@@ -28,3 +28,7 @@ The following fields are optional:
 A reaction file describes the biochemical reactions.  There is one reaction per line with fields separated by tabs.  The following fields are required:
 
 * id: Unique ID for the reaction in the format rxnNNNNN where NNNNN is a five digit number (e.g. rxn03789)
+* primary_name: Human readable reaction name
+* equation: Equation expressed in compound IDs
+* definition: Equation expressed in compound names
+* status: String describing status of the reaction where OK means valid, MI means there is a mass imbalance, CI means there is a charge imbalance, HI means there is a hydrogen imbalance.
