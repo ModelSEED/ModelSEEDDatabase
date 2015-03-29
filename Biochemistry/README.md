@@ -20,9 +20,16 @@ A compound file describes the compounds (or metabolites) involved in biochemical
 * formula: Standard chemical format using Hill format in protonated form to match reported charge
 * charge: Electric charge of compound
 
-The following fields are optional:
+What about the following fields?
 
-* aliases: List of IDs for duplicate, out-dated or otherwise repeated compounds
+* aliases: List of IDs for duplicate, out-dated or otherwise repeated compounds or ID of compound in other databases
+* abbreviation: Short name of compound
+* is_cofactor: True if the compound is a cofactor
+* deltaG: Change in free energy
+* deltaG_err: 
+* mass: Mass of compound (units?)
+* pkas: do not understand the definition of the array
+* pkbs: do not understand the definition of the array
 
 ## Reaction file format
 A reaction file describes the biochemical reactions.  There is one reaction per line with fields separated by tabs.  The following fields are required:
@@ -31,4 +38,12 @@ A reaction file describes the biochemical reactions.  There is one reaction per 
 * primary_name: Human readable reaction name
 * equation: Equation expressed in compound IDs
 * definition: Equation expressed in compound names
-* status: String describing status of the reaction where OK means valid, MI means there is a mass imbalance, CI means there is a charge imbalance, HI means there is a hydrogen imbalance.
+* status: String describing status of the reaction where OK means valid, MI means there is a mass imbalance, CI means there is a charge imbalance, HI means there is a hydrogen imbalance. Multiple values are delimited with a | character.
+
+What about the following fields?
+
+* aliases: List of IDs for duplicate, out-dated or otherwise repeated reactions or ID of reaction in other databases
+* abbreviation: Short name of reaction
+* deltaG: Change in free energy
+* deltaG_err:
+* reversibility: Need definition
