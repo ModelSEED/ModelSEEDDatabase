@@ -2,6 +2,7 @@
 
 import argparse
 import re
+from BiochemHelper import BiochemHelper
 
 desc1 = '''
 NAME
@@ -22,8 +23,9 @@ DESCRIPTION
       the absolute value of the charge from the compound is larger than the value,
       the charge is invalid.  The default value is 50.
 
-      When the --show-details optional argument is specified, details on each
-      duplicate or missing value are displayed.
+      When the --show-details optional argument is specified, details on all
+      problems are displayed.  When the other --show optional arguments are
+      specified, details on the corresponding type of problem are displayed.
 '''
 
 desc3 = '''
@@ -46,34 +48,30 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(formatter_class=argparse.RawDescriptionHelpFormatter, prog='Validate_Compounds', epilog=desc3)
     parser.add_argument('cpdfile', help='path to compounds file', action='store')
     parser.add_argument('--charge', help='flag compounds with charge larger than value', action='store', dest='charge', type=int, default=50)
-    parser.add_argument('--show-details', help='show details on problems', action='store_true', dest='showDetails', default=False)
+    parser.add_argument('--show-details', help='show details on all problems', action='store_true', dest='showDetails', default=False)
+    parser.add_argument('--show-dup-ids', help='show details on duplicate IDs', action='store_true', dest='showDupIds', default=False)
+    parser.add_argument('--show-bad-ids', help='show details on bad IDs', action='store_true', dest='showBadIds', default=False)
+    parser.add_argument('--show-dup-names', help='show details on duplicate names', action='store_true', dest='showDupNames', default=False)
+    parser.add_argument('--show-bad-names', help='show details on bad names', action='store_true', dest='showBadNames', default=False)
+    parser.add_argument('--show-formulas', help='show details on missing formulas', action='store_true', dest='showFormulas', default=False)
+    parser.add_argument('--show-charges', help='show details on invalid charges', action='store_true', dest='showCharges', default=False)
     usage = parser.format_usage()
     parser.description = desc1 + '      ' + usage + desc2
     parser.usage = argparse.SUPPRESS
     args = parser.parse_args()
 
-    # Read the compounds from the specified file.
-    compounds = list()
-    with open(args.cpdfile, 'r') as handle:
-        # The first line has the header with the field names.
-        fieldNames = handle.readline().strip().split('\t')
-        # @todo Validate required fields are in the header
-        
-        lineno = 1
-        for line in handle:
-            lineno += 1
-            fields = line.strip().split('\t')
-            if len(fields) < len(fieldNames):
-                print 'WARNING: Compound on line %d is missing one or more fields, %s' %(lineno, fields)
-                continue
-            cpd = dict()
-            cpd['id'] = fields[0]
-            cpd['name'] = fields[1]
-            cpd['formula'] = fields[2]
-            cpd['charge'] = int(fields[3])
-            cpd['lineno'] = lineno
-            compounds.append(cpd)
+    # The --show-details option turns on all of the detail options.
+    if args.showDetails:
+        args.showDupIds = True
+        args.showBadIds = True
+        args.showDupNames = True
+        args.showBadNames = True
+        args.showFormulas = True
+        args.showCharges = True
 
+    # Read the compounds from the specified file.
+    helper = BiochemHelper()
+    compounds = helper.readCompoundsFile(args.cpdfile)
     print 'Compound file: %s' %(args.cpdfile)
     print 'Number of compounds: %d' %(len(compounds))
 
@@ -134,34 +132,39 @@ if __name__ == "__main__":
     print
 
     # Print details if requested.
-    if args.showDetails:
+    if args.showDupIds:
         for id in idDict:
             if len(idDict[id]) > 1:
                 print 'Duplicate compound ID: %s' %(id)
                 for dup in idDict[id]:
                     print 'Line %05d: %s' %(compounds[dup]['lineno'], compounds[dup])
                 print
+    if args.showBadIds:
         if len(badIdChars) > 0:
             print 'Compounds with bad characters in ID:'
             for index in range(len(badIdChars)):
                 print 'Line %05d: %s' %(compounds[badIdChars[index]]['lineno'], compounds[badIdChars[index]])
             print
+    if args.showDupNames:
         for name in nameDict:
             if len(nameDict[name]) > 1:
                 print 'Duplicate compound name: %s' %(name)
                 for dup in nameDict[name]:
                     print 'Line %05d: %s' %(compounds[dup]['lineno'], compounds[dup])
                 print
+    if args.showBadNames:
         if len(badNameChars) > 0:
             print 'Compounds with bad characters in name:'
             for index in range(len(badNameChars)):
                 print 'Line %05d: %s' %(compounds[badNameChars[index]]['lineno'], compounds[badNameChars[index]])
             print
+    if args.showFormulas:
         if len(noFormula) > 0:
             print 'Compounds with no formula:'
             for index in range(len(noFormula)):
                 print 'Line %05d: %s' %(compounds[noFormula[index]]['lineno'], compounds[noFormula[index]])
             print
+    if args.showCharges:
         if len(largeCharge) > 0:
             print 'Compounds with charge larger than %d:' %(args.charge)
             for index in range(len(largeCharge)):
