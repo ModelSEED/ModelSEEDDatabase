@@ -65,7 +65,7 @@ class BiochemHelper:
             lineno = 1
             for line in handle:
                 lineno += 1
-                fields = line.strip().split('\t')
+                fields = line.strip('\n ').split('\t')
                 if len(fields) < len(fieldNames):
                     print 'WARNING: Reaction on line %d is missing one or more fields, %s' %(lineno, fields)
                     continue

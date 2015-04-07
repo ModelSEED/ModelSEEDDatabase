@@ -48,6 +48,7 @@ if __name__ == "__main__":
     parser.add_argument('--show-bad-ids', help='show details on bad IDs', action='store_true', dest='showBadIds', default=False)
     parser.add_argument('--show-dup-names', help='show details on duplicate names', action='store_true', dest='showDupNames', default=False)
     parser.add_argument('--show-bad-names', help='show details on bad names', action='store_true', dest='showBadNames', default=False)
+    parser.add_argument('--show-bad-eq', help='show details on missing reactants or products in equations', action='store_true', dest='showBadEquations', default=False)
     parser.add_argument('--show-status', help='show details on status types', action='store_true', dest='showStatus', default=False)
     usage = parser.format_usage()
     parser.description = desc1 + '      ' + usage + desc2
@@ -75,8 +76,10 @@ if __name__ == "__main__":
     nameDict = dict()
     duplicateName = 0
     badNameChars = list()
-    noEquation = 0
-    noDefinition = 0
+    noEquation = list()
+    noDefinition = list()
+    noReactants = list()
+    noProducts = list()
     statusTypes = dict()
     okStatus = 0
     for index in range(len(reactions)):
@@ -109,11 +112,18 @@ if __name__ == "__main__":
         except UnicodeDecodeError:
             badNameChars.append(index)
 
-        # Check for missing equation or definition.
-        if len(rxn['equation']) == 0:
-            noEquation += 1
-        if len(rxn['definition']) == 0:
-            noDefinition += 1
+        # Check for missing reactants and/or products.
+        reactants, products = helper.parseEquation(rxn['equation'])
+        if reactants is None and products is None:
+            noEquation.append(index)
+        if len(reactants) == 0:
+            noReactants.append(index)
+        if len(products) == 0:
+            noProducts.append(index)
+
+        reactants, products = helper.parseEquation(rxn['definition'])
+        if reactants is None and products is None:
+            noDefinition.append(index)
 
         # Check reaction status.
         if rxn['status'] == 'OK':
@@ -136,8 +146,10 @@ if __name__ == "__main__":
     print 'Number of reactions with bad characters in ID: %d' %(len(badIdChars))
     print 'Number of reactions with duplicate names: %d' %(duplicateName)
     print 'Number of reactions with bad characters in name: %d' %(len(badNameChars))
-    print 'Number of reactions with missing equation: %d' %(noEquation)
-    print 'Number of reactions with missing definition: %d' %(noDefinition)
+    print 'Number of reactions with missing equation: %d' %(len(noEquation))
+    print 'Number of reactions with missing definition: %d' %(len(noDefinition))
+    print 'Number of reactions with no reactants: %d' %(len(noReactants))
+    print 'Number of reactions with no products: %d' %(len(noProducts))
     print 'Number of reactions with OK status: %d' %(okStatus)
     print 'Number of reactions with error status: %d' %(len(reactions)-okStatus)
     print
@@ -168,6 +180,27 @@ if __name__ == "__main__":
             print 'reactions with bad characters in name:'
             for index in range(len(badNameChars)):
                 print 'Line %05d: %s' %(reactions[badNameChars[index]]['lineno'], reactions[badNameChars[index]])
+            print
+    if args.showBadEquations:
+        if len(noReactants) > 0:
+            print 'Reactions with no reactants:'
+            for index in range(len(noReactants)):
+                print 'Line %05d: %s' %(reactions[noReactants[index]]['lineno'], reactions[noReactants[index]])
+            print
+        if len(noProducts) > 0:
+            print 'Reactions with no products:'
+            for index in range(len(noProducts)):
+                print 'Line %05d: %s' %(reactions[noProducts[index]]['lineno'], reactions[noProducts[index]])
+            print
+        if len(noEquation) > 0:
+            print 'Reactions with no equation:'
+            for index in range(len(noEquation)):
+                print 'Line %05d: %s' %(reactions[noEquation[index]]['lineno'], reactions[noEquation[index]])
+            print
+        if len(noDefinition) > 0:
+            print 'Reactions with no definition:'
+            for index in range(len(noDefinition)):
+                print 'Line %05d: %s' %(reactions[noDefinition[index]]['lineno'], reactions[noDefinition[index]])
             print
     if args.showStatus:
         for type in statusTypes:
