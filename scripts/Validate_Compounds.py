@@ -137,38 +137,38 @@ if __name__ == "__main__":
             if len(idDict[id]) > 1:
                 print 'Duplicate compound ID: %s' %(id)
                 for dup in idDict[id]:
-                    print 'Line %05d: %s' %(compounds[dup]['lineno'], compounds[dup])
+                    print 'Line %05d: %s' %(compounds[dup]['linenum'], compounds[dup])
                 print
     if args.showBadIds:
         if len(badIdChars) > 0:
             print 'Compounds with bad characters in ID:'
             for index in range(len(badIdChars)):
-                print 'Line %05d: %s' %(compounds[badIdChars[index]]['lineno'], compounds[badIdChars[index]])
+                print 'Line %05d: %s' %(compounds[badIdChars[index]]['linenum'], compounds[badIdChars[index]])
             print
     if args.showDupNames:
         for name in nameDict:
             if len(nameDict[name]) > 1:
                 print 'Duplicate compound name: %s' %(name)
                 for dup in nameDict[name]:
-                    print 'Line %05d: %s' %(compounds[dup]['lineno'], compounds[dup])
+                    print 'Line %05d: %s' %(compounds[dup]['linenum'], compounds[dup])
                 print
     if args.showBadNames:
         if len(badNameChars) > 0:
             print 'Compounds with bad characters in name:'
             for index in range(len(badNameChars)):
-                print 'Line %05d: %s' %(compounds[badNameChars[index]]['lineno'], compounds[badNameChars[index]])
+                print 'Line %05d: %s' %(compounds[badNameChars[index]]['linenum'], compounds[badNameChars[index]])
             print
     if args.showFormulas:
         if len(noFormula) > 0:
             print 'Compounds with no formula:'
             for index in range(len(noFormula)):
-                print 'Line %05d: %s' %(compounds[noFormula[index]]['lineno'], compounds[noFormula[index]])
+                print 'Line %05d: %s' %(compounds[noFormula[index]]['linenum'], compounds[noFormula[index]])
             print
     if args.showCharges:
         if len(largeCharge) > 0:
             print 'Compounds with charge larger than %d:' %(args.charge)
             for index in range(len(largeCharge)):
-                print 'Line %05d: %s' %(compounds[largeCharge[index]]['lineno'], compounds[largeCharge[index]])
+                print 'Line %05d: %s' %(compounds[largeCharge[index]]['linenum'], compounds[largeCharge[index]])
             print
 
     exit(0)

@@ -160,47 +160,47 @@ if __name__ == "__main__":
             if len(idDict[id]) > 1:
                 print 'Duplicate reaction ID: %s' %(id)
                 for dup in idDict[id]:
-                    print 'Line %05d: %s' %(reactions[dup]['lineno'], reactions[dup])
+                    print 'Line %05d: %s' %(reactions[dup]['linenum'], reactions[dup])
                 print
     if args.showBadIds:
         if len(badIdChars) > 0:
             print 'reactions with bad characters in ID:'
             for index in range(len(badIdChars)):
-                print 'Line %05d: %s' %(reactions[badIdChars[index]]['lineno'], reactions[badIdChars[index]])
+                print 'Line %05d: %s' %(reactions[badIdChars[index]]['linenum'], reactions[badIdChars[index]])
             print
     if args.showDupNames:
         for name in nameDict:
             if len(nameDict[name]) > 1:
                 print 'Duplicate reaction name: %s' %(name)
                 for dup in nameDict[name]:
-                    print 'Line %05d: %s' %(reactions[dup]['lineno'], reactions[dup])
+                    print 'Line %05d: %s' %(reactions[dup]['linenum'], reactions[dup])
                 print
     if args.showBadNames:
         if len(badNameChars) > 0:
             print 'reactions with bad characters in name:'
             for index in range(len(badNameChars)):
-                print 'Line %05d: %s' %(reactions[badNameChars[index]]['lineno'], reactions[badNameChars[index]])
+                print 'Line %05d: %s' %(reactions[badNameChars[index]]['linenum'], reactions[badNameChars[index]])
             print
     if args.showBadEquations:
         if len(noReactants) > 0:
             print 'Reactions with no reactants:'
             for index in range(len(noReactants)):
-                print 'Line %05d: %s' %(reactions[noReactants[index]]['lineno'], reactions[noReactants[index]])
+                print 'Line %05d: %s' %(reactions[noReactants[index]]['linenum'], reactions[noReactants[index]])
             print
         if len(noProducts) > 0:
             print 'Reactions with no products:'
             for index in range(len(noProducts)):
-                print 'Line %05d: %s' %(reactions[noProducts[index]]['lineno'], reactions[noProducts[index]])
+                print 'Line %05d: %s' %(reactions[noProducts[index]]['linenum'], reactions[noProducts[index]])
             print
         if len(noEquation) > 0:
             print 'Reactions with no equation:'
             for index in range(len(noEquation)):
-                print 'Line %05d: %s' %(reactions[noEquation[index]]['lineno'], reactions[noEquation[index]])
+                print 'Line %05d: %s' %(reactions[noEquation[index]]['linenum'], reactions[noEquation[index]])
             print
         if len(noDefinition) > 0:
             print 'Reactions with no definition:'
             for index in range(len(noDefinition)):
-                print 'Line %05d: %s' %(reactions[noDefinition[index]]['lineno'], reactions[noDefinition[index]])
+                print 'Line %05d: %s' %(reactions[noDefinition[index]]['linenum'], reactions[noDefinition[index]])
             print
     if args.showStatus:
         for type in statusTypes:

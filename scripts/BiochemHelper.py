@@ -11,13 +11,14 @@ class BiochemHelper:
 
         pass
 
-    def readCompoundsFile(self, path):
+    def readCompoundsFile(self, path, includeLinenum=True):
         ''' Read the contents of a compounds file.
     
             There is one compound per line in the file with fields separated by tabs.
             The first line of the file is a header with the field names.
     
             @param path: Path to compounds file
+            @param includeLinenum: When True, include line number in dictionary
             @return List of compound dictionaries.
         '''
     
@@ -25,22 +26,30 @@ class BiochemHelper:
         compounds = list()
         with open(path, 'r') as handle:
             # The first line has the header with the field names.
-            fieldNames = handle.readline().strip().split('\t')
-            # @todo Validate required fields are in the header
+            nameList = handle.readline().strip().split('\t')
+            fieldNames = dict()
+            for index in range(len(nameList)):
+                fieldNames[nameList[index]] = index
+            required = { 'id', 'name', 'abbreviation', 'formula', 'charge', 'isCofactor' }
+            for req in required:
+                if req not in fieldNames:
+                    print 'WARNING: Required field %s is missing from header' %(req)
+                    return None
             
-            lineno = 1
+            linenum = 1
             for line in handle:
-                lineno += 1
+                linenum += 1
                 fields = line.strip().split('\t')
                 if len(fields) < len(fieldNames):
-                    print 'WARNING: Compound on line %d is missing one or more fields, %s' %(lineno, fields)
+                    print 'WARNING: Compound on line %d is missing one or more fields, %s' %(linenum, fields)
                     continue
                 cpd = dict()
-                cpd['id'] = fields[0]
-                cpd['name'] = fields[1]
-                cpd['formula'] = fields[2]
-                cpd['charge'] = int(fields[3])
-                cpd['lineno'] = lineno
+                cpd['id'] = fields[fieldNames['id']]
+                cpd['name'] = fields[fieldNames['name']]
+                cpd['formula'] = fields[fieldNames['formula']]
+                cpd['charge'] = int(fields[fieldNames['charge']])
+                if includeLinenum:
+                    cpd['linenum'] = linenum
                 compounds.append(cpd)
     
         return compounds
@@ -62,12 +71,12 @@ class BiochemHelper:
             fieldNames = handle.readline().strip().split('\t')
             # @todo Validate required fields are in the header
             
-            lineno = 1
+            linenum = 1
             for line in handle:
-                lineno += 1
+                linenum += 1
                 fields = line.strip('\n ').split('\t')
                 if len(fields) < len(fieldNames):
-                    print 'WARNING: Reaction on line %d is missing one or more fields, %s' %(lineno, fields)
+                    print 'WARNING: Reaction on line %d is missing one or more fields, %s' %(linenum, fields)
                     continue
                 rxn = dict()
                 rxn['id'] = fields[0]
@@ -75,7 +84,7 @@ class BiochemHelper:
                 rxn['equation'] = fields[2]
                 rxn['definition'] = fields[3]
                 rxn['status'] = fields[4]
-                rxn['lineno'] = lineno
+                rxn['linenum'] = linenum
                 reactions.append(rxn)
     
         return reactions

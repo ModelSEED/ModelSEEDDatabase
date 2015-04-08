@@ -122,24 +122,24 @@ if __name__ == "__main__":
         if len(diffNames) > 0:
             print 'Compounds with different names:'
             for cpdId in diffNames:
-                print '1: line %05d: %s' %(firstCompounds[cpdId]['lineno'], firstCompounds[cpdId])
-                print '2: line %05d: %s' %(secondCompounds[cpdId]['lineno'], secondCompounds[cpdId])
+                print '1: line %05d: %s' %(firstCompounds[cpdId]['linenum'], firstCompounds[cpdId])
+                print '2: line %05d: %s' %(secondCompounds[cpdId]['linenum'], secondCompounds[cpdId])
                 print
 
     if args.showFormulas:
         if len(diffFormulas) > 0:
             print 'Compounds with different formulas:'
             for cpdId in diffFormulas:
-                print '1: line %05d: %s' %(firstCompounds[cpdId]['lineno'], firstCompounds[cpdId])
-                print '2: line %05d: %s' %(secondCompounds[cpdId]['lineno'], secondCompounds[cpdId])
+                print '1: line %05d: %s' %(firstCompounds[cpdId]['linenum'], firstCompounds[cpdId])
+                print '2: line %05d: %s' %(secondCompounds[cpdId]['linenum'], secondCompounds[cpdId])
                 print
 
     if args.showCharges:
         if len(diffCharges) > 0:
             print 'Compounds with different charges:'
             for cpdId in diffCharges:
-                print '1: line %05d: %s' %(firstCompounds[cpdId]['lineno'], firstCompounds[cpdId])
-                print '2: line %05d: %s' %(secondCompounds[cpdId]['lineno'], secondCompounds[cpdId])
+                print '1: line %05d: %s' %(firstCompounds[cpdId]['linenum'], firstCompounds[cpdId])
+                print '2: line %05d: %s' %(secondCompounds[cpdId]['linenum'], secondCompounds[cpdId])
                 print
 
     exit(0)

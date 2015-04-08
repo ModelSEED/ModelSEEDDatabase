@@ -32,12 +32,18 @@ $FBAImpl->_setContext(undef,{auth=>$AToken});
 my $ws="kbase";
 my $bioObj = $FBAImpl->_get_msobject("Biochemistry",$ws,"default");
 open(OUT, "> ../Biochemistry/compounds.default.tsv");
-print OUT "id\tprimary_name\tformula\tcharge\n";
-print OUT join("\n", map { $_->id()."\t".$_->name()."\t".$_->formula()."\t".$_->defaultCharge() } @{$bioObj->compounds()}),"\n";
+print OUT "id\tname\tabbreviation\tformula\tcharge\tisCofactor\n";
+print OUT join("\n", map { $_->id()."\t".$_->name()."\t".$_->abbreviation()."\t".$_->formula()."\t".$_->defaultCharge()."\t".$_->isCofactor() } @{$bioObj->compounds()}),"\n";
 close OUT;
 
 $bioObj = $FBAImpl->_get_msobject("Biochemistry",$ws,"plantdefault");
 open(OUT, "> ../Biochemistry/compounds.plantdefault.tsv");
-print OUT "id\tprimary_name\tformula\tcharge\n";
-print OUT join("\n", map { $_->id()."\t".$_->name()."\t".$_->formula()."\t".$_->defaultCharge() } @{$bioObj->compounds()}),"\n";
+print OUT "id\tname\tabbreviation\tformula\tcharge\tisCofactor\n";
+print OUT join("\n", map { $_->id()."\t".$_->name()."\t".$_->abbreviation()."\t".$_->formula()."\t".$_->defaultCharge()."\t".$_->isCofactor() } @{$bioObj->compounds()}),"\n";
+close OUT;
+
+$bioObj = $FBAImpl->_get_msobject("Biochemistry",$ws,"plantdefault_obs");
+open(OUT, "> ../Biochemistry/compounds.plantdefault_obs.tsv");
+print OUT "id\tname\tabbreviation\tformula\tcharge\tisCofactor\n";
+print OUT join("\n", map { $_->id()."\t".$_->name()."\t".$_->abbreviation()."\t".$_->formula()."\t".$_->defaultCharge()."\t".$_->isCofactor() } @{$bioObj->compounds()}),"\n";
 close OUT;

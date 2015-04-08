@@ -143,24 +143,24 @@ if __name__ == "__main__":
         if len(diffNames) > 0:
             print 'Reactions with different names:'
             for rxnId in diffNames:
-                print '1: line %05d: %s' %(firstReactions[rxnId]['lineno'], firstReactions[rxnId])
-                print '2: line %05d: %s' %(secondReactions[rxnId]['lineno'], secondReactions[rxnId])
+                print '1: line %05d: %s' %(firstReactions[rxnId]['linenum'], firstReactions[rxnId])
+                print '2: line %05d: %s' %(secondReactions[rxnId]['linenum'], secondReactions[rxnId])
                 print
 
     if args.showStatus:
         if len(diffStatus) > 0:
             print 'Reactions with different status:'
             for rxnId in diffStatus:
-                print '1: line %05d: %s' %(firstReactions[rxnId]['lineno'], firstReactions[rxnId])
-                print '2: line %05d: %s' %(secondReactions[rxnId]['lineno'], secondReactions[rxnId])
+                print '1: line %05d: %s' %(firstReactions[rxnId]['linenum'], firstReactions[rxnId])
+                print '2: line %05d: %s' %(secondReactions[rxnId]['linenum'], secondReactions[rxnId])
                 print
 
     if args.showStoich:
         if len(diffStoich) > 0:
             print 'Reactions with different stoichiometry:'
             for rxnId in diffStoich:
-                print '1: line %05d: %s' %(firstReactions[rxnId]['lineno'], firstReactions[rxnId])
-                print '2: line %05d: %s' %(secondReactions[rxnId]['lineno'], secondReactions[rxnId])
+                print '1: line %05d: %s' %(firstReactions[rxnId]['linenum'], firstReactions[rxnId])
+                print '2: line %05d: %s' %(secondReactions[rxnId]['linenum'], secondReactions[rxnId])
                 print
 
     exit(0)
