@@ -53,8 +53,11 @@ if __name__ == "__main__":
     parser.add_argument('--show-bad-ids', help='show details on bad IDs', action='store_true', dest='showBadIds', default=False)
     parser.add_argument('--show-dup-names', help='show details on duplicate names', action='store_true', dest='showDupNames', default=False)
     parser.add_argument('--show-bad-names', help='show details on bad names', action='store_true', dest='showBadNames', default=False)
+    parser.add_argument('--show-dup-abbrs', help='show details on duplicate abbreviations', action='store_true', dest='showDupAbbrs', default=False)
+    parser.add_argument('--show-bad-abbrs', help='show details on bad abbreviations', action='store_true', dest='showBadAbbrs', default=False)
     parser.add_argument('--show-formulas', help='show details on missing formulas', action='store_true', dest='showFormulas', default=False)
     parser.add_argument('--show-charges', help='show details on invalid charges', action='store_true', dest='showCharges', default=False)
+    parser.add_argument('--show-cofactors', help='show details on invalid cofactors', action='store_true', dest='showCofactors', default=False)
     usage = parser.format_usage()
     parser.description = desc1 + '      ' + usage + desc2
     parser.usage = argparse.SUPPRESS
@@ -66,8 +69,11 @@ if __name__ == "__main__":
         args.showBadIds = True
         args.showDupNames = True
         args.showBadNames = True
+        args.showDupAbbrs = True
+        args.showBadAbbrs = True
         args.showFormulas = True
         args.showCharges = True
+        args.showCofactors = True
 
     # Read the compounds from the specified file.
     helper = BiochemHelper()
@@ -82,8 +88,13 @@ if __name__ == "__main__":
     nameDict = dict()
     duplicateName = 0
     badNameChars = list()
+    abbrDict = dict()
+    duplicateAbbr = 0
+    badAbbrChars = list()
     noFormula = list()
     largeCharge = list()
+    badCofactor = list()
+    numCofactors = 0
     for index in range(len(compounds)):
         cpd = compounds[index]
         
@@ -114,6 +125,20 @@ if __name__ == "__main__":
         except UnicodeDecodeError:
             badNameChars.append(index)
 
+        # Check for duplicate abbreviations.
+        if cpd['abbreviation'] in abbrDict:
+            if len(abbrDict[cpd['abbreviation']]) == 1:
+                duplicateAbbr += 1
+            abbrDict[cpd['abbreviation']].append(index)
+        else:
+            abbrDict[cpd['abbreviation']] = [ index ]
+
+        # Check for invalid characters in the abbreviation.
+        try:
+            cpd['abbreviation'].decode('ascii')
+        except UnicodeDecodeError:
+            badAbbrChars.append(index)
+
         # Check for missing or unknown formulas.
         if cpd['formula'] == '' or cpd['formula'] == 'noformula' or cpd['formula'] == 'unknown':
             noFormula.append(index)
@@ -122,13 +147,23 @@ if __name__ == "__main__":
         if abs(cpd['charge']) > args.charge:
             largeCharge.append(index)
 
+        # Check for invalid isCofactor flags.
+        if cpd['isCofactor'] != 0 and cpd['isCofactor'] != 1:
+            badCofactor.append(index)
+        if cpd['isCofactor'] == 1:
+            numCofactors += 1
+
     # Print summary data.
     print 'Number of compounds with duplicate IDs: %d' %(duplicateId)    
     print 'Number of compounds with bad characters in ID: %d' %(len(badIdChars))
     print 'Number of compounds with duplicate names: %d' %(duplicateName)
     print 'Number of compounds with bad characters in name: %d' %(len(badNameChars))
+    print 'Number of compounds with duplicate abbreviations: %d' %(duplicateAbbr)
+    print 'Number of compounds with bad characters in abbreviation: %d' %(len(badAbbrChars))
     print 'Number of compounds with no formula: %d' %(len(noFormula))
     print 'Number of compounds with charge larger than %d: %d' %(args.charge, len(largeCharge))
+    print 'Number of compounds with bad isCofactor flag: %d' %(len(badCofactor))
+    print 'Number of compounds flagged as cofactor: %d' %(numCofactors)
     print
 
     # Print details if requested.
@@ -158,6 +193,19 @@ if __name__ == "__main__":
             for index in range(len(badNameChars)):
                 print 'Line %05d: %s' %(compounds[badNameChars[index]]['linenum'], compounds[badNameChars[index]])
             print
+    if args.showDupAbbrs:
+        for abbr in abbrDict:
+            if len(abbrDict[abbr]) > 1:
+                print 'Duplicate compound abbreviation: %s' %(abbr)
+                for dup in abbrDict[abbr]:
+                    print 'Line %05d: %s' %(compounds[dup]['linenum'], compounds[dup])
+                print
+    if args.showBadAbbrs:
+        if len(badAbbrChars) > 0:
+            print 'Compounds with bad characters in abbreviation:'
+            for index in range(len(badAbbrChars)):
+                print 'Line %05d: %s' %(compounds[badAbbrChars[index]]['linenum'], compounds[badAbbrChars[index]])
+            print
     if args.showFormulas:
         if len(noFormula) > 0:
             print 'Compounds with no formula:'
@@ -169,6 +217,12 @@ if __name__ == "__main__":
             print 'Compounds with charge larger than %d:' %(args.charge)
             for index in range(len(largeCharge)):
                 print 'Line %05d: %s' %(compounds[largeCharge[index]]['linenum'], compounds[largeCharge[index]])
+            print
+    if args.showCofactors:
+        if len(badCofactor) > 0:
+            print 'Compounds with bad isCofactor flag:'
+            for index in range(len(badCofactor)):
+                print 'Line %05d: %s' %(compounds[badCofactor[index]]['linenum'], compounds[badCofactor[index]])
             print
 
     exit(0)
