@@ -15,21 +15,21 @@ See the scripts folder for commands to compile the tables into typed objects.
 ## Compound file format
 A compound file describes the compounds (or metabolites) involved in biochemical reactions.  There is one compound per line with fields separated by tabs.  The following fields are required.
 
-* id: Unique ID for the compound in the format cpdNNNNN where NNNNN is a five digit number (e.g. cpd00001)
-* primary_name: Human readable compound name
-* formula: Standard chemical format using Hill format in protonated form to match reported charge
-* charge: Electric charge of compound
+* **id**: Unique ID for the compound in the format cpdNNNNN where NNNNN is a five digit number (e.g. cpd00001)
+* **name**: Human readable long name of compound
+* **abbreviation**: Short name of compound
+* **formula**: Standard chemical format (using Hill system) in protonated form to match reported charge
+* **charge**: Electric charge of compound
+* **isCofactor**: True if the compound is a cofactor
 
-What about the following fields?
+The following fields are optional.
 
-* aliases: List of IDs for duplicate, out-dated or otherwise repeated compounds or ID of compound in other databases
-* abbreviation: Short name of compound
-* is_cofactor: True if the compound is a cofactor
-* deltaG: Change in free energy
-* deltaG_err: 
-* mass: Mass of compound (units?)
-* pkas: do not understand the definition of the array
-* pkbs: do not understand the definition of the array
+* **aliases**: List of IDs for duplicate, out-dated or otherwise repeated compounds or ID of compound in other databases
+* **deltaG**: Change in free energy
+* **deltaG_err**: 
+* **mass**: Mass of compound (units?)
+* **pkas**: do not understand the definition of the array
+* **pkbs**: do not understand the definition of the array
 
 ## Reaction file format
 A reaction file describes the biochemical reactions.  There is one reaction per line with fields separated by tabs.  The following fields are required:
