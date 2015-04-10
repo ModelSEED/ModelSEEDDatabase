@@ -26,6 +26,11 @@ DESCRIPTION
       When the --show-details optional argument is specified, details on all
       problems are displayed.  When the other --show optional arguments are
       specified, details on the corresponding type of problem are displayed.
+
+      When the --fix-dup-names optional argument is specified, duplicate names
+      are fixed by appending the string " (dupN)" to the name and abbreviation
+      of duplicate compounds (where N is a number starting with 2).  The compounds
+      file is rewritten with the fixed data.
 '''
 
 desc3 = '''
@@ -58,6 +63,7 @@ if __name__ == "__main__":
     parser.add_argument('--show-formulas', help='show details on missing formulas', action='store_true', dest='showFormulas', default=False)
     parser.add_argument('--show-charges', help='show details on invalid charges', action='store_true', dest='showCharges', default=False)
     parser.add_argument('--show-cofactors', help='show details on invalid cofactors', action='store_true', dest='showCofactors', default=False)
+    parser.add_argument('--fix-dup-names', help='fix on duplicate names', action='store_true', dest='fixDupNames', default=False)
     usage = parser.format_usage()
     parser.description = desc1 + '      ' + usage + desc2
     parser.usage = argparse.SUPPRESS
@@ -224,5 +230,24 @@ if __name__ == "__main__":
             for index in range(len(badCofactor)):
                 print 'Line %05d: %s' %(compounds[badCofactor[index]]['linenum'], compounds[badCofactor[index]])
             print
+
+    if args.fixDupNames:
+        for name in nameDict:
+            if len(nameDict[name]) > 1:
+                for index in range(1,len(nameDict[name])): # Leave the first duplicate unchanged
+                    dup = nameDict[name][index]
+                    compounds[dup]['name'] += ' (dup%d)' %(index+1)
+                    compounds[dup]['abbreviation'] = compounds[dup]['name']
+                    if compounds[dup]['formula'] != compounds[nameDict[name][0]]['formula']:
+                        print 'WARNING: formula mismatch'
+                        print 'Line %05d: %s' %(compounds[nameDict[name][0]]['linenum'], compounds[nameDict[name][0]])
+                        print 'Line %05d: %s' %(compounds[dup]['linenum'], compounds[dup])
+
+        with open(args.cpdfile, 'w') as handle:
+            handle.write('id\tname\tabbreviation\tformula\tcharge\tisCofactor\n')
+            for index in range(len(compounds)):
+                cpd = compounds[index]
+                line = '%s\t%s\t%s\t%s\t%d\t%d\n' %(cpd['id'], cpd['name'], cpd['abbreviation'], cpd['formula'], cpd['charge'], cpd['isCofactor'])
+                handle.write(line)
 
     exit(0)
