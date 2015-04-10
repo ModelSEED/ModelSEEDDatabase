@@ -48,7 +48,7 @@ class BiochemHelper:
                 cpd['name'] = fields[fieldNames['name']]
                 cpd['abbreviation'] = fields[fieldNames['abbreviation']]
                 cpd['formula'] = fields[fieldNames['formula']]
-                cpd['charge'] = int(fields[fieldNames['charge']])
+                cpd['defaultCharge'] = int(fields[fieldNames['charge']])
                 cpd['isCofactor'] = int(fields[fieldNames['isCofactor']])
                 if includeLinenum:
                     cpd['linenum'] = linenum

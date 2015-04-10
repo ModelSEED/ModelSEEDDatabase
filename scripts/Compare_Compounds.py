@@ -94,7 +94,7 @@ if __name__ == "__main__":
             different.add(cpdId)
         
         # Find compounds with different charges.
-        if firstCompounds[cpdId]['charge'] != secondCompounds[cpdId]['charge']:
+        if firstCompounds[cpdId]['defaultCharge'] != secondCompounds[cpdId]['defaultCharge']:
             diffCharges.add(cpdId)
             different.add(cpdId)
             

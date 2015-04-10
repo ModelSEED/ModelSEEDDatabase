@@ -150,7 +150,7 @@ if __name__ == "__main__":
             noFormula.append(index)
 
         # Check for charges that are too big.
-        if abs(cpd['charge']) > args.charge:
+        if abs(cpd['defaultCharge']) > args.charge:
             largeCharge.append(index)
 
         # Check for invalid isCofactor flags.
@@ -247,7 +247,7 @@ if __name__ == "__main__":
             handle.write('id\tname\tabbreviation\tformula\tcharge\tisCofactor\n')
             for index in range(len(compounds)):
                 cpd = compounds[index]
-                line = '%s\t%s\t%s\t%s\t%d\t%d\n' %(cpd['id'], cpd['name'], cpd['abbreviation'], cpd['formula'], cpd['charge'], cpd['isCofactor'])
+                line = '%s\t%s\t%s\t%s\t%d\t%d\n' %(cpd['id'], cpd['name'], cpd['abbreviation'], cpd['formula'], cpd['defaultCharge'], cpd['isCofactor'])
                 handle.write(line)
 
     exit(0)
