@@ -56,13 +56,14 @@ class BiochemHelper:
     
         return compounds
     
-    def readReactionsFile(self, path):
+    def readReactionsFile(self, path, includeLinenum=True):
         ''' Read the contents of a reactions file.
     
             There is one reaction per line in the file with fields separated by tabs.
             The first line of the file is a header with the field names.
     
             @param path: Path to reactions file
+            @param includeLinenum: When True, include line number in dictionary
             @return List of reaction dictionaries.
         '''
     
@@ -70,9 +71,16 @@ class BiochemHelper:
         reactions = list()
         with open(path, 'r') as handle:
             # The first line has the header with the field names.
-            fieldNames = handle.readline().strip().split('\t')
-            # @todo Validate required fields are in the header
-            
+            nameList = handle.readline().strip().split('\t')
+            fieldNames = dict()
+            for index in range(len(nameList)):
+                fieldNames[nameList[index]] = index
+            required = { 'id', 'name', 'abbreviation', 'direction', 'thermoReversibility', 'status', 'defaultProtons', 'equation' }
+            for req in required:
+                if req not in fieldNames:
+                    print 'WARNING: Required field %s is missing from header' %(req)
+                    return None
+
             linenum = 1
             for line in handle:
                 linenum += 1
@@ -81,12 +89,16 @@ class BiochemHelper:
                     print 'WARNING: Reaction on line %d is missing one or more fields, %s' %(linenum, fields)
                     continue
                 rxn = dict()
-                rxn['id'] = fields[0]
-                rxn['name'] = fields[1]
-                rxn['equation'] = fields[2]
-                rxn['definition'] = fields[3]
-                rxn['status'] = fields[4]
-                rxn['linenum'] = linenum
+                rxn['id'] = fields[fieldNames['id']]
+                rxn['name'] = fields[fieldNames['name']]
+                rxn['abbreviation'] = fields[fieldNames['abbreviation']]
+                rxn['direction'] = fields[fieldNames['direction']]
+                rxn['thermoReversibility'] = fields[fieldNames['thermoReversibility']]
+                rxn['status'] = fields[fieldNames['status']]
+                rxn['defaultProtons'] = int(fields[fieldNames['defaultProtons']])
+                rxn['equation'] = fields[fieldNames['equation']]
+                if includeLinenum:
+                    rxn['linenum'] = linenum
                 reactions.append(rxn)
     
         return reactions

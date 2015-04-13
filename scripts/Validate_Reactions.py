@@ -48,7 +48,12 @@ if __name__ == "__main__":
     parser.add_argument('--show-bad-ids', help='show details on bad IDs', action='store_true', dest='showBadIds', default=False)
     parser.add_argument('--show-dup-names', help='show details on duplicate names', action='store_true', dest='showDupNames', default=False)
     parser.add_argument('--show-bad-names', help='show details on bad names', action='store_true', dest='showBadNames', default=False)
+    parser.add_argument('--show-dup-abbrs', help='show details on duplicate abbreviations', action='store_true', dest='showDupAbbrs', default=False)
+    parser.add_argument('--show-bad-abbrs', help='show details on bad abbreviations', action='store_true', dest='showBadAbbrs', default=False)
+    parser.add_argument('--show-bad-direction', help='show details on bad directions', action='store_true', dest='showBadDirection', default=False)
+    parser.add_argument('--show-bad-reverse', help='show details on bad reversibility', action='store_true', dest='showBadReverse', default=False)
     parser.add_argument('--show-bad-eq', help='show details on missing reactants or products in equations', action='store_true', dest='showBadEquations', default=False)
+    parser.add_argument('--show-protons', help='show details on default proton values', action='store_true', dest='showProtons', default=False)
     parser.add_argument('--show-status', help='show details on status types', action='store_true', dest='showStatus', default=False)
     usage = parser.format_usage()
     parser.description = desc1 + '      ' + usage + desc2
@@ -76,6 +81,13 @@ if __name__ == "__main__":
     nameDict = dict()
     duplicateName = 0
     badNameChars = list()
+    abbrDict = dict()
+    duplicateAbbr = 0
+    badAbbrChars = list()
+    badDirection = list()
+    badReversibility = list()
+    unknownReversibility = list()
+    protons = dict()
     noEquation = list()
     noDefinition = list()
     noReactants = list()
@@ -112,18 +124,49 @@ if __name__ == "__main__":
         except UnicodeDecodeError:
             badNameChars.append(index)
 
+        # Check for duplicate abbreviations.
+        if rxn['abbreviation'] in abbrDict:
+            if len(abbrDict[rxn['abbreviation']]) == 1:
+                duplicateAbbr += 1
+            abbrDict[rxn['abbreviation']].append(index)
+        else:
+            abbrDict[rxn['abbreviation']] = [ index ]
+
+        # Check for invalid characters in the abbreviation.
+        try:
+            rxn['abbreviation'].decode('ascii')
+        except UnicodeDecodeError:
+            badAbbrChars.append(index)
+
+        # Check for invalid direction.
+        if rxn['direction'] != '<' and rxn['direction'] != '>' and rxn['direction'] != '=':
+            badDirection.append(index)
+
+        # Check for unknown or invalid reversibility.
+        if rxn['thermoReversibility'] == '?':
+            unknownReversibility.append(index)
+        elif rxn['thermoReversibility'] != '<' and rxn['thermoReversibility'] != '>' and rxn['thermoReversibility'] != '=':
+            badReversibility.append(index)
+
+        # Check defaultProtons value.
+        if rxn['defaultProtons'] in protons:
+            protons[rxn['defaultProtons']] += 1
+        else:
+            protons[rxn['defaultProtons']] = 1
+
         # Check for missing reactants and/or products.
         reactants, products = helper.parseEquation(rxn['equation'])
         if reactants is None and products is None:
             noEquation.append(index)
-        if len(reactants) == 0:
-            noReactants.append(index)
-        if len(products) == 0:
-            noProducts.append(index)
+        else:
+            if len(reactants) == 0:
+                noReactants.append(index)
+            if len(products) == 0:
+                noProducts.append(index)
 
-        reactants, products = helper.parseEquation(rxn['definition'])
-        if reactants is None and products is None:
-            noDefinition.append(index)
+#         reactants, products = helper.parseEquation(rxn['definition'])
+#         if reactants is None and products is None:
+#             noDefinition.append(index)
 
         # Check reaction status.
         if rxn['status'] == 'OK':
@@ -146,8 +189,14 @@ if __name__ == "__main__":
     print 'Number of reactions with bad characters in ID: %d' %(len(badIdChars))
     print 'Number of reactions with duplicate names: %d' %(duplicateName)
     print 'Number of reactions with bad characters in name: %d' %(len(badNameChars))
+    print 'Number of reactions with duplicate abbreviations: %d' %(duplicateAbbr)
+    print 'Number of reactions with bad characters in abbreviation: %d' %(len(badAbbrChars))
+    print 'Number of reactions with bad direction: %d' %(len(badDirection))
+    print 'Number of reactions with bad thermoReversibility: %d' %(len(badReversibility))
+    print 'Number of reactions with unknown thermoReversibility: %d' %(len(unknownReversibility))
+    print 'Number of reactions with 0 default protons: %d' %(protons[0])
     print 'Number of reactions with missing equation: %d' %(len(noEquation))
-    print 'Number of reactions with missing definition: %d' %(len(noDefinition))
+#    print 'Number of reactions with missing definition: %d' %(len(noDefinition))
     print 'Number of reactions with no reactants: %d' %(len(noReactants))
     print 'Number of reactions with no products: %d' %(len(noProducts))
     print 'Number of reactions with OK status: %d' %(okStatus)
@@ -181,6 +230,40 @@ if __name__ == "__main__":
             for index in range(len(badNameChars)):
                 print 'Line %05d: %s' %(reactions[badNameChars[index]]['linenum'], reactions[badNameChars[index]])
             print
+    if args.showDupAbbrs:
+        for abbr in abbrDict:
+            if len(abbrDict[abbr]) > 1:
+                print 'Duplicate reaction abbreviation: %s' %(abbr)
+                for dup in abbrDict[abbr]:
+                    print 'Line %05d: %s' %(reactions[dup]['linenum'], reactions[dup])
+                print
+    if args.showBadAbbrs:
+        if len(badAbbrChars) > 0:
+            print 'Reactions with bad characters in abbreviation:'
+            for index in range(len(badAbbrChars)):
+                print 'Line %05d: %s' %(reactions[badAbbrChars[index]]['linenum'], reactions[badAbbrChars[index]])
+            print
+    if args.showBadDirection:
+        if len(badDirection) > 0:
+            print 'Reactions with bad value in direction:'
+            for index in range(len(badDirection)):
+                print 'Line %05d: %s' %(reactions[badDirection[index]]['linenum'], reactions[badDirection[index]])
+            print
+    if args.showBadReverse:
+        if len(badReversibility) > 0:
+            print 'Reactions with bad value in thermoReversibility:'
+            for index in range(len(badReversibility)):
+                print 'Line %05d: %s' %(reactions[badReversibility[index]]['linenum'], reactions[badReversibility[index]])
+            print
+        if len(unknownReversibility) > 0:
+            print 'Reactions with unknown thermoReversibility:'
+            for index in range(len(unknownReversibility)):
+                print 'Line %05d: %s' %(reactions[unknownReversibility[index]]['linenum'], reactions[unknownReversibility[index]])
+            print
+    if args.showProtons:
+        for key in protons:
+            print 'Default protons %d: %d' %(key, protons[key])
+        print
     if args.showBadEquations:
         if len(noReactants) > 0:
             print 'Reactions with no reactants:'

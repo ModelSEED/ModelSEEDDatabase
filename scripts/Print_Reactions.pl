@@ -31,13 +31,22 @@ $FBAImpl->_setContext(undef,{auth=>$AToken});
 
 my $ws="kbase";
 my $bioObj = $FBAImpl->_get_msobject("Biochemistry",$ws,"default");
+my @reactions = sort { $a->{id} cmp $b->{id} } @{$bioObj->reactions()};
 open(OUT, "> ../Biochemistry/reactions.default.tsv");
-print OUT "id\tprimary_name\tequation\tdefinition\tstatus\n";
-print OUT join("\n", map { $_->id()."\t".$_->name()."\t".$_->equation()."\t".$_->definition()."\t".$_->status() } @{$bioObj->reactions()}),"\n";
+print OUT "id\tname\tabbreviation\tdirection\tthermoReversibility\tstatus\tdefaultProtons\tequation\n";
+print OUT join("\n", map { $_->id()."\t".$_->name()."\t".$_->abbreviation()."\t".$_->direction()."\t".$_->thermoReversibility()."\t".$_->status()."\t".$_->defaultProtons()."\t".$_->equation() } @reactions),"\n";
 close OUT;
 
 $bioObj = $FBAImpl->_get_msobject("Biochemistry",$ws,"plantdefault");
+@reactions = sort { $a->{id} cmp $b->{id} } @{$bioObj->reactions()};
 open(OUT, "> ../Biochemistry/reactions.plantdefault.tsv");
-print OUT "id\tprimary_name\tequation\tdefinition\tstatus\n";
-print OUT join("\n", map { $_->id()."\t".$_->name()."\t".$_->equation()."\t".$_->definition()."\t".$_->status() } @{$bioObj->reactions()}),"\n";
+print OUT "id\tname\tabbreviation\tdirection\tthermoReversibility\tstatus\tdefaultProtons\tequation\n";
+print OUT join("\n", map { $_->id()."\t".$_->name()."\t".$_->abbreviation()."\t".$_->direction()."\t".$_->thermoReversibility()."\t".$_->status()."\t".$_->defaultProtons()."\t".$_->equation() } @reactions),"\n";
+close OUT;
+
+$bioObj = $FBAImpl->_get_msobject("Biochemistry",$ws,"plantdefault_obs");
+@reactions = sort { $a->{id} cmp $b->{id} } @{$bioObj->reactions()};
+open(OUT, "> ../Biochemistry/reactions.plantdefault_obs.tsv");
+print OUT "id\tname\tabbreviation\tdirection\tthermoReversibility\tstatus\tdefaultProtons\tequation\n";
+print OUT join("\n", map { $_->id()."\t".$_->name()."\t".$_->abbreviation()."\t".$_->direction()."\t".$_->thermoReversibility()."\t".$_->status()."\t".$_->defaultProtons()."\t".$_->equation() } @reactions),"\n";
 close OUT;

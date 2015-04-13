@@ -34,16 +34,17 @@ The following fields are optional.
 ## Reaction file format
 A reaction file describes the biochemical reactions.  There is one reaction per line with fields separated by tabs.  The following fields are required:
 
-* id: Unique ID for the reaction in the format rxnNNNNN where NNNNN is a five digit number (e.g. rxn03789)
-* primary_name: Human readable reaction name
-* equation: Equation expressed in compound IDs
-* definition: Equation expressed in compound names
-* status: String describing status of the reaction where OK means valid, MI means there is a mass imbalance, CI means there is a charge imbalance, HI means there is a hydrogen imbalance. Multiple values are delimited with a | character.
+* **id**: Unique ID for the reaction in the format rxnNNNNN where NNNNN is a five digit number (e.g. rxn03789)
+* **name**: Human readable long name of reaction
+* **abbreviation**: Short name of reaction
+* **direction**: Direction of reaction where ">" means right directional, "<" means left directional, and "=" means bi-directional
+* **thermoReversibility**: Reversibility of reaction where ">" means right directional, "<" means left directional, and "=" means bi-directional
+* **defaultProtons**: Number of protons ???
+* **status**: String describing status of the reaction where OK means valid, MI means there is a mass imbalance, CI means there is a charge imbalance, HI means there is a hydrogen imbalance. Multiple values are delimited with a | character.
+* **equation**: Equation expressed in compound IDs
 
 What about the following fields?
 
 * aliases: List of IDs for duplicate, out-dated or otherwise repeated reactions or ID of reaction in other databases
-* abbreviation: Short name of reaction
 * deltaG: Change in free energy
 * deltaG_err:
-* reversibility: Need definition
