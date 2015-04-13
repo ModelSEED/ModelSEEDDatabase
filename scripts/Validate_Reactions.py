@@ -69,9 +69,12 @@ if __name__ == "__main__":
         args.showStatus = True
 
     # Read the reactions from the specified file.
+    print 'Reaction file: %s' %(args.rxnfile)
     helper = BiochemHelper()
     reactions = helper.readReactionsFile(args.rxnfile)
-    print 'Reaction file: %s' %(args.rxnfile)
+    if reactions is None:
+        print 'Error reading reactions file'
+        exit(1)
     print 'Number of reactions: %d' %(len(reactions))
 
     # Check for duplicates, missing and invalid values.

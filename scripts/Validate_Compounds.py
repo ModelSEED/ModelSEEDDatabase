@@ -82,9 +82,12 @@ if __name__ == "__main__":
         args.showCofactors = True
 
     # Read the compounds from the specified file.
+    print 'Compound file: %s' %(args.cpdfile)
     helper = BiochemHelper()
     compounds = helper.readCompoundsFile(args.cpdfile)
-    print 'Compound file: %s' %(args.cpdfile)
+    if compounds is None:
+        print 'Error reading compounds file'
+        exit(1)
     print 'Number of compounds: %d' %(len(compounds))
 
     # Check for duplicates, missing and invalid values.
