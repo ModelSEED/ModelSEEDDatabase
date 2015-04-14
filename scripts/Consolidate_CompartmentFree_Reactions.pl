@@ -64,7 +64,7 @@ foreach my $rxn (@{$bioObj->reactions()}){
 my %Touched_Rxns=();
 my %Touched_Codes=();
 open(OUT, "> ../Biochemistry/reactions.default.cf.tsv");
-print OUT "id\tprimary_name\tequation\tdefinition\tstatus\tpaired reactions\n";
+print OUT "id\tname\tabbreviation\tdirection\tthermoReversibility\tstatus\tdefaultProtons\tequation\tpaired reactions\n";
 foreach my $rxn (sort keys %Rxns_Codes){
     next if exists($Touched_Rxns{$rxn});
 
@@ -80,6 +80,6 @@ foreach my $rxn (sort keys %Rxns_Codes){
 	}
     }
 
-    print OUT $rxn."\t".$Rxns{$rxn}->name()."\t".$Rxns{$rxn}->genEquation()."\t".$Rxns{$rxn}->definition()."\t".$Rxns{$rxn}->status()."\t".join("|",sort keys %Paired_Rxns)."\n";
+    print OUT $rxn."\t".$Rxns{$rxn}->name()."\t".$Rxns{$rxn}->abbreviation()."\t".$Rxns{$rxn}->direction()."\t".$Rxns{$rxn}->thermoReversibility()."\t".$Rxns{$rxn}->status()."\t".$Rxns{$rxn}->defaultProtons()."\t".$Rxns{$rxn}->genEquation()."\t".join("|",sort keys %Paired_Rxns)."\n";
 }
 close(OUT);

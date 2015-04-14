@@ -20,7 +20,7 @@ A compound file describes the compounds (or metabolites) involved in biochemical
 * **abbreviation**: Short name of compound
 * **formula**: Standard chemical format (using Hill system) in protonated form to match reported charge
 * **charge**: Electric charge of compound
-* **isCofactor**: True if the compound is a cofactor
+* **isCofactor**: True if the compound is a cofactor  This is false for all compounds
 
 The following fields are optional.
 
@@ -38,9 +38,9 @@ A reaction file describes the biochemical reactions.  There is one reaction per 
 * **name**: Human readable long name of reaction
 * **abbreviation**: Short name of reaction
 * **direction**: Direction of reaction where ">" means right directional, "<" means left directional, and "=" means bi-directional
-* **thermoReversibility**: Reversibility of reaction where ">" means right directional, "<" means left directional, and "=" means bi-directional
-* **defaultProtons**: Number of protons ???
-* **status**: String describing status of the reaction where OK means valid, MI means there is a mass imbalance, CI means there is a charge imbalance, HI means there is a hydrogen imbalance. Multiple values are delimited with a | character.
+* **thermoReversibility**: Reversibility of reaction where ">" means right directional, "<" means left directional, "=" means bi-directional, and "?" means unknown
+* **defaultProtons**: Number of protons ???  This is 0 in all reactions
+* **status**: String describing status of the reaction with multiple values delimited with a "|" character.  See below for details.
 * **equation**: Equation expressed in compound IDs
 
 What about the following fields?
@@ -48,3 +48,10 @@ What about the following fields?
 * aliases: List of IDs for duplicate, out-dated or otherwise repeated reactions or ID of reaction in other databases
 * deltaG: Change in free energy
 * deltaG_err:
+
+### Reaction status values ###
+
+* OK means the reaction was valid with no changes.
+* MI means there was a mass imbalance that was corrected.
+* CI means there was a charge imbalance that was corrected.
+* HI means there was a hydrogen imbalance?

@@ -48,7 +48,7 @@ class BiochemHelper:
                 cpd['name'] = fields[fieldNames['name']]
                 cpd['abbreviation'] = fields[fieldNames['abbreviation']]
                 cpd['formula'] = fields[fieldNames['formula']]
-                cpd['defaultCharge'] = int(fields[fieldNames['charge']])
+                cpd['defaultCharge'] = float(fields[fieldNames['charge']])
                 cpd['isCofactor'] = int(fields[fieldNames['isCofactor']])
                 if includeLinenum:
                     cpd['linenum'] = linenum
@@ -95,7 +95,7 @@ class BiochemHelper:
                 rxn['direction'] = fields[fieldNames['direction']]
                 rxn['thermoReversibility'] = fields[fieldNames['thermoReversibility']]
                 rxn['status'] = fields[fieldNames['status']]
-                rxn['defaultProtons'] = int(fields[fieldNames['defaultProtons']])
+                rxn['defaultProtons'] = float(fields[fieldNames['defaultProtons']])
                 rxn['equation'] = fields[fieldNames['equation']]
                 if includeLinenum:
                     rxn['linenum'] = linenum
@@ -145,12 +145,13 @@ class BiochemHelper:
         compound = dict()
         
         # Extract the stoichiometry coefficient from inside the parenthesis.
-        if stoichString.find('(') >= 0:
-            compound['stoich'] = re.sub(r'\(([0-9]*\.?[0-9]+)\) .+', r'\1', stoichString)
-            prefix = stoichString.find(')')
-            id = stoichString[prefix+2:] # Maybe this should be converted to a number?
+        lparen = stoichString.find('(')
+        if lparen >= 0:
+            rparen = stoichString.find(')')
+            compound['stoich'] = float(stoichString[lparen+1:rparen])
+            id = stoichString[rparen+2:]
         else:
-            compound['stoich'] = 1
+            compound['stoich'] = 1.0
             id = stoichString
             
         # Convert the ID from a format with the compartment and index number in
@@ -198,12 +199,13 @@ class BiochemHelper:
         compound = dict()
         
         # Extract the stoichiometry coefficient from inside the parenthesis.
-        if stoichString.find('(') >= 0:
-            compound['stoich'] = re.sub(r'\(([0-9]*\.?[0-9]+)\).+', r'\1', stoichString) # MBM remove space?
-            prefix = stoichString.find(')')
-            id = stoichString[prefix+1:] # Maybe this should be converted to a number?
+        lparen = stoichString.find('(')
+        if lparen >= 0:
+            rparen = stoichString.find(')')
+            compound['stoich'] = float(stoichString[lparen+1:rparen])
+            id = stoichString[rparen+2:]
         else:
-            compound['stoich'] = 1
+            compound['stoich'] = 1.0
             id = stoichString
     
         # Convert the ID from a format with the compartment and index number in
