@@ -103,6 +103,48 @@ class BiochemHelper:
     
         return reactions
     
+    def readCompartmentsFile(self, path, includeLinenum=True):
+        ''' Read the contents of a comparments file.
+
+            There is one compartment per line in the file with fields separated by tabs.
+            The first line of the file is a header with the field names.
+
+            @param path: Path to compartments file
+            @param includeLinenum: When True, include line number in dictionary
+            @return List of compartment dictionaries.
+        '''
+
+        # Read the compartments from the specified file.
+        compartments = list()
+        with open(path, 'r') as handle:
+            # The first line has the header with the field names.
+            nameList = handle.readline().strip().split('\t')
+            fieldNames = dict()
+            for index in range(len(nameList)):
+                fieldNames[nameList[index]] = index
+            required = { 'id', 'name', 'hierarchy' }
+            for req in required:
+                if req not in fieldNames:
+                    print 'WARNING: Required field %s is missing from header' %(req)
+                    return None
+
+            linenum = 1
+            for line in handle:
+                linenum += 1
+                fields = line.strip('\n ').split('\t')
+                if len(fields) < len(fieldNames):
+                    print 'WARNING: Compartment on line %d is missing one or more fields, %s' %(linenum, fields)
+                    continue
+                cmp = dict()
+                cmp['id'] = fields[fieldNames['id']]
+                cmp['name'] = fields[fieldNames['name']]
+                cmp['hierarchy'] = int(fields[fieldNames['hierarchy']])
+                if includeLinenum:
+                    cmp['linenum'] = linenum
+                compartments.append(cmp)
+
+        return compartments
+
     def buildDictFromListOfObjects(self, objectList, key='id'):
         ''' Build a dictionary with the specified key from a list of objects.
     

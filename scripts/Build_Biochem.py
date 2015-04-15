@@ -31,9 +31,10 @@ AUTHORS
 if __name__ == "__main__":
     # Parse options.
     parser = argparse.ArgumentParser(formatter_class=argparse.RawDescriptionHelpFormatter, prog='Build_Biochem', epilog=desc3)
-    parser.add_argument('id', help='ID of object', action='store')
-    parser.add_argument('cpdfile', help='path to compounds file', action='store')
-    parser.add_argument('rxnfile', help='path to reactions file', action='store')
+    parser.add_argument('id', help='ID of Biochemistry object', action='store')
+    parser.add_argument('compoundfile', help='path to compounds file', action='store')
+    parser.add_argument('reactionfile', help='path to reactions file', action='store')
+    parser.add_argument('compartmentfile', help='path to compartments file', action='store')
     parser.add_argument('--name', help='name of object', action='store', dest='name', default=None)
     parser.add_argument('--desc', help='description of object', action='store', dest='description', default=None)
     parser.add_argument('-w', '--workspace', help='ID of workspace containing Media object', action='store', dest='workspace', default=None)
@@ -64,14 +65,14 @@ if __name__ == "__main__":
     # Add the compounds from the compounds file.  Required fields: id, name,
     # name, abbreviation, formula, defaultCharge, isCofactor
     helper = BiochemHelper()
-    compounds = helper.readCompoundsFile(args.cpdfile, includeLinenum=False)
+    compounds = helper.readCompoundsFile(args.compoundfile, includeLinenum=False)
 
     for index in range(len(compounds)):
         biochem['compounds'].append(compounds[index])
 
     # Add the reactions from the reactions file.  Required fields: id, name,
     # abbreviation, direction, thermoReversibility, status, defaultProtons, reagents.
-    reactions = helper.readReactionsFile(args.rxnfile, includeLinenum=False)
+    reactions = helper.readReactionsFile(args.reactionfile, includeLinenum=False)
     
     for index in range(len(reactions)):
         rxn = reactions[index]
@@ -97,6 +98,13 @@ if __name__ == "__main__":
             rxn['reagents'].append(reagent)
         del rxn['equation'] # Remove after converting to reagent format
         biochem['reactions'].append(rxn)
+
+    # Add the compartments from the compartments file.  Required fields: id, name,
+    # and hierarchy.
+    compartments = helper.readCompartmentsFile(args.compartmentfile, includeLinenum=False)
+
+    for index in range(len(compartments)):
+        biochem['compartments'].append(compartments[index])
 
     # Save the Biochemistry object to the specified workspace.
     wsClient = Workspace(args.wsurl)
