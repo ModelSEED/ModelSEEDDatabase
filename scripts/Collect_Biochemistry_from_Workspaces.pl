@@ -26,7 +26,36 @@ my $FBAImpl = Bio::KBase::fbaModelServices::Impl->new({'fbajobcache' => "/homes/
 $FBAImpl->_setContext(undef,{auth=>$AToken});
 my $WSClient = $FBAImpl->_workspaceServices();
 
+my %Rxns=();
 my %Cpds=();
+
+foreach my $template (@{$WSClient->list_objects({workspaces=>["KBaseTemplateModels"],type=>"KBaseFBA.ModelTemplate"})}){
+    my $templateObj = $FBAImpl->_get_msobject("ModelTemplate","KBaseTemplateModels",$template->[1]);
+
+    foreach my $tmplrxn (@{$templateObj->templateReactions()}){
+	next unless $tmplrxn->type() eq "universal" || $tmplrxn->type() eq "conditional";
+
+	my $rxn = $tmplrxn->reaction();
+	$Rxns{$rxn->id()}{$template->[1]}=1;
+
+	foreach my $rgt (@{$rxn->reagents()}){
+	    $Cpds{$rgt->compound()->id()}{$template->[1]}=1;
+	}
+    }
+}
+
+open(OUT, "> KBaseTemplateModels.cpd");
+print OUT join("\n",map { $_."\t".join("|",sort keys %{$Cpds{$_}}) } sort keys %Cpds),"\n";
+close(OUT);
+
+open(OUT, "> KBaseTemplateModels.rxn");
+print OUT join("\n",map { $_."\t".join("|",sort keys %{$Rxns{$_}}) } sort keys %Rxns),"\n";
+close(OUT);
+
+__END__
+undef(%Cpds);
+undef(%Rxns);
+
 foreach my $media (@{$WSClient->list_objects({workspaces=>["KBaseMedia"],type=>"KBaseBiochem.Media"})}){
     my $mediaObj = $FBAImpl->_get_msobject("Media","KBaseMedia",$media->[1]);
 
@@ -39,7 +68,6 @@ open(OUT, "> KBaseMedia.cpd");
 print OUT join("\n", sort keys %Cpds),"\n";
 close(OUT);
 
-my %Rxns=();
 foreach my $ws ("KBasePublicModelsV4","PlantSEED"){
     foreach my $model (@{$WSClient->list_objects({workspaces=>[$ws],type=>"KBaseFBA.FBAModel"})}){
 	undef(%Cpds);
@@ -63,29 +91,3 @@ foreach my $ws ("KBasePublicModelsV4","PlantSEED"){
     print OUT join("\n", sort keys %Rxns),"\n";
     close(OUT);
 }
-
-undef(%Cpds);
-undef(%Rxns);
-
-foreach my $template (@{$WSClient->list_objects({workspaces=>["KBaseTemplateModels"],type=>"KBaseFBA.ModelTemplate"})}){
-    my $templateObj = $FBAImpl->_get_msobject("ModelTemplate","KBaseTemplateModels",$template->[1]);
-
-    foreach my $tmplrxn (@{$templateObj->templateReactions()}){
-	next unless $tmplrxn->type() eq "universal" || $tmplrxn->type() eq "conditional";
-
-	my $rxn = $tmplrxn->reaction();
-	$Rxns{$rxn->id()}=1;
-
-	foreach my $rgt (@{$rxn->reagents()}){
-	    $Cpds{$rgt->compound()->id()}=1;
-	}
-    }
-}
-
-open(OUT, "> KBaseTemplateModels.cpd");
-print OUT join("\n",sort keys %Cpds),"\n";
-close(OUT);
-
-open(OUT, "> KBaseTemplateModels.rxn");
-print OUT join("\n",sort keys %Rxns),"\n";
-close(OUT);
