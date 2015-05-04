@@ -25,9 +25,7 @@ while(<FH>){
     @temp=split(/\t/,$_,-1);
     next unless exists($Cpds{$temp[2]});
 
-    foreach my $id (split(/\|/,$temp[2])){
-	$Aliases{$temp[0]}{$id}=1;
-    }
+    $Aliases{$temp[0]} = (split(/\|/,$temp[2]))[0];
 }
 close(FH);
 
@@ -52,9 +50,10 @@ while(<FH>){
     next unless exists($Aliases{$temp[0]});
 
     my ($formula,$layers)=InChIs::parse($temp[1]);
+    $InChIs{$Aliases{$temp[0]}}{OLD}=$formula;
     $formula = InChIs::adjust_protons($formula,$layers->{p});
+    $InChIs{$Aliases{$temp[0]}}{NEW}=$formula;
 
-    $InChIs{$Aliases{$temp[0]}}=$formula;
 }
 close(FH);
 
@@ -62,12 +61,12 @@ open(FH, "< ../Structures/MetaCyc_Charged_InChI.txt");
 while(<FH>){
     chomp;
     @temp=split(/\t/,$_,-1);
-    next unless exists($Aliases{$temp[0]});
+    next unless exists($Aliases{$temp[0]}) && !exists($InChIs{$Aliases{$temp[0]}});
 
     my ($formula,$layers)=InChIs::parse($temp[1]);
+    $InChIs{$Aliases{$temp[0]}}{OLD}=$formula;
     $formula = InChIs::adjust_protons($formula,$layers->{p});
-    
-    $InChIs{$Aliases{$temp[0]}}=$formula;
+    $InChIs{$Aliases{$temp[0]}}{NEW}=$formula;
 }
 close(FH);
     
@@ -89,8 +88,9 @@ my $FBAImpl = Bio::KBase::fbaModelServices::Impl->new({'fbajobcache' => "/homes/
 						       'idserver-url' => "http://kbase.us/services/idserver"});
 $FBAImpl->_setContext(undef,{auth=>$AToken});
 
-my $bioObj = $FBAImpl->_get_msobject("Biochemistry","kbase","defaultplant");
+my $bioObj = $FBAImpl->_get_msobject("Biochemistry","kbase","plantdefault");
 foreach my $cpd (sort keys %InChIs){
-    print $cpd,"\n" if $bioObj->getObject("compounds",$cpd)->formula() ne $InChIs{$cpd};
+    my $obj = $bioObj->getObject("compounds",$cpd);
+    print $cpd,"\t",$obj->formula(),"\t",$InChIs{$cpd}{OLD},"\t",$InChIs{$cpd}{NEW},"\n" if $obj->formula() ne $InChIs{$cpd}{NEW};
 }
 	
