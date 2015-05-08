@@ -91,6 +91,6 @@ $FBAImpl->_setContext(undef,{auth=>$AToken});
 my $bioObj = $FBAImpl->_get_msobject("Biochemistry","kbase","plantdefault");
 foreach my $cpd (sort keys %InChIs){
     my $obj = $bioObj->getObject("compounds",$cpd);
-    print $cpd,"\t",$obj->formula(),"\t",$InChIs{$cpd}{OLD},"\t",$InChIs{$cpd}{NEW},"\n" if $obj->formula() ne $InChIs{$cpd}{NEW};
+    print $cpd,"\t",$obj->formula(),"\t",$InChIs{$cpd}{OLD},"\t",$InChIs{$cpd}{NEW},"\n" if $obj->formula() eq $InChIs{$cpd}{NEW};
 }
 	
