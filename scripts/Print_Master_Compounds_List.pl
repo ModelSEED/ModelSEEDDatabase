@@ -101,14 +101,16 @@ close(FH);
 
 #Print it all out
 open(OUT, "> Master_Compound_List.tsv");
-print OUT join("\t",@headers),"\n";
+print OUT join("\t",@headers),"\tInChI\n",;
 foreach my $cpd ( grep { $_ ne "cpd00000" } sort keys %Cpds){
     print OUT $cpd."\t";
 
     print OUT join("\t", map { $Cpds{$cpd}{$_} } grep { $_ ne "id" } @headers),"\t";
 
-    #priortize InChIs from KEGG
-    if(exists($Aliases{$cpd}{KEGG}) && exists($InChIs{$Aliases{$cpd}{KEGG}})){
+    #priortize manual InChIs then InChIs from KEGG
+    if(exists($Cpd_Mods{$cpd}{InChI})){
+	print OUT $Cpd_Mods{$cpd}{InChI}."\n";
+    }elsif(exists($Aliases{$cpd}{KEGG}) && exists($InChIs{$Aliases{$cpd}{KEGG}})){
 	print OUT $InChIs{$Aliases{$cpd}{KEGG}}."\n";
     }elsif(exists($Aliases{$cpd}{MetaCyc}) && exists($InChIs{$Aliases{$cpd}{MetaCyc}})){
 	print OUT $InChIs{$Aliases{$cpd}{MetaCyc}}."\n";
