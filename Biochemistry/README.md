@@ -55,3 +55,20 @@ What about the following fields?
 * MI means there was a mass imbalance that was corrected.
 * CI means there was a charge imbalance that was corrected.
 * HI means there was a hydrogen imbalance?
+
+## Complex role file format
+A complex role file maps complexes to functional roles.  There is one complex role mapping per line with fields separated by tabs.  The following fields are required:
+
+* **complex_id**: Unique ID for the complex in the format cpx.N where N is a number
+* **complex_name**: Human readable name of complex (currently same as the ID)
+* **complex_source**: Source of complex, valid values are ModelSEED and KEGG
+* **complex_type**: Type of complex, valid values are SEED\_role\_complex and KEGG\_role\_complex
+* **role_id**: Unique ID for the role in the format in the format fr.N where N is a number
+* **role_name**: Human readable name of the role
+* **role_source**: Source of role, valid values are SEED and KEGG
+* **role_type**: Type of role, valid values are SEED\_role and KEGG\_role
+* **role_aliases**: List of aliases for the role where each entry in the format type:alias
+* **role_exemplar**: What is this?  Currently not set for any mappings
+* **type**: What is this? All entries are set to role_mapping
+* **triggering**: What is this? All entries are set to true
+* **optional**: What is this? 12 of 2221 are set to true
