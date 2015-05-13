@@ -104,7 +104,7 @@ class BiochemHelper:
         return reactions
     
     def readCompartmentsFile(self, path, includeLinenum=True):
-        ''' Read the contents of a comparments file.
+        ''' Read the contents of a compartments file.
 
             There is one compartment per line in the file with fields separated by tabs.
             The first line of the file is a header with the field names.
@@ -144,6 +144,58 @@ class BiochemHelper:
                 compartments.append(cmp)
 
         return compartments
+
+    def readComplexRolesFile(self, path, includeLinenum=True):
+        ''' Read the contents of a complex role mapping file.
+
+            There is one mapping per line in the file with fields separated by tabs.
+            The first line of the file is a header with the field names.
+
+            @param path: Path to complex role mapping file
+            @param includeLinenum: When True, include line number in dictionary
+            @return List of complex role mapping dictionaries.
+        '''
+
+        # Read the complex role mappings from the specified file.
+        complexRoles = list()
+        with open(path, 'r') as handle:
+            # The first line has the header with the field names.
+            nameList = handle.readline().strip().split('\t')
+            fieldNames = dict()
+            for index in range(len(nameList)):
+                fieldNames[nameList[index]] = index
+            required = { 'complex_id', 'complex_name', 'complex_source', 'complex_type', 'role_id', 'role_name', 'role_type', 'role_source', 'role_aliases', 'role_exemplar', 'type', 'triggering', 'optional' }
+            for req in required:
+                if req not in fieldNames:
+                    print 'WARNING: Required field %s is missing from header' %(req)
+                    return None
+
+            linenum = 1
+            for line in handle:
+                linenum += 1
+                fields = line.strip('\n ').split('\t')
+                if len(fields) < len(fieldNames):
+                    print 'WARNING: Complex role mapping on line %d is missing one or more fields, %s' %(linenum, fields)
+                    continue
+                cpxrole = dict()
+                cpxrole['complex_id'] = fields[fieldNames['complex_id']]
+                cpxrole['complex_name'] = fields[fieldNames['complex_name']]
+                cpxrole['complex_source'] = fields[fieldNames['complex_source']]
+                cpxrole['complex_type'] = fields[fieldNames['complex_type']]
+                cpxrole['role_id'] = fields[fieldNames['role_id']]
+                cpxrole['role_name'] = fields[fieldNames['role_name']]
+                cpxrole['role_type'] = fields[fieldNames['role_type']]
+                cpxrole['role_source'] = fields[fieldNames['role_source']]
+                cpxrole['role_aliases'] = fields[fieldNames['role_aliases']]
+                cpxrole['role_exemplar'] = fields[fieldNames['role_exemplar']]
+                cpxrole['type'] = fields[fieldNames['type']]
+                cpxrole['triggering'] = int(fields[fieldNames['triggering']])
+                cpxrole['optional'] = int(fields[fieldNames['optional']])
+                if includeLinenum:
+                    cpxrole['linenum'] = linenum
+                complexRoles.append(cpxrole)
+
+        return complexRoles
 
     def buildDictFromListOfObjects(self, objectList, key='id'):
         ''' Build a dictionary with the specified key from a list of objects.
