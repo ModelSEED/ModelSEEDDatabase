@@ -42,6 +42,16 @@ foreach my $aliasSet (sort keys %$cpd_aliases){
     }
 }
 
+my $rxn_aliases = $bioObj->reactionsByAlias();
+
+foreach my $aliasSet (sort keys %$rxn_aliases){
+    foreach my $alias (sort keys %{$rxn_aliases->{$aliasSet}}){
+	foreach my $id (sort keys %{$rxn_aliases->{$aliasSet}{$alias}}){
+	    $Global_Aliases{$aliasSet}{$alias}{default}{$id}=1;
+	}
+    }
+}
+
 $bioObj = $FBAImpl->_get_msobject("Biochemistry",$ws,"plantdefault");
 $cpd_aliases = $bioObj->compoundsByAlias();
 
@@ -49,6 +59,16 @@ foreach my $aliasSet (sort keys %$cpd_aliases){
     foreach my $alias (sort keys %{$cpd_aliases->{$aliasSet}}){
 	foreach my $id (sort keys %{$cpd_aliases->{$aliasSet}{$alias}}){
 	    $Global_Aliases{$aliasSet}{$alias}{plantdefault}{$id}=1;
+	}
+    }
+}
+
+$rxn_aliases = $bioObj->reactionsByAlias();
+
+foreach my $aliasSet (sort keys %$rxn_aliases){
+    foreach my $alias (sort keys %{$rxn_aliases->{$aliasSet}}){
+	foreach my $id (sort keys %{$rxn_aliases->{$aliasSet}{$alias}}){
+	    $Global_Aliases{$aliasSet}{$alias}{default}{$id}=1;
 	}
     }
 }
