@@ -7,6 +7,8 @@ use strict;
 #######################################################
 
 my $directory = $ARGV[0];
+exit if !$directory || !-d $directory;
+$directory.="/" if $directory !~ /\/$/;
 
 use Bio::KBase::fbaModelServices::ScriptHelpers qw( getToken );
 my $AToken = getToken();
@@ -28,11 +30,12 @@ $fba->_setContext(undef,{auth=>$AToken});
 my $bio = $fba->_get_msobject("Biochemistry","kbase","default");
 my $pbio = $fba->_get_msobject("Biochemistry","kbase","plantdefault");
 my $map = $fba->_get_msobject("Mapping","kbase","default-mapping");
+my $pmap = $fba->_get_msobject("Mapping","PlantSEED","PlantSEED_Mapping");
 
 my $rxn_alias_hash = $bio->reactionsByAlias();
 my $p_rxn_alias_hash = $pbio->reactionsByAlias();
 my $rxn_pathways = {};
-open(my $fh, "<", "/Users/chenry/workspace/maindb/HopeScenarios.txt");
+open(my $fh, "<", "../Pathways/HopeScenarios.txt");
 while (my $line = <$fh>) {
 	chomp($line);
 	my $array = [split(/\t/,$line)];
@@ -56,7 +59,7 @@ close($fh);
 my $cpd_alias_hash = $bio->compoundsByAlias();
 my $p_cpd_alias_hash = $pbio->compoundsByAlias();
 my $cpd_structure = {};
-open($fh, "<", "/Users/chenry/code/ModelSEEDDatabase/Structures/KEGG_Search_InChI.txt");
+open($fh, "<", "../Structures/KEGG_Charged_InChI.txt");
 while (my $line = <$fh>) {
 	chomp($line);
 	my $array = [split(/\t/,$line)];
@@ -75,7 +78,7 @@ while (my $line = <$fh>) {
 	}
 }
 close($fh);
-open($fh, "<", "/Users/chenry/code/ModelSEEDDatabase/Structures/MetaCyc_Search_InChI.txt");
+open($fh, "<", "../Structures/MetaCyc_Charged_InChI.txt");
 while (my $line = <$fh>) {
 	chomp($line);
 	my $array = [split(/\t/,$line)];
@@ -208,6 +211,7 @@ $columns = [qw(
 print $fh join("\t",@{$columns})."\n";
 my $cpxs = $map->complexes();
 my $idhash;
+my $count=0;
 for (my $i=0; $i < @{$cpxs}; $i++) {
 	my $cpx = $cpxs->[$i];
 	$idhash->{$cpx->id()} = "cpx.".$i;
@@ -233,8 +237,39 @@ for (my $i=0; $i < @{$cpxs}; $i++) {
 	    ];
 	    print $fh join("\t",@{$data})."\n";
 	}
+	$count = $i;
+}
+
+$cpxs = $pmap->complexes();
+for (my $i=0; $i < @{$cpxs}; $i++) {
+    $count++;
+	my $cpx = $cpxs->[$i];
+	$idhash->{$cpx->id()} = "cpx.".$count;
+	my $cpxroles = $cpx->complexroles();
+	for (my $j=0; $j < @{$cpxroles}; $j++) {
+		my $cpxrole = $cpxroles->[$j];
+		my $roleid = $cpxrole->role()->id();
+		$roleid =~ s/ms//;
+		my $data = [
+	    	"cpx.".$count,
+	    	"cpx.".$count,
+	    	"ModelSEED",
+	    	"SEED_role_complex",
+	    	$roleid,
+	    	$cpxrole->role()->name(),
+	    	"SEED_role",
+	    	"SEED",
+	    	"searchname:".$cpxrole->role()->searchname(),
+	    	"null",
+	    	"role_mapping",
+	    	$cpxrole->triggering(),
+	    	$cpxrole->optionalRole(),
+	    ];
+	    print $fh join("\t",@{$data})."\n";
+	}
 }
 close($fh);
+
 #Printing compounds
 my $cpdhash = {};
 open($fh, ">", $directory."Compounds.tsv");
@@ -299,12 +334,13 @@ for (my $i=0; $i < @{$cpds}; $i++) {
     		$aliases .= "\"".$type.":".$alias."\"";;
     	}
     }
+
     my $data = [
     	$cpd->id(),
     	$cpd->abbreviation(),
     	$cpd->name(),
     	$cpd->formula(),
-    	$cpd->mass(),
+    	defined($cpd->mass()) ? $cpd->mass() : "null",
     	"ModelSEED",
     	$structure,
     	$cpd->defaultCharge(),
@@ -312,8 +348,8 @@ for (my $i=0; $i < @{$cpds}; $i++) {
     	0,
     	"null",
     	$cpd->isCofactor(),
-    	$cpd->deltaG(),
-    	$cpd->deltaGErr(),
+    	defined($cpd->deltaG()) ? $cpd->deltaG() : "null",
+    	defined($cpd->deltaGErr()) ? $cpd->deltaGErr() : "null",
     	$pka,
     	$pkb,
     	$abstractcpd,
@@ -463,6 +499,7 @@ for (my $i=0; $i < @{$rxns}; $i++) {
     		}
     	}
     }
+
     my $data = [
     	$rxn->id(),
     	$rxn->abbreviation(),
@@ -478,8 +515,8 @@ for (my $i=0; $i < @{$rxns}; $i++) {
     	$pathways,
     	$aliases,
     	$ecnums,
-    	$rxn->deltaG(),
-    	$rxn->deltaGErr(),
+    	defined($rxn->deltaG()) ? $rxn->deltaG() : "null",
+    	defined($rxn->deltaGErr()) ? $rxn->deltaGErr() : "null",
     	join(";",keys(%{$compounds}))
     ];
     print $fh join("\t",@{$data})."\n";
@@ -580,6 +617,7 @@ for (my $i=0; $i < @{$templates}; $i++) {
 	    		}
 	    	}
 	    }
+
 	    my $compid = "c0";
 	    my $data = [
 	    	$templatedata->[$i]->[0].".".$rxn->reaction()->id()."_".$compid,
@@ -594,14 +632,14 @@ for (my $i=0; $i < @{$templates}; $i++) {
 	    	$rxn->direction(),
 	    	$rxn->GapfillDirection(),
 	    	"null",
-	    	$rxn->base_cost(),
-	    	$rxn->forward_penalty(),
-	    	$rxn->reverse_penalty(),
+	    	defined($rxn->base_cost()) ? $rxn->base_cost() : 0,
+	    	defined($rxn->forward_penalty()) ? $rxn->base_cost() : 0,
+	    	defined($rxn->reverse_penalty()) ? $rxn->base_cost() : 0,
 	    	$pathways,
 	    	$aliases,
 	    	$ecnums,
-	    	$rxn->reaction()->deltaG(),
-	    	$rxn->reaction()->deltaGErr(),
+	    	defined($rxn->reaction()->deltaG()) ? $rxn->reaction()->deltaG() : "null",
+	    	defined($rxn->reaction()->deltaGErr()) ? $rxn->reaction()->deltaGErr() : "null",
 	    	$templatedata->[$i]->[0],
 	    	$templatedata->[$i]->[1],
 	    	$templatedata->[$i]->[2],
