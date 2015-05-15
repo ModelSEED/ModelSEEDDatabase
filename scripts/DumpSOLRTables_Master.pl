@@ -1,6 +1,8 @@
 #!/usr/bin/env perl
 use warnings;
 use strict;
+my @temp=();
+my $header = 1;
 
 #######################################################
 #Initialization
@@ -32,8 +34,49 @@ my $pbio = $fba->_get_msobject("Biochemistry","kbase","plantdefault");
 my $map = $fba->_get_msobject("Mapping","kbase","default-mapping");
 my $pmap = $fba->_get_msobject("Mapping","PlantSEED","PlantSEED_Mapping");
 
-my $rxn_alias_hash = $bio->reactionsByAlias();
-my $p_rxn_alias_hash = $pbio->reactionsByAlias();
+#Collect Aliases
+opendir(my $AliasDir, "../Aliases/");
+my @Files = grep { $_ =~ /\.aliases$/ } readdir($AliasDir);
+closedir($AliasDir);
+
+my $rxn_alias_hash = {};
+my $p_rxn_alias_hash = {};
+my $cpd_alias_hash = {};
+my $p_cpd_alias_hash = {};
+
+foreach my $file (sort @Files){
+    $file =~ /^(\w+)\.aliases/;
+    my $aliasSet = $1;
+    $aliasSet = join(" ", split(/_/,$aliasSet)) if $aliasSet eq "Enzyme_Class";
+
+    open(FH, "< ../Aliases/".$file);
+    $header = 1;
+    while(<FH>){
+	chomp;
+	if($header){$header--;next}
+	@temp=split(/\t/,$_,-1);
+
+	if($temp[1] =~ /^cpd/ || $temp[2] =~ /^cpd/){
+	    foreach my $cpd (split(/\|/,$temp[1])){
+		$cpd_alias_hash->{$aliasSet}->{$temp[0]}->{$cpd}=1;
+	    }
+	    foreach my $cpd (split(/\|/,$temp[2])){
+		$p_cpd_alias_hash->{$aliasSet}->{$temp[0]}->{$cpd}=1;
+	    }
+	}
+	if($temp[1] =~ /^rxn/ || $temp[2] =~ /^rxn/){
+	    foreach my $rxn (split(/\|/,$temp[1])){
+		$rxn_alias_hash->{$aliasSet}->{$temp[0]}->{$rxn}=1;
+	    }
+	    foreach my $rxn (split(/\|/,$temp[2])){
+		$p_rxn_alias_hash->{$aliasSet}->{$temp[0]}->{$rxn}=1;
+	    }
+	}
+
+    }
+    close(FH);
+}
+
 my $rxn_pathways = {};
 open(my $fh, "<", "../Pathways/HopeScenarios.txt");
 while (my $line = <$fh>) {
@@ -56,44 +99,47 @@ while (my $line = <$fh>) {
 }
 close($fh);
 
-my $cpd_alias_hash = $bio->compoundsByAlias();
-my $p_cpd_alias_hash = $pbio->compoundsByAlias();
 my $cpd_structure = {};
 open($fh, "<", "../Structures/KEGG_Charged_InChI.txt");
 while (my $line = <$fh>) {
 	chomp($line);
 	my $array = [split(/\t/,$line)];
 	if (defined($cpd_alias_hash->{KEGG}->{$array->[0]})) {
-		my $idarray = [keys(%{$cpd_alias_hash->{KEGG}->{$array->[0]}})];
-		my $cpdid = $idarray->[0];
+	    foreach my $cpdid (keys(%{$cpd_alias_hash->{KEGG}->{$array->[0]}})){
 		if (!defined($cpd_structure->{$cpdid})) {
-			$cpd_structure->{$cpdid} = $array->[1];
+		    $cpd_structure->{$cpdid} = $array->[1];
 		}
-	} elsif (defined($p_cpd_alias_hash->{KEGG}->{$array->[0]})) {
-		my $idarray = [keys(%{$p_cpd_alias_hash->{KEGG}->{$array->[0]}})];
-		my $cpdid = $idarray->[0];
+	    } 
+	}
+
+	if (defined($p_cpd_alias_hash->{KEGG}->{$array->[0]})) {
+	    foreach my $cpdid (keys(%{$p_cpd_alias_hash->{KEGG}->{$array->[0]}})){
 		if (!defined($cpd_structure->{$cpdid})) {
-			$cpd_structure->{$cpdid} = $array->[1];
+		    $cpd_structure->{$cpdid} = $array->[1];
 		}
+	    }
 	}
 }
 close($fh);
+
 open($fh, "<", "../Structures/MetaCyc_Charged_InChI.txt");
 while (my $line = <$fh>) {
 	chomp($line);
 	my $array = [split(/\t/,$line)];
 	if (defined($cpd_alias_hash->{MetaCyc}->{$array->[0]})) {
-		my $idarray = [keys(%{$cpd_alias_hash->{KEGG}->{$array->[0]}})];
-		my $cpdid = $idarray->[0];
+	    foreach my $cpdid (keys(%{$cpd_alias_hash->{MetaCyc}->{$array->[0]}})){
 		if (!defined($cpd_structure->{$cpdid})) {
-			$cpd_structure->{$cpdid} = $array->[1];
+		    $cpd_structure->{$cpdid} = $array->[1];
 		}
-	} elsif (defined($p_cpd_alias_hash->{MetaCyc}->{$array->[0]})) {
-		my $idarray = [keys(%{$p_cpd_alias_hash->{MetaCyc}->{$array->[0]}})];
-		my $cpdid = $idarray->[0];
+	    } 
+	}
+
+	if (defined($p_cpd_alias_hash->{MetaCyc}->{$array->[0]})) {
+	    foreach my $cpdid (keys(%{$p_cpd_alias_hash->{MetaCyc}->{$array->[0]}})){
 		if (!defined($cpd_structure->{$cpdid})) {
-			$cpd_structure->{$cpdid} = $array->[1];
+		    $cpd_structure->{$cpdid} = $array->[1];
 		}
+	    }
 	}
 }
 close($fh);
@@ -271,6 +317,11 @@ for (my $i=0; $i < @{$cpxs}; $i++) {
 close($fh);
 
 #Printing compounds
+#open(FH, "< ../Biochemistry/compounds.master.tsv");
+#while(<FH>){
+
+#}
+#close(FH);
 my $cpdhash = {};
 open($fh, ">", $directory."Compounds.tsv");
 $columns = [qw(

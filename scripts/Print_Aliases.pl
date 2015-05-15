@@ -55,10 +55,26 @@ foreach my $aliasSet (sort keys %$rxn_aliases){
 $bioObj = $FBAImpl->_get_msobject("Biochemistry",$ws,"plantdefault");
 $cpd_aliases = $bioObj->compoundsByAlias();
 
+#special case where previously merged compounds need to have their aliases restored
+my %Merged_MS=();
+foreach my $alias (keys %{$cpd_aliases->{ModelSEED}}){
+    foreach my $id (keys %{$cpd_aliases->{ModelSEED}{$alias}}){
+	if($alias ne $id){
+	    $Merged_MS{$id}{$alias}=1;
+	}
+    }
+}
+
 foreach my $aliasSet (sort keys %$cpd_aliases){
     foreach my $alias (sort keys %{$cpd_aliases->{$aliasSet}}){
 	foreach my $id (sort keys %{$cpd_aliases->{$aliasSet}{$alias}}){
 	    $Global_Aliases{$aliasSet}{$alias}{plantdefault}{$id}=1;
+
+	    if(exists($Merged_MS{$id})){
+		foreach my $merged_id (keys %{$Merged_MS{$id}}){
+		    $Global_Aliases{$aliasSet}{$alias}{plantdefault}{$merged_id}=1;
+		}
+	    }
 	}
     }
 }
@@ -74,7 +90,10 @@ foreach my $aliasSet (sort keys %$rxn_aliases){
 }
 
 foreach my $aliasSet (sort keys %Global_Aliases){
-    open(OUT, "> ".$aliasSet.".aliases");
+    my $file = $aliasSet;
+    $file = join("_",split(/\s/,$aliasSet)) if $aliasSet eq "Enzyme Class";
+
+    open(OUT, "> ".$file.".aliases");
     print OUT $aliasSet."\tdefault\tplantdefault\n";
     foreach my $alias (sort keys %{$Global_Aliases{$aliasSet}}){
 	print OUT $alias."\t";
