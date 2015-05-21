@@ -4,13 +4,13 @@ use strict;
 my @temp=();
 my $header = 1;
 
-#######################################################
-#Initialization
-#######################################################
-
 my $directory = $ARGV[0];
 exit if !$directory || !-d $directory;
 $directory.="/" if $directory !~ /\/$/;
+
+#######################################################
+#Initialization
+#######################################################
 
 use Bio::KBase::fbaModelServices::ScriptHelpers qw( getToken );
 my $AToken = getToken();
@@ -44,6 +44,7 @@ my $p_rxn_alias_hash = {};
 my $cpd_alias_hash = {};
 my $p_cpd_alias_hash = {};
 
+my %alias_cpd_hash = ();
 foreach my $file (sort @Files){
     $file =~ /^(\w+)\.aliases/;
     my $aliasSet = $1;
@@ -59,9 +60,15 @@ foreach my $file (sort @Files){
 	if($temp[1] =~ /^cpd/ || $temp[2] =~ /^cpd/){
 	    foreach my $cpd (split(/\|/,$temp[1])){
 		$cpd_alias_hash->{$aliasSet}->{$temp[0]}->{$cpd}=1;
+		$alias_cpd_hash{$cpd}{$aliasSet}{$temp[0]}=1;
 	    }
 	    foreach my $cpd (split(/\|/,$temp[2])){
 		$p_cpd_alias_hash->{$aliasSet}->{$temp[0]}->{$cpd}=1;
+
+		#Need to revise the decision to forgo aliases found in more recent database
+		if(!exists($alias_cpd_hash{$cpd}) && !exists($alias_cpd_hash{$cpd}{$aliasSet})){
+		    $alias_cpd_hash{$cpd}{$aliasSet}{$temp[0]}=1;
+		}
 	    }
 	}
 	if($temp[1] =~ /^rxn/ || $temp[2] =~ /^rxn/){
@@ -317,165 +324,41 @@ for (my $i=0; $i < @{$cpxs}; $i++) {
 close($fh);
 
 #Printing compounds
-#open(FH, "< ../Biochemistry/compounds.master.tsv");
-#while(<FH>){
+#As it stands, it's a copy of the master compounds file with the aliases integrated
+open(FH, "< ../Biochemistry/compounds.master.tsv");
+open(my $fh, ">", $directory."Compounds.tsv");
+$header = 1;
+my @headers=();
+while(<FH>){
+    chomp;
+    if($header){
+	@headers = split(/\t/,$_,-1);
+	print $fh $_;
+	$header--;
+	next;
+    }
+    @temp=split(/\t/,$_,-1);
 
-#}
-#close(FH);
-my $cpdhash = {};
-open($fh, ">", $directory."Compounds.tsv");
-$columns = [qw(
-	id
-	abbreviation
-	name
-	formula
-	mass
-	source
-	structure
-	charge
-	is_core
-	is_obsolete
-	linked_compound
-	is_cofactor
-	deltag
-	deltagerr
-	pka
-	pkb
-	abstract_compound
-	comprised_of
-	aliases
-)];
-print $fh join("\t",@{$columns})."\n";
-my $cpds = $bio->compounds();
-for (my $i=0; $i < @{$cpds}; $i++) {
-	my $cpd = $cpds->[$i];
-	my $aliases = "";
-	my $pka = "";
-	my $pkb = "";
-	my $structure = "null";
-	if (defined($cpd_structure->{$cpd->id()})) {
-		$structure = $cpd_structure->{$cpd->id()};
-	}
-	my $abstractcpd = "null";
-	if (defined($cpd->abstractCompound_ref())) {
-		$abstractcpd = $cpd->abstractCompound()->id();
-	}
-	foreach my $atom (keys(%{$cpd->pkas()})) {
-		foreach my $value (@{$cpd->pkas()->{$atom}}) {
-			if (length($pka) > 0) {
-				$pka .= ";";
-			}
-			$pka .= $value.":".$atom;
-		}
-	}
-	foreach my $atom (keys(%{$cpd->pkbs()})) {
-		foreach my $value (@{$cpd->pkbs()->{$atom}}) {
-			if (length($pkb) > 0) {
-				$pkb .= ";";
-			}
-			$pkb .= $value.":".$atom;
-		}
-	}
-	my $aliasehash = $cpd->parent()->compound_aliases()->{$cpd->id()};
-    foreach my $type (keys(%{$aliasehash})) {
-    	foreach my $alias (@{$aliasehash->{$type}}) {
-    		if (length($aliases) > 0) {
-	    		$aliases .= ";";
-	    	}
-    		$aliases .= "\"".$type.":".$alias."\"";;
-    	}
+    #map values to keys
+    #probably not that necessary, but useful if column order changes
+    my %cpdHash=();
+    for(my $i=0;$i<scalar(@headers);$i++){
+	$cpdHash{$headers[$i]}=$temp[$i];
     }
 
-    my $data = [
-    	$cpd->id(),
-    	$cpd->abbreviation(),
-    	$cpd->name(),
-    	$cpd->formula(),
-    	defined($cpd->mass()) ? $cpd->mass() : "null",
-    	"ModelSEED",
-    	$structure,
-    	$cpd->defaultCharge(),
-    	1,
-    	0,
-    	"null",
-    	$cpd->isCofactor(),
-    	defined($cpd->deltaG()) ? $cpd->deltaG() : "null",
-    	defined($cpd->deltaGErr()) ? $cpd->deltaGErr() : "null",
-    	$pka,
-    	$pkb,
-    	$abstractcpd,
-    	"null",
-    	$aliases
-    ];
-	print $fh join("\t",@{$data})."\n";
-	$cpdhash->{$cpd->id()} = 1;
-}
-$cpds = $pbio->compounds();
-for (my $i=0; $i < @{$cpds}; $i++) {
-	my $cpd = $cpds->[$i];
-	if (!defined($cpdhash->{$cpd->id()})) {
-		my $aliases = "";
-		my $pka = "";
-		my $pkb = "";
-		my $structure = "null";
-		if (defined($cpd_structure->{$cpd->id()})) {
-			$structure = $cpd_structure->{$cpd->id()};
-		}
-		my $abstractcpd = "null";
-		if (defined($cpd->abstractCompound_ref())) {
-			$abstractcpd = $cpd->abstractCompound()->id();
-		}
-		foreach my $atom (keys(%{$cpd->pkas()})) {
-			foreach my $value (@{$cpd->pkas()->{$atom}}) {
-				if (length($pka) > 0) {
-					$pka .= ";";
-				}
-				$pka .= $atom.":".$value;
-			}
-		}
-		foreach my $atom (keys(%{$cpd->pkbs()})) {
-			foreach my $value (@{$cpd->pkbs()->{$atom}}) {
-				if (length($pkb) > 0) {
-					$pkb .= ";";
-				}
-				$pkb .= $atom.":".$value;
-			}
-		}
-		my $aliasehash = $cpd->parent()->compound_aliases()->{$cpd->id()};
-	    foreach my $type (keys(%{$aliasehash})) {
-	    	foreach my $alias (@{$aliasehash->{$type}}) {
-	    		if (length($aliases) > 0) {
-		    		$aliases .= ";";
-		    	}
-	    		$aliases .= "\"".$type.":".$alias."\"";;
-	    	}
-	    }
-		my $data = [
-	    	$cpd->id(),
-	    	$cpd->abbreviation(),
-	    	$cpd->name(),
-	    	$cpd->formula(),
-	    	$cpd->mass(),
-	    	"ModelSEED",
-	    	$structure,
-	    	$cpd->defaultCharge(),
-	    	1,
-	    	0,
-	    	"null",
-	    	$cpd->isCofactor(),
-	    	$cpd->deltaG(),
-	    	$cpd->deltaGErr(),
-	    	$pka,
-	    	$pkb,
-	    	$abstractcpd,
-	    	"null",
-	    	$aliases
-	    ];
-		print $fh join("\t",@{$data})."\n";
-		$cpdhash->{$cpd->id()} = 1;
+    my @aliases = ();
+    foreach my $aliasSet (keys %{$alias_cpd_hash{$cpdHash{id}}}){
+	foreach my $alias (keys %{$alias_cpd_hash{$cpdHash{id}}{$aliasSet}}){
+	    push(@aliases, "\"".$aliasSet.":".$alias."\"");
 	}
+    }
+
+    $cpdHash{aliases}= scalar(@aliases)>0 ? join(";",@aliases) : "null";
+
+    print $fh join("\t", map { $cpdHash{$_} } @headers),"\n";
 }
 close($fh);
+
 #Printing reactions
 my $rxnhash = {};
 open($fh, ">", $directory."Reactions.tsv");
