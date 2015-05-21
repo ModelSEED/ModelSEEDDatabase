@@ -4,8 +4,8 @@ use strict;
 my @temp=();
 my $header=1;
 
-my %Defaults = (charge => 0,
-		isCofactor => 0,
+my %Defaults = (charge => "null",
+		is_cofactor => 0,
 		formula => "null");
 
 #Load up the required modifications
@@ -27,9 +27,10 @@ while(<FH>){
     chomp;
     @temp=split(/\t/,$_,-1);
     for(my $i=1;$i<scalar(@temp);$i++){
+
 	if(exists($Cpd_Mods{$temp[0]}) && exists($Cpd_Mods{$temp[0]}{$headers[$i]})){
 	    $temp[$i] = $Cpd_Mods{$temp[0]}{$headers[$i]};
-	}elsif(!$temp[$i] && exists($Defaults{$headers[$i]})){
+	}elsif((!defined($temp[$i]) || $temp[$i] eq "10000000" || $temp[$i] eq "unknown" || $temp[$i] eq "noformula") && exists($Defaults{$headers[$i]})){
 	    $temp[$i] = $Defaults{$headers[$i]};
 	}
 
@@ -50,7 +51,7 @@ while(<FH>){
     for(my $i=1;$i<scalar(@temp);$i++){
 	if(exists($Cpd_Mods{$temp[0]}) && exists($Cpd_Mods{$temp[0]}{$headers[$i]})){
 	    $temp[$i] = $Cpd_Mods{$temp[0]}{$headers[$i]};
-	}elsif(!$temp[$i] && exists($Defaults{$headers[$i]})){
+	}elsif((!$temp[$i] || $temp[$i] eq "10000000" || $temp[$i] eq "unknown" || $temp[$i] eq "noformula") && exists($Defaults{$headers[$i]})){
 	    $temp[$i] = $Defaults{$headers[$i]};
 	}
 
@@ -101,18 +102,21 @@ close(FH);
 
 #Print it all out
 open(OUT, "> Master_Compound_List.tsv");
-print OUT join("\t",@headers),"\tInChI\n",;
+print OUT join("\t",@headers),"\n",;
 foreach my $cpd ( grep { $_ ne "cpd00000" } sort keys %Cpds){
     print OUT $cpd."\t";
 
-    print OUT join("\t", map { $Cpds{$cpd}{$_} } grep { $_ ne "id" } @headers),"\t";
-
-    #priortize manual InChIs then InChIs from KEGG
-    if(exists($Cpd_Mods{$cpd}{InChI})){
-	print OUT $Cpd_Mods{$cpd}{InChI}."\n";
+    #priortize manual structures then structures from KEGG
+    my $structure = "null";
+    if(exists($Cpd_Mods{$cpd}{structure})){
+	$structure = $Cpd_Mods{$cpd}{structure};
     }elsif(exists($Aliases{$cpd}{KEGG}) && exists($InChIs{$Aliases{$cpd}{KEGG}})){
-	print OUT $InChIs{$Aliases{$cpd}{KEGG}}."\n";
+	$structure = $InChIs{$Aliases{$cpd}{KEGG}};
     }elsif(exists($Aliases{$cpd}{MetaCyc}) && exists($InChIs{$Aliases{$cpd}{MetaCyc}})){
-	print OUT $InChIs{$Aliases{$cpd}{MetaCyc}}."\n";
+	$structure = $InChIs{$Aliases{$cpd}{MetaCyc}};
     }
+    $Cpds{$cpd}{structure}=$structure;
+    
+
+    print OUT join("\t", map { $Cpds{$cpd}{$_} } grep { $_ ne "id" } @headers),"\n";
 }
