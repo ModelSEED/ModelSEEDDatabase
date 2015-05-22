@@ -2,6 +2,10 @@
 use warnings;
 use strict;
 
+my $DB = $ARGV[0];
+exit if !$DB;
+exit if $DB ne "default" && $DB ne "plantdefault";
+
 #######################################################
 #Initialization
 #######################################################
@@ -23,30 +27,46 @@ my $FBAImpl = Bio::KBase::fbaModelServices::Impl->new({'fbajobcache' => "/homes/
 						       'gaserver-url' => "http://kbase.us/services/genome_annotation",
 						       'idserver-url' => "http://kbase.us/services/idserver"});
 $FBAImpl->_setContext(undef,{auth=>$AToken});
+my $bioObj = $FBAImpl->_get_msobject("Biochemistry","kbase", $DB);
 
+#List of headers used in SOLR Dump
+my @headers = ("id","abbreviation","name","code","stoichiometry","is_transport","equation","definition","reversibility","direction","abstract_reaction","pathways","aliases","ec_numbers","deltag","deltagerr","compound_ids");
 
-#######################################################
-#Biochemistry and Model
-#######################################################
+#Translation of header to originating attribute in reaction
+my %Original_Header = ( deltag=>"deltaG", deltagerr => "deltaGErr", is_transport => "isTransport", reversibility => "thermoReversibility" );
 
-my $ws="kbase";
-my $bioObj = $FBAImpl->_get_msobject("Biochemistry",$ws,"default");
-my @reactions = sort { $a->{id} cmp $b->{id} } @{$bioObj->reactions()};
-open(OUT, "> ../Biochemistry/reactions.default.tsv");
-print OUT "id\tname\tabbreviation\tdirection\tthermoReversibility\tstatus\tdefaultProtons\tequation\n";
-print OUT join("\n", map { $_->id()."\t".$_->name()."\t".$_->abbreviation()."\t".$_->direction()."\t".$_->thermoReversibility()."\t".$_->status()."\t".$_->defaultProtons()."\t".$_->equation() } @reactions),"\n";
-close OUT;
+#Headers to skip as they are not true compound attributes in current biochemistry
+my %Skip_Header = ( stoichiometry => 1, abstract_reaction => 1, pathways => 1, aliases => 1, ec_numbers => 1, compound_ids => 1 );
 
-$bioObj = $FBAImpl->_get_msobject("Biochemistry",$ws,"plantdefault");
-@reactions = sort { $a->{id} cmp $b->{id} } @{$bioObj->reactions()};
-open(OUT, "> ../Biochemistry/reactions.plantdefault.tsv");
-print OUT "id\tname\tabbreviation\tdirection\tthermoReversibility\tstatus\tdefaultProtons\tequation\n";
-print OUT join("\n", map { $_->id()."\t".$_->name()."\t".$_->abbreviation()."\t".$_->direction()."\t".$_->thermoReversibility()."\t".$_->status()."\t".$_->defaultProtons()."\t".$_->equation() } @reactions),"\n";
-close OUT;
+#Default values to use
+my %Default_Values = ( stoichiometry => "null", deltag => "null", deltagerr => "null", abstract_reaction => "null",
+		       compound_ids => "null", aliases => "null", ec_numbers => "null", aliases => "null" );
 
-$bioObj = $FBAImpl->_get_msobject("Biochemistry",$ws,"plantdefault_obs");
-@reactions = sort { $a->{id} cmp $b->{id} } @{$bioObj->reactions()};
-open(OUT, "> ../Biochemistry/reactions.plantdefault_obs.tsv");
-print OUT "id\tname\tabbreviation\tdirection\tthermoReversibility\tstatus\tdefaultProtons\tequation\n";
-print OUT join("\n", map { $_->id()."\t".$_->name()."\t".$_->abbreviation()."\t".$_->direction()."\t".$_->thermoReversibility()."\t".$_->status()."\t".$_->defaultProtons()."\t".$_->equation() } @reactions),"\n";
-close OUT;
+#Hash of subroutines that transform the values of some hierarchical attributes to a single string
+#The subroutines here are copied from the DumpSOLRTables scripts
+my %Transform_Header =  map { my $item = pop @$_; map { $_, $item } @$_ }
+[qw(abstract_reaction) => sub { my $rxn = shift; return defined($rxn->abstractReaction_ref()) ? $rxn->abstractReaction()->id() : "null"; }],
+[qw(compounds) => sub { my $rxn = shift; my $compounds = join(";", map { $_->compound()->id() } @{$rxn->reagents()}); return $compounds; }],
+[qw(stoichiometry) => sub { my $rxn = shift; my $stoichiometry = join(";", map { $_->coefficient().":".$_->compound()->id().":".$_->compartment()->id().":0:\"".$_->compound()->name()."\"" } @{$rxn->reagents()}); return $stoichiometry; }];
+
+my @reactions = sort { $a->{id} cmp $b->{id} } grep { $_->id() ne "cpd00000" } @{$bioObj->reactions()};
+
+open(OUT, "> ../Biochemistry/reactions.".$DB.".tsv");
+print OUT join("\t", @headers),"\n";
+foreach my $rxn (@reactions){
+
+#Here, we either transform the attributes value, use its original value (or skip it), and then use the default value if availeble
+#Finally, the header itself if printed if it falls through to the end, so a simple test is to see if any column headers are repeated
+#Lots of nulls appear at this stage, as they are integrated when forming the master document
+print OUT join("\t", map { 
+    if(exists($Transform_Header{$_})){ 
+	$Transform_Header{$_}($rxn);
+    }elsif( !exists($Skip_Header{$_}) && defined($rxn->$_()) ){
+	$rxn->$_();
+    }elsif( exists($Default_Values{$_}) ){ 
+	$Default_Values{$_}; 
+    }else{
+	$_;
+    }} map { exists($Original_Header{$_}) ? $Original_Header{$_} : $_ } @headers),"\n";
+}
+close(OUT);
