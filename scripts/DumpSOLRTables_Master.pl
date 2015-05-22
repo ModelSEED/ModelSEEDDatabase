@@ -326,7 +326,7 @@ close($fh);
 #Printing compounds
 #As it stands, it's a copy of the master compounds file with the aliases integrated
 open(FH, "< ../Biochemistry/compounds.master.tsv");
-open(my $fh, ">", $directory."Compounds.tsv");
+open($fh, ">", $directory."Compounds.tsv");
 $header = 1;
 my @headers=();
 while(<FH>){
@@ -564,7 +564,7 @@ for (my $i=0; $i < @{$templates}; $i++) {
 	    	$rxn->reaction()->equation(),
 	    	$rxn->reaction()->definition(),
 	    	$rxn->direction(),
-	    	$rxn->GapfillDirection(),
+	    	defined($rxn->GapfillDirection()) ? $rxn->GapfillDirection() : "?",
 	    	"null",
 	    	defined($rxn->base_cost()) ? $rxn->base_cost() : 0,
 	    	defined($rxn->forward_penalty()) ? $rxn->base_cost() : 0,

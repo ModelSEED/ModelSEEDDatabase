@@ -45,7 +45,7 @@ my %Default_Values = ( mass => "null", deltag => "null", deltagerr => "null", co
 #Hash of subroutines that transform the values of some hierarchical attributes to a single string
 #The subroutines here are copied from the DumpSOLRTables scripts
 my %Transform_Header =  map { my $item = pop @$_; map { $_, $item } @$_ }
-[qw(abstract_compound) => sub { my $cpd = shift; return $cpd->abstractCompound()->id() if defined($cpd->abstractCompound_ref()); }],
+[qw(abstract_compound) => sub { my $cpd = shift; return defined($cpd->abstractCompound_ref()) ? $cpd->abstractCompound()->id() : "null"; }],
 [qw(pka) => sub { my $cpd = shift; my $pka= join(";", map { my $atom = $_; map { $_.":".$atom } @{$cpd->pkas()->{$atom}} } keys %{$cpd->pkas()}); return $pka; }],
 [qw(pkb) => sub { my $cpd = shift; my $pkb= join(";", map { my $atom = $_; map { $_.":".$atom } @{$cpd->pkbs()->{$atom}} } keys %{$cpd->pkbs()}); return $pkb; }];
 
