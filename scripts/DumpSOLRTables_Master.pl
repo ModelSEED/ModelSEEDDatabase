@@ -529,7 +529,7 @@ for (my $i=0; $i < @{$templates}; $i++) {
 	    	$rxn->reaction()->equation(),
 	    	$rxn->reaction()->definition(),
 	    	$rxn->direction(),
-	    	defined($rxn->GapfillDirection()) ? $rxn->GapfillDirection() : "?",
+	    	defined($rxn->GapfillDirection()) ? $rxn->GapfillDirection() : "=",
 	    	"null",
 	    	defined($rxn->base_cost()) ? $rxn->base_cost() : 0,
 	    	defined($rxn->forward_penalty()) ? $rxn->base_cost() : 0,
