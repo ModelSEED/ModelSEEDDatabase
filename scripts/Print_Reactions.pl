@@ -30,7 +30,7 @@ $FBAImpl->_setContext(undef,{auth=>$AToken});
 my $bioObj = $FBAImpl->_get_msobject("Biochemistry","kbase", $DB);
 
 #List of headers used in SOLR Dump
-my @headers = ("id","abbreviation","name","code","stoichiometry","is_transport","equation","definition","reversibility","direction","abstract_reaction","pathways","aliases","ec_numbers","deltag","deltagerr","compound_ids");
+my @headers = ("id","abbreviation","name","code","stoichiometry","is_transport","equation","definition","reversibility","direction","abstract_reaction","pathways","aliases","ec_numbers","deltag","deltagerr","compound_ids","status");
 
 #Translation of header to originating attribute in reaction
 my %Original_Header = ( deltag=>"deltaG", deltagerr => "deltaGErr", is_transport => "isTransport", reversibility => "thermoReversibility" );
