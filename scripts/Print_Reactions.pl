@@ -40,16 +40,16 @@ my %Skip_Header = ( stoichiometry => 1, abstract_reaction => 1, pathways => 1, a
 
 #Default values to use
 my %Default_Values = ( stoichiometry => "null", deltag => "null", deltagerr => "null", abstract_reaction => "null",
-		       compound_ids => "null", aliases => "null", ec_numbers => "null", aliases => "null" );
+		       compound_ids => "null", aliases => "null", ec_numbers => "null", aliases => "null", pathways => "null" );
 
 #Hash of subroutines that transform the values of some hierarchical attributes to a single string
 #The subroutines here are copied from the DumpSOLRTables scripts
 my %Transform_Header =  map { my $item = pop @$_; map { $_, $item } @$_ }
 [qw(abstract_reaction) => sub { my $rxn = shift; return defined($rxn->abstractReaction_ref()) ? $rxn->abstractReaction()->id() : "null"; }],
-[qw(compounds) => sub { my $rxn = shift; my $compounds = join(";", map { $_->compound()->id() } @{$rxn->reagents()}); return $compounds; }],
+[qw(compound_ids) => sub { my $rxn = shift; my $compounds = join(";", map { $_->compound()->id() } @{$rxn->reagents()}); return $compounds; }],
 [qw(stoichiometry) => sub { my $rxn = shift; my $stoichiometry = join(";", map { $_->coefficient().":".$_->compound()->id().":".$_->compartment()->id().":0:\"".$_->compound()->name()."\"" } @{$rxn->reagents()}); return $stoichiometry; }];
 
-my @reactions = sort { $a->{id} cmp $b->{id} } grep { $_->id() ne "cpd00000" } @{$bioObj->reactions()};
+my @reactions = sort { $a->{id} cmp $b->{id} } grep { $_->id() ne "rxn00000" && $_->id() !~ /^CoA-2-methylpropanoylating/ } @{$bioObj->reactions()};
 
 open(OUT, "> ../Biochemistry/reactions.".$DB.".tsv");
 print OUT join("\t", @headers),"\n";

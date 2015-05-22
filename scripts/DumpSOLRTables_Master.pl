@@ -45,6 +45,7 @@ my $cpd_alias_hash = {};
 my $p_cpd_alias_hash = {};
 
 my %alias_cpd_hash = ();
+my %alias_rxn_hash = ();
 foreach my $file (sort @Files){
     $file =~ /^(\w+)\.aliases/;
     my $aliasSet = $1;
@@ -74,9 +75,15 @@ foreach my $file (sort @Files){
 	if($temp[1] =~ /^rxn/ || $temp[2] =~ /^rxn/){
 	    foreach my $rxn (split(/\|/,$temp[1])){
 		$rxn_alias_hash->{$aliasSet}->{$temp[0]}->{$rxn}=1;
+		$alias_rxn_hash{$rxn}{$aliasSet}{$temp[0]}=1;
 	    }
 	    foreach my $rxn (split(/\|/,$temp[2])){
 		$p_rxn_alias_hash->{$aliasSet}->{$temp[0]}->{$rxn}=1;
+
+		#Need to revise the decision to forgo aliases found in more recent database
+		if(!exists($alias_rxn_hash{$rxn}) && !exists($alias_rxn_hash{$rxn}{$aliasSet})){
+		    $alias_rxn_hash{$rxn}{$aliasSet}{$temp[0]}=1;
+		}
 	    }
 	}
 
@@ -333,7 +340,7 @@ while(<FH>){
     chomp;
     if($header){
 	@headers = split(/\t/,$_,-1);
-	print $fh $_;
+	print $fh $_."\n";
 	$header--;
 	next;
     }
@@ -360,103 +367,61 @@ while(<FH>){
 close($fh);
 
 #Printing reactions
-my $rxnhash = {};
+#As it stands, it's a copy of the master reactions file with the pathways, aliases, and ec numbers integrated
+open(FH, "< ../Biochemistry/reactions.master.tsv");
 open($fh, ">", $directory."Reactions.tsv");
-$columns = [qw(
-	id
-	abbreviation
-	name
-	code
-	stoichiometry
-	is_transport
-	equation
-	definition
-	reversibility
-	direction
-	abstract_reaction
-	pathways
-	aliases
-	ec_numbers
-	deltag
-	deltagerr
-	compound_ids
-)];
-print $fh join("\t",@{$columns})."\n";
-my $rxns = $bio->reactions();
-for (my $i=0; $i < @{$rxns}; $i++) {
-	my $rxn = $rxns->[$i];
-	my $aliases = "";
-	my $pathways = "";
-	if (defined($rxn_pathways->{$rxn->id()})) {
-		foreach my $type (keys(%{$rxn_pathways->{$rxn->id()}})) {
-			foreach my $path (keys(%{$rxn_pathways->{$rxn->id()}->{$type}})) {
-				if (length($pathways) > 0) {
-					$pathways .= ";";
-				}
-				$pathways .= $type.":".$path;
-			}
-		}
-	}
-	my $ecnums = "null";
-	my $stoichiometry = "";
-	my $compounds = {};
-	my $rgts = $rxn->reagents();
-	for (my $j=0; $j < @{$rgts}; $j++) {
-		if (length($stoichiometry) > 0) {
-			$stoichiometry .= ";";
-		}
-		$stoichiometry .= $rgts->[$j]->coefficient().":".$rgts->[$j]->compound()->id().":".$rgts->[$j]->compartment()->id().":0:\"".$rgts->[$j]->compound()->name()."\"";
-		$compounds->{$rgts->[$j]->compound()->id()} = 1;
-	}
-	my $abstractrxn = "null";
-	if (defined($rxn->abstractReaction_ref())) {
-		$abstractrxn = $rxn->abstractReaction()->id();
-	}
-	my $aliasehash = $rxn->parent()->reaction_aliases()->{$rxn->id()};
-    foreach my $type (keys(%{$aliasehash})) {
-    	if ($type eq "Enzyme Class") {
-    		for (my $m=0; $m < @{$aliasehash->{$type}}; $m++) {
-    			if ($aliasehash->{$type}->[$m] =~ m/\d+\.\d+\.\d+\.\d+/) {
-    				if ($ecnums eq "null") {
-    					$ecnums = $aliasehash->{$type}->[$m];
-    				} else {
-    					$ecnums .= ";".$aliasehash->{$type}->[$m];
-    				}
-    			}
-    		}
-	    } else {
-    		foreach my $alias (@{$aliasehash->{$type}}) {
-    			if (length($aliases) > 0) {
-	    			$aliases .= ";";
-	    		}
-    			$aliases .= "\"".$type.":".$alias."\"";;
-    		}
-    	}
+$header = 1;
+undef(@headers);
+while(<FH>){
+    chomp;
+    if($header){
+	@headers = split(/\t/,$_,-1);
+	print $fh $_."\n";
+	$header--;
+	next;
+    }
+    @temp=split(/\t/,$_,-1);
+
+    #map values to keys
+    #probably not that necessary, but useful if column order changes
+    my %rxnHash=();
+    for(my $i=0;$i<scalar(@headers);$i++){
+	$rxnHash{$headers[$i]}=$temp[$i];
     }
 
-    my $data = [
-    	$rxn->id(),
-    	$rxn->abbreviation(),
-    	$rxn->name(),
-    	$rxn->code(),
-    	$stoichiometry,
-    	$rxn->isTransport(),
-    	$rxn->equation(),
-    	$rxn->definition(),
-    	$rxn->thermoReversibility(),
-    	$rxn->direction(),
-    	$abstractrxn,
-    	$pathways,
-    	$aliases,
-    	$ecnums,
-    	defined($rxn->deltaG()) ? $rxn->deltaG() : "null",
-    	defined($rxn->deltaGErr()) ? $rxn->deltaGErr() : "null",
-    	join(";",keys(%{$compounds}))
-    ];
-    print $fh join("\t",@{$data})."\n";
-    $rxnhash->{$rxn->id()} = 1;
+    my @ecnums = ();		
+    my @aliases = ();
+    foreach my $aliasSet (keys %{$alias_rxn_hash{$rxnHash{id}}}){
+	foreach my $alias (keys %{$alias_rxn_hash{$rxnHash{id}}{$aliasSet}}){
+	    #Only include full ec numbers (?)
+	    if ($aliasSet eq "Enzyme Class"){
+		if($alias =~ m/\d+\.\d+\.\d+\.\d+/){
+		    push(@ecnums, $alias);
+		}
+	    }else{
+		push(@aliases, "\"".$aliasSet.":".$alias."\"");
+	    }
+	}
+    }
+
+    $rxnHash{aliases}= scalar(@aliases)>0 ? join(";",@aliases) : "null";
+    $rxnHash{ec_numbers}= scalar(@ecnums)>0 ? join(";",@ecnums) : "null";
+
+    my @pathways = ();
+    if (defined($rxn_pathways->{$rxnHash{id}})) {
+	foreach my $type (keys(%{$rxn_pathways->{$rxnHash{id}}})) {
+	    foreach my $path (keys(%{$rxn_pathways->{$rxnHash{id}}{$type}})) {
+		push(@pathways, $type.":".$path);
+	    }
+	}
+    }
+
+    $rxnHash{pathways}= scalar(@pathways)>0 ? join(";",@pathways) : "null";
+
+    print $fh join("\t", map { $rxnHash{$_} } @headers),"\n";
 }
 close($fh);
+
 #Printing template reactions
 open($fh, ">", $directory."TemplateReactions.tsv");
 $columns = [qw(
