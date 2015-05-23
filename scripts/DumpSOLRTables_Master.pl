@@ -418,7 +418,7 @@ while(<FH>){
 
     $rxnHash{pathways}= scalar(@pathways)>0 ? join(";",@pathways) : "null";
 
-    print $fh join("\t", map { $rxnHash{$_} } grep { $_ ne "status" } @headers),"\n";
+    print $fh join("\t", map { $rxnHash{$_} } @headers),"\n";
 }
 close($fh);
 
