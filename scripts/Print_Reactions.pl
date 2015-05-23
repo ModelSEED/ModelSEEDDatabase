@@ -36,7 +36,7 @@ my @headers = ("id","abbreviation","name","code","stoichiometry","is_transport",
 my %Original_Header = ( deltag=>"deltaG", deltagerr => "deltaGErr", is_transport => "isTransport", reversibility => "thermoReversibility" );
 
 #Headers to skip as they are not true compound attributes in current biochemistry
-my %Skip_Header = ( stoichiometry => 1, abstract_reaction => 1, pathways => 1, aliases => 1, ec_numbers => 1, compound_ids => 1 );
+my %Skip_Header = ( abstract_reaction => 1, pathways => 1, aliases => 1, ec_numbers => 1, compound_ids => 1 );
 
 #Default values to use
 my %Default_Values = ( stoichiometry => "null", deltag => "null", deltagerr => "null", abstract_reaction => "null",
@@ -46,8 +46,7 @@ my %Default_Values = ( stoichiometry => "null", deltag => "null", deltagerr => "
 #The subroutines here are copied from the DumpSOLRTables scripts
 my %Transform_Header =  map { my $item = pop @$_; map { $_, $item } @$_ }
 [qw(abstract_reaction) => sub { my $rxn = shift; return defined($rxn->abstractReaction_ref()) ? $rxn->abstractReaction()->id() : "null"; }],
-[qw(compound_ids) => sub { my $rxn = shift; my $compounds = join(";", map { $_->compound()->id() } @{$rxn->reagents()}); return $compounds; }],
-[qw(stoichiometry) => sub { my $rxn = shift; my $stoichiometry = join(";", map { $_->coefficient().":".$_->compound()->id().":".$_->compartment()->id().":0:\"".$_->compound()->name()."\"" } @{$rxn->reagents()}); return $stoichiometry; }];
+[qw(compound_ids) => sub { my $rxn = shift; my $compounds = join(";", map { $_->compound()->id() } @{$rxn->reagents()}); return $compounds; }];
 
 my @reactions = sort { $a->{id} cmp $b->{id} } grep { $_->id() ne "rxn00000" && $_->id() !~ /^CoA-2-methylpropanoylating/ } @{$bioObj->reactions()};
 
