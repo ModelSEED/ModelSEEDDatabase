@@ -376,7 +376,7 @@ while(<FH>){
     chomp;
     if($header){
 	@headers = split(/\t/,$_,-1);
-	print $fh $_."\n";
+	print $fh  join("\t", grep { $_ ne 'is_obsolete' && $_ ne 'linked_reaction' } @headers),"\n";
 	$header--;
 	next;
     }
@@ -418,7 +418,7 @@ while(<FH>){
 
     $rxnHash{pathways}= scalar(@pathways)>0 ? join(";",@pathways) : "null";
 
-    print $fh join("\t", map { $rxnHash{$_} } @headers),"\n";
+    print $fh join("\t", map { $rxnHash{$_} } grep { $_ ne 'is_obsolete' && $_ ne 'linked_reaction' } @headers),"\n";
 }
 close($fh);
 
