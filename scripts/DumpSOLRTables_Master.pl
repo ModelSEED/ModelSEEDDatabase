@@ -112,6 +112,22 @@ while (my $line = <$fh>) {
 	}
 }
 close($fh);
+open($fh, "< ../Pathways/plantdefault.pathways.tsv");
+my @headers = split(/\t/,<$fh>);
+shift(@headers);
+chomp($headers[$#headers]);
+while(<$fh>){
+    chomp;
+    @temp=split(/\t/,$_,-1);
+    my $id = shift (@temp);
+    for(my $i=0;$i<scalar(@headers);$i++){
+	next if $temp[$i] eq "null";
+	foreach my $path (split(/\|/,$temp[$i])){
+	    $rxn_pathways->{$id}{$headers[$i]}{$temp[$i]}=1;
+	}
+    }
+}
+close($fh);
 
 my $cpd_structure = {};
 open($fh, "<", "../Structures/KEGG_Charged_InChI.txt");
@@ -335,7 +351,7 @@ close($fh);
 open(FH, "< ../Biochemistry/compounds.master.tsv");
 open($fh, ">", $directory."Compounds.tsv");
 $header = 1;
-my @headers=();
+undef(@headers);
 while(<FH>){
     chomp;
     if($header){
