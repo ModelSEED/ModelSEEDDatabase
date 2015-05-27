@@ -1,4 +1,4 @@
-#! /usr/bin/python
+#! /usr/bin/env python
 
 import argparse
 import re
@@ -52,9 +52,10 @@ if __name__ == "__main__":
     parser.add_argument('--show-bad-abbrs', help='show details on bad abbreviations', action='store_true', dest='showBadAbbrs', default=False)
     parser.add_argument('--show-bad-direction', help='show details on bad directions', action='store_true', dest='showBadDirection', default=False)
     parser.add_argument('--show-bad-reverse', help='show details on bad reversibility', action='store_true', dest='showBadReverse', default=False)
+    parser.add_argument('--show-diff-eq', help='show details on different equation and code', action='store_true', dest='showDiffEqCode', default=False)
     parser.add_argument('--show-bad-eq', help='show details on missing reactants or products in equations', action='store_true', dest='showBadEquations', default=False)
-    parser.add_argument('--show-protons', help='show details on default proton values', action='store_true', dest='showProtons', default=False)
     parser.add_argument('--show-status', help='show details on status types', action='store_true', dest='showStatus', default=False)
+    parser.add_argument('--show-bad-link', help='show details on bad links', action='store_true', dest='showBadLink', default=False)
     usage = parser.format_usage()
     parser.description = desc1 + '      ' + usage + desc2
     parser.usage = argparse.SUPPRESS
@@ -76,6 +77,9 @@ if __name__ == "__main__":
         print 'Error reading reactions file'
         exit(1)
     print 'Number of reactions: %d' %(len(reactions))
+    
+    # Create a dictionary keyed by id for fast lookup of reactions.
+    reactionDict = helper.buildIndexDictFromListOfObjects(reactions)
 
     # Check for duplicates, missing and invalid values.
     idDict = dict()
@@ -90,13 +94,17 @@ if __name__ == "__main__":
     badDirection = list()
     badReversibility = list()
     unknownReversibility = list()
-    protons = dict()
+    diffEquationCode = list()
     noEquation = list()
     noDefinition = list()
     noReactants = list()
     noProducts = list()
     statusTypes = dict()
     okStatus = 0
+    isTransport = list()
+    isObsolete = list()
+    badLink = list()
+    
     for index in range(len(reactions)):
         rxn = reactions[index]
         
@@ -146,16 +154,14 @@ if __name__ == "__main__":
             badDirection.append(index)
 
         # Check for unknown or invalid reversibility.
-        if rxn['thermoReversibility'] == '?':
+        if rxn['reversibility'] == '?':
             unknownReversibility.append(index)
-        elif rxn['thermoReversibility'] != '<' and rxn['thermoReversibility'] != '>' and rxn['thermoReversibility'] != '=':
+        elif rxn['reversibility'] != '<' and rxn['reversibility'] != '>' and rxn['reversibility'] != '=':
             badReversibility.append(index)
 
-        # Check defaultProtons value.
-        if rxn['defaultProtons'] in protons:
-            protons[rxn['defaultProtons']] += 1
-        else:
-            protons[rxn['defaultProtons']] = 1
+        # Check for different equation and code fields.
+        if rxn['equation'] != rxn['code']:
+            diffEquationCode.append(index)
 
         # Check for missing reactants and/or products.
         reactants, products = helper.parseEquation(rxn['equation'])
@@ -187,6 +193,19 @@ if __name__ == "__main__":
                 else:
                     statusTypes[type] = 1
 
+        # Check for transport and obsolete reactions.
+        if rxn['is_transport'] != '0':
+            isTransport.append(index)
+        if rxn['is_obsolete'] != '0':
+            isObsolete.append(index)
+
+        # Check that linked reactions are all valid.
+        if rxn['linked_reaction'] != 'null':
+            linkedRxns = rxn['linked_reaction'].split(';')
+            for rxnid in linkedRxns:
+                if rxnid not in reactionDict:
+                    badLink.append(index)
+        
     # Print summary data.
     print 'Number of reactions with duplicate IDs: %d' %(duplicateId)    
     print 'Number of reactions with bad characters in ID: %d' %(len(badIdChars))
@@ -195,15 +214,18 @@ if __name__ == "__main__":
     print 'Number of reactions with duplicate abbreviations: %d' %(duplicateAbbr)
     print 'Number of reactions with bad characters in abbreviation: %d' %(len(badAbbrChars))
     print 'Number of reactions with bad direction: %d' %(len(badDirection))
-    print 'Number of reactions with bad thermoReversibility: %d' %(len(badReversibility))
-    print 'Number of reactions with unknown thermoReversibility: %d' %(len(unknownReversibility))
-    print 'Number of reactions with 0 default protons: %d' %(protons[0])
+    print 'Number of reactions with bad reversibility: %d' %(len(badReversibility))
+    print 'Number of reactions with unknown reversibility: %d' %(len(unknownReversibility))
+    print 'Number of reactions with different equation and code: %d' %(len(diffEquationCode))
     print 'Number of reactions with missing equation: %d' %(len(noEquation))
 #    print 'Number of reactions with missing definition: %d' %(len(noDefinition))
     print 'Number of reactions with no reactants: %d' %(len(noReactants))
     print 'Number of reactions with no products: %d' %(len(noProducts))
     print 'Number of reactions with OK status: %d' %(okStatus)
     print 'Number of reactions with error status: %d' %(len(reactions)-okStatus)
+    print 'Number of transport reactions: %d' %(len(isTransport))
+    print 'Number of obsolete reactions: %d' %(len(isObsolete))
+    print 'Number of reactions with bad links: %d' %(len(badLink))
     print
 
     # Print details if requested.
@@ -254,19 +276,21 @@ if __name__ == "__main__":
             print
     if args.showBadReverse:
         if len(badReversibility) > 0:
-            print 'Reactions with bad value in thermoReversibility:'
+            print 'Reactions with bad value in reversibility:'
             for index in range(len(badReversibility)):
                 print 'Line %05d: %s' %(reactions[badReversibility[index]]['linenum'], reactions[badReversibility[index]])
             print
         if len(unknownReversibility) > 0:
-            print 'Reactions with unknown thermoReversibility:'
+            print 'Reactions with unknown reversibility:'
             for index in range(len(unknownReversibility)):
                 print 'Line %05d: %s' %(reactions[unknownReversibility[index]]['linenum'], reactions[unknownReversibility[index]])
             print
-    if args.showProtons:
-        for key in protons:
-            print 'Default protons %d: %d' %(key, protons[key])
-        print
+    if args.showDiffEqCode:
+        if len(diffEquationCode) > 0:
+            print 'Reactions with different equation and code fields:'
+            for index in range(len(diffEquationCode)):
+                print 'Line %05d: %s' %(reactions[diffEquationCode[index]]['linenum'], reactions[diffEquationCode[index]])
+            print
     if args.showBadEquations:
         if len(noReactants) > 0:
             print 'Reactions with no reactants:'
@@ -291,5 +315,10 @@ if __name__ == "__main__":
     if args.showStatus:
         for type in statusTypes:
             print 'Reaction status %s: %d' %(type, statusTypes[type])
+    if args.showBadLink:
+        if len(badLink) > 0:
+            print 'Reactions with bad links:'
+            for index in range(len(badLink)):
+                print 'Line %05d: %s' %(reactions[badLink[index]]['linenum'], reactions[badLink[index]])
 
     exit(0)
