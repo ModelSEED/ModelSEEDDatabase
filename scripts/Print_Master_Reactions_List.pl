@@ -26,12 +26,35 @@ my $FBAImpl = Bio::KBase::fbaModelServices::Impl->new({'fbajobcache' => "/homes/
 						       'idserver-url' => "http://kbase.us/services/idserver"});
 $FBAImpl->_setContext(undef,{auth=>$AToken});
 
+#Load up the name modifications
+#These are needed for the generation of stoichiometry field
+open(FH, "< ../Biochemistry/compounds.master.mods");
+my %Cpd_Mods=();
+while(<FH>){
+    chomp;
+    @temp = split(/\t/,$_,-1);
+    next unless $temp[2] eq "name";
+    $Cpd_Mods{$temp[0]}{$temp[2]}=$temp[3];
+}
+close(FH);
+
 my %Rxns_Codes=();
 my %Codes_Rxns=();
 my %Rxns=();
 
 foreach my $db ("default","plantdefault"){
     my $bioObj = $FBAImpl->_get_msobject("Biochemistry","kbase",$db);
+
+    #Modify compounds first
+    foreach my $cpd (sort keys %Cpd_Mods){
+	my $obj = $bioObj->getObject("compounds",$cpd);
+	next if !$obj;
+
+	foreach my $attr (keys %{$Cpd_Mods{$cpd}}){
+	    $obj->$attr($Cpd_Mods{$cpd}{$attr});
+	}
+    }
+
     my @reactions = sort { $a->{id} cmp $b->{id} } grep { $_->id() ne "rxn00000" && $_->id() !~ /^CoA-2-methylpropanoylating/ } @{$bioObj->reactions()};
 
     foreach my $rxn (@reactions){
@@ -81,6 +104,7 @@ while(<FH>){
     }
 }
 close(FH);
+
 #foreach my $rxn (sort keys %Rxns_Codes){
 #    print join("\n", map { $rxn.":".$_.":".$Rxns{$rxn}{$_} } grep { !defined($Rxns{$rxn}{$_}) } grep { $_ ne "id" } @headers),"\n";
 #    last;
