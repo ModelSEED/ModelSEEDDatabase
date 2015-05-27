@@ -66,7 +66,13 @@ class BiochemHelper:
             @param includeLinenum: When True, include line number in dictionary
             @return List of reaction dictionaries.
         '''
-    
+
+        # The following columns are required in a reactions file.
+        required = { 'id', 'abbreviation', 'name', 'code', 'stoichiometry', 'is_transport', 
+                     'equation', 'definition', 'reversibility', 'direction', 'abstract_reaction',
+                     'pathways', 'aliases', 'ec_numbers', 'deltag', 'deltagerr', 'compound_ids',
+                     'status', 'is_obsolete', 'linked_reaction' }
+
         # Read the reactions from the specified file.
         reactions = list()
         with open(path, 'r') as handle:
@@ -75,7 +81,6 @@ class BiochemHelper:
             fieldNames = dict()
             for index in range(len(nameList)):
                 fieldNames[nameList[index]] = index
-            required = { 'id', 'name', 'abbreviation', 'direction', 'thermoReversibility', 'status', 'defaultProtons', 'equation' }
             for req in required:
                 if req not in fieldNames:
                     print 'WARNING: Required field %s is missing from header' %(req)
@@ -90,13 +95,25 @@ class BiochemHelper:
                     continue
                 rxn = dict()
                 rxn['id'] = fields[fieldNames['id']]
-                rxn['name'] = fields[fieldNames['name']]
                 rxn['abbreviation'] = fields[fieldNames['abbreviation']]
-                rxn['direction'] = fields[fieldNames['direction']]
-                rxn['thermoReversibility'] = fields[fieldNames['thermoReversibility']]
-                rxn['status'] = fields[fieldNames['status']]
-                rxn['defaultProtons'] = float(fields[fieldNames['defaultProtons']])
+                rxn['name'] = fields[fieldNames['name']]
+                rxn['code'] = fields[fieldNames['code']]
+                rxn['stoichiometry'] = fields[fieldNames['stoichiometry']]
+                rxn['is_transport'] = fields[fieldNames['is_transport']]
                 rxn['equation'] = fields[fieldNames['equation']]
+                rxn['definition'] = fields[fieldNames['definition']]
+                rxn['reversibility'] = fields[fieldNames['reversibility']]
+                rxn['direction'] = fields[fieldNames['direction']]
+                rxn['abstract_reaction'] = fields[fieldNames['abstract_reaction']]
+                rxn['pathways'] = fields[fieldNames['pathways']]
+                rxn['aliases'] = fields[fieldNames['aliases']]
+                rxn['ec_numbers'] = fields[fieldNames['ec_numbers']]
+                rxn['deltag'] = fields[fieldNames['deltag']]
+                rxn['deltagerr'] = fields[fieldNames['deltagerr']]
+                rxn['compound_ids'] = fields[fieldNames['compound_ids']]
+                rxn['status'] = fields[fieldNames['status']]
+                rxn['is_obsolete'] = fields[fieldNames['is_obsolete']]
+                rxn['linked_reaction'] = fields[fieldNames['linked_reaction']]
                 if includeLinenum:
                     rxn['linenum'] = linenum
                 reactions.append(rxn)
@@ -204,6 +221,7 @@ class BiochemHelper:
             object.  This copies the objects into a separate data structure.
     
             @param objectList: List of objects
+            @param key: Field in object to use for keys in returned dictionary
             @return Dictionary mapping key to object
         '''
     
@@ -213,6 +231,25 @@ class BiochemHelper:
             if obj is not None:
                 objectDict[obj[key]] = obj
         return objectDict
+
+    def buildIndexDictFromListOfObjects(self, objectList, key='id'):
+        ''' Build a dictionary with the specified key to the index in the list.
+    
+            The value of each element in the returned dictionary is the index into
+            the list of the object.  This allows for lookup of objects by the key
+            without copying the objects.
+    
+            @param objectList: List of objects
+            @param key: Field in object to use for keys in returned dictionary
+            @return Dictionary mapping key to index of element in objectList
+        '''
+    
+        indexDict = dict()
+        for index in range(len(objectList)):
+            obj = objectList[index]
+            if obj is not None:
+                indexDict[obj[key]] = index
+        return indexDict
 
     def parseCompoundIdStoich(self, stoichString):
         ''' Parse a compound stoichiometry string with IDs into a dictionary.
