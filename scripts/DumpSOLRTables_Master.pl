@@ -496,15 +496,10 @@ for (my $i=0; $i < @{$templates}; $i++) {
 		}
 		my $compounds = {};
 		my $comps = {};
-		my $stoichiometry = "";
 		my $rgts = $rxn->reaction()->reagents();
 		for (my $j=0; $j < @{$rgts}; $j++) {
-			if (length($stoichiometry) > 0) {
-				$stoichiometry .= ";";
-			}
-			$stoichiometry .= $rgts->[$j]->coefficient().":".$rgts->[$j]->compound()->id().":".$rgts->[$j]->compartment()->id().":0:\"".$rgts->[$j]->compound()->name()."\"";
-			$compounds->{$rgts->[$j]->compound()->id()} = 1;
-			$comps->{$rgts->[$j]->compartment()->id()} = 1;
+		    $compounds->{$rgts->[$j]->compound()->id()} = 1;
+		    $comps->{$rgts->[$j]->compartment()->id()} = 1;
 		}
 		my $abstractrxn = "null";
 		if (defined($rxn->reaction()->abstractReaction_ref())) {
@@ -540,7 +535,7 @@ for (my $i=0; $i < @{$templates}; $i++) {
 	    	$rxn->reaction()->abbreviation()."_".$compid,
 	    	$rxn->reaction()->name()."_".$compid,
 	    	$rxn->reaction()->code(),
-	    	$stoichiometry,
+	    	$rxn->reaction()->stoichiometry(),
 	    	$rxn->reaction()->isTransport(),
 	    	$rxn->reaction()->equation(),
 	    	$rxn->reaction()->definition(),
