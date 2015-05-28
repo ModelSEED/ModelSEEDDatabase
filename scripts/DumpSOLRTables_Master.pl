@@ -313,6 +313,7 @@ open(FH, "< ../Biochemistry/reactions.master.tsv");
 open($fh, ">", $directory."Reactions.tsv");
 $header = 1;
 undef(@headers);
+my %Reactions=();
 while(<FH>){
     chomp;
     if($header){
@@ -360,6 +361,7 @@ while(<FH>){
     $rxnHash{pathways}= scalar(@pathways)>0 ? join(";",@pathways) : "null";
 
     print $fh join("\t", map { $rxnHash{$_} } grep { $_ ne 'is_obsolete' && $_ ne 'linked_reaction' } @headers),"\n";
+    $Reactions{$rxnHash{id}}=\%rxnHash;
 }
 close($fh);
 #Printing template biomasses reactions
@@ -475,18 +477,6 @@ for (my $i=0; $i < @{$templates}; $i++) {
 	my $rxns = $templates->[$i]->templateReactions();
 	for (my $j=0; $j < @{$rxns}; $j++) {
 		my $rxn = $rxns->[$j];
-		my $aliases = "";
-		my $pathways = "";
-		if (defined($rxn_pathways->{$rxn->reaction()->id()})) {
-			foreach my $type (keys(%{$rxn_pathways->{$rxn->reaction()->id()}})) {
-				foreach my $path (keys(%{$rxn_pathways->{$rxn->reaction()->id()}->{$type}})) {
-					if (length($pathways) > 0) {
-						$pathways .= ";";
-					}
-					$pathways .= $type.":".$path;
-				}
-			}
-		}
 		my $complexes = {};
 		my $cpxs = $rxn->complexs();
 		for (my $j=0; $j < @{$cpxs}; $j++) {
@@ -494,60 +484,36 @@ for (my $i=0; $i < @{$templates}; $i++) {
 		}
 		my $compounds = {};
 		my $comps = {};
-		my $rgts = $rxn->reaction()->reagents();
+		my $rgts = [split(/;/,$Reactions{$rxn->reaction()->id()}{stoichiometry})];
 		for (my $j=0; $j < @{$rgts}; $j++) {
-		    $compounds->{$rgts->[$j]->compound()->id()} = 1;
-		    $comps->{$rgts->[$j]->compartment()->id()} = 1;
+		    my ($coef,$cpd,$cmpt) = split(/:/,$rgts->[$j]);
+		    $compounds->{$cpd}=1;
+		    $comps->{$cmpt}=1;
 		}
-		my $abstractrxn = "null";
-		if (defined($rxn->reaction()->abstractReaction_ref())) {
-			$abstractrxn = $rxn->reaction()->abstractReaction()->id();
-		}
-		my $aliasehash = $rxn->reaction()->parent()->reaction_aliases()->{$rxn->reaction()->id()};
-	    my $ecnums = "null";
-	    foreach my $type (keys(%{$aliasehash})) {
-	    	if ($type eq "Enzyme Class") {
-	    		for (my $m=0; $m < @{$aliasehash->{$type}}; $m++) {
-	    			if ($aliasehash->{$type}->[$m] =~ m/\d+\.\d+\.\d+\.\d+/) {
-	    				if ($ecnums eq "null") {
-	    					$ecnums = $aliasehash->{$type}->[$m];
-	    				} else {
-	    					$ecnums .= ";".$aliasehash->{$type}->[$m];
-	    				}
-	    			}
-	    		}
-	    	} else {
-	    		foreach my $alias (@{$aliasehash->{$type}}) {
-	    			if (length($aliases) > 0) {
-		    			$aliases .= ";";
-		    		}
-	    			$aliases .= "\"".$type.":".$alias."\"";
-	    		}
-	    	}
-	    }
 
+		my $rxn_id = $rxn->reaction()->id();
 	    my $compid = "c0";
 	    my $data = [
-	    	$templatedata->[$i]->[0].".".$rxn->reaction()->id()."_".$compid,
-	    	$rxn->reaction()->id(),
-	    	$rxn->reaction()->abbreviation()."_".$compid,
-	    	$rxn->reaction()->name()."_".$compid,
-	    	$rxn->reaction()->code(),
-	    	$rxn->reaction()->stoichiometry(),
-	    	$rxn->reaction()->isTransport(),
-	    	$rxn->reaction()->equation(),
-	    	$rxn->reaction()->definition(),
+	    	$templatedata->[$i]->[0].".".$rxn_id."_".$compid,
+	    	$rxn_id,
+	    	$Reactions{$rxn_id}{abbreviation}."_".$compid,
+	    	$Reactions{$rxn_id}{name}."_".$compid,
+	    	$Reactions{$rxn_id}{code},
+	    	$Reactions{$rxn_id}{stoichiometry},
+	    	$Reactions{$rxn_id}{is_transport},
+	    	$Reactions{$rxn_id}{equation},
+	    	$Reactions{$rxn_id}{definition},
 	    	$rxn->direction(),
 	    	defined($rxn->GapfillDirection()) ? $rxn->GapfillDirection() : "=",
 	    	"null",
 	    	defined($rxn->base_cost()) ? $rxn->base_cost() : 0,
 	    	defined($rxn->forward_penalty()) ? $rxn->base_cost() : 0,
 	    	defined($rxn->reverse_penalty()) ? $rxn->base_cost() : 0,
-	    	$pathways,
-	    	$aliases,
-	    	$ecnums,
-	    	defined($rxn->reaction()->deltaG()) ? $rxn->reaction()->deltaG() : "null",
-	    	defined($rxn->reaction()->deltaGErr()) ? $rxn->reaction()->deltaGErr() : "null",
+	    	$Reactions{$rxn_id}{pathways},
+	    	$Reactions{$rxn_id}{aliases},
+	    	$Reactions{$rxn_id}{ec_numbers},
+		$Reactions{$rxn_id}{deltag},
+		$Reactions{$rxn_id}{deltagerr},
 	    	$templatedata->[$i]->[0],
 	    	$templatedata->[$i]->[1],
 	    	$templatedata->[$i]->[2],
