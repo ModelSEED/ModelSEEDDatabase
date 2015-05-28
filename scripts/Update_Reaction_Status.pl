@@ -18,7 +18,7 @@ $Bio_Obj->_reference("~");
 open(FH, "< ../Biochemistry/compounds.master.tsv");
 my @headers = split(/\t/,<FH>);
 chomp($headers[$#headers]);
-my %Required_Headers=(id=>'id',charge=>'defaultCharge',formula=>'formula');
+my %Required_Headers=(id=>'id',charge=>'defaultCharge',formula=>'formula',name=>'name');
 my %Cpds=();
 while(<FH>){
     chomp;
@@ -35,6 +35,16 @@ while(<FH>){
 }
 close(FH);
 
+#Retrieve prioritized reactions
+open(FH, "< ../Biochemistry/Workspaces/KBaseTemplateModels.rxn");
+my %PriRxns=();
+while(<FH>){
+    chomp;
+    @temp=split(/\t/);
+    $PriRxns{$temp[0]}=1;
+}
+close(FH);
+
 #######################################################
 #Iterate Master Reactions
 #######################################################
@@ -42,7 +52,9 @@ open(FH, "< ../Biochemistry/reactions.master.tsv");
 @headers = split(/\t/,<FH>);
 chomp($headers[$#headers]);
 my %Rxns=();
+open(OUT, "> Status_Diffs.txt");
 while(<FH>){
+    chomp;
     @temp=split(/\t/,$_,-1);
     my %Rxn_Hash = map { $headers[$_] => $temp[$_] } (0..$#temp);
     my $Rxn_Obj = $Bio_Obj->add("reactions",{id=>$temp[0]});
@@ -66,6 +78,8 @@ while(<FH>){
 
     $Rxn_Obj->checkReactionMassChargeBalance({rebalanceProtons=>1,rebalanceWater=>0,saveStatus=>1});
 
+    print OUT exists($PriRxns{$Rxn_Hash{id}})."\t".$Rxn_Hash{id}."\t".$Rxn_Hash{status}."\t".$Rxn_Obj->status()."\n";
+
     $Rxn_Hash{equation}=$Rxn_Obj->genEquation();
     $Rxn_Hash{code}=$Rxn_Obj->genCode();
     $Rxn_Hash{definition}=$Rxn_Obj->genDefinition();
@@ -75,9 +89,10 @@ while(<FH>){
     $Rxns{$temp[0]}=join("\t", map { $Rxn_Hash{$_} } @headers);
 }
 close(FH);
+close(OUT);
 
-#open(OUT, "> ../Biochemistry/reactions.master.tsv");
-open(OUT, "> tmp");
+open(OUT, "> ../Biochemistry/reactions.master.tsv");
+#open(OUT, "> tmp");
 print OUT join("\t",@headers)."\n";
 foreach my $rxn ( sort { $a cmp $b } keys %Rxns){
     print OUT $Rxns{$rxn},"\n";
