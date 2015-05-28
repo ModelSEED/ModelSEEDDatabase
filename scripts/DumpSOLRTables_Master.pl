@@ -189,87 +189,9 @@ my $templatedata = [
 	["template.2","core_template","core_model","Bacteria","0","1","chenry"],
 	["template.3","plant_template","genome_scale_model","Plant","0","1","seaver"],
 ];
-#Printing template biomasses reactions
-open($fh, ">", $directory."TemplateBiomasses.tsv");
-my $columns = [qw(
-	id
-	name
-	type
-	other
-	dna
-	rna
-	protein
-	lipid
-	cellwall
-	cofactor
-	energy
-	template_id
-	template_name
-	template_modeltype
-	template_domain
-	template_version
-	template_is_current
-	template_owner
-	compartment_ids
-	compound_ids
-	compound_data
-)];
-print $fh join("\t",@{$columns})."\n";
-for (my $i=0; $i < @{$templates}; $i++) {
-	my $biomasses = $templates->[$i]->templateBiomasses();
-	for (my $j=0; $j < @{$biomasses}; $j++) {
-		my $compounds = {};
-		my $comps = {};
-		my $bio = $biomasses->[$j];
-		my $biocpds = $bio->templateBiomassComponents();
-		my $compounddata = "";
-		for (my $k=0; $k < @{$biocpds}; $k++) {
-			my $biocpd = $biocpds->[$k];
-			my $links = "";
-			my $linkrefs = $biocpd->linked_compounds();
-			for (my $m=0; $m < @{$linkrefs}; $m++) {
-				if (length($links) > 0) {
-					$links .= "|";
-				}
-				$links .= $linkrefs->[$m]->id()."{".$biocpd->link_coefficients()->[$m]."}";
-			}
-			if (length($compounddata) > 0) {
-				$compounddata .= ";";
-			}
-			$compounds->{$biocpd->compound()->id()} = 1;
-			$comps->{$biocpd->compartment()->id()} = 1;
-			$compounddata .= $biocpd->compound()->id().":\"".$biocpd->compound()->name()."\":".$biocpd->coefficient().":".$biocpd->coefficientType().":".$biocpd->class().":".$links;
-		}
-		my $data = [
-	    	$templatedata->[$i]->[0].".".$bio->id(),
-	    	$bio->name(),
-	    	"growth",
-	    	$bio->other(),
-	    	$bio->dna(),
-	    	$bio->rna(),
-	    	$bio->protein(),
-	    	$bio->lipid(),
-	    	$bio->cellwall(),
-	    	$bio->cofactor(),
-	    	$bio->energy(),
-	    	$templatedata->[$i]->[0],
-	    	$templatedata->[$i]->[1],
-	    	$templatedata->[$i]->[2],
-	    	$templatedata->[$i]->[3],
-	    	$templatedata->[$i]->[4],
-	    	$templatedata->[$i]->[5],
-	    	$templatedata->[$i]->[6],
-	    	"0:".join(";0:",keys(%{$comps})),
-	    	join(";",keys(%{$compounds})),
-	    	$compounddata
-	    ];
-	    print $fh join("\t",@{$data})."\n";
-	}
-}
-close($fh);
 #Printing complex roles
 open($fh, ">", $directory."ComplexRoles.tsv");
-$columns = [qw(
+my $columns = [qw(
 	complex_id
 	complex_name
 	complex_source
@@ -352,6 +274,7 @@ open(FH, "< ../Biochemistry/compounds.master.tsv");
 open($fh, ">", $directory."Compounds.tsv");
 $header = 1;
 undef(@headers);
+my %Compounds=();
 while(<FH>){
     chomp;
     if($header){
@@ -379,6 +302,8 @@ while(<FH>){
     $cpdHash{aliases}= scalar(@aliases)>0 ? join(";",@aliases) : "null";
 
     print $fh join("\t", map { $cpdHash{$_} } @headers),"\n";
+
+    $Compounds{$cpdHash{id}}=\%cpdHash;
 }
 close($fh);
 
@@ -435,6 +360,79 @@ while(<FH>){
     $rxnHash{pathways}= scalar(@pathways)>0 ? join(";",@pathways) : "null";
 
     print $fh join("\t", map { $rxnHash{$_} } grep { $_ ne 'is_obsolete' && $_ ne 'linked_reaction' } @headers),"\n";
+}
+close($fh);
+#Printing template biomasses reactions
+open($fh, ">", $directory."TemplateBiomasses.tsv");
+$columns = [qw(
+	id
+	name
+	type
+	other
+	dna
+	rna
+	protein
+	lipid
+	cellwall
+	cofactor
+	energy
+	template_id
+	template_name
+	template_modeltype
+	template_domain
+	template_version
+	template_is_current
+	template_owner
+	compartment_ids
+	compound_ids
+	compound_data
+)];
+print $fh join("\t",@{$columns})."\n";
+for (my $i=0; $i < @{$templates}; $i++) {
+	my $biomasses = $templates->[$i]->templateBiomasses();
+	for (my $j=0; $j < @{$biomasses}; $j++) {
+		my $compounds = {};
+		my $comps = {};
+		my $bio = $biomasses->[$j];
+		my $biocpds = $bio->templateBiomassComponents();
+		my @compounddata = ();
+		for (my $k=0; $k < @{$biocpds}; $k++) {
+			my $biocpd = $biocpds->[$k];
+			my $biocpd_id = $biocpd->compound()->id();
+			my @links = ();
+			my $linkrefs = $biocpd->linked_compounds();
+			for (my $m=0; $m < @{$linkrefs}; $m++) {
+			    push(@links, $linkrefs->[$m]->id()."{".$biocpd->link_coefficients()->[$m]."}");
+			}
+			$compounds->{$biocpd_id} = 1;
+			$comps->{$biocpd->compartment()->id()} = 1;
+			push(@compounddata, $biocpd_id.":\"".$Compounds{$biocpd_id}{name}."\":".$biocpd->coefficient().":".$biocpd->coefficientType().":".$biocpd->class().":".join("|",@links));
+		}
+		my $data = [
+	    	$templatedata->[$i]->[0].".".$bio->id(),
+	    	$bio->name(),
+	    	"growth",
+	    	$bio->other(),
+	    	$bio->dna(),
+	    	$bio->rna(),
+	    	$bio->protein(),
+	    	$bio->lipid(),
+	    	$bio->cellwall(),
+	    	$bio->cofactor(),
+	    	$bio->energy(),
+	    	$templatedata->[$i]->[0],
+	    	$templatedata->[$i]->[1],
+	    	$templatedata->[$i]->[2],
+	    	$templatedata->[$i]->[3],
+	    	$templatedata->[$i]->[4],
+	    	$templatedata->[$i]->[5],
+	    	$templatedata->[$i]->[6],
+	    	"0:".join(";0:",keys(%{$comps})),
+	    	join(";",keys(%{$compounds})),
+		join(";",@compounddata)
+	    ];
+	    print $fh join("\t",@{$data})."\n";
+	}
 }
 close($fh);
 
