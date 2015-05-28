@@ -484,9 +484,11 @@ for (my $i=0; $i < @{$templates}; $i++) {
 		}
 		my $compounds = {};
 		my $comps = {};
-		my $rgts = [split(/;/,$Reactions{$rxn->reaction()->id()}{stoichiometry})];
+#		my $rgts = [split(/;/,$Reactions{$rxn->reaction()->id()}{stoichiometry})];
+		my $rgts = $rxn->reaction()->reagents();
 		for (my $j=0; $j < @{$rgts}; $j++) {
-		    my ($coef,$cpd,$cmpt) = split(/:/,$rgts->[$j]);
+#		    my ($coef,$cpd,$cmpt) = split(/:/,$rgts->[$j]);
+		    my ($cpd,$cmpt) = ($rgts->[$j]->compound()->id(),$rgts->[$j]->compartment()->id());
 		    $compounds->{$cpd}=1;
 		    $comps->{$cmpt}=1;
 		}
@@ -498,11 +500,15 @@ for (my $i=0; $i < @{$templates}; $i++) {
 	    	$rxn_id,
 	    	$Reactions{$rxn_id}{abbreviation}."_".$compid,
 	    	$Reactions{$rxn_id}{name}."_".$compid,
-	    	$Reactions{$rxn_id}{code},
-	    	$Reactions{$rxn_id}{stoichiometry},
+#	    	$Reactions{$rxn_id}{code},
+#	    	$Reactions{$rxn_id}{stoichiometry},
+		$rxn->reaction()->code(),
+		$rxn->reaction()->stoichiometry(),
 	    	$Reactions{$rxn_id}{is_transport},
-	    	$Reactions{$rxn_id}{equation},
-	    	$Reactions{$rxn_id}{definition},
+#	    	$Reactions{$rxn_id}{equation},
+#	    	$Reactions{$rxn_id}{definition},
+		$rxn->reaction()->equation(),
+		$rxn->reaction()->definition(),
 	    	$rxn->direction(),
 	    	defined($rxn->GapfillDirection()) ? $rxn->GapfillDirection() : "=",
 	    	"null",
