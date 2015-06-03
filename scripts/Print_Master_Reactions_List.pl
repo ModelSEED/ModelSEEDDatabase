@@ -38,6 +38,16 @@ while(<FH>){
 }
 close(FH);
 
+#Load up the required modifications
+open(FH, "< ../Biochemistry/reactions.master.mods");
+my %Rxn_Mods=();
+while(<FH>){
+    chomp;
+    @temp = split(/\t/,$_,-1);
+    $Rxn_Mods{$temp[0]}{$temp[2]}=$temp[3];
+}
+close(FH);
+
 my %Rxns_Codes=();
 my %Codes_Rxns=();
 my %Rxns=();
@@ -58,6 +68,7 @@ foreach my $db ("default","plantdefault"){
     my @reactions = sort { $a->{id} cmp $b->{id} } grep { $_->id() ne "rxn00000" && $_->id() !~ /^CoA-2-methylpropanoylating/ } @{$bioObj->reactions()};
 
     foreach my $rxn (@reactions){
+	next if exists($Rxn_Mods{$rxn->id()}) && exists($Rxn_Mods{$rxn->id()}{priority}) && $Rxn_Mods{$rxn->id()}{priority} ne $db;
 	next if exists($Rxns{$rxn->id()});
 
 	my $code = $rxn->genEquationCode();
@@ -74,16 +85,6 @@ foreach my $db ("default","plantdefault"){
     }
 }
 
-#Load up the required modifications
-open(FH, "< ../Biochemistry/reactions.master.mods");
-my %Rxn_Mods=();
-while(<FH>){
-    chomp;
-    @temp = split(/\t/,$_,-1);
-    $Rxn_Mods{$temp[0]}{$temp[2]}=$temp[3];
-}
-close(FH);
-
 #Start with original biochemistry
 open(FH, "< ../Biochemistry/reactions.default.tsv");
 my @headers = split(/\t/,<FH>);
@@ -91,6 +92,11 @@ chomp $headers[$#headers];
 while(<FH>){
     chomp;
     @temp=split(/\t/,$_,-1);
+
+    if(exists($Rxn_Mods{$temp[0]}) && exists($Rxn_Mods{$temp[0]}{priority})){
+	next;
+    }
+
     for(my $i=1;$i<scalar(@temp);$i++){
 
 	if(exists($Rxn_Mods{$temp[0]}) && exists($Rxn_Mods{$temp[0]}{$headers[$i]})){
