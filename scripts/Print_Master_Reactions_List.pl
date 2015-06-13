@@ -45,10 +45,6 @@ while(<FH>){
     chomp;
     @temp = split(/\t/,$_,-1);
     $Rxn_Mods{$temp[0]}{$temp[2]}=$temp[3];
-
-    if($temp[2] eq 'replace'){
-	$Rxn_Mods{$temp[0]}{$temp[2]}=$temp[3].":".$temp[4];
-    }
 }
 close(FH);
 
@@ -74,16 +70,6 @@ foreach my $db ("default","plantdefault"){
     foreach my $rxn (@reactions){
 	next if exists($Rxn_Mods{$rxn->id()}) && exists($Rxn_Mods{$rxn->id()}{priority}) && $Rxn_Mods{$rxn->id()}{priority} ne $db;
 	next if exists($Rxns{$rxn->id()});
-
-	if(exists($Rxn_Mods{$rxn->id()}) && exists($Rxn_Mods{$rxn->id()}{replace})){
-	    my ($old,$new) = split(/:/,$Rxn_Mods{$rxn->id()}{replace});
-
-	    foreach my $rgt (@{$rxn->reagents()}){
-		if($rgt->compound()->id() eq $old){
-		    $rgt->compound($bioObj->getObject("compounds",$new));
-		}
-	    }
-	}
 
 	my $code = $rxn->genEquationCode();
 	if(!exists($Codes_Rxns{$code})){
