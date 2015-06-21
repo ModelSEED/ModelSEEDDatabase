@@ -99,7 +99,7 @@ close(DATA);
 my @Roles_Headers = ('id', 'name', 'seedfeature');
 my @Subsystems_Headers = ('id', 'name', 'class', 'subclass', 'type', 'role_refs');
 my @Complexes_Headers = ('id', 'name', 'complexroles');
-@Data_Headers = ('id', 'name', 'roles', 'subsystems', 'complexes', 'role_aliases', 'complex_aliases', 'subsystem_aliases');
+@Data_Headers = ('id', 'name', 'role_aliases', 'complex_aliases', 'subsystem_aliases');
 open(DATA, '> ../Mappings/Mapping_Data.txt');
 print DATA "ws_id\t",join("\t", @Data_Headers),"\n";
 foreach my $mapping (keys %Mappings){
@@ -109,11 +109,12 @@ foreach my $mapping (keys %Mappings){
     #Print out top-level data
     print DATA $mapping,"\t";
     foreach my $header (@Data_Headers){
-#	if($header eq 'roles' || $header eq 'subsystems' || $header eq 'complexes'){
-#	    print DATA join("|", sort @{$Mappings{$mapping}->$header()});
-#	}else{
+	if($header eq 'role_aliases' || $header eq 'subsystem_aliases' || $header eq 'complex_aliases'){
+	    my $hash_ref = $Mappings{$mapping}->$header();
+	    print DATA join("|", map { my $key = $_; $key.":".join("/", map { $_.":".join(";",@{$hash_ref->{$key}{$_}}) } sort keys %{$hash_ref->{$key}} ) } sort keys %$hash_ref);
+	}else{
 	    print DATA $Mappings{$mapping}->$header();
-#	}
+	}
 
 	print DATA $header eq $Data_Headers[$#Data_Headers] ? "\n" : "\t";
     }
@@ -133,7 +134,7 @@ foreach my $mapping (keys %Mappings){
     foreach my $complex (@{$Mappings{$mapping}->complexes()}){
 	foreach my $header (@Complexes_Headers){
 	    if($header eq 'complexroles'){
-		print COMPLEXES join("|", map { $_->role_ref().";".$_->optionalRole().";".$_->type().";".$_->triggering()} @{$complex->complexroles()});
+		print COMPLEXES join("|", map { "role_ref:".$_->role_ref().";optionalRole:".$_->optionalRole().";type:".$_->type().";triggering:".$_->triggering()} @{$complex->complexroles()});
 	    }else{
 		print COMPLEXES defined($complex->$header()) ? $complex->$header() : "";
 	    }
