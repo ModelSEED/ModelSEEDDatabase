@@ -45,6 +45,9 @@ while(<FH>){
     chomp;
     @temp = split(/\t/,$_,-1);
     $Rxn_Mods{$temp[0]}{$temp[2]}=$temp[3];
+    if($temp[2] eq "replace"){
+	$Rxn_Mods{$temp[0]}{$temp[2]} = [$temp[3], $temp[4]];
+    }
 }
 close(FH);
 
@@ -65,9 +68,20 @@ foreach my $db ("default","plantdefault"){
 	}
     }
 
-    my @reactions = sort { $a->{id} cmp $b->{id} } grep { $_->id() ne "rxn00000" && $_->id() !~ /^CoA-2-methylpropanoylating/ } @{$bioObj->reactions()};
-
+    my @reactions = sort { $a->id() cmp $b->id() } grep { $_->id() ne "rxn00000" && $_->id() !~ /^CoA-2-methylpropanoylating/ } @{$bioObj->reactions()};
     foreach my $rxn (@reactions){
+
+	if(exists($Rxn_Mods{$rxn->id()}) && exists($Rxn_Mods{$rxn->id()}{replace})){
+	    my $repCpd = $bioObj->getObject("compounds", $Rxn_Mods{$rxn->id()}{replace}[1]);
+	    next if !$repCpd;
+
+	    foreach my $rgt (@{$rxn->reagents()}){
+		if($rgt->compound()->id() eq $Rxn_Mods{$rxn->id()}{replace}[0]){
+		    $rgt->compound($repCpd);
+		}
+	    }
+	}
+
 	next if exists($Rxn_Mods{$rxn->id()}) && exists($Rxn_Mods{$rxn->id()}{priority}) && $Rxn_Mods{$rxn->id()}{priority} ne $db;
 	next if exists($Rxns{$rxn->id()});
 
