@@ -1,4 +1,4 @@
-#! /usr/bin/python
+#! /usr/bin/env python
 
 import argparse
 import re
@@ -102,8 +102,17 @@ if __name__ == "__main__":
     badAbbrChars = list()
     noFormula = list()
     largeCharge = list()
+    noCharge = list()
+    badCore = list()
+    numCore = 0
+    badObsolete = list()
+    numObsolete = 0
+    noLinked = list()
     badCofactor = list()
     numCofactors = 0
+    unknownDeltag = list()
+    unknownDeltagErr = list()
+
     for index in range(len(compounds)):
         cpd = compounds[index]
         
@@ -153,14 +162,40 @@ if __name__ == "__main__":
             noFormula.append(index)
 
         # Check for charges that are too big.
-        if abs(cpd['defaultCharge']) > args.charge:
-            largeCharge.append(index)
+        if 'charge' in cpd:
+            if abs(cpd['charge']) > args.charge:
+                largeCharge.append(index)
+        else:
+            noCharge.append(index)
 
-        # Check for invalid isCofactor flags.
-        if cpd['isCofactor'] != 0 and cpd['isCofactor'] != 1:
+        # Check for invalid is_core flags.
+        if cpd['is_core'] != 0 and cpd['is_core'] != 1:
+            badCore.append(index)
+        if cpd['is_core'] == 1:
+            numCore += 1
+
+        # Check for invalid is_obsolete flags.
+        if cpd['is_obsolete'] != 0 and cpd['is_obsolete'] != 1:
+            badObsolete.append(index)
+        if cpd['is_obsolete'] == 1:
+            numObsolete += 1
+            if 'linked_compound' in cpd:
+                linked = cpd['linked_compound'].split(';')
+                # No good way to validate at this point
+            else:
+                noLinked.append(index)
+
+        # Check for invalid is_cofactor flags.
+        if cpd['is_cofactor'] != 0 and cpd['is_cofactor'] != 1:
             badCofactor.append(index)
-        if cpd['isCofactor'] == 1:
+        if cpd['is_cofactor'] == 1:
             numCofactors += 1
+
+        # Check for unknown deltaG and deltaGerr values.
+        if cpd['deltag'] == float(10000000):
+            unknownDeltag.append(index)
+        if cpd['deltagerr'] == float(10000000):
+            unknownDeltagErr.append(index)
 
     # Print summary data.
     print 'Number of compounds with duplicate IDs: %d' %(duplicateId)    
@@ -171,8 +206,16 @@ if __name__ == "__main__":
     print 'Number of compounds with bad characters in abbreviation: %d' %(len(badAbbrChars))
     print 'Number of compounds with no formula: %d' %(len(noFormula))
     print 'Number of compounds with charge larger than %d: %d' %(args.charge, len(largeCharge))
-    print 'Number of compounds with bad isCofactor flag: %d' %(len(badCofactor))
+    print 'Number of compounds with no charge: %d' %(len(noCharge))
+    print 'Number of compounds with bad is_core flag: %d' %(len(badCore))
+    print 'Number of compounds flagged as core: %d' %(numCore)
+    print 'Number of compounds with bad is_obsolete flag: %d' %(len(badObsolete))
+    print 'Number of compounds flagged as obsolete: %d' %(numObsolete)
+    print 'Number of compounds with unspecified linked_compound : %d' %(len(noLinked))
+    print 'Number of compounds with bad is_cofactor flag: %d' %(len(badCofactor))
     print 'Number of compounds flagged as cofactor: %d' %(numCofactors)
+    print 'Number of compounds with unknown deltaG value: %d' %(len(unknownDeltag))
+    print 'Number of compounds with unknown deltaGErr value: %d' %(len(unknownDeltagErr))
     print
 
     # Print details if requested.
