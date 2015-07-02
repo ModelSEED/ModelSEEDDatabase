@@ -30,7 +30,10 @@ class BiochemHelper:
             fieldNames = dict()
             for index in range(len(nameList)):
                 fieldNames[nameList[index]] = index
-            required = { 'id', 'name', 'abbreviation', 'formula', 'charge', 'isCofactor' }
+            required = { 'id', 'abbreviation', 'name', 'formula', 'mass', 'source',
+                          'structure', 'charge', 'is_core', 'is_obsolete', 'linked_compound',
+                          'is_cofactor', 'deltag', 'deltagerr', 'pka', 'pkb',
+                          'abstract_compound', 'comprised_of', 'aliases' }
             for req in required:
                 if req not in fieldNames:
                     print 'WARNING: Required field %s is missing from header' %(req)
@@ -45,11 +48,35 @@ class BiochemHelper:
                     continue
                 cpd = dict()
                 cpd['id'] = fields[fieldNames['id']]
-                cpd['name'] = fields[fieldNames['name']]
                 cpd['abbreviation'] = fields[fieldNames['abbreviation']]
+                cpd['name'] = fields[fieldNames['name']]
                 cpd['formula'] = fields[fieldNames['formula']]
-                cpd['defaultCharge'] = float(fields[fieldNames['charge']])
-                cpd['isCofactor'] = int(fields[fieldNames['isCofactor']])
+                cpd['mass'] = fields[fieldNames['mass']]
+                cpd['source'] = fields[fieldNames['source']]
+                cpd['structure'] = fields[fieldNames['structure']]
+                if fields[fieldNames['charge']] != 'null':
+                    cpd['charge'] = float(fields[fieldNames['charge']])
+                cpd['is_core'] = int(fields[fieldNames['is_core']])
+                cpd['is_obsolete'] = int(fields[fieldNames['is_obsolete']])
+                if fields[fieldNames['linked_compound']] != 'null':
+                    cpd['linked_compound'] = fields[fieldNames['linked_compound']]
+                cpd['is_cofactor'] = int(fields[fieldNames['is_cofactor']])
+                if fields[fieldNames['deltag']] == 'deltaG':
+                    cpd['deltag'] = float(10000000)
+                else:
+                    cpd['deltag'] = float(fields[fieldNames['deltag']])
+                if fields[fieldNames['deltagerr']] == 'deltaGErr':
+                    cpd['deltagerr'] = float(10000000)
+                else:
+                    cpd['deltagerr'] = float(fields[fieldNames['deltagerr']])
+                cpd['pka'] = fields[fieldNames['pka']]
+                cpd['pkb'] = fields[fieldNames['pkb']]
+                if fields[fieldNames['abstract_compound']] != 'null':
+                    cpd['abstract_compound'] = fields[fieldNames['abstract_compound']]
+                if fields[fieldNames['comprised_of']] != 'null':
+                    cpd['comprised_of'] = fields[fieldNames['comprised_of']]
+                if fields[fieldNames['aliases']] != 'null':
+                    cpd['aliases'] = fields[fieldNames['aliases']]
                 if includeLinenum:
                     cpd['linenum'] = linenum
                 compounds.append(cpd)
