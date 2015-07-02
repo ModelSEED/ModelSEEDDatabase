@@ -39,7 +39,7 @@ my %Original_Header = ( deltag=>"deltaG", deltagerr => "deltaGErr", is_transport
 my %Skip_Header = ( abstract_reaction => 1, pathways => 1, aliases => 1, ec_numbers => 1, compound_ids => 1 );
 
 #Default values to use
-my %Default_Values = ( stoichiometry => "null", deltag => "null", deltagerr => "null", abstract_reaction => "null",
+my %Default_Values = ( stoichiometry => "null", deltaG => "null", deltaGErr => "null", abstract_reaction => "null",
 		       compound_ids => "null", aliases => "null", ec_numbers => "null", aliases => "null", pathways => "null" );
 
 #Hash of subroutines that transform the values of some hierarchical attributes to a single string

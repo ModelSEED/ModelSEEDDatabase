@@ -39,7 +39,7 @@ my %Original_Header = ( charge=>"defaultCharge", deltag=>"deltaG", deltagerr => 
 my %Skip_Header = ( source => 1, structure => 1, is_core => 1, is_obsolete => 1, linked_compound => 1, comprised_of => 1, aliases => 1 );
 
 #Default values to use
-my %Default_Values = ( mass => "null", deltag => "null", deltagerr => "null", comprised_of => "null", source => "ModelSEED", is_core => 1, is_obsolete => 0,
+my %Default_Values = ( mass => "null", deltaG => "null", deltaGErr => "null", comprised_of => "null", source => "ModelSEED", is_core => 1, is_obsolete => 0,
 		       linked_compound => "null", comprised_of => "null", structure => "null", aliases => "null" );
 
 #Hash of subroutines that transform the values of some hierarchical attributes to a single string
