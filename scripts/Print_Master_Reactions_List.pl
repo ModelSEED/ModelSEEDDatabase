@@ -157,7 +157,7 @@ close(FH);
 my %Touched_Rxns=();
 push(@headers,"is_obsolete");
 push(@headers,"linked_reaction");
-open(OUT, "> Master_Reaction_List.tsv");
+open(OUT, "> ../Biochemistry/reactions.master.tsv");
 print OUT join("\t",@headers),"\n",;
 foreach my $rxn (sort keys %Rxns_Codes){
 

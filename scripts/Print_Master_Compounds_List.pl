@@ -101,7 +101,7 @@ while(<FH>){
 close(FH);
 
 #Print it all out
-open(OUT, "> Master_Compound_List.tsv");
+open(OUT, "> ../Biochemistry/compounds.master.tsv");
 print OUT join("\t",@headers),"\n",;
 foreach my $cpd ( grep { $_ ne "cpd00000" } sort keys %Cpds){
     print OUT $cpd."\t";
