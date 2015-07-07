@@ -4,27 +4,8 @@ use strict;
 my @temp=();
 my $header = 1;
 
-#######################################################
-#Initialization
-#######################################################
-
-use Bio::KBase::fbaModelServices::ScriptHelpers qw( getToken );
-my $AToken = getToken();
-
-use Bio::KBase::fbaModelServices::Impl;
-my $FBAImpl = Bio::KBase::fbaModelServices::Impl->new({'fbajobcache' => "/homes/seaver/Projects/KBase_Scripts/FBA_Scripts/JobsCache",
-                                                       'jobserver-url' => "http://kbase.us/services/workspace",
-                                                       'fbajobdir' => "/tmp/fbajobs",
-                                                       'mfatoolkitbin' => "/homes/chenry/kbase/MFAToolkit/bin/mfatoolkit",
-                                                       'probanno-url' => "http://140.221.85.86:7073/",
-                                                       'mssserver-url' => "http://bio-data-1.mcs.anl.gov/services/ms_fba",
-                                                       'accounttype' => "kbase",
-                                                       'workspace-url' => "http://kbase.us/services/ws",
-                                                       'defaultJobState' => "queued",
-                                                       'gaserver-url' => "http://kbase.us/services/genome_annotation",
-                                                       'idserver-url' => "http://kbase.us/services/idserver"});
-$FBAImpl->_setContext(undef,{auth=>$AToken});
-my $WSClient = $FBAImpl->_workspaceServices();
+use Bio::KBase::ObjectAPI::KBaseFBA::ModelTemplate;
+use Bio::KBase::ObjectAPI::KBaseOntology::Mapping;
 
 open(DATA, "< ../ModelTemplates/ModelTemplate_Data.txt");
 my @Data_Headers = split(/\t/,<DATA>,-1);
