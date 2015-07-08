@@ -90,6 +90,9 @@ if __name__ == "__main__":
         exit(1)
     print 'Number of compounds: %d' %(len(compounds))
 
+    # Create a dictionary keyed by id for fast lookup of compounds.
+    compoundDict = helper.buildIndexDictFromListOfObjects(compounds)
+
     # Check for duplicates, missing and invalid values.
     idDict = dict()
     duplicateId = 0
@@ -107,11 +110,13 @@ if __name__ == "__main__":
     numCore = 0
     badObsolete = list()
     numObsolete = 0
-    noLinked = list()
+    badLink = list()
     badCofactor = list()
     numCofactors = 0
     unknownDeltag = list()
     unknownDeltagErr = list()
+    zeroDeltag = list()
+    zeroDeltagErr = list()
 
     for index in range(len(compounds)):
         cpd = compounds[index]
@@ -179,11 +184,13 @@ if __name__ == "__main__":
             badObsolete.append(index)
         if cpd['is_obsolete'] == 1:
             numObsolete += 1
-            if 'linked_compound' in cpd:
-                linked = cpd['linked_compound'].split(';')
-                # No good way to validate at this point
-            else:
-                noLinked.append(index)
+
+        # Check that linked reactions are all valid.
+        if 'linked_compound' in cpd:
+            linkedCpds = cpd['linked_compound'].split(';')
+            for cpdid in linkedCpds:
+                if cpdid not in compoundDict:
+                    badLink.append(index)
 
         # Check for invalid is_cofactor flags.
         if cpd['is_cofactor'] != 0 and cpd['is_cofactor'] != 1:
@@ -192,9 +199,15 @@ if __name__ == "__main__":
             numCofactors += 1
 
         # Check for unknown deltaG and deltaGerr values.
-        if cpd['deltag'] == float(10000000):
+        if 'deltag' in cpd:
+            if cpd['deltag'] == float(0):
+                zeroDeltag.append(index)
+        else:
             unknownDeltag.append(index)
-        if cpd['deltagerr'] == float(10000000):
+        if 'deltagerr' in cpd:
+            if cpd['deltagerr'] == float(0):
+                zeroDeltagErr.append(index)
+        else:
             unknownDeltagErr.append(index)
 
     # Print summary data.
@@ -211,11 +224,13 @@ if __name__ == "__main__":
     print 'Number of compounds flagged as core: %d' %(numCore)
     print 'Number of compounds with bad is_obsolete flag: %d' %(len(badObsolete))
     print 'Number of compounds flagged as obsolete: %d' %(numObsolete)
-    print 'Number of compounds with unspecified linked_compound : %d' %(len(noLinked))
+    print 'Number of compounds with bad links : %d' %(len(badLink))
     print 'Number of compounds with bad is_cofactor flag: %d' %(len(badCofactor))
     print 'Number of compounds flagged as cofactor: %d' %(numCofactors)
     print 'Number of compounds with unknown deltaG value: %d' %(len(unknownDeltag))
+    print 'Number of compounds with zero deltaG value: %d' %(len(zeroDeltag))
     print 'Number of compounds with unknown deltaGErr value: %d' %(len(unknownDeltagErr))
+    print 'Number of compounds with zero deltaGErr value: %d' %(len(zeroDeltagErr))
     print
 
     # Print details if requested.
