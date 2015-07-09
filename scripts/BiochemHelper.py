@@ -94,7 +94,7 @@ class BiochemHelper:
         required = { 'id', 'abbreviation', 'name', 'code', 'stoichiometry', 'is_transport', 
                      'equation', 'definition', 'reversibility', 'direction', 'abstract_reaction',
                      'pathways', 'aliases', 'ec_numbers', 'deltag', 'deltagerr', 'compound_ids',
-                     'status', 'is_obsolete', 'linked_reaction' }
+                     'status' }
 
         # Read the reactions from the specified file.
         reactions = list()
@@ -137,9 +137,11 @@ class BiochemHelper:
                     rxn['deltagerr'] = float(fields[fieldNames['deltagerr']])
                 rxn['compound_ids'] = fields[fieldNames['compound_ids']]
                 rxn['status'] = fields[fieldNames['status']]
-                rxn['is_obsolete'] = int(fields[fieldNames['is_obsolete']])
-                if fields[fieldNames['linked_reaction']] != 'null':
-                    rxn['linked_reaction'] = fields[fieldNames['linked_reaction']]
+                if 'is_obsolete' in fieldNames:
+                    rxn['is_obsolete'] = int(fields[fieldNames['is_obsolete']])
+                if 'linked_reaction' in fieldNames:
+                    if fields[fieldNames['linked_reaction']] != 'null':
+                        rxn['linked_reaction'] = fields[fieldNames['linked_reaction']]
                 if includeLinenum:
                     rxn['linenum'] = linenum
                 reactions.append(rxn)

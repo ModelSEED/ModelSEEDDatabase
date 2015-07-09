@@ -206,10 +206,11 @@ if __name__ == "__main__":
             isTransport.append(index)
 
         # Check for invalid is_obsolete flags.
-        if rxn['is_obsolete'] != 0 and rxn['is_obsolete'] != 1:
-            badObsolete.append(index)
-        if rxn['is_obsolete'] == 1:
-            isObsolete.append(index)
+        if 'is_obsolete' in rxn:
+            if rxn['is_obsolete'] != 0 and rxn['is_obsolete'] != 1:
+                badObsolete.append(index)
+            if rxn['is_obsolete'] == 1:
+                isObsolete.append(index)
 
         # Check that linked reactions are all valid.
         if 'linked_reaction' in rxn:
