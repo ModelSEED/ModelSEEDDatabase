@@ -8,7 +8,7 @@ my $header = 1;
 #######################################################
 #Create Empty Biochemistry
 #######################################################
-use Bio::KBase::fbaModelServices::Impl;
+use Bio::KBase::ObjectAPI::KBaseBiochem::Biochemistry;
 my $Bio_Obj=Bio::KBase::ObjectAPI::KBaseBiochem::Biochemistry->new({id=>"Temp"});
 $Bio_Obj->_reference("~");
 
