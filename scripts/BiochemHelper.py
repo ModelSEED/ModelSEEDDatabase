@@ -61,13 +61,9 @@ class BiochemHelper:
                 if fields[fieldNames['linked_compound']] != 'null':
                     cpd['linked_compound'] = fields[fieldNames['linked_compound']]
                 cpd['is_cofactor'] = int(fields[fieldNames['is_cofactor']])
-                if fields[fieldNames['deltag']] == 'deltaG':
-                    cpd['deltag'] = float(10000000)
-                else:
+                if fields[fieldNames['deltag']] != 'null' and fields[fieldNames['deltag']] != '10000000':
                     cpd['deltag'] = float(fields[fieldNames['deltag']])
-                if fields[fieldNames['deltagerr']] == 'deltaGErr':
-                    cpd['deltagerr'] = float(10000000)
-                else:
+                if fields[fieldNames['deltagerr']] != 'null' and fields[fieldNames['deltagerr']] != '10000000':
                     cpd['deltagerr'] = float(fields[fieldNames['deltagerr']])
                 cpd['pka'] = fields[fieldNames['pka']]
                 cpd['pkb'] = fields[fieldNames['pkb']]
@@ -98,7 +94,7 @@ class BiochemHelper:
         required = { 'id', 'abbreviation', 'name', 'code', 'stoichiometry', 'is_transport', 
                      'equation', 'definition', 'reversibility', 'direction', 'abstract_reaction',
                      'pathways', 'aliases', 'ec_numbers', 'deltag', 'deltagerr', 'compound_ids',
-                     'status', 'is_obsolete', 'linked_reaction' }
+                     'status' }
 
         # Read the reactions from the specified file.
         reactions = list()
@@ -126,7 +122,7 @@ class BiochemHelper:
                 rxn['name'] = fields[fieldNames['name']]
                 rxn['code'] = fields[fieldNames['code']]
                 rxn['stoichiometry'] = fields[fieldNames['stoichiometry']]
-                rxn['is_transport'] = fields[fieldNames['is_transport']]
+                rxn['is_transport'] = int(fields[fieldNames['is_transport']])
                 rxn['equation'] = fields[fieldNames['equation']]
                 rxn['definition'] = fields[fieldNames['definition']]
                 rxn['reversibility'] = fields[fieldNames['reversibility']]
@@ -135,12 +131,17 @@ class BiochemHelper:
                 rxn['pathways'] = fields[fieldNames['pathways']]
                 rxn['aliases'] = fields[fieldNames['aliases']]
                 rxn['ec_numbers'] = fields[fieldNames['ec_numbers']]
-                rxn['deltag'] = fields[fieldNames['deltag']]
-                rxn['deltagerr'] = fields[fieldNames['deltagerr']]
+                if fields[fieldNames['deltag']] != 'null' and fields[fieldNames['deltag']] != '10000000':
+                    rxn['deltag'] = float(fields[fieldNames['deltag']])
+                if fields[fieldNames['deltagerr']] != 'null' and fields[fieldNames['deltagerr']] != '10000000':
+                    rxn['deltagerr'] = float(fields[fieldNames['deltagerr']])
                 rxn['compound_ids'] = fields[fieldNames['compound_ids']]
                 rxn['status'] = fields[fieldNames['status']]
-                rxn['is_obsolete'] = fields[fieldNames['is_obsolete']]
-                rxn['linked_reaction'] = fields[fieldNames['linked_reaction']]
+                if 'is_obsolete' in fieldNames:
+                    rxn['is_obsolete'] = int(fields[fieldNames['is_obsolete']])
+                if 'linked_reaction' in fieldNames:
+                    if fields[fieldNames['linked_reaction']] != 'null':
+                        rxn['linked_reaction'] = fields[fieldNames['linked_reaction']]
                 if includeLinenum:
                     rxn['linenum'] = linenum
                 reactions.append(rxn)

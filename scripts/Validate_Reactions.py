@@ -101,8 +101,14 @@ if __name__ == "__main__":
     noProducts = list()
     statusTypes = dict()
     okStatus = 0
+    badTransport = list()
     isTransport = list()
+    badObsolete = list()
     isObsolete = list()
+    unknownDeltag = list()
+    unknownDeltagErr = list()
+    zeroDeltag = list()
+    zeroDeltagerr = list()
     badLink = list()
     
     for index in range(len(reactions)):
@@ -182,30 +188,49 @@ if __name__ == "__main__":
             okStatus += 1
         else:
             fields = rxn['status'].split('|')
-            for index in range(len(fields)):
-                if ':' in fields[index]:
-                    pos = fields[index].find(':')
-                    type = fields[index][:pos]
+            for sindex in range(len(fields)):
+                if ':' in fields[sindex]:
+                    pos = fields[sindex].find(':')
+                    type = fields[sindex][:pos]
                 else:
-                    type = fields[index]
+                    type = fields[sindex]
                 if type in statusTypes:
                     statusTypes[type] += 1
                 else:
                     statusTypes[type] = 1
 
-        # Check for transport and obsolete reactions.
-        if rxn['is_transport'] != '0':
+        # Check for invalid is_transport flags.
+        if rxn['is_transport'] != 0 and rxn['is_transport'] != 1:
+            badTransport.append(index)
+        if rxn['is_transport'] == 1:
             isTransport.append(index)
-        if rxn['is_obsolete'] != '0':
-            isObsolete.append(index)
+
+        # Check for invalid is_obsolete flags.
+        if 'is_obsolete' in rxn:
+            if rxn['is_obsolete'] != 0 and rxn['is_obsolete'] != 1:
+                badObsolete.append(index)
+            if rxn['is_obsolete'] == 1:
+                isObsolete.append(index)
 
         # Check that linked reactions are all valid.
-        if rxn['linked_reaction'] != 'null':
+        if 'linked_reaction' in rxn:
             linkedRxns = rxn['linked_reaction'].split(';')
             for rxnid in linkedRxns:
                 if rxnid not in reactionDict:
                     badLink.append(index)
         
+        # Check for unknown deltaG and deltaGerr values.
+        if 'deltag' in rxn:
+            if rxn['deltag'] == float(0):
+                zeroDeltag.append(index)
+        else:
+            unknownDeltag.append(index)
+        if 'deltagerr' in rxn:
+            if rxn['deltagerr'] == float(0):
+                zeroDeltagerr.append(index)
+        else:
+            unknownDeltagErr.append(index)
+
     # Print summary data.
     print 'Number of reactions with duplicate IDs: %d' %(duplicateId)    
     print 'Number of reactions with bad characters in ID: %d' %(len(badIdChars))
@@ -223,8 +248,14 @@ if __name__ == "__main__":
     print 'Number of reactions with no products: %d' %(len(noProducts))
     print 'Number of reactions with OK status: %d' %(okStatus)
     print 'Number of reactions with error status: %d' %(len(reactions)-okStatus)
+    print 'Number of reactions with bad is_transport flag: %d' %(len(badTransport))
     print 'Number of transport reactions: %d' %(len(isTransport))
+    print 'Number of reactions with bad is_obsolete flag: %d' %(len(badObsolete))
     print 'Number of obsolete reactions: %d' %(len(isObsolete))
+    print 'Number of reactions with unknown deltaG value: %d' %(len(unknownDeltag))
+    print 'Number of reactions with zero deltaG value: %d' %(len(zeroDeltag))
+    print 'Number of reactions with unknown deltaGErr value: %d' %(len(unknownDeltagErr))
+    print 'Number of reactions with zero deltaGErr value: %d' %(len(zeroDeltagerr))
     print 'Number of reactions with bad links: %d' %(len(badLink))
     print
 
