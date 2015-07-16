@@ -1,28 +1,21 @@
 # Biochemistry
 The purpose of this folder is to version control updates, changes, and corrections to the current Biochemistry object for ModelSEED, PlantSEED, and Probabilistic Annotation.  May there be one version to rule them all.
 
-A Biochemistry object is defined by its compounds, reactions, and compartments.  The following files contain the data needed to build a Biochemistry object.  Highlighted files are in the current supported format.
+A Biochemistry object is defined by its compounds, reactions, and compartments.  The following files contain the data needed to build a Biochemistry object.
 
-* **compounds.master.tsv**: List of compounds for combined master biochemistry
+* compounds.master.tsv: List of compounds for combined master biochemistry
 * compounds.master.mods: Modifications to apply to combined master biochemistry
-* **compounds.default.tsv**: List of compounds from ModelSEED biochemistry
-* **compounds.plantdefault.tsv**: List of compounds from PlantSEED
-* compounds.plantdefault_obs.tsv: List of compounds from PlantSEED biochemistry (includes obsolete IDs)
-* compounds.tsv: First attempt at merged compounds file, currently empty
+* compounds.default.tsv: List of compounds from ModelSEED biochemistry
+* compounds.plantdefault.tsv: List of compounds from PlantSEED
 
-* **reactions.master.tsv**: List of reactions for combined master biochemistry
+* reactions.master.tsv: List of reactions for combined master biochemistry
 * reactions.master.mods: Modifications to apply to combined master biochemistry
-* **reactions.default.tsv**: List of reactions from ModelSEED biochemistry
-* reactions.default.cf.tsv: List of reactions from ModelSEED biochemistry in compartment-free notation
-* **reactions.plantdefault.tsv**: List of reactions from PlantSEED biochemistry
-* reactions.plantdefault.cf.tsv: List of reactions from PlantSEED biochemistry in compartment-free notation
-* reactions.plantdefault_obs.tsv: List of reactions from PlantSEED biochemistry (includes obsolete IDs)
-* reactions.plantdefault_obs.cf.tsv: List of reactions from PlantSEED biochemistry in compartment-free notation (includes obsolete IDs)
-* reactions.tsv: First attempt at merged reactions file, currently empty
+* reactions.default.tsv: List of reactions from ModelSEED biochemistry
+* reactions.plantdefault.tsv: List of reactions from PlantSEED biochemistry
 
+* compartments.master.tsv: List of compartments for combined master biochemistry
 * compartments.default.tsv: List of compartments from ModelSEED biochemistry
 * compartments.plantdefault.tsv: Set of compartments from PlantSEED biochemistry
-* compartments.plantdefault_obs.tsv: List of compartments from PlantSEED biochemistry (includes obsolete IDs and is not used)
 
 See the scripts folder for commands to compile the tables into typed objects.
 
@@ -33,21 +26,31 @@ A compound file describes the compounds (or metabolites) involved in biochemical
 2. **abbreviation**: Short name of compound
 3. **name**: Human readable long name of compound
 4. **formula**: Standard chemical format (using Hill system) in protonated form to match reported charge
-5. **mass**: Mass of compound
+5. **mass**: Mass of compound or "null" when unknown
 6. **source**: Source database of compound (currently only source is ModelSEED)
 7. **structure**: Structure of compound using IUPAC International Chemical Identifier (InChI) format
-8. **charge**: Electric charge of compound or "null" if not specified
+8. **charge**: Electric charge of compound
 9. **is_core**: True if compound is in core biochemistry (currently all compounds are set to true)
 10. **is_obsolete**: True if compound is obsolete and replaced by different compound (currently all compounds are set to false)
 11. **linked_compound**: List of compound IDs separated by semicolon related to this compound or "null" if not specified (used to link an obsolete compound to replacement compound)
 12. **is_cofactor**: True if compound is a cofactor (currently all compounds are set to false)
-13. **deltag**: Value for change in free energy of compound or 10000000 when unknown
-14. **deltagerr**: Value for change in free energy error of compound or 10000000 when unknown
-15. **pka**: Acid dissociation constants of compound with multiple values separated by colon
-16. **pkb**: Base dissociation constants of compound with multiple values separated by colon
+13. **deltag**: Value for change in free energy of compound or "null" when unknown
+14. **deltagerr**: Value for change in free energy error of compound or "null" when unknown
+15. **pka**: Acid dissociation constants of compound (see below for description of format)
+16. **pkb**: Base dissociation constants of compound (see below for description of format)
 17. **abstract_compound**: Not sure of definition or "null" if not specified (currently all compounds are set to null)
 18. **comprised_of**: Not sure of definition or "null" if not specified (currently all compounds are set to null)
 19. **aliases**: Alternative names of compound or "null" if not specified (currently all compounds are set to null)
+
+### Format of pka and pkb
+
+Each pka or pkb is in this format:
+
+    atoms:value
+
+Multiple pkas or pkbs are separated by a semicolon.  For example, this is the pka for NAD:
+
+    17:1.8;18:2.56;6:12.32;25:11.56;35:13.12
 
 ## Compound modifications file format
 A compound modification file describes modifications to make to the master compound file.  There is no header line in the file.  Each line has these fields:
@@ -150,3 +153,17 @@ A complex role file maps complexes to functional roles.  There is one complex ro
 * **type**: What is this? All entries are set to role_mapping
 * **triggering**: What is this? All entries are set to true
 * **optional**: What is this? 12 of 2221 are set to true
+
+## Obsolete files
+
+The following files are obsolete and are saved for reference.
+
+* compounds.plantdefault_obs.tsv: List of compounds from PlantSEED biochemistry (includes obsolete IDs)
+* compounds.tsv: First attempt at merged compounds file, currently empty
+* reactions.default.cf.tsv: List of reactions from ModelSEED biochemistry in compartment-free notation
+* reactions.plantdefault.cf.tsv: List of reactions from PlantSEED biochemistry in compartment-free notation
+* reactions.plantdefault_obs.tsv: List of reactions from PlantSEED biochemistry (includes obsolete IDs)
+* reactions.plantdefault_obs.cf.tsv: List of reactions from PlantSEED biochemistry in compartment-free notation (includes obsolete IDs)
+* reactions.tsv: First attempt at merged reactions file, currently empty
+* compartments.plantdefault_obs.tsv: List of compartments from PlantSEED biochemistry (includes obsolete IDs and is not used)
+
