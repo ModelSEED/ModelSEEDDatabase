@@ -3,18 +3,28 @@ use warnings;
 use strict;
 use Bio::KBase::ObjectAPI::KBaseBiochem::Biochemistry;
 use Data::Dumper;
+use Getopt::Long::Descriptive;
+
+my ($opt, $usage) = describe_options("%c %o <ID>",
+	[ "compounds=s", "path to master compounds file", { default => "../Biochemistry/compounds.master.tsv" } ],
+	[ "compartments=s", "path to master compartments file", { default => "../Biochemistry/compartments.master.tsv" } ],
+	[ "reactions=s", "path to master reactions file", { default => "../Biochemistry/reactions.master.tsv" } ],
+	[ "help|h", "print usage message and exit" ]
+);
+print($usage->text), exit if $opt->help;
+my $id = $ARGV[0];
 
 # Create a new Biochemistry object (starting from scratch).  Set the reference so it
 # is not in the default UUID format.
-my $biochem = Bio::KBase::ObjectAPI::KBaseBiochem::Biochemistry->new({"id" => "master_v1.0.0", "_reference" => "~"});
+my $biochem = Bio::KBase::ObjectAPI::KBaseBiochem::Biochemistry->new({"id" => $id, "_reference" => "~"});
 
 # Note that the order of adding objects is important.
 
 # Get the master list of compounds from the source file.
-print "Getting compounds from ../Biochemistry/compounds.master.tsv ...\n";
+print "Getting compounds from ".$opt->compounds." ...\n";
 my %Compounds=();
 my @temp=();
-open(FH, "< ../Biochemistry/compounds.master.tsv");
+open(FH, "< ".$opt->compounds);
 my @headers = split(/\t/,<FH>);
 chomp $headers[$#headers];
 while(<FH>){
@@ -44,6 +54,35 @@ foreach my $cpd (sort keys %Compounds) { # grep { $_ ne "cpd00000" }
 	
 	# Name needs to be specified as an array.
 	$Compounds{$cpd}{"names"} = [ $Compounds{$cpd}{"name"} ];
+	
+	# Convert pkas and pkbs from file format to input argument.
+	if ($Compounds{$cpd}{"pka"} eq "null") {
+		delete $Compounds{$cpd}{"pka"};
+	} else {
+		# Multiple pkas are separated by semicolon.
+		my @pka = split(";", $Compounds{$cpd}{"pka"});
+		# Input argument is a hash keyed by dissocation constant values.
+		$Compounds{$cpd}{"pkas"} = {};
+		for (my $i=0; $i<scalar(@pka); $i++) {
+			# Each pka is the format "atoms:value".
+			my @elements = split(":",$pka[$i]);
+			$Compounds{$cpd}{"pkas"}{$elements[1]} = [ int($elements[0]) ]; # Assuming only two elements after split
+		}
+		delete $Compounds{$cpd}{"pka"};
+	}
+	if ($Compounds{$cpd}{"pkb"} eq "null") {
+		delete $Compounds{$cpd}{"pkb"};
+	} else {
+		# pkbs are handled the same way as pkas.
+		my @pkb = split(";", $Compounds{$cpd}{"pkb"});
+		$Compounds{$cpd}{"pkbs"} = {};
+		for (my $i=0; $i<scalar(@pkb); $i++) {
+			my @elements = split(":",$pkb[$i]);
+			$Compounds{$cpd}{"pkbs"}{$elements[1]} = [ int($elements[0]) ]; # Assuming only two elements after split
+		}
+		delete $Compounds{$cpd}{"pkb"};
+	}
+	
 	delete $Compounds{$cpd}{"structure"}; # do I need to build a CompoundStructure object here?
 	
 	# Add the compound.
@@ -53,9 +92,9 @@ my $num_cpds = keys %Compounds;
 print "Added ".$num_cpds." compounds to biochemistry object\n";
 
 # Get the master list of compartments from the source file.
-print "Getting compartments from ../Biochemistry/compartments.master.tsv\n";
+print "Getting compartments from ".$opt->compartments." \n";
 my %Compartments=();
-open(FH, "< ../Biochemistry/compartments.default.tsv");
+open(FH, "< ".$opt->compartments);
 @headers = split(/\t/,<FH>);
 chomp $headers[$#headers];
 while(<FH>){
@@ -76,9 +115,9 @@ my $num_cpts = keys %Compartments;
 print "Added ".$num_cpts." compartments to biochemistry object\n";
 
 # Get the master list of reactions from the source file.
-print "Getting reactions from ../Biochemistry/reactions.master.tsv\n";
+print "Getting reactions from ".$opt->reactions."\n";
 my %Reactions=();
-open(FH, "< ../Biochemistry/reactions.master.tsv");
+open(FH, "< ".$opt->reactions);
 @headers = split(/\t/,<FH>);
 chomp $headers[$#headers];
 while(<FH>){
@@ -91,7 +130,13 @@ while(<FH>){
 close(FH);
 
 # Add each reaction to the biochemistry object.
+my $num_rxns = 0;
 foreach my $rxn (sort keys %Reactions) {
+	# Skip obsolete reactions.
+	if ($Reactions{$rxn}{"is_obsolete"} eq "1") {
+		next;
+	}
+
 	# Remove unknown values so reaction object defaults are used instead.
 	if ($Reactions{$rxn}{"deltag"} eq "null") {
 		delete $Reactions{$rxn}{"deltag"};
@@ -105,8 +150,8 @@ foreach my $rxn (sort keys %Reactions) {
 	
 	# Add the reaction.
 	$biochem->addReactionFromHash($Reactions{$rxn});
+	$num_rxns++;
 }
-my $num_rxns = keys %Reactions;
 print "Added ".$num_rxns." reactions to biochemistry object\n";
 
 # Get aliases from other sources.

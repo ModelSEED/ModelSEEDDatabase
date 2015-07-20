@@ -44,11 +44,11 @@ A compound file describes the compounds (or metabolites) involved in biochemical
 
 ### Format of pka and pkb
 
-Each pka or pkb is in this format:
+The pka and pkb fields are in this format:
 
     atoms:value
 
-Multiple pkas or pkbs are separated by a semicolon.  For example, this is the pka for NAD:
+where "atoms" is the number of atoms and "value" is the dissociation constant value.  Multiple pkas or pkbs are separated by a semicolon.  For example, this is the pka for NAD:
 
     17:1.8;18:2.56;6:12.32;25:11.56;35:13.12
 
@@ -115,10 +115,15 @@ where "n" is the number of compounds and a negative number indicates a reactant 
 
 ### Reaction status values
 
-* OK means the reaction was valid with no changes.
-* MI means there was a mass imbalance that was corrected.
-* CI means there was a charge imbalance that was corrected.
-* HI means there was a hydrogen imbalance?
+* OK means the reaction is valid.  If "OK" is the only value, then the reaction was valid with no changes.
+* MI means a mass imbalance was corrected.
+* CI means a charge imbalance was corrected.
+* HI means a hydrogen imbalance was corrected?
+* RC means the reversibility was corrected.
+* FO means ?
+* RO means ?
+* SP means spontaneous?
+* UN means ?
 
 ## Reaction modifications file format
 A reaction modification file describes modifications to make to the master reaction file.  There is no header line in the file. Each line has these fields:
