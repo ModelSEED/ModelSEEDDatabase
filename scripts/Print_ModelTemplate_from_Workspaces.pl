@@ -26,13 +26,31 @@ my $FBAImpl = Bio::KBase::fbaModelServices::Impl->new({'fbajobcache' => "/homes/
 $FBAImpl->_setContext(undef,{auth=>$AToken});
 my $WSClient = $FBAImpl->_workspaceServices();
 
-my @TmplRxn_Headers = ('id', 'reaction_ref', 'compartment_ref', 'complex_refs', 'direction', 'GapfillDirection', 'type', 'base_cost', 'forward_penalty', 'reverse_penalty');
+#PMS    templatereaction_id id;
+#reaction_ref reaction_ref;
+#string name;
+#string type;
+#string reference;
+#string direction;
+#string GapfillDirection;
+#float maxforflux;
+#float maxrevflux;
+#templatecompartment_ref templatecompartment_ref;
+#float base_cost;
+#float forward_penalty;
+#float reverse_penalty;
+#list<TemplateReactionReagent> templateReactionReagents;
+#list<templatecomplex_ref> templatecomplex_refs;
+
+my @TmplRxn_Headers = ('id', 'reaction_ref', 'name', 'compartment_ref', 'complex_refs', 'direction', 'GapfillDirection', 'type', 'base_cost', 'forward_penalty', 'reverse_penalty');
 my @TmplBio_Headers = ('id', 'name', 'type', 'other', 'dna', 'rna', 'protein', 'lipid', 'cellwall', 'cofactor', 'energy');
 my @TmplBioCmp_Headers = ('id', 'class', 'compound_ref', 'compartment_ref', 'coefficientType', 'coefficient', 'linked_compound_refs', 'link_coefficients');
 
-my @Data_Headers = ('id', 'name', 'modelType', 'domain', 'mapping_ref', 'biochemistry_ref');
+my @Data_Headers = ('id', 'name', 'modelType', 'domain', 'mapping_ref', 'mapping_id', 'biochemistry_ref');
 open(DATA, '> ../ModelTemplates/ModelTemplate_Data.txt');
 print DATA "ws_id\t",join("\t", @Data_Headers),"\n";
+
+my %Bad_Reactions = (rxn05017 => 1,rxn03190 => 1,rxn26353 => 1,rxn31649 => 1,rxn31650 => 1);
 
 my %Mappings = ();
 foreach my $template (@{$WSClient->list_objects({workspaces=>["KBaseTemplateModels"],type=>"KBaseFBA.ModelTemplate"})}){
@@ -52,20 +70,36 @@ foreach my $template (@{$WSClient->list_objects({workspaces=>["KBaseTemplateMode
     #Print out top-level data
     print DATA $template->[1],"\t";
     foreach my $header (@Data_Headers){
-	print DATA $templateObj->$header();
+	if($header eq 'mapping_id'){
+	    print DATA $mapping_wsid;
+	}else{
+	    print DATA $templateObj->$header();
+	}
 	print DATA $header eq $Data_Headers[$#Data_Headers] ? "\n" : "\t";
     }
 
     open(TMPLRXN, "> ".$MT_Dir."ModelTemplate_Reactions.txt");
     print TMPLRXN join("\t", @TmplRxn_Headers),"\n";
     foreach my $tmplrxn (@{$templateObj->templateReactions()}){
+	#Skip Bad Reactions
+	my $Skip = 0;
+	foreach my $header (@TmplRxn_Headers){
+	    if($header eq 'reaction_ref'){
+		my $rxn = substr($tmplrxn->$header(),-8);
+		print "Ignoring bad reaction ",$rxn," in ",$template->[1],"\n" if exists($Bad_Reactions{$rxn});
+		$Skip = 1 if exists($Bad_Reactions{$rxn});
+	    }
+	}
+	next if $Skip;
+
 	foreach my $header (@TmplRxn_Headers){
 	    if($header eq 'complex_refs'){
 		print TMPLRXN join("|", sort @{$tmplrxn->$header()});
+	    }elsif($header eq 'name'){
+		print TMPLRXN defined($tmplrxn->reaction()->$header()) ? $tmplrxn->reaction()->$header() : "null";
 	    }else{
 		print TMPLRXN defined($tmplrxn->$header()) ? $tmplrxn->$header() : "";
 	    }
-
 	    print TMPLRXN $header eq $TmplRxn_Headers[$#TmplRxn_Headers] ? "\n" : "\t";
 	}
     }
