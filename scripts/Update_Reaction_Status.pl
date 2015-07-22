@@ -2,24 +2,31 @@
 use warnings;
 use strict;
 use Formulas;
-my @temp=();
-my $header = 1;
+use Bio::KBase::ObjectAPI::KBaseBiochem::Biochemistry;
+use Getopt::Long::Descriptive;
+
+my ($opt, $usage) = describe_options("%c %o ",
+	[ "compounds=s", "path to master compounds file", { default => "../Biochemistry/compounds.master.tsv" } ],
+	[ "reactions=s", "path to master reactions file", { default => "../Biochemistry/reactions.master.tsv" } ],
+	[ "priority=s", "path to prioritized reactions file", { default => "../Biochemistry/Workspaces/KBaseTemplateModels.rxn" } ],
+	[ "help|h", "print usage message and exit" ]
+);
+print($usage->text), exit if $opt->help;
 
 #######################################################
 #Create Empty Biochemistry
 #######################################################
-use Bio::KBase::ObjectAPI::KBaseBiochem::Biochemistry;
-my $Bio_Obj=Bio::KBase::ObjectAPI::KBaseBiochem::Biochemistry->new({id=>"Temp"});
-$Bio_Obj->_reference("~");
+my $Bio_Obj=Bio::KBase::ObjectAPI::KBaseBiochem::Biochemistry->new({id=>"Temp", _reference => "~"});
 
 #######################################################
 #Load Master Compounds
 #######################################################
-open(FH, "< ../Biochemistry/compounds.master.tsv");
+open(FH, "< ".$opt->compounds);
 my @headers = split(/\t/,<FH>);
 chomp($headers[$#headers]);
 my %Required_Headers=(id=>'id',charge=>'defaultCharge',formula=>'formula',name=>'name');
 my %Cpds=();
+my @temp=();
 while(<FH>){
     chomp;
     @temp=split(/\t/,$_,-1);
@@ -36,7 +43,7 @@ while(<FH>){
 close(FH);
 
 #Retrieve prioritized reactions
-open(FH, "< ../Biochemistry/Workspaces/KBaseTemplateModels.rxn");
+open(FH, "< ".$opt->priority);
 my %PriRxns=();
 while(<FH>){
     chomp;
@@ -48,7 +55,7 @@ close(FH);
 #######################################################
 #Iterate Master Reactions
 #######################################################
-open(FH, "< ../Biochemistry/reactions.master.tsv");
+open(FH, "< ".$opt->reactions);
 @headers = split(/\t/,<FH>);
 chomp($headers[$#headers]);
 my %Rxns=();
@@ -59,22 +66,22 @@ while(<FH>){
     my %Rxn_Hash = map { $headers[$_] => $temp[$_] } (0..$#temp);
     my $Rxn_Obj = $Bio_Obj->add("reactions",{id=>$temp[0]});
 
-    foreach my $cpd_array (split(/\;/,$Rxn_Hash{stoichiometry})){
-	my ($coef,$cpd,$cmpt) = split(/:/,$cpd_array);
+	foreach my $cpd_array (split(/\;/,$Rxn_Hash{stoichiometry})) {
+		my ($coef,$cpd,$cmpt) = split(/:/,$cpd_array);
 
-	#Check for compartment
-	my $cmptObj = $Bio_Obj->getObject("compartments", $cmpt);
-	unless(defined($cmptObj)) {
-	    $cmptObj = $Bio_Obj->add("compartments",{id => $cmpt,hierarchy=>3});
-	}
+		#Check for compartment
+		my $cmptObj = $Bio_Obj->getObject("compartments", $cmpt);
+		unless(defined($cmptObj)) {
+			$cmptObj = $Bio_Obj->add("compartments",{id => $cmpt,hierarchy=>3});
+		}
 
-	#Add reagent
-	$Rxn_Obj->add("reagents",{compound_ref => "~/compounds/id/".$cpd,
+		#Add reagent
+		$Rxn_Obj->add("reagents",{compound_ref => "~/compounds/id/".$cpd,
 				  compartment_ref => "~/compartments/id/".$cmpt,
 				  coefficient => $coef,
 				  isCofactor => 0});
 
-    }
+	}
 
     $Rxn_Obj->checkReactionMassChargeBalance({rebalanceProtons=>1,rebalanceWater=>0,saveStatus=>1});
 
@@ -91,7 +98,7 @@ while(<FH>){
 close(FH);
 close(OUT);
 
-open(OUT, "> ../Biochemistry/reactions.master.tsv");
+open(OUT, "> ".$opt->reactions);
 #open(OUT, "> tmp");
 print OUT join("\t",@headers)."\n";
 foreach my $rxn ( sort { $a cmp $b } keys %Rxns){
