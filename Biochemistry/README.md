@@ -12,12 +12,18 @@ A Biochemistry object is defined by its compounds, reactions, and compartments. 
 * reactions.master.mods: Modifications to apply to combined master biochemistry
 * reactions.default.tsv: List of reactions from ModelSEED biochemistry
 * reactions.plantdefault.tsv: List of reactions from PlantSEED biochemistry
+* Workspaces/KBaseTemplateModels.rxn: List of reactions and the model templates that include the reaction 
 
 * compartments.master.tsv: List of compartments for combined master biochemistry
 * compartments.default.tsv: List of compartments from ModelSEED biochemistry
 * compartments.plantdefault.tsv: Set of compartments from PlantSEED biochemistry
 
-See the scripts folder for commands to compile the tables into typed objects.
+Run the following commands to compile the tables into typed objects.
+
+1. scripts/Print\_Master\_Compounds\_List.pl merges the default and plantdefault files, applies modifications, and creates the master file.
+2. scripts/Print\_Master\_Reactions\_List.pl merges the default and plantdefault files, applies modifications, and creates the master file.
+3. scripts/Update\_Reaction\_Status.pl checks reaction mass and charge balance and updates reactions used in model templates.
+4. scripts/Build\_Biochem\_JSON.pl creates a Biochemistry object and exports to a JSON file.
 
 ## Compound file format
 A compound file describes the compounds (or metabolites) involved in biochemical reactions.  There is one compound per line with fields separated by tabs.  The following fields are required.
@@ -44,11 +50,11 @@ A compound file describes the compounds (or metabolites) involved in biochemical
 
 ### Format of pka and pkb
 
-Each pka or pkb is in this format:
+The pka and pkb fields are in this format:
 
     atoms:value
 
-Multiple pkas or pkbs are separated by a semicolon.  For example, this is the pka for NAD:
+where "atoms" is the number of atoms and "value" is the dissociation constant value.  Multiple pkas or pkbs are separated by a semicolon.  For example, this is the pka for NAD:
 
     17:1.8;18:2.56;6:12.32;25:11.56;35:13.12
 
@@ -107,26 +113,32 @@ where "n" is the number of compounds, "cpdname" is the compound name, and "m" is
 ### Format of reaction stoichiometry
 Each compound participating in the reaction is in this format:
 
-	n:cpdid:x:y:"cpdname"
+	n:cpdid:c:i:"cpdname"
 
-where "n" is the number of compounds and a negative number indicates a reactant and a positive number indicates a product, "cpdid" is the compound ID, x is "", y is "", and "cpdname" is the compound name.  Compounds are separated by semicolon.  For example, this is the stoichiometry of reaction rxn00001:
+where "n" is the number of compounds and a negative number indicates a reactant and a positive number indicates a product, "cpdid" is the compound ID, "c" is the compartment, "i" is the compartment index, and "cpdname" is the compound name.  Compounds are separated by semicolon.  For example, this is the stoichiometry of reaction rxn00001:
 
 	-1:cpd00001:0:0:"H2O";-1:cpd00012:0:0:"PPi";2:cpd00009:0:0:"Phosphate";1:cpd00067:0:0:"H+"
 
 ### Reaction status values
 
-* OK means the reaction was valid with no changes.
-* MI means there was a mass imbalance that was corrected.
-* CI means there was a charge imbalance that was corrected.
-* HI means there was a hydrogen imbalance?
+* OK means the reaction is valid.  If "OK" is the only value, then the reaction was valid with no changes.
+* MI means a mass imbalance was corrected.
+* CI means a charge imbalance was corrected.
+* HI means a hydrogen imbalance was corrected?
+* HB means ?
+* RC means the reversibility was corrected.
+* FO means ?
+* RO means ?
+* SP means spontaneous?
+* UN means ?
 
 ## Reaction modifications file format
 A reaction modification file describes modifications to make to the master reaction file.  There is no header line in the file. Each line has these fields:
 
 1. **id**: ID of reaction to modify
 2. **source**: Source of modification where "plantdefault" is for PlantSEED and "curated" is for manual curation
-3. **field**: Name of field to modify or "replace" to replace a compound ID with another compound ID in all fields
-4. **value**: Modified value of the specified field or when field is "replace" original compound ID and new compound ID 
+3. **action**: (1) Name of field to modify, (2) "replace" to replace a compound ID with another compound ID in all fields, or (3) "priority" to select the reaction from a specific database
+4. **value**: (1) When action is name of field the modified value of the specified field, (2) when action is "replace" original compound ID and new compound ID, or (3) when action is "priority" the name of database to select the reaction from
 
 Note that a reaction ID can be repeated if there are multiple fields that need to be modified.
 
