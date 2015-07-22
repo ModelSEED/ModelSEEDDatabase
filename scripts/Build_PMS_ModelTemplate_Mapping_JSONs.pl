@@ -120,13 +120,13 @@ chomp($Data_Headers[$#Data_Headers]);
 while(<DATA>){
     chomp;
     @temp=split(/\t/,$_,-1);
-    next unless $temp[0] =~ /core/i;
+
     my $MT_Dir = "../ModelTemplates/".$temp[0]."_PMS/";
     next unless -d $MT_Dir;
     my $Map_Dir = "../Mappings/".$temp[6]."/";
+    next unless -d $Map_Dir;
 
     my $ModelTemplate = {};
-
     for(my $i=0;$i<scalar(@Data_Headers);$i++){
 	next if $Data_Headers[$i] =~ /^(ws_id|mapping_ref|mapping_id)$/;
 	$ModelTemplate->{$Data_Headers[$i]}=$temp[$i];
