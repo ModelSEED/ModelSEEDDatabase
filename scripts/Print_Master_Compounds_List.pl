@@ -1,6 +1,14 @@
 #!/usr/bin/env perl
 use warnings;
 use strict;
+use Getopt::Long::Descriptive;
+
+my ($opt, $usage) = describe_options("%c %o ",
+	[ "compounds=s", "path to master compounds file", { default => "../Biochemistry/compounds.master.tsv" } ],
+	[ "mods=s", "path to compound modifications file", { default => "../Biochemistry/compounds.master.mods" } ],
+	[ "help|h", "print usage message and exit" ]
+);
+print($usage->text), exit if $opt->help;
 my @temp=();
 my $header=1;
 
@@ -9,7 +17,7 @@ my %Defaults = (charge => 0,
 		formula => "null");
 
 #Load up the required modifications
-open(FH, "< ../Biochemistry/compounds.master.mods");
+open(FH, "< ".$opt->mods);
 my %Cpd_Mods=();
 while(<FH>){
     chomp;
@@ -101,7 +109,7 @@ while(<FH>){
 close(FH);
 
 #Print it all out
-open(OUT, "> ../Biochemistry/compounds.master.tsv");
+open(OUT, "> ".$opt->compounds);
 print OUT join("\t",@headers),"\n",;
 foreach my $cpd ( grep { $_ ne "cpd00000" } sort keys %Cpds){
     print OUT $cpd."\t";
