@@ -7,23 +7,22 @@ A Biochemistry object is defined by its compounds, reactions, and compartments. 
 * compounds.master.mods: Modifications to apply to combined master biochemistry
 * compounds.default.tsv: List of compounds from ModelSEED biochemistry
 * compounds.plantdefault.tsv: List of compounds from PlantSEED
-
 * reactions.master.tsv: List of reactions for combined master biochemistry
 * reactions.master.mods: Modifications to apply to combined master biochemistry
 * reactions.default.tsv: List of reactions from ModelSEED biochemistry
 * reactions.plantdefault.tsv: List of reactions from PlantSEED biochemistry
-* Workspaces/KBaseTemplateModels.rxn: List of reactions and the model templates that include the reaction 
-
+* Workspaces/KBaseTemplateModels.rxn: List of reactions and the model templates that include the reaction
 * compartments.master.tsv: List of compartments for combined master biochemistry
 * compartments.default.tsv: List of compartments from ModelSEED biochemistry
 * compartments.plantdefault.tsv: Set of compartments from PlantSEED biochemistry
 
-Run the following commands to compile the tables into typed objects.
+To build a Biochemistry object from the files, change to the scripts directory and run the following commands:
 
-1. scripts/Print\_Master\_Compounds\_List.pl merges the default and plantdefault files, applies modifications, and creates the master file.
-2. scripts/Print\_Master\_Reactions\_List.pl merges the default and plantdefault files, applies modifications, and creates the master file.
-3. scripts/Update\_Reaction\_Status.pl checks reaction mass and charge balance and updates reactions used in model templates.
-4. scripts/Build\_Biochem\_JSON.pl creates a Biochemistry object and exports to a JSON file.
+1. `./Print_Master_Compounds_List.pl` merges the default and plantdefault files, applies modifications, and creates the master file.
+2. `./Print_Master_Compartments_List.pl` merges the default and plantdefault file and creates the master file.
+3. `./Print_Master_Reactions_List.pl` merges the default and plantdefault files, applies modifications, and creates the master file.
+4. `./Update_Reaction_Status.pl` checks reaction mass and charge balance and updates reactions used in model templates.
+5. `./Build_Biochem_JSON.pl master-2015a` creates a Biochemistry object with the ID master-2015a and exports it to a JSON file.
 
 ## Compound file format
 A compound file describes the compounds (or metabolites) involved in biochemical reactions.  There is one compound per line with fields separated by tabs.  The following fields are required.

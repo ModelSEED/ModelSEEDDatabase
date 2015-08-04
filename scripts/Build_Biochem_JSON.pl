@@ -2,6 +2,7 @@
 use warnings;
 use strict;
 use Bio::KBase::ObjectAPI::KBaseBiochem::Biochemistry;
+use Bio::P3::Workspace::WorkspaceClientExt;
 use Data::Dumper;
 use Getopt::Long::Descriptive;
 
@@ -9,6 +10,8 @@ my ($opt, $usage) = describe_options("%c %o <ID>",
 	[ "compounds=s", "path to master compounds file", { default => "../Biochemistry/compounds.master.tsv" } ],
 	[ "compartments=s", "path to master compartments file", { default => "../Biochemistry/compartments.master.tsv" } ],
 	[ "reactions=s", "path to master reactions file", { default => "../Biochemistry/reactions.master.tsv" } ],
+	[ "master=s", "path to output master biochemistry json file", { default => "../Biochemistry/biochemistry.master.json" } ],
+	[ "wsobject=s", "path to workspace object", { default => undef } ],
 	[ "help|h", "print usage message and exit" ]
 );
 print($usage->text), exit if $opt->help;
@@ -157,9 +160,14 @@ print "Added ".$num_rxns." reactions to biochemistry object\n";
 # Get aliases from other sources.
 
 # Save to a json format file.
-print "Saving biochemistry to ../Biochemistry/biochemistry.master.json\n";
-my $output = $biochem->export( { "format" => "json" } );
-open(OUT, "> ../Biochemistry/biochemistry.master.json");
-print OUT $output;
+print "Saving biochemistry to ".$opt->master."\n";
+my $data = $biochem->export( { "format" => "json" } );
+open(OUT, "> ".$opt->master);
+print OUT $data;
 
+if (defined($opt->wsobject)) {
+	print "Storing biochemistry in workspace object ".$opt->wsobject."\n";
+	my $wsClient = Bio::P3::Workspace::WorkspaceClientExt->new();
+	my $output = $wsClient->create( { "objects" => [ [ $opt->wsobject, 'biochemistry', {}, $data ] ] });
+}
 exit(0);
