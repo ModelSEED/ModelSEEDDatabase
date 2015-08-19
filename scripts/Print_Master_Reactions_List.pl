@@ -7,6 +7,7 @@ use Getopt::Long::Descriptive;
 
 my ($opt, $usage) = describe_options("%c %o ",
 	[ "compounds=s", "path to master compounds file", { default => "../Biochemistry/compounds.master.tsv" } ],
+	[ "compartments=s", "path to master compartments file", { default => "../Biochemistry/compartments.master.tsv" } ],
 	[ "reactions=s", "path to master reactions file", { default => "../Biochemistry/reactions.master.tsv" } ],
 	[ "mods=s", "path to reaction modifications file", { default => "../Biochemistry/reactions.master.mods" } ],
 	[ "help|h", "print usage message and exit" ]
@@ -69,7 +70,7 @@ foreach my $cpd (sort keys %Compounds) { # grep { $_ ne "cpd00000" }
 
 # Get the master list of compartments from the source file.
 my %Compartments=();
-open(FH, "< ../Biochemistry/compartments.default.tsv");
+open(FH, "< ".$opt->compartments);
 @headers = split(/\t/,<FH>);
 chomp $headers[$#headers];
 while(<FH>){
