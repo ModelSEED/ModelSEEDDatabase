@@ -76,6 +76,7 @@ while(<FH>){
 
     }
 
+    $Rxn_Obj->status($Rxn_Hash{status});
     $Rxn_Obj->checkReactionMassChargeBalance({rebalanceProtons=>1,rebalanceWater=>0,saveStatus=>1});
 
     print OUT exists($PriRxns{$Rxn_Hash{id}})."\t".$Rxn_Hash{id}."\t".$Rxn_Hash{status}."\t".$Rxn_Obj->status()."\n";
