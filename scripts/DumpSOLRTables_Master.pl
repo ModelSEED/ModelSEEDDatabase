@@ -1,41 +1,32 @@
 #!/usr/bin/env perl
 use warnings;
 use strict;
-my @temp=();
-my $header = 1;
+use Getopt::Long::Descriptive;
 
+my ($opt, $usage) = describe_options("%c %o <directory>",
+	[ "compounds=s", "path to master compounds file", { default => "../Biochemistry/compounds.master.tsv" } ],
+	[ "compartments=s", "path to master compartments file", { default => "../Biochemistry/compartments.master.tsv" } ],
+	[ "reactions=s", "path to master reactions file", { default => "../Biochemistry/reactions.master.tsv" } ],
+	[ "aliasdir=s", "path to directory with alias files", { default => "../Aliases/" } ],
+	[ "pathwaydir=s", "path to directory with pathway files", { default => "../Pathways/" } ],
+	[ "structuredir=s", "path to directory with structure files", { default => "../Structures/" } ],
+	[ "master=s", "path to output master biochemistry json file", { default => "../Biochemistry/biochemistry.master.json" } ],
+	[ "help|h", "print usage message and exit" ]
+);
+print($usage->text), exit if $opt->help;
 my $directory = $ARGV[0];
 exit if !$directory || !-d $directory;
 $directory.="/" if $directory !~ /\/$/;
+
+my @temp=();
+my $header = 1;
 
 #######################################################
 #Initialization
 #######################################################
 
-use Bio::KBase::fbaModelServices::ScriptHelpers qw( getToken );
-my $AToken = getToken();
-
-use Bio::KBase::fbaModelServices::Impl;
-my $fba = Bio::KBase::fbaModelServices::Impl->new({'fbajobcache' => "/homes/seaver/Projects/KBase_Scripts/FBA_Scripts/JobsCache",
-						       'jobserver-url' => "http://kbase.us/services/workspace",
-						       'fbajobdir' => "/tmp/fbajobs",
-						       'mfatoolkitbin' => "/vol/model-prod/kbase/MFAToolkit/bin/mfatoolkit",
-#						       'mfatoolkitbin' => "/homes/seaver/Software/MFAToolkit/bin/mfatoolkit",
-						       'probanno-url' => "http://140.221.85.86:7073/",
-						       'mssserver-url' => "http://bio-data-1.mcs.anl.gov/services/ms_fba",
-						       'accounttype' => "kbase",
-						       'workspace-url' => "http://kbase.us/services/ws",
-						       'defaultJobState' => "queued",
-						       'gaserver-url' => "http://kbase.us/services/genome_annotation",
-						       'idserver-url' => "http://kbase.us/services/idserver"});
-$fba->_setContext(undef,{auth=>$AToken});
-my $bio = $fba->_get_msobject("Biochemistry","kbase","default");
-my $pbio = $fba->_get_msobject("Biochemistry","kbase","plantdefault");
-my $map = $fba->_get_msobject("Mapping","kbase","default-mapping");
-my $pmap = $fba->_get_msobject("Mapping","PlantSEED","PlantSEED_Mapping");
-
 #Collect Aliases
-opendir(my $AliasDir, "../Aliases/");
+opendir(my $AliasDir, $opt->aliasdir);
 my @Files = grep { $_ =~ /\.aliases$/ } readdir($AliasDir);
 closedir($AliasDir);
 
@@ -51,7 +42,7 @@ foreach my $file (sort @Files){
     my $aliasSet = $1;
     $aliasSet = join(" ", split(/_/,$aliasSet)) if $aliasSet eq "Enzyme_Class";
 
-    open(FH, "< ../Aliases/".$file);
+    open(FH, "< ".$opt->aliasdir.$file);
     $header = 1;
     while(<FH>){
 	chomp;
@@ -92,7 +83,7 @@ foreach my $file (sort @Files){
 }
 
 my $rxn_pathways = {};
-open(my $fh, "<", "../Pathways/HopeScenarios.txt");
+open(my $fh, "< ".$opt->pathwaydir."HopeScenarios.txt");
 while (my $line = <$fh>) {
 	chomp($line);
 	my $array = [split(/\t/,$line)];
@@ -112,7 +103,7 @@ while (my $line = <$fh>) {
 	}
 }
 close($fh);
-open($fh, "< ../Pathways/plantdefault.pathways.tsv");
+open($fh, "< ".$opt->pathwaydir."plantdefault.pathways.tsv");
 my @headers = split(/\t/,<$fh>);
 shift(@headers);
 chomp($headers[$#headers]);
@@ -130,7 +121,7 @@ while(<$fh>){
 close($fh);
 
 my $cpd_structure = {};
-open($fh, "<", "../Structures/KEGG_Charged_InChI.txt");
+open($fh, "< ".$opt->structuredir."KEGG_Charged_InChI.txt");
 while (my $line = <$fh>) {
 	chomp($line);
 	my $array = [split(/\t/,$line)];
@@ -152,7 +143,7 @@ while (my $line = <$fh>) {
 }
 close($fh);
 
-open($fh, "<", "../Structures/MetaCyc_Charged_InChI.txt");
+open($fh, "< ".$opt->structuredir."MetaCyc_Charged_InChI.txt");
 while (my $line = <$fh>) {
 	chomp($line);
 	my $array = [split(/\t/,$line)];
@@ -175,6 +166,7 @@ while (my $line = <$fh>) {
 close($fh);
 
 #Retreiving templates
+# Need to get these from source file
 my $templates = [
 	$fba->_get_msobject("ModelTemplate","KBaseTemplateModels","GramPosModelTemplate"),
 	$fba->_get_msobject("ModelTemplate","KBaseTemplateModels","GramNegModelTemplate"),
@@ -207,7 +199,7 @@ my $columns = [qw(
 	optional
 )];
 print $fh join("\t",@{$columns})."\n";
-my $cpxs = $map->complexes();
+my $cpxs = $map->complexes(); # Need to get these from source file
 my $idhash;
 my $count=0;
 for (my $i=0; $i < @{$cpxs}; $i++) {
@@ -238,7 +230,7 @@ for (my $i=0; $i < @{$cpxs}; $i++) {
 	$count = $i;
 }
 
-$cpxs = $pmap->complexes();
+$cpxs = $pmap->complexes(); # Need to get these from source file
 for (my $i=0; $i < @{$cpxs}; $i++) {
     $count++;
 	my $cpx = $cpxs->[$i];
@@ -270,7 +262,7 @@ close($fh);
 
 #Printing compounds
 #As it stands, it's a copy of the master compounds file with the aliases integrated
-open(FH, "< ../Biochemistry/compounds.master.tsv");
+open(FH, "< ".$opt->compounds);
 open($fh, ">", $directory."Compounds.tsv");
 $header = 1;
 undef(@headers);
@@ -309,7 +301,7 @@ close($fh);
 
 #Printing reactions
 #As it stands, it's a copy of the master reactions file with the pathways, aliases, and ec numbers integrated
-open(FH, "< ../Biochemistry/reactions.master.tsv");
+open(FH, "< ".$opt->reactions);
 open($fh, ">", $directory."Reactions.tsv");
 $header = 1;
 undef(@headers);
