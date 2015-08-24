@@ -9,6 +9,7 @@ my ($opt, $usage) = describe_options("%c %o ",
 	[ "compounds=s", "path to master compounds file", { default => "../Biochemistry/compounds.master.tsv" } ],
 	[ "reactions=s", "path to master reactions file", { default => "../Biochemistry/reactions.master.tsv" } ],
 	[ "priority=s", "path to prioritized reactions file", { default => "../Biochemistry/Workspaces/KBaseTemplateModels.rxn" } ],
+	[ "reset", "reset reaction status" ],
 	[ "help|h", "print usage message and exit" ]
 );
 print($usage->text), exit if $opt->help;
@@ -25,9 +26,9 @@ open(FH, "< ".$opt->compounds);
 my @headers = split(/\t/,<FH>);
 chomp($headers[$#headers]);
 my %Required_Headers=(id=>'id',charge=>'defaultCharge',formula=>'formula',name=>'name');
-my %Cpds=();
 my @temp=();
 while(<FH>){
+	# Get a compound from the master file and add it to the Biochemistry object.
     chomp;
     @temp=split(/\t/,$_,-1);
 
@@ -38,11 +39,10 @@ while(<FH>){
     $Cpd_Hash{formula}="noformula" if $Cpd_Hash{formula} eq "null";
 
     my $Obj = $Bio_Obj->add("compounds",\%Cpd_Hash);
-    $Cpds{$temp[0]}=$Obj;
 }
 close(FH);
 
-#Retrieve prioritized reactions
+# Retrieve prioritized reactions (only used to flag reactions in status log file).
 open(FH, "< ".$opt->priority);
 my %PriRxns=();
 while(<FH>){
@@ -61,46 +61,59 @@ chomp($headers[$#headers]);
 my %Rxns=();
 open(OUT, "> Status_Diffs.txt");
 while(<FH>){
+	# Get a reaction from the master file and add it to the Biochemistry object.
     chomp;
     @temp=split(/\t/,$_,-1);
     my %Rxn_Hash = map { $headers[$_] => $temp[$_] } (0..$#temp);
     my $Rxn_Obj = $Bio_Obj->add("reactions",{id=>$temp[0]});
 
+	# Parse the stoichiometry field and add the compounds to the Reaction object.
 	foreach my $cpd_array (split(/\;/,$Rxn_Hash{stoichiometry})) {
 		my ($coef,$cpd,$cmpt) = split(/:/,$cpd_array);
 
-		#Check for compartment
+		# Check for compartment and add it to Biochemistry object if it is not found.
+		# Note that the master reaction file uses a compartment free notation so the
+		# compartments that are added are just index numbers.
 		my $cmptObj = $Bio_Obj->getObject("compartments", $cmpt);
 		unless(defined($cmptObj)) {
 			$cmptObj = $Bio_Obj->add("compartments",{id => $cmpt,hierarchy=>3});
 		}
 
-		#Add reagent
+		# Add reagent to the Reaction object.
 		$Rxn_Obj->add("reagents",{compound_ref => "~/compounds/id/".$cpd,
 				  compartment_ref => "~/compartments/id/".$cmpt,
 				  coefficient => $coef,
 				  isCofactor => 0});
-
 	}
 
-    $Rxn_Obj->status($Rxn_Hash{status});
+	# Check the reaction for mass and charge balance and update the status with the results.
+	if (!($opt->reset)) {
+	    $Rxn_Obj->status($Rxn_Hash{status}); # Start with current status	
+	}
     $Rxn_Obj->checkReactionMassChargeBalance({rebalanceProtons=>1,rebalanceWater=>0,saveStatus=>1});
 
-    print OUT exists($PriRxns{$Rxn_Hash{id}})."\t".$Rxn_Hash{id}."\t".$Rxn_Hash{status}."\t".$Rxn_Obj->status()."\n";
+	# Log the old and new status values.
+	my $updated = "";
+	if ($Rxn_Hash{status} ne $Rxn_Obj->status()) {
+		$updated = "updated";
+	}
+    print OUT exists($PriRxns{$Rxn_Hash{id}})."\t".$Rxn_Hash{id}."\t".$Rxn_Hash{status}."\t".$Rxn_Obj->status()."\t".$updated."\n";
 
+	# Update the fields that were changed by the balancing.
     $Rxn_Hash{equation}=$Rxn_Obj->genEquation();
     $Rxn_Hash{code}=$Rxn_Obj->genCode();
     $Rxn_Hash{definition}=$Rxn_Obj->genDefinition();
     $Rxn_Hash{stoichiometry}=$Rxn_Obj->genStoichiometry();
     $Rxn_Hash{status}=$Rxn_Obj->status();
 
+	# Save the updated reaction.
     $Rxns{$temp[0]}=join("\t", map { $Rxn_Hash{$_} } @headers);
 }
 close(FH);
 close(OUT);
 
+# Rewrite the master reactions file with the updated reactions, sorted by reaction ID.
 open(OUT, "> ".$opt->reactions);
-#open(OUT, "> tmp");
 print OUT join("\t",@headers)."\n";
 foreach my $rxn ( sort { $a cmp $b } keys %Rxns){
     print OUT $Rxns{$rxn},"\n";
