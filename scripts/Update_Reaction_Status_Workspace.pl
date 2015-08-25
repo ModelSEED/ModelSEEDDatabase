@@ -2,8 +2,15 @@
 use warnings;
 use strict;
 use Formulas;
+use Getopt::Long::Descriptive;
 my @temp=();
 my $header = 1;
+
+my ($opt, $usage) = describe_options("%c %o ",
+	[ "conserve_hb", "conserver hb in reaction status" ],
+	[ "help|h", "print usage message and exit" ]
+);
+print($usage->text), exit if $opt->help;
 
 #######################################################
 #Create Empty Biochemistry
@@ -78,7 +85,9 @@ while(<FH>){
 
     }
 
-    $Rxn_Obj->status($Rxn_Hash{status});
+    if ($opt->conserve_hb){
+	$Rxn_Obj->status($Rxn_Hash{status});
+    }
     $Rxn_Obj->checkReactionMassChargeBalance({rebalanceProtons=>1,rebalanceWater=>0,saveStatus=>1});
 
     print OUT exists($PriRxns{$Rxn_Hash{id}})."\t".$Rxn_Hash{id}."\t".$Rxn_Hash{status}."\t".$Rxn_Obj->status()."\n";
