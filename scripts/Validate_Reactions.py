@@ -99,7 +99,7 @@ if __name__ == "__main__":
     noDefinition = list()
     noReactants = list()
     noProducts = list()
-    statusTypes = dict()
+    statusTypes = { 'OK': 0, 'MI': 0, 'CI': 0, 'HB': 0, 'EMPTY': 0, 'CPDFORMERROR': 0 }
     okStatus = 0
     badTransport = list()
     isTransport = list()
@@ -188,16 +188,21 @@ if __name__ == "__main__":
             okStatus += 1
         else:
             fields = rxn['status'].split('|')
+            simpleStatus = list()
             for sindex in range(len(fields)):
                 if ':' in fields[sindex]:
                     pos = fields[sindex].find(':')
                     type = fields[sindex][:pos]
                 else:
                     type = fields[sindex]
-                if type in statusTypes:
-                    statusTypes[type] += 1
+                statusTypes[type] += 1
+                simpleStatus.append(type)
+            if len(simpleStatus) > 1:
+                status = '|'.join(simpleStatus)
+                if status in statusTypes:
+                    statusTypes[status] += 1
                 else:
-                    statusTypes[type] = 1
+                    statusTypes[status] = 1
 
         # Check for invalid is_transport flags.
         if rxn['is_transport'] != 0 and rxn['is_transport'] != 1:
@@ -345,6 +350,7 @@ if __name__ == "__main__":
                 print 'Line %05d: %s' %(reactions[noDefinition[index]]['linenum'], reactions[noDefinition[index]])
             print
     if args.showStatus:
+        print 'Reactions with status that is not OK:'
         for type in statusTypes:
             print 'Reaction status %s: %d' %(type, statusTypes[type])
     if args.showBadLink:

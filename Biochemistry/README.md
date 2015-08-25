@@ -120,16 +120,31 @@ where "n" is the number of compounds and a negative number indicates a reactant 
 
 ### Reaction status values
 
+The reaction status field is a string with one or more values. Multiple values are separated with a "|" character.  There are multiple values when a reaction is updated after mass and charge balancing.  If "OK" is one of the values, the reaction is valid and additional values describe the changes made to the reaction to balance it.  The status values are:
+
 * OK means the reaction is valid.  If "OK" is the only value, then the reaction was valid with no changes.
-* MI means a mass imbalance was corrected.
-* CI means a charge imbalance was corrected.
-* HI means a hydrogen imbalance was corrected?
-* HB means ?
-* RC means the reversibility was corrected.
-* FO means ?
-* RO means ?
-* SP means spontaneous?
-* UN means ?
+* MI means there is a mass imbalance. The remainder of the string after the first colon indicates what atoms are unbalanced and the number of atoms needed to balance the reaction.  Multiple atoms are separated by a "/" character.  A positive number means the righthand side of the reaction has more atoms and a negative number means the lefthand side of the reaction has more atoms.
+* CI means there is a charge imbalance.  A positive number after the first colon means the righthand side of the reaction has a larger charge and a negative number means the lefthand side of the reaction has a larger charge.
+* HB means hydrogen is added to the reaction to balance it.
+* EMPTY means reactants cancel out completely.
+* CPDFORMERROR means at least one compound either has no formula or has an invalid formula.
+
+For example, rxn00277 has this definition:
+
+	(1) Glycine[0] <=> (1) HCN[0] or
+	(1) C2H5NO2 <=> (1) CHN
+	
+and its status shows that it has a mass imbalance with 1 extra carbon, 4 extra hydrogen, 2 extra oxygen atoms on the lefthand side of the reaction:
+
+	MI:C:-1/H:-4/O:-2
+
+And rxn00008 has this definition:
+
+	(2) H2O[0] <=> (1) H2O2[0] + (2) H+[0]
+
+and its status shows it has a charge imbalance with the righthand side of the reaction having a larger charge:
+
+	CI:2
 
 ## Reaction modifications file format
 A reaction modification file describes modifications to make to the master reaction file.  There is no header line in the file. Each line has these fields:
