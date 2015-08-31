@@ -1,9 +1,10 @@
-
 import re
+import os
+from BaseHelper import BaseHelper
 
-''' Helper methods for working with reactions and compounds in Biochemistry objects. '''
+''' Helper methods for working with Biochemistry source files. '''
 
-class BiochemHelper:
+class BiochemHelper(BaseHelper):
     
     def __init__(self):
         ''' Initialize object.
@@ -11,14 +12,20 @@ class BiochemHelper:
 
         pass
 
-    def readCompoundsFile(self, path, includeLinenum=True):
+    def readCompoundsFile(self, path, includeLinenum=True, noFormat=False):
         ''' Read the contents of a compounds file.
     
             There is one compound per line in the file with fields separated by tabs.
             The first line of the file is a header with the field names.
+            
+            The returned compound dictionary uses the field names as keys.  When
+            noFormat is True, the field values are exactly as read from the file.
+            Otherwise, the fields with a null value are not included in the
+            dictionary and numeric values are converted to numbers.
     
             @param path: Path to compounds file
             @param includeLinenum: When True, include line number in dictionary
+            @param noFormat: When True, values in compound dictionary are not formatted
             @return List of compound dictionaries.
         '''
     
@@ -47,46 +54,56 @@ class BiochemHelper:
                     print 'WARNING: Compound on line %d is missing one or more fields, %s' %(linenum, fields)
                     continue
                 cpd = dict()
-                cpd['id'] = fields[fieldNames['id']]
-                cpd['abbreviation'] = fields[fieldNames['abbreviation']]
-                cpd['name'] = fields[fieldNames['name']]
-                cpd['formula'] = fields[fieldNames['formula']]
-                cpd['mass'] = fields[fieldNames['mass']]
-                cpd['source'] = fields[fieldNames['source']]
-                cpd['structure'] = fields[fieldNames['structure']]
-                if fields[fieldNames['charge']] != 'null':
-                    cpd['charge'] = float(fields[fieldNames['charge']])
-                cpd['is_core'] = int(fields[fieldNames['is_core']])
-                cpd['is_obsolete'] = int(fields[fieldNames['is_obsolete']])
-                if fields[fieldNames['linked_compound']] != 'null':
-                    cpd['linked_compound'] = fields[fieldNames['linked_compound']]
-                cpd['is_cofactor'] = int(fields[fieldNames['is_cofactor']])
-                if fields[fieldNames['deltag']] != 'null' and fields[fieldNames['deltag']] != '10000000':
-                    cpd['deltag'] = float(fields[fieldNames['deltag']])
-                if fields[fieldNames['deltagerr']] != 'null' and fields[fieldNames['deltagerr']] != '10000000':
-                    cpd['deltagerr'] = float(fields[fieldNames['deltagerr']])
-                cpd['pka'] = fields[fieldNames['pka']]
-                cpd['pkb'] = fields[fieldNames['pkb']]
-                if fields[fieldNames['abstract_compound']] != 'null':
-                    cpd['abstract_compound'] = fields[fieldNames['abstract_compound']]
-                if fields[fieldNames['comprised_of']] != 'null':
-                    cpd['comprised_of'] = fields[fieldNames['comprised_of']]
-                if fields[fieldNames['aliases']] != 'null':
-                    cpd['aliases'] = fields[fieldNames['aliases']]
+                if noFormat:
+                    for index in range(len(nameList)):
+                        cpd[nameList[index]] = fields[index]
+                else:
+                    cpd['id'] = fields[fieldNames['id']]
+                    cpd['abbreviation'] = fields[fieldNames['abbreviation']]
+                    cpd['name'] = fields[fieldNames['name']]
+                    cpd['formula'] = fields[fieldNames['formula']]
+                    cpd['mass'] = fields[fieldNames['mass']]
+                    cpd['source'] = fields[fieldNames['source']]
+                    cpd['structure'] = fields[fieldNames['structure']]
+                    if fields[fieldNames['charge']] != 'null':
+                        cpd['charge'] = float(fields[fieldNames['charge']])
+                    cpd['is_core'] = int(fields[fieldNames['is_core']])
+                    cpd['is_obsolete'] = int(fields[fieldNames['is_obsolete']])
+                    if fields[fieldNames['linked_compound']] != 'null':
+                        cpd['linked_compound'] = fields[fieldNames['linked_compound']]
+                    cpd['is_cofactor'] = int(fields[fieldNames['is_cofactor']])
+                    if fields[fieldNames['deltag']] != 'null' and fields[fieldNames['deltag']] != '10000000':
+                        cpd['deltag'] = float(fields[fieldNames['deltag']])
+                    if fields[fieldNames['deltagerr']] != 'null' and fields[fieldNames['deltagerr']] != '10000000':
+                        cpd['deltagerr'] = float(fields[fieldNames['deltagerr']])
+                    cpd['pka'] = fields[fieldNames['pka']]
+                    cpd['pkb'] = fields[fieldNames['pkb']]
+                    if fields[fieldNames['abstract_compound']] != 'null':
+                        cpd['abstract_compound'] = fields[fieldNames['abstract_compound']]
+                    if fields[fieldNames['comprised_of']] != 'null':
+                        cpd['comprised_of'] = fields[fieldNames['comprised_of']]
+                    if fields[fieldNames['aliases']] != 'null':
+                        cpd['aliases'] = fields[fieldNames['aliases']]
                 if includeLinenum:
                     cpd['linenum'] = linenum
                 compounds.append(cpd)
     
         return compounds
     
-    def readReactionsFile(self, path, includeLinenum=True):
+    def readReactionsFile(self, path, includeLinenum=True, noFormat=False):
         ''' Read the contents of a reactions file.
     
             There is one reaction per line in the file with fields separated by tabs.
             The first line of the file is a header with the field names.
     
+            The returned reaction dictionary uses the field names as keys.  When
+            noFormat is True, the field values are exactly as read from the file.
+            Otherwise, the fields with a null value are not included in the
+            dictionary and numeric values are converted to numbers.
+    
             @param path: Path to reactions file
             @param includeLinenum: When True, include line number in dictionary
+            @param noFormat: When True, values in reaction dictionary are not formatted
             @return List of reaction dictionaries.
         '''
 
@@ -117,31 +134,35 @@ class BiochemHelper:
                     print 'WARNING: Reaction on line %d is missing one or more fields, %s' %(linenum, fields)
                     continue
                 rxn = dict()
-                rxn['id'] = fields[fieldNames['id']]
-                rxn['abbreviation'] = fields[fieldNames['abbreviation']]
-                rxn['name'] = fields[fieldNames['name']]
-                rxn['code'] = fields[fieldNames['code']]
-                rxn['stoichiometry'] = fields[fieldNames['stoichiometry']]
-                rxn['is_transport'] = int(fields[fieldNames['is_transport']])
-                rxn['equation'] = fields[fieldNames['equation']]
-                rxn['definition'] = fields[fieldNames['definition']]
-                rxn['reversibility'] = fields[fieldNames['reversibility']]
-                rxn['direction'] = fields[fieldNames['direction']]
-                rxn['abstract_reaction'] = fields[fieldNames['abstract_reaction']]
-                rxn['pathways'] = fields[fieldNames['pathways']]
-                rxn['aliases'] = fields[fieldNames['aliases']]
-                rxn['ec_numbers'] = fields[fieldNames['ec_numbers']]
-                if fields[fieldNames['deltag']] != 'null' and fields[fieldNames['deltag']] != '10000000':
-                    rxn['deltag'] = float(fields[fieldNames['deltag']])
-                if fields[fieldNames['deltagerr']] != 'null' and fields[fieldNames['deltagerr']] != '10000000':
-                    rxn['deltagerr'] = float(fields[fieldNames['deltagerr']])
-                rxn['compound_ids'] = fields[fieldNames['compound_ids']]
-                rxn['status'] = fields[fieldNames['status']]
-                if 'is_obsolete' in fieldNames:
-                    rxn['is_obsolete'] = int(fields[fieldNames['is_obsolete']])
-                if 'linked_reaction' in fieldNames:
-                    if fields[fieldNames['linked_reaction']] != 'null':
-                        rxn['linked_reaction'] = fields[fieldNames['linked_reaction']]
+                if noFormat:
+                    for index in range(len(nameList)):
+                        rxn[nameList[index]] = fields[index]
+                else:
+                    rxn['id'] = fields[fieldNames['id']]
+                    rxn['abbreviation'] = fields[fieldNames['abbreviation']]
+                    rxn['name'] = fields[fieldNames['name']]
+                    rxn['code'] = fields[fieldNames['code']]
+                    rxn['stoichiometry'] = fields[fieldNames['stoichiometry']]
+                    rxn['is_transport'] = int(fields[fieldNames['is_transport']])
+                    rxn['equation'] = fields[fieldNames['equation']]
+                    rxn['definition'] = fields[fieldNames['definition']]
+                    rxn['reversibility'] = fields[fieldNames['reversibility']]
+                    rxn['direction'] = fields[fieldNames['direction']]
+                    rxn['abstract_reaction'] = fields[fieldNames['abstract_reaction']]
+                    rxn['pathways'] = fields[fieldNames['pathways']]
+                    rxn['aliases'] = fields[fieldNames['aliases']]
+                    rxn['ec_numbers'] = fields[fieldNames['ec_numbers']]
+                    if fields[fieldNames['deltag']] != 'null' and fields[fieldNames['deltag']] != '10000000':
+                        rxn['deltag'] = float(fields[fieldNames['deltag']])
+                    if fields[fieldNames['deltagerr']] != 'null' and fields[fieldNames['deltagerr']] != '10000000':
+                        rxn['deltagerr'] = float(fields[fieldNames['deltagerr']])
+                    rxn['compound_ids'] = fields[fieldNames['compound_ids']]
+                    rxn['status'] = fields[fieldNames['status']]
+                    if 'is_obsolete' in fieldNames:
+                        rxn['is_obsolete'] = int(fields[fieldNames['is_obsolete']])
+                    if 'linked_reaction' in fieldNames:
+                        if fields[fieldNames['linked_reaction']] != 'null':
+                            rxn['linked_reaction'] = fields[fieldNames['linked_reaction']]
                 if includeLinenum:
                     rxn['linenum'] = linenum
                 reactions.append(rxn)
@@ -242,42 +263,74 @@ class BiochemHelper:
 
         return complexRoles
 
-    def buildDictFromListOfObjects(self, objectList, key='id'):
-        ''' Build a dictionary with the specified key from a list of objects.
-    
-            The value of each element in the returned dictionary is the complete
-            object.  This copies the objects into a separate data structure.
-    
-            @param objectList: List of objects
-            @param key: Field in object to use for keys in returned dictionary
-            @return Dictionary mapping key to object
+    def readAliasFiles(self, aliasDir):
+        ''' Read the contents of all of the alias files.
+        
+            There is one alias mapping per line in the file with fields separated by tabs.
+            The first line of the file is a header with the field names.
+            
+            The returned dictionaries use the ModelSEED ID as the key and each source has
+            a list of values that are aliases for the compound or reaction.
+        
+            @param aliasDir: Path to directory containing alias files.
+            @return Dictionary of compound aliases, dictionary of reaction aliases.
         '''
-    
-        objectDict = dict()
-        for index in range(len(objectList)):
-            obj = objectList[index]
-            if obj is not None:
-                objectDict[obj[key]] = obj
-        return objectDict
 
-    def buildIndexDictFromListOfObjects(self, objectList, key='id'):
-        ''' Build a dictionary with the specified key to the index in the list.
+        compoundAliases = dict() # First level is compound ID, second level is source with a list of values.
+        reactionAliases = dict()
     
-            The value of each element in the returned dictionary is the index into
-            the list of the object.  This allows for lookup of objects by the key
-            without copying the objects.
-    
-            @param objectList: List of objects
-            @param key: Field in object to use for keys in returned dictionary
-            @return Dictionary mapping key to index of element in objectList
-        '''
-    
-        indexDict = dict()
-        for index in range(len(objectList)):
-            obj = objectList[index]
-            if obj is not None:
-                indexDict[obj[key]] = index
-        return indexDict
+        # Read all of the alias files.  Each alias file has a header on the first line. Assumption
+        # is that first column is the ID in the alternate system, second column is the ID
+        # in ModelSEED, and third column is the ID in PlantSEED.  Multiple values in the second
+        # and third columns are separated by "|".  Second or third column can be empty if there
+        # is no match in ModelSEED or PlantSEED.  Aliases can be either for compounds or
+        # reactions as indicated by the prefix on the ID.
+        aliasFiles = os.listdir(aliasDir)
+        for index in range(len(aliasFiles)):
+            (source, ext) = os.path.splitext(aliasFiles[index]) 
+            if ext != '.aliases':
+                continue
+            print 'Processing aliases in '+aliasFiles[index]
+            source = source.replace('_', ' ') # Replace the underscores used in file names
+            with open(os.path.join(aliasDir, aliasFiles[index]), 'r') as handle:
+                header = handle.readline().strip().split('\t')
+                for line in handle:
+                    fields = line.strip().split('\t')
+                    # Need to split on | Need to separate in four checks
+                    if fields[1].startswith('cpd'):
+                        idList = fields[1].split('|')
+                        for index in range(len(idList)):
+                            if idList[index] not in compoundAliases:
+                                compoundAliases[idList[index]] = dict()
+                            if source not in compoundAliases[idList[index]]:
+                                compoundAliases[idList[index]][source] = list()
+                            compoundAliases[idList[index]][source].append(fields[0])
+                    if len(fields) > 2 and fields[2].startswith('cpd'):
+                        idList = fields[2].split('|')
+                        for index in range(len(idList)):
+                            if idList[index] not in compoundAliases:
+                                compoundAliases[idList[index]] = dict()
+                            if source not in compoundAliases[idList[index]]:
+                                compoundAliases[idList[index]][source] = list()
+                            compoundAliases[idList[index]][source].append(fields[0])
+                    if fields[1].startswith('rxn'):
+                        idList = fields[1].split('|')
+                        for index in range(len(idList)):
+                            if idList[index] not in reactionAliases:
+                                reactionAliases[idList[index]] = dict()
+                            if source not in reactionAliases[idList[index]]:
+                                reactionAliases[idList[index]][source] = list()
+                            reactionAliases[idList[index]][source].append(fields[0])
+                    if len(fields) > 2 and fields[2].startswith('rxn'):
+                        idList = fields[2].split('|')
+                        for index in range(len(idList)):
+                            if idList[index] not in reactionAliases:
+                                reactionAliases[idList[index]] = dict()
+                            if source not in reactionAliases[idList[index]]:
+                                reactionAliases[idList[index]][source] = list()
+                            reactionAliases[idList[index]][source].append(fields[0])
+
+        return compoundAliases, reactionAliases
 
     def parseCompoundIdStoich(self, stoichString):
         ''' Parse a compound stoichiometry string with IDs into a dictionary.

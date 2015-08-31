@@ -1,14 +1,16 @@
-#! /usr/bin/python
+#! /usr/bin/env python
 
 import argparse
+import json
 from BiochemHelper import BiochemHelper
-from biokbase.workspace.client import Workspace
+from biop3.Workspace.WorkspaceClient import Workspace
 
 desc1 = '''
 NAME
-      Build_Biochem -- build a Biochemistry object
+      Build_Biochem -- build a Biochemistry typed object
 
 SYNOPSIS
+      Build a Biochemistry typed object directly from source files.
 '''
 
 desc2 = '''
@@ -18,60 +20,62 @@ DESCRIPTION
 desc3 = '''
 EXAMPLES
       Build a Biochemistry object:
-      > Build_Biochem.py compounds.tsv reactions.tsv
+      > Build_Biochem.py master-2015a /mmundy/public/modelsupport/biochemistry/master-2015a
       
 SEE ALSO
-      Print_Compounds.pl
-      Print_Reactions.pl
+      Build_SOLR_Tables.py
 
 AUTHORS
       Mike Mundy 
 '''
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     # Parse options.
     parser = argparse.ArgumentParser(formatter_class=argparse.RawDescriptionHelpFormatter, prog='Build_Biochem', epilog=desc3)
     parser.add_argument('id', help='ID of Biochemistry object', action='store')
-    parser.add_argument('compoundfile', help='path to compounds file', action='store')
-    parser.add_argument('reactionfile', help='path to reactions file', action='store')
-    parser.add_argument('compartmentfile', help='path to compartments file', action='store')
+    parser.add_argument('ref', help='reference to workspace location to store Biochemistry object')
+#    parser.add_argument('compartmentfile', help='path to compartments file', action='store')
+    parser.add_argument('--compoundfile', help='path to compounds file', action='store', default='../Biochemistry/compounds.master.tsv')
+    parser.add_argument('--reactionfile', help='path to reactions file', action='store', default='../Biochemistry/reactions.master.tsv')
+    parser.add_argument('--aliasdir', help='path to directory with source aliases files', action='store', default='../Aliases')
     parser.add_argument('--name', help='name of object', action='store', dest='name', default=None)
     parser.add_argument('--desc', help='description of object', action='store', dest='description', default=None)
-    parser.add_argument('-w', '--workspace', help='ID of workspace containing Media object', action='store', dest='workspace', default=None)
-    parser.add_argument('--wsurl', help='URL of workspace server', action='store', dest='wsurl', default='https://kbase.us/services/ws/')
+    parser.add_argument('--wsurl', help='URL of workspace server', action='store', dest='wsurl', default='http://p3.theseed.org/services/Workspace')
     usage = parser.format_usage()
     parser.description = desc1 + '      ' + usage + desc2
     parser.usage = argparse.SUPPRESS
     args = parser.parse_args()
 
-    # The following fields are required in a Biochemistry object.
+    # Create the Biochemistry typed object.
     biochem = dict()
     biochem['id'] = args.id
-    biochem['compartments'] = list()
-    biochem['compounds'] = list()
-    biochem['reactions'] = list()
+
+    # The following fields are required in a Biochemistry typed object but they are currently unused.
     biochem['reactionSets'] = list()
     biochem['compoundSets'] = list()
     biochem['cues'] = list()
-    biochem['compound_aliases'] = dict()
-    biochem['reaction_aliases'] = dict()
 
-    # The following fields are optional in a Biochemistry object.
+    # The following fields are optional in a Biochemistry typed object.
     if args.name is not None:
         biochem['name'] = args.name
     if args.description is not None:
         biochem['description'] = args.description
 
-    # Add the compounds from the compounds file.  Required fields: id, name,
-    # name, abbreviation, formula, defaultCharge, isCofactor
+    # Create a helper object.
     helper = BiochemHelper()
-    compounds = helper.readCompoundsFile(args.compoundfile, includeLinenum=False)
 
-    for index in range(len(compounds)):
-        biochem['compounds'].append(compounds[index])
+    # Add the compounds from the compounds file.
+    print 'Adding compounds from %s ...' %(args.compoundfile)
+    biochem['compounds'] = helper.readCompoundsFile(args.compoundfile, includeLinenum=False)
+    compounds = helper.buildIndexDictFromListOfObjects(biochem['compounds'])
 
-    # Add the reactions from the reactions file.  Required fields: id, name,
-    # abbreviation, direction, thermoReversibility, status, defaultProtons, reagents.
+    # Start with an empty dictionary of compartments.  With compartment-free reactions, just add
+    # place holder compartments as they are found processing the reactions.
+    compartments = dict()
+
+    # Add the reactions from the reactions file.
+    print 'Adding reactions from %s ...' %(args.reactionfile)
+    biochem['reactions'] = list()
     reactions = helper.readReactionsFile(args.reactionfile, includeLinenum=False)
     
     for index in range(len(reactions)):
@@ -83,7 +87,14 @@ if __name__ == "__main__":
         for rindex in range(len(reactants)):
             cpd = helper.parseCompoundIdStoich(reactants[rindex])
             reagent = dict()
-            reagent['compound_ref'] = '~/compounds/id/'+cpd['compound']
+            # Validate the compound is valid.
+            if cpd['compound'] in compounds:
+                reagent['compound_ref'] = '~/compounds/id/'+cpd['compound']
+            else:
+                print 'WARNING: Compound %s is not defined in the list of compounds' %(cpd['compound'])
+            # Add compartment the first time it is found.
+            if cpd['compartmentId'] not in compartments:
+                compartments[cpd['compartmentId']] = { 'id': cpd['compartmentId'], 'name': 'Compartment'+cpd['compartmentId'], 'hierarchy': 3}
             reagent['compartment_ref'] = '~/compartments/id/'+cpd['compartmentId']
             reagent['coefficient'] = cpd['stoich']*-1.0
             reagent['isCofactor'] = 0 # @todo Is this set separately from value in compound?
@@ -91,7 +102,14 @@ if __name__ == "__main__":
         for pindex in range(len(products)):
             cpd = helper.parseCompoundIdStoich(products[pindex])
             reagent = dict()
-            reagent['compound_ref'] = '~/compounds/id/'+cpd['compound']
+            # Validate the compound is valid.
+            if cpd['compound'] in compounds:
+                reagent['compound_ref'] = '~/compounds/id/'+cpd['compound']
+            else:
+                print 'WARNING: Compound %s is not defined in the list of compounds' %(cpd['compound'])
+            # Add compartment the first time it is found.
+            if cpd['compartmentId'] not in compartments:
+                compartments[cpd['compartmentId']] = { 'id': cpd['compartmentId'], 'name': 'Compartment'+cpd['compartmentId'], 'hierarchy': 3}
             reagent['compartment_ref'] = '~/compartments/id/'+cpd['compartmentId']
             reagent['coefficient'] = cpd['stoich']
             reagent['isCofactor'] = 0 # @todo Is this set separately from value in compound?
@@ -99,21 +117,22 @@ if __name__ == "__main__":
         del rxn['equation'] # Remove after converting to reagent format
         biochem['reactions'].append(rxn)
 
-    # Add the compartments from the compartments file.  Required fields: id, name,
-    # and hierarchy.
-    compartments = helper.readCompartmentsFile(args.compartmentfile, includeLinenum=False)
+    # Create the compartment list from the dictionary assembled above.
+    biochem['compartments'] = list()
+    for id in compartments:
+        biochem['compartments'].append(compartments[id])
 
-    for index in range(len(compartments)):
-        biochem['compartments'].append(compartments[index])
+    # Add the aliases from all of the aliases files.
+    print 'Reading aliases from %s ...' %(args.aliasdir)
+    compoundAliases, reactionAliases = helper.readAliasFiles(args.aliasdir)
+    biochem['compound_aliases'] = compoundAliases
+    biochem['reaction_aliases'] = reactionAliases
 
-    # Save the Biochemistry object to the specified workspace.
+    # Save the Biochemistry typed object to the specified workspace path. An existing typed object
+    # is overwritten with the updated data.
+    print 'Saving typed object to %s ...' %(args.ref)
     wsClient = Workspace(args.wsurl)
-    objectSaveData = dict()
-    objectSaveData['type'] = 'KBaseBiochem.Biochemistry-4.0'
-    objectSaveData['name'] = args.id
-    objectSaveData['data'] = biochem
-#    objectSaveData['meta'] = objectMetaData
-#    objectSaveData['provenance'] = [ objectProvData ]
-    objectInfo = wsClient.save_objects( { 'workspace': args.workspace, 'objects': [ objectSaveData ] } )
-
+    output = wsClient.create( { 'objects': [ [ args.ref, 'biochemistry', {}, biochem ] ], 'overwrite': 1 });
+    
+#    json.dump(biochem, open('master.json', 'w'), indent=4)
     exit(0)
