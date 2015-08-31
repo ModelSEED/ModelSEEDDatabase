@@ -11,7 +11,6 @@ A Biochemistry object is defined by its compounds, reactions, and compartments. 
 * reactions.master.mods: Modifications to apply to combined master biochemistry
 * reactions.default.tsv: List of reactions from ModelSEED biochemistry
 * reactions.plantdefault.tsv: List of reactions from PlantSEED biochemistry
-* Workspaces/KBaseTemplateModels.rxn: List of reactions and the model templates that include the reaction
 * compartments.master.tsv: List of compartments for combined master biochemistry
 * compartments.default.tsv: List of compartments from ModelSEED biochemistry
 * compartments.plantdefault.tsv: Set of compartments from PlantSEED biochemistry
@@ -20,8 +19,7 @@ To build a Biochemistry object from the files, change to the scripts directory a
 
 1. `./Print_Master_Compounds_List.pl` merges the default and plantdefault files, applies modifications, and creates the master file.
 2. `./Print_Master_Compartments_List.pl` merges the default and plantdefault file and creates the master file.
-3. `./Print_Master_Reactions_List.pl` merges the default and plantdefault files, applies modifications, and creates the master file.
-4. `./Update_Reaction_Status.pl` checks reaction mass and charge balance and updates reactions used in model templates.
+3. `./Print_Master_Reactions_From_Files.pl` merges the default and plantdefault files, applies modifications, checks reaction mass and charge balance, and creates the master file.
 5. `./Build_Biochem_JSON.pl master-2015a` creates a Biochemistry object with the ID master-2015a and exports it to a JSON file.
 
 ## Compound file format
@@ -45,10 +43,9 @@ A compound file describes the compounds (or metabolites) involved in biochemical
 16. **pkb**: Base dissociation constants of compound (see below for description of format)
 17. **abstract_compound**: Not sure of definition or "null" if not specified (currently all compounds are set to null)
 18. **comprised_of**: Not sure of definition or "null" if not specified (currently all compounds are set to null)
-19. **aliases**: Alternative names of compound or "null" if not specified (currently all compounds are set to null)
+19. **aliases**: List of alternative names of compound separated by semicolon or "null" if not specified (see below for description of format)
 
 ### Format of pka and pkb
-
 The pka and pkb fields are in this format:
 
     atoms:value
@@ -56,6 +53,15 @@ The pka and pkb fields are in this format:
 where "atoms" is the number of atoms and "value" is the dissociation constant value.  Multiple pkas or pkbs are separated by a semicolon.  For example, this is the pka for NAD:
 
     17:1.8;18:2.56;6:12.32;25:11.56;35:13.12
+
+### Format of aliases
+An alias is in this format:
+
+	"source:value"
+	
+where "source" is the name of the alternative database and "value" is the name or ID in the alternative database. Multiple aliases are separated by a semicolon.  For example, this is the list of aliases for Cobamide (or cpd00181):
+
+	"KEGG:C00210";"name:Cobamide";"searchname:cobamide";"ModelSEED:cpd00181";"KBase:kb|cpd.181"
 
 ## Compound modifications file format
 A compound modification file describes modifications to make to the master compound file.  There is no header line in the file.  Each line has these fields:
@@ -82,7 +88,7 @@ A reaction file describes the biochemical reactions.  There is one reaction per 
 10. **direction**: Direction of reaction where ">" means right directional, "<" means left directional, and "=" means bi-directional
 11. **abstract_reaction**: Not sure of definition or "null" if not specified (currently all reactions are set to null)
 12. **pathways**: Pathways reaction is a part of or "null" if not specified (currently all reactions are set to null)
-13. **aliases**: Alternative names of reaction or "null" if not specified (currently all reactions are set to null)
+13. **aliases**: List of alternative names of reaction separated by semicolon or "null" if not specified (format is the same as Compounds file)
 14. **ec_numbers**: Enzyme Commission numbers of enzymes that catalyze reaction or "null" if not specified (currently all reactions are set to null)
 15. **deltag**: Value for change in free energy of reaction or 10000000 when unknown
 16. **deltagerr**: Value for change in free energy error of reaction or 10000000 when unknown
@@ -180,9 +186,9 @@ A complex role file maps complexes to functional roles.  There is one complex ro
 * **triggering**: What is this? All entries are set to true
 * **optional**: What is this? 12 of 2221 are set to true
 
-## Obsolete files
+## Archived files
 
-The following files are obsolete and are saved for reference.
+The following files were used to merge the ModelSEED and PlantSEED biochemistry and are saved for reference.
 
 * compounds.plantdefault_obs.tsv: List of compounds from PlantSEED biochemistry (includes obsolete IDs)
 * compounds.tsv: First attempt at merged compounds file, currently empty
@@ -192,4 +198,5 @@ The following files are obsolete and are saved for reference.
 * reactions.plantdefault_obs.cf.tsv: List of reactions from PlantSEED biochemistry in compartment-free notation (includes obsolete IDs)
 * reactions.tsv: First attempt at merged reactions file, currently empty
 * compartments.plantdefault_obs.tsv: List of compartments from PlantSEED biochemistry (includes obsolete IDs and is not used)
+* Workspaces/KBaseTemplateModels.rxn: List of reactions and the model templates that include the reaction
 
