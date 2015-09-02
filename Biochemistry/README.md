@@ -1,5 +1,5 @@
 # Biochemistry
-The purpose of this folder is to version control updates, changes, and corrections to the current Biochemistry object for ModelSEED, PlantSEED, and Probabilistic Annotation.  May there be one version to rule them all.
+The purpose of this folder is to version control updates, changes, and corrections to the current Biochemistry object using the sources from ModelSEED, PlantSEED, and Probabilistic Annotation.  May there be one version to rule them all.
 
 A Biochemistry object is defined by its compounds, reactions, and compartments.  The following files contain the data needed to build a Biochemistry object.
 
@@ -27,7 +27,7 @@ A compound file describes the compounds (or metabolites) involved in biochemical
 
 1. **id**: Unique ID for the compound in the format cpdNNNNN where NNNNN is a five digit number (e.g. cpd00001)
 2. **abbreviation**: Short name of compound
-3. **name**: Human readable long name of compound
+3. **name**: Long name of compound
 4. **formula**: Standard chemical format (using Hill system) in protonated form to match reported charge
 5. **mass**: Mass of compound or "null" when unknown
 6. **source**: Source database of compound (currently only source is ModelSEED)
@@ -78,7 +78,7 @@ A reaction file describes the biochemical reactions.  There is one reaction per 
 
 1. **id**: Unique ID for the reaction in the format rxnNNNNN where NNNNN is a five digit number (e.g. rxn03789)
 2. **abbreviation**: Short name of reaction
-3. **name**: Human readable long name of reaction
+3. **name**: Long name of reaction
 4. **code**: Definition of reaction expressed using compound IDs and before protonation (see below for description of format)
 5. **stoichiometry**: Definition of reaction expressed in stoichiometry format (see below for description of format)
 6. **is_transport**: True if reaction is a transport reaction 
@@ -102,7 +102,7 @@ Each compound participating in the reaction is in this format:
 
 	(n) cpdid[m]
 
-where "n" is the number of compounds, "cpdid" is the compound ID, and "m" is a compartment index number.  Compounds are separated by "+" and reactant and product compounds are delimited by the direction symbol.  For example, this is the definition of reaction rxn00001:
+where "n" is the compound coefficient, "cpdid" is the compound ID, and "m" is a compartment index number.  Compounds are separated by "+" and reactant and product compounds are delimited by the direction symbol.  For example, this is the definition of reaction rxn00001:
 
 	(1) cpd00001[0] + (1) cpd00012[0] <=> (2) cpd00009[0] + (1) cpd00067[0]
 
@@ -111,16 +111,16 @@ Each compound participating in the reaction is in this format:
 
 	(n) cpdname[m]
 
-where "n" is the number of compounds, "cpdname" is the compound name, and "m" is a compartment index number.  Compounds are separated by "+" and reactant and product compounds are delimited by the direction symbol.  For example, this is the definition of reaction rxn00001:
+where "n" is the compound coefficient, "cpdname" is the compound name, and "m" is a compartment index number.  Compounds are separated by "+" and reactant and product compounds are delimited by the direction symbol.  For example, this is the definition of reaction rxn00001:
 
 	(1) H2O[0] + (1) PPi[0] <=>  (2) Phosphate[0] + (1) H+[0]
 
 ### Format of reaction stoichiometry
 Each compound participating in the reaction is in this format:
 
-	n:cpdid:c:i:"cpdname"
+	n:cpdid:m:i:"cpdname"
 
-where "n" is the number of compounds and a negative number indicates a reactant and a positive number indicates a product, "cpdid" is the compound ID, "c" is the compartment, "i" is the compartment index, and "cpdname" is the compound name.  Compounds are separated by semicolon.  For example, this is the stoichiometry of reaction rxn00001:
+where "n" is the compound coefficient and a negative number indicates a reactant and a positive number indicates a product, "cpdid" is the compound ID, "m" is the compartment index number, "i" is the community index number (I think this is no longer needed), and "cpdname" is the compound name.  Compounds are separated by semicolon.  For example, this is the stoichiometry of reaction rxn00001:
 
 	-1:cpd00001:0:0:"H2O";-1:cpd00012:0:0:"PPi";2:cpd00009:0:0:"Phosphate";1:cpd00067:0:0:"H+"
 
@@ -166,14 +166,14 @@ Note that a reaction ID can be repeated if there are multiple fields that need t
 A compartment file describes the compartments in cells where biochemical reactions take place.  There is one compartment per line with fields separated by tabs:  The following fields are required:
 
 * **id**: Unique ID for the compartment (single character)
-* **name**: Human readable long name of compartment
+* **name**: Long name of compartment
 * **hierarchy**: Number describing where compartment is in the hierarchy, starting from 0 for extracellular
 
 ## Complex role file format
 A complex role file maps complexes to functional roles.  There is one complex role mapping per line with fields separated by tabs.  The following fields are required:
 
 * **complex_id**: Unique ID for the complex in the format cpx.N where N is a number
-* **complex_name**: Human readable name of complex (currently same as the ID)
+* **complex_name**: Long name of complex (currently same as the ID)
 * **complex_source**: Source of complex, valid values are ModelSEED and KEGG
 * **complex_type**: Type of complex, valid values are SEED\_role\_complex and KEGG\_role\_complex
 * **role_id**: Unique ID for the role in the format in the format fr.N where N is a number
