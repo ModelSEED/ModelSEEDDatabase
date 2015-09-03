@@ -29,22 +29,18 @@ class BiochemHelper(BaseHelper):
             @return List of compound dictionaries.
         '''
     
+        # The following fields are required in a compounds file.
+        required = { 'id', 'abbreviation', 'name', 'formula', 'mass', 'source',
+                      'structure', 'charge', 'is_core', 'is_obsolete', 'linked_compound',
+                      'is_cofactor', 'deltag', 'deltagerr', 'pka', 'pkb',
+                      'abstract_compound', 'comprised_of', 'aliases' }
+
         # Read the compounds from the specified file.
         compounds = list()
         with open(path, 'r') as handle:
             # The first line has the header with the field names.
             nameList = handle.readline().strip().split('\t')
-            fieldNames = dict()
-            for index in range(len(nameList)):
-                fieldNames[nameList[index]] = index
-            required = { 'id', 'abbreviation', 'name', 'formula', 'mass', 'source',
-                          'structure', 'charge', 'is_core', 'is_obsolete', 'linked_compound',
-                          'is_cofactor', 'deltag', 'deltagerr', 'pka', 'pkb',
-                          'abstract_compound', 'comprised_of', 'aliases' }
-            for req in required:
-                if req not in fieldNames:
-                    print 'WARNING: Required field %s is missing from header' %(req)
-                    return None
+            fieldNames = self.validateHeader(nameList, required)
             
             linenum = 1
             for line in handle:
@@ -67,22 +63,30 @@ class BiochemHelper(BaseHelper):
                     cpd['structure'] = fields[fieldNames['structure']]
                     if fields[fieldNames['charge']] != 'null':
                         cpd['charge'] = float(fields[fieldNames['charge']])
+                    else:
+                        cpd['charge'] = float(0)
                     cpd['is_core'] = int(fields[fieldNames['is_core']])
                     cpd['is_obsolete'] = int(fields[fieldNames['is_obsolete']])
                     if fields[fieldNames['linked_compound']] != 'null':
                         cpd['linked_compound'] = fields[fieldNames['linked_compound']]
                     cpd['is_cofactor'] = int(fields[fieldNames['is_cofactor']])
-                    if fields[fieldNames['deltag']] != 'null' and fields[fieldNames['deltag']] != '10000000':
+                    if fields[fieldNames['deltag']] != 'null':
                         cpd['deltag'] = float(fields[fieldNames['deltag']])
-                    if fields[fieldNames['deltagerr']] != 'null' and fields[fieldNames['deltagerr']] != '10000000':
+                    else:
+                        cpd['deltag'] = float(10000000)
+                    if fields[fieldNames['deltagerr']] != 'null':
                         cpd['deltagerr'] = float(fields[fieldNames['deltagerr']])
+                    else:
+                        cpd['deltagerr'] = float(10000000)
                     cpd['pka'] = fields[fieldNames['pka']]
                     cpd['pkb'] = fields[fieldNames['pkb']]
                     if fields[fieldNames['abstract_compound']] != 'null':
                         cpd['abstract_compound'] = fields[fieldNames['abstract_compound']]
                     if fields[fieldNames['comprised_of']] != 'null':
                         cpd['comprised_of'] = fields[fieldNames['comprised_of']]
+                    cpd['aliases'] = list()
                     if fields[fieldNames['aliases']] != 'null':
+                        # This actually needs to parse the aliases format.
                         cpd['aliases'] = fields[fieldNames['aliases']]
                 if includeLinenum:
                     cpd['linenum'] = linenum
@@ -107,7 +111,7 @@ class BiochemHelper(BaseHelper):
             @return List of reaction dictionaries.
         '''
 
-        # The following columns are required in a reactions file.
+        # The following fields are required in a reactions file.
         required = { 'id', 'abbreviation', 'name', 'code', 'stoichiometry', 'is_transport', 
                      'equation', 'definition', 'reversibility', 'direction', 'abstract_reaction',
                      'pathways', 'aliases', 'ec_numbers', 'deltag', 'deltagerr', 'compound_ids',
@@ -118,13 +122,7 @@ class BiochemHelper(BaseHelper):
         with open(path, 'r') as handle:
             # The first line has the header with the field names.
             nameList = handle.readline().strip().split('\t')
-            fieldNames = dict()
-            for index in range(len(nameList)):
-                fieldNames[nameList[index]] = index
-            for req in required:
-                if req not in fieldNames:
-                    print 'WARNING: Required field %s is missing from header' %(req)
-                    return None
+            fieldNames = self.validateHeader(nameList, required)
 
             linenum = 1
             for line in handle:
@@ -178,21 +176,19 @@ class BiochemHelper(BaseHelper):
             @param path: Path to compartments file
             @param includeLinenum: When True, include line number in dictionary
             @return List of compartment dictionaries.
+            
+            @note This method should become obsolete when compartments are moved to Model Template
         '''
+
+        # The following fields are required in a compartments file.
+        required = { 'id', 'name', 'hierarchy' }
 
         # Read the compartments from the specified file.
         compartments = list()
         with open(path, 'r') as handle:
             # The first line has the header with the field names.
             nameList = handle.readline().strip().split('\t')
-            fieldNames = dict()
-            for index in range(len(nameList)):
-                fieldNames[nameList[index]] = index
-            required = { 'id', 'name', 'hierarchy' }
-            for req in required:
-                if req not in fieldNames:
-                    print 'WARNING: Required field %s is missing from header' %(req)
-                    return None
+            fieldNames = self.validateHeader(nameList, required)
 
             linenum = 1
             for line in handle:
@@ -222,19 +218,17 @@ class BiochemHelper(BaseHelper):
             @return List of complex role mapping dictionaries.
         '''
 
+        # The following fields are required in a complex roles files.
+        required = { 'complex_id', 'complex_name', 'complex_source', 'complex_type', 'role_id',
+                     'role_name', 'role_type', 'role_source', 'role_aliases', 'role_exemplar',
+                     'type', 'triggering', 'optional' }
+
         # Read the complex role mappings from the specified file.
         complexRoles = list()
         with open(path, 'r') as handle:
             # The first line has the header with the field names.
             nameList = handle.readline().strip().split('\t')
-            fieldNames = dict()
-            for index in range(len(nameList)):
-                fieldNames[nameList[index]] = index
-            required = { 'complex_id', 'complex_name', 'complex_source', 'complex_type', 'role_id', 'role_name', 'role_type', 'role_source', 'role_aliases', 'role_exemplar', 'type', 'triggering', 'optional' }
-            for req in required:
-                if req not in fieldNames:
-                    print 'WARNING: Required field %s is missing from header' %(req)
-                    return None
+            fieldNames = self.validateHeader(nameList, required)
 
             linenum = 1
             for line in handle:
