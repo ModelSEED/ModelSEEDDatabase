@@ -9,13 +9,28 @@ class CompoundNotFoundError(Exception):
 class ObsoleteCompoundError(Exception):
     pass
 
+class CompoundKeyError(Exception):
+    pass
+
+class DuplicateCompartmentError(Exception):
+    pass
+
 class CompartmentNotFoundError(Exception):
+    pass
+
+class DuplicateRoleError(Exception):
     pass
 
 class ReactionNotFoundError(Exception):
     pass
 
+class DuplicateReactionError(Exception):
+    pass
+
 class ObsoleteReactionError(Exception):
+    pass
+
+class ComplexNotFoundError(Exception):
     pass
 
 class NoComplexesError(Exception):
@@ -41,9 +56,13 @@ class TemplateHelper(BaseHelper):
         self.masterReactions = self.buildIndexDictFromListOfObjects(self.masterReactionsList)
         
         # Create empty dictionaries for keeping track of items to add to Model Template.
+        self.compartments = dict()
+        self.biomasses = dict()
         self.compounds = dict()
         self.compCompounds = dict()
-        self.compartments = dict()
+        self.roles = dict()
+        self.complexes = dict()
+        self.reactions = dict()
 
         return
 
@@ -62,7 +81,7 @@ class TemplateHelper(BaseHelper):
             @param compoundsPath: Path to biomass compounds file
             @param includeLinenum: When True, include line number in dictionary
             @param noFormat: When True, values in compound dictionary are not formatted
-            @return List of compound dictionaries.
+            @return Nothing
         '''
 
         # Read the biomass compounds from the specified file.
@@ -90,7 +109,7 @@ class TemplateHelper(BaseHelper):
                 else:
                     compCompound = self.addCompCompound(fields[fieldNames['id']], fields[fieldNames['compartment']])
                     component['class'] = fields[fieldNames['class']]
-                    component['templatecompcompound_ref'] = '~/compcompounds/id/'+compCompound['id']
+                    component['compcompound_ref'] = '~/compcompounds/id/'+compCompound['id']
                     component['coefficient_type'] = fields[fieldNames['coefficient_type']]
                     component['coefficient'] = float(fields[fieldNames['coefficient']])
                     component['linked_compound_refs'] = list()
@@ -109,7 +128,6 @@ class TemplateHelper(BaseHelper):
                 compounds[fields[fieldNames['biomass_id']]].append(component)
             
         # Read the biomasses from the specified file.
-        biomasses = list()
         with open(biomassPath, 'r') as handle:
             # The first line has the header with the field names.
             nameList = handle.readline().strip().split('\t')
@@ -145,9 +163,12 @@ class TemplateHelper(BaseHelper):
                     biomass['templateBiomassComponents'] = compounds[biomass['id']]
                 if includeLinenum:
                     biomass['linenum'] = linenum
-                biomasses.append(biomass)
+                if biomass['id'] not in self.biomasses:
+                    self.biomasses[biomass['id']] = biomass
+                else:
+                    raise DuplicateBiomassError('Biomass %s on line %d is a duplicate' %(biomass['id'], linenum))
 
-        return biomasses
+        return
     
     def readCompartmentsFile(self, path, includeLinenum=True, noFormat=False):
         ''' Read the contents of a compartments file.
@@ -163,14 +184,13 @@ class TemplateHelper(BaseHelper):
             @param path: Path to compartments file
             @param includeLinenum: When True, include line number in dictionary
             @param noFormat: When True, values in compound dictionary are not formatted
-            @return List of template compartment dictionaries
+            @return Nothing
         '''
 
         # The following fields are required in a compartments file.
         required = { 'index', 'id', 'name', 'hierarchy', 'pH', 'aliases' }
 
         # Read the compartments from the specified file.
-        compartments = list()
         with open(path, 'r') as handle:
             # The first line has the header with the field names.
             nameList = handle.readline().strip().split('\t')
@@ -200,10 +220,137 @@ class TemplateHelper(BaseHelper):
                         self.addToList(fields[fieldNames['aliases']], ';', compartment['aliases'])
                 if includeLinenum:
                     compartment['linenum'] = linenum
-                compartments.append(compartment)
-                self.compartments[compartment['id']] = compartment
-        return compartments
+                if compartment['id'] not in self.compartments:
+                    self.compartments[compartment['id']] = compartment
+                else:
+                    raise DuplicateCompartmentError('Compartment %s on line %d is a duplicate' %(compartment['id'], linenum))
 
+        return
+
+    def readRolesFile(self, path, includeLinenum=True, noFormat=False):
+        ''' Read the contents of a roles file.
+
+            There is one role per line in the file with fields separated by tabs.
+            The first line of the file is a header with the field names.
+            
+            The TemplateRole structure uses the field names as keys.  When noFormat
+            is True, the field values are exactly as read from the file. Otherwise,
+            the fields with a null value are converted to default values and numeric
+            values are converted to numbers.
+    
+            @param path: Path to roles file
+            @param includeLinenum: When True, include line number in dictionary
+            @param noFormat: When True, values in TemplateRole dictionary are not formatted
+            @return Nothing
+        '''
+
+        # The following fields are required in a reactions file.
+        required = { 'id', 'name', 'source', 'features', 'aliases' }
+
+        # Read the reactions from the specified file.
+        with open(path, 'r') as handle:
+            # The first line has the header with the field names.
+            nameList = handle.readline().strip().split('\t')
+            fieldNames = self.validateHeader(nameList, required)
+            
+            linenum = 1
+            for line in handle:
+                linenum += 1
+                fields = line.strip().split('\t')
+                if len(fields) < len(required):
+                    print 'WARNING: Role on line %d is missing one or more fields, %s' %(linenum, fields)
+                    continue
+                
+
+                # Create a new TemplateCompartment.
+                role = dict()
+                if noFormat:
+                    for index in range(len(nameList)):
+                        role[nameList[index]] = fields[index]
+                else:
+                    role['id'] = fields[fieldNames['id']]
+                    role['name'] = fields[fieldNames['name']]
+                    role['source'] = fields[fieldNames['source']]
+                    role['features'] = list()
+                    if fields[fieldNames['features']] != 'null':
+                        self.addToList(fields[fieldNames['features']], ';', role['features'])
+                    role['aliases'] = list()
+                    if fields[fieldNames['aliases']] != 'null':
+                        self.addToList(fields[fieldNames['aliases']], ';', role['aliases'])
+                if includeLinenum:
+                    role['linenum'] = linenum
+                if role['id'] not in self.roles:
+                    self.roles[role['id']] = role
+                else:
+                    raise DuplicateRoleError('Role %s on line %d is a duplicate' %(role['id'], linenum))
+        return
+
+    def readComplexesFile(self, path, includeLinenum=True, noFormat=False):
+        ''' Read the contents of a complex roles file.
+
+            There is one complex per line in the file with fields separated by tabs.
+            The first line of the file is a header with the field names.
+            
+            The TemplateComplex structure uses the field names as keys.  When noFormat
+            is True, the field values are exactly as read from the file. Otherwise, the
+            fields with a null value are converted to default values and numeric values
+            are converted to numbers.
+    
+            @param path: Path to complex roles file
+            @param includeLinenum: When True, include line number in dictionary
+            @return Nothing
+        '''
+
+        # The following fields are required in a complexes file.
+        required = { 'id', 'name', 'source', 'reference', 'confidence', 'roles' }
+
+        # Read the reactions from the specified file.
+        with open(path, 'r') as handle:
+            # The first line has the header with the field names.
+            nameList = handle.readline().strip().split('\t')
+            fieldNames = self.validateHeader(nameList, required)
+            
+            linenum = 1
+            for line in handle:
+                linenum += 1
+                fields = line.strip().split('\t')
+                if len(fields) < len(required):
+                    print 'WARNING: Role on line %d is missing one or more fields, %s' %(linenum, fields)
+                    continue
+                
+                # Create a new TemplateComplex if needed. The same complex can be paired with multiple roles.
+                complex = dict()
+                if noFormat:
+                    for index in range(len(nameList)):
+                        role[nameList[index]] = fields[index]
+                else:
+                    complex['id'] = fields[fieldNames['id']]
+                    complex['name'] = fields[fieldNames['name']]
+                    complex['source'] = fields[fieldNames['source']]
+                    complex['reference'] = fields[fieldNames['reference']]
+                    complex['confidence'] = float(fields[fieldNames['confidence']])
+                    complex['complexroles'] = list()
+                    if fields[fieldNames['roles']] != 'null':
+                        # Link the role and complex through a TemplateComplexRole.
+                        links = fields[fieldNames['roles']].split('|')
+                        for index in range(len(links)):
+                            values = links[index].split(';')
+                            if values[0] not in self.roles:
+                                raise RoleNotFoundError('Role %s on line %d not found' %(values[0], linenum))
+                            complexRole = dict()
+                            complexRole['role_ref'] = '~/roles/id/'+values[0] # Need to validate
+                            complexRole['optional'] = int(values[2])
+                            complexRole['triggering'] = int(values[3])
+                            complex['complexroles'].append(complexRole)
+                if includeLinenum:
+                    complex['linenum'] = linenum
+                if complex['id'] not in self.complexes:
+                    self.complexes[complex['id']] = complex
+                else:
+                    raise DuplicateComplexError('Complex %s on line %d is a duplicate' %(role['id'], linenum))
+                
+        return
+    
     def readReactionsFile(self, path, includeLinenum=True, noFormat=False):
         ''' Read the contents of a reactions file.
 
@@ -218,7 +365,7 @@ class TemplateHelper(BaseHelper):
             @param path: Path to reactions file
             @param includeLinenum: When True, include line number in dictionary
             @param noFormat: When True, values in reaction dictionary are not formatted
-            @return List of template reaction dictionaries
+            @return Nothing
         '''
 
         # The following fields are required in a reactions file.
@@ -226,8 +373,6 @@ class TemplateHelper(BaseHelper):
                      'forward_cost', 'reverse_cost', 'complexes' }
 
         # Read the reactions from the specified file.
-        reactionIds = dict() # Check for duplicates
-        reactions = list()
         with open(path, 'r') as handle:
             # The first line has the header with the field names.
             nameList = handle.readline().strip().split('\t')
@@ -291,16 +436,16 @@ class TemplateHelper(BaseHelper):
                     reaction['name'] = masterReaction['name']
                     reaction['direction'] = fields[fieldNames['direction']]
                     if fields[fieldNames['gfdir']] == 'null':
-                        reaction['gapfillDirection'] = ''
+                        reaction['GapfillDirection'] = ''
                     else:
-                        reaction['gapfillDirection'] = fields[fieldNames['gfdir']]
+                        reaction['GapfillDirection'] = fields[fieldNames['gfdir']]
                     reaction['type'] = fields[fieldNames['type']]
                     reaction['maxforflux'] = float(100)
                     reaction['maxrevflux'] = float(-100)
-                    reaction['templatecompartment_ref'] = '~/compartments/id/'+compartmentIds[0]
+                    reaction['compartment_ref'] = '~/compartments/id/'+compartmentIds[0]
                     reaction['base_cost'] = float(fields[fieldNames['base_cost']])
-                    reaction['forward_cost'] = float(fields[fieldNames['forward_cost']])
-                    reaction['reverse_cost'] = float(fields[fieldNames['reverse_cost']])
+                    reaction['forward_penalty'] = float(fields[fieldNames['forward_cost']])
+                    reaction['reverse_penalty'] = float(fields[fieldNames['reverse_cost']])
                     reaction['templateReactionReagents'] = list()
                     # Stoichiometry format is n:cpdid:c:i:"cpdname"
                     reagents = masterReaction['stoichiometry'].split(';')
@@ -309,26 +454,31 @@ class TemplateHelper(BaseHelper):
                         compartmentIndex = int(parts[2])
                         compCompound = self.addCompCompound(parts[1], compartmentIds[compartmentIndex])
                         templateReactionReagent = dict()
-                        templateReactionReagent['templatecompcompound_ref'] = '~/compcompounds/id/'+compCompound['id']
+                        templateReactionReagent['compcompound_ref'] = '~/compcompounds/id/'+compCompound['id']
                         templateReactionReagent['coefficient'] = float(parts[0])
                         reaction['templateReactionReagents'].append(templateReactionReagent)
-                    reaction['templatecomplex_refs'] = list()
+                    reaction['complex_refs'] = list()
                     if reaction['type'] == 'conditional' and fields[fieldNames['complexes']] == 'null':
                         raise NoComplexesError('Reaction %s is of type conditional and no complexes are specified' %(reactionId))
                     if fields[fieldNames['complexes']] != 'null':
                         complexes = fields[fieldNames['complexes']].split('|')
+                        for cindex in range(len(complexes)):
+                            if complexes[cindex] in self.complexes:
+                                reaction['complex_refs'].append('~/complexes/id/'+complexes[cindex])
+                            else:
+#                                print 'Reaction %s on line %d refers to complex %s which is not found' %(reaction['id'], linenum, complexes[cindex])
+                                raise ComplexNotFoundError('Reaction %s on line %d refers to complex %s which is not found' %(reaction['id'], linenum, complexes[cindex]))
                         
                 if includeLinenum:
                     reaction['linenum'] = linenum
 
                 # Check for duplicates.
-                if reaction['id'] not in reactionIds:
-                    reactionIds[reaction['id']] = 1
-                    reactions.append(reaction)
+                if reaction['id'] not in self.reactions:
+                    self.reactions[reaction['id']] = reaction
                 else:
-                    print 'WARNING: Duplicate reaction %s not added' %(reaction['id'])
-                    
-        return reactions
+                    raise DuplicateReactionError('Reaction %s on line %d is a duplicate' %(reaction['id'], linenum))
+        
+        return
 
     def addCompCompound(self, compoundId, compartmentId):
         ''' Add a compound to the model template.
@@ -379,7 +529,7 @@ class TemplateHelper(BaseHelper):
                 compound['formula'] = masterCompound['formula']
                 self.compounds[compound['id']] = compound
             except KeyError as e:
-                print 'Missing key in compound %s: %s' %(masterCompound['id'], e.message)
+                raise CompoundKeyError('Missing key in compound %s: %s' %(masterCompound['id'], e.message))
         else:
             compound = self.compounds[compoundId]
 
@@ -396,9 +546,13 @@ class TemplateHelper(BaseHelper):
             compCompound['id'] = id
             compCompound['templatecompound_ref'] = '~/compounds/id/'+compoundId
             compCompound['charge'] = compound['defaultCharge'] # @todo Not sure how charge could be different
-            compCompound['maxuptake'] = 0 #For extracellular, set to 100; otherwise 0
+            if compartment['id'] == 'e':
+                compCompound['maxuptake'] = 100.0 # Set a maximum for the extracellular compartment
+            else:
+                compCompound['maxuptake'] = 0.0
             compCompound['templatecompartment_ref'] = '~/compartments/id/'+compartmentId
-            self.compCompounds[compoundId] = compCompound
+            self.compCompounds[id] = compCompound
         else:
-            compCompound = self.compCompounds[compoundId]
+            compCompound = self.compCompounds[id]
+
         return compCompound

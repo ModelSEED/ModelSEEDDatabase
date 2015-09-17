@@ -38,6 +38,7 @@ if __name__ == "__main__":
     parser.add_argument('--biochemref', help='reference to Biochemistry object in workspace', action='store', default='')
     parser.add_argument('--compoundfile', help='path to master compounds file', action='store', default='../Biochemistry/compounds.master.tsv')
     parser.add_argument('--reactionfile', help='path to master reactions file', action='store', default='../Biochemistry/reactions.master.tsv')
+    parser.add_argument('--complexfile', help='path to master complexes file', action='store', default='../Templates/Complexes.tsv')
     parser.add_argument('--name', help='name of object', action='store', default=None)
     parser.add_argument('--type', help='type of model', action='store', default='GenomeScale')
     parser.add_argument('--domain', help='domain of organisms', action='store', default='Bacteria')
@@ -70,26 +71,35 @@ if __name__ == "__main__":
     
     # Add the template compartments.
     compartmentsFile = os.path.join(args.templatedir, 'Compartments.tsv')
-    template['compartments'] = helper.readCompartmentsFile(compartmentsFile, includeLinenum=False)
+    helper.readCompartmentsFile(compartmentsFile, includeLinenum=False)
+    template['compartments'] = [ helper.compartments[key] for key in helper.compartments ]
 
     # Add the template biomasses.
     biomassFile = os.path.join(args.templatedir, 'Biomasses.tsv')
     biomassCompoundsFile = os.path.join(args.templatedir, 'BiomassCompounds.tsv')
-    template['biomasses'] = helper.readBiomassesFile(biomassFile, biomassCompoundsFile, includeLinenum=False)
+    helper.readBiomassesFile(biomassFile, biomassCompoundsFile, includeLinenum=False)
+    template['biomasses'] = [ helper.biomasses[key] for key in helper.biomasses ]
+
+    # Add the template roles.
+    rolesFile = os.path.join(args.templatedir, '..', 'Roles.tsv')
+    helper.readRolesFile(rolesFile, includeLinenum=False)
+    template['roles'] = [ helper.roles[key] for key in helper.roles ]
+
+    # Add the template complexes.
+    complexesFile = os.path.join(args.templatedir, '..', 'Complexes.tsv')
+    helper.readComplexesFile(complexesFile, includeLinenum=False)
+    template['complexes'] = [ helper.complexes[key] for key in helper.complexes ]
 
     # Add the template reactions.
     reactionsFile = os.path.join(args.templatedir, 'Reactions.tsv')
-    template['reactions'] = helper.readReactionsFile(reactionsFile, includeLinenum=False)
+    helper.readReactionsFile(reactionsFile, includeLinenum=False)
+    template['reactions'] = [ helper.reactions[key] for key in helper.reactions ]
 
     # Add the template compounds (constructed from reagents in reactions).
-    template['compounds'] = list()
-    for key in helper.compounds:
-        template['compounds'].append(helper.compounds[key])
+    template['compounds'] = [ helper.compounds[key] for key in helper.compounds ]
 
     # Add the template comp compounds (constructed from reagents in reactions).
-    template['compcompounds'] = list()
-    for key in helper.compCompounds:
-        template['compcompounds'].append(helper.compCompounds[key])
+    template['compcompounds'] = [ helper.compCompounds[key] for key in helper.compCompounds ]
 
     # Save a local copy for easy reference.
     filename = os.path.join(args.templatedir, args.id+'.json')
@@ -99,3 +109,4 @@ if __name__ == "__main__":
     # is overwritten with the updated data.
     wsClient = Workspace(args.wsurl)
     output = wsClient.create( { 'objects': [ [ args.ref, 'modeltemplate', {}, template ] ], 'overwrite': 1 });
+    exit(0)
