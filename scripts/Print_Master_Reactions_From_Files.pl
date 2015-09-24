@@ -79,6 +79,8 @@ while(<FH>){
 	$Rxn_Mods{$temp[0]}{$temp[2]} = [$temp[3], $temp[4]];
     }elsif($temp[2] eq "coefficient"){
 	$Rxn_Mods{$temp[0]}{$temp[2]}{$temp[3]}=$temp[4];
+    }elsif($temp[2] eq "add"){
+	$Rxn_Mods{$temp[0]}{$temp[2]}{$temp[3]}=[$temp[4], $temp[5]];
     }else{
 	$Rxn_Mods{$temp[0]}{$temp[2]}=$temp[3];
     }
@@ -190,6 +192,35 @@ foreach my $db ("default", "plantdefault") {
 		my $name = $Compounds{$cpd}{name};
 		$rxnhash{definition} =~ s/\(\d+\) ${name}/\(${stoich}\) ${name}/g;
 
+	    }
+	}
+
+	if (exists($Rxn_Mods{$rxnid}) && exists($Rxn_Mods{$rxnid}{add})) {
+	    foreach my $cpd (keys %{$Rxn_Mods{$rxnid}{add}}){
+		my ($stoich,$cmpt) = @{$Rxn_Mods{$rxnid}{add}{$cpd}};
+
+		if($stoich < 0){
+		    #add compound to left side of equation
+		    my $neutral_stoich = abs($stoich);
+		    $rxnhash{equation} = "($neutral_stoich) ${cpd}[${cmpt}] ".$rxnhash{equation};
+		    if($cpd ne 'cpd00067'){
+			$rxnhash{equation} = "($neutral_stoich) ${cpd}[${cmpt}] ".$rxnhash{code};
+		    }
+
+		    my $name = $Compounds{$cpd}{name};
+		    $rxnhash{stoichiometry} = "$neutral_stoich:$cpd:$cmpt:0:$name;".$rxnhash{stoichiometry};
+		    $rxnhash{definition} = "($neutral_stoich) ${name}[${cmpt}] ".$rxnhash{definition};
+		}elsif($stoich > 0){
+		    #add compound to right side of equation
+		    $rxnhash{equation} = $rxnhash{equation}." ($stoich) ${cpd}[${cmpt}]";
+		    if($cpd ne 'cpd00067'){
+			$rxnhash{equation} = $rxnhash{code}." ($stoich) ${cpd}[${cmpt}]";
+		    }
+
+		    my $name = $Compounds{$cpd}{name};
+		    $rxnhash{stoichiometry} = $rxnhash{stoichiometry}.";$stoich:$cpd:$cmpt:0:$name";
+		    $rxnhash{definition} = $rxnhash{definition}." ($stoich) ${name}[${cmpt}]";
+		}
 	    }
 	}
 
