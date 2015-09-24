@@ -74,9 +74,13 @@ my %Rxn_Mods=();
 while(<FH>){
     chomp;
     @temp = split(/\t/,$_,-1);
-    $Rxn_Mods{$temp[0]}{$temp[2]}=$temp[3];
+
     if($temp[2] eq "replace"){
 	$Rxn_Mods{$temp[0]}{$temp[2]} = [$temp[3], $temp[4]];
+    }elsif($temp[2] eq "coefficient"){
+	$Rxn_Mods{$temp[0]}{$temp[2]}{$temp[3]}=$temp[4];
+    }else{
+	$Rxn_Mods{$temp[0]}{$temp[2]}=$temp[3];
     }
 }
 close(FH);
@@ -156,7 +160,7 @@ foreach my $db ("default", "plantdefault") {
 	#update any modifications
 	if (exists($Rxn_Mods{$rxnid}) && exists($Rxn_Mods{$rxnid}{replace})) {
 	    my ($old_cpd,$new_cpd) = @{$Rxn_Mods{$rxnid}{replace}};
-	    
+
 	    # Make sure replacement compound exists.
 	    my $repCpd = $biochem->getObject("compounds", $old_cpd);
 	    if (!$repCpd) {
@@ -166,8 +170,27 @@ foreach my $db ("default", "plantdefault") {
 
 	    $rxnhash{equation} =~ s/${old_cpd}/${new_cpd}/g;
 	    $rxnhash{code} =~ s/${old_cpd}/${new_cpd}/g;
-	    $rxnhash{definition} =~ s/${old_cpd}/${new_cpd}/g;
 	    $rxnhash{stoichiometry} =~ s/${old_cpd}/${new_cpd}/g;
+
+	    my $old_name = $Compounds{$old_cpd}{name};
+	    my $new_name = $Compounds{$new_cpd}{name};
+
+	    $rxnhash{definition} =~ s/${old_name}/${new_name}/g;
+	}
+
+	if (exists($Rxn_Mods{$rxnid}) && exists($Rxn_Mods{$rxnid}{coefficient})) {
+	    foreach my $cpd (keys %{$Rxn_Mods{$rxnid}{coefficient}}){
+		my $stoich = $Rxn_Mods{$rxnid}{coefficient}{$cpd};
+
+		$rxnhash{equation} =~ s/\(\d+\) ${cpd}/\(${stoich}\) ${cpd}/;
+		$rxnhash{code} =~ s/\(\d+\) ${cpd}/\(${stoich}\) ${cpd}/;
+
+		$rxnhash{stoichiometry} =~ s/\d+:${cpd}/${stoich}:${cpd}/;
+
+		my $name = $Compounds{$cpd}{name};
+		$rxnhash{definition} =~ s/\(\d+\) ${name}/\(${stoich}\) ${name}/g;
+
+	    }
 	}
 
 	$rxnhash{findmatch}=0;
