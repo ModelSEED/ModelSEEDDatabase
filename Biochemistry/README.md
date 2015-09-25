@@ -1,7 +1,7 @@
 # Biochemistry
 The purpose of this folder is to version control updates, changes, and corrections to the current Biochemistry object using the sources from ModelSEED, PlantSEED, and Probabilistic Annotation.  May there be one version to rule them all.
 
-A Biochemistry object is defined by its compounds, reactions, and compartments.  The following files contain the data needed to build a Biochemistry object.
+A Biochemistry object is defined by its compounds and reactions.  The following files contain the data needed to build a Biochemistry object.
 
 * compounds.master.tsv: List of compounds for combined master biochemistry
 * compounds.master.mods: Modifications to apply to combined master biochemistry
@@ -11,16 +11,12 @@ A Biochemistry object is defined by its compounds, reactions, and compartments. 
 * reactions.master.mods: Modifications to apply to combined master biochemistry
 * reactions.default.tsv: List of reactions from ModelSEED biochemistry
 * reactions.plantdefault.tsv: List of reactions from PlantSEED biochemistry
-* compartments.master.tsv: List of compartments for combined master biochemistry
-* compartments.default.tsv: List of compartments from ModelSEED biochemistry
-* compartments.plantdefault.tsv: Set of compartments from PlantSEED biochemistry
 
 To build a Biochemistry object from the files, change to the scripts directory and run the following commands:
 
 1. `./Print_Master_Compounds_List.pl` merges the default and plantdefault files, applies modifications, and creates the master file.
-2. `./Print_Master_Compartments_List.pl` merges the default and plantdefault file and creates the master file.
-3. `./Print_Master_Reactions_From_Files.pl` merges the default and plantdefault files, applies modifications, checks reaction mass and charge balance, and creates the master file.
-5. `./Build_Biochem_JSON.pl master-2015a` creates a Biochemistry object with the ID master-2015a and exports it to a JSON file.
+2. `./Print_Master_Reactions_From_Files.pl` merges the default and plantdefault files, applies modifications, checks reaction mass and charge balance, and creates the master file.
+3. `./Build_Biochem_JSON.pl master-2015a` creates a Biochemistry object with the ID master-2015a and exports it to a JSON file.
 
 ## Compound file format
 A compound file describes the compounds (or metabolites) involved in biochemical reactions.  There is one compound per line with fields separated by tabs.  The following fields are required.
@@ -41,8 +37,8 @@ A compound file describes the compounds (or metabolites) involved in biochemical
 14. **deltagerr**: Value for change in free energy error of compound or "null" when unknown
 15. **pka**: Acid dissociation constants of compound (see below for description of format)
 16. **pkb**: Base dissociation constants of compound (see below for description of format)
-17. **abstract_compound**: Not sure of definition or "null" if not specified (currently all compounds are set to null)
-18. **comprised_of**: Not sure of definition or "null" if not specified (currently all compounds are set to null)
+17. **abstract_compound**: _Need definition_ or "null" if not specified (currently all compounds are set to null)
+18. **comprised_of**: _Need definition_ or "null" if not specified (currently all compounds are set to null)
 19. **aliases**: List of alternative names of compound separated by semicolon or "null" if not specified (see below for description of format)
 
 ### Format of pka and pkb
@@ -84,9 +80,9 @@ A reaction file describes the biochemical reactions.  There is one reaction per 
 6. **is_transport**: True if reaction is a transport reaction 
 7. **equation**: Definition of reaction expressed using compound IDs and after protonation (see below for description of format)
 8. **definition**: Definition of reaction expressed using compound names (see below for description of format)
-9. **reversibility**: Reversibility of reaction where ">" means right directional, "<" means left directional, "=" means bi-directional, and "?" means unknown
+9. **reversibility**: Reversibility of reaction where ">" means right directional, "<" means left directional, "=" means bi-directional, and "?" means unknown (_Need a better description of reversibility and direction_)
 10. **direction**: Direction of reaction where ">" means right directional, "<" means left directional, and "=" means bi-directional
-11. **abstract_reaction**: Not sure of definition or "null" if not specified (currently all reactions are set to null)
+11. **abstract_reaction**: _Need definition_ or "null" if not specified (currently all reactions are set to null)
 12. **pathways**: Pathways reaction is a part of or "null" if not specified (currently all reactions are set to null)
 13. **aliases**: List of alternative names of reaction separated by semicolon or "null" if not specified (format is the same as Compounds file)
 14. **ec_numbers**: Enzyme Commission numbers of enzymes that catalyze reaction or "null" if not specified (currently all reactions are set to null)
@@ -131,7 +127,7 @@ The reaction status field is a string with one or more values. Multiple values a
 * OK means the reaction is valid.  If "OK" is the only value, then the reaction was valid with no changes.
 * MI means there is a mass imbalance. The remainder of the string after the first colon indicates what atoms are unbalanced and the number of atoms needed to balance the reaction.  Multiple atoms are separated by a "/" character.  A positive number means the righthand side of the reaction has more atoms and a negative number means the lefthand side of the reaction has more atoms.
 * CI means there is a charge imbalance.  A positive number after the first colon means the righthand side of the reaction has a larger charge and a negative number means the lefthand side of the reaction has a larger charge.
-* HB means hydrogen is added to the reaction to balance it.
+* HB means the reaction has been balanced by adding hydrogen to it.
 * EMPTY means reactants cancel out completely.
 * CPDFORMERROR means at least one compound either has no formula or has an invalid formula.
 
@@ -157,34 +153,10 @@ A reaction modification file describes modifications to make to the master react
 
 1. **id**: ID of reaction to modify
 2. **source**: Source of modification where "plantdefault" is for PlantSEED and "curated" is for manual curation
-3. **action**: (1) Name of field to modify, (2) "replace" to replace a compound ID with another compound ID in all fields, or (3) "priority" to select the reaction from a specific database
-4. **value**: (1) When action is name of field the modified value of the specified field, (2) when action is "replace" original compound ID and new compound ID, or (3) when action is "priority" the name of database to select the reaction from
+3. **action**: (1) Name of field to modify, (2) "replace" to replace a compound ID with another compound ID in all fields, (3) "priority" to select the reaction from a specific database, (4) "add" to add a compound to the reaction, (5) "remove" to remove the reaction from the master file, or (6) "coefficient" to update the coefficient of a compound 
+4. **value**: (1) When action is name of field, the modified value of the specified field, (2) when action is "replace", original compound ID and new compound ID, (3) when action is "priority", the name of database to select the reaction from, (4) when action is "add", the compound ID, coefficient (negative number for reactant, positive number for product), and compartment index number, (5) when action is "remove", the value is ignored but must be specified, or (6) when action is "coefficient", the compound ID and new coefficient value
 
 Note that a reaction ID can be repeated if there are multiple fields that need to be modified.
-
-## Compartment file format
-A compartment file describes the compartments in cells where biochemical reactions take place.  There is one compartment per line with fields separated by tabs:  The following fields are required:
-
-* **id**: Unique ID for the compartment (single character)
-* **name**: Long name of compartment
-* **hierarchy**: Number describing where compartment is in the hierarchy, starting from 0 for extracellular
-
-## Complex role file format
-A complex role file maps complexes to functional roles.  There is one complex role mapping per line with fields separated by tabs.  The following fields are required:
-
-* **complex_id**: Unique ID for the complex in the format cpx.N where N is a number
-* **complex_name**: Long name of complex (currently same as the ID)
-* **complex_source**: Source of complex, valid values are ModelSEED and KEGG
-* **complex_type**: Type of complex, valid values are SEED\_role\_complex and KEGG\_role\_complex
-* **role_id**: Unique ID for the role in the format in the format fr.N where N is a number
-* **role_name**: Human readable name of the role
-* **role_source**: Source of role, valid values are SEED and KEGG
-* **role_type**: Type of role, valid values are SEED\_role and KEGG\_role
-* **role_aliases**: List of aliases for the role where each entry in the format type:alias
-* **role_exemplar**: What is this?  Currently not set for any mappings
-* **type**: What is this? All entries are set to role_mapping
-* **triggering**: What is this? All entries are set to true
-* **optional**: What is this? 12 of 2221 are set to true
 
 ## Archived files
 
@@ -198,5 +170,8 @@ The following files were used to merge the ModelSEED and PlantSEED biochemistry 
 * reactions.plantdefault_obs.cf.tsv: List of reactions from PlantSEED biochemistry in compartment-free notation (includes obsolete IDs)
 * reactions.tsv: First attempt at merged reactions file, currently empty
 * compartments.plantdefault_obs.tsv: List of compartments from PlantSEED biochemistry (includes obsolete IDs and is not used)
+* compartments.master.tsv: List of compartments for combined master biochemistry
+* compartments.default.tsv: List of compartments from ModelSEED biochemistry
+* compartments.plantdefault.tsv: Set of compartments from PlantSEED biochemistry
 * Workspaces/KBaseTemplateModels.rxn: List of reactions and the model templates that include the reaction
 

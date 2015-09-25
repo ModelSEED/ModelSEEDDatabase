@@ -15,15 +15,42 @@ There is a folder for each Model Template which contains the following files:
 
 When a Model is reconstructed from the Model Template only the compartments, biomass reactions, and reactions from the above files are available to be included in the Model.
 
+## Roles file format
+The Roles file describes functional roles that are available for Models.  There is one master Roles file and a Model Template only includes the roles that are associated with the reactions in the Model Template.  There is one role per line with fields separated by tabs.  Each line has the following fields:
+
+* **id**: ID of role
+* **name**: Long name of role
+* **source**: Source of role (valid values are "ModelSEED", "PlantSEED", "KEGG", or "published")
+* **features**: List of features associated with role separated by semicolon or "null" if not specified
+* **aliases**: List of aliases for role separated by semicolon or "null" if not specified
+
+## Complexes file format
+The Complexes file describes the complexes that are available for Models.  There is one master Complexes file and a Model Template only includes the complexes that are associated with the reactions in the Model Template.  There is one complex per line with fields separated by tabs.  Each line has the following fields:
+
+* **id**: ID of complex
+* **name**: Name of complex (typically the same as the ID)
+* **source**: Source of complex (valid values are "ModelSEED", "KEGG", or "published")
+* **reference**: Reference to where complex came from (_PUBMED id of publication or KBase DLITs for SEED?_) or "null" if not specified
+* **confidence**: Value from 0 to 1 (_need details on how value is calculated_)
+* **roles**: List of roles and relationship to the complex (format described below)
+
+### Roles field format
+
+* **role_id**: ID of role
+* **type**: Type (always seems to be "role_mapping")
+* **optional**: Is the role necessary?
+* **triggering**: If role is found does it trigger associated reaction
+
+
 ## Compartments file format
 The Compartments file describes the compartments that are available for Models reconstructed from the Model Template.  There is one compartment per line with fields separated by tabs.  Each line has the following fields:
 
 * **index**: Compartment index number from Biochemistry reaction stoichiometry
 * **id**: Unique ID of compartment (not sure how to handle community models where compartments are numbered)
 * **name**: Long name of compartment
-* **hierarchy**: Number describing where compartment is in the hierarchy, starting from 0 for extracellular (is this used anywhere?)
-* **pH**: Value of pH of compartment (is this used anywhere?)
-* **aliases**: List of alternative names of compartment separated by semicolon or "null" if not specified
+* **hierarchy**: Number describing where compartment is in the hierarchy, starting from 0 for extracellular (_Is hierarchy ever used in models?_)
+* **pH**: Value of pH of compartment (_Is pH ever used in models?_)
+* **aliases**: List of alternative names of compartment separated by semicolon or "null" if not specified (_Are aliases ever used in models?_)
 
 ## Biomasses file format
 The Biomasses file describes the biomass reactions. There is one biomass reaction per line with fields separated by tabs. The compounds involved in the biomass reaction are described in the Biomass Compounds file. Each line has the following fields:
@@ -46,7 +73,7 @@ The Biomass Compounds file describes the compounds that are included in the biom
 * **biomass_id**: ID of biomass reaction (must match an ID in the Biomasses file)
 * **id**: ID of compound (must match an ID in master biochemistry)
 * **coefficient**: Coefficient value where a negative number indicates a reactant and a positive value indicates a product
-* **coefficient_type**: Type of coefficient (valid values are "MOLFRACTION", "MOLSPLIT", "EXACT", "AT", "GC", or "MULTIPLIER")
+* **coefficient_type**: Type of coefficient (valid values are "MOLFRACTION", "MOLSPLIT", "EXACT", "AT", "GC", or "MULTIPLIER") (need better description of these values)
 * **class**: Class of compound (valid values are "dna", "rna", "cellwall", "lipid", "protein", "cofactor", "energy", or "other")
 * **linked_compounds**: List of linked compounds and coefficients or "null" if not specified (see below for description of format) 
 * **compartment**: ID of compartment where biomass reaction occurs (Could it ever be a compartment other than cytosol?)
@@ -56,7 +83,7 @@ A linked compound is in this format:
 
 	cpdid:coeff
 
-where "cpdid" is the ID of the linked compound and "coeff" is the coefficient for the compound.  A negative coefficient means X and a positive coefficient means Y.  Multiple compounds are separated by a "|" character.
+where "cpdid" is the ID of the linked compound and "coeff" is the coefficient for the compound.  A negative coefficient means X and a positive coefficient means Y.  Multiple compounds are separated by a "|" character. _Need more information on how linked compounds are used in models_.
 
 ## Reactions file format
 The Reactions file describes the reactions that can be added to a Model reconstructed from a Model Template. There is one reaction per line with fields separated by tabs.  Each line has the following fields:
@@ -79,23 +106,7 @@ In addition, the first compartment ID in the list is used as the suffix for the 
 ### Type field description
 The type field has the following valid values:
 
-* **conditional**: A conditional reaction can be added to a Model only if the associated gene is in the organism
-* **gapfilling**: A gapfilling reaction can be added to a Model as needed (could go away if we get gene associations)
-* **spontaneous**: A spontaneous reaction can be added to a Model even if the associated gene is not in the organism
-* **universal**: An universal reaction is always added to a Model
-
-## Complexes file format
-cpxid
-cpxname
-reference Where complex came from (PUBMED id of publication) (could get from KBase DLITs for SEED?)
-source KEGG published or SEED
-confidence Value from 0 to 1 
-optional Is the role necessary?
-triggering If role is there does it trigger reaction to be there
-type
-roleid
-rolename
-roletype 
-rolefeatures Reference to feature in blast database
-
-The Complexes.tsv file contains
+* **conditional**: A conditional reaction can be added to a Model only if the associated gene is in the organism. At least one complex ID is required for conditional reactions.
+* **gapfilling**: A gapfilling reaction can be added to a Model as needed (could go away if we get gene associations).
+* **spontaneous**: A spontaneous reaction can be added to a Model even if the associated gene is not in the organism. (is a complex required for spontaneous reactions?)
+* **universal**: An universal reaction is always added to a Model.
