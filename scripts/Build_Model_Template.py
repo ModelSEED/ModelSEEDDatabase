@@ -63,10 +63,6 @@ if __name__ == "__main__":
     template['biochemistry_ref'] = args.biochemref
     template['pathways'] = list() # Always an empty for now
 
-    # Need to support these fields
-    template['roles'] = list()
-    template['complexes'] = list()
-
     # Order is important so references can be made between sections of the Model Template.
     
     # Add the template compartments.

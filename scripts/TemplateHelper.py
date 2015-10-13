@@ -21,6 +21,9 @@ class CompartmentNotFoundError(Exception):
 class DuplicateRoleError(Exception):
     pass
 
+class RoleNotFoundError(Exception):
+    pass
+
 class ReactionNotFoundError(Exception):
     pass
 
@@ -277,6 +280,7 @@ class TemplateHelper(BaseHelper):
                     role['aliases'] = list()
                     if fields[fieldNames['aliases']] != 'null':
                         self.addToList(fields[fieldNames['aliases']], ';', role['aliases'])
+#                        role['aliases'] = self.makeAliases(fields[fieldNames['aliases']], ';', ':')
                 if includeLinenum:
                     role['linenum'] = linenum
                 if role['id'] not in self.roles:
@@ -434,6 +438,10 @@ class TemplateHelper(BaseHelper):
                     # Build the TemplateReaction.        
                     reaction['id'] = '%s_%s' %(reactionId, compartmentIds[0]) # Use first compartment for suffix
                     reaction['name'] = masterReaction['name']
+                    reaction['deltaG'] = masterReaction['deltag']
+                    reaction['deltaGErr'] = masterReaction['deltagerr']
+                    reaction['status'] = masterReaction['status']
+                    reaction['reversibility'] = masterReaction['reversibility']
                     reaction['direction'] = fields[fieldNames['direction']]
                     if fields[fieldNames['gfdir']] == 'null':
                         reaction['GapfillDirection'] = ''
@@ -446,7 +454,7 @@ class TemplateHelper(BaseHelper):
                     reaction['base_cost'] = float(fields[fieldNames['base_cost']])
                     reaction['forward_penalty'] = float(fields[fieldNames['forward_cost']])
                     reaction['reverse_penalty'] = float(fields[fieldNames['reverse_cost']])
-                    reaction['templateReactionReagents'] = list()
+                    reaction['reactionReagents'] = list()
                     # Stoichiometry format is n:cpdid:c:i:"cpdname"
                     reagents = masterReaction['stoichiometry'].split(';')
                     for rindex in range(len(reagents)):
@@ -456,7 +464,7 @@ class TemplateHelper(BaseHelper):
                         templateReactionReagent = dict()
                         templateReactionReagent['compcompound_ref'] = '~/compcompounds/id/'+compCompound['id']
                         templateReactionReagent['coefficient'] = float(parts[0])
-                        reaction['templateReactionReagents'].append(templateReactionReagent)
+                        reaction['reactionReagents'].append(templateReactionReagent)
                     reaction['complex_refs'] = list()
                     if reaction['type'] == 'conditional' and fields[fieldNames['complexes']] == 'null':
                         raise NoComplexesError('Reaction %s is of type conditional and no complexes are specified' %(reactionId))
