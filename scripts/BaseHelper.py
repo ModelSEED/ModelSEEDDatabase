@@ -4,7 +4,7 @@ class BadHeaderError(Exception):
 
 ''' Helper methods for working with common data structures. '''
 
-class BaseHelper:
+class BaseHelper(object):
     
     def __init__(self):
         ''' Initialize object.
@@ -79,3 +79,23 @@ class BaseHelper:
         for index in range(len(items)):
             destList.append(items[index])
         return
+    
+    def makeAliases(self, sourceString, delim1, delim2):
+        ''' Make a dictionary of aliases from a source string.
+        
+            @param sourceString: Source string with aliases separated by first delimiter
+            @param delim1: First delimiter separating aliases
+            @param delim2: Second delimiter separating type and value in an alias
+            @return Dictionary of aliases keyed by alias type where each key is a list of values
+        '''
+        
+        aliases = dict()
+        items = sourceString.split(delim1)
+        for index in range(len(items)):
+            parts = items[index].split(delim2)
+            try:
+                aliases[parts[0]].append(parts[1])
+            except KeyError:
+                aliases[parts[0]] = [ parts[1] ]
+                
+        return aliases
