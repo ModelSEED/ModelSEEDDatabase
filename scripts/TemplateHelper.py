@@ -109,7 +109,7 @@ class TemplateHelper(BaseHelper):
                 else:
                     compCompound = self.addCompCompound(fields[fieldNames['id']], fields[fieldNames['compartment']])
                     component['class'] = fields[fieldNames['class']]
-                    component['compcompound_ref'] = '~/compcompounds/id/'+compCompound['id']
+                    component['templatecompcompound_ref'] = '~/compcompounds/id/'+compCompound['id']
                     component['coefficient_type'] = fields[fieldNames['coefficient_type']]
                     component['coefficient'] = float(fields[fieldNames['coefficient']])
                     component['linked_compound_refs'] = list()
@@ -338,7 +338,7 @@ class TemplateHelper(BaseHelper):
                             if values[0] not in self.roles:
                                 raise RoleNotFoundError('Role %s on line %d not found' %(values[0], linenum))
                             complexRole = dict()
-                            complexRole['role_ref'] = '~/roles/id/'+values[0] # Need to validate
+                            complexRole['templaterole_ref'] = '~/roles/id/'+values[0] # Need to validate
                             complexRole['optional'] = int(values[2])
                             complexRole['triggering'] = int(values[3])
                             complex['complexroles'].append(complexRole)
@@ -400,9 +400,9 @@ class TemplateHelper(BaseHelper):
                         raise ReactionNotFoundError('Reaction %s not found in master biochemistry' %(reactionId))
                     
                     # Check the reaction status.
-                    if 'OK' not in masterReaction['status']:
-                        print 'WARNING: Reaction %s has status %s and was skipped' %(masterReaction['id'], masterReaction['status'])
-                        continue
+                    #if 'OK' not in masterReaction['status']:
+                    #    print 'WARNING: Reaction %s has status %s and was skipped' %(masterReaction['id'], masterReaction['status'])
+                    #    continue
 
                     # Check for obsolete reaction.
                     if masterReaction['is_obsolete']:
@@ -425,6 +425,7 @@ class TemplateHelper(BaseHelper):
                     
                     # Make sure all of the compartments are valid.
                     compartmentIds = fields[fieldNames['compartment']].split('|')
+                    idcomp = compartmentIds[0]
                     for cindex in range(len(compartmentIds)):
                         try:
                             self.compartments[compartmentIds[cindex]]
@@ -432,7 +433,7 @@ class TemplateHelper(BaseHelper):
                             raise CompartmentNotFoundError('Compartment %s not found in current list' %(compartmentIds[cindex]))
                     
                     # Build the TemplateReaction.        
-                    reaction['id'] = '%s_%s' %(reactionId, compartmentIds[0]) # Use first compartment for suffix
+                    reaction['id'] = '%s_%s' %(reactionId, idcomp) # Use first compartment for suffix
                     reaction['name'] = masterReaction['name']
                     reaction['direction'] = fields[fieldNames['direction']]
                     if fields[fieldNames['gfdir']] == 'null':
@@ -442,29 +443,30 @@ class TemplateHelper(BaseHelper):
                     reaction['type'] = fields[fieldNames['type']]
                     reaction['maxforflux'] = float(100)
                     reaction['maxrevflux'] = float(-100)
-                    reaction['compartment_ref'] = '~/compartments/id/'+compartmentIds[0]
+                    reaction['templatecompartment_ref'] = '~/compartments/id/'+compartmentIds[0]
                     reaction['base_cost'] = float(fields[fieldNames['base_cost']])
                     reaction['forward_penalty'] = float(fields[fieldNames['forward_cost']])
                     reaction['reverse_penalty'] = float(fields[fieldNames['reverse_cost']])
                     reaction['templateReactionReagents'] = list()
                     # Stoichiometry format is n:cpdid:c:i:"cpdname"
-                    reagents = masterReaction['stoichiometry'].split(';')
-                    for rindex in range(len(reagents)):
-                        parts = reagents[rindex].split(':')
-                        compartmentIndex = int(parts[2])
-                        compCompound = self.addCompCompound(parts[1], compartmentIds[compartmentIndex])
-                        templateReactionReagent = dict()
-                        templateReactionReagent['compcompound_ref'] = '~/compcompounds/id/'+compCompound['id']
-                        templateReactionReagent['coefficient'] = float(parts[0])
-                        reaction['templateReactionReagents'].append(templateReactionReagent)
-                    reaction['complex_refs'] = list()
+                    if len(masterReaction['stoichiometry']) > 0:
+                        reagents = masterReaction['stoichiometry'].split(';')
+                        for rindex in range(len(reagents)):
+                            parts = reagents[rindex].split(':')
+                            compartmentIndex = int(parts[2])
+                            compCompound = self.addCompCompound(parts[1], compartmentIds[compartmentIndex])
+                            templateReactionReagent = dict()
+                            templateReactionReagent['templatecompcompound_ref'] = '~/compcompounds/id/'+compCompound['id']
+                            templateReactionReagent['coefficient'] = float(parts[0])
+                            reaction['templateReactionReagents'].append(templateReactionReagent)
+                    reaction['templatecomplex_refs'] = list()
                     if reaction['type'] == 'conditional' and fields[fieldNames['complexes']] == 'null':
                         raise NoComplexesError('Reaction %s is of type conditional and no complexes are specified' %(reactionId))
                     if fields[fieldNames['complexes']] != 'null':
                         complexes = fields[fieldNames['complexes']].split('|')
                         for cindex in range(len(complexes)):
                             if complexes[cindex] in self.complexes:
-                                reaction['complex_refs'].append('~/complexes/id/'+complexes[cindex])
+                                reaction['templatecomplex_refs'].append('~/complexes/id/'+complexes[cindex])
                             else:
 #                                print 'Reaction %s on line %d refers to complex %s which is not found' %(reaction['id'], linenum, complexes[cindex])
                                 raise ComplexNotFoundError('Reaction %s on line %d refers to complex %s which is not found' %(reaction['id'], linenum, complexes[cindex]))
@@ -524,6 +526,8 @@ class TemplateHelper(BaseHelper):
                 compound['aliases'] = masterCompound['aliases']
                 compound['defaultCharge'] = masterCompound['charge']
                 compound['mass'] = masterCompound['mass']
+                if compound['mass'] == 'null':
+                    compound['mass'] = 0
                 compound['deltaG'] = masterCompound['deltag']
                 compound['deltaGErr'] = masterCompound['deltagerr']
                 compound['formula'] = masterCompound['formula']

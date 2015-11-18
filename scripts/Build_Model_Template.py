@@ -4,7 +4,7 @@ import argparse
 import os
 import json
 from TemplateHelper import TemplateHelper
-from biop3.Workspace.WorkspaceClient import Workspace
+#from biop3.Workspace.WorkspaceClient import Workspace
 
 desc1 = '''
 NAME
@@ -35,7 +35,7 @@ if __name__ == "__main__":
     parser.add_argument('id', help='ID of Model Template object', action='store')
     parser.add_argument('templatedir', help='path to directory containing source files', action='store')
     parser.add_argument('ref', help='reference to workspace location to store Model Template object', action='store')
-    parser.add_argument('--biochemref', help='reference to Biochemistry object in workspace', action='store', default='')
+    parser.add_argument('--biochemref', help='reference to Biochemistry object in workspace', action='store', default='/chenry/public/modelsupport/biochemistry/default.biochem')
     parser.add_argument('--compoundfile', help='path to master compounds file', action='store', default='../Biochemistry/compounds.master.tsv')
     parser.add_argument('--reactionfile', help='path to master reactions file', action='store', default='../Biochemistry/reactions.master.tsv')
     parser.add_argument('--complexfile', help='path to master complexes file', action='store', default='../Templates/Complexes.tsv')
@@ -58,7 +58,7 @@ if __name__ == "__main__":
         template['name'] = args.name
     else:
         template['name'] = args.id
-    template['modelType'] = args.type
+    template['type'] = args.type
     template['domain'] = args.domain
     template['biochemistry_ref'] = args.biochemref
     template['pathways'] = list() # Always an empty for now
@@ -107,6 +107,6 @@ if __name__ == "__main__":
     
     # Save the Model Template typed object to the specified workspace path. An existing typed object
     # is overwritten with the updated data.
-    wsClient = Workspace(args.wsurl)
-    output = wsClient.create( { 'objects': [ [ args.ref, 'modeltemplate', {}, template ] ], 'overwrite': 1 });
+    #wsClient = Workspace(args.wsurl)
+    #output = wsClient.create( { 'objects': [ [ args.ref, 'modeltemplate', {}, template ] ], 'overwrite': 1 });
     exit(0)
