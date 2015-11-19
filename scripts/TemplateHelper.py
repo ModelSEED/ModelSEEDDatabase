@@ -21,6 +21,9 @@ class CompartmentNotFoundError(Exception):
 class DuplicateRoleError(Exception):
     pass
 
+class RoleNotFoundError(Exception):
+    pass
+
 class ReactionNotFoundError(Exception):
     pass
 
@@ -34,6 +37,9 @@ class ComplexNotFoundError(Exception):
     pass
 
 class NoComplexesError(Exception):
+    pass
+
+class LinkedCompoundFormatError(Exception):
     pass
 
 ''' Helper methods for working with Model Template objects. '''
@@ -116,8 +122,12 @@ class TemplateHelper(BaseHelper):
                     component['link_coefficients'] = list()
                     if fields[fieldNames['linked_compounds']] != 'null':
                         linkedCpds = fields[fieldNames['linked_compounds']].split('|')
+                        if len(linkedCpds) < 1:
+                            raise LinkedCompoundFormatError('Biomass compound %s on line %d has an invalid linked compound field' %(fields[fieldNames['id']], linenum))
                         for lcIndex in range(len(linkedCpds)):
                             parts = linkedCpds[lcIndex].split(':')
+                            if len(parts) != 2:
+                                raise LinkedCompoundFormatError('Biomass compound %s on line %d has an invalid linked compound field' %(fields[fieldNames['id']], linenum))                                
                             linkCompCompound = self.addCompCompound(parts[0], fields[fieldNames['compartment']])
                             component['linked_compound_refs'].append('~/compcompounds/id/'+linkCompCompound['id'])
                             component['link_coefficients'].append(float(parts[1]))
@@ -277,6 +287,7 @@ class TemplateHelper(BaseHelper):
                     role['aliases'] = list()
                     if fields[fieldNames['aliases']] != 'null':
                         self.addToList(fields[fieldNames['aliases']], ';', role['aliases'])
+#                        role['aliases'] = self.makeAliases(fields[fieldNames['aliases']], '///', ':')
                 if includeLinenum:
                     role['linenum'] = linenum
                 if role['id'] not in self.roles:
@@ -435,6 +446,10 @@ class TemplateHelper(BaseHelper):
                     # Build the TemplateReaction.        
                     reaction['id'] = '%s_%s' %(reactionId, idcomp) # Use first compartment for suffix
                     reaction['name'] = masterReaction['name']
+                    reaction['deltaG'] = masterReaction['deltag']
+                    reaction['deltaGErr'] = masterReaction['deltagerr']
+                    reaction['status'] = masterReaction['status']
+                    reaction['reversibility'] = masterReaction['reversibility']
                     reaction['direction'] = fields[fieldNames['direction']]
                     if fields[fieldNames['gfdir']] == 'null':
                         reaction['GapfillDirection'] = ''

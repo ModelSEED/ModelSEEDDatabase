@@ -29,7 +29,7 @@ The Complexes file describes the complexes that are available for Models.  There
 
 * **id**: ID of complex
 * **name**: Name of complex (typically the same as the ID)
-* **source**: Source of complex (valid values are "ModelSEED", "KEGG", or "published")
+* **source**: Source of complex (valid values are "ModelSEED", "PlantSEED", "KEGG", or "published")
 * **reference**: Reference to where complex came from (_PUBMED id of publication or KBase DLITs for SEED?_) or "null" if not specified
 * **confidence**: Value from 0 to 1 (_need details on how value is calculated_)
 * **roles**: List of roles and relationship to the complex (format described below)
@@ -110,3 +110,28 @@ The type field has the following valid values:
 * **gapfilling**: A gapfilling reaction can be added to a Model as needed (could go away if we get gene associations).
 * **spontaneous**: A spontaneous reaction can be added to a Model even if the associated gene is not in the organism. (is a complex required for spontaneous reactions?)
 * **universal**: An universal reaction is always added to a Model.
+
+## How to create a model template
+
+#### Step 1
+Create a folder for the template in the Templates folder and add a compartments file, biomasses file, biomass compounds file, and reactions file using the formats described above.
+
+#### Step 2
+Run Build\_Model\_Template.py to build a Model Template object from the source files and store it in a workspace.
+
+## How to create complex and role files
+
+Note that these steps only need to be run to generate the complex and role files from the original sources. In the future, the complex and roles can be updated directly (e.g. when KEGG adds new enzymes).
+
+#### Step 1
+Run Print\_ModelTemplate\_from\_Workspaces.pl script which creates a Mappings folder with subfolders for each of the Mapping objects in the current system. Each subfolder has Mapping\_Complexes.txt and Mapping\_Roles.txt files with the corresponding data from the Mapping object.  Note this step uses the KBase workspace and requires a KBase runtime environment.
+
+#### Step 2
+Run Print\_KEGG\_Complex\_Role.py script which creates complexes and roles files from a KEGG enzyme database.  You must have a source file in the KEGG file format. Note this step uses the uses packages from KBase and requires a KBase runtime environment.
+
+#### Step 3
+Run Build\_Complex\_File.py which merges complexes from all source files and creates a Complexes file as described above.
+
+#### Step 4
+Run Build\_Role\_File.py which merges all roles from all source files and creates a Roles file as described above.
+

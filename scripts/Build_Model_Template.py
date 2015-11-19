@@ -20,7 +20,7 @@ DESCRIPTION
 desc3 = '''
 EXAMPLES
       Build a Model Template object:
-      > Build_Model_Template.py compounds.tsv reactions.tsv
+      > Build_Model_Template.py GramNegative ../Templates/GramNegative /mmundy/public/modelsupport/templates/GramNegative.modeltemplate
       
 SEE ALSO
       Build_Biochem.py
@@ -39,6 +39,7 @@ if __name__ == "__main__":
     parser.add_argument('--compoundfile', help='path to master compounds file', action='store', default='../Biochemistry/compounds.master.tsv')
     parser.add_argument('--reactionfile', help='path to master reactions file', action='store', default='../Biochemistry/reactions.master.tsv')
     parser.add_argument('--complexfile', help='path to master complexes file', action='store', default='../Templates/Complexes.tsv')
+    parser.add_argument('--rolefile', help='path to master roles file', action='store', default='../Templates/Roles.tsv')
     parser.add_argument('--name', help='name of object', action='store', default=None)
     parser.add_argument('--type', help='type of model', action='store', default='GenomeScale')
     parser.add_argument('--domain', help='domain of organisms', action='store', default='Bacteria')
@@ -63,10 +64,6 @@ if __name__ == "__main__":
     template['biochemistry_ref'] = args.biochemref
     template['pathways'] = list() # Always an empty for now
 
-    # Need to support these fields
-    template['roles'] = list()
-    template['complexes'] = list()
-
     # Order is important so references can be made between sections of the Model Template.
     
     # Add the template compartments.
@@ -81,13 +78,11 @@ if __name__ == "__main__":
     template['biomasses'] = [ helper.biomasses[key] for key in helper.biomasses ]
 
     # Add the template roles.
-    rolesFile = os.path.join(args.templatedir, '..', 'Roles.tsv')
-    helper.readRolesFile(rolesFile, includeLinenum=False)
+    helper.readRolesFile(args.rolefile, includeLinenum=False)
     template['roles'] = [ helper.roles[key] for key in helper.roles ]
 
     # Add the template complexes.
-    complexesFile = os.path.join(args.templatedir, '..', 'Complexes.tsv')
-    helper.readComplexesFile(complexesFile, includeLinenum=False)
+    helper.readComplexesFile(args.complexfile, includeLinenum=False)
     template['complexes'] = [ helper.complexes[key] for key in helper.complexes ]
 
     # Add the template reactions.

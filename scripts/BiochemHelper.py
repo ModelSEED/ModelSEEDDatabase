@@ -58,7 +58,10 @@ class BiochemHelper(BaseHelper):
                     cpd['abbreviation'] = fields[fieldNames['abbreviation']]
                     cpd['name'] = fields[fieldNames['name']]
                     cpd['formula'] = fields[fieldNames['formula']]
-                    cpd['mass'] = fields[fieldNames['mass']]
+                    if fields[fieldNames['mass']] != 'null':
+                        cpd['mass'] = fields[fieldNames['mass']]
+                    else:
+                        cpd['mass'] = float(10000000)
                     cpd['source'] = fields[fieldNames['source']]
                     cpd['structure'] = fields[fieldNames['structure']]
                     if fields[fieldNames['charge']] != 'null':
@@ -150,10 +153,14 @@ class BiochemHelper(BaseHelper):
                     rxn['pathways'] = fields[fieldNames['pathways']]
                     rxn['aliases'] = fields[fieldNames['aliases']]
                     rxn['ec_numbers'] = fields[fieldNames['ec_numbers']]
-                    if fields[fieldNames['deltag']] != 'null' and fields[fieldNames['deltag']] != '10000000':
+                    if fields[fieldNames['deltag']] != 'null':
                         rxn['deltag'] = float(fields[fieldNames['deltag']])
-                    if fields[fieldNames['deltagerr']] != 'null' and fields[fieldNames['deltagerr']] != '10000000':
+                    else:
+                        rxn['deltag'] = float(10000000)
+                    if fields[fieldNames['deltagerr']] != 'null':
                         rxn['deltagerr'] = float(fields[fieldNames['deltagerr']])
+                    else:
+                        rxn['deltagerr'] = float(10000000)
                     rxn['compound_ids'] = fields[fieldNames['compound_ids']]
                     rxn['status'] = fields[fieldNames['status']]
                     if 'is_obsolete' in fieldNames:
