@@ -27,6 +27,9 @@ class RoleNotFoundError(Exception):
 class ReactionNotFoundError(Exception):
     pass
 
+class ReactionFormatError(Exception):
+    pass
+
 class DuplicateReactionError(Exception):
     pass
 
@@ -465,15 +468,18 @@ class TemplateHelper(BaseHelper):
                     reaction['templateReactionReagents'] = list()
                     # Stoichiometry format is n:cpdid:c:i:"cpdname"
                     if len(masterReaction['stoichiometry']) > 0:
-                        reagents = masterReaction['stoichiometry'].split(';')
-                        for rindex in range(len(reagents)):
-                            parts = reagents[rindex].split(':')
-                            compartmentIndex = int(parts[2])
-                            compCompound = self.addCompCompound(parts[1], compartmentIds[compartmentIndex])
-                            templateReactionReagent = dict()
-                            templateReactionReagent['templatecompcompound_ref'] = '~/compcompounds/id/'+compCompound['id']
-                            templateReactionReagent['coefficient'] = float(parts[0])
-                            reaction['templateReactionReagents'].append(templateReactionReagent)
+                        try:
+                            reagents = masterReaction['stoichiometry'].split(';')
+                            for rindex in range(len(reagents)):
+                                parts = reagents[rindex].split(':')
+                                compartmentIndex = int(parts[2])
+                                compCompound = self.addCompCompound(parts[1], compartmentIds[compartmentIndex])
+                                templateReactionReagent = dict()
+                                templateReactionReagent['templatecompcompound_ref'] = '~/compcompounds/id/'+compCompound['id']
+                                templateReactionReagent['coefficient'] = float(parts[0])
+                                reaction['templateReactionReagents'].append(templateReactionReagent)
+                        except IndexError as e:
+                            raise ReactionFormatError('Reaction %s on line %d has invalid stoichiometry "%s" in master reaction' %(reaction['id'], linenum, masterReaction['stoichiometry']))
                     reaction['templatecomplex_refs'] = list()
                     if reaction['type'] == 'conditional' and fields[fieldNames['complexes']] == 'null':
                         raise NoComplexesError('Reaction %s is of type conditional and no complexes are specified' %(reactionId))
