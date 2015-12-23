@@ -464,23 +464,23 @@ class BiochemHelper(BaseHelper):
     
         # Build search strings using specified delimiter.
         bidirectional = delimiter+'<=>'+delimiter
-        leftdirectional = delimiter+'<='+delimiter
-        rightdirectional = delimiter+'=>'+delimiter
+        reverse = delimiter+'<='+delimiter
+        forward = delimiter+'=>'+delimiter
         separator = delimiter+'+'+delimiter
     
         # Find the special string that separates reactants and products.
         reactants = list()
         products = list()
-        if equation.find(rightdirectional) >= 0:
+        if equation.find(forward) >= 0:
             direction = '>'
-            parts = equation.split(rightdirectional)
+            parts = equation.split(forward)
             if parts[0]:
                 reactants = parts[0].split(separator)
             if parts[1]:
                 products = parts[1].split(separator)
-        elif equation.find(leftdirectional) >= 0:
+        elif equation.find(reverse) >= 0:
             direction = '<'
-            parts = equation.split(leftdirectional)
+            parts = equation.split(reverse)
             if parts[1]:
                 reactants = parts[1].split(separator)
             if parts[0]:
@@ -500,10 +500,10 @@ class BiochemHelper(BaseHelper):
     def isTransportReaction(self, equation):
         ''' Determine if a reaction is a transport reaction.
 
-            A transport reaction is defined as a reaction in which there is a
-            compound on both sides of the reaction and the compound's compartment
-            on the reactant side is different from the compound's compartment on
-            the product side.
+            A transport reaction is defined as a reaction in which there are
+            compounds in more than one compartment. Typically a transport
+            reaction is moving the same compound from one compartment to
+            another compartment.
 
             The compounds in the reaction equation string can be given either as
             compound names or as compound IDs.
@@ -517,7 +517,7 @@ class BiochemHelper(BaseHelper):
         # compound IDs.
         reactants, products = self.parseEquation(equation)
         if len(reactants) == 0 and len(products) == 0:
-            print 'What the hell? '+equation
+            print 'This reaction has no reactants and no products: '+equation
             return False
 
         # Figure out if the compounds are identified by ID or by name.
@@ -531,35 +531,30 @@ class BiochemHelper(BaseHelper):
             byName = False
 
         # Parse the reactant and product compound lists to get the details on
-        # the compounds.
-        reactantCompounds = dict()
+        # the compounds. Keep track of the compartment IDs for reactants and
+        # products.
+        compartments = list()
         for cpd in reactants:
             if byName is True:
                 compound = self.parseCompoundNameStoich(cpd)
             else:
                 compound = self.parseCompoundIdStoich(cpd)
-            reactantCompounds[compound['compound']] = compound
+            compartments.append(compound['compartmentId'])
 
-        productCompounds = dict()
         for cpd in products:
             if byName is True:
                 compound = self.parseCompoundNameStoich(cpd)
             else:
                 compound = self.parseCompoundIdStoich(cpd)
-            productCompounds[compound['compound']] = compound
+            compartments.append(compound['comparmentId'])
 
-        # Run through the list of reactant compounds and see if the compound is
-        # also in the list of product compounds.  If so and the compartment is 
-        # different then this is a transport reaction.
-        transportReaction = False
-        transporterList = list()
-        for compound in reactantCompounds:
-            if compound in productCompounds:
-                if reactantCompounds[compound]['compartmentId'] != productCompounds[compound]['compartmentId']:
-                    transportReaction = True
-                    transporterList.append(reactantCompounds[compound]) # @todo Not sure about what to put in the list
-
-        return transportReaction
+        # Run through the list of compartment IDs. If all of the compartment IDs
+        # are the same then this is not a transport reaction. Otherwise there are
+        # multiple compartments and this is a transport reaction.
+        for index in range(1,len(compartments)):
+            if compartments[0] != compartments[index]:
+                return True
+        return False
 
     def isCompoundIdInList(self, compoundId, compoundList):
         ''' Determine if a compound ID is in a list of compounds.
