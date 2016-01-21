@@ -382,6 +382,12 @@ class TemplateHelper(BaseHelper):
             @return Nothing
         '''
 
+        # Keep track of these statistics.
+        self.numConditional = 0
+        self.numGapfilling = 0
+        self.numSpontaneous = 0
+        self.numUniversal = 0
+        
         # The following fields are required in a reactions file.
         required = { 'id', 'compartment', 'direction', 'gfdir', 'type', 'base_cost',
                      'forward_cost', 'reverse_cost', 'complexes' }
@@ -491,16 +497,25 @@ class TemplateHelper(BaseHelper):
                             else:
 #                                print 'Reaction %s on line %d refers to complex %s which is not found' %(reaction['id'], linenum, complexes[cindex])
                                 raise ComplexNotFoundError('Reaction %s on line %d refers to complex %s which is not found' %(reaction['id'], linenum, complexes[cindex]))
-                        
+                        if reaction['type'] == 'gapfilling':
+                            print 'NOTICE: Reaction %s on line %d has complexes but is not of type conditional' %(reaction['id'], linenum)
                 if includeLinenum:
                     reaction['linenum'] = linenum
 
                 # Check for duplicates.
                 if reaction['id'] not in self.reactions:
                     self.reactions[reaction['id']] = reaction
+                    if reaction['type'] == 'conditional':
+                        self.numConditional += 1
+                    elif reaction['type'] == 'gapfilling':
+                        self.numGapfilling += 1
+                    elif reaction['type'] == 'spontaneous':
+                        self.numSpontaneous += 1
+                    elif reaction['type'] == 'universal':
+                        self.numUniversal += 1
                 else:
                     raise DuplicateReactionError('Reaction %s on line %d is a duplicate' %(reaction['id'], linenum))
-        
+
         return
 
     def addCompCompound(self, compoundId, compartmentId):
