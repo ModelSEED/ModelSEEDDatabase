@@ -99,6 +99,7 @@ if __name__ == "__main__":
 
     # Save a local copy for easy reference.
     filename = os.path.join(args.templatedir, args.id+'.json')
+    print filename
     json.dump(template, open(filename, 'w'), indent=4)
     
     # Save the Model Template typed object to the specified workspace path. An existing typed object

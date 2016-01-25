@@ -495,8 +495,8 @@ class TemplateHelper(BaseHelper):
                             if complexes[cindex] in self.complexes:
                                 reaction['templatecomplex_refs'].append('~/complexes/id/'+complexes[cindex])
                             else:
-#                                print 'Reaction %s on line %d refers to complex %s which is not found' %(reaction['id'], linenum, complexes[cindex])
-                                raise ComplexNotFoundError('Reaction %s on line %d refers to complex %s which is not found' %(reaction['id'], linenum, complexes[cindex]))
+                                print 'Reaction %s on line %d refers to complex %s which is not found' %(reaction['id'], linenum, complexes[cindex])
+#                                raise ComplexNotFoundError('Reaction %s on line %d refers to complex %s which is not found' %(reaction['id'], linenum, complexes[cindex]))
                         if reaction['type'] == 'gapfilling':
                             print 'NOTICE: Reaction %s on line %d has complexes but is not of type conditional' %(reaction['id'], linenum)
                 if includeLinenum:
