@@ -274,7 +274,7 @@ foreach my $db ("default", "plantdefault") {
 		$temp[$i] = $Rxn_Mods{$rxnid}{$headers[$i]};
 	    }
 
-	    if($headers[$i] !~ /status|equation|definition|code|stoichiometry/){
+	    if($headers[$i] !~ /status|equation|definition|code|stoichiometry/ || exists($Rxn_Mods{$rxnid}{$headers[$i]})){
 		$Reactions{$rxnid}{$headers[$i]} = $temp[$i];
 	    }
 
