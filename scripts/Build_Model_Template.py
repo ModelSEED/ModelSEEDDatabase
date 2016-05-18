@@ -43,6 +43,7 @@ if __name__ == "__main__":
     parser.add_argument('--name', help='name of object', action='store', default=None)
     parser.add_argument('--type', help='type of model', action='store', default='GenomeScale')
     parser.add_argument('--domain', help='domain of organisms', action='store', default='Bacteria')
+    parser.add_argument('--show-stats', help='show statistics about Model Template', action='store_true', dest='showStats', default=False)
     parser.add_argument('--wsurl', help='URL of workspace server', action='store', dest='wsurl', default='http://p3.theseed.org/services/Workspace')
     usage = parser.format_usage()
     parser.description = desc1 + '      ' + usage + desc2
@@ -98,10 +99,26 @@ if __name__ == "__main__":
 
     # Save a local copy for easy reference.
     filename = os.path.join(args.templatedir, args.id+'.json')
+    print filename
     json.dump(template, open(filename, 'w'), indent=4)
     
     # Save the Model Template typed object to the specified workspace path. An existing typed object
     # is overwritten with the updated data.
     #wsClient = Workspace(args.wsurl)
     #output = wsClient.create( { 'objects': [ [ args.ref, 'modeltemplate', {}, template ] ], 'overwrite': 1 });
+    
+    # Print statistics about the Model Template if requested.
+    if args.showStats:
+        print 'Number of compartments: '+str(len(template['compartments']))
+        print 'Number of biomasses: '+str(len(template['biomasses']))
+        print 'Number of roles: '+str(len(template['roles']))
+        print 'Number of complexes: '+str(len(template['complexes']))
+        print 'Number of reactions: '+str(len(template['reactions']))
+        print '  Number of conditional reactions: '+str(helper.numConditional)
+        print '  Number of gapfilling reactions: '+str(helper.numGapfilling)
+        print '  Number of spontaneous reactions: '+str(helper.numSpontaneous)
+        print '  Number of universal reactions: '+str(helper.numUniversal)
+        print 'Number of compounds: '+str(len(template['compounds']))
+        print 'Number of compcompounds: '+str(len(template['compcompounds']))
+        
     exit(0)

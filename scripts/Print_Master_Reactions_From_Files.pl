@@ -204,7 +204,7 @@ foreach my $db ("default", "plantdefault") {
 		    my $neutral_stoich = abs($stoich);
 		    $rxnhash{equation} = "($neutral_stoich) ${cpd}[${cmpt}] ".$rxnhash{equation};
 		    if($cpd ne 'cpd00067'){
-			$rxnhash{equation} = "($neutral_stoich) ${cpd}[${cmpt}] ".$rxnhash{code};
+			$rxnhash{code} = "($neutral_stoich) ${cpd}[${cmpt}] ".$rxnhash{code};
 		    }
 
 		    my $name = $Compounds{$cpd}{name};
@@ -214,7 +214,7 @@ foreach my $db ("default", "plantdefault") {
 		    #add compound to right side of equation
 		    $rxnhash{equation} = $rxnhash{equation}." ($stoich) ${cpd}[${cmpt}]";
 		    if($cpd ne 'cpd00067'){
-			$rxnhash{equation} = $rxnhash{code}." ($stoich) ${cpd}[${cmpt}]";
+			$rxnhash{code} = $rxnhash{code}." ($stoich) ${cpd}[${cmpt}]";
 		    }
 
 		    my $name = $Compounds{$cpd}{name};
@@ -228,7 +228,7 @@ foreach my $db ("default", "plantdefault") {
 	my $rxn = $biochem->addReactionFromHash(\%rxnhash);
 	$rxn->status($rxnhash{status});
 	$rxn->checkReactionMassChargeBalance({rebalanceProtons=>1,rebalanceWater=>0,saveStatus=>1});
-	
+
 	# Generate a md5 of the equation for merging later.
 	my $code = $rxn->genEquationCode();
 	if (!exists($Codes_Rxns{$code})) { # If not unique, generate md5 with reversed equation.
@@ -274,7 +274,7 @@ foreach my $db ("default", "plantdefault") {
 		$temp[$i] = $Rxn_Mods{$rxnid}{$headers[$i]};
 	    }
 
-	    if($headers[$i] !~ /status|equation|definition|code|stoichiometry/){
+	    if($headers[$i] !~ /status|equation|definition|code|stoichiometry/ || exists($Rxn_Mods{$rxnid}{$headers[$i]})){
 		$Reactions{$rxnid}{$headers[$i]} = $temp[$i];
 	    }
 
