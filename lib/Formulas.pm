@@ -5,6 +5,7 @@ use warnings;
 sub parse{
     my $string=shift;
     return {} if !$string;
+    return {error => "No formula"} if $string =~ /^(noformula|null)$/;
     my @atoms = ($string =~ /(\D[a-z]?\d*)/g);
     my %atomKey=();
     foreach my $a (@atoms){
