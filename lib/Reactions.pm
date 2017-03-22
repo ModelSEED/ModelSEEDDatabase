@@ -100,6 +100,7 @@ sub balance_reaction {
 
 	#balance out protons
 	$atomHash->{H} = 0;
+	print "Proton Imbalance: ".$imbalancedAtoms->{H}."\n";
 	delete($imbalancedAtoms->{H});
 	push(@status,"HB");
     }
