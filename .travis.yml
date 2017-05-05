@@ -1,0 +1,7 @@
+language: python
+python:
+  - "3.6"
+script:
+  - python scripts/Validate_Compounds.py Biochemistry/compounds.master.tsv
+  - python scripts/Validate_Reactions.py Biochemistry/reactions.master.tsv
+  - python scripts/Validate_Complex_Roles.py Mappings/ComplexRoles.kegg.tsv
