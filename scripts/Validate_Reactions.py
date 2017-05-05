@@ -70,13 +70,13 @@ if __name__ == "__main__":
         args.showStatus = True
 
     # Read the reactions from the specified file.
-    print 'Reaction file: %s' %(args.rxnfile)
+    print('Reaction file: %s' % args.rxnfile)
     helper = BiochemHelper()
     reactions = helper.readReactionsFile(args.rxnfile)
     if reactions is None:
-        print 'Error reading reactions file'
+        print('Error reading reactions file')
         exit(1)
-    print 'Number of reactions: %d' %(len(reactions))
+    print('Number of reactions: %d' % len(reactions))
     
     # Create a dictionary keyed by id for fast lookup of reactions.
     reactionDict = helper.buildIndexDictFromListOfObjects(reactions)
@@ -99,7 +99,8 @@ if __name__ == "__main__":
     noDefinition = list()
     noReactants = list()
     noProducts = list()
-    statusTypes = { 'OK': 0, 'MI': 0, 'CI': 0, 'HB': 0, 'EMPTY': 0, 'CPDFORMERROR': 0 }
+    statusTypes = {'CK': 0, 'OK': 0, 'MI': 0, 'CI': 0, 'HB': 0, 'EMPTY': 0,
+                   'CPDFORMERROR': 0}
     okStatus = 0
     badTransport = list()
     isTransport = list()
@@ -120,7 +121,7 @@ if __name__ == "__main__":
                 duplicateId += 1
             idDict[rxn['id']].append(index)
         else:
-            idDict[rxn['id']] = [ index ]
+            idDict[rxn['id']] = [index]
 
         # Check for invalid characters in the ID.
         match = re.search(r'rxn\d\d\d\d\d', rxn['id'])
@@ -133,12 +134,12 @@ if __name__ == "__main__":
                 duplicateName += 1
             nameDict[rxn['name']].append(index)
         else:
-            nameDict[rxn['name']] = [ index ]
+            nameDict[rxn['name']] = [index]
 
         # Check for invalid characters in the name.
         try:
-            rxn['name'].decode('ascii')
-        except UnicodeDecodeError:
+            rxn['name'].encode('ascii')
+        except UnicodeEncodeError:
             badNameChars.append(index)
 
         # Check for duplicate abbreviations.
@@ -147,12 +148,12 @@ if __name__ == "__main__":
                 duplicateAbbr += 1
             abbrDict[rxn['abbreviation']].append(index)
         else:
-            abbrDict[rxn['abbreviation']] = [ index ]
+            abbrDict[rxn['abbreviation']] = [index]
 
         # Check for invalid characters in the abbreviation.
         try:
-            rxn['abbreviation'].decode('ascii')
-        except UnicodeDecodeError:
+            rxn['abbreviation'].encode('ascii')
+        except UnicodeEncodeError:
             badAbbrChars.append(index)
 
         # Check for invalid direction.
@@ -237,126 +238,126 @@ if __name__ == "__main__":
             unknownDeltagErr.append(index)
 
     # Print summary data.
-    print 'Number of reactions with duplicate IDs: %d' %(duplicateId)    
-    print 'Number of reactions with bad characters in ID: %d' %(len(badIdChars))
-    print 'Number of reactions with duplicate names: %d' %(duplicateName)
-    print 'Number of reactions with bad characters in name: %d' %(len(badNameChars))
-    print 'Number of reactions with duplicate abbreviations: %d' %(duplicateAbbr)
-    print 'Number of reactions with bad characters in abbreviation: %d' %(len(badAbbrChars))
-    print 'Number of reactions with bad direction: %d' %(len(badDirection))
-    print 'Number of reactions with bad reversibility: %d' %(len(badReversibility))
-    print 'Number of reactions with unknown reversibility: %d' %(len(unknownReversibility))
-    print 'Number of reactions with different equation and code: %d' %(len(diffEquationCode))
-    print 'Number of reactions with missing equation: %d' %(len(noEquation))
-#    print 'Number of reactions with missing definition: %d' %(len(noDefinition))
-    print 'Number of reactions with no reactants: %d' %(len(noReactants))
-    print 'Number of reactions with no products: %d' %(len(noProducts))
-    print 'Number of reactions with OK status: %d' %(okStatus)
-    print 'Number of reactions with OK status after balancing: %d' %(statusTypes['OK'])
-    print 'Number of reactions with bad status: %d' %(len(reactions)-okStatus-statusTypes['OK'])
-    print 'Number of reactions with bad is_transport flag: %d' %(len(badTransport))
-    print 'Number of transport reactions: %d' %(len(isTransport))
-    print 'Number of reactions with bad is_obsolete flag: %d' %(len(badObsolete))
-    print 'Number of obsolete reactions: %d' %(len(isObsolete))
-    print 'Number of reactions with unknown deltaG value: %d' %(len(unknownDeltag))
-    print 'Number of reactions with zero deltaG value: %d' %(len(zeroDeltag))
-    print 'Number of reactions with unknown deltaGErr value: %d' %(len(unknownDeltagErr))
-    print 'Number of reactions with zero deltaGErr value: %d' %(len(zeroDeltagerr))
-    print 'Number of reactions with bad links: %d' %(len(badLink))
-    print
+    print('Number of reactions with duplicate IDs: %d' % (duplicateId))
+    print('Number of reactions with bad characters in ID: %d' % (len(badIdChars)))
+    print('Number of reactions with duplicate names: %d' % (duplicateName))
+    print('Number of reactions with bad characters in name: %d' % (len(badNameChars)))
+    print('Number of reactions with duplicate abbreviations: %d' % (duplicateAbbr))
+    print('Number of reactions with bad characters in abbreviation: %d' % (len(badAbbrChars)))
+    print('Number of reactions with bad direction: %d' % (len(badDirection)))
+    print('Number of reactions with bad reversibility: %d' % (len(badReversibility)))
+    print('Number of reactions with unknown reversibility: %d' % (len(unknownReversibility)))
+    print('Number of reactions with different equation and code: %d' % (len(diffEquationCode)))
+    print('Number of reactions with missing equation: %d' % (len(noEquation)))
+#    print 'Number of reactions with missing definition: %d' % (len(noDefinition))
+    print('Number of reactions with no reactants: %d' % (len(noReactants)))
+    print('Number of reactions with no products: %d' % (len(noProducts)))
+    print('Number of reactions with OK status: %d' % (okStatus))
+    print('Number of reactions with OK status after balancing: %d' % (statusTypes['OK']))
+    print('Number of reactions with bad status: %d' % (len(reactions)-okStatus-statusTypes['OK']))
+    print('Number of reactions with bad is_transport flag: %d' % (len(badTransport)))
+    print('Number of transport reactions: %d' % (len(isTransport)))
+    print('Number of reactions with bad is_obsolete flag: %d' % (len(badObsolete)))
+    print('Number of obsolete reactions: %d' % (len(isObsolete)))
+    print('Number of reactions with unknown deltaG value: %d' % (len(unknownDeltag)))
+    print('Number of reactions with zero deltaG value: %d' % (len(zeroDeltag)))
+    print('Number of reactions with unknown deltaGErr value: %d' % (len(unknownDeltagErr)))
+    print('Number of reactions with zero deltaGErr value: %d' % (len(zeroDeltagerr)))
+    print('Number of reactions with bad links: %d' % (len(badLink)))
+    print()
 
     # Print details if requested.
     if args.showDupIds:
         for id in idDict:
             if len(idDict[id]) > 1:
-                print 'Duplicate reaction ID: %s' %(id)
+                print('Duplicate reaction ID: %s' % id)
                 for dup in idDict[id]:
-                    print 'Line %05d: %s' %(reactions[dup]['linenum'], reactions[dup])
-                print
+                    print('Line %05d: %s' % (reactions[dup]['linenum'], reactions[dup]))
+                print()
     if args.showBadIds:
         if len(badIdChars) > 0:
-            print 'reactions with bad characters in ID:'
+            print('reactions with bad characters in ID:')
             for index in range(len(badIdChars)):
-                print 'Line %05d: %s' %(reactions[badIdChars[index]]['linenum'], reactions[badIdChars[index]])
-            print
+                print('Line %05d: %s' % (reactions[badIdChars[index]]['linenum'], reactions[badIdChars[index]]))
+            print()
     if args.showDupNames:
         for name in nameDict:
             if len(nameDict[name]) > 1:
-                print 'Duplicate reaction name: %s' %(name)
+                print('Duplicate reaction name: %s' % name)
                 for dup in nameDict[name]:
-                    print 'Line %05d: %s' %(reactions[dup]['linenum'], reactions[dup])
-                print
+                    print('Line %05d: %s' % (reactions[dup]['linenum'], reactions[dup]))
+                print()
     if args.showBadNames:
         if len(badNameChars) > 0:
-            print 'reactions with bad characters in name:'
+            print('reactions with bad characters in name:')
             for index in range(len(badNameChars)):
-                print 'Line %05d: %s' %(reactions[badNameChars[index]]['linenum'], reactions[badNameChars[index]])
-            print
+                print('Line %05d: %s' % (reactions[badNameChars[index]]['linenum'], reactions[badNameChars[index]]))
+            print()
     if args.showDupAbbrs:
         for abbr in abbrDict:
             if len(abbrDict[abbr]) > 1:
-                print 'Duplicate reaction abbreviation: %s' %(abbr)
+                print('Duplicate reaction abbreviation: %s' % abbr)
                 for dup in abbrDict[abbr]:
-                    print 'Line %05d: %s' %(reactions[dup]['linenum'], reactions[dup])
-                print
+                    print('Line %05d: %s' % (reactions[dup]['linenum'], reactions[dup]))
+                print()
     if args.showBadAbbrs:
         if len(badAbbrChars) > 0:
-            print 'Reactions with bad characters in abbreviation:'
+            print('Reactions with bad characters in abbreviation:')
             for index in range(len(badAbbrChars)):
-                print 'Line %05d: %s' %(reactions[badAbbrChars[index]]['linenum'], reactions[badAbbrChars[index]])
-            print
+                print('Line %05d: %s' % (reactions[badAbbrChars[index]]['linenum'], reactions[badAbbrChars[index]]))
+            print()
     if args.showBadDirection:
         if len(badDirection) > 0:
-            print 'Reactions with bad value in direction:'
+            print('Reactions with bad value in direction:')
             for index in range(len(badDirection)):
-                print 'Line %05d: %s' %(reactions[badDirection[index]]['linenum'], reactions[badDirection[index]])
-            print
+                print('Line %05d: %s' % (reactions[badDirection[index]]['linenum'], reactions[badDirection[index]]))
+            print()
     if args.showBadReverse:
         if len(badReversibility) > 0:
-            print 'Reactions with bad value in reversibility:'
+            print('Reactions with bad value in reversibility:')
             for index in range(len(badReversibility)):
-                print 'Line %05d: %s' %(reactions[badReversibility[index]]['linenum'], reactions[badReversibility[index]])
-            print
+                print('Line %05d: %s' % (reactions[badReversibility[index]]['linenum'], reactions[badReversibility[index]]))
+            print()
         if len(unknownReversibility) > 0:
-            print 'Reactions with unknown reversibility:'
+            print('Reactions with unknown reversibility:')
             for index in range(len(unknownReversibility)):
-                print 'Line %05d: %s' %(reactions[unknownReversibility[index]]['linenum'], reactions[unknownReversibility[index]])
-            print
+                print('Line %05d: %s' % (reactions[unknownReversibility[index]]['linenum'], reactions[unknownReversibility[index]]))
+            print()
     if args.showDiffEqCode:
         if len(diffEquationCode) > 0:
-            print 'Reactions with different equation and code fields:'
+            print('Reactions with different equation and code fields:')
             for index in range(len(diffEquationCode)):
-                print 'Line %05d: %s' %(reactions[diffEquationCode[index]]['linenum'], reactions[diffEquationCode[index]])
-            print
+                print('Line %05d: %s' % (reactions[diffEquationCode[index]]['linenum'], reactions[diffEquationCode[index]]))
+            print()
     if args.showBadEquations:
         if len(noReactants) > 0:
-            print 'Reactions with no reactants:'
+            print('Reactions with no reactants:')
             for index in range(len(noReactants)):
-                print 'Line %05d: %s' %(reactions[noReactants[index]]['linenum'], reactions[noReactants[index]])
-            print
+                print('Line %05d: %s' % (reactions[noReactants[index]]['linenum'], reactions[noReactants[index]]))
+            print()
         if len(noProducts) > 0:
-            print 'Reactions with no products:'
+            print('Reactions with no products:')
             for index in range(len(noProducts)):
-                print 'Line %05d: %s' %(reactions[noProducts[index]]['linenum'], reactions[noProducts[index]])
-            print
+                print('Line %05d: %s' % (reactions[noProducts[index]]['linenum'], reactions[noProducts[index]]))
+            print()
         if len(noEquation) > 0:
-            print 'Reactions with no equation:'
+            print('Reactions with no equation:')
             for index in range(len(noEquation)):
-                print 'Line %05d: %s' %(reactions[noEquation[index]]['linenum'], reactions[noEquation[index]])
-            print
+                print('Line %05d: %s' % (reactions[noEquation[index]]['linenum'], reactions[noEquation[index]]))
+            print()
         if len(noDefinition) > 0:
-            print 'Reactions with no definition:'
+            print('Reactions with no definition:')
             for index in range(len(noDefinition)):
-                print 'Line %05d: %s' %(reactions[noDefinition[index]]['linenum'], reactions[noDefinition[index]])
-            print
+                print('Line %05d: %s' % (reactions[noDefinition[index]]['linenum'], reactions[noDefinition[index]]))
+            print()
     if args.showStatus:
-        print 'Reactions with status that is not OK:'
+        print('Reactions with status that is not OK:')
         for type in statusTypes:
-            print 'Reaction status %s: %d' %(type, statusTypes[type])
+            print('Reaction status %s: %d' % (type, statusTypes[type]))
     if args.showBadLink:
         if len(badLink) > 0:
-            print 'Reactions with bad links:'
+            print('Reactions with bad links:')
             for index in range(len(badLink)):
-                print 'Line %05d: %s' %(reactions[badLink[index]]['linenum'], reactions[badLink[index]])
+                print('Line %05d: %s' % (reactions[badLink[index]]['linenum'], reactions[badLink[index]]))
 
     exit(0)
