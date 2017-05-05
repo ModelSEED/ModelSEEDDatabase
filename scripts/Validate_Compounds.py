@@ -311,4 +311,6 @@ if __name__ == "__main__":
                 line = '%s\t%s\t%s\t%s\t%d\t%d\n' % (cpd['id'], cpd['name'], cpd['abbreviation'], cpd['formula'], cpd['defaultCharge'], cpd['isCofactor'])
                 handle.write(line)
 
-    exit(0)
+    if any([duplicateId, noFormula, noCharge, badIdChars, badAbbrChars,
+            badCofactor, badCore, badLink, badNameChars, badObsolete]):
+        exit(1)

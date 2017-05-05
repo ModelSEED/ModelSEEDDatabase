@@ -360,4 +360,6 @@ if __name__ == "__main__":
             for index in range(len(badLink)):
                 print('Line %05d: %s' % (reactions[badLink[index]]['linenum'], reactions[badLink[index]]))
 
-    exit(0)
+    if any([duplicateId, badIdChars, badLink, badNameChars, badAbbrChars,
+            badDirection, badReversibility, badObsolete, badTransport]):
+        exit(1)

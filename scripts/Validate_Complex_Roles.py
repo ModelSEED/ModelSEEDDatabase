@@ -193,4 +193,7 @@ if __name__ == "__main__":
                 print('Line %05d: %s' % (complexRoles[badRoleNameChars[index]]['linenum'], complexRoles[badRoleNameChars[index]]))
             print()
 
-    exit(0)
+    if any([duplicateComplexId, duplicateRoleId, badComplexIdChars,
+            duplicateComplexName, duplicateRoleName, badComplexNameChars,
+            badRoleNameChars]):
+        exit(0)
