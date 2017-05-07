@@ -53,6 +53,7 @@ if __name__ == "__main__":
     parser.add_argument('--show-bad-direction', help='show details on bad directions', action='store_true', dest='showBadDirection', default=False)
     parser.add_argument('--show-bad-reverse', help='show details on bad reversibility', action='store_true', dest='showBadReverse', default=False)
     parser.add_argument('--show-diff-eq', help='show details on different equation and code', action='store_true', dest='showDiffEqCode', default=False)
+    parser.add_argument('--show-dup-eq', help='show details on duplicated reaction equations', action='store_true', dest='showDupEquations', default=False)
     parser.add_argument('--show-bad-eq', help='show details on missing reactants or products in equations', action='store_true', dest='showBadEquations', default=False)
     parser.add_argument('--show-status', help='show details on status types', action='store_true', dest='showStatus', default=False)
     parser.add_argument('--show-bad-link', help='show details on bad links', action='store_true', dest='showBadLink', default=False)
@@ -67,6 +68,7 @@ if __name__ == "__main__":
         args.showBadIds = True
         args.showDupNames = True
         args.showBadNames = True
+        args.showDupEquations = True
         args.showStatus = True
 
     # Read the reactions from the specified file.
@@ -96,6 +98,8 @@ if __name__ == "__main__":
     unknownReversibility = list()
     diffEquationCode = list()
     noEquation = list()
+    duplicateEquation = dict()
+    eqnHashDict = dict()
     noDefinition = list()
     noReactants = list()
     noProducts = list()
@@ -175,14 +179,18 @@ if __name__ == "__main__":
         if reactants is None and products is None:
             noEquation.append(index)
         else:
+            rxn_hash = hash("%s<>%s" % (sorted(reactants), sorted(products)))
+            if rxn_hash in eqnHashDict:
+                if rxn_hash not in duplicateEquation:
+                    duplicateEquation[rxn_hash] = [eqnHashDict[rxn_hash]]
+                duplicateEquation[rxn_hash].append(index)
+            else:
+                eqnHashDict[rxn_hash] = index
+
             if len(reactants) == 0:
                 noReactants.append(index)
             if len(products) == 0:
                 noProducts.append(index)
-
-#         reactants, products = helper.parseEquation(rxn['definition'])
-#         if reactants is None and products is None:
-#             noDefinition.append(index)
 
         # Check reaction status.
         if rxn['status'] == 'OK':
@@ -249,7 +257,7 @@ if __name__ == "__main__":
     print('Number of reactions with unknown reversibility: %d' % (len(unknownReversibility)))
     print('Number of reactions with different equation and code: %d' % (len(diffEquationCode)))
     print('Number of reactions with missing equation: %d' % (len(noEquation)))
-#    print 'Number of reactions with missing definition: %d' % (len(noDefinition))
+    print('Number of reactions with duplicate equations: %d' % (len(duplicateEquation)))
     print('Number of reactions with no reactants: %d' % (len(noReactants)))
     print('Number of reactions with no products: %d' % (len(noProducts)))
     print('Number of reactions with OK status: %d' % (okStatus))
@@ -264,7 +272,7 @@ if __name__ == "__main__":
     print('Number of reactions with unknown deltaGErr value: %d' % (len(unknownDeltagErr)))
     print('Number of reactions with zero deltaGErr value: %d' % (len(zeroDeltagerr)))
     print('Number of reactions with bad links: %d' % (len(badLink)))
-    print()
+    print('\n')
 
     # Print details if requested.
     if args.showDupIds:
@@ -345,11 +353,11 @@ if __name__ == "__main__":
             for index in range(len(noEquation)):
                 print('Line %05d: %s' % (reactions[noEquation[index]]['linenum'], reactions[noEquation[index]]))
             print()
-        if len(noDefinition) > 0:
-            print('Reactions with no definition:')
-            for index in range(len(noDefinition)):
-                print('Line %05d: %s' % (reactions[noDefinition[index]]['linenum'], reactions[noDefinition[index]]))
-            print()
+    if args.showDupEquations:
+        for rxn_list in duplicateEquation.values():
+            print('\nReactions with duplicate equations:')
+            for index in rxn_list:
+                print('Line %05d: %s' % (reactions[index]['linenum'], reactions[index]))
     if args.showStatus:
         print('Reactions with status that is not OK:')
         for type in statusTypes:
@@ -360,6 +368,6 @@ if __name__ == "__main__":
             for index in range(len(badLink)):
                 print('Line %05d: %s' % (reactions[badLink[index]]['linenum'], reactions[badLink[index]]))
 
-    if any([duplicateId, badIdChars, badLink, badNameChars, badAbbrChars,
-            badDirection, badReversibility, badObsolete, badTransport]):
+    if any([duplicateId, duplicateEquation, badIdChars, badLink, badNameChars,
+            badAbbrChars, badDirection, badReversibility, badObsolete, badTransport]):
         exit(1)
