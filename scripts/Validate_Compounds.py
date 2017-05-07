@@ -1,5 +1,7 @@
 #! /usr/bin/env python
 
+from rdkit.Chem import AllChem
+from rdkit import RDLogger
 import argparse
 import re
 from BiochemHelper import BiochemHelper
@@ -62,6 +64,7 @@ if __name__ == "__main__":
     parser.add_argument('--show-bad-abbrs', help='show details on bad abbreviations', action='store_true', dest='showBadAbbrs', default=False)
     parser.add_argument('--show-formulas', help='show details on missing formulas', action='store_true', dest='showFormulas', default=False)
     parser.add_argument('--show-charges', help='show details on invalid charges', action='store_true', dest='showCharges', default=False)
+    parser.add_argument('--show-dup-compounds', help='show details on duplicate compounds', action='store_true', dest='showDupStruct', default=False)
     parser.add_argument('--show-cofactors', help='show details on invalid cofactors', action='store_true', dest='showCofactors', default=False)
     parser.add_argument('--fix-dup-names', help='fix on duplicate names', action='store_true', dest='fixDupNames', default=False)
     usage = parser.format_usage()
@@ -79,6 +82,7 @@ if __name__ == "__main__":
         args.showBadAbbrs = True
         args.showFormulas = True
         args.showCharges = True
+        args.showDupStruct = True
         args.showCofactors = True
 
     # Read the compounds from the specified file.
@@ -93,6 +97,10 @@ if __name__ == "__main__":
     # Create a dictionary keyed by id for fast lookup of compounds.
     compoundDict = helper.buildIndexDictFromListOfObjects(compounds)
 
+    # Suppress RDKit output
+    lg = RDLogger.logger()
+    lg.setLevel(RDLogger.CRITICAL)
+
     # Check for duplicates, missing and invalid values.
     idDict = dict()
     duplicateId = 0
@@ -106,6 +114,9 @@ if __name__ == "__main__":
     noFormula = list()
     largeCharge = list()
     noCharge = list()
+    structureDict = dict()
+    noStructure = list()
+    duplicateStructure = dict()
     badCore = list()
     numCore = 0
     badObsolete = list()
@@ -166,6 +177,19 @@ if __name__ == "__main__":
         if cpd['formula'] == '' or cpd['formula'] == 'noformula' or cpd['formula'] == 'unknown':
             noFormula.append(index)
 
+        # Check for duplicate and missing compound structures.
+        mol = AllChem.MolFromInchi(cpd['structure'])
+        if mol:
+            inchikey = AllChem.InchiToInchiKey(cpd['structure'])
+            if inchikey in structureDict:
+                if inchikey not in duplicateStructure:
+                    duplicateStructure[inchikey] = [structureDict[inchikey]]
+                duplicateStructure[inchikey].append(index)
+            else:
+                structureDict[inchikey] = index
+        else:
+            noStructure.append(index)
+
         # Check for charges that are too big.
         if 'charge' in cpd:
             if abs(cpd['charge']) > args.charge:
@@ -220,6 +244,8 @@ if __name__ == "__main__":
     print('Number of compounds with no formula: %d' % len(noFormula))
     print('Number of compounds with charge larger than %d: %d' % (args.charge, len(largeCharge)))
     print('Number of compounds with no charge: %d' % len(noCharge))
+    print('Number of compounds with no structure: %d' % len(noStructure))
+    print('Number of compounds with duplicate structure: %d' % len(duplicateStructure))
     print('Number of compounds with bad is_core flag: %d' % len(badCore))
     print('Number of compounds flagged as core: %d' % numCore)
     print('Number of compounds with bad is_obsolete flag: %d' % len(badObsolete))
@@ -285,6 +311,14 @@ if __name__ == "__main__":
             for index in range(len(largeCharge)):
                 print('Line %05d: %s' % (compounds[largeCharge[index]]['linenum'], compounds[largeCharge[index]]))
             print()
+
+    if args.showDupStruct:
+        for inchikey, indices in duplicateStructure.items():
+            print('Duplicated chemical structure: %s' % inchikey)
+            for index in indices:
+                print('Line %05d: %s' % (compounds[index]['linenum'], compounds[index]))
+            print()
+
     if args.showCofactors:
         if len(badCofactor) > 0:
             print('Compounds with bad isCofactor flag:')
@@ -311,6 +345,6 @@ if __name__ == "__main__":
                 line = '%s\t%s\t%s\t%s\t%d\t%d\n' % (cpd['id'], cpd['name'], cpd['abbreviation'], cpd['formula'], cpd['defaultCharge'], cpd['isCofactor'])
                 handle.write(line)
 
-    if any([duplicateId, noFormula, noCharge, badIdChars, badAbbrChars,
+    if any([duplicateId, noCharge, badIdChars, badAbbrChars, duplicateStructure,
             badCofactor, badCore, badLink, badNameChars, badObsolete]):
         exit(1)
