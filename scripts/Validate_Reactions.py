@@ -3,6 +3,9 @@
 import argparse
 import re
 from BiochemHelper import BiochemHelper
+from csv import DictReader
+from collections import Counter
+import re
 
 desc1 = '''
 NAME
@@ -39,10 +42,27 @@ AUTHORS
       Mike Mundy 
 '''
 
+
+def get_atom_count(formulaDict, complist):
+    atom_counts = Counter()
+    for term in complist:
+        stoich = float(term.split()[0].strip("()"))
+        id = term.split()[1].split('[')[0]
+        if formulaDict[id] == 'null':
+            continue
+        for pair in re.findall('([A-Z][a-z]?)(\d*)', formulaDict[id]):
+            if not pair[1]:
+                atom_counts[pair[0]] += stoich
+            else:
+                atom_counts[pair[0]] += int(pair[1]) * stoich
+    return atom_counts
+
+
 if __name__ == "__main__":
     # Parse options.
     parser = argparse.ArgumentParser(formatter_class=argparse.RawDescriptionHelpFormatter, prog='Validate_Reactions', epilog=desc3)
     parser.add_argument('rxnfile', help='path to reactions file', action='store')
+    parser.add_argument('-c', help='show details on all problems', action='store', dest='compfile', default=False)
     parser.add_argument('--show-details', help='show details on all problems', action='store_true', dest='showDetails', default=False)
     parser.add_argument('--show-dup-ids', help='show details on duplicate IDs', action='store_true', dest='showDupIds', default=False)
     parser.add_argument('--show-bad-ids', help='show details on bad IDs', action='store_true', dest='showBadIds', default=False)
@@ -54,6 +74,7 @@ if __name__ == "__main__":
     parser.add_argument('--show-bad-reverse', help='show details on bad reversibility', action='store_true', dest='showBadReverse', default=False)
     parser.add_argument('--show-diff-eq', help='show details on different equation and code', action='store_true', dest='showDiffEqCode', default=False)
     parser.add_argument('--show-dup-eq', help='show details on duplicated reaction equations', action='store_true', dest='showDupEquations', default=False)
+    parser.add_argument('--show-unbalanced', help='show details on equations taht are not atom balanced', action='store_true', dest='showUnbalanced', default=False)
     parser.add_argument('--show-bad-eq', help='show details on missing reactants or products in equations', action='store_true', dest='showBadEquations', default=False)
     parser.add_argument('--show-status', help='show details on status types', action='store_true', dest='showStatus', default=False)
     parser.add_argument('--show-bad-link', help='show details on bad links', action='store_true', dest='showBadLink', default=False)
@@ -70,6 +91,7 @@ if __name__ == "__main__":
         args.showBadNames = True
         args.showDupEquations = True
         args.showStatus = True
+        args.showUnbalanced = True
 
     # Read the reactions from the specified file.
     print('Reaction file: %s' % args.rxnfile)
@@ -80,8 +102,13 @@ if __name__ == "__main__":
         exit(1)
     print('Number of reactions: %d' % len(reactions))
     
-    # Create a dictionary keyed by id for fast lookup of reactions.
+    # Create a dictionary keyed by id for fast lookup of reactions (and compounds)
     reactionDict = helper.buildIndexDictFromListOfObjects(reactions)
+    if args.compfile:
+        compoundDict = {}
+        with open(args.compfile, 'r') as infile:
+            for line in DictReader(infile, dialect='excel-tab'):
+                compoundDict[line['id']] = line['formula']
 
     # Check for duplicates, missing and invalid values.
     idDict = dict()
@@ -99,6 +126,7 @@ if __name__ == "__main__":
     diffEquationCode = list()
     noEquation = list()
     duplicateEquation = dict()
+    unbalanced = list()
     eqnHashDict = dict()
     noDefinition = list()
     noReactants = list()
@@ -176,6 +204,11 @@ if __name__ == "__main__":
 
         # Check for missing reactants and/or products.
         reactants, products = helper.parseEquation(rxn['equation'])
+        reactant_atoms = get_atom_count(compoundDict, reactants)
+        product_atoms = get_atom_count(compoundDict, products)
+        if reactant_atoms - product_atoms or product_atoms - reactant_atoms:
+            unbalanced.append((index, reactant_atoms, product_atoms))
+
         if reactants is None and products is None:
             noEquation.append(index)
         else:
@@ -258,6 +291,7 @@ if __name__ == "__main__":
     print('Number of reactions with different equation and code: %d' % (len(diffEquationCode)))
     print('Number of reactions with missing equation: %d' % (len(noEquation)))
     print('Number of reactions with duplicate equations: %d' % (len(duplicateEquation)))
+    print('Number of reactions with unbalanced equations: %d' % (len(unbalanced)))
     print('Number of reactions with no reactants: %d' % (len(noReactants)))
     print('Number of reactions with no products: %d' % (len(noProducts)))
     print('Number of reactions with OK status: %d' % (okStatus))
@@ -358,6 +392,13 @@ if __name__ == "__main__":
             print('\nReactions with duplicate equations:')
             for index in rxn_list:
                 print('Line %05d: %s' % (reactions[index]['linenum'], reactions[index]))
+    if args.showUnbalanced:
+        if len(unbalanced) > 0:
+            print('Unbalenced Reactions:')
+            for tup in unbalanced:
+                print('Line %05d: %s' % (reactions[tup[0]]['linenum'], reactions[tup[0]]))
+                print("Reactant atoms:%s\n Product atoms:%s\n" %
+                      (sorted(tup[1].items()), sorted(tup[2].items())))
     if args.showStatus:
         print('Reactions with status that is not OK:')
         for type in statusTypes:
