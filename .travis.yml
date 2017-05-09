@@ -14,6 +14,6 @@ install:
   - source activate test-environment
 script:
   - python scripts/Validate_Compounds.py Biochemistry/compounds.master.tsv
-  - python scripts/Validate_Reactions.py Biochemistry/reactions.master.tsv
+  - python scripts/Validate_Reactions.py -c Biochemistry/compounds.master.tsv Biochemistry/reactions.master.tsv
   - python scripts/Validate_Complex_Roles.py Mappings/ComplexRoles.kegg.tsv
   - python scripts/Validate_Templates.py

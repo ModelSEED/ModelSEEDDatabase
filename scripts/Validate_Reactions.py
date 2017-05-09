@@ -62,7 +62,7 @@ if __name__ == "__main__":
     # Parse options.
     parser = argparse.ArgumentParser(formatter_class=argparse.RawDescriptionHelpFormatter, prog='Validate_Reactions', epilog=desc3)
     parser.add_argument('rxnfile', help='path to reactions file', action='store')
-    parser.add_argument('-c', help='show details on all problems', action='store', dest='compfile', default=False)
+    parser.add_argument('-c', help='Path to compound file', action='store', dest='compfile', default=False)
     parser.add_argument('--show-details', help='show details on all problems', action='store_true', dest='showDetails', default=False)
     parser.add_argument('--show-dup-ids', help='show details on duplicate IDs', action='store_true', dest='showDupIds', default=False)
     parser.add_argument('--show-bad-ids', help='show details on bad IDs', action='store_true', dest='showBadIds', default=False)
@@ -204,10 +204,11 @@ if __name__ == "__main__":
 
         # Check for missing reactants and/or products.
         reactants, products = helper.parseEquation(rxn['equation'])
-        reactant_atoms = get_atom_count(compoundDict, reactants)
-        product_atoms = get_atom_count(compoundDict, products)
-        if reactant_atoms - product_atoms or product_atoms - reactant_atoms:
-            unbalanced.append((index, reactant_atoms, product_atoms))
+        if args.compfile:
+            reactant_atoms = get_atom_count(compoundDict, reactants)
+            product_atoms = get_atom_count(compoundDict, products)
+            if reactant_atoms - product_atoms or product_atoms - reactant_atoms:
+                unbalanced.append((index, reactant_atoms, product_atoms))
 
         if reactants is None and products is None:
             noEquation.append(index)
