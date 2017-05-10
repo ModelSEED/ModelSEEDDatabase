@@ -156,7 +156,7 @@ if __name__ == "__main__":
             idDict[rxn['id']] = [index]
 
         # Check for invalid characters in the ID.
-        match = re.search(r'rxn\d\d\d\d\d', rxn['id'])
+        match = re.search(r'^rxn\d\d\d\d\d$', rxn['id'])
         if match is None:
             badIdChars.append(index)
 
@@ -173,6 +173,8 @@ if __name__ == "__main__":
             rxn['name'].encode('ascii')
         except UnicodeEncodeError:
             badNameChars.append(index)
+        if rxn['name'] != rxn['name'].strip():
+            badNameChars.append(index)
 
         # Check for duplicate abbreviations.
         if rxn['abbreviation'] in abbrDict:
@@ -186,6 +188,8 @@ if __name__ == "__main__":
         try:
             rxn['abbreviation'].encode('ascii')
         except UnicodeEncodeError:
+            badAbbrChars.append(index)
+        if rxn['abbreviation'] != rxn['abbreviation'].strip():
             badAbbrChars.append(index)
 
         # Check for invalid direction.

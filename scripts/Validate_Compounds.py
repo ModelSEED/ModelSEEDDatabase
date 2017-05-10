@@ -138,10 +138,10 @@ if __name__ == "__main__":
                 duplicateId += 1
             idDict[cpd['id']].append(index)
         else:
-            idDict[cpd['id']] = [ index ]
+            idDict[cpd['id']] = [index]
 
         # Check for invalid characters in the ID.
-        match = re.search(r'cpd\d\d\d\d\d', cpd['id'])
+        match = re.search(r'^cpd\d\d\d\d\d$', cpd['id'])
         if match is None:
             badIdChars.append(index)
 
@@ -151,12 +151,14 @@ if __name__ == "__main__":
                 duplicateName += 1
             nameDict[cpd['name']].append(index)
         else:
-            nameDict[cpd['name']] = [ index ]
+            nameDict[cpd['name']] = [index]
 
         # Check for invalid characters in the name.
         try:
             cpd['name'].encode('ascii')
         except UnicodeEncodeError:
+            badNameChars.append(index)
+        if cpd['name'] != cpd['name'].strip():
             badNameChars.append(index)
 
         # Check for duplicate abbreviations.
@@ -172,6 +174,8 @@ if __name__ == "__main__":
             cpd['abbreviation'].encode('ascii')
         except UnicodeEncodeError:
             badAbbrChars.append(index)
+        if cpd['abbreviation'] != cpd['abbreviation'].strip():
+            badNameChars.append(index)
 
         # Check for missing or unknown formulas.
         if cpd['formula'] == '' or cpd['formula'] == 'noformula' or cpd['formula'] == 'unknown':
