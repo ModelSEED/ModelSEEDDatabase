@@ -47,7 +47,7 @@ class BiochemHelper(BaseHelper):
                 linenum += 1
                 fields = line.strip().split('\t')
                 if len(fields) < len(fieldNames):
-                    print 'WARNING: Compound on line %d is missing one or more fields, %s' %(linenum, fields)
+                    print('WARNING: Compound on line %d is missing one or more fields, %s' %(linenum, fields))
                     continue
                 cpd = dict()
                 if noFormat:
@@ -132,7 +132,7 @@ class BiochemHelper(BaseHelper):
                 linenum += 1
                 fields = line.strip('\n ').split('\t')
                 if len(fields) < len(fieldNames):
-                    print 'WARNING: Reaction on line %d is missing one or more fields, %s' %(linenum, fields)
+                    print('WARNING: Reaction on line %d is missing one or more fields, %s' %(linenum, fields))
                     continue
                 rxn = dict()
                 if noFormat:
@@ -202,7 +202,7 @@ class BiochemHelper(BaseHelper):
                 linenum += 1
                 fields = line.strip('\n ').split('\t')
                 if len(fields) < len(fieldNames):
-                    print 'WARNING: Compartment on line %d is missing one or more fields, %s' %(linenum, fields)
+                    print('WARNING: Compartment on line %d is missing one or more fields, %s' %(linenum, fields))
                     continue
                 cmp = dict()
                 cmp['id'] = fields[fieldNames['id']]
@@ -242,7 +242,7 @@ class BiochemHelper(BaseHelper):
                 linenum += 1
                 fields = line.strip('\n ').split('\t')
                 if len(fields) < len(fieldNames):
-                    print 'WARNING: Complex role mapping on line %d is missing one or more fields, %s' %(linenum, fields)
+                    print('WARNING: Complex role mapping on line %d is missing one or more fields, %s' %(linenum, fields))
                     continue
                 cpxrole = dict()
                 cpxrole['complex_id'] = fields[fieldNames['complex_id']]
@@ -291,7 +291,7 @@ class BiochemHelper(BaseHelper):
             (source, ext) = os.path.splitext(aliasFiles[index]) 
             if ext != '.aliases':
                 continue
-            print 'Processing aliases in '+aliasFiles[index]
+            print('Processing aliases in '+aliasFiles[index])
             source = source.replace('_', ' ') # Replace the underscores used in file names
             with open(os.path.join(aliasDir, aliasFiles[index]), 'r') as handle:
                 header = handle.readline().strip().split('\t')
@@ -517,7 +517,7 @@ class BiochemHelper(BaseHelper):
         # compound IDs.
         reactants, products = self.parseEquation(equation)
         if len(reactants) == 0 and len(products) == 0:
-            print 'This reaction has no reactants and no products: '+equation
+            print('This reaction has no reactants and no products: '+equation)
             return False
 
         # Figure out if the compounds are identified by ID or by name.

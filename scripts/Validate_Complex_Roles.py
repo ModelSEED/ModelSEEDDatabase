@@ -62,13 +62,13 @@ if __name__ == "__main__":
         args.showBadNames = True
 
     # Read the complex role mapping from the specified file.
-    print 'Complex role mapping file: %s' %(args.cpxrolefile)
+    print('Complex role mapping file: %s' % args.cpxrolefile)
     helper = BiochemHelper()
     complexRoles = helper.readComplexRolesFile(args.cpxrolefile)
     if complexRoles is None:
-        print 'Error reading complex role mapping file'
+        print('Error reading complex role mapping file')
         exit(1)
-    print 'Number of mappings: %d' %(len(complexRoles))
+    print('Number of mappings: %d' % len(complexRoles))
 
     # Check for duplicates, missing and invalid values.
     complexIdDict = dict()
@@ -92,13 +92,13 @@ if __name__ == "__main__":
                 duplicateComplexId += 1
             complexIdDict[cpxrole['complex_id']].append(index)
         else:
-            complexIdDict[cpxrole['complex_id']] = [ index ]
+            complexIdDict[cpxrole['complex_id']] = [index]
         if cpxrole['role_id'] in complexIdDict:
             if len(complexIdDict[cpxrole['role_id']]) == 1:
                 duplicateComplexId += 1
             complexIdDict[cpxrole['role_id']].append(index)
         else:
-            complexIdDict[cpxrole['role_id']] = [ index ]
+            complexIdDict[cpxrole['role_id']] = [index]
 
         # Check for invalid characters in the ID.
         match = re.search(r'cpx.\d+', cpxrole['complex_id'])
@@ -114,83 +114,86 @@ if __name__ == "__main__":
                 duplicateComplexName += 1
             complexNameDict[cpxrole['complex_name']].append(index)
         else:
-            complexNameDict[cpxrole['complex_name']] = [ index ]
+            complexNameDict[cpxrole['complex_name']] = [index]
         if cpxrole['role_name'] in roleNameDict:
             if len(roleNameDict[cpxrole['role_name']]) == 1:
                 duplicateRoleName += 1
             roleNameDict[cpxrole['role_name']].append(index)
         else:
-            roleNameDict[cpxrole['role_name']] = [ index ]
+            roleNameDict[cpxrole['role_name']] = [index]
  
         # Check for invalid characters in the name.
         try:
-            cpxrole['complex_name'].decode('ascii')
-        except UnicodeDecodeError:
+            cpxrole['complex_name'].encode('ascii')
+        except UnicodeEncodeError:
             badComplexNameChars.append(index)
         try:
-            cpxrole['role_name'].decode('ascii')
-        except UnicodeDecodeError:
+            cpxrole['role_name'].encode('ascii')
+        except UnicodeEncodeError:
             badRoleNameChars.append(index)
 
     # Print summary data.
-    print 'Number of mappings with duplicate complex IDs: %d' %(duplicateComplexId)    
-    print 'Number of mappings with role complex IDs: %d' %(duplicateRoleId)    
-    print 'Number of mappings with bad characters in complex ID: %d' %(len(badComplexIdChars))
-    print 'Number of mappings with bad characters in role ID: %d' %(len(badComplexIdChars))
-    print 'Number of mappings with duplicate complex names: %d' %(duplicateComplexName)
-    print 'Number of mappings with duplicate role names: %d' %(duplicateRoleName)
-    print 'Number of mappings with bad characters in complex name: %d' %(len(badComplexNameChars))
-    print 'Number of mappings with bad characters in role name: %d' %(len(badRoleNameChars))
-    print
+    print('Number of mappings with duplicate complex IDs: %d' % duplicateComplexId)
+    print('Number of mappings with role complex IDs: %d' % duplicateRoleId)
+    print('Number of mappings with bad characters in complex ID: %d' % len(badComplexIdChars))
+    print('Number of mappings with bad characters in role ID: %d' % len(badComplexIdChars))
+    print('Number of mappings with duplicate complex names: %d' % duplicateComplexName)
+    print('Number of mappings with duplicate role names: %d' % duplicateRoleName)
+    print('Number of mappings with bad characters in complex name: %d' % len(badComplexNameChars))
+    print('Number of mappings with bad characters in role name: %d' % len(badRoleNameChars))
+    print()
 
     # Print details if requested.
     if args.showDupIds:
         for id in complexIdDict:
             if len(complexIdDict[id]) > 1:
-                print 'Duplicate complex ID: %s' %(id)
+                print('Duplicate complex ID: %s' % id)
                 for dup in complexIdDict[id]:
-                    print 'Line %05d: %s' %(complexRoles[dup]['linenum'], complexRoles[dup])
-                print
+                    print('Line %05d: %s' % (complexRoles[dup]['linenum'], complexRoles[dup]))
+                print()
         for id in roleIdDict:
             if len(roleIdDict[id]) > 1:
-                print 'Duplicate role ID: %s' %(id)
+                print('Duplicate role ID: %s' % id)
                 for dup in roleIdDict[id]:
-                    print 'Line %05d: %s' %(complexRoles[dup]['linenum'], complexRoles[dup])
-                print
+                    print('Line %05d: %s' % (complexRoles[dup]['linenum'], complexRoles[dup]))
+                print()
     if args.showBadIds:
         if len(badComplexIdChars) > 0:
-            print 'Complex IDs with bad characters:'
+            print('Complex IDs with bad characters:')
             for index in range(len(badComplexIdChars)):
-                print 'Line %05d: %s' %(complexRoles[badComplexIdChars[index]]['linenum'], complexRoles[badComplexIdChars[index]])
-            print
+                print('Line %05d: %s' % (complexRoles[badComplexIdChars[index]]['linenum'], complexRoles[badComplexIdChars[index]]))
+            print()
         if len(badRoleIdChars) > 0:
-            print 'Role IDs with bad characters:'
+            print('Role IDs with bad characters:')
             for index in range(len(badRoleIdChars)):
-                print 'Line %05d: %s' %(complexRoles[badRoleIdChars[index]]['linenum'], complexRoles[badRoleIdChars[index]])
-            print
+                print('Line %05d: %s' % (complexRoles[badRoleIdChars[index]]['linenum'], complexRoles[badRoleIdChars[index]]))
+            print()
     if args.showDupNames:
         for name in complexNameDict:
             if len(complexNameDict[name]) > 1:
-                print 'Duplicate complex name: %s' %(name)
+                print('Duplicate complex name: %s' % name)
                 for dup in complexNameDict[name]:
-                    print 'Line %05d: %s' %(complexRoles[dup]['linenum'], complexRoles[dup])
-                print
+                    print('Line %05d: %s' % (complexRoles[dup]['linenum'], complexRoles[dup]))
+                print()
         for name in roleNameDict:
             if len(roleNameDict[name]) > 1:
-                print 'Duplicate role name: %s' %(name)
+                print('Duplicate role name: %s' % name)
                 for dup in roleNameDict[name]:
-                    print 'Line %05d: %s' %(complexRoles[dup]['linenum'], complexRoles[dup])
-                print
+                    print('Line %05d: %s' % (complexRoles[dup]['linenum'], complexRoles[dup]))
+                print()
     if args.showBadNames:
         if len(badComplexNameChars) > 0:
-            print 'Complex names with bad characters:'
+            print('Complex names with bad characters:')
             for index in range(len(badComplexNameChars)):
-                print 'Line %05d: %s' %(complexRoles[badComplexNameChars[index]]['linenum'], complexRoles[badComplexNameChars[index]])
-            print
+                print('Line %05d: %s' % (complexRoles[badComplexNameChars[index]]['linenum'], complexRoles[badComplexNameChars[index]]))
+            print()
         if len(badRoleNameChars) > 0:
-            print 'Role names with bad characters:'
+            print('Role names with bad characters:')
             for index in range(len(badRoleNameChars)):
-                print 'Line %05d: %s' %(complexRoles[badRoleNameChars[index]]['linenum'], complexRoles[badRoleNameChars[index]])
-            print
+                print('Line %05d: %s' % (complexRoles[badRoleNameChars[index]]['linenum'], complexRoles[badRoleNameChars[index]]))
+            print()
 
-    exit(0)
+    if any([duplicateComplexId, duplicateRoleId, badComplexIdChars,
+            duplicateComplexName, duplicateRoleName, badComplexNameChars,
+            badRoleNameChars]):
+        exit(0)
