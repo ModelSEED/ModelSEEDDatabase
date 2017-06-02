@@ -1,0 +1,19 @@
+language: python
+python:
+  - "3.6"
+before_install:
+  - sudo apt-get update
+  - wget https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh;
+  - bash miniconda.sh -b -p $HOME/miniconda
+  - export PATH="$HOME/miniconda/bin:$PATH"
+  - hash -r
+  - conda config --set always_yes yes --set changeps1 no
+  - conda update -q conda
+install:
+  - conda create -q -y  -c rdkit -n test-environment python=$TRAVIS_PYTHON_VERSION rdkit
+  - source activate test-environment
+script:
+  - python scripts/Validate_Compounds.py Biochemistry/compounds.master.tsv
+  - python scripts/Validate_Reactions.py -c Biochemistry/compounds.master.tsv Biochemistry/reactions.master.tsv
+  - python scripts/Validate_Complex_Roles.py Mappings/ComplexRoles.kegg.tsv
+  - python scripts/Validate_Templates.py
