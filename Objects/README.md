@@ -1,0 +1,1 @@
+#Workspace pointers for KBase/PATRIC/SOLR objects
