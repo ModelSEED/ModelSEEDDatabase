@@ -13,7 +13,6 @@ install:
   - conda create -q -y  -c rdkit -n test-environment python=$TRAVIS_PYTHON_VERSION rdkit
   - source activate test-environment
 script:
-  - python scripts/Validate_Compounds.py Biochemistry/compounds.master.tsv
-  - python scripts/Validate_Reactions.py -c Biochemistry/compounds.master.tsv Biochemistry/reactions.master.tsv
-  - python scripts/Validate_Complex_Roles.py Mappings/ComplexRoles.kegg.tsv
-  - python scripts/Validate_Templates.py
+  - python Scripts/Validation/Validate_Compounds.py Biochemistry/compounds.tsv
+  - python Scripts/Validation/Validate_Reactions.py -c Biochemistry/compounds.tsv Biochemistry/reactions.tsv
+  - python Scripts/Validation/Validate_Templates.py

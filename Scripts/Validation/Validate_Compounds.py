@@ -4,7 +4,7 @@ from rdkit.Chem import AllChem
 from rdkit import RDLogger
 import argparse
 import re
-from BiochemHelper import BiochemHelper
+from Scripts.Biochem_Helper import BiochemHelper
 
 desc1 = '''
 NAME

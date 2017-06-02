@@ -1,8 +1,7 @@
 #! /usr/bin/env python
 
 import argparse
-import re
-from BiochemHelper import BiochemHelper
+from Scripts.Biochem_Helper import BiochemHelper
 from csv import DictReader
 from collections import Counter
 import re

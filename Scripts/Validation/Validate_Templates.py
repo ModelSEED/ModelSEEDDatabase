@@ -34,13 +34,13 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(
         description='Validates BiomassCompounds and Reactions files in Templates folder')
     parser.add_argument('-c', dest='comp_tsv',
-                        default=script_dir+'/../Biochemistry/compounds.master.tsv',
+                        default=script_dir+'/../../Biochemistry/compounds.tsv',
                         help='Path to the compounds file')
     parser.add_argument('-r', dest='rxn_tsv',
-                        default=script_dir+'/../Biochemistry/reactions.master.tsv',
+                        default=script_dir+'/../../Biochemistry/reactions.tsv',
                         help='Path to the reaction file')
     parser.add_argument('-t', dest='template_dir',
-                        default=script_dir+'/../Templates',
+                        default=script_dir+'/../../Templates',
                         help='Path to the templates directory')
     args = parser.parse_args()
     comp_ids = get_id_set(args.comp_tsv)
