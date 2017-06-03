@@ -105,9 +105,12 @@ if __name__ == "__main__":
     reactionDict = helper.buildIndexDictFromListOfObjects(reactions)
     if args.compfile:
         compoundDict = {}
+        obs_compounds = set()
         with open(args.compfile, 'r') as infile:
             for line in DictReader(infile, dialect='excel-tab'):
                 compoundDict[line['id']] = line['formula']
+                if line['is_obsolete']:
+                    obs_compounds.add(line['id'])
 
     # Check for duplicates, missing and invalid values.
     idDict = dict()
@@ -126,6 +129,7 @@ if __name__ == "__main__":
     noEquation = list()
     duplicateEquation = dict()
     unbalanced = list()
+    obsoleteComps = list()
     eqnHashDict = dict()
     noDefinition = list()
     noReactants = list()
@@ -145,6 +149,14 @@ if __name__ == "__main__":
     
     for index in range(len(reactions)):
         rxn = reactions[index]
+
+        # Check for invalid is_obsolete flags.
+        if 'is_obsolete' in rxn:
+            if rxn['is_obsolete'] != 0 and rxn['is_obsolete'] != 1:
+                badObsolete.append(index)
+            if rxn['is_obsolete'] == 1:
+                isObsolete.append(index)
+                continue
         
         # Check for duplicate IDs.
         if rxn['id'] in idDict:
@@ -212,6 +224,8 @@ if __name__ == "__main__":
             product_atoms = get_atom_count(compoundDict, products)
             if reactant_atoms - product_atoms or product_atoms - reactant_atoms:
                 unbalanced.append((index, reactant_atoms, product_atoms))
+            if reactants in obs_compounds or products in obs_compounds:
+                obsoleteComps.append(index)
 
         if reactants is None and products is None:
             noEquation.append(index)
@@ -256,13 +270,6 @@ if __name__ == "__main__":
         if rxn['is_transport'] == 1:
             isTransport.append(index)
 
-        # Check for invalid is_obsolete flags.
-        if 'is_obsolete' in rxn:
-            if rxn['is_obsolete'] != 0 and rxn['is_obsolete'] != 1:
-                badObsolete.append(index)
-            if rxn['is_obsolete'] == 1:
-                isObsolete.append(index)
-
         # Check that linked reactions are all valid.
         if 'linked_reaction' in rxn:
             linkedRxns = rxn['linked_reaction'].split(';')
@@ -296,6 +303,7 @@ if __name__ == "__main__":
     print('Number of reactions with missing equation: %d' % (len(noEquation)))
     print('Number of reactions with duplicate equations: %d' % (len(duplicateEquation)))
     print('Number of reactions with unbalanced equations: %d' % (len(unbalanced)))
+    print('Number of reactions with obsolete compounds: %d' % (len(obsoleteComps)))
     print('Number of reactions with no reactants: %d' % (len(noReactants)))
     print('Number of reactions with no products: %d' % (len(noProducts)))
     print('Number of reactions with OK status: %d' % (okStatus))
@@ -413,6 +421,11 @@ if __name__ == "__main__":
             for index in range(len(badLink)):
                 print('Line %05d: %s' % (reactions[badLink[index]]['linenum'], reactions[badLink[index]]))
 
-    if any([duplicateId, duplicateEquation, badIdChars, badLink, badNameChars,
-            badAbbrChars, badDirection, badReversibility, badObsolete, badTransport]):
+    errors = [x for x in ['duplicateId', 'duplicateName', 'duplicateEquation',
+                          'unbalanced', 'obsoleteComps', 'badIdChars',
+                          'badLink', 'badNameChars', 'badAbbrChars',
+                          'badDirection', 'badReversibility', 'badObsolete',
+                          'badTransport'] if eval(x)]
+    if errors:
+        print("ERRORS: " + ", ".join(errors))
         exit(1)
