@@ -1,10 +1,13 @@
 #! /usr/bin/env python
 
-from rdkit.Chem import AllChem
-from rdkit import RDLogger
 import argparse
 import re
-from Scripts.Biochem_Helper import BiochemHelper
+import sys
+
+from rdkit import RDLogger
+from rdkit.Chem import AllChem
+
+from ..Biochem_Helper import BiochemHelper
 
 desc1 = '''
 NAME

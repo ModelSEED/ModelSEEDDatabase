@@ -1,11 +1,11 @@
 #! /usr/bin/env python
 
 import argparse
-from Scripts.Biochem_Helper import BiochemHelper
-from csv import DictReader
-from collections import Counter
 import re
 import sys
+from collections import Counter
+from csv import DictReader
+from ..Biochem_Helper import BiochemHelper
 
 desc1 = '''
 NAME
@@ -225,7 +225,7 @@ if __name__ == "__main__":
             product_atoms = get_atom_count(compoundDict, products)
             if reactant_atoms - product_atoms or product_atoms - reactant_atoms:
                 unbalanced.append((index, reactant_atoms, product_atoms))
-            if reactants in obs_compounds or products in obs_compounds:
+            if [cid for cid in reactants + products if cid in obs_compounds]:
                 obsoleteComps.append(index)
 
         if reactants is None and products is None:
