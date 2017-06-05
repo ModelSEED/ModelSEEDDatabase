@@ -2,6 +2,7 @@
 
 from csv import DictReader
 import os
+import sys
 import argparse
 
 
@@ -22,12 +23,14 @@ def validate_biomass_compounds(path, comp_set):
         return template_compounds - comp_set
 
 
-def validate_reaction_list(path, rxn_set):
+def validate_reaction_list(path, rxn_set, complex_set):
     with open(path) as infile:
         template_rxns = set()
-        for line in infile:
-            template_rxns.add(line.split('\t')[0])
-        return template_rxns - rxn_set
+        template_complexes = set()
+        for line in DictReader(infile, dialect='excel-tab'):
+            template_rxns.add(line['id'])
+            template_complexes.update(line['complexes'].strip().split("|"))
+        return template_rxns - rxn_set, template_complexes - complex_set
 
 if __name__ == '__main__':
     script_dir = os.path.dirname(__file__)
@@ -39,25 +42,39 @@ if __name__ == '__main__':
     parser.add_argument('-r', dest='rxn_tsv',
                         default=script_dir+'/../../Biochemistry/reactions.tsv',
                         help='Path to the reaction file')
+    parser.add_argument('-C', dest='complex_tsv',
+                        default=script_dir+'/../../Annotations/Complexes.tsv',
+                        help='Path to the complexes file')
     parser.add_argument('-t', dest='template_dir',
                         default=script_dir+'/../../Templates',
                         help='Path to the templates directory')
     args = parser.parse_args()
     comp_ids = get_id_set(args.comp_tsv)
     rxn_ids = get_id_set(args.rxn_tsv)
+    complex_ids = get_id_set(args.complex_tsv) | {'universal', 'null'}
     exit_code = 0
     for template in os.listdir(args.template_dir):
         if not os.path.isdir(os.path.join(args.template_dir, template)):
             continue
         print("Validating %s template" % template)
-        undefined_comps = validate_biomass_compounds('%s/%s/BiomassCompounds.tsv'
-                                                   % (args.template_dir, template), comp_ids)
-        if undefined_comps:
-            print("Undefined Compounds: " + ", ".join(undefined_comps))
+        undef_comps = validate_biomass_compounds(
+            '%s/%s/BiomassCompounds.tsv' % (args.template_dir, template),
+            comp_ids)
+        undef_rxns, undef_complex = validate_reaction_list(
+            '%s/%s/Reactions.tsv' % (args.template_dir, template), rxn_ids,
+            complex_ids)
+
+        if undef_comps:
+            print("ERROR-Undefined Compounds: " + ", ".join(undef_comps),
+                  file=sys.stderr)
             exit_code = 1
-        undefined_rxns = validate_reaction_list('%s/%s/Reactions.tsv'
-                                                % (args.template_dir, template), rxn_ids)
-        if undefined_rxns:
-            print("Undefined Reactions: " + ", ".join(undefined_rxns))
+        if undef_rxns:
+            print("ERROR-Undefined Reactions: " + ", ".join(undef_rxns),
+                  file=sys.stderr)
             exit_code = 1
+        if undef_complex:
+            print("ERROR-Undefined Complexes: " + ", ".join(undef_complex),
+                  file=sys.stderr)
+            exit_code = 1
+
     exit(exit_code)

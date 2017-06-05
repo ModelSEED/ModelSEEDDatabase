@@ -381,5 +381,5 @@ if __name__ == "__main__":
                           'badNameChars', 'badObsolete', 'inconsistentCharge',
                           'inconsistentFormula'] if eval(x)]
     if errors:
-        print("ERRORS: " + ", ".join(errors))
+        print("ERRORS: " + ", ".join(errors), file=sys.stderr)
         exit(1)

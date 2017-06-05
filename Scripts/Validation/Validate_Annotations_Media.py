@@ -1,8 +1,7 @@
 """Validates Annotations and Media files"""
 
-from csv import DictReader
 import os
-import argparse
+import sys
 
 
 def check_id_set(tsv_path):
@@ -31,9 +30,12 @@ if __name__ == '__main__':
                                                comp_ids)
 
     if undefined_comps:
-        print("ERROR-Undefined Compounds: " + ", ".join(undefined_comps))
+        print("ERROR-Undefined Compounds: " + ", ".join(undefined_comps),
+              file=sys.stderr)
     if dup_complex:
-        print("ERROR-Duplicated Complexes: " + ", ".join(dup_complex))
+        print("ERROR-Duplicated Complexes: " + ", ".join(dup_complex),
+              file=sys.stderr)
     if dup_roles:
-        print("ERROR-Duplicated Roles: " + ", ".join(dup_roles))
+        print("ERROR-Duplicated Roles: " + ", ".join(dup_roles),
+              file=sys.stderr)
     exit(any([undefined_comps, dup_roles, dup_complex]))

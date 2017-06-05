@@ -5,6 +5,7 @@ from Scripts.Biochem_Helper import BiochemHelper
 from csv import DictReader
 from collections import Counter
 import re
+import sys
 
 desc1 = '''
 NAME
@@ -427,5 +428,5 @@ if __name__ == "__main__":
                           'badDirection', 'badReversibility', 'badObsolete',
                           'badTransport'] if eval(x)]
     if errors:
-        print("ERRORS: " + ", ".join(errors))
+        print("ERRORS: " + ", ".join(errors), file=sys.stderr)
         exit(1)
