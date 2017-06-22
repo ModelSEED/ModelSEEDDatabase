@@ -61,30 +61,30 @@ foreach my $cpd (keys %Cpd_Aliases){
     }
 }
 
-foreach my $cpd (keys %Cpd_Aliases){
-    if(exists($Cpd_Aliases{$cpd}{"ModelSEED"})){
-	foreach my $link (@{$Cpd_Aliases{$cpd}{"ModelSEED"}}){
+#foreach my $cpd (keys %Cpd_Aliases){
+#    if(exists($Cpd_Aliases{$cpd}{"ModelSEED"})){
+#	foreach my $link (@{$Cpd_Aliases{$cpd}{"ModelSEED"}}){
 	    
-	    foreach my $alias (keys %{$Cpd_Aliases{$link}}){
-		foreach my $entry (@{$Cpd_Aliases{$link}{$alias}}){
-		    $Global_Aliases{"Compounds"}{$alias}{$entry}{plantdefault}{$cpd}=1;
-		    if(exists($BiGG{$alias})){
-			$Global_Aliases{"Compounds"}{"BiGG"}{$entry}{plantdefault}{$cpd}=1;
-		    }
-		}
-	    }
+#	    foreach my $alias (keys %{$Cpd_Aliases{$link}}){
+#		foreach my $entry (@{$Cpd_Aliases{$link}{$alias}}){
+#		    $Global_Aliases{"Compounds"}{$alias}{$entry}{plantdefault}{$cpd}=1;
+#		    if(exists($BiGG{$alias})){
+#			$Global_Aliases{"Compounds"}{"BiGG"}{$entry}{plantdefault}{$cpd}=1;
+#		    }
+#		}
+#	    }
 
-	    foreach my $alias (keys %{$Cpd_Aliases{$cpd}}){
-		foreach my $entry (@{$Cpd_Aliases{$cpd}{$alias}}){
-		    $Global_Aliases{"Compounds"}{$alias}{$entry}{plantdefault}{$link}=1;
-		    if(exists($BiGG{$alias})){
-			$Global_Aliases{"Compounds"}{"BiGG"}{$entry}{plantdefault}{$link}=1;
-		    }
-		}
-	    }
-	}
-    }
-}
+#	    foreach my $alias (keys %{$Cpd_Aliases{$cpd}}){
+#		foreach my $entry (@{$Cpd_Aliases{$cpd}{$alias}}){
+#		    $Global_Aliases{"Compounds"}{$alias}{$entry}{plantdefault}{$link}=1;
+#		    if(exists($BiGG{$alias})){
+#			$Global_Aliases{"Compounds"}{"BiGG"}{$entry}{plantdefault}{$link}=1;
+#		    }
+#		}
+#	    }
+#	}
+#    }
+#}
 
 %Rxn_Aliases = %{$PlantDefault_JSON->{"reaction_aliases"}};
 foreach my $rxn (keys %Rxn_Aliases){
@@ -99,30 +99,31 @@ foreach my $rxn (keys %Rxn_Aliases){
     }
 }
 
-foreach my $rxn (keys %Rxn_Aliases){
-    if(exists($Rxn_Aliases{$rxn}{"ModelSEED"})){
-	foreach my $link (@{$Rxn_Aliases{$rxn}{"ModelSEED"}}){
+#foreach my $rxn (keys %Rxn_Aliases){
+#    if(exists($Rxn_Aliases{$rxn}{"ModelSEED"})){
+#	foreach my $link (@{$Rxn_Aliases{$rxn}{"ModelSEED"}}){
 	    
-	    foreach my $alias (keys %{$Rxn_Aliases{$link}}){
-		foreach my $entry (@{$Rxn_Aliases{$link}{$alias}}){
-		    $Global_Aliases{"Reactions"}{$alias}{$entry}{plantdefault}{$rxn}=1;
-		    if(exists($BiGG{$alias})){
-			$Global_Aliases{"Reactions"}{"BiGG"}{$entry}{plantdefault}{$rxn}=1;
-		    }
-		}
-	    }
+#	    foreach my $alias (keys %{$Rxn_Aliases{$link}}){
+#		foreach my $entry (@{$Rxn_Aliases{$link}{$alias}}){
+#		    $Global_Aliases{"Reactions"}{$alias}{$entry}{plantdefault}{$rxn}=1;
+#		    if(exists($BiGG{$alias})){
+#			$Global_Aliases{"Reactions"}{"BiGG"}{$entry}{plantdefault}{$rxn}=1;
+#		    }
+#		}
+#	    }
 
-	    foreach my $alias (keys %{$Rxn_Aliases{$rxn}}){
-		foreach my $entry (@{$Rxn_Aliases{$rxn}{$alias}}){
-		    $Global_Aliases{"Reactions"}{$alias}{$entry}{plantdefault}{$link}=1;
-		    if(exists($BiGG{$alias})){
-			$Global_Aliases{"Reactions"}{"BiGG"}{$entry}{plantdefault}{$link}=1;
-		    }
-		}
-	    }
-	}
-    }
-}
+#	    foreach my $alias (keys %{$Rxn_Aliases{$rxn}}){
+#		foreach my $entry (@{$Rxn_Aliases{$rxn}{$alias}}){
+#		    $Global_Aliases{"Reactions"}{$alias}{$entry}{plantdefault}{$link}=1;
+#		    if(exists($BiGG{$alias})){
+#			$Global_Aliases{"Reactions"}{"BiGG"}{$entry}{plantdefault}{$link}=1;
+#		    }
+#		}
+#	    }
+#	}
+#    }
+#}
+
 
 foreach my $entity (["Compounds","cpd"],["Reactions","rxn"]){
     my $file = $entity->[0]."_Aliases.tsv";
