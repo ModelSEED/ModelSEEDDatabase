@@ -302,20 +302,20 @@ if __name__ == "__main__":
             if len(nameDict[name]) > 1:
                 print('Duplicate compound name: %s' % name)
                 for dup in nameDict[name]:
-                    print('Line %05d: %s' % (compounds[dup]['linenum'], compounds[dup]))
+                    print('Line %05d: %s' % (compounds[dup]['linenum'], compounds[dup]['id']))
                 print()
     if args.showBadNames:
         if len(badNameChars) > 0:
             print('Compounds with bad characters in name:')
             for index in range(len(badNameChars)):
-                print('Line %05d: %s' % (compounds[badNameChars[index]]['linenum'], compounds[badNameChars[index]]))
+                print('Line %05d: %s' % (compounds[badNameChars[index]]['linenum'], compounds[badNameChars[index]]['id']))
             print()
     if args.showDupAbbrs:
         for abbr in abbrDict:
             if len(abbrDict[abbr]) > 1:
                 print('Duplicate compound abbreviation: %s' % abbr)
                 for dup in abbrDict[abbr]:
-                    print('Line %05d: %s' % (compounds[dup]['linenum'], compounds[dup]))
+                    print('Line %05d: %s' % (compounds[dup]['linenum'], compounds[dup]['id']))
                 print()
     if args.showBadAbbrs:
         if len(badAbbrChars) > 0:
@@ -331,14 +331,14 @@ if __name__ == "__main__":
             print()
         if len(inconsistentFormula) > 0:
             print('Compounds with formulas that do not match their structures')
-            for index in inconsistentCharge:
-                print('Line %05d: %s' % (compounds[index]['linenum'], compounds[index]))
+            for index in inconsistentFormula:
+                print('Line %05d: %s' % (compounds[index]['linenum'], compounds[index]['id']))
             print()
     if args.showCharges:
         if len(inconsistentCharge) > 0:
             print('Compounds with names that do not match specified charges')
             for index in inconsistentCharge:
-                print('Line %05d: %s' % (compounds[index]['linenum'], compounds[index]))
+                print('Line %05d: %s' % (compounds[index]['linenum'], compounds[index]['id']))
             print()
         if len(largeCharge) > 0:
             print('Compounds with charge larger than %d:' %(args.charge))
@@ -350,7 +350,7 @@ if __name__ == "__main__":
         for inchikey, indices in duplicateStructure.items():
             print('Duplicated chemical structure: %s' % inchikey)
             for index in indices:
-                print('Line %05d: %s' % (compounds[index]['linenum'], compounds[index]))
+                print('Line %05d: %s' % (compounds[index]['linenum'], compounds[index]['id']))
             print()
 
     if args.showCofactors:

@@ -341,7 +341,7 @@ if __name__ == "__main__":
             if len(nameDict[name]) > 1:
                 print('Duplicate reaction name: %s' % name)
                 for dup in nameDict[name]:
-                    print('Line %05d: %s' % (reactions[dup]['linenum'], reactions[dup]))
+                    print('Line %05d: %s' % (reactions[dup]['linenum'], reactions[dup]['id']))
                 print()
     if args.showBadNames:
         if len(badNameChars) > 0:
@@ -405,12 +405,12 @@ if __name__ == "__main__":
         for rxn_list in duplicateEquation.values():
             print('\nReactions with duplicate equations:')
             for index in rxn_list:
-                print('Line %05d: %s' % (reactions[index]['linenum'], reactions[index]))
+                print('Line %05d: %s' % (reactions[index]['linenum'], reactions[index]['id']))
     if args.showUnbalanced:
         if len(unbalanced) > 0:
             print('Unbalenced Reactions:')
             for tup in unbalanced:
-                print('Line %05d: %s' % (reactions[tup[0]]['linenum'], reactions[tup[0]]))
+                print('Line %05d: %s' % (reactions[tup[0]]['linenum'], reactions[tup[0]]['id']))
                 print("Reactant atoms:%s\n Product atoms:%s\n" %
                       (sorted(tup[1].items()), sorted(tup[2].items())))
     if args.showStatus:
