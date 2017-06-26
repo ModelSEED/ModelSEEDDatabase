@@ -2,10 +2,11 @@
 
 import argparse
 import re
-from BiochemHelper import BiochemHelper
-from csv import DictReader
+import sys
 from collections import Counter
-import re
+from csv import DictReader
+from .error_reporting import find_new_errors
+from ..Biochem_Helper import BiochemHelper
 
 desc1 = '''
 NAME
@@ -106,9 +107,12 @@ if __name__ == "__main__":
     reactionDict = helper.buildIndexDictFromListOfObjects(reactions)
     if args.compfile:
         compoundDict = {}
+        obs_compounds = set()
         with open(args.compfile, 'r') as infile:
             for line in DictReader(infile, dialect='excel-tab'):
                 compoundDict[line['id']] = line['formula']
+                if line['is_obsolete']:
+                    obs_compounds.add(line['id'])
 
     # Check for duplicates, missing and invalid values.
     idDict = dict()
@@ -127,6 +131,7 @@ if __name__ == "__main__":
     noEquation = list()
     duplicateEquation = dict()
     unbalanced = list()
+    obsoleteComps = list()
     eqnHashDict = dict()
     noDefinition = list()
     noReactants = list()
@@ -146,6 +151,14 @@ if __name__ == "__main__":
     
     for index in range(len(reactions)):
         rxn = reactions[index]
+
+        # Check for invalid is_obsolete flags.
+        if 'is_obsolete' in rxn:
+            if rxn['is_obsolete'] != 0 and rxn['is_obsolete'] != 1:
+                badObsolete.append(index)
+            if rxn['is_obsolete'] == 1:
+                isObsolete.append(index)
+                continue
         
         # Check for duplicate IDs.
         if rxn['id'] in idDict:
@@ -213,6 +226,8 @@ if __name__ == "__main__":
             product_atoms = get_atom_count(compoundDict, products)
             if reactant_atoms - product_atoms or product_atoms - reactant_atoms:
                 unbalanced.append((index, reactant_atoms, product_atoms))
+            if [cid for cid in reactants + products if cid in obs_compounds]:
+                obsoleteComps.append(index)
 
         if reactants is None and products is None:
             noEquation.append(index)
@@ -257,13 +272,6 @@ if __name__ == "__main__":
         if rxn['is_transport'] == 1:
             isTransport.append(index)
 
-        # Check for invalid is_obsolete flags.
-        if 'is_obsolete' in rxn:
-            if rxn['is_obsolete'] != 0 and rxn['is_obsolete'] != 1:
-                badObsolete.append(index)
-            if rxn['is_obsolete'] == 1:
-                isObsolete.append(index)
-
         # Check that linked reactions are all valid.
         if 'linked_reaction' in rxn:
             linkedRxns = rxn['linked_reaction'].split(';')
@@ -297,6 +305,7 @@ if __name__ == "__main__":
     print('Number of reactions with missing equation: %d' % (len(noEquation)))
     print('Number of reactions with duplicate equations: %d' % (len(duplicateEquation)))
     print('Number of reactions with unbalanced equations: %d' % (len(unbalanced)))
+    print('Number of reactions with obsolete compounds: %d' % (len(obsoleteComps)))
     print('Number of reactions with no reactants: %d' % (len(noReactants)))
     print('Number of reactions with no products: %d' % (len(noProducts)))
     print('Number of reactions with OK status: %d' % (okStatus))
@@ -332,7 +341,7 @@ if __name__ == "__main__":
             if len(nameDict[name]) > 1:
                 print('Duplicate reaction name: %s' % name)
                 for dup in nameDict[name]:
-                    print('Line %05d: %s' % (reactions[dup]['linenum'], reactions[dup]))
+                    print('Line %05d: %s' % (reactions[dup]['linenum'], reactions[dup]['id']))
                 print()
     if args.showBadNames:
         if len(badNameChars) > 0:
@@ -396,12 +405,12 @@ if __name__ == "__main__":
         for rxn_list in duplicateEquation.values():
             print('\nReactions with duplicate equations:')
             for index in rxn_list:
-                print('Line %05d: %s' % (reactions[index]['linenum'], reactions[index]))
+                print('Line %05d: %s' % (reactions[index]['linenum'], reactions[index]['id']))
     if args.showUnbalanced:
         if len(unbalanced) > 0:
             print('Unbalenced Reactions:')
             for tup in unbalanced:
-                print('Line %05d: %s' % (reactions[tup[0]]['linenum'], reactions[tup[0]]))
+                print('Line %05d: %s' % (reactions[tup[0]]['linenum'], reactions[tup[0]]['id']))
                 print("Reactant atoms:%s\n Product atoms:%s\n" %
                       (sorted(tup[1].items()), sorted(tup[2].items())))
     if args.showStatus:
@@ -414,6 +423,13 @@ if __name__ == "__main__":
             for index in range(len(badLink)):
                 print('Line %05d: %s' % (reactions[badLink[index]]['linenum'], reactions[badLink[index]]))
 
-    if any([duplicateId, duplicateEquation, badIdChars, badLink, badNameChars,
-            badAbbrChars, badDirection, badReversibility, badObsolete, badTransport]):
+    error_fields = ['duplicateId', 'duplicateName', 'duplicateEquation',
+                    'unbalanced', 'obsoleteComps', 'badIdChars', 'badLink',
+                    'badNameChars', 'badAbbrChars', 'badDirection',
+                    'badReversibility', 'badObsolete', 'badTransport']
+    errors = dict([(x, eval(x)) if isinstance(eval(x), int)
+                   else (x, len(eval(x))) for x in error_fields])
+    new_errors = find_new_errors('reactions', errors)
+    if new_errors:
+        print("ERRORS: " + ", ".join(new_errors), file=sys.stderr)
         exit(1)

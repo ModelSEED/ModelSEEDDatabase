@@ -1,6 +1,6 @@
 import re
 import os
-from BaseHelper import BaseHelper
+from Scripts.Base_Helper import BaseHelper
 
 ''' Helper methods for working with Biochemistry source files. '''
 

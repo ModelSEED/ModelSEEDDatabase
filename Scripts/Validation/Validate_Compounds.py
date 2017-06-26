@@ -1,10 +1,14 @@
 #! /usr/bin/env python
 
-from rdkit.Chem import AllChem
-from rdkit import RDLogger
 import argparse
 import re
-from BiochemHelper import BiochemHelper
+import sys
+
+from rdkit import RDLogger
+from rdkit.Chem import AllChem
+
+from .error_reporting import find_new_errors
+from ..Biochem_Helper import BiochemHelper
 
 desc1 = '''
 NAME
@@ -112,8 +116,10 @@ if __name__ == "__main__":
     duplicateAbbr = 0
     badAbbrChars = list()
     noFormula = list()
+    inconsistentFormula = list()
     largeCharge = list()
     noCharge = list()
+    inconsistentCharge = list()
     structureDict = dict()
     noStructure = list()
     duplicateStructure = dict()
@@ -131,6 +137,12 @@ if __name__ == "__main__":
 
     for index in range(len(compounds)):
         cpd = compounds[index]
+        # Check for invalid is_obsolete flags. If obsolete, don't bother checking anything else
+        if cpd['is_obsolete'] != 0 and cpd['is_obsolete'] != 1:
+            badObsolete.append(index)
+        if cpd['is_obsolete'] == 1:
+            numObsolete += 1
+            continue
         
         # Check for duplicate IDs.
         if cpd['id'] in idDict:
@@ -191,6 +203,8 @@ if __name__ == "__main__":
                 duplicateStructure[inchikey].append(index)
             else:
                 structureDict[inchikey] = index
+            if cpd['formula'] != AllChem.CalcMolFormula(mol):
+                inconsistentFormula.append(index)
         else:
             noStructure.append(index)
 
@@ -200,6 +214,10 @@ if __name__ == "__main__":
                 largeCharge.append(index)
         else:
             noCharge.append(index)
+
+        m = re.search('(\d)\+', cpd['name'])
+        if m and int(m.group(1)) != int(cpd['charge']):
+            inconsistentCharge.append(index)
 
         # Check for invalid is_core flags.
         if cpd['is_core'] != 0 and cpd['is_core'] != 1:
@@ -246,8 +264,10 @@ if __name__ == "__main__":
     print('Number of compounds with duplicate abbreviations: %d' % duplicateAbbr)
     print('Number of compounds with bad characters in abbreviation: %d' % len(badAbbrChars))
     print('Number of compounds with no formula: %d' % len(noFormula))
+    print('Number of compounds with inconsistent formula and structure: %d' % len(inconsistentFormula))
     print('Number of compounds with charge larger than %d: %d' % (args.charge, len(largeCharge)))
     print('Number of compounds with no charge: %d' % len(noCharge))
+    print('Number of compounds with inconsistent charge and structure: %d' % len(inconsistentCharge))
     print('Number of compounds with no structure: %d' % len(noStructure))
     print('Number of compounds with duplicate structure: %d' % len(duplicateStructure))
     print('Number of compounds with bad is_core flag: %d' % len(badCore))
@@ -282,20 +302,20 @@ if __name__ == "__main__":
             if len(nameDict[name]) > 1:
                 print('Duplicate compound name: %s' % name)
                 for dup in nameDict[name]:
-                    print('Line %05d: %s' % (compounds[dup]['linenum'], compounds[dup]))
+                    print('Line %05d: %s' % (compounds[dup]['linenum'], compounds[dup]['id']))
                 print()
     if args.showBadNames:
         if len(badNameChars) > 0:
             print('Compounds with bad characters in name:')
             for index in range(len(badNameChars)):
-                print('Line %05d: %s' % (compounds[badNameChars[index]]['linenum'], compounds[badNameChars[index]]))
+                print('Line %05d: %s' % (compounds[badNameChars[index]]['linenum'], compounds[badNameChars[index]]['id']))
             print()
     if args.showDupAbbrs:
         for abbr in abbrDict:
             if len(abbrDict[abbr]) > 1:
                 print('Duplicate compound abbreviation: %s' % abbr)
                 for dup in abbrDict[abbr]:
-                    print('Line %05d: %s' % (compounds[dup]['linenum'], compounds[dup]))
+                    print('Line %05d: %s' % (compounds[dup]['linenum'], compounds[dup]['id']))
                 print()
     if args.showBadAbbrs:
         if len(badAbbrChars) > 0:
@@ -309,7 +329,17 @@ if __name__ == "__main__":
             for index in range(len(noFormula)):
                 print('Line %05d: %s' % (compounds[noFormula[index]]['linenum'], compounds[noFormula[index]]))
             print()
+        if len(inconsistentFormula) > 0:
+            print('Compounds with formulas that do not match their structures')
+            for index in inconsistentFormula:
+                print('Line %05d: %s' % (compounds[index]['linenum'], compounds[index]['id']))
+            print()
     if args.showCharges:
+        if len(inconsistentCharge) > 0:
+            print('Compounds with names that do not match specified charges')
+            for index in inconsistentCharge:
+                print('Line %05d: %s' % (compounds[index]['linenum'], compounds[index]['id']))
+            print()
         if len(largeCharge) > 0:
             print('Compounds with charge larger than %d:' %(args.charge))
             for index in range(len(largeCharge)):
@@ -320,7 +350,7 @@ if __name__ == "__main__":
         for inchikey, indices in duplicateStructure.items():
             print('Duplicated chemical structure: %s' % inchikey)
             for index in indices:
-                print('Line %05d: %s' % (compounds[index]['linenum'], compounds[index]))
+                print('Line %05d: %s' % (compounds[index]['linenum'], compounds[index]['id']))
             print()
 
     if args.showCofactors:
@@ -349,6 +379,15 @@ if __name__ == "__main__":
                 line = '%s\t%s\t%s\t%s\t%d\t%d\n' % (cpd['id'], cpd['name'], cpd['abbreviation'], cpd['formula'], cpd['defaultCharge'], cpd['isCofactor'])
                 handle.write(line)
 
-    if any([duplicateId, noCharge, badIdChars, badAbbrChars, duplicateStructure,
-            badCofactor, badCore, badLink, badNameChars, badObsolete]):
+    error_fields = ['duplicateId', 'duplicateAbbr', 'duplicateName',
+                    'duplicateStructure', 'noCharge', 'badIdChars',
+                    'badAbbrChars', 'badCofactor', 'badCore', 'badLink',
+                    'badNameChars', 'badObsolete', 'inconsistentCharge',
+                    'inconsistentFormula']
+    errors = dict([(x, eval(x)) if isinstance(eval(x), int)
+                   else (x, len(eval(x)))for x in error_fields])
+    new_errors = find_new_errors('compounds', errors)
+
+    if new_errors:
+        print("NEW ERRORS: " + ", ".join(new_errors), file=sys.stderr)
         exit(1)
