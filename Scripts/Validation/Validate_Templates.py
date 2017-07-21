@@ -5,9 +5,11 @@ import os
 import sys
 import argparse
 
+imbalenced = {}
 
 def get_id_set(tsv_path):
     with open(tsv_path) as infile:
+        global imbalenced
         ids = set()
         obs = {}
         for line in DictReader(infile, dialect='excel-tab'):
@@ -15,6 +17,7 @@ def get_id_set(tsv_path):
                 obs[line['id']] = line.get('linked_reaction', "").split(';')[0]
                 continue
             if 'status' in line and ("MI" in line['status']):
+                imbalenced[line['id']] = ", ".join([line['id'], line['name'], line['code'], line['status']])
                 continue
             ids.add(line['id'])
     return ids, obs
@@ -54,7 +57,7 @@ def remove_ids(path, ids):
     ids = set(ids)
     txt = open(path).readlines()
     with open(path, 'w') as outfile:
-        outfile.writelines([x for x in txt if (x.split('\t')[0] not in ids)])
+        outfile.writelines([x if (x.split('\t')[0] not in ids) else print(x) for x in txt])
 
 def update_obsolete(path, obs_rxns):
     txt = open(path).readlines()
@@ -112,6 +115,9 @@ if __name__ == '__main__':
         if undef_rxns:
             print("ERROR-%s Invalid Reactions: %s"
                   % (len(undef_rxns), ", ".join(undef_rxns)))
+            for x in undef_rxns:
+                if x in imbalenced:
+                    print(imbalenced[x])
             exit_code = 1
         if undef_complex:
             print("ERROR-%s Invalid Complexes: %s"
