@@ -9,7 +9,6 @@ from rdkit.Chem import AllChem
 
 from .error_reporting import find_new_errors
 from ..Biochem_Helper import BiochemHelper
-from repostat.stash import StatStash
 
 desc1 = '''
 NAME
