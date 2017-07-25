@@ -31,7 +31,7 @@ def find_new_errors(script, errors):
     new_errors = []
     for err, val in errors.items():
         # this checks to see if any errors types get worse
-        if val - master_errors[err]:
+        if val > master_errors[err]:
             print("%s new %s errors detected" % (val - master_errors[err], err))
             new_errors.append(err)
     return new_errors
