@@ -13,6 +13,7 @@ install:
   - conda create -q -y  -c rdkit -n test-environment python=$TRAVIS_PYTHON_VERSION rdkit
   - source activate test-environment
   - pip install keen
+  - pip install repostat
 script:
   - python -m Scripts.Validation.Validate_Templates
   - python -m Scripts.Validation.Validate_Annotations_Media
