@@ -92,6 +92,7 @@ if __name__ == "__main__":
         args.showBadIds = True
         args.showDupNames = True
         args.showBadNames = True
+        args.showBadAbbrs = True
         args.showDupEquations = True
         args.showStatus = True
         args.showUnbalanced = True
