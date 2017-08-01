@@ -5,7 +5,9 @@ import re
 import sys
 from collections import Counter
 from csv import DictReader
-from .error_reporting import find_new_errors
+
+from repostat.stash import StatStash
+from .error_reporting import find_new_errors, report_errors
 from ..Biochem_Helper import BiochemHelper
 
 desc1 = '''
@@ -430,6 +432,11 @@ if __name__ == "__main__":
     errors = dict([(x, eval(x)) if isinstance(eval(x), int)
                    else (x, len(eval(x))) for x in error_fields])
     new_errors = find_new_errors('reactions', errors)
+    report_errors('reactions', errors)
+    stash = StatStash('redis://redis-16221.c12.us-east-1-4.ec2.cloud.redislabs.com:16221')
+    stash.report_stats('reactions', errors)
+
+
     if new_errors:
         print("ERRORS: " + ", ".join(new_errors), file=sys.stderr)
         exit(1)
