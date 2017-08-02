@@ -6,6 +6,8 @@ from subprocess import call
 from shutil import move
 
 
+mol_convert_path = "/Applications/MarvinSuite/bin/molconvert"
+
 def generate_image_files(compounds_file, path, structure_key='structure', dir_depth=0,
                          img_type='svg', formating='-a,nosource,w500,h500'):
     """Generates image files for compounds in database using ChemAxon's
@@ -50,7 +52,7 @@ def generate_image_files(compounds_file, path, structure_key='structure', dir_de
                    % (path, img_type, img_type, formating, tmp_structures)],
                   shell=True)
     else:
-        rc = call(["molconvert -mgo %s/.%s %s:%s %s" % (
+        rc = call([mol_convert_path + " -mgo %s/.%s %s:%s %s" % (
             path, img_type, img_type, formating, tmp_structures)], shell=True)
     if rc:
         raise RuntimeError("molconvert returned %s" % rc)
@@ -92,7 +94,8 @@ def safe_generate_image_files(compounds_file, path, structure_key='structure',
     :type img_type: str
 
     """
-    tmp_structures = path[:-4] + 'structures.tmp'
+    tmp_structures = os.path.dirname(__file__) + '/structures.tmp'
+    path = os.path.dirname(__file__) + "/" + path
     if not os.path.exists(path):
         os.mkdir(path)
     with open(compounds_file) as infile:
@@ -109,8 +112,7 @@ def safe_generate_image_files(compounds_file, path, structure_key='structure',
             if not os.path.exists(new):
                 os.makedirs(new)
             new = os.path.join(new, line['id'] + '.' + img_type)
-            rc = call(["molconvert -Yo %s %s:%s %s"
-                       % (new, img_type, formating, tmp_structures)], shell=True)
+            rc = call([mol_convert_path, '-Yo', new, img_type+":"+formating, tmp_structures])
     os.remove(tmp_structures)
 
 if __name__ == '__main__':
