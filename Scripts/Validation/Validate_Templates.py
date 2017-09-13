@@ -57,7 +57,7 @@ def remove_ids(path, ids):
     ids = set(ids)
     txt = open(path).readlines()
     with open(path, 'w') as outfile:
-        outfile.writelines([x if (x.split('\t')[0] not in ids) else print(x) for x in txt])
+        outfile.writelines([x for x in txt if (x.split('\t')[0] not in ids)])
 
 def update_obsolete(path, obs_rxns):
     txt = open(path).readlines()
@@ -97,7 +97,12 @@ if __name__ == '__main__':
     rxn_ids, obs_rxns = get_id_set(args.rxn_tsv)
     complex_ids = get_id_set(args.complex_tsv)[0] | {'universal', 'null'}
     exit_code = 0
+    #The following reactions are inherently unbalanced so we give them a pass
+    whitelist_rxns = {'rxn05296', 'rxn05294', 'rxn11921', 'rxn11922'}
     for template in os.listdir(args.template_dir):
+        # Skip validation on Mayo clinic templates
+        if template in {'Human', 'Microbial', 'Mycobacteria'}:
+            continue
         if not os.path.isdir(os.path.join(args.template_dir, template)):
             continue
         print("Validating %s template" % template)
@@ -112,6 +117,7 @@ if __name__ == '__main__':
             print("ERROR-%s Invalid Compounds: %s"
                   % (len(undef_comps), ", ".join(undef_comps)))
             exit_code = 1
+        undef_rxns -= whitelist_rxns
         if undef_rxns:
             print("ERROR-%s Invalid Reactions: %s"
                   % (len(undef_rxns), ", ".join(undef_rxns)))
@@ -123,11 +129,11 @@ if __name__ == '__main__':
             print("ERROR-%s Invalid Complexes: %s"
                   % (len(undef_complex), ", ".join(undef_complex)))
             exit_code = 1
+        if args.update and undef_rxns:
+            update_obsolete('%s/%s/Reactions.tsv' % (args.template_dir, template), obs_rxns)
         if args.delete and undef_comps:
             remove_ids('%s/%s/BiomassCompounds.tsv' % (args.template_dir, template), undef_comps)
         if args.delete and undef_rxns:
             remove_ids('%s/%s/Reactions.tsv' % (args.template_dir, template), undef_rxns)
-        if args.update and undef_rxns:
-            update_obsolete('%s/%s/Reactions.tsv' % (args.template_dir, template), obs_rxns)
 
     exit(exit_code)
