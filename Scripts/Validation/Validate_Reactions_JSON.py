@@ -25,6 +25,7 @@ def get_atom_count(compoundDict, complist):
                 atom_counts[pair[0]] += float(stoich)
             else:
                 atom_counts[pair[0]] += int(pair[1]) * float(stoich)
+    atom_counts = Counter({k: round(v, 1) for k, v in atom_counts.items()})
     return atom_counts
 
 
