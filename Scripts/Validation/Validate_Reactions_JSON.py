@@ -8,6 +8,26 @@ import argparse
 import json
 
 
+def parse_rxn(_rxn):
+    # returns a tuple of dicts with compounds as keys and stoich as values
+    _rxn = _rxn.translate(str.maketrans("", "", "()"))
+    return [dict([compound[:-3].split()[::-1] for compound in half.split(' + ')])
+            if half else {} for half in re.split(' <?=>? ', _rxn)]
+
+
+def get_atom_count(compoundDict, complist):
+    atom_counts = Counter()
+    for id, stoich in complist.items():
+        if compoundDict[id]['formula'] == 'null':
+            continue
+        for pair in re.findall('([A-Z][a-z]?)(\d*)', compoundDict[id]['formula']):
+            if not pair[1]:
+                atom_counts[pair[0]] += float(stoich)
+            else:
+                atom_counts[pair[0]] += int(pair[1]) * float(stoich)
+    return atom_counts
+
+
 def validate_schema(_rxns, verbose):
     v = Draft4Validator(schemas.reactions)
     schema_errors = sorted(v.iter_errors(rxns), key=lambda x: x.path)
@@ -38,7 +58,7 @@ def check_dups(_rxns, verbose, unique_fields=('id', 'abbreviation',
 
 
 def check_compounds(_rxns, verbose, compound_loc='./Biochemistry/compounds.json'):
-    err = {'obsolete_comps': 0}
+    err = defaultdict(int)
     compounds = json.load(open(compound_loc))
     obsolete_comps = set(cid for cid, comp in compounds.items()
                          if comp['is_obsolete'] == '1')
@@ -51,6 +71,32 @@ def check_compounds(_rxns, verbose, compound_loc='./Biochemistry/compounds.json'
                 print('Obsolete compounds in {}: {}'
                       .format(id, comp_ids & obsolete_comps))
             err['obsolete_comps'] += 1
+        try:
+            reactants, products = parse_rxn(rxn['equation'])
+        except ValueError as e:
+            print("Unable to parse {}: {}".format(rxn['equation'], e))
+            err['invalid_equation'] += 1
+        try:
+            reactant_atoms = get_atom_count(compounds, reactants)
+            product_atoms = get_atom_count(compounds, products)
+        except KeyError as e:
+            print('Invalid id {} in equation {}'.format(id, e))
+            err['invalid_equation'] += 1
+        if reactant_atoms - product_atoms or product_atoms - reactant_atoms:
+            if verbose:
+                print('Unbalanced reaction in {}\n{}\n{}'
+                      .format(id, reactant_atoms, product_atoms))
+            err['unbalanced_reactions'] += 1
+            if rxn['status'] == 'OK':
+                if verbose:
+                    print('Unbalanced reaction marked OK {}\n{}\n{}'
+                          .format(id, reactant_atoms, product_atoms))
+                err['unbalanced_marked_OK'] += 1
+        if comp_ids ^ set(list(reactants.keys()) + list(products.keys())):
+            if verbose:
+                print('"compound_ids" and "equation" are inconsistant in {}:\n{}\n{}'
+                      .format(id, rxn['compound_ids'], rxn['code']))
+            err['inconsistent_equation_compids'] += 1
     return err
 
 
