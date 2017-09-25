@@ -1,86 +1,94 @@
-import os, json
+import os
+import json
+
 
 class Reactions:
     def __init__(self):
-        self.BiochemRoot='../../Biochemistry/'
-        self.RxnsFile=self.BiochemRoot+'reactions.tsv'
+        self.BiochemRoot = '../../Biochemistry/'
+        self.RxnsFile = self.BiochemRoot + 'reactions.tsv'
 
-        RxnsFileHandle = open(self.RxnsFile,'r')
-        HeaderLine = RxnsFileHandle.readline().strip()
-        self.Headers = HeaderLine.split("\t")
+        rxns_file_handle = open(self.RxnsFile, 'r')
+        header_line = rxns_file_handle.readline().strip()
+        self.Headers = header_line.split("\t")
 
         from BiochemPy import Compounds
-        self.CompoundsHelper=Compounds()
+        self.CompoundsHelper = Compounds()
         self.Compounds_Dict = self.CompoundsHelper.loadCompounds()
 
     def loadReactions(self):
-        RxnsFile = open(self.RxnsFile,'r')
-        RxnsFile.readline()
+        rxns_file = open(self.RxnsFile, 'r')
+        rxns_file.readline()
 
-        RxnsDict = dict()
-        for line in RxnsFile.readlines():
-            line=line.strip()
+        rxns_dict = dict()
+        for line in rxns_file.readlines():
+            line = line.strip()
             items = line.split("\t")
-            RxnsDict[items[0]] = dict()
+            rxns_dict[items[0]] = dict()
             for i in range(len(self.Headers)):
-                item="null"
-                if(i < len(items)):
-                    item=items[i]
+                item = "null"
+                if (i < len(items)):
+                    item = items[i]
 
-                #capture ints
-                for header in ["is_transport","is_obsolete"]:
-                    if(self.Headers[i] == header):
-                        item=int(item)
+                # capture ints
+                for header in ["is_transport", "is_obsolete"]:
+                    if (self.Headers[i] == header):
+                        item = int(item)
 
-                #capture floats
-                #for header in ["deltag","deltagerr"]:
+                # capture floats
+                # for header in ["deltag","deltagerr"]:
                 #    if(self.Headers[i] == header):
                 #        item=float(item)
 
-                RxnsDict[items[0]][self.Headers[i]]=item
+                rxns_dict[items[0]][self.Headers[i]] = item
 
-        return RxnsDict
+        return rxns_dict
 
-    def parseStoich(self,stoichiometry):
-        Rxn_Cpds_Array=list()
+    def parseStoich(self, stoichiometry):
+        rxn_cpds_array = list()
         for rgt in stoichiometry.split(";"):
-            (coeff,cpd,cpt,index,name) = rgt.split(":",4)
-            rgt_id = cpd+"_"+cpt+index
+            (coeff, cpd, cpt, index, name) = rgt.split(":", 4)
+            rgt_id = cpd + "_" + cpt + index
 
-            coeff=float(coeff)
+            coeff = float(coeff)
 
-            #Correct for redundant ".0" in floats
-            if(str(coeff)[-2:] == ".0"):
-                coeff=int(round(coeff))
+            # Correct for redundant ".0" in floats
+            if (str(coeff)[-2:] == ".0"):
+                coeff = int(round(coeff))
 
-            cpt=int(cpt)
-            index=int(index)
+            cpt = int(cpt)
+            index = int(index)
 
-            Rxn_Cpds_Array.append({"reagent":rgt_id,"coefficient":coeff,
-                                   "compound":cpd,"compartment":cpt,"index":index,"name":name,
-                                   "formula":self.Compounds_Dict[cpd]["formula"],
-                                   "charge":self.Compounds_Dict[cpd]["charge"]})
-        return Rxn_Cpds_Array
+            rxn_cpds_array.append({"reagent": rgt_id, "coefficient": coeff,
+                                   "compound": cpd, "compartment": cpt,
+                                   "index": index, "name": name,
+                                   "formula": self.Compounds_Dict[cpd][
+                                       "formula"],
+                                   "charge": self.Compounds_Dict[cpd][
+                                       "charge"]})
+        return rxn_cpds_array
 
-    def buildStoich(self,Rxn_Cpds_Array):
-        Stoichiometry_Array = list()
-        for rgt in sorted(Rxn_Cpds_Array, key = lambda x: (int(x["coefficient"] > 0),x["reagent"])):
+    def buildStoich(self, rxn_cpds_array):
+        stoichiometry_array = list()
+        for rgt in sorted(rxn_cpds_array, key=lambda x: (
+        int(x["coefficient"] > 0), x["reagent"])):
 
-            #Correct for redundant ".0" in floats
-            if(str(rgt["coefficient"])[-2:] == ".0"):
-                rgt["coefficient"]=int(round(rgt["coefficient"]))
+            # Correct for redundant ".0" in floats
+            if (str(rgt["coefficient"])[-2:] == ".0"):
+                rgt["coefficient"] = int(round(rgt["coefficient"]))
 
-            rgt["coefficient"]=str(rgt["coefficient"])
-            rgt["compartment"]=str(rgt["compartment"])
-            rgt["index"]=str(rgt["index"])
+            rgt["coefficient"] = str(rgt["coefficient"])
+            rgt["compartment"] = str(rgt["compartment"])
+            rgt["index"] = str(rgt["index"])
 
-            Rgt_String = ":".join([rgt["coefficient"],rgt["compound"],rgt["compartment"],rgt["index"],rgt["name"]])
-            Stoichiometry_Array.append(Rgt_String)
-        Stoichiometry_String = ";".join(Stoichiometry_Array)
-        return Stoichiometry_String
+            rgt_string = ":".join(
+                [rgt["coefficient"], rgt["compound"], rgt["compartment"],
+                 rgt["index"], rgt["name"]])
+            stoichiometry_array.append(rgt_string)
+        stoichiometry_string = ";".join(stoichiometry_array)
+        return stoichiometry_string
 
-    def balanceReaction(self,Rgts_Array):
-        if(len(Rgts_Array)==0):
+    def balanceReaction(self, rgts_array):
+        if (len(rgts_array) == 0):
             return "EMPTY"
 
         ########################################
@@ -88,14 +96,14 @@ class Reactions:
         # different compound or in a different
         # compartment, and report.
         ########################################
-        Rgts_Dict=dict()
-        for rgt in Rgts_Array:
-            if(rgt["reagent"] not in Rgts_Dict):
-                Rgts_Dict[rgt["reagent"]]=0
-            Rgts_Dict[rgt["reagent"]]+=1
+        rgts_dict = dict()
+        for rgt in rgts_array:
+            if (rgt["reagent"] not in rgts_dict):
+                rgts_dict[rgt["reagent"]] = 0
+            rgts_dict[rgt["reagent"]] += 1
 
-        for rgt in Rgts_Dict.keys():
-            if(Rgts_Dict[rgt]>1):
+        for rgt in rgts_dict.keys():
+            if (rgts_dict[rgt] > 1):
                 return "ERROR: Duplicate reagents"
 
         ########################################
@@ -103,89 +111,93 @@ class Reactions:
         # different compartments, these are 
         # balanced directly.
         #######################################
-        Cpds_Coeff_Dict=dict()
-        for rgt in Rgts_Array:
-            cpd=rgt["compound"]
-            if(cpd not in Cpds_Coeff_Dict):
-                Cpds_Coeff_Dict[cpd]=0
+        cpds_coeff_dict = dict()
+        for rgt in rgts_array:
+            cpd = rgt["compound"]
+            if (cpd not in cpds_coeff_dict):
+                cpds_coeff_dict[cpd] = 0
 
-            #Use float() because you can get real coefficients
-            Cpds_Coeff_Dict[cpd]+=float(rgt["coefficient"])
+            # Use float() because you can get real coefficients
+            cpds_coeff_dict[cpd] += float(rgt["coefficient"])
 
-        #Build dict of compounds
-        Cpds_Dict=dict()
-        for rgt in Rgts_Array:
-            rgt["coefficient"]=Cpds_Coeff_Dict[rgt["compound"]]
-            Cpds_Dict[rgt["compound"]]=rgt
+        # Build dict of compounds
+        cpds_dict = dict()
+        for rgt in rgts_array:
+            rgt["coefficient"] = cpds_coeff_dict[rgt["compound"]]
+            cpds_dict[rgt["compound"]] = rgt
 
         ########################################
         # Check for duplicate elements, across
         # all compounds, these are balanced 
         # directly.
         #######################################
-        Rxn_Net_Charge=0.0
-        Rxn_Net_Mass=dict()
-        for cpd in Cpds_Dict.keys():
-            cpdAtoms = self.CompoundsHelper.parseFormula(Cpds_Dict[cpd]["formula"])
-            if(len(cpdAtoms.keys())==0):
+        rxn_net_charge = 0.0
+        rxn_net_mass = dict()
+        for cpd in cpds_dict.keys():
+            cpd_atoms = self.CompoundsHelper.parseFormula(
+                cpds_dict[cpd]["formula"])
+            if (len(cpd_atoms.keys()) == 0):
                 return "CPDFORMERROR"
 
-            Cpd_Coeff_Charge = float(Cpds_Dict[cpd]["charge"]) * float(Cpds_Dict[cpd]["coefficient"])
-            Rxn_Net_Charge += Cpd_Coeff_Charge
+            cpd_coeff_charge = float(cpds_dict[cpd]["charge"]) * float(
+                cpds_dict[cpd]["coefficient"])
+            rxn_net_charge += cpd_coeff_charge
 
-            for atom in cpdAtoms.keys():
-                Atom_Coeff_Mass = float(cpdAtoms[atom]) * float(Cpds_Dict[cpd]["coefficient"])
+            for atom in cpd_atoms.keys():
+                atom_coeff_mass = float(cpd_atoms[atom]) * float(
+                    cpds_dict[cpd]["coefficient"])
 
-                if(atom not in Rxn_Net_Mass.keys()):
-                    Rxn_Net_Mass[atom]=0.0
+                if (atom not in rxn_net_mass.keys()):
+                    rxn_net_mass[atom] = 0.0
 
-                Rxn_Net_Mass[atom] += Atom_Coeff_Mass
+                rxn_net_mass[atom] += atom_coeff_mass
 
-        #Round out tiny numbers that occur because we add/substract floats
-        #Threshold of 1e-6 found to capture all these instances without
-        #removing actual small differences in mass.
-        for atom in Rxn_Net_Mass.keys():
-            if(Rxn_Net_Mass[atom] > -1e-6 and Rxn_Net_Mass[atom] < 1e-6):
-                Rxn_Net_Mass[atom]=0
+        # Round out tiny numbers that occur because we add/substract floats
+        # Threshold of 1e-6 found to capture all these instances without
+        # removing actual small differences in mass.
+        for atom in rxn_net_mass.keys():
+            if (rxn_net_mass[atom] > -1e-6 and rxn_net_mass[atom] < 1e-6):
+                rxn_net_mass[atom] = 0
 
-        if(Rxn_Net_Charge > -1e-6 and Rxn_Net_Charge < 1e-6):
-            Rxn_Net_Charge=0
-            
-        #Report any imbalance
-        Imbalanced_Atoms_Array=list()
-        for atom in sorted(Rxn_Net_Mass.keys()):
-            if(Rxn_Net_Mass[atom]==0):
+        if (rxn_net_charge > -1e-6 and rxn_net_charge < 1e-6):
+            rxn_net_charge = 0
+
+        # Report any imbalance
+        imbalanced_atoms_array = list()
+        for atom in sorted(rxn_net_mass.keys()):
+            if (rxn_net_mass[atom] == 0):
                 continue
 
-            #Correct for redundant ".0" in floats
-            if(str(Rxn_Net_Mass[atom])[-2:] == ".0"):
-                Rxn_Net_Mass[atom]=int(round(Rxn_Net_Mass[atom]))
+            # Correct for redundant ".0" in floats
+            if (str(rxn_net_mass[atom])[-2:] == ".0"):
+                rxn_net_mass[atom] = int(round(rxn_net_mass[atom]))
 
-            Imbalanced_Atoms_Array.append(atom+":"+str(Rxn_Net_Mass[atom]))
-            
-        #Correct for redundant ".0" in floats
-        if(str(Rxn_Net_Charge)[-2:] == ".0"):
-            Rxn_Net_Charge=int(Rxn_Net_Charge)
+            imbalanced_atoms_array.append(atom + ":" + str(rxn_net_mass[atom]))
 
-        Status=""
+        # Correct for redundant ".0" in floats
+        if (str(rxn_net_charge)[-2:] == ".0"):
+            rxn_net_charge = int(rxn_net_charge)
 
-        if(len(Imbalanced_Atoms_Array)>0):
-            Status = "MI:"+"/".join(Imbalanced_Atoms_Array)
+        status = ""
 
-        if(Rxn_Net_Charge != 0):
-            if(len(Status)>0):
-                Status = "CI:"+str(Rxn_Net_Charge)
+        if (len(imbalanced_atoms_array) > 0):
+            status = "MI:" + "/".join(imbalanced_atoms_array)
+
+        if (rxn_net_charge != 0):
+            if (len(status) > 0):
+                status = "CI:" + str(rxn_net_charge)
             else:
-                Status += "|CI:"+str(Rxn_Net_Charge)
+                status += "|CI:" + str(rxn_net_charge)
 
-        if(Status == ""):
-            Status = "OK"
+        if (status == ""):
+            status = "OK"
 
-        return Status
+        return status
 
-    def adjustCompound(self,Rxn_Cpds_Array,Compound,Adjustment,Compartment=0):
-        if(Adjustment==0):
-            return Rxn_Cpds_Array
+    def adjustCompound(self, rxn_cpds_array, compound, adjustment,
+                       compartment=0):
+        if (adjustment == 0):
+            return rxn_cpds_array
 
         ######################################################################
         # We will always assume to adjust a compound automatically
@@ -193,95 +205,106 @@ class Reactions:
         # This answers the question of how to handle transporters.
         ######################################################################
 
-        #Check to see if it already exists
-        Cpd_Exists=0
-        for rgt in Rxn_Cpds_Array:
-            if(rgt["compound"]==Compound and rgt["compartment"]==Compartment):
-                rgt["coefficient"] += Adjustment
-                Cpd_Exists=1
+        # Check to see if it already exists
+        cpd_exists = 0
+        for rgt in rxn_cpds_array:
+            if (rgt["compound"] == compound and
+                        rgt["compartment"] == compartment):
+                rgt["coefficient"] += adjustment
+                cpd_exists = 1
 
-        if(Cpd_Exists != 1):
-            rgt_id = Compound+"_"+str(Compartment)+"0"
+        if (cpd_exists != 1):
+            rgt_id = compound + "_" + str(compartment) + "0"
 
-            Rxn_Cpds_Array.append({"reagent":rgt_id,"coefficient":Adjustment,
-                                   "compound":Compound,"compartment":Compartment,"index":0,
-                                   "name":self.Compounds_Dict[Compound]["name"],
-                                   "formula":self.Compounds_Dict[Compound]["formula"],
-                                   "charge":self.Compounds_Dict[Compound]["charge"]})            
+            rxn_cpds_array.append(
+                {"reagent": rgt_id, "coefficient": adjustment,
+                 "compound": compound, "compartment": compartment, "index": 0,
+                 "name": self.Compounds_Dict[compound]["name"],
+                 "formula": self.Compounds_Dict[compound]["formula"],
+                 "charge": self.Compounds_Dict[compound]["charge"]})
         return
 
-    def rebuildReaction(self,Reaction_Dict,Stoichiometry):
-        #Assign stoich
-        Reaction_Dict["stoichiometry"]=Stoichiometry
+    def rebuildReaction(self, reaction_dict, stoichiometry):
+        # Assign stoich
+        reaction_dict["stoichiometry"] = stoichiometry
 
-        #Build list of "reagents" and "products"
-        Rxn_Cpds_Array=self.parseStoich(Stoichiometry)
-        Reagents_Array=list()
-        Products_Array=list()
-        CompoundIDs_Dict=dict()
-        for rgt in Rxn_Cpds_Array:
-            CompoundIDs_Dict[rgt["compound"]]=1
-            if(rgt["coefficient"]>0):
-                Products_Array.append(rgt)
+        # Build list of "reagents" and "products"
+        rxn_cpds_array = self.parseStoich(stoichiometry)
+        reagents_array = list()
+        products_array = list()
+        compound_ids_dict = dict()
+        for rgt in rxn_cpds_array:
+            compound_ids_dict[rgt["compound"]] = 1
+            if (rgt["coefficient"] > 0):
+                products_array.append(rgt)
             else:
-                Reagents_Array.append(rgt)
+                reagents_array.append(rgt)
 
-        RgtsStr_Array=list()
-        for rgt in Reagents_Array:
-            ID_String = "("+str(abs(rgt["coefficient"]))+") "+rgt["compound"]+"["+str(rgt["index"])+"]"
-            RgtsStr_Array.append(ID_String)
+        rgts_str__array = list()
+        for rgt in reagents_array:
+            id_string = "(" + str(abs(rgt["coefficient"])) + ") " + rgt[
+                "compound"] + "[" + str(rgt["index"]) + "]"
+            rgts_str__array.append(id_string)
 
-        Equation_Array=list()
-        Code_Array=list()
-        Definition_Array=list()
+        equation_array = list()
+        code_array = list()
+        definition_array = list()
 
-        Equation_Array.append(" + ".join(RgtsStr_Array))
-        Definition_Array.append(" + ".join(RgtsStr_Array))
-        Code_Array.append(" + ".join(x for x in RgtsStr_Array if "cpd00067" not in x))
-                    
-        Code_Array.append("<=>")
-        if(Reaction_Dict["direction"] == "="):
-            Equation_Array.append("<=>")
-            Definition_Array.append("<=>")
-        elif(Reaction_Dict["direction"] == "<"):
-            Equation_Array.append("<=")
-            Definition_Array.append("<=")
+        equation_array.append(" + ".join(rgts_str__array))
+        definition_array.append(" + ".join(rgts_str__array))
+        code_array.append(
+            " + ".join(x for x in rgts_str__array if "cpd00067" not in x))
+
+        code_array.append("<=>")
+        if (reaction_dict["direction"] == "="):
+            equation_array.append("<=>")
+            definition_array.append("<=>")
+        elif (reaction_dict["direction"] == "<"):
+            equation_array.append("<=")
+            definition_array.append("<=")
         else:
-            Equation_Array.append("=>")
-            Definition_Array.append("=>")
+            equation_array.append("=>")
+            definition_array.append("=>")
 
-        PdtsStr_Array=list()
-        for rgt in Products_Array:
-            ID_String = "("+str(abs(rgt["coefficient"]))+") "+rgt["compound"]+"["+str(rgt["index"])+"]"
-            PdtsStr_Array.append(ID_String)
+        pdts_str_array = list()
+        for rgt in products_array:
+            id_string = "(" + str(abs(rgt["coefficient"])) + ") " + rgt[
+                "compound"] + "[" + str(rgt["index"]) + "]"
+            pdts_str_array.append(id_string)
 
-        Equation_Array.append(" + ".join(PdtsStr_Array))
-        Definition_Array.append(" + ".join(PdtsStr_Array))
-        Code_Array.append(" + ".join(x for x in PdtsStr_Array if "cpd00067" not in x))
+        equation_array.append(" + ".join(pdts_str_array))
+        definition_array.append(" + ".join(pdts_str_array))
+        code_array.append(
+            " + ".join(x for x in pdts_str_array if "cpd00067" not in x))
 
-        Reaction_Dict["code"]=" ".join(Code_Array)
-        Reaction_Dict["equation"]=" ".join(Equation_Array)
-        Reaction_Dict["definition"]=" ".join(Definition_Array)
-        Reaction_Dict["compound_ids"]=";".join(sorted(CompoundIDs_Dict.keys()))
-        
-        #Replace ids with names in Definition
-        for cpd_id in CompoundIDs_Dict.keys():
-            if(cpd_id in Reaction_Dict["definition"]):
-                Reaction_Dict["definition"] = Reaction_Dict["definition"].replace(cpd_id,self.Compounds_Dict[cpd_id]["name"])
+        reaction_dict["code"] = " ".join(code_array)
+        reaction_dict["equation"] = " ".join(equation_array)
+        reaction_dict["definition"] = " ".join(definition_array)
+        reaction_dict["compound_ids"] = ";".join(
+            sorted(compound_ids_dict.keys()))
+
+        # Replace ids with names in Definition
+        for cpd_id in compound_ids_dict.keys():
+            if (cpd_id in reaction_dict["definition"]):
+                reaction_dict["definition"] = reaction_dict[
+                    "definition"].replace(cpd_id,
+                                          self.Compounds_Dict[cpd_id]["name"])
 
         return
 
-    def saveReactions(self,Reactions_Dict):
-        RxnsRoot = os.path.splitext(self.RxnsFile)[0]
-        
-        #Print to TSV
-        RxnsFile = open(RxnsRoot+".tsv",'w')
-        RxnsFile.write("\t".join(self.Headers)+"\n")
-        for rxn in sorted(Reactions_Dict.keys()):
-            RxnsFile.write("\t".join(str(Reactions_Dict[rxn][header]) for header in self.Headers)+"\n")
-        RxnsFile.close()
+    def saveReactions(self, reactions_dict):
+        rxns_root = os.path.splitext(self.RxnsFile)[0]
 
-        #Print to JSON
-        RxnsFile = open(RxnsRoot+".json",'w')
-        RxnsFile.write(json.dumps(Reactions_Dict, indent=4, sort_keys=True))
-        RxnsFile.close()
+        # Print to TSV
+        rxns_file = open(rxns_root + ".tsv", 'w')
+        rxns_file.write("\t".join(self.Headers) + "\n")
+        for rxn in sorted(reactions_dict.keys()):
+            rxns_file.write("\t".join(
+                str(reactions_dict[rxn][header]) for header in
+                self.Headers) + "\n")
+        rxns_file.close()
+
+        # Print to JSON
+        rxns_file = open(rxns_root + ".json", 'w')
+        rxns_file.write(json.dumps(reactions_dict, indent=4, sort_keys=True))
+        rxns_file.close()
