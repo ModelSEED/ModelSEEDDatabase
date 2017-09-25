@@ -1,45 +1,28 @@
 import os
 import json
+from csv import DictReader
 
 
 class Reactions:
-    def __init__(self):
-        self.BiochemRoot = '../../Biochemistry/'
-        self.RxnsFile = self.BiochemRoot + 'reactions.tsv'
+    def __init__(self, biochem_root='../../Biochemistry/',
+                 rxns_file='compounds.tsv'):
+        self.BiochemRoot = biochem_root
+        self.RxnsFile = rxns_file
 
-        rxns_file_handle = open(self.RxnsFile, 'r')
-        header_line = rxns_file_handle.readline().strip()
-        self.Headers = header_line.split("\t")
+        reader = DictReader(open(self.RxnsFile), dialect='excel-tab')
+        self.Headers = reader.fieldnames
 
         from BiochemPy import Compounds
         self.CompoundsHelper = Compounds()
         self.Compounds_Dict = self.CompoundsHelper.loadCompounds()
 
     def loadReactions(self):
-        rxns_file = open(self.RxnsFile, 'r')
-        rxns_file.readline()
-
+        reader = DictReader(open(self.RxnsFile), dialect='excel-tab')
         rxns_dict = dict()
-        for line in rxns_file.readlines():
-            line = line.strip()
-            items = line.split("\t")
-            rxns_dict[items[0]] = dict()
-            for i in range(len(self.Headers)):
-                item = "null"
-                if (i < len(items)):
-                    item = items[i]
-
-                # capture ints
-                for header in ["is_transport", "is_obsolete"]:
-                    if (self.Headers[i] == header):
-                        item = int(item)
-
-                # capture floats
-                # for header in ["deltag","deltagerr"]:
-                #    if(self.Headers[i] == header):
-                #        item=float(item)
-
-                rxns_dict[items[0]][self.Headers[i]] = item
+        for line in reader:
+            for header in ["is_transport", "is_obsolete"]:
+                line[header] = int(line[header])
+            rxns_dict[line['id']] = line
 
         return rxns_dict
 

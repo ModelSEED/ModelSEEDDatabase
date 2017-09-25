@@ -1,43 +1,25 @@
 import re
 import os
 import json
+from csv import DictReader
 
 
 class Compounds:
-    def __init__(self):
-        self.BiochemRoot = '../../Biochemistry/'
-        self.CpdsFile = self.BiochemRoot + 'compounds.tsv'
+    def __init__(self, biochem_root='../../Biochemistry/',
+                 cpds_file='compounds.tsv'):
+        self.BiochemRoot = biochem_root
+        self.CpdsFile = cpds_file
 
-        cpds_file_handle = open(self.CpdsFile, 'r')
-        header_line = cpds_file_handle.readline().strip()
-        self.Headers = header_line.split("\t")
+        reader = DictReader(open(self.CpdsFile), dialect='excel-tab')
+        self.Headers = reader.fieldnames
 
     def loadCompounds(self):
-        cpds_file = open(self.CpdsFile, 'r')
-        cpds_file.readline()
-
-        cpds_dict = dict()
-        for line in cpds_file.readlines():
-            line = line.strip()
-            items = line.split("\t")
-            cpds_dict[items[0]] = dict()
-            for i in range(len(self.Headers)):
-                item = "null"
-                if (i < len(items)):
-                    item = items[i]
-
-                # capture ints
-                for header in ["is_core", "is_obsolete", "is_cofactor"]:
-                    if (self.Headers[i] == header):
-                        item = int(item)
-
-                # capture floats
-                # for header in ["mass","charge","deltag","deltagerr"]:
-                #    if(self.Headers[i] == header):
-                #        print header,item
-                #        item=float(item)
-
-                cpds_dict[items[0]][self.Headers[i]] = item
+        reader = DictReader(open(self.CpdsFile), dialect='excel-tab')
+        cpds_dict = {}
+        for line in reader:
+            for header in ["is_core", "is_obsolete", "is_cofactor"]:
+                line[header] = int(line[header])
+            cpds_dict[line['id']] = line
 
         return cpds_dict
 
