@@ -44,9 +44,13 @@ if __name__ == "__main__":
     parser.add_argument('-s', '--print-schema', help='Print all schema violations', action='store_true', dest='print_schema', default=False)
     args = parser.parse_args()
     compounds = json.load(open(args.cpdfile))
-    errors = {}
+    errors = dict()
     errors['schema_violations'] = validate_schema(compounds, args.print_schema)
     errors.update(check_dups(compounds, args.print_dups))
     print("\nError counts")
     for error_type, count in errors.items():
         print("\t{}: {}".format(error_type, count))
+    new_errors = find_new_errors('compounds', errors)
+    report_errors('compounds', errors)
+    print("New errors detected: " + ", ".join(new_errors))
+    exit(len(new_errors))

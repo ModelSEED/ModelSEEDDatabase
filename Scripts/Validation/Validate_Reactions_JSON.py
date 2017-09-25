@@ -1,6 +1,5 @@
 import Scripts.Validation.Schemas as schemas
-from Scripts.Validation.error_reporting import find_new_errors, report_errors, get_master_errors
-from repostat.stash import StatStash
+from Scripts.Validation.error_reporting import find_new_errors, report_errors
 from jsonschema import Draft4Validator
 from collections import defaultdict, Counter
 import re
@@ -110,10 +109,14 @@ if __name__ == "__main__":
     parser.add_argument('-c', '--print-compound', help='Print all compound related violations', action='store_true', dest='print_compound', default=False)
     args = parser.parse_args()
     rxns = json.load(open(args.rxnfile))
-    errors = {}
+    errors = dict()
     errors['schema_violations'] = validate_schema(rxns, args.print_schema)
     errors.update(check_dups(rxns, args.print_dups))
     errors.update(check_compounds(rxns, args.print_compound))
     print("\nError counts")
     for error_type, count in errors.items():
         print("\t{}: {}".format(error_type, count))
+    new_errors = find_new_errors('reactions', errors)
+    report_errors('reactions', errors)
+    print("New errors detected: " + ", ".join(new_errors))
+    exit(len(new_errors))
