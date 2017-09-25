@@ -41,7 +41,8 @@ class Compounds:
 
         return cpds_dict
 
-    def parseFormula(self, formula):
+    @staticmethod
+    def parseFormula(formula):
         if (
                         formula is None or formula == "" or "noFormula" in formula or "null" in formula):
             return {}
@@ -61,7 +62,8 @@ class Compounds:
 
         return atoms_dict
 
-    def mergeFormula(self, formula):
+    @staticmethod
+    def mergeFormula(formula):
         formula = formula.strip()
         Notes = ""
         if (formula is None or formula == "" or "null" in formula or len(
@@ -94,24 +96,26 @@ class Compounds:
                         re.findall("^(\d+)(.*)$", fragment)[0]
                         fragment_multiplier = int(fragment_multiplier)
 
-                    fragment_atoms_dict = self.parseFormula(fragment)
+                    fragment_atoms_dict = Compounds.parseFormula(fragment)
                     for atom in fragment_atoms_dict:
                         if atom not in global_atoms_dict.keys():
                             global_atoms_dict[atom] = 0
                         global_atoms_dict[atom] += fragment_atoms_dict[atom] \
                             * bracketed_multiplier * fragment_multiplier
 
-        return (self.buildFormula(global_atoms_dict), Notes)
+        return (Compounds.buildFormula(global_atoms_dict), Notes)
 
-    def buildFormula(self, Atoms_Dict):
+    @staticmethod
+    def buildFormula(Atoms_Dict):
         formula = ""
-        for atom in self.hill_sorted(Atoms_Dict.keys()):
+        for atom in Compounds.hill_sorted(Atoms_Dict.keys()):
             if (Atoms_Dict[atom] == 1):
                 Atoms_Dict[atom] = ""
             formula += atom + str(Atoms_Dict[atom])
         return formula
 
-    def hill_sorted(self, atoms):
+    @staticmethod
+    def hill_sorted(atoms):
         if ("C" in atoms):
             atoms.remove("C")
             yield "C"

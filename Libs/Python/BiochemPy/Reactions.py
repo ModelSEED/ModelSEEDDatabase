@@ -67,7 +67,8 @@ class Reactions:
                                        "charge"]})
         return rxn_cpds_array
 
-    def buildStoich(self, rxn_cpds_array):
+    @staticmethod
+    def buildStoich(rxn_cpds_array):
         stoichiometry_array = list()
         for rgt in sorted(rxn_cpds_array, key=lambda x: (
         int(x["coefficient"] > 0), x["reagent"])):
