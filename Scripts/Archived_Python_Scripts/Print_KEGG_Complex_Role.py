@@ -121,6 +121,6 @@ if __name__ == "__main__":
     # Show details on the enzymes that were skipped and not stored in the complex role file.        
     if args.showSkipped:
         for key in skippedComplex:
-            print key+skippedComplex[key]
+            print(key+skippedComplex[key])
 
     exit(0)

@@ -107,7 +107,7 @@ class TemplateHelper(BaseHelper):
                 linenum += 1
                 fields = line.strip().split('\t')
                 if len(fields) < len(required):
-                    print 'WARNING: Biomass compound on line %d is missing one or more fields, %s' %(linenum, fields)
+                    print('WARNING: Biomass compound on line %d is missing one or more fields, %s' %(linenum, fields))
                     continue
                 
                 # Create a new TemplateBiomassComponent.
@@ -153,7 +153,7 @@ class TemplateHelper(BaseHelper):
                 linenum += 1
                 fields = line.strip().split('\t')
                 if len(fields) < len(required):
-                    print 'WARNING: Biomass on line %d is missing one or more fields, %s' %(linenum, fields)
+                    print('WARNING: Biomass on line %d is missing one or more fields, %s' %(linenum, fields))
                     continue
                 
                 # Create a new TemplateBiomass.
@@ -214,7 +214,7 @@ class TemplateHelper(BaseHelper):
                 linenum += 1
                 fields = line.strip().split('\t')
                 if len(fields) < len(required):
-                    print 'WARNING: Compartment on line %d is missing one or more fields, %s' %(linenum, fields)
+                    print('WARNING: Compartment on line %d is missing one or more fields, %s' %(linenum, fields))
                     continue
                 
                 # Create a new TemplateCompartment.
@@ -271,7 +271,7 @@ class TemplateHelper(BaseHelper):
                 linenum += 1
                 fields = line.strip().split('\t')
                 if len(fields) < len(required):
-                    print 'WARNING: Role on line %d is missing one or more fields, %s' %(linenum, fields)
+                    print('WARNING: Role on line %d is missing one or more fields, %s' %(linenum, fields))
                     continue
                 
 
@@ -329,7 +329,7 @@ class TemplateHelper(BaseHelper):
                 linenum += 1
                 fields = line.strip().split('\t')
                 if len(fields) < len(required):
-                    print 'WARNING: Role on line %d is missing one or more fields, %s' %(linenum, fields)
+                    print('WARNING: Role on line %d is missing one or more fields, %s' %(linenum, fields))
                     continue
                 
                 # Create a new TemplateComplex if needed. The same complex can be paired with multiple roles.
@@ -403,7 +403,7 @@ class TemplateHelper(BaseHelper):
                 linenum += 1
                 fields = line.strip().split('\t')
                 if len(fields) < len(required):
-                    print 'WARNING: Reaction on line %d is missing one or more fields, %s' %(linenum, fields)
+                    print('WARNING: Reaction on line %d is missing one or more fields, %s' %(linenum, fields))
                     continue
                 
                 # Create a new TemplateReaction.
@@ -433,7 +433,7 @@ class TemplateHelper(BaseHelper):
                                 try:
                                     linkReaction = self.masterReactionsList[self.masterReactions[linkIds[index]]]
                                     if not linkReaction['is_obsolete']:
-                                        print 'NOTICE: Obsolete reaction %s replaced by %s' %(masterReaction['id'], linkReaction['id'])
+                                        print('NOTICE: Obsolete reaction %s replaced by %s' %(masterReaction['id'], linkReaction['id']))
                                         masterReaction = linkReaction
                                         break
                                 except KeyError as e:
@@ -495,10 +495,10 @@ class TemplateHelper(BaseHelper):
                             if complexes[cindex] in self.complexes:
                                 reaction['templatecomplex_refs'].append('~/complexes/id/'+complexes[cindex])
                             else:
-                                print 'Reaction %s on line %d refers to complex %s which is not found' %(reaction['id'], linenum, complexes[cindex])
+                                print('Reaction %s on line %d refers to complex %s which is not found' %(reaction['id'], linenum, complexes[cindex]))
 #                                raise ComplexNotFoundError('Reaction %s on line %d refers to complex %s which is not found' %(reaction['id'], linenum, complexes[cindex]))
                         if reaction['type'] == 'gapfilling':
-                            print 'NOTICE: Reaction %s on line %d has complexes but is not of type conditional' %(reaction['id'], linenum)
+                            print('NOTICE: Reaction %s on line %d has complexes but is not of type conditional' %(reaction['id'], linenum))
                 if includeLinenum:
                     reaction['linenum'] = linenum
 
@@ -541,7 +541,7 @@ class TemplateHelper(BaseHelper):
                     try:
                         linkCompound = self.masterCompoundsList[self.masterCompounds[linkIds[index]]]
                         if not linkCompound['is_obsolete']:
-                            print 'NOTICE: Obsolete compound %s replaced by %s' %(masterCompound['id'], linkCompound['id'])
+                            print('NOTICE: Obsolete compound %s replaced by %s' %(masterCompound['id'], linkCompound['id']))
                             masterCompound = linkCompound
                             break
                     except KeyError as e:
