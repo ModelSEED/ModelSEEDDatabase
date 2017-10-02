@@ -3,7 +3,7 @@
 import argparse
 import os
 import json
-from ..TemplateHelper import TemplateHelper
+from Scripts.TemplateHelper import TemplateHelper
 
 desc1 = '''
 NAME
@@ -33,12 +33,11 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(formatter_class=argparse.RawDescriptionHelpFormatter, prog='Build_Model_Template', epilog=desc3)
     parser.add_argument('id', help='ID of Model Template object', action='store')
     parser.add_argument('templatedir', help='path to directory containing source files', action='store')
-    parser.add_argument('ref', help='reference to workspace location to store Model Template object', action='store')
-    parser.add_argument('--biochemref', help='reference to Biochemistry object in workspace', action='store', default='/chenry/public/modelsupport/biochemistry/default.biochem')
-    parser.add_argument('--compoundfile', help='path to master compounds file', action='store', default='../Biochemistry/compounds.master.tsv')
-    parser.add_argument('--reactionfile', help='path to master reactions file', action='store', default='../Biochemistry/reactions.master.tsv')
-    parser.add_argument('--complexfile', help='path to master complexes file', action='store', default='../Templates/Complexes.tsv')
-    parser.add_argument('--rolefile', help='path to master roles file', action='store', default='../Templates/Roles.tsv')
+    parser.add_argument('--biochemref', help='reference to Biochemistry object in workspace', action='store', default='default/default.biochem')
+    parser.add_argument('--compoundfile', help='path to master compounds file', action='store', default='../../Biochemistry/compounds.tsv')
+    parser.add_argument('--reactionfile', help='path to master reactions file', action='store', default='../../Biochemistry/reactions.tsv')
+    parser.add_argument('--complexfile', help='path to master complexes file', action='store', default='../../Annotations/Complexes.tsv')
+    parser.add_argument('--rolefile', help='path to master roles file', action='store', default='../../Annotations/Roles.tsv')
     parser.add_argument('--name', help='name of object', action='store', default=None)
     parser.add_argument('--type', help='type of model', action='store', default='GenomeScale')
     parser.add_argument('--domain', help='domain of organisms', action='store', default='Bacteria')

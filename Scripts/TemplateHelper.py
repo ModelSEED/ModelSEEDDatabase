@@ -1,7 +1,7 @@
 
 import re
-from BaseHelper import BaseHelper
-from BiochemHelper import BiochemHelper
+from .Base_Helper import BaseHelper
+from .Biochem_Helper import BiochemHelper
 
 class CompoundNotFoundError(Exception):
     pass

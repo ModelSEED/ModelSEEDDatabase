@@ -1,5 +1,5 @@
-import Scripts.Validation.Schemas as schemas
-from Scripts.Validation.error_reporting import find_new_errors, report_errors, get_master_errors
+from . import Schemas as schemas
+from .error_reporting import find_new_errors, report_errors, get_master_errors
 from repostat.stash import StatStash
 from jsonschema import Draft4Validator
 from collections import defaultdict
