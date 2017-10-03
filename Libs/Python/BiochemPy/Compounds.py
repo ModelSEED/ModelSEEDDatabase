@@ -8,7 +8,7 @@ class Compounds:
     def __init__(self, biochem_root='../../Biochemistry/',
                  cpds_file='compounds.tsv'):
         self.BiochemRoot = biochem_root
-        self.CpdsFile = cpds_file
+        self.CpdsFile = biochem_root + cpds_file
 
         reader = DictReader(open(self.CpdsFile), dialect='excel-tab')
         self.Headers = reader.fieldnames
