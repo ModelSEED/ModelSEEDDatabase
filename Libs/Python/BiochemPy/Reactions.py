@@ -51,6 +51,16 @@ class Reactions:
         return rxn_cpds_array
 
     @staticmethod
+    def isTransport(rxn_cpds_array):
+        compartments_dict=dict()
+        for rgt in rxn_cpds_array:
+            compartments_dict[rgt['compartment']]=1
+        if(len(compartments_dict.keys())>1):
+            return 1
+        else:
+            return 0
+
+    @staticmethod
     def buildStoich(rxn_cpds_array):
         stoichiometry_array = list()
         for rgt in sorted(rxn_cpds_array, key=lambda x: (
@@ -107,8 +117,7 @@ class Reactions:
         # Build dict of compounds
         cpds_dict = dict()
         for rgt in rgts_array:
-            rgt["coefficient"] = cpds_coeff_dict[rgt["compound"]]
-            cpds_dict[rgt["compound"]] = rgt
+            cpds_dict[rgt["compound"]] = {"formula":rgt['formula'],'charge':rgt['charge'],'coefficient':cpds_coeff_dict[rgt['compound']]}
 
         ########################################
         # Check for duplicate elements, across
@@ -235,7 +244,7 @@ class Reactions:
         rgts_str__array = list()
         for rgt in reagents_array:
             id_string = "(" + str(abs(rgt["coefficient"])) + ") " + rgt[
-                "compound"] + "[" + str(rgt["index"]) + "]"
+                "compound"] + "[" + str(rgt["compartment"]) + "]"
             rgts_str__array.append(id_string)
 
         equation_array = list()
@@ -261,7 +270,7 @@ class Reactions:
         pdts_str_array = list()
         for rgt in products_array:
             id_string = "(" + str(abs(rgt["coefficient"])) + ") " + rgt[
-                "compound"] + "[" + str(rgt["index"]) + "]"
+                "compound"] + "[" + str(rgt["compartment"]) + "]"
             pdts_str_array.append(id_string)
 
         equation_array.append(" + ".join(pdts_str_array))
