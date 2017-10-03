@@ -1,7 +1,8 @@
 
-import re
-from BaseHelper import BaseHelper
-from BiochemHelper import BiochemHelper
+import json
+import os
+from .Base_Helper import BaseHelper
+from .Biochem_Helper import BiochemHelper
 
 class CompoundNotFoundError(Exception):
     pass
@@ -12,7 +13,13 @@ class ObsoleteCompoundError(Exception):
 class CompoundKeyError(Exception):
     pass
 
+class DuplicateBiomassError(Exception):
+    pass
+
 class DuplicateCompartmentError(Exception):
+    pass
+
+class DuplicateComplexError(Exception):
     pass
 
 class CompartmentNotFoundError(Exception):
@@ -59,10 +66,12 @@ class TemplateHelper(BaseHelper):
 
         # Load the master compounds and reactions from source files.
         self.biochem = BiochemHelper()
-        self.masterCompoundsList = self.biochem.readCompoundsFile(compoundsPath, includeLinenum=False)
-        self.masterCompounds = self.buildIndexDictFromListOfObjects(self.masterCompoundsList)
-        self.masterReactionsList = self.biochem.readReactionsFile(reactionsPath, includeLinenum=False)
-        self.masterReactions = self.buildIndexDictFromListOfObjects(self.masterReactionsList)
+        if not os.path.exists(compoundsPath):
+            raise ValueError("Invalid path to compounds: {}".format(compoundsPath))
+        self.masterCompounds = json.load(open(compoundsPath))
+        if not os.path.exists(reactionsPath):
+            raise ValueError("Invalid path to reactions: {}".format(reactionsPath))
+        self.masterReactions = json.load(open(reactionsPath))
         
         # Create empty dictionaries for keeping track of items to add to Model Template.
         self.compartments = dict()
@@ -107,7 +116,7 @@ class TemplateHelper(BaseHelper):
                 linenum += 1
                 fields = line.strip().split('\t')
                 if len(fields) < len(required):
-                    print 'WARNING: Biomass compound on line %d is missing one or more fields, %s' %(linenum, fields)
+                    print('WARNING: Biomass compound on line %d is missing one or more fields, %s' %(linenum, fields))
                     continue
                 
                 # Create a new TemplateBiomassComponent.
@@ -153,7 +162,7 @@ class TemplateHelper(BaseHelper):
                 linenum += 1
                 fields = line.strip().split('\t')
                 if len(fields) < len(required):
-                    print 'WARNING: Biomass on line %d is missing one or more fields, %s' %(linenum, fields)
+                    print('WARNING: Biomass on line %d is missing one or more fields, %s' %(linenum, fields))
                     continue
                 
                 # Create a new TemplateBiomass.
@@ -214,7 +223,7 @@ class TemplateHelper(BaseHelper):
                 linenum += 1
                 fields = line.strip().split('\t')
                 if len(fields) < len(required):
-                    print 'WARNING: Compartment on line %d is missing one or more fields, %s' %(linenum, fields)
+                    print('WARNING: Compartment on line %d is missing one or more fields, %s' %(linenum, fields))
                     continue
                 
                 # Create a new TemplateCompartment.
@@ -271,7 +280,7 @@ class TemplateHelper(BaseHelper):
                 linenum += 1
                 fields = line.strip().split('\t')
                 if len(fields) < len(required):
-                    print 'WARNING: Role on line %d is missing one or more fields, %s' %(linenum, fields)
+                    print('WARNING: Role on line %d is missing one or more fields, %s' %(linenum, fields))
                     continue
                 
 
@@ -329,7 +338,7 @@ class TemplateHelper(BaseHelper):
                 linenum += 1
                 fields = line.strip().split('\t')
                 if len(fields) < len(required):
-                    print 'WARNING: Role on line %d is missing one or more fields, %s' %(linenum, fields)
+                    print('WARNING: Role on line %d is missing one or more fields, %s' %(linenum, fields))
                     continue
                 
                 # Create a new TemplateComplex if needed. The same complex can be paired with multiple roles.
@@ -403,7 +412,7 @@ class TemplateHelper(BaseHelper):
                 linenum += 1
                 fields = line.strip().split('\t')
                 if len(fields) < len(required):
-                    print 'WARNING: Reaction on line %d is missing one or more fields, %s' %(linenum, fields)
+                    print('WARNING: Reaction on line %d is missing one or more fields, %s' %(linenum, fields))
                     continue
                 
                 # Create a new TemplateReaction.
@@ -415,7 +424,7 @@ class TemplateHelper(BaseHelper):
                     # Get the reaction from the master list.
                     reactionId = fields[fieldNames['id']]
                     try:
-                        masterReaction = self.masterReactionsList[self.masterReactions[reactionId]]
+                        masterReaction = self.masterReactions[reactionId]
                     except:
                         raise ReactionNotFoundError('Reaction %s not found in master biochemistry' %(reactionId))
                     
@@ -431,9 +440,9 @@ class TemplateHelper(BaseHelper):
                             linkIds = masterReaction['linked_reaction'].split(';')
                             for index in range(len(linkIds)):
                                 try:
-                                    linkReaction = self.masterReactionsList[self.masterReactions[linkIds[index]]]
+                                    linkReaction = self.masterReactions[linkIds[index]]
                                     if not linkReaction['is_obsolete']:
-                                        print 'NOTICE: Obsolete reaction %s replaced by %s' %(masterReaction['id'], linkReaction['id'])
+                                        print('NOTICE: Obsolete reaction %s replaced by %s' %(masterReaction['id'], linkReaction['id']))
                                         masterReaction = linkReaction
                                         break
                                 except KeyError as e:
@@ -495,10 +504,10 @@ class TemplateHelper(BaseHelper):
                             if complexes[cindex] in self.complexes:
                                 reaction['templatecomplex_refs'].append('~/complexes/id/'+complexes[cindex])
                             else:
-                                print 'Reaction %s on line %d refers to complex %s which is not found' %(reaction['id'], linenum, complexes[cindex])
+                                print('Reaction %s on line %d refers to complex %s which is not found' %(reaction['id'], linenum, complexes[cindex]))
 #                                raise ComplexNotFoundError('Reaction %s on line %d refers to complex %s which is not found' %(reaction['id'], linenum, complexes[cindex]))
                         if reaction['type'] == 'gapfilling':
-                            print 'NOTICE: Reaction %s on line %d has complexes but is not of type conditional' %(reaction['id'], linenum)
+                            print('NOTICE: Reaction %s on line %d has complexes but is not of type conditional' %(reaction['id'], linenum))
                 if includeLinenum:
                     reaction['linenum'] = linenum
 
@@ -528,7 +537,7 @@ class TemplateHelper(BaseHelper):
         
         # Get the compound from the master list.
         try:
-            masterCompound = self.masterCompoundsList[self.masterCompounds[compoundId]]
+            masterCompound = self.masterCompounds[compoundId]
         except KeyError as e:
             raise CompoundNotFoundError('Compound %s not found in master biochemistry' %(compoundId))
 
@@ -539,9 +548,9 @@ class TemplateHelper(BaseHelper):
                 # One of the compounds in the list is not obsolete.
                 for index in range(len(linkIds)):
                     try:
-                        linkCompound = self.masterCompoundsList[self.masterCompounds[linkIds[index]]]
+                        linkCompound = self.masterCompounds[linkIds[index]]
                         if not linkCompound['is_obsolete']:
-                            print 'NOTICE: Obsolete compound %s replaced by %s' %(masterCompound['id'], linkCompound['id'])
+                            print('NOTICE: Obsolete compound %s replaced by %s' %(masterCompound['id'], linkCompound['id']))
                             masterCompound = linkCompound
                             break
                     except KeyError as e:

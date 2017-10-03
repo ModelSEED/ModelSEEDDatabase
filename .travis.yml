@@ -14,8 +14,9 @@ install:
   - source activate test-environment
   - pip install keen
   - pip install repostat
+  - pip install jsonschema
 script:
   - python -m Scripts.Validation.Validate_Templates
   - python -m Scripts.Validation.Validate_Annotations_Media
-  - python -m Scripts.Validation.Validate_Compounds --show-details Biochemistry/compounds.tsv
-  - python -m Scripts.Validation.Validate_Reactions --show-details -c Biochemistry/compounds.tsv Biochemistry/reactions.tsv
+  - python -m Scripts.Validation.Validate_Compounds_JSON -ds Biochemistry/compounds.json
+  - python -m Scripts.Validation.Validate_Reactions_JSON -dsc Biochemistry/reactions.json

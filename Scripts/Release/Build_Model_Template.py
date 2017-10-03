@@ -3,8 +3,7 @@
 import argparse
 import os
 import json
-from TemplateHelper import TemplateHelper
-#from biop3.Workspace.WorkspaceClient import Workspace
+from Scripts.TemplateHelper import TemplateHelper
 
 desc1 = '''
 NAME
@@ -34,12 +33,11 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(formatter_class=argparse.RawDescriptionHelpFormatter, prog='Build_Model_Template', epilog=desc3)
     parser.add_argument('id', help='ID of Model Template object', action='store')
     parser.add_argument('templatedir', help='path to directory containing source files', action='store')
-    parser.add_argument('ref', help='reference to workspace location to store Model Template object', action='store')
-    parser.add_argument('--biochemref', help='reference to Biochemistry object in workspace', action='store', default='/chenry/public/modelsupport/biochemistry/default.biochem')
-    parser.add_argument('--compoundfile', help='path to master compounds file', action='store', default='../Biochemistry/compounds.master.tsv')
-    parser.add_argument('--reactionfile', help='path to master reactions file', action='store', default='../Biochemistry/reactions.master.tsv')
-    parser.add_argument('--complexfile', help='path to master complexes file', action='store', default='../Templates/Complexes.tsv')
-    parser.add_argument('--rolefile', help='path to master roles file', action='store', default='../Templates/Roles.tsv')
+    parser.add_argument('--biochemref', help='reference to Biochemistry object in workspace', action='store', default='default/default.biochem')
+    parser.add_argument('--compoundfile', help='path to master compounds file', action='store', default='../../Biochemistry/compounds.json')
+    parser.add_argument('--reactionfile', help='path to master reactions file', action='store', default='../../Biochemistry/reactions.json')
+    parser.add_argument('--complexfile', help='path to master complexes file', action='store', default='../../Annotations/Complexes.tsv')
+    parser.add_argument('--rolefile', help='path to master roles file', action='store', default='../../Annotations/Roles.tsv')
     parser.add_argument('--name', help='name of object', action='store', default=None)
     parser.add_argument('--type', help='type of model', action='store', default='GenomeScale')
     parser.add_argument('--domain', help='domain of organisms', action='store', default='Bacteria')
@@ -99,26 +97,21 @@ if __name__ == "__main__":
 
     # Save a local copy for easy reference.
     filename = os.path.join(args.templatedir, args.id+'.json')
-    print filename
+    print(filename)
     json.dump(template, open(filename, 'w'), indent=4)
-    
-    # Save the Model Template typed object to the specified workspace path. An existing typed object
-    # is overwritten with the updated data.
-    #wsClient = Workspace(args.wsurl)
-    #output = wsClient.create( { 'objects': [ [ args.ref, 'modeltemplate', {}, template ] ], 'overwrite': 1 });
     
     # Print statistics about the Model Template if requested.
     if args.showStats:
-        print 'Number of compartments: '+str(len(template['compartments']))
-        print 'Number of biomasses: '+str(len(template['biomasses']))
-        print 'Number of roles: '+str(len(template['roles']))
-        print 'Number of complexes: '+str(len(template['complexes']))
-        print 'Number of reactions: '+str(len(template['reactions']))
-        print '  Number of conditional reactions: '+str(helper.numConditional)
-        print '  Number of gapfilling reactions: '+str(helper.numGapfilling)
-        print '  Number of spontaneous reactions: '+str(helper.numSpontaneous)
-        print '  Number of universal reactions: '+str(helper.numUniversal)
-        print 'Number of compounds: '+str(len(template['compounds']))
-        print 'Number of compcompounds: '+str(len(template['compcompounds']))
+        print(('Number of compartments: '+str(len(template['compartments']))))
+        print(('Number of biomasses: '+str(len(template['biomasses']))))
+        print(('Number of roles: '+str(len(template['roles']))))
+        print(('Number of complexes: '+str(len(template['complexes']))))
+        print(('Number of reactions: '+str(len(template['reactions']))))
+        print(('  Number of conditional reactions: '+str(helper.numConditional)))
+        print(('  Number of gapfilling reactions: '+str(helper.numGapfilling)))
+        print(('  Number of spontaneous reactions: '+str(helper.numSpontaneous)))
+        print(('  Number of universal reactions: '+str(helper.numUniversal)))
+        print(('Number of compounds: '+str(len(template['compounds']))))
+        print(('Number of compcompounds: '+str(len(template['compcompounds']))))
         
     exit(0)

@@ -65,7 +65,7 @@ if __name__ == '__main__':
     helper = BiochemHelper()
 
     # Add the compounds from the compounds file.
-    print 'Adding compounds from %s ...' %(args.compoundfile)
+    print(('Adding compounds from %s ...' %(args.compoundfile)))
     biochem['compounds'] = helper.readCompoundsFile(args.compoundfile, includeLinenum=False)
     compounds = helper.buildIndexDictFromListOfObjects(biochem['compounds'])
 
@@ -74,7 +74,7 @@ if __name__ == '__main__':
     compartments = dict()
 
     # Add the reactions from the reactions file.
-    print 'Adding reactions from %s ...' %(args.reactionfile)
+    print(('Adding reactions from %s ...' %(args.reactionfile)))
     biochem['reactions'] = list()
     reactions = helper.readReactionsFile(args.reactionfile, includeLinenum=False)
     
@@ -91,7 +91,7 @@ if __name__ == '__main__':
             if cpd['compound'] in compounds:
                 reagent['compound_ref'] = '~/compounds/id/'+cpd['compound']
             else:
-                print 'WARNING: Compound %s is not defined in the list of compounds' %(cpd['compound'])
+                print(('WARNING: Compound %s is not defined in the list of compounds' %(cpd['compound'])))
             # Add compartment the first time it is found.
             if cpd['compartmentId'] not in compartments:
                 compartments[cpd['compartmentId']] = { 'id': cpd['compartmentId'], 'name': 'Compartment'+cpd['compartmentId'], 'hierarchy': 3}
@@ -106,7 +106,7 @@ if __name__ == '__main__':
             if cpd['compound'] in compounds:
                 reagent['compound_ref'] = '~/compounds/id/'+cpd['compound']
             else:
-                print 'WARNING: Compound %s is not defined in the list of compounds' %(cpd['compound'])
+                print(('WARNING: Compound %s is not defined in the list of compounds' %(cpd['compound'])))
             # Add compartment the first time it is found.
             if cpd['compartmentId'] not in compartments:
                 compartments[cpd['compartmentId']] = { 'id': cpd['compartmentId'], 'name': 'Compartment'+cpd['compartmentId'], 'hierarchy': 3}
@@ -123,14 +123,14 @@ if __name__ == '__main__':
         biochem['compartments'].append(compartments[id])
 
     # Add the aliases from all of the aliases files.
-    print 'Reading aliases from %s ...' %(args.aliasdir)
+    print(('Reading aliases from %s ...' %(args.aliasdir)))
     compoundAliases, reactionAliases = helper.readAliasFiles(args.aliasdir)
     biochem['compound_aliases'] = compoundAliases
     biochem['reaction_aliases'] = reactionAliases
 
     # Save the Biochemistry typed object to the specified workspace path. An existing typed object
     # is overwritten with the updated data.
-    print 'Saving typed object to %s ...' %(args.ref)
+    print(('Saving typed object to %s ...' %(args.ref)))
     wsClient = Workspace(args.wsurl)
     output = wsClient.create( { 'objects': [ [ args.ref, 'biochemistry', {}, biochem ] ], 'overwrite': 1 });
     
