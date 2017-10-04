@@ -5,9 +5,9 @@ from csv import DictReader
 
 class Reactions:
     def __init__(self, biochem_root='../../Biochemistry/',
-                 rxns_file='compounds.tsv'):
+                 rxns_file='reactions.tsv'):
         self.BiochemRoot = biochem_root
-        self.RxnsFile = rxns_file
+        self.RxnsFile = biochem_root + rxns_file
 
         reader = DictReader(open(self.RxnsFile), dialect='excel-tab')
         self.Headers = reader.fieldnames
@@ -120,6 +120,7 @@ class Reactions:
         for cpd in cpds_dict.keys():
             cpd_atoms = self.CompoundsHelper.parseFormula(
                 cpds_dict[cpd]["formula"])
+
             if (len(cpd_atoms.keys()) == 0):
                 return "CPDFORMERROR"
 
@@ -168,7 +169,7 @@ class Reactions:
             status = "MI:" + "/".join(imbalanced_atoms_array)
 
         if (rxn_net_charge != 0):
-            if (len(status) > 0):
+            if (len(status) == 0):
                 status = "CI:" + str(rxn_net_charge)
             else:
                 status += "|CI:" + str(rxn_net_charge)
@@ -194,7 +195,7 @@ class Reactions:
         for rgt in rxn_cpds_array:
             if (rgt["compound"] == compound and
                         rgt["compartment"] == compartment):
-                rgt["coefficient"] += adjustment
+                rgt["coefficient"] -= adjustment
                 cpd_exists = 1
 
         if (cpd_exists != 1):
