@@ -1,6 +1,7 @@
 import keen
 import subprocess
 import copy
+from collections import defaultdict
 
 keen.project_id = "594bd6a50935ce9ceaaaaf63"
 keen.read_key = '7856E5E161A29A43701E1F65BCCB6FDD1C0DF3B3624A5212C9946D8419C98A6E8F32D0BEA5616B60E92C4567571E23B32EAF7438458814654F7DE37F885E59D15F434D19C386D975F907B890F9F546D1CE2D3DA2F400C437557150639A37AF4B'
@@ -11,9 +12,9 @@ current_branch = subprocess.check_output(['git', 'rev-parse', '--abbrev-ref', 'H
 
 
 def get_master_errors(stream):
-    hit = keen.extraction(stream, 'this_5_years', filters=[
+    hit = keen.extraction(stream, 'this_3_years', filters=[
         {"property_name": "branch", "operator": "eq",
-         "property_value": 'master'}])
+         "property_value": 'HEAD'}])
     if not hit:
         raise ValueError('No data for master branch found')
     return hit[-1]
@@ -27,7 +28,8 @@ def report_errors(stream, error_counts):
 
 
 def find_new_errors(script, errors):
-    master_errors = get_master_errors(script)
+    master_errors = defaultdict(int)
+    master_errors.update(get_master_errors(script))
     new_errors = []
     for err, val in errors.items():
         # this checks to see if any errors types get worse

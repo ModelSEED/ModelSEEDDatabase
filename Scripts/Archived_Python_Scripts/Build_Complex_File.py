@@ -71,19 +71,19 @@ def readMappingFile(sourceFile, source, rolePrefix, adjust, output):
                         fid = int(sourceRole[0].split('/')[-1].strip(rolePrefix)) + adjust
                         values.append('ftr%05d' %(fid))
                     else:
-                        print 'Bad role '+sourceRole
+                        print(('Bad role '+sourceRole))
                     if sourceRole[2].startswith('type:'):
                         values.append(sourceRole[2].split(':')[-1])
                     else:
-                        print 'Bad role '+sourceRole
+                        print(('Bad role '+sourceRole))
                     if sourceRole[1].startswith('optionalRole:'):
                         values.append(sourceRole[1].split(':')[-1])
                     else:
-                        print 'Bad role '+sourceRole
+                        print(('Bad role '+sourceRole))
                     if sourceRole[3].startswith('triggering'):
                         values.append(sourceRole[3].split(':')[-1])
                     else:
-                        print 'Bad role '+sourceRole
+                        print(('Bad role '+sourceRole))
                     destRoles.append(';'.join(values))
                 dfields.append('|'.join(destRoles))
             else:

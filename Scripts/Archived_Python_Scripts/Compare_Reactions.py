@@ -62,13 +62,13 @@ if __name__ == "__main__":
     # Read the reactions from the first file.
     helper = BiochemHelper()
     firstReactions = helper.buildDictFromListOfObjects(helper.readReactionsFile(args.rxnfile1))
-    print 'First reaction file: %s' %(args.rxnfile1)
-    print '  Number of reactions: %d' %(len(firstReactions))
+    print('First reaction file: %s' %(args.rxnfile1))
+    print('  Number of reactions: %d' %(len(firstReactions)))
 
     # Read the compounds from the second file.
     secondReactions = helper.buildDictFromListOfObjects(helper.readReactionsFile(args.rxnfile2))
-    print 'Second reaction file: %s' %(args.rxnfile2)
-    print '  Number of reactions: %d' %(len(secondReactions))
+    print('Second reaction file: %s' %(args.rxnfile2))
+    print('  Number of reactions: %d' %(len(secondReactions)))
 
     # Track differences in reactions.
     reactionsOnlyInFirst = list()
@@ -126,41 +126,41 @@ if __name__ == "__main__":
             reactionsOnlyInSecond.append(rxnId)
 
     # Print summary data.
-    print
-    print 'Reaction differences:'
-    print '  There are %d reaction IDs only in first object' %(len(reactionsOnlyInFirst))
-    print '  There are %d reaction IDs only in second object' %(len(reactionsOnlyInSecond))
-    print '  There are %d reactions with same ID and different names' %(len(diffNames))
-    print '  There are %d reactions with same ID and different status' %(len(diffStatus))
-    print '  There are %d reactions with same ID and different stoichiometry' %(len(diffStoich))
-    print '  There are %d reactions with same ID and at least one difference' %(len(different))
+    print()
+    print('Reaction differences:')
+    print('  There are %d reaction IDs only in first object' %(len(reactionsOnlyInFirst)))
+    print('  There are %d reaction IDs only in second object' %(len(reactionsOnlyInSecond)))
+    print('  There are %d reactions with same ID and different names' %(len(diffNames)))
+    print('  There are %d reactions with same ID and different status' %(len(diffStatus)))
+    print('  There are %d reactions with same ID and different stoichiometry' %(len(diffStoich)))
+    print('  There are %d reactions with same ID and at least one difference' %(len(different)))
     allDiffs = diffNames & diffStatus & diffStoich
-    print '  There are %d reactions with the same ID and all differences' %(len(allDiffs))
-    print
+    print('  There are %d reactions with the same ID and all differences' %(len(allDiffs)))
+    print()
     
     # Print details if requested. 
     if args.showNames:
         if len(diffNames) > 0:
-            print 'Reactions with different names:'
+            print('Reactions with different names:')
             for rxnId in diffNames:
-                print '1: line %05d: %s' %(firstReactions[rxnId]['linenum'], firstReactions[rxnId])
-                print '2: line %05d: %s' %(secondReactions[rxnId]['linenum'], secondReactions[rxnId])
-                print
+                print('1: line %05d: %s' %(firstReactions[rxnId]['linenum'], firstReactions[rxnId]))
+                print('2: line %05d: %s' %(secondReactions[rxnId]['linenum'], secondReactions[rxnId]))
+                print()
 
     if args.showStatus:
         if len(diffStatus) > 0:
-            print 'Reactions with different status:'
+            print('Reactions with different status:')
             for rxnId in diffStatus:
-                print '1: line %05d: %s' %(firstReactions[rxnId]['linenum'], firstReactions[rxnId])
-                print '2: line %05d: %s' %(secondReactions[rxnId]['linenum'], secondReactions[rxnId])
-                print
+                print('1: line %05d: %s' %(firstReactions[rxnId]['linenum'], firstReactions[rxnId]))
+                print('2: line %05d: %s' %(secondReactions[rxnId]['linenum'], secondReactions[rxnId]))
+                print()
 
     if args.showStoich:
         if len(diffStoich) > 0:
-            print 'Reactions with different stoichiometry:'
+            print('Reactions with different stoichiometry:')
             for rxnId in diffStoich:
-                print '1: line %05d: %s' %(firstReactions[rxnId]['linenum'], firstReactions[rxnId])
-                print '2: line %05d: %s' %(secondReactions[rxnId]['linenum'], secondReactions[rxnId])
-                print
+                print('1: line %05d: %s' %(firstReactions[rxnId]['linenum'], firstReactions[rxnId]))
+                print('2: line %05d: %s' %(secondReactions[rxnId]['linenum'], secondReactions[rxnId]))
+                print()
 
     exit(0)
