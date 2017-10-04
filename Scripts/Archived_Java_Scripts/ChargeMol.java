@@ -5,6 +5,7 @@ import chemaxon.formats.MolExporter;
 import chemaxon.formats.MolFormatException;
 import chemaxon.struc.Molecule;
 import chemaxon.marvin.calculations.MajorMicrospeciesPlugin;
+import chemaxon.marvin.calculations.TautomerizationPlugin;
 import chemaxon.marvin.plugin.PluginException;
 
 public final class ChargeMol {
@@ -35,10 +36,14 @@ public final class ChargeMol {
 	    pH = Double.parseDouble(args[1]);
 	}
 
-	//Ready Plugin
-	MajorMicrospeciesPlugin plugin = new MajorMicrospeciesPlugin();
-	//System.out.println("pH "+String.valueOf(pH));
-	plugin.setpH(pH);
+	//Ready Charge Plugin
+	MajorMicrospeciesPlugin mms_plugin = new MajorMicrospeciesPlugin();
+	mms_plugin.setpH(pH);
+
+	//Ready Tautomerizer Plugin
+	TautomerizationPlugin t_plugin = new TautomerizationPlugin();
+	t_plugin.setDominantTautomerDistributionCalculation(true);
+	t_plugin.setpH(pH);
 
 	//Molecule for fusing all fragments
 	Molecule FusedMol = new Molecule();
@@ -48,40 +53,25 @@ public final class ChargeMol {
 	for(int i = 0; i < frags.length; i++){
 	    
 	    try{
+
+		//Run Charge Plugin
+		mms_plugin.setMolecule(frags[i]);
+		mms_plugin.standardize(frags[i]);
+		mms_plugin.run();
+		Molecule mms_mol = mms_plugin.getMajorMicrospecies();
 		
-		//Run Pluging
-		plugin.setMolecule(frags[i]);
-		plugin.run();
-		
-		//Get Major microspecies as molecule
-		Molecule FragMMS = plugin.getMajorMicrospecies();
+		//Run Tautomer Plugin
+		t_plugin.setMolecule(mms_mol);
+		t_plugin.standardize(mms_mol);
+		t_plugin.run();
+		Molecule t_mol = t_plugin.getStructure(0);
 		
 		//Fuse fragment
-		FusedMol.fuse(FragMMS,false);
+		FusedMol.fuse(t_mol,false);
 		
 	    }catch(PluginException PIE){
 		System.out.println("Error: "+PIE.getMessage());
 	    }
-
-	    //try{
-	
-		//String FragString = MolExporter.exportToFormat(frags[i], "inchi");
-		//String FragMMSString = MolExporter.exportToFormat(FragMMS, "inchi");
-		//System.out.println("Fragment "+Integer.toString(i)+" : "+FragString);
-		//System.out.println("Fragment "+Integer.toString(i)+" : "+FragMMSString);
-		
-	    //}catch(IOException IOE) {
-	    //System.out.println("Error: "+IOE.getMessage());
-	    //}
-	}
-	
-	//Dearomatize
-	try{
-	    
-	    FusedMol.dearomatize();
-
-	}catch(SecurityException SE){
-	    System.out.println("Error: "+SE.getMessage());
 	}
 
 	//Print to string

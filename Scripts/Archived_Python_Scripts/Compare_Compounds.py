@@ -63,14 +63,14 @@ if __name__ == "__main__":
     helper = BiochemHelper()
     firstCompounds = helper.buildDictFromListOfObjects(helper.readCompoundsFile(args.cpdfile1))
     if(args.flatFile == False):
-        print 'First compound file: %s' %(args.cpdfile1)
-        print '  Number of compounds: %d' %(len(firstCompounds))
+        print('First compound file: %s' %(args.cpdfile1))
+        print('  Number of compounds: %d' %(len(firstCompounds)))
 
     # Read the compounds from the second file.
     secondCompounds = helper.buildDictFromListOfObjects(helper.readCompoundsFile(args.cpdfile2))
     if(args.flatFile == False):
-        print 'Second compound file: %s' %(args.cpdfile2)
-        print '  Number of compounds: %d' %(len(secondCompounds))
+        print('Second compound file: %s' %(args.cpdfile2))
+        print('  Number of compounds: %d' %(len(secondCompounds)))
 
     # Keep track of differences in compounds.
     compoundsOnlyInFirst = list()
@@ -108,57 +108,57 @@ if __name__ == "__main__":
 
     # Print summary data.
     if(args.flatFile == False):
-        print
-        print 'Compound differences:'
-        print '  There are %d compound IDs only in first object' %(len(compoundsOnlyInFirst))
-        print '  There are %d compound IDs only in second object' %(len(compoundsOnlyInSecond))
-        print '  There are %d compounds with same ID and different names' %(len(diffNames))
-        print '  There are %d compounds with same ID and different formulas' %(len(diffFormulas))
-        print '  There are %d compounds with same ID and different charges' %(len(diffCharges))
-        print '  There are %d compounds with same ID and at least one difference' %(len(different))
+        print()
+        print('Compound differences:')
+        print('  There are %d compound IDs only in first object' %(len(compoundsOnlyInFirst)))
+        print('  There are %d compound IDs only in second object' %(len(compoundsOnlyInSecond)))
+        print('  There are %d compounds with same ID and different names' %(len(diffNames)))
+        print('  There are %d compounds with same ID and different formulas' %(len(diffFormulas)))
+        print('  There are %d compounds with same ID and different charges' %(len(diffCharges)))
+        print('  There are %d compounds with same ID and at least one difference' %(len(different)))
         diffFormulaCharge = diffFormulas & diffCharges
-        print '  There are %d compounds with the same ID and different formulas and charges' %(len(diffFormulaCharge))
+        print('  There are %d compounds with the same ID and different formulas and charges' %(len(diffFormulaCharge)))
         allDiffs = diffNames & diffFormulas & diffCharges
-        print '  There are %d compounds with the same ID and all differences' %(len(allDiffs))
+        print('  There are %d compounds with the same ID and all differences' %(len(allDiffs)))
 
     # Print details if requested. 
     if args.showNames:
         if len(diffNames) > 0:
             if(args.flatFile == False):
-                print 'Compounds with different names:'
+                print('Compounds with different names:')
 
             for cpdId in diffNames:
                 if(args.flatFile == False):
-                    print '1: line %05d: %s' %(firstCompounds[cpdId]['linenum'], firstCompounds[cpdId])
-                    print '2: line %05d: %s' %(secondCompounds[cpdId]['linenum'], secondCompounds[cpdId])
-                    print
+                    print('1: line %05d: %s' %(firstCompounds[cpdId]['linenum'], firstCompounds[cpdId]))
+                    print('2: line %05d: %s' %(secondCompounds[cpdId]['linenum'], secondCompounds[cpdId]))
+                    print()
                 else:
-                    print '%s\t%s\t%s' %(cpdId, firstCompounds[cpdId]['name'], secondCompounds[cpdId]['name'])
+                    print('%s\t%s\t%s' %(cpdId, firstCompounds[cpdId]['name'], secondCompounds[cpdId]['name']))
 
     if args.showFormulas:
         if len(diffFormulas) > 0:
             if(args.flatFile == False):
-                print 'Compounds with different formulas:'
+                print('Compounds with different formulas:')
 
             for cpdId in diffFormulas:
                 if(args.flatFile == False):
-                    print '1: line %05d: %s' %(firstCompounds[cpdId]['linenum'], firstCompounds[cpdId])
-                    print '2: line %05d: %s' %(secondCompounds[cpdId]['linenum'], secondCompounds[cpdId])
-                    print
+                    print('1: line %05d: %s' %(firstCompounds[cpdId]['linenum'], firstCompounds[cpdId]))
+                    print('2: line %05d: %s' %(secondCompounds[cpdId]['linenum'], secondCompounds[cpdId]))
+                    print()
                 else:
-                    print '%s\t%s\t%s' %(cpdId, firstCompounds[cpdId]['formula'], secondCompounds[cpdId]['formula'])
+                    print('%s\t%s\t%s' %(cpdId, firstCompounds[cpdId]['formula'], secondCompounds[cpdId]['formula']))
 
     if args.showCharges:
         if len(diffCharges) > 0:
             if(args.flatFile == False):
-                print 'Compounds with different charges:'
+                print('Compounds with different charges:')
 
             for cpdId in diffCharges:
                 if(args.flatFile == False):
-                    print '1: line %05d: %s' %(firstCompounds[cpdId]['linenum'], firstCompounds[cpdId])
-                    print '2: line %05d: %s' %(secondCompounds[cpdId]['linenum'], secondCompounds[cpdId])
-                    print
+                    print('1: line %05d: %s' %(firstCompounds[cpdId]['linenum'], firstCompounds[cpdId]))
+                    print('2: line %05d: %s' %(secondCompounds[cpdId]['linenum'], secondCompounds[cpdId]))
+                    print()
                 else:
-                    print '%s\t%s\t%s' %(cpdId, firstCompounds[cpdId]['defaultCharge'], secondCompounds[cpdId]['defaultCharge'])
+                    print('%s\t%s\t%s' %(cpdId, firstCompounds[cpdId]['defaultCharge'], secondCompounds[cpdId]['defaultCharge']))
 
     exit(0)
