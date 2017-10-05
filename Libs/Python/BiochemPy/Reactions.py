@@ -60,6 +60,39 @@ class Reactions:
         else:
             return 0
 
+    def generateCodes(self, rxns_dict):
+        codes_dict=dict()
+        for rxn in rxns_dict:
+            if(rxns_dict[rxn]['status']=="EMPTY"):
+                continue
+            code = self.generateCode(rxns_dict[rxn]['stoichiometry'])
+            if(code not in codes_dict):
+                codes_dict[code]=dict()
+            codes_dict[code][rxn]=1
+        return codes_dict
+
+    def generateCode(self,stoichiometry):
+        rxn_cpds_array = self.parseStoich(stoichiometry)
+
+        #It matters which side of the equation, so build reagents and products arrays
+        reagents=list()
+        products=list()
+        for rgt in sorted(rxn_cpds_array, key=lambda x: ( x["reagent"], x["coefficient"] )):
+            #skip protons
+            if("cpd00067" in rgt["reagent"]):
+                continue
+
+            if(rgt["coefficient"]<0):
+                reagents.append(rgt["reagent"]+":"+str(abs(rgt["coefficient"])))
+            if(rgt["coefficient"]>0):
+                products.append(rgt["reagent"]+":"+str(abs(rgt["coefficient"])))
+
+        rgt_string = "|".join(reagents)
+        pdt_string = "|".join(products)
+        #Sorting the overall strings here helps with matching transporters
+        rxn_string = "|=|".join(sorted([rgt_string,pdt_string]))
+        return rxn_string
+
     @staticmethod
     def buildStoich(rxn_cpds_array):
         stoichiometry_array = list()
