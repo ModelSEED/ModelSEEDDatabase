@@ -7,15 +7,22 @@ sys.path.append('../../Libs/Python')
 from BiochemPy import Compounds
 
 CompoundsHelper = Compounds()
+
+#Load Compounds
 Compounds_Dict = CompoundsHelper.loadCompounds()
+
+#Load Structures
 Structures_Dict = CompoundsHelper.loadStructures()
+
+#Load Aliases
 MS_Aliases_Dict =  CompoundsHelper.loadMSAliases()
+
 #Source_Aliases_Dict =  CompoundsHelper.loadSourceAliases()
 
 for msid in MS_Aliases_Dict.keys():
     ms_structure = "null"
 
-    #prioritizes KEGG structures
+    #prioritizes KEGG structures (arbitrarily)
     for source in ["KEGG","MetaCyc"]:
         if(source not in MS_Aliases_Dict[msid]):
             continue
