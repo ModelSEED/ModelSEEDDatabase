@@ -51,6 +51,52 @@ class Reactions:
         return rxn_cpds_array
 
     @staticmethod
+    def isTransport(rxn_cpds_array):
+        compartments_dict=dict()
+        for rgt in rxn_cpds_array:
+            compartments_dict[rgt['compartment']]=1
+        if(len(compartments_dict.keys())>1):
+            return 1
+        else:
+            return 0
+
+    def generateCodes(self, rxns_dict):
+        codes_dict=dict()
+        for rxn in rxns_dict:
+            if(rxns_dict[rxn]['status']=="EMPTY"):
+                continue
+            code = self.generateCode(rxns_dict[rxn]['stoichiometry'])
+            if(code not in codes_dict):
+                codes_dict[code]=dict()
+            codes_dict[code][rxn]=1
+        return codes_dict
+
+    def generateCode(self,stoichiometry):
+        rxn_cpds_array = self.parseStoich(stoichiometry)
+
+        #It matters if its a transport reaction, and we include protons when matching transpor
+        is_transport = self.isTransport(rxn_cpds_array)
+
+        #It matters which side of the equation, so build reagents and products arrays
+        reagents=list()
+        products=list()
+        for rgt in sorted(rxn_cpds_array, key=lambda x: ( x["reagent"], x["coefficient"] )):
+            #skip protons
+            if("cpd00067" in rgt["reagent"] and is_transport == 0):
+                continue
+
+            if(rgt["coefficient"]<0):
+                reagents.append(rgt["reagent"]+":"+str(abs(rgt["coefficient"])))
+            if(rgt["coefficient"]>0):
+                products.append(rgt["reagent"]+":"+str(abs(rgt["coefficient"])))
+
+        rgt_string = "|".join(reagents)
+        pdt_string = "|".join(products)
+        #Sorting the overall strings here helps with matching transporters
+        rxn_string = "|=|".join(sorted([rgt_string,pdt_string]))
+        return rxn_string
+
+    @staticmethod
     def buildStoich(rxn_cpds_array):
         stoichiometry_array = list()
         for rgt in sorted(rxn_cpds_array, key=lambda x: (
@@ -107,8 +153,7 @@ class Reactions:
         # Build dict of compounds
         cpds_dict = dict()
         for rgt in rgts_array:
-            rgt["coefficient"] = cpds_coeff_dict[rgt["compound"]]
-            cpds_dict[rgt["compound"]] = rgt
+            cpds_dict[rgt["compound"]] = {"formula":rgt['formula'],'charge':rgt['charge'],'coefficient':cpds_coeff_dict[rgt['compound']]}
 
         ########################################
         # Check for duplicate elements, across
@@ -192,11 +237,14 @@ class Reactions:
 
         # Check to see if it already exists
         cpd_exists = 0
+        delete_cpd = 0
         for rgt in rxn_cpds_array:
             if (rgt["compound"] == compound and
                         rgt["compartment"] == compartment):
                 rgt["coefficient"] -= adjustment
                 cpd_exists = 1
+                if(rgt["coefficient"] == 0):
+                    delete_cpd=rgt
 
         if (cpd_exists != 1):
             rgt_id = compound + "_" + str(compartment) + "0"
@@ -207,6 +255,10 @@ class Reactions:
                  "name": self.Compounds_Dict[compound]["name"],
                  "formula": self.Compounds_Dict[compound]["formula"],
                  "charge": self.Compounds_Dict[compound]["charge"]})
+
+        if (delete_cpd != 0):
+            rxn_cpds_array.remove(delete_cpd)
+
         return
 
     def rebuildReaction(self, reaction_dict, stoichiometry):
@@ -228,7 +280,7 @@ class Reactions:
         rgts_str__array = list()
         for rgt in reagents_array:
             id_string = "(" + str(abs(rgt["coefficient"])) + ") " + rgt[
-                "compound"] + "[" + str(rgt["index"]) + "]"
+                "compound"] + "[" + str(rgt["compartment"]) + "]"
             rgts_str__array.append(id_string)
 
         equation_array = list()
@@ -254,7 +306,7 @@ class Reactions:
         pdts_str_array = list()
         for rgt in products_array:
             id_string = "(" + str(abs(rgt["coefficient"])) + ") " + rgt[
-                "compound"] + "[" + str(rgt["index"]) + "]"
+                "compound"] + "[" + str(rgt["compartment"]) + "]"
             pdts_str_array.append(id_string)
 
         equation_array.append(" + ".join(pdts_str_array))
