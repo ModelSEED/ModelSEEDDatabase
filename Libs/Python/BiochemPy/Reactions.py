@@ -74,12 +74,15 @@ class Reactions:
     def generateCode(self,stoichiometry):
         rxn_cpds_array = self.parseStoich(stoichiometry)
 
+        #It matters if its a transport reaction, and we include protons when matching transpor
+        is_transport = self.isTransport(rxn_cpds_array)
+
         #It matters which side of the equation, so build reagents and products arrays
         reagents=list()
         products=list()
         for rgt in sorted(rxn_cpds_array, key=lambda x: ( x["reagent"], x["coefficient"] )):
             #skip protons
-            if("cpd00067" in rgt["reagent"]):
+            if("cpd00067" in rgt["reagent"] and is_transport == 0):
                 continue
 
             if(rgt["coefficient"]<0):
