@@ -194,9 +194,9 @@ if __name__ == "__main__":
             noFormula.append(index)
 
         # Check for duplicate and missing compound structures.
-        mol = AllChem.MolFromInchi(cpd['structure'])
+        mol = AllChem.MolFromInchi(cpd['smiles'])
         if mol:
-            inchikey = AllChem.InchiToInchiKey(cpd['structure'])
+            inchikey = AllChem.InchiToInchiKey(cpd['smiles'])
             if inchikey in structureDict:
                 if inchikey not in duplicateStructure:
                     duplicateStructure[inchikey] = [structureDict[inchikey]]
