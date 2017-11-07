@@ -86,6 +86,6 @@ for msid in sorted(MS_Aliases_Dict.keys()):
     if(ms_structure == "null"):
         continue
 
-    ms_structs_file.write("\t".join([msid,ms_structure_type,";".join(sorted(ms_external_ids)),ms_structure]))
+    ms_structs_file.write("\t".join([msid,ms_structure_type,";".join(sorted(ms_external_ids)),ms_structure])+"\n")
 
 ms_structs_file.close()
