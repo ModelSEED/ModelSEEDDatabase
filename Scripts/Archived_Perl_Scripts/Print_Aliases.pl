@@ -50,6 +50,8 @@ foreach my $rxn (keys %Rxn_Aliases){
 		foreach my $sub_entry (split(/[\s\/]+/,$entry)){
 		    next if $sub_entry =~ /determined/;
 		    $sub_entry =~ s/^EC-//;
+		    $sub_entry =~ s/[\),]+//;
+
 		    $Global_Aliases{"Reactions"}{$alias}{$sub_entry}{default}{$rxn}=1;
 		    if(exists($BiGG{$alias})){
 			$Global_Aliases{"Reactions"}{"BiGG"}{$sub_entry}{default}{$rxn}=1;
@@ -93,6 +95,8 @@ foreach my $rxn (keys %Rxn_Aliases){
 		foreach my $sub_entry (split(/[\s\/]+/,$entry)){
 		    next if $sub_entry =~ /determined/;
 		    $sub_entry =~ s/^EC-//;
+		    $sub_entry =~ s/[\),]+//;
+
 		    $Global_Aliases{"Reactions"}{$alias}{$sub_entry}{plantdefault}{$rxn}=1;
 		    if(exists($BiGG{$alias})){
 			$Global_Aliases{"Reactions"}{"BiGG"}{$sub_entry}{plantdefault}{$rxn}=1;
