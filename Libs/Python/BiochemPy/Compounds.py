@@ -9,6 +9,8 @@ class Compounds:
                  cpds_file='compounds.tsv'):
         self.BiochemRoot = biochem_root
         self.CpdsFile = biochem_root + cpds_file
+        self.AliasFile = biochem_root + "Aliases/Compounds_Aliases.tsv"
+        self.StructRoot = biochem_root + "Structures/"
 
         reader = DictReader(open(self.CpdsFile), dialect='excel-tab')
         self.Headers = reader.fieldnames
@@ -23,6 +25,75 @@ class Compounds:
 
         return cpds_dict
 
+    def loadMSAliases(self,sources_array=[]):
+        if(len(sources_array)==0):
+            return {}
+
+        aliases_dict = dict()
+        reader = DictReader(open(self.AliasFile), dialect = 'excel-tab')
+        for line in reader:
+            if("cpd" not in line['MS ID']):
+                continue
+
+            if(line['Source'] not in sources_array):
+                continue
+
+            if(line['MS ID'] not in aliases_dict):
+                   aliases_dict[line['MS ID']]=dict()
+
+            if(line['Source'] not in aliases_dict[line['MS ID']]):
+                aliases_dict[line['MS ID']][line['Source']]=list()
+
+            aliases_dict[line['MS ID']][line['Source']].append(line['External ID'])
+
+        return aliases_dict
+
+    def loadSourceAliases(self):
+        aliases_dict = dict()
+        reader = DictReader(open(self.AliasFile), dialect = 'excel-tab')
+        for line in reader:
+            if("cpd" not in line['MS ID']):
+                continue
+
+            if(line['Source'] not in aliases_dict):
+                   aliases_dict[line['Source']]=dict()
+
+            if(line['External ID'] not in aliases_dict[line['Source']]):
+                aliases_dict[line['Source']][line['External ID']]=list()
+
+            aliases_dict[line['Source']][line['External ID']].append(line['MS ID'])
+
+        return aliases_dict
+
+    def loadStructures(self,sources_array=[],db_array=[]):
+        if(len(sources_array)==0):
+            sources_array=["SMILE","InChIKey","InChI"]
+
+        if(len(db_array)==0):
+            db_array=["KEGG","MetaCyc"]
+
+        structures_dict = dict()
+        for struct_type in sources_array:
+            structures_dict[struct_type]=dict()
+            for db in db_array:
+                for struct_stage in ["Charged","Original"]:
+                    struct_file = db+"/"+struct_type+"_"+struct_stage+"Strings.txt"
+                    struct_file = self.StructRoot+struct_file
+
+                    if(os.path.isfile(struct_file)==False):
+                        continue
+
+                    reader = DictReader(open(struct_file), dialect = "excel-tab", fieldnames = ['ID','Structure','Name'])
+                    for line in reader:
+                        if(line['ID'] not in structures_dict[struct_type]):
+                            structures_dict[struct_type][line['ID']]=dict()
+
+                        if(struct_stage not in structures_dict[struct_type][line['ID']]):
+                            structures_dict[struct_type][line['ID']][struct_stage]=dict()
+
+                        structures_dict[struct_type][line['ID']][struct_stage][line['Structure']]=1
+        return structures_dict
+        
     @staticmethod
     def parseFormula(formula):
         if (

@@ -18,7 +18,7 @@ def validate_schema(_compounds, verbose):
 
 
 def check_dups(_compounds, verbose, unique_fields=('id', 'abbreviation',
-                                                   'name', 'structure')):
+                                                   'name', 'inchikey')):
     unique_values = dict([(x, defaultdict(list)) for x in unique_fields])
     for id, comp in _compounds.items():
         if comp['is_obsolete'] == "1":
