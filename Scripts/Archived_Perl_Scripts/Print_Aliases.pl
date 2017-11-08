@@ -49,6 +49,8 @@ foreach my $rxn (keys %Rxn_Aliases){
 	    if($alias eq "Enzyme Class"){
 		foreach my $sub_entry (split(/[\s\/]+/,$entry)){
 		    next if $sub_entry =~ /determined/;
+		    next if $sub_entry =~ /or/;
+
 		    $sub_entry =~ s/^EC-//;
 		    $sub_entry =~ s/[\),]+//;
 
@@ -94,6 +96,8 @@ foreach my $rxn (keys %Rxn_Aliases){
 	    if($alias eq "Enzyme Class"){
 		foreach my $sub_entry (split(/[\s\/]+/,$entry)){
 		    next if $sub_entry =~ /determined/;
+		    next if $sub_entry =~ /or/;
+
 		    $sub_entry =~ s/^EC-//;
 		    $sub_entry =~ s/[\),]+//;
 
