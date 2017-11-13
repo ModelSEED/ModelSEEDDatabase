@@ -274,7 +274,7 @@ class Reactions:
         rgts_str__array = list()
         for rgt in reagents_array:
             id_string = "(" + str(abs(rgt["coefficient"])) + ") " + rgt[
-                "compound"] + "[" + str(rgt["index"]) + "]"
+                "compound"] + "[" + str(rgt["compartment"]) + "]"
             rgts_str__array.append(id_string)
 
         equation_array = list()
@@ -300,7 +300,7 @@ class Reactions:
         pdts_str_array = list()
         for rgt in products_array:
             id_string = "(" + str(abs(rgt["coefficient"])) + ") " + rgt[
-                "compound"] + "[" + str(rgt["index"]) + "]"
+                "compound"] + "[" + str(rgt["compartment"]) + "]"
             pdts_str_array.append(id_string)
 
         equation_array.append(" + ".join(pdts_str_array))

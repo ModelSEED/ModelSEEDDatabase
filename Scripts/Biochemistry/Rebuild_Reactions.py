@@ -13,7 +13,7 @@ Update_Reactions=0
 for rxn in sorted(Reactions_Dict.keys()):
     if(Reactions_Dict[rxn]["status"] == "EMPTY"):
         continue
-    
+
     Rxn_Cpds_Array = ReactionsHelper.parseStoich(Reactions_Dict[rxn]["stoichiometry"])
     Stoichiometry=ReactionsHelper.buildStoich(Rxn_Cpds_Array)
     if(Stoichiometry != Reactions_Dict[rxn]["stoichiometry"]):
