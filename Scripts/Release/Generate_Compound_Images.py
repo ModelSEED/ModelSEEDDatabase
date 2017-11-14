@@ -100,8 +100,8 @@ def safe_generate_image_files(compounds_file, path, structure_key='structure',
         os.mkdir(path)
     with open(compounds_file) as infile:
         r = csv.DictReader(infile, dialect='excel-tab')
-        for line in r:
-            if not line[structure_key] or line[structure_key] == 'null':
+        for i,line in enumerate(r):
+            if not line[structure_key] or line[structure_key] == 'null' or i < 600:
                 continue
             with open(tmp_structures, 'w') as outfile:
                 outfile.write(line[structure_key])
@@ -126,7 +126,7 @@ if __name__ == '__main__':
                         help='The desired depth of the directory tree')
     parser.add_argument('-t', '--type', type=str, default="png",
                         help='The desired output file type: png, svg or jpeg')
-    parser.add_argument('-f', '--formatting', type=str, default="w500h500",
+    parser.add_argument('-f', '--formatting', type=str, default="w500h500#00ffffff",
                         help='The dimensions of the output file')
     parser.add_argument('-k', '--kekulize', type=bool, default=True,
                         help='Should aromatic structures be represented in '
