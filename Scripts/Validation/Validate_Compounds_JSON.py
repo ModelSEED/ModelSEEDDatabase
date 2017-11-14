@@ -19,13 +19,16 @@ def validate_schema(_compounds, verbose):
 
 def check_dups(_compounds, verbose, unique_fields=('id', 'abbreviation',
                                                    'name', 'inchikey')):
+    # build a nested dict for uniqueness checking
+    # {field: {value: [ids_with_this_value]}}
     unique_values = dict([(x, defaultdict(list)) for x in unique_fields])
     for id, comp in _compounds.items():
-        if comp['is_obsolete'] == "1":
+        if comp['is_obsolete']:
             continue
         for key in unique_values:
             unique_values[key][comp[key]].append(id)
 
+    # if the unique_values dict for a field has more than one id, it's not unique
     duplicated = defaultdict(int)
     for value_type in unique_values:
         for key, ids in unique_values[value_type].items():
