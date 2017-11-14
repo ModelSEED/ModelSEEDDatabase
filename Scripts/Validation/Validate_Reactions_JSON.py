@@ -38,8 +38,7 @@ def validate_schema(_rxns, verbose):
     return len(schema_errors)
 
 
-def check_dups(_rxns, verbose, unique_fields=('id', 'abbreviation',
-                                              'name', 'stoichiometry')):
+def check_dups(_rxns, verbose, unique_fields=('id', 'stoichiometry')):
     # build a nested dict for uniqueness checking
     # {field: {value: [ids_with_this_value]}}
     unique_values = dict([(key, defaultdict(list)) for key in unique_fields])
@@ -86,9 +85,6 @@ def check_compounds(_rxns, verbose, compound_loc='./Biochemistry/compounds.json'
             print('Invalid id {} in equation {}'.format(id, e))
             err['invalid_equation'] += 1
         if reactant_atoms - product_atoms or product_atoms - reactant_atoms:
-            if verbose:
-                print('Unbalanced reaction in {}\n{}\n{}'
-                      .format(id, reactant_atoms, product_atoms))
             err['unbalanced_reactions'] += 1
             if rxn['status'] == 'OK':
                 if verbose:
