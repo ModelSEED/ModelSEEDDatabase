@@ -362,7 +362,7 @@ class TemplateHelper(BaseHelper):
                                 raise RoleNotFoundError('Role %s on line %d not found' %(values[0], linenum))
                             complexRole = dict()
                             complexRole['templaterole_ref'] = '~/roles/id/'+values[0] # Need to validate
-                            complexRole['optional'] = int(values[2])
+                            complexRole['optional_role'] = int(values[2])
                             complexRole['triggering'] = int(values[3])
                             complex['complexroles'].append(complexRole)
                 if includeLinenum:
@@ -481,6 +481,26 @@ class TemplateHelper(BaseHelper):
                     reaction['forward_penalty'] = float(fields[fieldNames['forward_cost']])
                     reaction['reverse_penalty'] = float(fields[fieldNames['reverse_cost']])
                     reaction['templateReactionReagents'] = list()
+                    if reaction['base_cost'] == 'null':
+                        reaction['base_cost'] = 1
+                    if reaction['maxforflux'] == 'null':
+                        reaction['maxforflux'] = 0
+                    if reaction['maxrevflux'] == 'null':
+                        reaction['maxrevflux'] = 0
+                    if reaction['deltaG'] == 'null':
+                        reaction['deltaG'] = 10000000
+                    if reaction['deltaGErr'] == 'null':
+                        reaction['deltaGErr'] = 10000000
+                    if not isinstance(reaction['base_cost'], (int, long, float, complex)):
+                        reaction['base_cost'] = float(reaction['base_cost'])
+                    if not isinstance(reaction['maxforflux'], (int, long, float, complex)):
+                        reaction['maxforflux'] = float(reaction['maxforflux'])
+                    if not isinstance(reaction['maxrevflux'], (int, long, float, complex)):
+                        reaction['maxrevflux'] = float(reaction['maxrevflux'])
+                    if not isinstance(reaction['deltaG'], (int, long, float, complex)):
+                        reaction['deltaG'] = float(reaction['deltaG'])
+                    if not isinstance(reaction['deltaGErr'], (int, long, float, complex)):
+                        reaction['deltaGErr'] = float(reaction['deltaGErr'])
                     # Stoichiometry format is n:cpdid:c:i:"cpdname"
                     if len(masterReaction['stoichiometry']) > 0:
                         try:
@@ -571,10 +591,24 @@ class TemplateHelper(BaseHelper):
                 compound['aliases'] = masterCompound['aliases']
                 compound['defaultCharge'] = masterCompound['charge']
                 compound['mass'] = masterCompound['mass']
-                if compound['mass'] == 'null':
-                    compound['mass'] = 0
                 compound['deltaG'] = masterCompound['deltag']
                 compound['deltaGErr'] = masterCompound['deltagerr']
+                if compound['mass'] == 'null':
+                    compound['mass'] = 0
+                if compound['aliases'] == 'null':
+                    compound['aliases'] = []
+                if compound['deltaG'] == 'null':
+                    compound['deltaG'] = 10000000
+                if compound['deltaGErr'] == 'null':
+                    compound['deltaGErr'] = 10000000
+                if not isinstance(compound['mass'], (int, long, float, complex)):
+                    compound['mass'] = float(compound['mass'])
+                if not isinstance(compound['defaultCharge'], (int, long, float, complex)):
+                    compound['defaultCharge'] = float(compound['defaultCharge'])
+                if not isinstance(compound['deltaG'], (int, long, float, complex)):
+                    compound['deltaG'] = float(compound['deltaG'])
+                if not isinstance(compound['deltaGErr'], (int, long, float, complex)):
+                    compound['deltaGErr'] = float(compound['deltaGErr'])
                 compound['formula'] = masterCompound['formula']
                 self.compounds[compound['id']] = compound
             except KeyError as e:
@@ -595,6 +629,8 @@ class TemplateHelper(BaseHelper):
             compCompound['id'] = id
             compCompound['templatecompound_ref'] = '~/compounds/id/'+compoundId
             compCompound['charge'] = compound['defaultCharge'] # @todo Not sure how charge could be different
+            if not isinstance(compCompound['charge'], (int, long, float, complex)):
+                compCompound['charge'] = float(compCompound['charge'])
             if compartment['id'] == 'e':
                 compCompound['maxuptake'] = 100.0 # Set a maximum for the extracellular compartment
             else:
