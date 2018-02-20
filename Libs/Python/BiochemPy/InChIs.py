@@ -1,8 +1,9 @@
-import re
-from Libs.Python.BiochemPy.Compounds import Compounds
+import os, re, sys
+
+sys.path.append('../../Libs/Python')
+from BiochemPy import Compounds
 
 InChI_Layers = ('c', 'h', 'p', 'q', 'b', 't', 'm', 's')
-
 
 def parse(inchi, merge_formula=False):
     """
