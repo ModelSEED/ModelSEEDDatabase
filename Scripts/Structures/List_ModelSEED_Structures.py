@@ -70,8 +70,12 @@ for msid in sorted(MS_Aliases_Dict.keys()):
             else:
                 #Establish rules for checking/curating InChIKey strings
                 pass
-            
-    elif("InChI" in Structs):
+
+    if(ms_structure != "null"):
+        ms_structs_file.write("\t".join([msid,ms_structure_type,";".join(sorted(ms_external_ids)),ms_structure])+"\n")
+
+    ms_structure="null"
+    if("InChI" in Structs):
         #Default to structures charged by MarvinBeans
         if("Charged" in Structs["InChI"]):
 
