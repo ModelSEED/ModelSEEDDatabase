@@ -26,13 +26,15 @@ def check_dups(_compounds, verbose, unique_fields=('id', 'abbreviation',
         if comp['is_obsolete']:
             continue
         for key in unique_values:
+            if not comp.get(key) or comp[key] == 'null':
+                continue
             unique_values[key][comp[key]].append(id)
 
     # if the unique_values dict for a field has more than one id, it's not unique
     duplicated = defaultdict(int)
     for value_type in unique_values:
         for key, ids in unique_values[value_type].items():
-            if len(ids) > 1 and key != 'null':
+            if len(ids) > 1:
                 if verbose:
                     print("Duplicate {}: {} in {}".format(value_type, key, ids))
                 duplicated["duplicated_"+value_type] += len(ids)-1
