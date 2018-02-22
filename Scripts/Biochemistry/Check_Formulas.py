@@ -8,14 +8,24 @@ from BiochemPy import Reactions, Compounds, InChIs
 
 CompoundsHelper = Compounds()
 Compounds_Dict = CompoundsHelper.loadCompounds()
-
+Structures_Dict = CompoundsHelper.loadStructures(["InChI"],["ModelSEED"])
+print Structures_Dict.keys()
+sys.exit()
 for cpd in sorted(Compounds_Dict.keys()):
-    if(Compounds_Dict[cpd]['inchikey'] == 'null'):
+    if(Compounds_Dict[cpd]['inchikey'] == ''):
         continue
 
-    inchi_formula = InChIs.parse(Compounds_Dict[cpd]['inchikey'],True)
+    if(cpd not in Structures_Dict):
+        #None to date
+        print "Problem with "+cpd
+        continue
 
-    if(inchi_formula[0][0] != Compounds_Dict[cpd]['formula']):
+    if('InChI' not in Structures_Dict[cpd]):
+        print cpd,Structures_Dict[cpd]
+
+    (inchi_formula,inchi_layers) = InChIs.parse(Structures_Dict[cpd]['InChI'])
+    adjusted_inchi_formula = InChIs.adjust_protons(inchi_formula,inchi_layers['p'])
+    if(adjusted_inchi_formula != Compounds_Dict[cpd]['formula']):
         print cpd, inchi_formula, Compounds_Dict[cpd]['formula']
         break
 
