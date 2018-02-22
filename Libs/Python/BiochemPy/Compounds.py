@@ -73,7 +73,7 @@ class Compounds:
 
         structures_dict = dict()
         if(len(db_array)==1 and db_array[0]=="ModelSEED"):
-            struct_file = "ModelSEED/ModelSEED_Strings.txt"
+            struct_file = "ModelSEED_Structures.txt"
             struct_file = self.StructRoot+struct_file
             reader = DictReader(open(struct_file), dialect = "excel-tab", fieldnames = ['ID','Source','Aliases','Structure'])
             for line in reader:
