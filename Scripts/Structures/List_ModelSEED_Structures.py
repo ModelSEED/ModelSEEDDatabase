@@ -19,8 +19,8 @@ MS_Aliases_Dict =  CompoundsHelper.loadMSAliases(["KEGG","MetaCyc"])
 
 #Source_Aliases_Dict =  CompoundsHelper.loadSourceAliases()
 
-ms_structs_file = open("../../Biochemistry/Structures/ModelSEED/ModelSEED_Strings.txt",'w')
-ms_structs_file.write("ID\tSource\tAliases\tStructure\n")
+ms_structs_file = open("../../Biochemistry/Structures/ModelSEED_Structures.txt",'w')
+ms_structs_file.write("ID\tType\tAliases\tStructure\n")
 for msid in sorted(MS_Aliases_Dict.keys()):
 
     #Build collection of all structures for the ModelSEED ID
