@@ -3,7 +3,6 @@ import os
 import json
 from csv import DictReader
 
-
 class Compounds:
     def __init__(self, biochem_root='../../Biochemistry/',
                  cpds_file='compounds.tsv'):
@@ -73,6 +72,18 @@ class Compounds:
             db_array=["KEGG","MetaCyc"]
 
         structures_dict = dict()
+        if(len(db_array)==1 and db_array[0]=="ModelSEED"):
+            struct_file = "ModelSEED_Structures.txt"
+            struct_file = self.StructRoot+struct_file
+            reader = DictReader(open(struct_file), dialect = "excel-tab", fieldnames = ['ID','Source','Aliases','Structure'])
+            for line in reader:
+                if(line['ID'] not in structures_dict):
+                    structures_dict[line['ID']]={}
+
+                structures_dict[line['ID']][line['Source']]=line['Structure']
+
+            return structures_dict
+
         for struct_type in sources_array:
             structures_dict[struct_type]=dict()
             for db in db_array:
