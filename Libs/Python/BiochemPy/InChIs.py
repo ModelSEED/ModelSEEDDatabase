@@ -24,8 +24,7 @@ def parse(inchi, merge_formula=False):
     layer_dict = dict([(x, "") for x in InChI_Layers])
     for l in layers:
         layer_dict[l[0]] = l[1:]
-    return formula, layers
-
+    return formula, layer_dict
 
 def build(formula, layers, remove=(), merge_formula=False):
     """
@@ -52,19 +51,39 @@ def charge(q_str,p_str):
     @param p_str: p layer string
     @return: charge
     """
-    raise NotImplementedError
+    #my $charge=0;
+    #foreach my $q ( grep { $_ ne "" } split(/;/, $q_string)){
+    #    my $multiple=1;
+    #    if($q =~ s/^(\d+)\*(.+)$/$2/){
+    #        $multiple=$1;
+    #    }
+    #    $charge+=($q*$multiple);
+    #}
 
+    #foreach my $p ( grep { $_ ne "" } split(/;/, $p_string)){
+    #    my $multiple=1;
+        #NB: at time of press (12/2/2011)
+        #No /p sublayer does multiple components
+        #therefore multiple code doesn't apply
+    #    if($p =~ s/^(\d+)\*(.+)$/$2/){
+    #        $multiple=$1;
+    #    }
+    #    $charge+=($p*$multiple);
+    #}
+    raise NotImplementedError
 
 def adjust_protons(formula, protons):
     """
-
     @param formula: chemical formula as string
     @param protons: number of hydrogens to add/remove as intager
     @return: new formula as string
     """
     if not protons:
         return formula
+    protons = int(protons)
     formula_parts = formula.split('.')
+    #The whole function assumes that the single number of protons
+    #applies to the first fragment that has protons
     for i, component in enumerate(formula_parts):
         atoms = Compounds.parseFormula(component)
         if "H" in atoms:
@@ -73,6 +92,6 @@ def adjust_protons(formula, protons):
                 print('ERROR: Too Many Protons adjusted in formula!')
             if atoms['H'] == 0:
                 del atoms['H']
-            formula_parts[i] = Compounds.hill_sorted(atoms)
+            formula_parts[i] = Compounds.buildFormula(atoms)
             break
     return '.'.join(formula_parts)
