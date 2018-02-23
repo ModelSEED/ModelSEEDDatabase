@@ -10,7 +10,7 @@ CompoundsHelper = Compounds()
 Compounds_Dict = CompoundsHelper.loadCompounds()
 Structures_Dict = CompoundsHelper.loadStructures(["InChI"],["ModelSEED"])
 
-diff_file = open("Compound_Differences.txt", 'w')
+diff_file = open("Compound_Formula_Differences.txt", 'w')
 for cpd in sorted(Compounds_Dict.keys()):
     if(cpd not in Structures_Dict):
         diff_file.write("Zero structures for "+cpd+"\n")
