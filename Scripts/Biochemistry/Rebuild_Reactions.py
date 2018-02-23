@@ -18,7 +18,7 @@ for rxn in sorted(Reactions_Dict.keys()):
     Stoichiometry=ReactionsHelper.buildStoich(Rxn_Cpds_Array)
     if(Stoichiometry != Reactions_Dict[rxn]["stoichiometry"]):
         ReactionsHelper.rebuildReaction(Reactions_Dict[rxn],Stoichiometry)
-        Update_Reactions=1
+        Update_Reactions+=1
 
-print "Saving reactions";
+print "Saving rebuilt equations for "+str(Update_Reactions)+" reactions";
 ReactionsHelper.saveReactions(Reactions_Dict)

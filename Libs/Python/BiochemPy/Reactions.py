@@ -227,6 +227,7 @@ class Reactions:
 
     def adjustCompound(self, rxn_cpds_array, compound, adjustment,
                        compartment=0):
+
         if (adjustment == 0):
             return rxn_cpds_array
 
@@ -238,11 +239,14 @@ class Reactions:
 
         # Check to see if it already exists
         cpd_exists = 0
+        cpd_remove = {}
         for rgt in rxn_cpds_array:
             if (rgt["compound"] == compound and
                         rgt["compartment"] == compartment):
                 rgt["coefficient"] -= adjustment
                 cpd_exists = 1
+                if(rgt["coefficient"] == 0):
+                    cpd_remove=rgt
 
         if (cpd_exists != 1):
             rgt_id = compound + "_" + str(compartment) + "0"
@@ -253,6 +257,10 @@ class Reactions:
                  "name": self.Compounds_Dict[compound]["name"],
                  "formula": self.Compounds_Dict[compound]["formula"],
                  "charge": self.Compounds_Dict[compound]["charge"]})
+
+        if(len(cpd_remove.keys())>0):
+            rxn_cpds_array.remove(cpd_remove)
+
         return
 
     def rebuildReaction(self, reaction_dict, stoichiometry):
