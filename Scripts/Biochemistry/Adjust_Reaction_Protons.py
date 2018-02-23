@@ -10,8 +10,9 @@ ReactionsHelper = Reactions()
 Reactions_Dict = ReactionsHelper.loadReactions()
 
 Update_Reactions=0
+status_file = open("Status_Changes_After_Proton_Adjustment.txt",'w')
 for rxn in sorted(Reactions_Dict.keys()):
-#    if(rxn != "rxn00013"):
+#    if(rxn != "rxn00028"):
 #        continue
 
     if(Reactions_Dict[rxn]["status"] == "EMPTY"):
@@ -35,15 +36,21 @@ for rxn in sorted(Reactions_Dict.keys()):
             continue
         
         (element,number)=elements[0].split(":")
-        print rxn,element,number
+        print "Adjusting: "+rxn,element,number
 
+        #Parse old stoichiometry into array
         old_stoichiometry=Reactions_Dict[rxn]["stoichiometry"]
         Rxn_Cpds_Array=ReactionsHelper.parseStoich(old_stoichiometry)
-        print "1: ",Rxn_Cpds_Array
+
+        #Adjust for protons
         ReactionsHelper.adjustCompound(Rxn_Cpds_Array,"cpd00067",float(number))
-        print "2: ",Rxn_Cpds_Array
+
+        #Recompute new status and stoichiometry
         new_status = ReactionsHelper.balanceReaction(Rxn_Cpds_Array)
         new_stoichiometry = ReactionsHelper.buildStoich(Rxn_Cpds_Array)
+
+        if(new_status != Reactions_Dict[rxn]['status']):
+            status_file.write(rxn+"\t"+Reactions_Dict[rxn]['status']+"\t"+new_status)
 
         if(new_stoichiometry != old_stoichiometry):
             print "Rebuilding reaction :",rxn

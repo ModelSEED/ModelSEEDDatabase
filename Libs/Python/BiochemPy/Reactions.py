@@ -252,7 +252,7 @@ class Reactions:
             rgt_id = compound + "_" + str(compartment) + "0"
 
             rxn_cpds_array.append(
-                {"reagent": rgt_id, "coefficient": adjustment,
+                {"reagent": rgt_id, "coefficient": 0-adjustment,
                  "compound": compound, "compartment": compartment, "index": 0,
                  "name": self.Compounds_Dict[compound]["name"],
                  "formula": self.Compounds_Dict[compound]["formula"],

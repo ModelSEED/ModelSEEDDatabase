@@ -11,7 +11,7 @@ Reactions_Dict = ReactionsHelper.loadReactions()
 
 Update_Reactions=0
 for rxn in sorted(Reactions_Dict.keys()):
-#    if(rxn != "rxn00013"):
+#    if(rxn != "rxn00028"):
 #        continue
 
     if(Reactions_Dict[rxn]["status"] == "EMPTY"):
@@ -28,7 +28,7 @@ for rxn in sorted(Reactions_Dict.keys()):
     if(new_status != old_status and "CK" not in old_status):
         print "Changing Status for "+rxn+" from "+old_status+" to "+new_status
         Reactions_Dict[rxn]["status"]=new_status
-        Update_Reactions=+1
+        Update_Reactions+=1
 
 if(Update_Reactions>0):
     print "Saving updated statuses for "+str(Update_Reactions)+" reactions";
