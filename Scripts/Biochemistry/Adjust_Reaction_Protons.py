@@ -11,6 +11,9 @@ Reactions_Dict = ReactionsHelper.loadReactions()
 
 Update_Reactions=0
 for rxn in sorted(Reactions_Dict.keys()):
+#    if(rxn != "rxn00013"):
+#        continue
+
     if(Reactions_Dict[rxn]["status"] == "EMPTY"):
         continue
 
@@ -36,7 +39,9 @@ for rxn in sorted(Reactions_Dict.keys()):
 
         old_stoichiometry=Reactions_Dict[rxn]["stoichiometry"]
         Rxn_Cpds_Array=ReactionsHelper.parseStoich(old_stoichiometry)
+        print "1: ",Rxn_Cpds_Array
         ReactionsHelper.adjustCompound(Rxn_Cpds_Array,"cpd00067",float(number))
+        print "2: ",Rxn_Cpds_Array
         new_status = ReactionsHelper.balanceReaction(Rxn_Cpds_Array)
         new_stoichiometry = ReactionsHelper.buildStoich(Rxn_Cpds_Array)
 
@@ -49,8 +54,8 @@ for rxn in sorted(Reactions_Dict.keys()):
                     Reactions_Dict[rxn]["notes"]="HB"
                 else:
                     Reactions_Dict[rxn]["notes"]+="|HB"
-            Update_Reactions=1
+            Update_Reactions+=1
 
-if(Update_Reactions==1):
-    print "Saving reactions";
+if(Update_Reactions>0):
+    print "Saving adjusted protons for "+str(Update_Reactions)+" reactions";
     ReactionsHelper.saveReactions(Reactions_Dict)
