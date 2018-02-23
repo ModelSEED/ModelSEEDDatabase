@@ -79,19 +79,27 @@ def adjust_protons(formula, protons):
     @return: new formula as string
     """
     if not protons:
-        return formula
+        return (formula,"")
     protons = int(protons)
-    formula_parts = formula.split('.')
-    #The whole function assumes that the single number of protons
-    #applies to the first fragment that has protons
-    for i, component in enumerate(formula_parts):
-        atoms = Compounds.parseFormula(component)
-        if "H" in atoms:
-            atoms['H'] += protons
-            if atoms['H'] < 0:
-                print('ERROR: Too Many Protons adjusted in formula!')
-            if atoms['H'] == 0:
-                del atoms['H']
-            formula_parts[i] = Compounds.buildFormula(atoms)
-            break
-    return '.'.join(formula_parts)
+    Notes = ""
+    #The whole function assumes that there is a single formula string
+    #If the formula can be broken into components, it must first be merged
+    #This is because the proton layer only ever has a single component
+    if(len(formula.split('.'))>1):
+        print "Error: you must merge the formula components into a single formula string"
+        print "You can do so using Compounds.mergeFormula()"
+        return formula,"Unadjustable due to multiple components"
+
+    atoms = Compounds.parseFormula(formula)
+    if "H" in atoms:
+        atoms['H'] += protons
+        if atoms['H'] < 0:
+            Notes = 'Too Many Protons adjusted!'
+        if atoms['H'] == 0:
+            del atoms['H']
+    elif(len(atoms)==0):
+        #special case for the proton
+        atoms['H']=protons
+
+    formula = Compounds.buildFormula(atoms)
+    return (formula, Notes)

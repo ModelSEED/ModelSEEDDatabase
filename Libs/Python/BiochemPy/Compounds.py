@@ -107,8 +107,7 @@ class Compounds:
         
     @staticmethod
     def parseFormula(formula):
-        if (
-                        formula is None or formula == "" or "noFormula" in formula or "null" in formula):
+        if (formula is None or formula == "" or "noFormula" in formula or "null" in formula):
             return {}
 
         atoms = re.findall("\D[a-z]?\d*", formula)
