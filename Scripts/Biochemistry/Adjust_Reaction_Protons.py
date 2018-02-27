@@ -50,7 +50,7 @@ for rxn in sorted(Reactions_Dict.keys()):
         new_stoichiometry = ReactionsHelper.buildStoich(Rxn_Cpds_Array)
 
         if(new_status != Reactions_Dict[rxn]['status']):
-            status_file.write(rxn+"\t"+Reactions_Dict[rxn]['status']+"\t"+new_status)
+            status_file.write(rxn+"\t"+Reactions_Dict[rxn]['status']+"\t"+new_status+"\n")
 
         if(new_stoichiometry != old_stoichiometry):
             print "Rebuilding reaction :",rxn

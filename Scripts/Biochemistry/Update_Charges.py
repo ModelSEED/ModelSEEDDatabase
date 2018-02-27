@@ -25,9 +25,9 @@ for cpd in sorted(Compounds_Dict.keys()):
     inchi_charge = InChIs.charge(inchi_layers['q'],inchi_layers['p'])
 
     if(inchi_charge != current_charge):
-        Compounds_Dict[cpd]['charge']=inchi_charge
+        Compounds_Dict[cpd]['charge']=str(inchi_charge)
         Update_Compounds+=1
 
 if(Update_Compounds>0):
-    print "Saving charge for "+str(Update_Compounds)+" componds";
+    print "Saving charge for "+str(Update_Compounds)+" compounds";
     CompoundsHelper.saveCompounds(Compounds_Dict)

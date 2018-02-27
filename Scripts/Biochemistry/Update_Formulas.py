@@ -26,5 +26,5 @@ for cpd in sorted(Compounds_Dict.keys()):
         Update_Compounds+=1
 
 if(Update_Compounds>0):
-    print "Saving formula for "+str(Update_Compounds)+" componds";
+    print "Saving formula for "+str(Update_Compounds)+" compounds";
     CompoundsHelper.saveCompounds(Compounds_Dict)
