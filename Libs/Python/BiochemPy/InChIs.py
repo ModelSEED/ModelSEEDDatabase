@@ -13,17 +13,22 @@ def parse(inchi, merge_formula=False):
     formula string and dictionary of layers where key is layer code and value
     is layer contents
     """
+    layer_dict = dict([(x, "") for x in InChI_Layers])
+
     # special case for proton
     m = re.match('^InChI=1S/p([-+]\d*)', inchi)
     if m:
-        return "", {'p': m.group(1)}
+        layer_dict['p'] = m.group(1)
+        return "", layer_dict
+
     layers = inchi.split("/")[1:]
     formula = layers.pop(0)
     if merge_formula:
         formula = Compounds.mergeFormula(formula)
-    layer_dict = dict([(x, "") for x in InChI_Layers])
+
     for l in layers:
         layer_dict[l[0]] = l[1:]
+
     return formula, layer_dict
 
 def build(formula, layers, remove=(), merge_formula=False):
@@ -44,33 +49,40 @@ def build(formula, layers, remove=(), merge_formula=False):
     return inchi if len(inchi) > 8 else ""
 
 
-def charge(q_str,p_str):
+def charge(q_layer,p_layer):
     """
-    Not sure how this one works
-    @param q_str: q layer string
-    @param p_str: p layer string
+    @param q_layer: q layer string
+    @param p_layer: p layer string
     @return: charge
     """
-    #my $charge=0;
-    #foreach my $q ( grep { $_ ne "" } split(/;/, $q_string)){
-    #    my $multiple=1;
-    #    if($q =~ s/^(\d+)\*(.+)$/$2/){
-    #        $multiple=$1;
-    #    }
-    #    $charge+=($q*$multiple);
-    #}
+    global_charge = 0
+    if(q_layer != ""):
+        q_components = q_layer.split(';')
+        for q_component in q_components:
+            if(q_component!=""):
+                (multiplier,charge) = (1,0)
 
-    #foreach my $p ( grep { $_ ne "" } split(/;/, $p_string)){
-    #    my $multiple=1;
-        #NB: at time of press (12/2/2011)
-        #No /p sublayer does multiple components
-        #therefore multiple code doesn't apply
-    #    if($p =~ s/^(\d+)\*(.+)$/$2/){
-    #        $multiple=$1;
-    #    }
-    #    $charge+=($p*$multiple);
-    #}
-    raise NotImplementedError
+                #Match for multiplier
+                m = re.match('^(\d+)\*(.+)$', q_component)
+                if m:
+                    multiplier = int(m.group(1))
+                    charge = int(m.group(2))
+                else:
+                    charge = int(q_component)
+
+                global_charge += ( multiplier * charge )
+
+    #Proton layers have never had multiple components
+    #So this is an explicit warning, using it directly 
+    #will raise an error
+    if(";" in p_layer):
+        print "Warning: multiple components in mobile proton layer"
+
+    #protons have positive charge
+    if(p_layer != ''):
+        global_charge += int(p_layer)
+
+    return global_charge
 
 def adjust_protons(formula, protons):
     """
@@ -79,19 +91,27 @@ def adjust_protons(formula, protons):
     @return: new formula as string
     """
     if not protons:
-        return formula
+        return (formula,"")
     protons = int(protons)
-    formula_parts = formula.split('.')
-    #The whole function assumes that the single number of protons
-    #applies to the first fragment that has protons
-    for i, component in enumerate(formula_parts):
-        atoms = Compounds.parseFormula(component)
-        if "H" in atoms:
-            atoms['H'] += protons
-            if atoms['H'] < 0:
-                print('ERROR: Too Many Protons adjusted in formula!')
-            if atoms['H'] == 0:
-                del atoms['H']
-            formula_parts[i] = Compounds.buildFormula(atoms)
-            break
-    return '.'.join(formula_parts)
+    Notes = ""
+    #The whole function assumes that there is a single formula string
+    #If the formula can be broken into components, it must first be merged
+    #This is because the proton layer only ever has a single component
+    if(len(formula.split('.'))>1):
+        print "Error: you must merge the formula components into a single formula string"
+        print "You can do so using Compounds.mergeFormula()"
+        return formula,"Unadjustable due to multiple components"
+
+    atoms = Compounds.parseFormula(formula)
+    if "H" in atoms:
+        atoms['H'] += protons
+        if atoms['H'] < 0:
+            Notes = 'Too Many Protons adjusted!'
+        if atoms['H'] == 0:
+            del atoms['H']
+    elif(len(atoms)==0):
+        #special case for the proton
+        atoms['H']=protons
+
+    formula = Compounds.buildFormula(atoms)
+    return (formula, Notes)

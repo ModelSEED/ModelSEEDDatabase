@@ -8,6 +8,7 @@ class Reactions:
                  rxns_file='reactions.tsv'):
         self.BiochemRoot = biochem_root
         self.RxnsFile = biochem_root + rxns_file
+        self.AliasFile = biochem_root + "Aliases/Reactions_Aliases.tsv"
 
         reader = DictReader(open(self.RxnsFile), dialect='excel-tab')
         self.Headers = reader.fieldnames
@@ -252,7 +253,7 @@ class Reactions:
             rgt_id = compound + "_" + str(compartment) + "0"
 
             rxn_cpds_array.append(
-                {"reagent": rgt_id, "coefficient": adjustment,
+                {"reagent": rgt_id, "coefficient": 0-adjustment,
                  "compound": compound, "compartment": compartment, "index": 0,
                  "name": self.Compounds_Dict[compound]["name"],
                  "formula": self.Compounds_Dict[compound]["formula"],
@@ -347,3 +348,26 @@ class Reactions:
         rxns_file = open(rxns_root + ".json", 'w')
         rxns_file.write(json.dumps(reactions_dict, indent=4, sort_keys=True))
         rxns_file.close()
+
+    def loadMSAliases(self,sources_array=[]):
+        if(len(sources_array)==0):
+            return {}
+
+        aliases_dict = dict()
+        reader = DictReader(open(self.AliasFile), dialect = 'excel-tab')
+        for line in reader:
+            if("rxn" not in line['MS ID']):
+                continue
+
+            if(line['Source'] not in sources_array):
+                continue
+
+            if(line['MS ID'] not in aliases_dict):
+                   aliases_dict[line['MS ID']]=dict()
+
+            if(line['Source'] not in aliases_dict[line['MS ID']]):
+                aliases_dict[line['MS ID']][line['Source']]=list()
+
+            aliases_dict[line['MS ID']][line['Source']].append(line['External ID'])
+
+        return aliases_dict
