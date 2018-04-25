@@ -7,7 +7,8 @@ import sys
 from rdkit import RDLogger
 from rdkit.Chem import AllChem
 
-from .error_reporting import find_new_errors
+from repostat.stash import StatStash
+from .error_reporting import find_new_errors, report_errors
 from ..Biochem_Helper import BiochemHelper
 
 desc1 = '''
@@ -116,10 +117,9 @@ if __name__ == "__main__":
     duplicateAbbr = 0
     badAbbrChars = list()
     noFormula = list()
-    inconsistentFormula = list()
+    inconsistentFormula = dict()
     largeCharge = list()
     noCharge = list()
-    inconsistentCharge = list()
     structureDict = dict()
     noStructure = list()
     duplicateStructure = dict()
@@ -194,9 +194,9 @@ if __name__ == "__main__":
             noFormula.append(index)
 
         # Check for duplicate and missing compound structures.
-        mol = AllChem.MolFromInchi(cpd['structure'])
+        mol = AllChem.MolFromInchi(cpd['smiles'])
         if mol:
-            inchikey = AllChem.InchiToInchiKey(cpd['structure'])
+            inchikey = AllChem.InchiToInchiKey(cpd['smiles'])
             if inchikey in structureDict:
                 if inchikey not in duplicateStructure:
                     duplicateStructure[inchikey] = [structureDict[inchikey]]
@@ -204,7 +204,7 @@ if __name__ == "__main__":
             else:
                 structureDict[inchikey] = index
             if cpd['formula'] != AllChem.CalcMolFormula(mol):
-                inconsistentFormula.append(index)
+                inconsistentFormula[index] = (cpd['formula'], AllChem.CalcMolFormula(mol))
         else:
             noStructure.append(index)
 
@@ -215,21 +215,11 @@ if __name__ == "__main__":
         else:
             noCharge.append(index)
 
-        m = re.search('(\d)\+', cpd['name'])
-        if m and int(m.group(1)) != int(cpd['charge']):
-            inconsistentCharge.append(index)
-
         # Check for invalid is_core flags.
         if cpd['is_core'] != 0 and cpd['is_core'] != 1:
             badCore.append(index)
         if cpd['is_core'] == 1:
             numCore += 1
-
-        # Check for invalid is_obsolete flags.
-        if cpd['is_obsolete'] != 0 and cpd['is_obsolete'] != 1:
-            badObsolete.append(index)
-        if cpd['is_obsolete'] == 1:
-            numObsolete += 1
 
         # Check that linked reactions are all valid.
         if 'linked_compound' in cpd:
@@ -267,7 +257,6 @@ if __name__ == "__main__":
     print('Number of compounds with inconsistent formula and structure: %d' % len(inconsistentFormula))
     print('Number of compounds with charge larger than %d: %d' % (args.charge, len(largeCharge)))
     print('Number of compounds with no charge: %d' % len(noCharge))
-    print('Number of compounds with inconsistent charge and structure: %d' % len(inconsistentCharge))
     print('Number of compounds with no structure: %d' % len(noStructure))
     print('Number of compounds with duplicate structure: %d' % len(duplicateStructure))
     print('Number of compounds with bad is_core flag: %d' % len(badCore))
@@ -332,14 +321,9 @@ if __name__ == "__main__":
         if len(inconsistentFormula) > 0:
             print('Compounds with formulas that do not match their structures')
             for index in inconsistentFormula:
-                print('Line %05d: %s' % (compounds[index]['linenum'], compounds[index]['id']))
+                print('%s: %s, %s' % (compounds[index]['id'], inconsistentFormula[index][0], inconsistentFormula[index][1]))
             print()
     if args.showCharges:
-        if len(inconsistentCharge) > 0:
-            print('Compounds with names that do not match specified charges')
-            for index in inconsistentCharge:
-                print('Line %05d: %s' % (compounds[index]['linenum'], compounds[index]['id']))
-            print()
         if len(largeCharge) > 0:
             print('Compounds with charge larger than %d:' %(args.charge))
             for index in range(len(largeCharge)):
@@ -382,11 +366,13 @@ if __name__ == "__main__":
     error_fields = ['duplicateId', 'duplicateAbbr', 'duplicateName',
                     'duplicateStructure', 'noCharge', 'badIdChars',
                     'badAbbrChars', 'badCofactor', 'badCore', 'badLink',
-                    'badNameChars', 'badObsolete', 'inconsistentCharge',
-                    'inconsistentFormula']
+                    'badNameChars', 'badObsolete', 'inconsistentFormula']
     errors = dict([(x, eval(x)) if isinstance(eval(x), int)
                    else (x, len(eval(x)))for x in error_fields])
     new_errors = find_new_errors('compounds', errors)
+    report_errors('compounds', errors)
+    stash = StatStash('redis://redis-16221.c12.us-east-1-4.ec2.cloud.redislabs.com:16221')
+    stash.report_stats('compounds', errors)
 
     if new_errors:
         print("NEW ERRORS: " + ", ".join(new_errors), file=sys.stderr)

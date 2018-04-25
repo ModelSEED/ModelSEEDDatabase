@@ -28,6 +28,9 @@ my %Cpd_Aliases = %{$Default_JSON->{"compound_aliases"}};
 foreach my $cpd (keys %Cpd_Aliases){
     foreach my $alias (keys %{$Cpd_Aliases{$cpd}}){
 	foreach my $entry (@{$Cpd_Aliases{$cpd}{$alias}}){
+	    $entry =~ s/^\s+//;
+	    $entry =~ s/\s+$//;
+
 	    $Global_Aliases{"Compounds"}{$alias}{$entry}{default}{$cpd}=1;
 	    if(exists($BiGG{$alias})){
 		$Global_Aliases{"Compounds"}{"BiGG"}{$entry}{default}{$cpd}=1;
@@ -40,9 +43,27 @@ my %Rxn_Aliases = %{$Default_JSON->{"reaction_aliases"}};
 foreach my $rxn (keys %Rxn_Aliases){
     foreach my $alias (keys %{$Rxn_Aliases{$rxn}}){
 	foreach my $entry (@{$Rxn_Aliases{$rxn}{$alias}}){
-	    $Global_Aliases{"Reactions"}{$alias}{$entry}{default}{$rxn}=1;
-	    if(exists($BiGG{$alias})){
-		$Global_Aliases{"Reactions"}{"BiGG"}{$entry}{default}{$rxn}=1;
+	    $entry =~ s/^\s+//;
+	    $entry =~ s/\s+$//;
+
+	    if($alias eq "Enzyme Class"){
+		foreach my $sub_entry (split(/[\s\/]+/,$entry)){
+		    next if $sub_entry =~ /determined/;
+		    next if $sub_entry =~ /or/;
+
+		    $sub_entry =~ s/^EC-//;
+		    $sub_entry =~ s/[\),]+//;
+
+		    $Global_Aliases{"Reactions"}{$alias}{$sub_entry}{default}{$rxn}=1;
+		    if(exists($BiGG{$alias})){
+			$Global_Aliases{"Reactions"}{"BiGG"}{$sub_entry}{default}{$rxn}=1;
+		    }
+		}
+	    }else{
+		$Global_Aliases{"Reactions"}{$alias}{$entry}{default}{$rxn}=1;
+		if(exists($BiGG{$alias})){
+		    $Global_Aliases{"Reactions"}{"BiGG"}{$entry}{default}{$rxn}=1;
+		}
 	    }
 	}
     }
@@ -53,6 +74,9 @@ foreach my $cpd (keys %Cpd_Aliases){
     foreach my $alias ( grep { $_ ne "ModelSEED" } 
 			keys %{$Cpd_Aliases{$cpd}}){
 	foreach my $entry (@{$Cpd_Aliases{$cpd}{$alias}}){
+	    $entry =~ s/^\s+//;
+	    $entry =~ s/\s+$//;
+
 	    $Global_Aliases{"Compounds"}{$alias}{$entry}{plantdefault}{$cpd}=1;
 	    if(exists($BiGG{$alias})){
 		$Global_Aliases{"Compounds"}{"BiGG"}{$entry}{plantdefault}{$cpd}=1;
@@ -61,74 +85,44 @@ foreach my $cpd (keys %Cpd_Aliases){
     }
 }
 
-#foreach my $cpd (keys %Cpd_Aliases){
-#    if(exists($Cpd_Aliases{$cpd}{"ModelSEED"})){
-#	foreach my $link (@{$Cpd_Aliases{$cpd}{"ModelSEED"}}){
-	    
-#	    foreach my $alias (keys %{$Cpd_Aliases{$link}}){
-#		foreach my $entry (@{$Cpd_Aliases{$link}{$alias}}){
-#		    $Global_Aliases{"Compounds"}{$alias}{$entry}{plantdefault}{$cpd}=1;
-#		    if(exists($BiGG{$alias})){
-#			$Global_Aliases{"Compounds"}{"BiGG"}{$entry}{plantdefault}{$cpd}=1;
-#		    }
-#		}
-#	    }
-
-#	    foreach my $alias (keys %{$Cpd_Aliases{$cpd}}){
-#		foreach my $entry (@{$Cpd_Aliases{$cpd}{$alias}}){
-#		    $Global_Aliases{"Compounds"}{$alias}{$entry}{plantdefault}{$link}=1;
-#		    if(exists($BiGG{$alias})){
-#			$Global_Aliases{"Compounds"}{"BiGG"}{$entry}{plantdefault}{$link}=1;
-#		    }
-#		}
-#	    }
-#	}
-#    }
-#}
-
 %Rxn_Aliases = %{$PlantDefault_JSON->{"reaction_aliases"}};
 foreach my $rxn (keys %Rxn_Aliases){
     foreach my $alias ( grep { $_ ne "ModelSEED" } 
 			keys %{$Rxn_Aliases{$rxn}}){
 	foreach my $entry (@{$Rxn_Aliases{$rxn}{$alias}}){
-	    $Global_Aliases{"Reactions"}{$alias}{$entry}{plantdefault}{$rxn}=1;
-	    if(exists($BiGG{$alias})){
-		$Global_Aliases{"Reactions"}{"BiGG"}{$entry}{plantdefault}{$rxn}=1;
+	    $entry =~ s/^\s+//;
+	    $entry =~ s/\s+$//;
+
+	    if($alias eq "Enzyme Class"){
+		foreach my $sub_entry (split(/[\s\/]+/,$entry)){
+		    next if $sub_entry =~ /determined/;
+		    next if $sub_entry =~ /or/;
+
+		    $sub_entry =~ s/^EC-//;
+		    $sub_entry =~ s/[\),]+//;
+
+		    $Global_Aliases{"Reactions"}{$alias}{$sub_entry}{plantdefault}{$rxn}=1;
+		    if(exists($BiGG{$alias})){
+			$Global_Aliases{"Reactions"}{"BiGG"}{$sub_entry}{plantdefault}{$rxn}=1;
+		    }
+		}
+	    }else{
+		$Global_Aliases{"Reactions"}{$alias}{$entry}{plantdefault}{$rxn}=1;
+		if(exists($BiGG{$alias})){
+		    $Global_Aliases{"Reactions"}{"BiGG"}{$entry}{plantdefault}{$rxn}=1;
+		}
 	    }
 	}
     }
 }
 
-#foreach my $rxn (keys %Rxn_Aliases){
-#    if(exists($Rxn_Aliases{$rxn}{"ModelSEED"})){
-#	foreach my $link (@{$Rxn_Aliases{$rxn}{"ModelSEED"}}){
-	    
-#	    foreach my $alias (keys %{$Rxn_Aliases{$link}}){
-#		foreach my $entry (@{$Rxn_Aliases{$link}{$alias}}){
-#		    $Global_Aliases{"Reactions"}{$alias}{$entry}{plantdefault}{$rxn}=1;
-#		    if(exists($BiGG{$alias})){
-#			$Global_Aliases{"Reactions"}{"BiGG"}{$entry}{plantdefault}{$rxn}=1;
-#		    }
-#		}
-#	    }
-
-#	    foreach my $alias (keys %{$Rxn_Aliases{$rxn}}){
-#		foreach my $entry (@{$Rxn_Aliases{$rxn}{$alias}}){
-#		    $Global_Aliases{"Reactions"}{$alias}{$entry}{plantdefault}{$link}=1;
-#		    if(exists($BiGG{$alias})){
-#			$Global_Aliases{"Reactions"}{"BiGG"}{$entry}{plantdefault}{$link}=1;
-#		    }
-#		}
-#	    }
-#	}
-#    }
-#}
-
-
 foreach my $entity (["Compounds","cpd"],["Reactions","rxn"]){
     my $file = $entity->[0]."_Aliases.tsv";
     open(MAIN, "> ".$file);
     print MAIN "MS ID\tOld MS ID\tExternal ID\tSource\n";
+
+    open(NAMES, "> Names_".$file);
+    print NAMES "MS ID\tOld MS ID\tExternal ID\tSource\n";
 
     open(MODELS, "> Models_".$file);
     print MODELS "MS ID\tOld MS ID\tExternal ID\tSource\n";
@@ -164,7 +158,15 @@ foreach my $entity (["Compounds","cpd"],["Reactions","rxn"]){
 		print EC "\t";
 		print EC $alias."\t".$aliasSet."\n";
 	    }
-	}elsif($aliasSet !~ /KBase|ModelSEED|MicrobesOnlineFitness|name|NewMediaTransporters|obsolete|BioCyc/){
+	}elsif($aliasSet =~ /name/){
+	    foreach my $alias (sort keys %{$Global_Aliases{$entity->[0]}{$aliasSet}}){
+		print NAMES exists($Global_Aliases{$entity->[0]}{$aliasSet}{$alias}{plantdefault}) ? join("|",sort keys %{$Global_Aliases{$entity->[0]}{$aliasSet}{$alias}{plantdefault}}) : "";
+		print NAMES "\t";
+		print NAMES exists($Global_Aliases{$entity->[0]}{$aliasSet}{$alias}{default}) ? join("|",sort keys %{$Global_Aliases{$entity->[0]}{$aliasSet}{$alias}{default}}) : "";
+		print NAMES "\t";
+		print NAMES $alias."\t".$aliasSet."\n";
+	    }
+	}elsif($aliasSet !~ /KBase|ModelSEED|MicrobesOnlineFitness|NewMediaTransporters|obsolete|BioCyc/){
 	    foreach my $alias (sort keys %{$Global_Aliases{$entity->[0]}{$aliasSet}}){
 		print MODELS exists($Global_Aliases{$entity->[0]}{$aliasSet}{$alias}{plantdefault}) ? join("|",sort keys %{$Global_Aliases{$entity->[0]}{$aliasSet}{$alias}{plantdefault}}) : "";
 		print MODELS "\t";
@@ -176,6 +178,7 @@ foreach my $entity (["Compounds","cpd"],["Reactions","rxn"]){
     }
     close(MAIN);
     close(BIOCYC);
+    close(NAMES);
     close(MODELS);
     close(EC);
 }
