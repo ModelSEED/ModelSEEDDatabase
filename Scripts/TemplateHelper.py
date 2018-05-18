@@ -444,8 +444,8 @@ class TemplateHelper(BaseHelper):
                     try:
                         masterReaction = self.masterReactions[reactionId]
                     except KeyError:
-                        if 'reaction' in fieldNames and fields[fieldNames['reaction']]:
-                            masterReaction = self._gen_reaction_info(fields[fieldNames['reaction']])
+                        if 'custom_reaction' in fieldNames and fields[fieldNames['custom_reaction']]:
+                            masterReaction = self._gen_reaction_info(fields[fieldNames['custom_reaction']])
                         else:
                             raise ReactionNotFoundError('Reaction %s not found in master biochemistry' %(reactionId))
                     
@@ -475,6 +475,7 @@ class TemplateHelper(BaseHelper):
                     
                     # Make sure all of the compartments are valid.
                     compartmentIds = fields[fieldNames['compartment']].split('|')
+                    compartmentIds.sort(key=lambda x: ["m", "n", "p", "x", "z", "c", "e"].index(x))
                     idcomp = compartmentIds[0]
                     for cindex in range(len(compartmentIds)):
                         try:
