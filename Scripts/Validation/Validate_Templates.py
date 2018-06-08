@@ -69,9 +69,8 @@ if __name__ == '__main__':
                   file=sys.stderr)
             exit_code = 1
         if undef_rxns:
-            print("ERROR-Undefined Reactions: " + ", ".join(undef_rxns),
+            print("WARNING-Reactions not defined in main biochemistry: " + ", ".join(undef_rxns),
                   file=sys.stderr)
-            exit_code = 1
         if undef_complex:
             print("ERROR-Undefined Complexes: " + ", ".join(undef_complex),
                   file=sys.stderr)
