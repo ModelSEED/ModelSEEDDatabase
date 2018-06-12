@@ -23,7 +23,7 @@ def get_atom_count(compoundDict, complist):
             if not pair[1]:
                 atom_counts[pair[0]] += float(stoich)
             else:
-                atom_counts[pair[0]] += int(pair[1]) * float(stoich)
+                atom_counts[pair[0]] += float(pair[1]) * float(stoich)
     atom_counts = Counter({k: round(v, 1) for k, v in atom_counts.items()})
     return atom_counts
 
@@ -91,6 +91,9 @@ def check_compounds(_rxns, verbose, compound_loc='./Biochemistry/compounds.json'
                     print('Unbalanced reaction marked OK {}\n{}\n{}'
                           .format(id, reactant_atoms, product_atoms))
                 err['unbalanced_marked_OK'] += 1
+        if rxn['status'] == "EMPTY":
+            print("Empty Reaction: " + id)
+            continue
         if comp_ids ^ set(list(reactants.keys()) + list(products.keys())):
             if verbose:
                 print('"compound_ids" and "equation" are inconsistant in {}:\n{}\n{}'
