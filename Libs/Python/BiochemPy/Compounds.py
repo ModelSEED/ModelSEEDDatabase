@@ -73,14 +73,15 @@ class Compounds:
 
         structures_dict = dict()
         if(len(db_array)==1 and db_array[0]=="ModelSEED"):
-            struct_file = "Unique_ModelSEED_Structures.txt"
+            struct_file = "ModelSEED_Structures.txt"
             struct_file = self.StructRoot+struct_file
             reader = DictReader(open(struct_file), dialect = "excel-tab", fieldnames = ['ID','Source','Aliases','Structure'])
             for line in reader:
                 if(line['ID'] not in structures_dict):
                     structures_dict[line['ID']]={}
 
-                structures_dict[line['ID']][line['Source']]=line['Structure']
+                if(line['Source'] in sources_array):
+                    structures_dict[line['ID']][line['Source']]=line['Structure']
 
             return structures_dict
 
@@ -107,7 +108,7 @@ class Compounds:
         
     @staticmethod
     def parseFormula(formula):
-        if (formula is None or formula == "" or "noFormula" in formula or "null" in formula):
+        if (formula.strip() in {None, "", "noFormula", "null"}):
             return {}
 
         atoms = re.findall("\D[a-z]?\d*", formula)
