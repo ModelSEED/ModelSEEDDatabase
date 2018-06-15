@@ -11,8 +11,6 @@ Reactions_Dict = ReactionsHelper.loadReactions()
 
 Update_Reactions=0
 for rxn in sorted(Reactions_Dict.keys()):
-#    if(rxn != "rxn00013"):
-#        continue
 
     if(Reactions_Dict[rxn]["status"] == "EMPTY"):
         continue
@@ -33,15 +31,10 @@ for rxn in sorted(Reactions_Dict.keys()):
         #and the element is hydrogen
         if(len(elements)>1 or not elements[0].startswith("H:")):
             continue
-        
-        (element,number)=elements[0].split(":")
-        print rxn,element,number
 
         old_stoichiometry=Reactions_Dict[rxn]["stoichiometry"]
         Rxn_Cpds_Array=ReactionsHelper.parseStoich(old_stoichiometry)
-        print "1: ",Rxn_Cpds_Array
         ReactionsHelper.adjustCompound(Rxn_Cpds_Array,"cpd00067",float(number))
-        print "2: ",Rxn_Cpds_Array
         new_status = ReactionsHelper.balanceReaction(Rxn_Cpds_Array)
         new_stoichiometry = ReactionsHelper.buildStoich(Rxn_Cpds_Array)
 
