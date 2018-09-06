@@ -47,8 +47,7 @@ def make_tsv(data, tsv_file, tsv_header):
     with open(tsv_file, 'w') as handle:
         handle.write('%s\n' % ('\t'.join(tsv_header)))
         for item in data:
-            item['aliases'] = ";".join(comp_aliases[item['id']])
-            line = [item[h] for h in tsv_header]
+            line = [str(item[h]) for h in tsv_header]
             handle.write('%s\n' % ('\t'.join(line)))
 
 
@@ -68,8 +67,11 @@ if __name__ == '__main__':
     helper = BiochemHelper()
 
     # Get the aliases from all of the aliases files.
-    comp_aliases = alias_dict(args.aliasdir+'/Compounds_Aliases.tsv')
-    rxn_aliases = alias_dict(args.aliasdir + '/Reactions_Aliases.tsv')
+    cpd_aliases = alias_dict(args.aliasdir+'/Compounds_Aliases.tsv')
+    rxn_aliases  = alias_dict(args.aliasdir+'/Reactions_Aliases.tsv')
+
+    # Get additional cpd_names
+    cpd_names = alias_dict(args.aliasdir+'/Names_Compounds_Aliases.tsv')
 
     # Get the compounds from the master compounds file.
     compounds = helper.readCompoundsFile(args.compoundfile, includeLinenum=False, noFormat=True)
@@ -79,12 +81,25 @@ if __name__ == '__main__':
                        'source', 'structure', 'charge', 'is_core',
                        'is_obsolete', 'is_cofactor', 'deltag', 'deltagerr',
                        'pka', 'pkb', 'aliases']
+    
+    # Add aliases
+    for item in compounds:
+        item['aliases'] = ";".join(cpd_aliases[item['id']])
 
+    # Add names
+    for item in compounds:
+        names = ";".join(filter(lambda x: ("searchname" not in x), cpd_names[item['id']]))
+        item['aliases']+=";"+names
+
+    # Write TSV
     compound_file = os.path.join(args.outputdir, 'Compounds.tsv')
     make_tsv(compounds, compound_file, compound_header)
+
+    # Write JSON
     compounds_json = open(os.path.join(args.outputdir, 'Compounds.json'), 'w')
-    json.dump(compounds, compounds_json)
-    print('Stored compounds in ' + compound_file)
+    json.dump(compounds, compounds_json, sort_keys=True, indent=4)
+
+    print('Stored compounds in ' + compound_file + ' and Compounds.json')
 
     # Get the reactions from the master reactions file.
     reactions = helper.readReactionsFile(args.reactionfile, includeLinenum=False, noFormat=True)
@@ -93,9 +108,17 @@ if __name__ == '__main__':
     reaction_header = ['id', 'name', 'code', 'stoichiometry', 'is_transport',
                        'equation', 'definition', 'reversibility', 'direction',
                        'aliases', 'deltag', 'deltagerr', 'compound_ids']
-    
+
+    # Add aliases
+    for item in reactions:
+        item['aliases'] = ";".join(rxn_aliases[item['id']])
+
+    # Write TSV    
     reaction_file = os.path.join(args.outputdir, 'Reactions.tsv')
     make_tsv(reactions, reaction_file, reaction_header)
+
+    # Write JSON
     reaction_json = open(os.path.join(args.outputdir, 'Reactions.json'), 'w')
-    json.dump(reactions, reaction_json)
-    print('Stored reactions in ' + reaction_file)
+    json.dump(reactions, reaction_json, sort_keys=True, indent=4)
+
+    print('Stored reactions in ' + reaction_file + ' and Reactions.json')
