@@ -144,6 +144,8 @@ class BiochemHelper(BaseHelper):
                 rxn = dict()
                 if noFormat:
                     for index in range(len(nameList)):
+                        if(fields[index]=='null'):
+                            fields[index] = None
                         if(nameList[index] == 'notes'):
                             pass
                         else:
