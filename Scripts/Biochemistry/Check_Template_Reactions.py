@@ -23,6 +23,8 @@ for template in os.listdir(Template_Dir):
 
 time_str = time.strftime('%Y-%m-%d %H:%M:%S', time.gmtime(time.time()))
 file = open("Template_Update.txt","a")
+file.write("====================================\n")
+file.write(time_str+"\n")
 for template in sorted(Unbalanced_Reactions.keys()):
     file.write(template+": "+str(len(Unbalanced_Reactions[template].keys()))+"\n")
 file.close()
