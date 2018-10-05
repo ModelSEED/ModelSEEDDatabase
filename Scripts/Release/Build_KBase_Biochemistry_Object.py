@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 from collections import defaultdict
 import csv
 from datetime import datetime
@@ -18,7 +19,7 @@ def parse_compounds(fp):
         'name': ('name', str),
         'mass': ('mass', float),
         'charge': ('defaultCharge', int),
-        'is_cofactor': ('is_cofactor', int),
+        'is_cofactor': ('isCofactor', int),
     }
     source = json.load(open(fp))
     compounds = []
@@ -31,9 +32,9 @@ def parse_compounds(fp):
                 out_comp[out_tup[0]] = out_tup[1](in_comp[in_id])
             except ValueError:
                 continue
-        out_comp['pkas'] = dict([(x.split(':')[1], int(x.split(':')[0]))
+        out_comp['pkas'] = dict([(int(x.split(':')[0]), [float(x.split(':')[1])])
                                  for x in in_comp['pka'].split(';') if x])
-        out_comp['pkbs'] = dict([(x.split(':')[1], int(x.split(':')[0]))
+        out_comp['pkbs'] = dict([(int(x.split(':')[0]), [float(x.split(':')[1])])
                                  for x in in_comp['pkb'].split(';') if x])
         compounds.append(out_comp)
     return compounds
@@ -90,13 +91,20 @@ def parse_aliases(fp):
 
 
 if __name__ == "__main__":
-    biochem_obj = json.load(open("Objects/base_biochem.json"))
-    biochem_obj['compounds'] = parse_compounds('Biochemistry/compounds.json')
-    biochem_obj['reactions'] = parse_reactions('Biochemistry/reactions.json')
-    biochem_obj['compounds_aliases'] = parse_aliases('Biochemistry/Aliases/Compounds_Aliases.tsv')
-    biochem_obj['reaction_aliases'] = parse_aliases('Biochemistry/Aliases/Reactions_Aliases.tsv')
+    biochem_obj = json.load(open("../../Objects/Base_Biochemistry.json"))
+    biochem_obj['compounds'] = parse_compounds('../../Biochemistry/compounds.json')
+    biochem_obj['reactions'] = parse_reactions('../../Biochemistry/reactions.json')
+
+    biochem_obj['compound_aliases'] = defaultdict(lambda: defaultdict(list))
+    for file in ("Compounds_Aliases.tsv","Names_Compounds_Aliases.tsv"):
+        aliases = parse_aliases('../../Biochemistry/Aliases/'+file)
+        for msid in aliases:
+            for source in aliases[msid]:
+                biochem_obj['compound_aliases'][msid][source].append(aliases[msid][source])
+                
+    biochem_obj['reaction_aliases'] = parse_aliases('../../Biochemistry/Aliases/Reactions_Aliases.tsv')
     biochem_obj['description'] = \
         'Biochemistry object generated on {} from ModelSEEDDatabase commit {}'\
         .format(datetime.today(), local_head)
-    out_fp = 'Objects/{}.json'.format(biochem_obj['name'].split('/')[-1])
-    json.dump(biochem_obj, open(out_fp, 'w'))
+    out_fp = '../../Objects/{}.json'.format(biochem_obj['id'])
+    json.dump(biochem_obj, open(out_fp, 'w'), indent=4, sort_keys=True)
