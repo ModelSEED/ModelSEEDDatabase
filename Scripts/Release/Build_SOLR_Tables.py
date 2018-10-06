@@ -47,7 +47,7 @@ def make_tsv(data, tsv_file, tsv_header):
     with open(tsv_file, 'w') as handle:
         handle.write('%s\n' % ('\t'.join(tsv_header)))
         for item in data:
-            line = [item[h] for h in tsv_header]
+            line = [str(item[h]) for h in tsv_header]
             handle.write('%s\n' % ('\t'.join(line)))
 
 
@@ -97,7 +97,7 @@ if __name__ == '__main__':
 
     # Write JSON
     compounds_json = open(os.path.join(args.outputdir, 'Compounds.json'), 'w')
-    json.dump(compounds, compounds_json)
+    json.dump(compounds, compounds_json, sort_keys=True, indent=4)
 
     print('Stored compounds in ' + compound_file + ' and Compounds.json')
 
@@ -119,6 +119,6 @@ if __name__ == '__main__':
 
     # Write JSON
     reaction_json = open(os.path.join(args.outputdir, 'Reactions.json'), 'w')
-    json.dump(reactions, reaction_json)
+    json.dump(reactions, reaction_json, sort_keys=True, indent=4)
 
     print('Stored reactions in ' + reaction_file + ' and Reactions.json')

@@ -52,8 +52,12 @@ class BiochemHelper(BaseHelper):
                 cpd = dict()
                 if noFormat:
                     for index in range(len(nameList)):
+                        if(fields[index]=='null'):
+                            fields[index] = None
                         if(nameList[index] == 'smiles'):
                             cpd['structure'] = fields[index]
+                        elif(nameList[index] == 'inchikey'):
+                            pass
                         else:
                             cpd[nameList[index]] = fields[index]
                 else:
@@ -140,7 +144,12 @@ class BiochemHelper(BaseHelper):
                 rxn = dict()
                 if noFormat:
                     for index in range(len(nameList)):
-                        rxn[nameList[index]] = fields[index]
+                        if(fields[index]=='null'):
+                            fields[index] = None
+                        if(nameList[index] == 'notes'):
+                            pass
+                        else:
+                            rxn[nameList[index]] = fields[index]
                 else:
                     rxn['id'] = fields[fieldNames['id']]
                     rxn['abbreviation'] = fields[fieldNames['abbreviation']]
