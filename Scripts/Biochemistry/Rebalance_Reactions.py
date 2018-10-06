@@ -24,9 +24,10 @@ for rxn in sorted(Reactions_Dict.keys()):
 
     old_status=Reactions_Dict[rxn]["status"]
     if(new_status != old_status and "CK" not in old_status):
-        print "Changing Status for "+rxn+" from "+old_status+" to "+new_status
-        Reactions_Dict[rxn]["status"]=new_status
-        Update_Reactions=+1
+        if("OK" not in old_status and "OK" in new_status):
+            print "Changing Status for "+rxn+" from "+old_status+" to "+new_status
+            Reactions_Dict[rxn]["status"]=new_status
+            Update_Reactions+=1
 
 if(Update_Reactions>0):
     print "Saving updated statuses for "+str(Update_Reactions)+" reactions";

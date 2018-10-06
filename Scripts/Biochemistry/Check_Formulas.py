@@ -10,26 +10,59 @@ CompoundsHelper = Compounds()
 Compounds_Dict = CompoundsHelper.loadCompounds()
 Structures_Dict = CompoundsHelper.loadStructures(["InChI"],["ModelSEED"])
 
+diff_file = open("Compound_Formula_Differences.txt", 'w')
 for cpd in sorted(Compounds_Dict.keys()):
-    if(Compounds_Dict[cpd]['inchikey'] == '' or cpd not in Structures_Dict):
+    if(cpd not in Structures_Dict):
+        diff_file.write("Zero structures for "+cpd+"\n")
         continue
 
+    if('InChI' not in Structures_Dict[cpd]):
+        diff_file.write("No InChI structure for "+cpd+"\n")
+        continue
+
+    current_formula = Compounds_Dict[cpd]['formula']
+
+    #Parse out InChI formula
     (inchi_formula,inchi_layers) = InChIs.parse(Structures_Dict[cpd]['InChI'])
-    merged_inchi_formula = CompoundsHelper.mergeFormula(inchi_formula)[0]
-    adjusted_inchi_formula = (InChIs.adjust_protons(merged_inchi_formula,inchi_layers['p']))[0]
 
-    if(adjusted_inchi_formula != Compounds_Dict[cpd]['formula']):
+    #Make sure formula is merged appropriately before applying proton adjustment
+    (inchi_formula, notes) = Compounds.mergeFormula(inchi_formula)
+    if(notes != ""):
+        diff_file.write("Notes from merging InChI formula for "+cpd+": "+notes+"\n")
 
-         adjusted_inchi_atoms_dict = CompoundsHelper.parseFormula(adjusted_inchi_formula)
-         if('H' in adjusted_inchi_atoms_dict):
-             del(adjusted_inchi_atoms_dict['H'])
-         adjusted_inchi_protonfree_formula = CompoundsHelper.buildFormula(adjusted_inchi_atoms_dict)
+    #Make adjustments based to protonation state of InChI structure
+    (adjusted_inchi_formula, notes) = InChIs.adjust_protons(inchi_formula, inchi_layers['p'])
+    if(notes != ""):
+        diff_file.write("Notes from adjusting protons for "+cpd+": "+notes+"\n")
 
-         original_formula_atoms_dict = CompoundsHelper.parseFormula(Compounds_Dict[cpd]['formula'])
-         if('H' in original_formula_atoms_dict):
-             del(original_formula_atoms_dict['H'])
-         original_formula_protonfree_formula = CompoundsHelper.buildFormula(original_formula_atoms_dict)
+    if(adjusted_inchi_formula != current_formula):
+        if(current_formula == "null"):
+            diff_file.write("New formula for "+cpd+": "+adjusted_inchi_formula+"\n")
 
-         if(adjusted_inchi_protonfree_formula != original_formula_protonfree_formula):
-             print cpd,original_formula_protonfree_formula,adjusted_inchi_protonfree_formula
-#             break
+        else:
+
+            #Check to see if difference in update is only in protons
+            old_atoms = Compounds.parseFormula(current_formula)
+            new_atoms = Compounds.parseFormula(adjusted_inchi_formula)
+
+            missing_atoms=set()
+            different_atoms=dict()
+            for atom in old_atoms.keys():
+                if(atom not in new_atoms):
+                    missing_atoms.update(atom)
+                elif(old_atoms[atom] != new_atoms[atom]):
+                    different_atoms[atom]=old_atoms[atom]-new_atoms[atom]
+
+            for atom in new_atoms.keys():
+                if(atom not in old_atoms):
+                    missing_atoms.add(atom)
+
+            #Proton-specific (i.e. minor difference)
+            if( (len(missing_atoms)==1 and 'H' in missing_atoms) or (len(different_atoms)==1 and "H" in different_atoms)):
+                diff_file.write("Proton difference for "+cpd+": "+str(missing_atoms)+"/"+str(different_atoms)+"\n")
+                continue
+
+            if(len(missing_atoms)>0):
+                diff_file.write("Missing atoms for "+cpd+": "+str(missing_atoms)+"\n")
+            if(len(different_atoms.keys())>0):
+                diff_file.write("Differing atoms for "+cpd+": "+str(different_atoms)+"\n")

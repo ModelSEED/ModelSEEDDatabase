@@ -17,9 +17,6 @@ for cpd in sorted(Compounds_Dict.keys()):
 
     current_formula = Compounds_Dict[cpd]['formula']
 
-    if(current_formula != "null"):
-        continue
-
     (inchi_formula,inchi_layers) = InChIs.parse(Structures_Dict[cpd]['InChI'])
     (inchi_formula, notes) = Compounds.mergeFormula(inchi_formula)
     (adjusted_inchi_formula, notes) = InChIs.adjust_protons(inchi_formula, inchi_layers['p'])
