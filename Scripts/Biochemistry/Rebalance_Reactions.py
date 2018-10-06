@@ -11,8 +11,6 @@ Reactions_Dict = ReactionsHelper.loadReactions()
 
 Update_Reactions=0
 for rxn in sorted(Reactions_Dict.keys()):
-#    if(rxn != "rxn00028"):
-#        continue
 
     if(Reactions_Dict[rxn]["status"] == "EMPTY"):
         continue

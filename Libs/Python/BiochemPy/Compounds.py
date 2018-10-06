@@ -80,7 +80,8 @@ class Compounds:
                 if(line['ID'] not in structures_dict):
                     structures_dict[line['ID']]={}
 
-                structures_dict[line['ID']][line['Source']]=line['Structure']
+                if(line['Source'] in sources_array):
+                    structures_dict[line['ID']][line['Source']]=line['Structure']
 
             return structures_dict
 
@@ -107,7 +108,7 @@ class Compounds:
         
     @staticmethod
     def parseFormula(formula):
-        if (formula is None or formula == "" or "noFormula" in formula or "null" in formula):
+        if (formula.strip() in {None, "", "noFormula", "null"}):
             return {}
 
         atoms = re.findall("\D[a-z]?\d*", formula)

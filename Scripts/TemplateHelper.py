@@ -1,6 +1,7 @@
 
 import json
 import os
+import re
 from .Base_Helper import BaseHelper
 from .Biochem_Helper import BiochemHelper
 
@@ -373,6 +374,23 @@ class TemplateHelper(BaseHelper):
                     raise DuplicateComplexError('Complex %s on line %d is a duplicate' %(role['id'], linenum))
                 
         return
+
+    def _gen_reaction_info(self, reaction):
+        stoich = []
+        for prod, part in enumerate(reaction.split(" <=> ")):
+            for match in re.finditer('\((\d+)\) (\w+)\[(\d)\]', part):
+                coeff = match.group(1) if prod else "-"+match.group(1)
+                stoich.append(":".join([coeff, match.group(2), match.group(3), '0', match.group(2)]))
+        stoich = ";".join(stoich)
+        return {
+            'name': 'null',
+            'deltag': 'null',
+            'deltagerr': 'null',
+            'status': 'OK',
+            'reversibility': '=',
+            'is_obsolete': 0,
+            'stoichiometry': stoich
+        }
     
     def readReactionsFile(self, path, includeLinenum=True, noFormat=False):
         ''' Read the contents of a reactions file.
@@ -398,8 +416,8 @@ class TemplateHelper(BaseHelper):
         self.numUniversal = 0
         
         # The following fields are required in a reactions file.
-        required = { 'id', 'compartment', 'direction', 'gfdir', 'type', 'base_cost',
-                     'forward_cost', 'reverse_cost', 'complexes' }
+        required = {'id', 'compartment', 'direction', 'gfdir', 'type', 'base_cost',
+                     'forward_cost', 'reverse_cost', 'complexes'}
 
         # Read the reactions from the specified file.
         with open(path, 'r') as handle:
@@ -425,8 +443,11 @@ class TemplateHelper(BaseHelper):
                     reactionId = fields[fieldNames['id']]
                     try:
                         masterReaction = self.masterReactions[reactionId]
-                    except:
-                        raise ReactionNotFoundError('Reaction %s not found in master biochemistry' %(reactionId))
+                    except KeyError:
+                        if 'custom_reaction' in fieldNames and fields[fieldNames['custom_reaction']]:
+                            masterReaction = self._gen_reaction_info(fields[fieldNames['custom_reaction']])
+                        else:
+                            raise ReactionNotFoundError('Reaction %s not found in master biochemistry' %(reactionId))
                     
                     # Check the reaction status.
                     #if 'OK' not in masterReaction['status']:
@@ -454,6 +475,7 @@ class TemplateHelper(BaseHelper):
                     
                     # Make sure all of the compartments are valid.
                     compartmentIds = fields[fieldNames['compartment']].split('|')
+                    compartmentIds.sort(key=lambda x: ["m", "n", "p", "x", "z", "c", "e"].index(x))
                     idcomp = compartmentIds[0]
                     for cindex in range(len(compartmentIds)):
                         try:
@@ -491,6 +513,8 @@ class TemplateHelper(BaseHelper):
                         reaction['deltaG'] = 10000000
                     if reaction['deltaGErr'] == 'null':
                         reaction['deltaGErr'] = 10000000
+                    if reaction['name'] == 'null':
+                        reaction['name'] = reaction['id']
                     if not isinstance(reaction['base_cost'], (int, long, float, complex)):
                         reaction['base_cost'] = float(reaction['base_cost'])
                     if not isinstance(reaction['maxforflux'], (int, long, float, complex)):

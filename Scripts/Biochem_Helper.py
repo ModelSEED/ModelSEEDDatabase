@@ -1,5 +1,6 @@
 import re
 import os
+import sys
 from Scripts.Base_Helper import BaseHelper
 
 ''' Helper methods for working with Biochemistry source files. '''
@@ -31,28 +32,34 @@ class BiochemHelper(BaseHelper):
     
         # The following fields are required in a compounds file.
         required = { 'id', 'abbreviation', 'name', 'formula', 'mass', 'source',
-                      'structure', 'charge', 'is_core', 'is_obsolete', 'linked_compound',
+                      'smiles', 'charge', 'is_core', 'is_obsolete', 'linked_compound',
                       'is_cofactor', 'deltag', 'deltagerr', 'pka', 'pkb',
                       'abstract_compound', 'comprised_of', 'aliases' }
 
         # Read the compounds from the specified file.
         compounds = list()
-        with open(path, 'r') as handle:
+        with open(path, 'rU') as handle:
             # The first line has the header with the field names.
             nameList = handle.readline().strip().split('\t')
             fieldNames = self.validateHeader(nameList, required)
-            
             linenum = 1
             for line in handle:
                 linenum += 1
-                fields = line.strip().split('\t')
+                fields = line.rstrip('\n').split('\t',len(fieldNames))
                 if len(fields) < len(fieldNames):
                     print('WARNING: Compound on line %d is missing one or more fields, %s' %(linenum, fields))
                     continue
                 cpd = dict()
                 if noFormat:
                     for index in range(len(nameList)):
-                        cpd[nameList[index]] = fields[index]
+                        if(fields[index]=='null'):
+                            fields[index] = None
+                        if(nameList[index] == 'smiles'):
+                            cpd['structure'] = fields[index]
+                        elif(nameList[index] == 'inchikey'):
+                            pass
+                        else:
+                            cpd[nameList[index]] = fields[index]
                 else:
                     cpd['id'] = fields[fieldNames['id']]
                     cpd['abbreviation'] = fields[fieldNames['abbreviation']]
@@ -63,7 +70,7 @@ class BiochemHelper(BaseHelper):
                     else:
                         cpd['mass'] = float(10000000)
                     cpd['source'] = fields[fieldNames['source']]
-                    cpd['structure'] = fields[fieldNames['structure']]
+                    cpd['structure'] = fields[fieldNames['smiles']]
                     if fields[fieldNames['charge']] != 'null':
                         cpd['charge'] = float(fields[fieldNames['charge']])
                     else:
@@ -137,7 +144,12 @@ class BiochemHelper(BaseHelper):
                 rxn = dict()
                 if noFormat:
                     for index in range(len(nameList)):
-                        rxn[nameList[index]] = fields[index]
+                        if(fields[index]=='null'):
+                            fields[index] = None
+                        if(nameList[index] == 'notes'):
+                            pass
+                        else:
+                            rxn[nameList[index]] = fields[index]
                 else:
                     rxn['id'] = fields[fieldNames['id']]
                     rxn['abbreviation'] = fields[fieldNames['abbreviation']]
