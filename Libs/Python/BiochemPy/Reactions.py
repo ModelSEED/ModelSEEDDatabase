@@ -359,7 +359,7 @@ class Reactions:
             if("rxn" not in line['MS ID']):
                 continue
 
-            if(line['Source'] not in sources_array):
+            if("All" not in sources_array and line['Source'] not in sources_array):
                 continue
 
             if(line['MS ID'] not in aliases_dict):
