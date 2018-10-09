@@ -56,6 +56,7 @@ reaction_props = {
     "is_transport": {"type": "number"},
     "is_obsolete": {"type": "number"},
     "abstract_reaction": {"type": "string"},
+    "source": {"type": "string"},
 }
 
 reactions = {
