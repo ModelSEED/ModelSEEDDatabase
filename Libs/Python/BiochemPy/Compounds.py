@@ -9,6 +9,7 @@ class Compounds:
         self.BiochemRoot = biochem_root
         self.CpdsFile = biochem_root + cpds_file
         self.AliasFile = biochem_root + "Aliases/Unique_ModelSEED_Compound_Aliases.txt"
+        self.NameFile = biochem_root + "Aliases/Unique_ModelSEED_Compound_Names.txt"
         self.StructRoot = biochem_root + "Structures/"
 
         reader = DictReader(open(self.CpdsFile), dialect='excel-tab')
@@ -64,6 +65,25 @@ class Compounds:
             aliases_dict[line['Source']][line['External ID']].append(line['ModelSEED ID'])
 
         return aliases_dict
+
+    def loadNames(self):
+        names_dict = dict()
+        reader = DictReader(open(self.NameFile), dialect = 'excel-tab')
+        for line in reader:
+            if("cpd" not in line['ModelSEED ID']):
+                continue
+
+            if(line['ModelSEED ID'] not in names_dict):
+                   names_dict[line['ModelSEED ID']]=dict()
+
+            #redundant as only one source but keep this just in case
+            for source in line['Source'].split('|'):
+                if(source not in names_dict[line['ModelSEED ID']]):
+                    names_dict[line['ModelSEED ID']][source]=list()
+
+                names_dict[line['ModelSEED ID']][source].append(line['External ID'])
+
+        return names_dict
 
     def loadStructures(self,sources_array=[],db_array=[]):
         if(len(sources_array)==0):

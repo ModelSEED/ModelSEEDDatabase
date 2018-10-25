@@ -10,7 +10,7 @@ from BiochemPy import Reactions, Compounds, InChIs
 CompoundsHelper = Compounds()
 Compounds_Dict = CompoundsHelper.loadCompounds()
 Aliases_Dict = CompoundsHelper.loadMSAliases()
-#Names_Dict = CompoundsHelper.loadNames()
+Names_Dict = CompoundsHelper.loadNames()
 
 Source_Classes=dict()
 reader = DictReader(open('../../Biochemistry/Aliases/Source_Classifiers.txt'), dialect='excel-tab')
@@ -45,6 +45,12 @@ for cpd in sorted(Compounds_Dict.keys()):
     for source in sorted(Cpd_Aliases.keys()):
         source_line=source+":"+"|".join(sorted(Cpd_Aliases[source].keys()))
         Alias_List.append(source_line)
+        
+    if(cpd in Names_Dict):
+        name_line="name:"+"|".join(sorted(Names_Dict[cpd]['name']))
+        Alias_List.append(name_line)
+
     Alias_Line = ";".join(Alias_List)
     Compounds_Dict[cpd]['aliases']=Alias_Line
-#CompoundsHelper.saveCompounds(Compounds_Dict)
+
+CompoundsHelper.saveCompounds(Compounds_Dict)
