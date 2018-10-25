@@ -8,7 +8,7 @@ class Compounds:
                  cpds_file='compounds.tsv'):
         self.BiochemRoot = biochem_root
         self.CpdsFile = biochem_root + cpds_file
-        self.AliasFile = biochem_root + "Aliases/Compounds_Aliases.tsv"
+        self.AliasFile = biochem_root + "Aliases/Unique_ModelSEED_Compound_Aliases.tsv"
         self.StructRoot = biochem_root + "Structures/"
 
         reader = DictReader(open(self.CpdsFile), dialect='excel-tab')
