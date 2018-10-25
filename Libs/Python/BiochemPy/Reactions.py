@@ -8,7 +8,9 @@ class Reactions:
                  rxns_file='reactions.tsv'):
         self.BiochemRoot = biochem_root
         self.RxnsFile = biochem_root + rxns_file
-        self.AliasFile = biochem_root + "Aliases/Reactions_Aliases.tsv"
+        self.AliasFile = biochem_root + "Aliases/Unique_ModelSEED_Reaction_Aliases.txt"
+        self.NameFile = biochem_root + "Aliases/Unique_ModelSEED_Reaction_Names.txt"
+        self.ECFile = biochem_root + "Aliases/Unique_ModelSEED_Reaction_ECs.txt"
 
         reader = DictReader(open(self.RxnsFile), dialect='excel-tab')
         self.Headers = reader.fieldnames
@@ -351,23 +353,62 @@ class Reactions:
 
     def loadMSAliases(self,sources_array=[]):
         if(len(sources_array)==0):
-            return {}
+            sources_array.append("All")
 
         aliases_dict = dict()
         reader = DictReader(open(self.AliasFile), dialect = 'excel-tab')
         for line in reader:
-            if("rxn" not in line['MS ID']):
+            if("rxn" not in line['ModelSEED ID']):
                 continue
 
             if("All" not in sources_array and line['Source'] not in sources_array):
                 continue
 
-            if(line['MS ID'] not in aliases_dict):
-                   aliases_dict[line['MS ID']]=dict()
+            if(line['ModelSEED ID'] not in aliases_dict):
+                   aliases_dict[line['ModelSEED ID']]=dict()
 
-            if(line['Source'] not in aliases_dict[line['MS ID']]):
-                aliases_dict[line['MS ID']][line['Source']]=list()
+            for source in line['Source'].split('|'):
+                if(source not in aliases_dict[line['ModelSEED ID']]):
+                    aliases_dict[line['ModelSEED ID']][source]=list()
 
-            aliases_dict[line['MS ID']][line['Source']].append(line['External ID'])
+                aliases_dict[line['ModelSEED ID']][source].append(line['External ID'])
 
         return aliases_dict
+
+    def loadNames(self):
+        names_dict = dict()
+        reader = DictReader(open(self.NameFile), dialect = 'excel-tab')
+        for line in reader:
+            if("rxn" not in line['ModelSEED ID']):
+                continue
+
+            if(line['ModelSEED ID'] not in names_dict):
+                   names_dict[line['ModelSEED ID']]=dict()
+
+            #redundant as only one source but keep this just in case
+            for source in line['Source'].split('|'):
+                if(source not in names_dict[line['ModelSEED ID']]):
+                    names_dict[line['ModelSEED ID']][source]=list()
+
+                names_dict[line['ModelSEED ID']][source].append(line['External ID'])
+
+        return names_dict
+
+    def loadECs(self):
+        ecs_dict = dict()
+        reader = DictReader(open(self.ECFile), dialect = 'excel-tab')
+        for line in reader:
+            if("rxn" not in line['ModelSEED ID']):
+                continue
+
+            if(line['ModelSEED ID'] not in ecs_dict):
+                   ecs_dict[line['ModelSEED ID']]=dict()
+
+            #redundant as only one source but keep this just in case
+            for source in line['Source'].split('|'):
+                if(source not in ecs_dict[line['ModelSEED ID']]):
+                    ecs_dict[line['ModelSEED ID']][source]=list()
+
+                ecs_dict[line['ModelSEED ID']][source].append(line['External ID'])
+
+        return ecs_dict
