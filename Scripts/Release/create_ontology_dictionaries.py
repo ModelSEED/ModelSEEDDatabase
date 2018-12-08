@@ -3,7 +3,7 @@ import os
 import json
 import datetime
 import argparse
-from Bio.ExPASy import Enzyme
+#from Bio.ExPASy import Enzyme
 
 timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
@@ -63,7 +63,7 @@ def get_KEGG_KOs():
 
             kegg_dict['term_hash'][id] = {'id' : id, 'name' : name, 'synonyms' : synonym.split(", ")}
 
-    with open('KEGG_KO_ontologyDictionary.json', 'w') as outfile:
+    with open('../../Ontologies/KBaseOntology.OntologyDictionary.KEGG_KO_ontologyDictionary.json', 'w') as outfile:
         json.dump(kegg_dict, outfile, indent = 2)
 
 def get_KEGG_RXNs():
@@ -103,7 +103,7 @@ def get_KEGG_RXNs():
 
             kegg_dict['term_hash'][id] = {'id' : id, 'name' : name, 'synonyms' : fullLineSplit}
 
-    with open('KEGG_RXN_ontologyDictionary.json', 'w') as outfile:
+    with open('../../Ontologies/KBaseOntology.OntologyDictionary.KEGG_RXN_ontologyDictionary.json', 'w') as outfile:
         json.dump(kegg_dict, outfile, indent = 2)
 
 def get_EC_RXNs():
@@ -142,11 +142,11 @@ def get_EC_RXNs():
                                  'synonyms' : record['AN']
                                  }
 
-    with open('EBI_EC_ontologyDictionary.json', 'w') as outfile:
+    with open('../../Ontologies/KBaseOntology.OntologyDictionary.EBI_EC_ontologyDictionary.json', 'w') as outfile:
         json.dump(ec_dict, outfile, indent = 2)
 
 ## RUN FUNCTIONS ###############################################################
 
 get_KEGG_KOs()
 get_KEGG_RXNs()
-get_EC_RXNs()
+#get_EC_RXNs()
