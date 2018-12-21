@@ -193,7 +193,7 @@ class Compounds:
     @staticmethod
     def buildFormula(Atoms_Dict):
         formula = ""
-        for atom in Compounds.hill_sorted(Atoms_Dict.keys()):
+        for atom in Compounds.hill_sorted(list(Atoms_Dict.keys())):
             if (Atoms_Dict[atom] == 1):
                 Atoms_Dict[atom] = ""
             formula += atom + str(Atoms_Dict[atom])
