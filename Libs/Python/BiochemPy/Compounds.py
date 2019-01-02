@@ -35,13 +35,14 @@ class Compounds:
             if("cpd" not in line['ModelSEED ID']):
                 continue
 
-            if("All" not in sources_array and line['Source'] not in sources_array):
-                continue
+            for source in line['Source'].split('|'):
 
-            if(line['ModelSEED ID'] not in aliases_dict):
+                if("All" not in sources_array and source not in sources_array):
+                    continue
+
+                if(line['ModelSEED ID'] not in aliases_dict):
                    aliases_dict[line['ModelSEED ID']]=dict()
 
-            for source in line['Source'].split('|'):
                 if(source not in aliases_dict[line['ModelSEED ID']]):
                     aliases_dict[line['ModelSEED ID']][source]=list()
 
