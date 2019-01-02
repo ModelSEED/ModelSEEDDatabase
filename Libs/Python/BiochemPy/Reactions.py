@@ -213,7 +213,7 @@ class Reactions:
         rxn_net_charge = "{0:.2f}".format(rxn_net_charge)
 
         # Correct for redundant ".00" in floats
-        if (str(rxn_net_charge)[-3:] == ".00"):
+        if (rxn_net_charge[-3:] == ".00"):
             rxn_net_charge = str(int(float(rxn_net_charge)))
 
         status = ""
@@ -221,11 +221,11 @@ class Reactions:
         if (len(imbalanced_atoms_array) > 0):
             status = "MI:" + "/".join(imbalanced_atoms_array)
 
-        if (rxn_net_charge != 0):
+        if (rxn_net_charge != "0"):
             if (len(status) == 0):
-                status = "CI:" + str(rxn_net_charge)
+                status = "CI:" + rxn_net_charge
             else:
-                status += "|CI:" + str(rxn_net_charge)
+                status += "|CI:" + rxn_net_charge
 
         if (status == ""):
             status = "OK"
