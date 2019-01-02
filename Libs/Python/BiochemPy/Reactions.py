@@ -202,15 +202,19 @@ class Reactions:
             if (rxn_net_mass[atom] == 0):
                 continue
 
-            # Correct for redundant ".0" in floats
-            if (str(rxn_net_mass[atom])[-2:] == ".0"):
-                rxn_net_mass[atom] = int(round(rxn_net_mass[atom]))
+            rxn_net_mass[atom] = "{0:.2f}".format(rxn_net_mass[atom])
 
-            imbalanced_atoms_array.append(atom + ":" + str(rxn_net_mass[atom]))
+            # Correct for redundant ".00" in floats
+            if (rxn_net_mass[atom][-3:] == ".00"):
+                rxn_net_mass[atom] = str(int(float(rxn_net_mass[atom])))
+    
+            imbalanced_atoms_array.append(atom + ":" + rxn_net_mass[atom])
 
-        # Correct for redundant ".0" in floats
-        if (str(rxn_net_charge)[-2:] == ".0"):
-            rxn_net_charge = int(rxn_net_charge)
+        rxn_net_charge = "{0:.2f}".format(rxn_net_charge)
+
+        # Correct for redundant ".00" in floats
+        if (str(rxn_net_charge)[-3:] == ".00"):
+            rxn_net_charge = str(int(float(rxn_net_charge)))
 
         status = ""
 
