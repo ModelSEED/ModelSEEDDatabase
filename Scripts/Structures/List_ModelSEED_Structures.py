@@ -11,9 +11,10 @@ Compounds_Dict = CompoundsHelper.loadCompounds()
 #Load Curated Structures
 Ignored_Structures=dict()
 with open("../../Biochemistry/Structures/Curation/Ignore_Structures.txt") as ignore_file:
-    line=ignore_file.readline()
-    array=line.split('\t')
-    Ignored_Structures[array[0]]=1
+    for line in ignore_file.readlines():
+        array=line.split('\t')
+        Ignored_Structures[array[0]]=1
+ignore_file.close()
 
 #Load Structures and Aliases
 Structures_Dict = CompoundsHelper.loadStructures(["SMILE","InChIKey","InChI"],["KEGG","MetaCyc"])
@@ -45,7 +46,7 @@ for msid in sorted(MS_Aliases_Dict.keys()):
 
                     for structure in sorted(Structures_Dict[struct_type][external_id][struct_stage].keys()):
                             
-                        #Print to master
+                        #Write to master
                         master_structs_file.write("\t".join([msid,struct_type,struct_stage,external_id,source,structure])+"\n")    
 
                         if(external_id in Ignored_Structures):

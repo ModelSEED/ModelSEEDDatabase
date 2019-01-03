@@ -23,9 +23,13 @@ for cpd in sorted(Compounds_Dict.keys()):
     if(cpd not in Structures_Dict):
         continue
 
-    if('InChI' not in Structures_Dict[cpd] or 'SMILE' not in Structures_Dict[cpd]):
+    print(cpd)
+
+    if('InChI' not in Structures_Dict[cpd] and 'SMILE' not in Structures_Dict[cpd]):
         continue
 
+    print(cpd)
+    
     mol=None
     mol_source=""
     try:
