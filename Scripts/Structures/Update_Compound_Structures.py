@@ -18,5 +18,5 @@ for cpd in sorted (Compounds_Dict.keys()):
         Compounds_Dict[cpd]['inchikey']=Structures_Dict[cpd].get('InChIKey',"")
         Compounds_Dict[cpd]['smiles']=Structures_Dict[cpd].get('SMILE',"")
 
-print "Saving compounds";
+print("Saving compounds")
 CompoundsHelper.saveCompounds(Compounds_Dict)

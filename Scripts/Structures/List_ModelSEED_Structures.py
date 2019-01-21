@@ -8,9 +8,18 @@ from BiochemPy import Compounds #, Reactions
 CompoundsHelper = Compounds()
 Compounds_Dict = CompoundsHelper.loadCompounds()
 
+#Load Curated Structures
+Ignored_Structures=dict()
+with open("../../Biochemistry/Structures/Curation/Ignore_Structures.txt") as ignore_file:
+    for line in ignore_file.readlines():
+        array=line.split('\t')
+        Ignored_Structures[array[0]]=1
+ignore_file.close()
+
 #Load Structures and Aliases
 Structures_Dict = CompoundsHelper.loadStructures(["SMILE","InChIKey","InChI"],["KEGG","MetaCyc"])
 MS_Aliases_Dict =  CompoundsHelper.loadMSAliases(["KEGG","MetaCyc"])
+
 
 unique_structs_file = open("../../Biochemistry/Structures/Unique_ModelSEED_Structures.txt",'w')
 master_structs_file = open("../../Biochemistry/Structures/All_ModelSEED_Structures.txt",'w')
@@ -23,26 +32,30 @@ for msid in sorted(MS_Aliases_Dict.keys()):
         if(source not in MS_Aliases_Dict[msid].keys()):
             continue
 
-        for struct_type in Structures_Dict.keys():
+        for struct_type in sorted(Structures_Dict.keys()):
             for external_id in sorted(MS_Aliases_Dict[msid][source]):
                 if(external_id not in Structures_Dict[struct_type]):
                     continue
 
-                for struct_stage in Structures_Dict[struct_type][external_id].keys():
+                for struct_stage in sorted(Structures_Dict[struct_type][external_id].keys()):
                     if(struct_type not in Structs):
                         Structs[struct_type]=dict()
 
                     if(struct_stage not in Structs[struct_type]):
                         Structs[struct_type][struct_stage]=dict()
 
-                    for structure in Structures_Dict[struct_type][external_id][struct_stage].keys():
+                    for structure in sorted(Structures_Dict[struct_type][external_id][struct_stage].keys()):
+                            
+                        #Write to master
+                        master_structs_file.write("\t".join([msid,struct_type,struct_stage,external_id,source,structure])+"\n")    
+
+                        if(external_id in Ignored_Structures):
+                            continue
+
                         if(structure not in Structs[struct_type][struct_stage]):
                             Structs[struct_type][struct_stage][structure]=dict()
-                            
-                        Structs[struct_type][struct_stage][structure][external_id]=source
 
-                        #Print to master
-                        master_structs_file.write("\t".join([msid,struct_type,struct_stage,external_id,source,structure])+"\n")    
+                        Structs[struct_type][struct_stage][structure][external_id]=source
                         
     ms_structure = "null"
     ms_structure_type = "null"
@@ -51,7 +64,7 @@ for msid in sorted(MS_Aliases_Dict.keys()):
     if("SMILE" in Structs):
         if("Charged" in Structs["SMILE"]):
             if(len(Structs["SMILE"]["Charged"])==1):
-                structure = Structs["SMILE"]["Charged"].keys()[0]
+                structure = list(Structs["SMILE"]["Charged"].keys())[0]
                 ms_structure = structure
                 ms_structure_type = "SMILE"
                 ms_external_ids = Structs["SMILE"]["Charged"][structure].keys()
@@ -61,7 +74,7 @@ for msid in sorted(MS_Aliases_Dict.keys()):
 
         elif("Original" in Structs["SMILE"]):
             if(len(Structs["SMILE"]["Original"])==1):
-                structure = Structs["SMILE"]["Original"].keys()[0]
+                structure = list(Structs["SMILE"]["Original"].keys())[0]
                 ms_structure = structure
                 ms_structure_type = "SMILE"
                 ms_external_ids = Structs["SMILE"]["Original"][structure].keys()
@@ -86,7 +99,7 @@ for msid in sorted(MS_Aliases_Dict.keys()):
         if("Charged" in Structs["InChIKey"]):
 
             if(len(Structs["InChIKey"]["Charged"])==1):
-                structure = Structs["InChIKey"]["Charged"].keys()[0]
+                structure = list(Structs["InChIKey"]["Charged"].keys())[0]
                 ms_structure = structure
                 ms_structure_type = "InChIKey"
                 ms_external_ids = Structs["InChIKey"]["Charged"][structure].keys()
@@ -96,7 +109,7 @@ for msid in sorted(MS_Aliases_Dict.keys()):
 
         elif("Original" in Structs["InChIKey"]):
             if(len(Structs["InChIKey"]["Original"])==1):
-                structure = Structs["InChIKey"]["Original"].keys()[0]
+                structure = list(Structs["InChIKey"]["Original"].keys())[0]
                 ms_structure = structure
                 ms_structure_type = "InChIKey"
                 ms_external_ids = Structs["InChIKey"]["Original"][structure].keys()
@@ -114,7 +127,7 @@ for msid in sorted(MS_Aliases_Dict.keys()):
         if("Charged" in Structs["InChI"]):
 
             if(len(Structs["InChI"]["Charged"])==1):
-                structure = Structs["InChI"]["Charged"].keys()[0]
+                structure = list(Structs["InChI"]["Charged"].keys())[0]
                 ms_structure = structure
                 ms_structure_type = "InChI"
                 ms_external_ids = Structs["InChI"]["Charged"][structure].keys()
@@ -124,7 +137,7 @@ for msid in sorted(MS_Aliases_Dict.keys()):
 
         elif("Original" in Structs["InChI"]):
             if(len(Structs["InChI"]["Original"])==1):
-                structure = Structs["InChI"]["Original"].keys()[0]
+                structure = list(Structs["InChI"]["Original"].keys())[0]
                 ms_structure = structure
                 ms_structure_type = "InChI"
                 ms_external_ids = Structs["InChI"]["Original"][structure].keys()

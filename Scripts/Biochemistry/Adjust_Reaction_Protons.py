@@ -34,7 +34,7 @@ for rxn in sorted(Reactions_Dict.keys()):
             continue
         
         (element,number)=elements[0].split(":")
-        print "Adjusting: "+rxn,element,number
+        print("Adjusting: "+rxn,element,number)
 
         #Parse old stoichiometry into array
         old_stoichiometry=Reactions_Dict[rxn]["stoichiometry"]
@@ -51,7 +51,7 @@ for rxn in sorted(Reactions_Dict.keys()):
             status_file.write(rxn+"\t"+Reactions_Dict[rxn]['status']+"\t"+new_status+"\n")
 
         if(new_stoichiometry != old_stoichiometry):
-            print "Rebuilding reaction :",rxn
+            print("Rebuilding reaction :",rxn)
             ReactionsHelper.rebuildReaction(Reactions_Dict[rxn],new_stoichiometry)
             Reactions_Dict[rxn]["status"]=new_status
             if("HB" not in Reactions_Dict[rxn]["notes"]):
@@ -62,5 +62,5 @@ for rxn in sorted(Reactions_Dict.keys()):
             Update_Reactions+=1
 
 if(Update_Reactions>0):
-    print "Saving adjusted protons for "+str(Update_Reactions)+" reactions";
+    print("Saving adjusted protons for "+str(Update_Reactions)+" reactions")
     ReactionsHelper.saveReactions(Reactions_Dict)
