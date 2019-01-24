@@ -65,7 +65,26 @@ sub translate_html_entities{
 }
 
 my $Database_Root = "/homes/seaver/Biochemistry_Mirrors/bioinformatics.ai.sri.com/metacyc/dist/22.5/data/";
+my $Structure_Root = "/homes/seaver/Projects/ModelSEEDDatabase/Biochemistry/Structures/MetaCyc/";
 my $Output_Root = "/homes/seaver/Projects/ModelSEEDDatabase/Biochemistry/Aliases/Provenance/Primary_Databases/";
+
+my %Structures=();
+foreach my $type ("InChI","SMILE"){
+    open(FH, "< ".$Structure_Root.$type."_ChargedStrings.txt");
+    while(<FH>){
+	chomp;
+	@temp=split(/\t/,$_);
+	$Structures{$temp[0]}{$type}=$temp[1];
+    }
+
+    open(FH, "< ".$Structure_Root.$type."_OriginalStrings.txt");
+    while(<FH>){
+	chomp;
+	@temp=split(/\t/,$_);
+	next if exists($Structures{$temp[0]}) && exists($Structures{$temp[0]}{$type});
+	$Structures{$temp[0]}{$type}=$temp[1];
+    }
+}
 
 my %CycSEED = ();
 open(FH, "< ".$ENV{SEAVER_PROJECT}."Cyc/Meta/Meta_SEED_Compartments_v3.txt");
@@ -847,7 +866,7 @@ my %Remove_Names=();
 #my %Remove_Names=("phosphoglycerate"=>1,"aldehyde"=>1);
 open(OUT, "> ".$Output_Root."MetaCyc_Compounds.tbl");
 my @Headers=("ID","NAMES","FORMULA","CHARGE","MASS");
-print OUT join("\t",@Headers),"\n";
+print OUT join("\t",@Headers)."\tInChI\tSMILE\n";
 foreach my $cpd (keys %$Compounds){
     print OUT $cpd,"\t";
     foreach my $h ( grep { $_ ne "ID" } @Headers){
@@ -856,7 +875,11 @@ foreach my $cpd (keys %$Compounds){
 	}
 
 	print OUT $Compounds->{$cpd}{$h};
-	print OUT "\t" unless $h eq $Headers[$#Headers];
+	print OUT "\t"; # unless $h eq $Headers[$#Headers];
+    }
+    foreach my $type ("InChI","SMILE"){
+	print OUT $Structures{$cpd}{$type} if exists($Structures{$cpd}) && exists($Structures{$cpd}{$type});
+	print OUT "\t";
     }
     print OUT "\n";
 }

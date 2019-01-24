@@ -5,8 +5,26 @@ use strict;
 my @temp=();
 
 my $Database_Root = "/homes/seaver/Biochemistry_Mirrors/ftp.bioinformatics.jp/kegg/ligand/";
-my $Structure_Root = "/homes/seaver/Projects/ModelSEEDDatabase/Biochemistry/Structures/";
+my $Structure_Root = "/homes/seaver/Projects/ModelSEEDDatabase/Biochemistry/Structures/KEGG/";
 my $Output_Root = "/homes/seaver/Projects/ModelSEEDDatabase/Biochemistry/Aliases/Provenance/Primary_Databases/";
+
+my %Structures=();
+foreach my $type ("InChI","SMILE"){
+    open(FH, "< ".$Structure_Root.$type."_ChargedStrings.txt");
+    while(<FH>){
+	chomp;
+	@temp=split(/\t/,$_);
+	$Structures{$temp[0]}{$type}=$temp[1];
+    }
+
+    open(FH, "< ".$Structure_Root.$type."_OriginalStrings.txt");
+    while(<FH>){
+	chomp;
+	@temp=split(/\t/,$_);
+	next if exists($Structures{$temp[0]}) && exists($Structures{$temp[0]}{$type});
+	$Structures{$temp[0]}{$type}=$temp[1];
+    }
+}
 
 open(FH, "< ".$Database_Root."compound/compound");
 my ($field,$data)="";
@@ -222,12 +240,16 @@ close(OUT);
 
 open(OUT, "> ".$Output_Root."KEGG_Compounds.tbl");
 my @Headers=("NAMES","FORMULA","CHARGE","MASS");
-print OUT "ID\t".join("\t",@Headers)."\n";
+print OUT "ID\t".join("\t",@Headers)."\tInChI\tSMILE\n";
 foreach my $id (sort keys %$Compounds){
     print OUT $id,"\t";
     foreach my $h (@Headers){
 	print OUT $Compounds->{$id}{$h};
-	print OUT "\t" unless $h eq $Headers[$#Headers];
+	print OUT "\t"; # unless $h eq $Headers[$#Headers];
+    }
+    foreach my $type ("InChI","SMILE"){
+	print OUT $Structures{$id}{$type} if exists($Structures{$id}) && exists($Structures{$id}{$type});
+	print OUT "\t";
     }
     print OUT "\n";
 }
