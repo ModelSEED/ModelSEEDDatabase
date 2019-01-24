@@ -878,7 +878,11 @@ foreach my $cpd (keys %$Compounds){
 	print OUT "\t"; # unless $h eq $Headers[$#Headers];
     }
     foreach my $type ("InChI","SMILE"){
-	print OUT $Structures{$cpd}{$type} if exists($Structures{$cpd}) && exists($Structures{$cpd}{$type});
+	if(exists($Structures{$cpd}) && exists($Structures{$cpd}{$type})){
+	    print OUT $Structures{$cpd}{$type};
+	}else{
+	    print OUT "-";
+	}
 	print OUT "\t";
     }
     print OUT "\n";

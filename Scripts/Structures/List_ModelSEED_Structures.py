@@ -1,8 +1,11 @@
 #!/usr/bin/env python
 import os, sys
+from difflib import Differ
 
 sys.path.append('../../Libs/Python')
 from BiochemPy import Compounds #, Reactions
+
+DifferObj=Differ()
 
 #Load Compounds
 CompoundsHelper = Compounds()
@@ -23,6 +26,7 @@ MS_Aliases_Dict =  CompoundsHelper.loadMSAliases(["KEGG","MetaCyc"])
 
 unique_structs_file = open("../../Biochemistry/Structures/Unique_ModelSEED_Structures.txt",'w')
 master_structs_file = open("../../Biochemistry/Structures/All_ModelSEED_Structures.txt",'w')
+conflicts_file = open("InChI_Conflicts.txt",'w')
 unique_structs_file.write("ID\tType\tAliases\tStructure\n")
 for msid in sorted(MS_Aliases_Dict.keys()):
 
@@ -131,8 +135,14 @@ for msid in sorted(MS_Aliases_Dict.keys()):
                 ms_structure = structure
                 ms_structure_type = "InChI"
                 ms_external_ids = Structs["InChI"]["Charged"][structure].keys()
-            else:
-                #Establish rules for checking/curating InChI strings
+            elif(len(Structs["InChI"]["Charged"])>1):
+#                structures = list(Structs["InChI"]["Charged"].keys())
+#                result = DifferObj.compare(structures[0], structures[1])
+#                sys.stdout.writelines(result)
+
+                for structure in Structs["InChI"]["Charged"]:
+                    for external_id in Structs["InChI"]["Charged"][structure]:
+                        conflicts_file.write(msid+"\tCharged\t"+structure+"\t"+external_id+"\t"+Structs["InChI"]["Charged"][structure][external_id]+"\n")
                 pass
 
         elif("Original" in Structs["InChI"]):
@@ -142,10 +152,13 @@ for msid in sorted(MS_Aliases_Dict.keys()):
                 ms_structure_type = "InChI"
                 ms_external_ids = Structs["InChI"]["Original"][structure].keys()
             else:
-                #Establish rules for checking/curating InChI strings
+                for structure in Structs["InChI"]["Original"]:
+                    for external_id in Structs["InChI"]["Original"][structure]:
+                        conflicts_file.write(msid+"\tOriginal\t"+structure+"\t"+external_id+"\t"+Structs["InChI"]["Original"][structure][external_id]+"\n")
                 pass
 
     if(ms_structure != "null"):
         unique_structs_file.write("\t".join([msid,ms_structure_type,";".join(sorted(ms_external_ids)),ms_structure])+"\n")
 
 unique_structs_file.close()
+conflicts_file.close()

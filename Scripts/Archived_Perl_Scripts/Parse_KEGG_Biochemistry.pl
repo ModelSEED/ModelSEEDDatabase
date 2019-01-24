@@ -248,7 +248,11 @@ foreach my $id (sort keys %$Compounds){
 	print OUT "\t"; # unless $h eq $Headers[$#Headers];
     }
     foreach my $type ("InChI","SMILE"){
-	print OUT $Structures{$id}{$type} if exists($Structures{$id}) && exists($Structures{$id}{$type});
+	if(exists($Structures{$id}) && exists($Structures{$id}{$type})){
+	    print OUT $Structures{$id}{$type};
+	}else{
+	    print OUT "-";
+	}
 	print OUT "\t";
     }
     print OUT "\n";
