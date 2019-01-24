@@ -5,6 +5,7 @@ use strict;
 my @temp=();
 
 my $Database_Root = "/homes/seaver/Biochemistry_Mirrors/ftp.bioinformatics.jp/kegg/ligand/";
+my $Structure_Root = "/homes/seaver/Projects/ModelSEEDDatabase/Biochemistry/Structures/";
 my $Output_Root = "/homes/seaver/Projects/ModelSEEDDatabase/Biochemistry/Aliases/Provenance/Primary_Databases/";
 
 open(FH, "< ".$Database_Root."compound/compound");
