@@ -26,7 +26,8 @@ MS_Aliases_Dict =  CompoundsHelper.loadMSAliases(["KEGG","MetaCyc"])
 
 unique_structs_file = open("../../Biochemistry/Structures/Unique_ModelSEED_Structures.txt",'w')
 master_structs_file = open("../../Biochemistry/Structures/All_ModelSEED_Structures.txt",'w')
-conflicts_file = open("InChI_Conflicts.txt",'w')
+inchi_conflicts_file = open("InChI_Conflicts.txt",'w')
+smile_conflicts_file = open("SMILE_Conflicts.txt",'w')
 unique_structs_file.write("ID\tType\tAliases\tStructure\n")
 for msid in sorted(MS_Aliases_Dict.keys()):
 
@@ -60,6 +61,9 @@ for msid in sorted(MS_Aliases_Dict.keys()):
                             Structs[struct_type][struct_stage][structure]=dict()
 
                         Structs[struct_type][struct_stage][structure][external_id]=source
+
+    if(len(Structs.keys())==0):
+        continue
                         
     ms_structure = "null"
     ms_structure_type = "null"
@@ -73,7 +77,9 @@ for msid in sorted(MS_Aliases_Dict.keys()):
                 ms_structure_type = "SMILE"
                 ms_external_ids = Structs["SMILE"]["Charged"][structure].keys()
             else:
-                #Establish rules for checking/curating InChI strings
+                for structure in Structs["SMILE"]["Charged"]:
+                    for external_id in Structs["SMILE"]["Charged"][structure]:
+                        smile_conflicts_file.write(msid+"\tCharged\t"+external_id+"\t"+structure+"\t"+Structs["SMILE"]["Charged"][structure][external_id]+"\n")
                 pass
 
         elif("Original" in Structs["SMILE"]):
@@ -83,7 +89,10 @@ for msid in sorted(MS_Aliases_Dict.keys()):
                 ms_structure_type = "SMILE"
                 ms_external_ids = Structs["SMILE"]["Original"][structure].keys()
             else:
-                #Establish rules for checking/curating InChI strings
+                #Establish rules for checking/curating SMILE strings
+                for structure in Structs["SMILE"]["Original"]:
+                    for external_id in Structs["SMILE"]["Original"][structure]:
+                        smile_conflicts_file.write(msid+"\tOriginal\t"+external_id+"\t"+structure+"\t"+Structs["SMILE"]["Original"][structure][external_id]+"\n")
                 pass
     else:
         pass
@@ -91,10 +100,11 @@ for msid in sorted(MS_Aliases_Dict.keys()):
     if(ms_structure != "null"):
         unique_structs_file.write("\t".join([msid,ms_structure_type,";".join(sorted(ms_external_ids)),ms_structure])+"\n")
     else:
-        if("KEGG" in MS_Aliases_Dict[msid]):
-            #We have a problem where a structure is available for both KEGG and MetaCyc, but not only does conflict arise
-            #The MetaCyc InChI over-rides the KEGG SMILE
-            continue
+        #There are possible problems that arise where we can't find a unique SMILE structure, but we can find a unique InChI structure
+        #I don't yet know why, but I've a feeling it's to do with how some valences are assigned within a MOL file which
+        #is normalized using InChI as a standard, but breaks down when generating SMILE strings
+        #A good example is Protoheme: cpd00028
+        pass
 
     ms_structure="null"
     if("InChIKey" in Structs):
@@ -142,7 +152,7 @@ for msid in sorted(MS_Aliases_Dict.keys()):
 
                 for structure in Structs["InChI"]["Charged"]:
                     for external_id in Structs["InChI"]["Charged"][structure]:
-                        conflicts_file.write(msid+"\tCharged\t"+structure+"\t"+external_id+"\t"+Structs["InChI"]["Charged"][structure][external_id]+"\n")
+                        inchi_conflicts_file.write(msid+"\tCharged\t"+external_id+"\t"+structure+"\t"+Structs["InChI"]["Charged"][structure][external_id]+"\n")
                 pass
 
         elif("Original" in Structs["InChI"]):
@@ -154,11 +164,13 @@ for msid in sorted(MS_Aliases_Dict.keys()):
             else:
                 for structure in Structs["InChI"]["Original"]:
                     for external_id in Structs["InChI"]["Original"][structure]:
-                        conflicts_file.write(msid+"\tOriginal\t"+structure+"\t"+external_id+"\t"+Structs["InChI"]["Original"][structure][external_id]+"\n")
+                        inchi_conflicts_file.write(msid+"\tOriginal\t"+external_id+"\t"+structure+"\t"+Structs["InChI"]["Original"][structure][external_id]+"\n")
                 pass
 
     if(ms_structure != "null"):
         unique_structs_file.write("\t".join([msid,ms_structure_type,";".join(sorted(ms_external_ids)),ms_structure])+"\n")
 
+master_structs_file.close()
 unique_structs_file.close()
-conflicts_file.close()
+inchi_conflicts_file.close()
+smile_conflicts_file.close()
