@@ -9,7 +9,7 @@ class Compounds:
         self.BiochemRoot = biochem_root
         self.CpdsFile = biochem_root + cpds_file
         self.AliasFile = biochem_root + "Aliases/Unique_ModelSEED_Compound_Aliases.txt"
-        self.NameFile = biochem_root + "Aliases/Unique_ModelSEED_Compound_Names.txt"
+        self.NamesFile = biochem_root + "Aliases/Unique_ModelSEED_Compound_Names.txt"
         self.StructRoot = biochem_root + "Structures/"
 
         reader = DictReader(open(self.CpdsFile), dialect='excel-tab')
@@ -70,20 +70,15 @@ class Compounds:
 
     def loadNames(self):
         names_dict = dict()
-        reader = DictReader(open(self.NameFile), dialect = 'excel-tab')
+        reader = DictReader(open(self.NamesFile), dialect = 'excel-tab')
         for line in reader:
             if("cpd" not in line['ModelSEED ID']):
                 continue
 
             if(line['ModelSEED ID'] not in names_dict):
-                   names_dict[line['ModelSEED ID']]=dict()
+                   names_dict[line['ModelSEED ID']]=list()
 
-            #redundant as only one source but keep this just in case
-            for source in line['Source'].split('|'):
-                if(source not in names_dict[line['ModelSEED ID']]):
-                    names_dict[line['ModelSEED ID']][source]=list()
-
-                names_dict[line['ModelSEED ID']][source].append(line['External ID'])
+            names_dict[line['ModelSEED ID']].append(line['External ID'])
 
         return names_dict
 
@@ -237,6 +232,29 @@ class Compounds:
             yield "H"
         for atom in sorted(atoms):
             yield atom
+
+    def saveNames(self, names_dict):
+        names_root = os.path.splitext(self.NamesFile)[0]
+
+        # Print to TXT
+        names_file = open(names_root + ".txt", 'w')
+        names_file.write("\t".join(("ModelSEED ID","External ID","Source")) + "\n")
+        for cpd in sorted(names_dict.keys()):
+            for name in sorted(names_dict[cpd]):
+                names_file.write("\t".join((cpd,name,'name')) + "\n")
+        names_file.close()
+
+    def saveAliases(self, alias_dict):
+        alias_root = os.path.splitext(self.AliasFile)[0]
+
+        # Print to TXT
+        alias_file = open(alias_root + ".txt", 'w')
+        alias_file.write("\t".join(("ModelSEED ID","External ID","Source")) + "\n")
+        for cpd in sorted(alias_dict.keys()):
+            for source in sorted (alias_dict[cpd].keys()):
+                for alias in sorted(alias_dict[cpd][source]):
+                    alias_file.write("\t".join((cpd,alias,source)) + "\n")
+        alias_file.close()
 
     def saveCompounds(self, compounds_dict):
         cpds_root = os.path.splitext(self.CpdsFile)[0]
