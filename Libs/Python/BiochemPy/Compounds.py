@@ -57,13 +57,14 @@ class Compounds:
             if("cpd" not in line['ModelSEED ID']):
                 continue
 
-            if(line['Source'] not in aliases_dict):
-                   aliases_dict[line['Source']]=dict()
+            for source in line['Source'].split('|'):
+                if(source not in aliases_dict):
+                    aliases_dict[source]=dict()
 
-            if(line['External ID'] not in aliases_dict[line['Source']]):
-                aliases_dict[line['Source']][line['External ID']]=list()
+                if(line['External ID'] not in aliases_dict[source]):
+                    aliases_dict[source][line['External ID']]=list()
 
-            aliases_dict[line['Source']][line['External ID']].append(line['ModelSEED ID'])
+                aliases_dict[source][line['External ID']].append(line['ModelSEED ID'])
 
         return aliases_dict
 
@@ -126,8 +127,34 @@ class Compounds:
                             structures_dict[struct_type][line['ID']][struct_stage]=dict()
 
                         structures_dict[struct_type][line['ID']][struct_stage][line['Structure']]=1
+
         return structures_dict
-        
+
+    @staticmethod
+    def searchname(name):
+        searchname = name.lower()
+
+        #try to keep/maintain charges
+        ending = ""
+        if(searchname.endswith("-")):
+            ending="-"
+
+        if(searchname.endswith("+")):
+            ending="+"
+
+        searchname = ''.join(char for char in searchname if char.isalnum())
+
+        #attempting to match fatty acids
+        searchname = re.sub('icacid','ate',searchname)
+
+        #remove redundant articles
+        if(re.search('^an?\s',name)):
+            searchname = re.sub('^an?','',searchname)
+
+        searchname+=ending
+
+        return searchname
+
     @staticmethod
     def parseFormula(formula):
         if (formula.strip() in {None, "", "noFormula", "null"}):
