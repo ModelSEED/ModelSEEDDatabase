@@ -203,12 +203,12 @@ while(<FH>){
 	}
     }elsif(substr($_,0,2) eq "//"){
 
-	$Compounds->{$ID}={METACYC=>$ID,NAMES=>"",FORMULA=>"noformula",CHARGE=>10000000,MASS=>10000000};
+	$Compounds->{$ID}={METACYC=>$ID,NAMES=>"",FORMULA=>"null",CHARGE=>10000000,MASS=>10000000};
 	$Cpd_Rxns{$ID}=();
 
 	$Compounds->{$ID}{NAMES}=join("|",sort keys %Names);
 	$Compounds->{$ID}{NAMES}=$ID if !$Compounds->{$ID}{NAMES};
-	$Compounds->{$ID}{FORMULA}=$Formula if $Formula && $Formula ne "noformula";
+	$Compounds->{$ID}{FORMULA}=$Formula if $Formula && $Formula ne "null";
 	$Compounds->{$ID}{CHARGE}=$Charge;
 	$Compounds->{$ID}{MASS}=$Mass;
 
@@ -258,7 +258,7 @@ while(<FH>){
 	$Names{$Data}=1;
     }elsif(substr($_,0,2) eq "//"){
 
-	$Classes->{$ID}={METACYC=>$ID,NAMES=>$ID,FORMULA=>"noformula",CHARGE=>10000000,"MASS"=>10000000};
+	$Classes->{$ID}={METACYC=>$ID,NAMES=>$ID,FORMULA=>"null",CHARGE=>10000000,"MASS"=>10000000};
 	$Compounds->{$ID}{NAMES}=$ID if exists($Compounds->{$ID});
 	print CLASS $ID,"\n" if !exists($Compounds->{$ID});
 
@@ -278,7 +278,7 @@ while(<FH>){
 }
 
 #Add electrons
-$Classes->{"E-"}={METACYC=>"E-",NAMES=>"E-",FORMULA=>"noformula",UNCHARGED_FORMULA=>"noformula",CHARGE=>-1,"MASS"=>0,STRINGCODE=>"nostringcode",GROUPS=>"nogroups"};
+$Classes->{"E-"}={METACYC=>"E-",NAMES=>"E-",FORMULA=>"null",UNCHARGED_FORMULA=>"null",CHARGE=>-1,"MASS"=>0,STRINGCODE=>"nostringcode",GROUPS=>"nogroups"};
 close(CLASS);
 
 #Get gene references from genes.dat
@@ -362,7 +362,7 @@ while(<FH>){
     }elsif($Field eq "COMPONENTS"){
 	push(@components,$Data);
     }elsif($Field eq "//"){
-	$Proteins->{$ID}={METACYC=>$ID,NAMES=>$ID,FORMULA=>"noformula",CHARGE=>10000000,"MASS"=>10000000};
+	$Proteins->{$ID}={METACYC=>$ID,NAMES=>$ID,FORMULA=>"null",CHARGE=>10000000,"MASS"=>10000000};
 
 	if(exists($Genes{$ID}) && $Genes{$ID}{"ID"} ne $gene){
 	    print WARN "WARNING (proteins.dat): Inconsistency in genes used: ",$ID,"\t",$gene,"\t",$Genes{$ID}{"ID"},"\n";

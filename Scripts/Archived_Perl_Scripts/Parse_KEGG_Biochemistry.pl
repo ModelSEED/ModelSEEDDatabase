@@ -30,7 +30,7 @@ open(FH, "< ".$Database_Root."compound/compound");
 my ($field,$data)="";
 my $ENTRY="";
 my @NAMES=();
-my $FORMULA="noformula";
+my $FORMULA="null";
 my $MASS=10000000;
 my $CHARGE=10000000;
 my $Compounds={};
@@ -83,7 +83,7 @@ while(<FH>){
 	    $Compounds->{$ENTRY}{CHARGE}=0;
 	}
 	
-	($ENTRY,$FORMULA,$MASS,$CHARGE)=("","noformula",10000000,10000000);
+	($ENTRY,$FORMULA,$MASS,$CHARGE)=("","null",10000000,10000000);
 	undef(@NAMES);
     }
 }
@@ -91,7 +91,7 @@ close(FH);
 
 open(FH, "< ".$Database_Root."glycan/glycan");
 ($field,$data)=("","");
-($ENTRY,$FORMULA)=("","noformula");
+($ENTRY,$FORMULA)=("","null");
 my $Glycans={};
 undef(@NAMES);
 undef($Glycans);
@@ -124,7 +124,7 @@ while(<FH>){
 
     if($temp[0] eq "///"){
 	$Glycans->{$ENTRY}={Glycans=>$ENTRY,NAMES=>join("|",@NAMES),FORMULA=>$FORMULA,CHARGE=>10000000,MASS=>10000000};
-	($ENTRY,$FORMULA)=("","noformula");
+	($ENTRY,$FORMULA)=("","null");
 	undef(@NAMES);
     }
 }
