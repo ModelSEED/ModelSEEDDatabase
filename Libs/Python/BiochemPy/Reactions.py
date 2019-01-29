@@ -387,14 +387,9 @@ class Reactions:
                 continue
 
             if(line['ModelSEED ID'] not in names_dict):
-                   names_dict[line['ModelSEED ID']]=dict()
+                   names_dict[line['ModelSEED ID']]=list()
 
-            #redundant as only one source but keep this just in case
-            for source in line['Source'].split('|'):
-                if(source not in names_dict[line['ModelSEED ID']]):
-                    names_dict[line['ModelSEED ID']][source]=list()
-
-                names_dict[line['ModelSEED ID']][source].append(line['External ID'])
+            names_dict[line['ModelSEED ID']].append(line['External ID'])
 
         return names_dict
 

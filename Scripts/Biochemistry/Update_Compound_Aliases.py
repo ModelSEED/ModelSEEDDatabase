@@ -47,7 +47,7 @@ for cpd in sorted(Compounds_Dict.keys()):
         Alias_List.append(source_line)
         
     if(cpd in Names_Dict):
-        name_line="name:"+"|".join(sorted(Names_Dict[cpd]['name']))
+        name_line="name:"+"|".join(sorted(Names_Dict[cpd]))
         Alias_List.append(name_line)
 
     Alias_Line = ";".join(Alias_List)

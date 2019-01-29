@@ -64,7 +64,7 @@ for rxn in sorted(Reactions_Dict.keys()):
         
     if(rxn in Names_Dict):
         name_list=list()
-        for name in Names_Dict[rxn]['name']:
+        for name in Names_Dict[rxn]:
             if(name in Rxn_Aliases):
                 continue
 
