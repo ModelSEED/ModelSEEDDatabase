@@ -3,6 +3,97 @@ use fba_tools::fba_toolsImpl;
 use Data::Dumper;
 use JSON;
 
+sub translation_MetaCyc_to_ModelSEED {
+
+my ($def_hash) = @_;
+my $alias_file_url = "../../Biochemistry/Aliases/Provenance/Reactions_Aliases.tsv";
+my $translationfile = "../../Ontologies/KBaseOntology.OntologyTranslation.MetaCyc_RXN.ModelSEED.json";
+
+open my $OUTFILE, ">", $translationfile or die "Couldn't open output file $!\n";
+
+open alias_file, $alias_file_url or die "Couldn't open Metacyc->ModelSEED aliases file $!\n";
+
+    my $alias_hash;
+    while (my $inputln = <alias_file>){
+        chomp $inputln;
+        my @al = split /\t/, $inputln;
+        if ($inputln =~ /KEGG/ ){
+            #$alias_hash->{$al[2]} = [$al[0], $al[1],$al[2]];
+        }
+        elsif ($inputln =~ /MetaCyc/) {
+            my @alDot = split /\./, $al[2];
+            push (@{$alias_hash->{$alDot[0]}},$al[0] )
+            #$alias_hash->{$alDot[0]} = [$al[0], $al[1],$al[2], $alDot[0]];
+        }
+        else {
+            next;
+        }
+    }
+
+my $Cjson;
+    {
+        local $/; #Enable 'slurp' mode
+        open my $fh, "<", "../../Ontologies/KBaseOntology.OntologyDictionary.MetaCyc_RXN_ontologyDictionary.json";
+        $Cjson = <$fh>;
+        close $fh;
+    }
+
+    my $co = decode_json($Cjson);
+    my $cpdStHash;
+    my $inchikeyHash;
+
+    my $EquivalentTerm = {
+            equiv_term => "",
+            equiv_name => ""
+        };
+
+    my $TransRecord = {
+        name => "",
+        equiv_terms => []
+    };
+
+    #Replace ontology dictionary references at ontologyX before uploading into workspace
+    my $OntologyTranslation = {
+        comment => "MetaCyc->MS TranlationTable",
+        ontology1 => "38284/10/1",
+        ontology2 => "38284/9/1"
+    };
+
+    my $ontolgoyTable;
+    foreach my $krMETA (keys ($co->{term_hash})){
+        my @splitedKr  = split /META:/, $krMETA;
+        my $kr= $splitedKr[1];
+        #print &Dumper ($alias_hash->{$kr});
+        if (defined $alias_hash->{$kr} ){
+
+            # There are duplicate ModelSEED reactions ids(same equation)for the same MetaCyc identifier except for postfix .x
+            #rxn02836        RXN-4307.c  MetaCyc
+            #rxn23922        RXN-4307.d  MetaCyc
+            #rxn23923        RXN-4307.m  MetaCyc
+
+            my $EquivalentTermArr= [];
+            foreach my $r (@{$alias_hash->{$kr}}){
+                $EquivalentTerm = {
+                  equiv_term => $r,
+                  equiv_name => $def_hash->{$r}
+                };
+               push ($EquivalentTermArr, $EquivalentTerm);
+            }
+
+            $TransRecord = {
+              name => $co->{term_hash}->{$krMETA}->{name},
+              equiv_terms => $EquivalentTermArr
+
+            };
+            $OntologyTranslation->{translation}->{$kr} = $TransRecord;
+        }
+    }
+
+    my $onTJ = encode_json($OntologyTranslation);
+    print $OUTFILE $onTJ;
+
+}
+
 
 sub translation_KEGG_rxn_to_ModelSEED {
 
@@ -54,8 +145,8 @@ my $Cjson;
     #Replace ontology dictionary references at ontologyX before uploading into workspace
     my $OntologyTranslation = {
     	comment => "KEGG->MS TranlationTable",
-    	ontology1 => "KEGG",
-    	ontology2 => "ModelSEED"
+    	ontology1 => "38284/6/5",
+    	ontology2 => "38284/9/1"
     };
 
     my $ontolgoyTable;
@@ -117,8 +208,8 @@ open alias_file, $alias_file_url or die "Couldn't open complete data file $!\n";
     #Replace ontology dictionary references at ontologyX before uploading into workspace
     my $OntologyTranslation = {
       comment => "EC->ModelSEED_TranlationTable",
-      ontology1 => "EC",
-      ontology2 => "ModelSEED"
+      ontology1 => "38284/8/4",
+      ontology2 => "38284/9/1"
     };
 
     my $ontolgoyTable;
@@ -164,3 +255,4 @@ open def_file, $reaction_definitions or die "Couldn't open reaction_definitions 
 
 translation_KEGG_rxn_to_ModelSEED ($def_hash);
 translation_EC_to_ModelSEED ($def_hash);
+translation_MetaCyc_to_ModelSEED ($def_hash);
