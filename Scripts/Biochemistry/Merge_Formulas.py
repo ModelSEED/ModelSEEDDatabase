@@ -24,5 +24,5 @@ for cpd in sorted(Compounds_Dict.keys()):
         Update_Compounds=1
 
 if(Update_Compounds==1):
-    print("Saving componds")
+    print("Saving compounds")
     CompoundsHelper.saveCompounds(Compounds_Dict)
