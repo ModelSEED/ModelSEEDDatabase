@@ -182,6 +182,7 @@ with open(Biochem_Root+Biochem+"_Compounds.tbl") as fh:
 
             #Regardless of match-type, add new names
             #NB at this point, names shouldn't match _anything_ already in the database
+            #Names are saved separately as part of the aliases at the end of the script
             for name in cpd['NAMES'].split('|'):
                 if(name not in All_Names):
                     #Possible for there to be no names in biochemistry?
@@ -209,6 +210,7 @@ with open(Biochem_Root+Biochem+"_Compounds.tbl") as fh:
                 New_Alias_Count[matched_cpd]=1
 
         else:
+
             #New Compound!
             #Generate new identifier
             identifier_count+=1
@@ -220,8 +222,29 @@ with open(Biochem_Root+Biochem+"_Compounds.tbl") as fh:
             new_cpd['charge']=cpd['CHARGE']
             new_cpd['formula']=cpd['FORMULA']
 
+            #Add new identifier with KEGG ID as alias
+            Original_Alias_Dict[new_cpd['id']]={Biochem:[cpd['ID']]}
+            New_Alias_Count[new_cpd['id']]=1
+
+            #Add new names
             #Names are saved separately as part of the aliases at the end of the script
-            #Structures are processed independently using scripts in the Structures folder
+            for name in cpd['NAMES'].split('|'):
+                if(new_cpd['name']=='null'):
+                    new_cpd['name']=name
+                    new_cpd['abbreviation']=name
+
+                if(name not in All_Names):
+                    #Possible for there to be no names in biochemistry?
+                    if(new_cpd['id'] not in Names_Dict):
+                        Names_Dict[new_cpd['id']]=list()
+                    Names_Dict[new_cpd['id']].append(name)
+                    All_Names[name]=1
+                    New_Name_Count[new_cpd['id']]=1
+
+            #If no names at all
+            if(new_cpd['name']=='null'):
+                new_cpd['name']=cpd['ID']
+                new_cpd['abbreviation']=cpd['ID']
 
             Compounds_Dict[new_cpd['id']]=new_cpd
             New_Cpd_Count[new_cpd['id']]=1
