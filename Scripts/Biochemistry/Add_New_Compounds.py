@@ -246,6 +246,8 @@ with open(Biochem_Root+Biochem+"_Compounds.tbl") as fh:
                 new_cpd['name']=cpd['ID']
                 new_cpd['abbreviation']=cpd['ID']
 
+            #Add source type
+            new_cpd['source']='Primary Database'
             Compounds_Dict[new_cpd['id']]=new_cpd
             New_Cpd_Count[new_cpd['id']]=1
 
@@ -266,3 +268,4 @@ CompoundsHelper.saveCompounds(Compounds_Dict)
 #../Structures/List_ModelSEED_Structures.py
 #../Structures/Update_Compound_Structures.py
 #./Update_Formula_Charge.py
+#./Rebalance_Reactions.py
