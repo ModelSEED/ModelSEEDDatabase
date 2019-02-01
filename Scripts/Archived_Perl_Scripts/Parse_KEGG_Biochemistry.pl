@@ -209,6 +209,7 @@ while(<FH>){
 
     if($field eq "///"){
 	$Reactions->{$count}={"KEGG"=>$ENTRY,"NAMES"=>"".join("|",@NAMES),"EQUATION"=>convert_KEGG_equation($EQUATION),"ECs"=>"".join("|",@ECs)};
+	$Reactions->{$count}{'ECs'}="null" if !$Reactions->{$count}{'ECs'};
 
 	while($EQUATION =~ /([CG]\d{5})/g){
 	    if(!exists($Compounds->{$1})){
