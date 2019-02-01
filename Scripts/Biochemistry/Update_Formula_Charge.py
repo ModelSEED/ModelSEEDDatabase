@@ -19,6 +19,7 @@ Structures_Dict = CompoundsHelper.loadStructures(["InChI","SMILE"],["ModelSEED"]
 Update_Compounds=0
 Update_Formula=0
 Update_Charge=0
+unresolved_structures=open('Unresolved_Structures.txt','w')
 for cpd in sorted(Compounds_Dict.keys()):
     if(cpd not in Structures_Dict):
         continue
@@ -50,6 +51,7 @@ for cpd in sorted(Compounds_Dict.keys()):
         pass
 
     if(mol == None):
+        unresolved_structures.write(cpd+"\t"+str(Structures_Dict[cpd])+"\n")
         continue
 
     new_formula=""
@@ -73,6 +75,11 @@ for cpd in sorted(Compounds_Dict.keys()):
     #normalizing formula my own way, so I can be consistent
     #these are hill-sorted, and merges molecular fragments
     new_formula = Compounds.mergeFormula(new_formula)[0]
+
+    if(new_formula==""):
+        #At time of writing, there are SMILE strings that consist solely of '*'
+        unresolved_structures.write(cpd+"\t"+str(Structures_Dict[cpd])+"\n")
+        continue
 
     current_formula = Compounds_Dict[cpd]['formula']
     if(new_formula != current_formula):
