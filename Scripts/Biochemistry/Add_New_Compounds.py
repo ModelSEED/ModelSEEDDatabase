@@ -97,13 +97,13 @@ identifier_count = int(re.sub('^cpd','',last_identifier))
 Biochem="KEGG"
 Biochem_Root="../../Biochemistry/Aliases/Provenance/Primary_Databases/";
 
-Default_Cpd = OrderedDict({ "id": "cpd00000","name": "null","abbreviation": "null","aliases": "null",
-                             "formula": "null","mass": "10000000","charge": "0",
-                             "deltag": "10000000","deltagerr": "10000000","pka": "","pkb": "",
-                             "inchikey": "","smiles": "",
-                             "is_cofactor": 0,"is_core": 0,"is_obsolete": 0,
-                             "abstract_compound": "null","comprised_of": "null","linked_compound": "null",
-                             "source": "" })
+Default_Cpd = OrderedDict({ "id":"cpd00000","name":"null","abbreviation":"null","aliases":"null",
+                             "formula":"null","mass":"10000000","charge":"0",
+                             "deltag":"10000000","deltagerr":"10000000","pka":"","pkb":"",
+                             "inchikey":"","smiles":"",
+                             "is_cofactor":0,"is_core":0,"is_obsolete":0,
+                             "abstract_compound":"null","comprised_of":"null","linked_compound":"null",
+                             "source":"" })
 
 Matched_Cpd_Count=dict()
 New_Cpd_Count=dict()
@@ -208,6 +208,9 @@ with open(Biochem_Root+Biochem+"_Compounds.tbl") as fh:
                     Original_Alias_Dict[matched_cpd][Biochem]=list()
                 Original_Alias_Dict[matched_cpd][Biochem].append(cpd['ID'])
                 New_Alias_Count[matched_cpd]=1
+
+            #Update source type
+            Compounds_Dict[matched_cpd]['source']='Primary Database'
 
         else:
 
