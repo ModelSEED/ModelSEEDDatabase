@@ -176,6 +176,7 @@ class Reactions:
         for rgt in rgts_array:
             if (rgts_dict[rgt["reagent"]] == 0):
                 continue
+
             rgt["coefficient"]=rgts_dict[rgt["reagent"]]
 
             # Correct for redundant ".0" in floats
@@ -183,6 +184,10 @@ class Reactions:
                 rgt["coefficient"] = int(round(rgt["coefficient"]))
 
             new_rgts_array.append(rgt)
+            
+            #Trick to exclude reagent if it appears in array more than once
+            rgts_dict[rgt["reagent"]]=0
+            
 
         return new_rgts_array
 

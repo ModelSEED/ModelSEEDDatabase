@@ -111,10 +111,6 @@ with open(Biochem_Root+Biochem+"_Reactions.tbl") as fh:
         elif(rxn_code in Reactions_Codes):
             matched_rxn = sorted(list(Reactions_Codes[rxn_code].keys()))[0]
 
-
-        if(matched_rxn is None):
-            print(rxn['ID'],len(new_rxn_cpds_array),adjusted)
-
         if(matched_rxn is not None):
             #Add Names, EC and Alias
             #Regardless of match-type, add new names
@@ -210,7 +206,6 @@ with open(Biochem_Root+Biochem+"_Reactions.tbl") as fh:
             Reactions_Codes[rxn_code][new_rxn['id']]=1
 
 print("Missing Compounds: "+"|".join(sorted(missing_cpds.keys())))
-
 #Here, for matches, re-write names, ecs and aliases
 print("Saving additional ECs for "+str(len(New_EC_Count))+" reactions")
 ReactionsHelper.saveECs(ECs_Dict)
@@ -222,9 +217,9 @@ print("Saving "+str(len(New_Rxn_Count.keys()))+" new reactions from "+Biochem)
 ReactionsHelper.saveReactions(Reactions_Dict)
 
 #Scripts to run afterwards
-#./Rebuild_Reactions.py
-#./Merge_Reactions.py
-#./Update_Reaction_Aliases.py
-#./Rebalance_Reactions.py
+#./Rebuild_Reactions.py (in theory, because we adjust in this script, nothing should change)
+#./Rebalance_Reactions.py (very important)
 #./Adjust_Reaction_Protons.py
 #./Adjust_Reaction_Water.py
+#./Merge_Reactions.py (merges may happen because of water)
+#./Update_Reaction_Aliases.py

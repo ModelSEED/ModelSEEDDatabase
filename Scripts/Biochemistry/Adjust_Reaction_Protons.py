@@ -34,7 +34,7 @@ for rxn in sorted(Reactions_Dict.keys()):
             continue
         
         (element,number)=elements[0].split(":")
-        print("Adjusting: "+rxn,element,number)
+        #print("Adjusting: "+rxn,element,number)
 
         #Parse old stoichiometry into array
         old_stoichiometry=Reactions_Dict[rxn]["stoichiometry"]
