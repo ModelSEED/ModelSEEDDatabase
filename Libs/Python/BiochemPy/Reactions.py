@@ -180,7 +180,7 @@ class Reactions:
 
         for rgt in rgts_dict.keys():
             if (rgts_dict[rgt] > 1):
-                return "ERROR: Duplicate reagents"
+                return "Duplicate reagents"
 
         ########################################
         # Check for duplicate compounds in
@@ -200,6 +200,16 @@ class Reactions:
         cpds_dict = dict()
         for rgt in rgts_array:
             rgt["coefficient"] = cpds_coeff_dict[rgt["compound"]]
+
+            #Skip trans-compartmental compounds
+            if (rgt["coefficient"] == 0):
+                continue
+
+            #Here we can skip photons and electrons too
+            #They are the valid compounds with no mass
+            #if(rgt["compound"]=='cpd11632'): # or rgt["compound"]=='cpd12713'):
+            #    continue
+
             cpds_dict[rgt["compound"]] = rgt
 
         ########################################
