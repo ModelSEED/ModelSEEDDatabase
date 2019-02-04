@@ -56,6 +56,10 @@ for msid in sorted(ECs_Dict.keys()):
 last_identifier = list(sorted(Reactions_Dict.keys()))[-1]
 identifier_count = int(re.sub('^rxn','',last_identifier))
 
+#If a reaction, after removing cpd redundancy, is empty
+#We use a placeholder
+Empty_Rxn_ID="rxn14003"
+
 New_Rxn_Count=dict()
 Headers=list()
 rxns=list()
@@ -94,12 +98,24 @@ with open(Biochem_Root+Biochem+"_Reactions.tbl") as fh:
             continue
 
         rxn_cpds_array = ReactionsHelper.parseEquation(rxn['EQUATION'])
-        rxn_code = ReactionsHelper.generateCode(rxn_cpds_array)
+        adjusted=0
+        new_rxn_cpds_array = ReactionsHelper.removeCpdRedundancy(rxn_cpds_array)
+        if(len(new_rxn_cpds_array)!=len(rxn_cpds_array)):
+            adjusted=1
 
-        matched_rxn=None
-        if(rxn_code in Reactions_Codes):
+        rxn_code = ReactionsHelper.generateCode(new_rxn_cpds_array)
+
+        matched_rxn=None        
+        if(len(new_rxn_cpds_array)==0):
+            matched_rxn = Empty_Rxn_ID
+        elif(rxn_code in Reactions_Codes):
             matched_rxn = sorted(list(Reactions_Codes[rxn_code].keys()))[0]
-            
+
+
+        if(matched_rxn is None):
+            print(rxn['ID'],len(new_rxn_cpds_array),adjusted)
+
+        if(matched_rxn is not None):
             #Add Names, EC and Alias
             #Regardless of match-type, add new names
             #NB at this point, names shouldn't match _anything_ already in the database
@@ -185,7 +201,7 @@ with open(Biochem_Root+Biochem+"_Reactions.tbl") as fh:
             New_Rxn_Count[new_rxn['id']]=1
 
             #Rebuild key fields for reaction using parsed equation
-            stoichiometry=ReactionsHelper.buildStoich(rxn_cpds_array)
+            stoichiometry=ReactionsHelper.buildStoich(new_rxn_cpds_array)
             ReactionsHelper.rebuildReaction(Reactions_Dict[new_rxn['id']],stoichiometry)
 
             #Finally, because several new reactions may share equations
@@ -194,12 +210,10 @@ with open(Biochem_Root+Biochem+"_Reactions.tbl") as fh:
             Reactions_Codes[rxn_code][new_rxn['id']]=1
 
 print("Missing Compounds: "+"|".join(sorted(missing_cpds.keys())))
-print("Saving additional ECs for "+str(len(New_EC_Count))+" reactions")
-ReactionsHelper.saveECs(ECs_Dict)
-
-sys.exit()
 
 #Here, for matches, re-write names, ecs and aliases
+print("Saving additional ECs for "+str(len(New_EC_Count))+" reactions")
+ReactionsHelper.saveECs(ECs_Dict)
 print("Saving additional names for "+str(len(New_Name_Count))+" reactions")
 ReactionsHelper.saveNames(Names_Dict)
 print("Saving additional "+Biochem+" aliases for "+str(len(New_Alias_Count))+" reactions")
@@ -208,6 +222,7 @@ print("Saving "+str(len(New_Rxn_Count.keys()))+" new reactions from "+Biochem)
 ReactionsHelper.saveReactions(Reactions_Dict)
 
 #Scripts to run afterwards
+#./Rebuild_Reactions.py
 #./Merge_Reactions.py
 #./Update_Reaction_Aliases.py
 #./Rebalance_Reactions.py
