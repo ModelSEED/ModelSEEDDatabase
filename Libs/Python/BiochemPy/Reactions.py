@@ -205,11 +205,6 @@ class Reactions:
             if (rgt["coefficient"] == 0):
                 continue
 
-            #Here we can skip photons and electrons too
-            #They are the valid compounds with no mass
-            #if(rgt["compound"]=='cpd11632'): # or rgt["compound"]=='cpd12713'):
-            #    continue
-
             cpds_dict[rgt["compound"]] = rgt
 
         ########################################
@@ -219,12 +214,18 @@ class Reactions:
         #######################################
         rxn_net_charge = 0.0
         rxn_net_mass = dict()
+        cpdformerror=list()
         for cpd in cpds_dict.keys():
             cpd_atoms = self.CompoundsHelper.parseFormula(
                 cpds_dict[cpd]["formula"])
 
             if (len(cpd_atoms.keys()) == 0):
-                return "CPDFORMERROR"
+                #Here we can skip photons and electrons
+                #They are the valid compounds with no mass
+                if(cpd=='cpd11632' or cpd=='cpd12713'):
+                    pass
+                else:
+                    cpdformerror.append(cpd)
 
             cpd_coeff_charge = float(cpds_dict[cpd]["charge"]) * float(
                 cpds_dict[cpd]["coefficient"])
@@ -238,6 +239,9 @@ class Reactions:
                     rxn_net_mass[atom] = 0.0
 
                 rxn_net_mass[atom] += atom_coeff_mass
+
+        if(len(cpdformerror)>0):
+            return "CPDFORMERROR"
 
         # Round out tiny numbers that occur because we add/substract floats
         # Threshold of 1e-6 found to capture all these instances without
@@ -282,7 +286,7 @@ class Reactions:
 
         if (status == ""):
             status = "OK"
-
+            
         return status
 
     def adjustCompound(self, rxn_cpds_array, compound, adjustment,
