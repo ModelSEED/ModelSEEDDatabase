@@ -1,4 +1,5 @@
 import os
+import re
 import json
 from csv import DictReader
 
@@ -28,6 +29,48 @@ class Reactions:
             rxns_dict[line['id']] = line
 
         return rxns_dict
+
+    def parseEquation(self, equation_string):
+        rxn_cpds_array = list()
+        reagent=-1
+        coeff=1
+        index=0
+        for text in equation_string.split(" "):
+            if(text == "+"):
+                continue
+
+            match=re.search('^<?=>?$',text)
+            if(match is not None):
+                reagent=1
+
+            match=re.search('^\((\d+(?:\.\d+)?)\)$',text)
+            if(match is not None):
+                coeff=match.group(1)
+
+                # Correct for redundant ".0" in floats
+                coeff = float(coeff)
+                if (str(coeff)[-2:] == ".0"):
+                    coeff = int(round(coeff))
+
+            match=re.search('^(cpd\d{5})\[(\d)\]$',text)
+            if(match is not None):
+
+                #Side of equation
+                coeff=coeff*reagent
+
+                (cpd,cpt)=(match.group(1),match.group(2))
+                rgt_id = cpd + "_" + cpt + str(index)
+                cpt = int(cpt)
+                name = self.Compounds_Dict[cpd]["name"]
+                
+                rxn_cpds_array.append({"reagent": rgt_id, "coefficient": coeff,
+                                       "compound": cpd, "compartment": cpt,
+                                       "index": index, "name": name})
+
+                #Need to reset coeff for next compound
+                coeff=1
+
+        return rxn_cpds_array
 
     def parseStoich(self, stoichiometry):
         rxn_cpds_array = list()
@@ -68,16 +111,16 @@ class Reactions:
         for rxn in rxns_dict:
             if(rxns_dict[rxn]['status']=="EMPTY"):
                 continue
-            code = self.generateCode(rxns_dict[rxn]['stoichiometry'])
+            rxn_cpds_array = self.parseStoich(rxns_dict[rxn]['stoichiometry'])
+            code = self.generateCode(rxn_cpds_array)
             if(code not in codes_dict):
                 codes_dict[code]=dict()
             codes_dict[code][rxn]=1
         return codes_dict
 
-    def generateCode(self,stoichiometry):
-        rxn_cpds_array = self.parseStoich(stoichiometry)
+    def generateCode(self,rxn_cpds_array):
 
-        #It matters if its a transport reaction, and we include protons when matching transpor
+        #It matters if its a transport reaction, and we include protons when matching transport
         is_transport = self.isTransport(rxn_cpds_array)
 
         #It matters which side of the equation, so build reagents and products arrays
@@ -103,7 +146,7 @@ class Reactions:
     def buildStoich(rxn_cpds_array):
         stoichiometry_array = list()
         for rgt in sorted(rxn_cpds_array, key=lambda x: (
-        int(x["coefficient"] > 0), x["reagent"])):
+                int(x["coefficient"] > 0), x["reagent"])):
 
             # Correct for redundant ".0" in floats
             if (str(rgt["coefficient"])[-2:] == ".0"):
@@ -336,7 +379,32 @@ class Reactions:
                     "definition"].replace(cpd_id,
                                           self.Compounds_Dict[cpd_id]["name"])
 
+        # Define if transport?
+
         return
+
+    def saveNames(self, names_dict):
+        names_root = os.path.splitext(self.NameFile)[0]
+
+        # Print to TXT
+        names_file = open(names_root + ".txt", 'w')
+        names_file.write("\t".join(("ModelSEED ID","External ID","Source")) + "\n")
+        for rxn in sorted(names_dict.keys()):
+            for name in sorted(names_dict[rxn]):
+                names_file.write("\t".join((rxn,name,'name')) + "\n")
+        names_file.close()
+
+    def saveAliases(self, alias_dict):
+        alias_root = os.path.splitext(self.AliasFile)[0]
+
+        # Print to TXT
+        alias_file = open(alias_root + ".txt", 'w')
+        alias_file.write("\t".join(("ModelSEED ID","External ID","Source")) + "\n")
+        for rxn in sorted(alias_dict.keys()):
+            for source in sorted (alias_dict[rxn].keys()):
+                for alias in sorted(alias_dict[rxn][source]):
+                    alias_file.write("\t".join((rxn,alias,source)) + "\n")
+        alias_file.close()
 
     def saveReactions(self, reactions_dict):
         rxns_root = os.path.splitext(self.RxnsFile)[0]

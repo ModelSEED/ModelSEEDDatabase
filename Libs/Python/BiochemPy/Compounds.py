@@ -9,7 +9,7 @@ class Compounds:
         self.BiochemRoot = biochem_root
         self.CpdsFile = biochem_root + cpds_file
         self.AliasFile = biochem_root + "Aliases/Unique_ModelSEED_Compound_Aliases.txt"
-        self.NamesFile = biochem_root + "Aliases/Unique_ModelSEED_Compound_Names.txt"
+        self.NameFile = biochem_root + "Aliases/Unique_ModelSEED_Compound_Names.txt"
         self.StructRoot = biochem_root + "Structures/"
 
         reader = DictReader(open(self.CpdsFile), dialect='excel-tab')
@@ -70,7 +70,7 @@ class Compounds:
 
     def loadNames(self):
         names_dict = dict()
-        reader = DictReader(open(self.NamesFile), dialect = 'excel-tab')
+        reader = DictReader(open(self.NameFile), dialect = 'excel-tab')
         for line in reader:
             if("cpd" not in line['ModelSEED ID']):
                 continue
@@ -235,7 +235,7 @@ class Compounds:
             yield atom
 
     def saveNames(self, names_dict):
-        names_root = os.path.splitext(self.NamesFile)[0]
+        names_root = os.path.splitext(self.NameFile)[0]
 
         # Print to TXT
         names_file = open(names_root + ".txt", 'w')
