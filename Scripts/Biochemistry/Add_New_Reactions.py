@@ -45,6 +45,13 @@ for msid in sorted(Names_Dict.keys()):
     for name in Names_Dict[msid]:
         All_Names[name]=1
 
+ECs_Dict = ReactionsHelper.loadECs()
+All_ECs = dict()
+New_EC_Count=dict()
+for msid in sorted(ECs_Dict.keys()):
+    for name in ECs_Dict[msid]:
+        All_ECs[name]=1
+
 #Find last identifier and increment
 last_identifier = list(sorted(Reactions_Dict.keys()))[-1]
 identifier_count = int(re.sub('^rxn','',last_identifier))
@@ -93,7 +100,7 @@ with open(Biochem_Root+Biochem+"_Reactions.tbl") as fh:
         if(rxn_code in Reactions_Codes):
             matched_rxn = sorted(list(Reactions_Codes[rxn_code].keys()))[0]
             
-            #Add Names and Alias
+            #Add Names, EC and Alias
             #Regardless of match-type, add new names
             #NB at this point, names shouldn't match _anything_ already in the database
             #Names are saved separately as part of the aliases at the end of the script
@@ -105,6 +112,15 @@ with open(Biochem_Root+Biochem+"_Reactions.tbl") as fh:
                     Names_Dict[matched_rxn].append(name)
                     All_Names[name]=1
                     New_Name_Count[matched_rxn]=1
+
+            for ec in rxn['ECs'].split('|'):
+                if(ec not in All_ECs):
+                    #Possible for there to be no ecs in biochemistry?
+                    if(matched_rxn not in ECs_Dict):
+                        ECs_Dict[matched_rxn]=list()
+                    ECs_Dict[matched_rxn].append(ec)
+                    All_ECs[ec]=1
+                    New_EC_Count[matched_rxn]=1
 
             #Add ID to aliases if the match is with a different reaction
             if(matched_rxn not in Original_Alias_Dict):
@@ -152,6 +168,16 @@ with open(Biochem_Root+Biochem+"_Reactions.tbl") as fh:
                 new_rxn['name']=rxn['ID']
                 new_rxn['abbreviation']=rxn['ID']
 
+            #ECs
+            for ec in rxn['ECs'].split('|'):
+                if(ec not in All_ECs):
+                    #Possible for there to be no ecs in biochemistry?
+                    if(new_rxn['id'] not in ECs_Dict):
+                        ECs_Dict[new_rxn['id']]=list()
+                    ECs_Dict[new_rxn['id']].append(ec)
+                    All_ECs[ec]=1
+                    New_EC_Count[new_rxn['id']]=1
+
             #Add source type
             new_rxn['source']='Primary Database'
 
@@ -168,8 +194,12 @@ with open(Biochem_Root+Biochem+"_Reactions.tbl") as fh:
             Reactions_Codes[rxn_code][new_rxn['id']]=1
 
 print("Missing Compounds: "+"|".join(sorted(missing_cpds.keys())))
+print("Saving additional ECs for "+str(len(New_EC_Count))+" reactions")
+ReactionsHelper.saveECs(ECs_Dict)
 
-#Here, for matches, re-write names and aliases
+sys.exit()
+
+#Here, for matches, re-write names, ecs and aliases
 print("Saving additional names for "+str(len(New_Name_Count))+" reactions")
 ReactionsHelper.saveNames(Names_Dict)
 print("Saving additional "+Biochem+" aliases for "+str(len(New_Alias_Count))+" reactions")

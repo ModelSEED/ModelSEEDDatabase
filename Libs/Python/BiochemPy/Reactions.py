@@ -95,7 +95,7 @@ class Reactions:
                                    "charge": self.Compounds_Dict[cpd][
                                        "charge"]})
         return rxn_cpds_array
-
+        
     @staticmethod
     def isTransport(rxn_cpds_array):
         compartments_dict=dict()
@@ -162,6 +162,24 @@ class Reactions:
             stoichiometry_array.append(rgt_string)
         stoichiometry_string = ";".join(stoichiometry_array)
         return stoichiometry_string
+
+    @staticmethod
+    def removeCpdRedundancy(rgts_array):
+
+        rgts_dict = dict()
+        for rgt in rgts_array:
+            if (rgt["reagent"] not in rgts_dict):
+                rgts_dict[rgt["reagent"]] = 0
+            rgts_dict[rgt["reagent"]] += float(rgt["coefficient"])
+
+        new_rgts_array=list()
+        for rgt in rgts_array:
+            if (rgts_dict[rgt["reagent"]] == 0):
+                continue
+            rgt["coefficient"]=rgts_dict[rgt["reagent"]]
+            new_rgts_array.append(rgt)
+
+        return new_rgts_array
 
     def balanceReaction(self, rgts_array):
         if (len(rgts_array) == 0):
@@ -397,6 +415,17 @@ class Reactions:
 
         return
 
+    def saveECs(self, ecs_dict):
+        ecs_root = os.path.splitext(self.ECFile)[0]
+
+        # Print to TXT
+        ecs_file = open(ecs_root + ".txt", 'w')
+        ecs_file.write("\t".join(("ModelSEED ID","External ID","Source")) + "\n")
+        for rxn in sorted(ecs_dict.keys()):
+            for name in sorted(ecs_dict[rxn]):
+                ecs_file.write("\t".join((rxn,name,'Enzyme Class')) + "\n")
+        ecs_file.close()
+
     def saveNames(self, names_dict):
         names_root = os.path.splitext(self.NameFile)[0]
 
@@ -483,13 +512,8 @@ class Reactions:
                 continue
 
             if(line['ModelSEED ID'] not in ecs_dict):
-                   ecs_dict[line['ModelSEED ID']]=dict()
+                   ecs_dict[line['ModelSEED ID']]=list()
 
-            #redundant as only one source but keep this just in case
-            for source in line['Source'].split('|'):
-                if(source not in ecs_dict[line['ModelSEED ID']]):
-                    ecs_dict[line['ModelSEED ID']][source]=list()
-
-                ecs_dict[line['ModelSEED ID']][source].append(line['External ID'])
+            ecs_dict[line['ModelSEED ID']].append(line['External ID'])
 
         return ecs_dict
