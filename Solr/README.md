@@ -12,6 +12,7 @@ http://localhost:8983/solr/#/
 e.g., to create cores compounds and reactions, follow the steps below:
 
 1) Under the solr installation where 'bin/solr start [stop]' can be fired:
+
 -------------------------------------------------------------------------
 mkdir my_solr_install_dir/server/solr/compounds
 mkdir -p my_solr_install_dir/server/solr/compounds/conf
@@ -19,6 +20,7 @@ mkdir -p my_solr_install_dir/server/solr/compounds/data
 mkdir my_solr_install_dir/server/solr/reactions
 mkdir -p my_solr_install_dir/server/solr/reactions/conf
 mkdir -p my_solr_install_dir/server/solr/reactions/data
+
 -------------------------------------------------------------------------
 
 2) Inside each of the above conf folders, create/copy-paste the solrconfig.xml, schema.xml 
@@ -71,6 +73,7 @@ SimplePostTool: WARNING: IOException while reading response: java.io.IOException
 1 files indexed.
 COMMITting Solr index changes to http://localhost:8983/solr/reactions/update...
 Time spent: 0:00:06.774
+
 -------------------------------------------------------------------------
 
 The above error was caused by the .json file which contains data value of "null" as a string with quotes
@@ -108,6 +111,7 @@ Looking into the folder 'my_solr_install_dir/server/solr/reactions/conf', I foun
 newly added field 'data_source' and copyfield 'data_source' appear in the file managed-schema instead of in schema.xml.
 
 After that, the following commands ran without a problem:
+
 -------------------------------------------------------------------------
 
 localhost:my_solr_install_dir qzhang$ bin/post path-to-biochem_data/reactions.json -c reactions
@@ -120,6 +124,7 @@ POSTing file reactions.json (application/json) to [base]/json/docs
 1 files indexed.
 COMMITting Solr index changes to http://localhost:8983/solr/reactions/update...
 Time spent: 0:00:09.381
+
 -------------------------------------------------------------------------
 
 At this point, refresh the browser Solr Admin UI, I see 34711 reaction records in the reactions core. 
@@ -131,6 +136,7 @@ and I can query the reactions indexes.
 where the cloud version of Solr (7) was installed, every step is the same, except the core creation (via the browser UI) requires the elevation.xml file in addition to the other .xml files.  So I simply copy-pasted the eleveation.xml file from
 the megilen_solr_installation_dir/solr/server/solr/configsets/sample_techproducts_configs/conf/
 directory into each of the compounds and reactions' conf directory.  Then run the following:
+
 -------------------------------------------------------------------------
 
 megilen-cloud-server:megilen_solr_installation_dir modelseedSolrUser$ bin/post -c compounds path-to-biochem_data/compounds.json
@@ -153,6 +159,7 @@ POSTing file Reactions.json (application/json) to [base]/json/docs
 1 files indexed.
 COMMITting Solr index changes to http://localhost:8983/solr/reactions/update...
 Time spent: 0:00:12.632
+
 ----------------------------------------------------------------------
 
 5. To access the local Solr instance from local modelseed-ui
