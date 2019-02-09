@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!-- Schema for Metabolic Modeling: Compounds -->
+<!-- Attributes: id	abbreviation	name	formula	mass	source	structure	charge	is_core	is_obselete	linked_compound	is_cofactor	deltag	deltagerr	pka	pkb	abstract_compound	comprised_of	aliases -->
+
+<schema name="compounds" version="1.5">
+	<fields>
+
+		<field name="id"		type="string"		indexed="true"	stored="true"/>
+		<field name="abbreviation"		type="string_ci"		indexed="true"	stored="true"	docValues="true"/>
+		<field name="name"		type="string_ci"		indexed="true"	stored="true"	docValues="true"/>
+		<field name="formula"		type="string"		indexed="true"	stored="true"	docValues="true"/>
+		<field name="mass"		type="float"		indexed="true"	stored="true"/>
+		<field name="source"		type="string"		indexed="true"	stored="true"/>
+		<field name="smiles"		type="string"		indexed="true"	stored="true"/>
+		<field name="inchikey"		type="string"		indexed="true"	stored="true"/>
+		<field name="charge"		type="float"		indexed="true"	stored="true"/>
+		<field name="is_core"		type="boolean"		indexed="true"	stored="true"/>
+		<field name="is_obsolete"		type="boolean"		indexed="true"	stored="true"/>
+		<field name="linked_compound"		type="string"		indexed="true"	stored="true"/>
+		<field name="is_cofactor"		type="boolean"		indexed="true"	stored="true"/>
+		<field name="deltag"		type="float"		indexed="true"	stored="true"/>
+		<field name="deltagerr"		type="float"		indexed="true"	stored="true"/>
+		<field name="pka"		type="string"		indexed="true"	stored="true"	 multiValued="true"/>
+		<field name="pkb"		type="string"		indexed="true"	stored="true"	 multiValued="true"/>
+		<field name="abstract_compound"		type="string"		indexed="true"	stored="true"/>
+		<field name="comprised_of"		type="string"		indexed="true"	stored="true"/>
+		<field name="aliases"		type="string_ci"		indexed="true"	stored="true"	docValues="true" multiValued="true"/>
+		
+		<field name="text"		type="text_custom"	indexed="true"	stored="false"	multiValued="true"/>
+		<field name="_version_"		type="long"		indexed="true"	stored="true"/>
+		<field name="date_inserted"	type="tdate"		indexed="true"	stored="true" default="NOW"/>
+		<field name="date_modified"	type="tdate"		indexed="true"	stored="true" default="NOW"/>
+	</fields>
+
+	<uniqueKey>id</uniqueKey>
+	
+	<copyField source="id"		dest="text"/>
+	<copyField source="abbreviation"		dest="text"/>
+	<copyField source="name"		dest="text"/>
+	<copyField source="formula"		dest="text"/>
+	<copyField source="aliases"		dest="text"/>
+
+	<xi:include href="schema_types.xml" xmlns:xi="http://www.w3.org/2001/XInclude">
+		<xi:fallback></xi:fallback>
+	</xi:include>
+</schema>
+

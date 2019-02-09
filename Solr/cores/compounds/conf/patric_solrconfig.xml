@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<config>
+	<luceneMatchVersion>${lucene.version}</luceneMatchVersion>
+
+	<lib dir="${jetty.home:/opt/solr/example}/../contrib/extraction/lib" regex=".*\.jar" />
+	<lib dir="${jetty.home:/opt/solr/example}/../dist/" regex="solr-cell-\w.*\.jar" />
+
+	<lib dir="${jetty.home:/opt/solr/example}/../contrib/clustering/lib/" regex=".*\.jar" />
+	<lib dir="${jetty.home:/opt/solr/example}/../dist/" regex="solr-clustering-\w.*\.jar" />
+
+	<lib dir="${jetty.home:/opt/solr/example}/../contrib/langid/lib/" regex=".*\.jar" />
+	<lib dir="${jetty.home:/opt/solr/example}/../dist/" regex="solr-langid-\w.*\.jar" />
+
+	<lib dir="${jetty.home:/opt/solr/example}/../contrib/velocity/lib" regex=".*\.jar" />
+	<lib dir="${jetty.home:/opt/solr/example}/../dist/" regex="solr-velocity-\w.*\.jar" />
+
+	<dataDir>${solr.data.dir:}</dataDir>
+	<directoryFactory name="DirectoryFactory" class="${solr.directoryFactory:solr.NRTCachingDirectoryFactory}"/>
+
+	<codecFactory class="solr.SchemaCodecFactory"/>
+	<schemaFactory class="ClassicIndexSchemaFactory"/>
+
+	<indexConfig>
+		<lockType>${solr.lock.type:native}</lockType>
+	</indexConfig>
+
+	<!--<jmx />-->
+
+	<updateHandler class="solr.DirectUpdateHandler2">
+		<updateLog>
+			<str name="dir">${solr.ulog.dir:}</str>
+		</updateLog>
+	</updateHandler>
+
+	<query>
+		<maxBooleanClauses>500000</maxBooleanClauses>
+		<filterCache class="solr.FastLRUCache" size="512" initialSize="512" autowarmCount="0"/>
+		<queryResultCache class="solr.FastLRUCache" size="512" initialSize="512" autowarmCount="0"/>
+		<documentCache class="solr.FastLRUCache" size="512" initialSize="512" autowarmCount="0"/>
+
+		<!-- custom cache currently used by block join -->
+		<cache name="perSegFilter" class="solr.search.LRUCache" size="10" initialSize="0"
+			autowarmCount="10" regenerator="solr.NoOpRegenerator" />
+
+		<enableLazyFieldLoading>true</enableLazyFieldLoading>
+		<useFilterForSortedQuery>true</useFilterForSortedQuery>
+		<queryResultWindowSize>20</queryResultWindowSize>
+		<queryResultMaxDocsCached>200</queryResultMaxDocsCached>
+
+		<listener event="newSearcher" class="solr.QuerySenderListener">
+			<arr name="queries">
+			</arr>
+		</listener>
+		<listener event="firstSearcher" class="solr.QuerySenderListener">
+			<arr name="queries">
+			</arr>
+		</listener>
+
+		<useColdSearcher>false</useColdSearcher>
+
+		<maxWarmingSearchers>2</maxWarmingSearchers>
+	</query>
+
+	<requestDispatcher handleSelect="false" >
+<!--
+	<requestParsers enableRemoteStreaming="true"  multipartUploadLimitInKB="2048000"
+		formdataUploadLimitInKB="2048" addHttpRequestToContext="false"/>
+-->
+		<httpCaching never304="true" />
+	</requestDispatcher>
+
+	<requestHandler name="/select" class="solr.SearchHandler">
+		<lst name="defaults">
+			<str name="echoParams">explicit</str>
+			<int name="rows">10</int>
+			<str name="df">text</str>
+			<str name="spellcheck.dictionary">default</str>
+			<str name="spellcheck.count">1</str>
+			<str name="q.op">AND</str>
+			<!-- <str name="fl"></str> -->
+		</lst>
+	</requestHandler>
+
+	<requestHandler name="/get" class="solr.RealTimeGetHandler">
+		<lst name="defaults">
+			<str name="omitHeader">true</str>
+			<str name="wt">json</str>
+			<str name="indent">true</str>
+		</lst>
+	</requestHandler>
+
+	<requestHandler name="/update" class="solr.UpdateRequestHandler">
+		<lst name="defaults">
+			<!-- <str name="update.chain">keygen</str> --> 
+		</lst>
+	</requestHandler>
+
+<!-- 
+	<updateRequestProcessorChain name="keygen">
+		<processor class="solr.UUIDUpdateProcessorFactory">
+			<str name="fieldName">id</str>
+		</processor>
+		<processor class="solr.RunUpdateProcessorFactory" />
+	</updateRequestProcessorChain>
+-->
+
+	<!-- ping/healthcheck -->
+	<requestHandler name="/admin/ping" class="solr.PingRequestHandler">
+		<lst name="invariants">
+			<str name="q">solrpingquery</str>
+		</lst>
+		<lst name="defaults">
+			<str name="echoParams">all</str>
+		</lst>
+	</requestHandler>
+
+	<xi:include href="replication.xml" xmlns:xi="http://www.w3.org/2001/XInclude">
+		<xi:fallback></xi:fallback>
+	</xi:include>
+
+	<searchComponent name="spellcheck" class="solr.SpellCheckComponent"></searchComponent>
+
+	<searchComponent name="tvComponent" class="solr.TermVectorComponent"/>
+
+	<searchComponent name="terms" class="solr.TermsComponent"/>
+
+	<searchComponent class="solr.HighlightComponent" name="highlight"></searchComponent>
+
+	<queryResponseWriter name="velocity" class="solr.VelocityResponseWriter" startup="lazy"/>
+
+	<admin>
+		<defaultQuery>*:*</defaultQuery>
+	</admin>
+</config>
+

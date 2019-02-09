@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Solr managed schema - automatically generated - DO NOT EDIT -->
+<schema name="model_compound" version="1.5">
+  <uniqueKey>id</uniqueKey>
+  <fieldType name="binary" class="solr.BinaryField"/>
+  <fieldType name="boolean" class="solr.BoolField" sortMissingLast="true"/>
+  <fieldType name="date" class="solr.TrieDateField" positionIncrementGap="0" precisionStep="0"/>
+  <fieldType name="double" class="solr.TrieDoubleField" positionIncrementGap="0" precisionStep="0"/>
+  <fieldType name="float" class="solr.TrieFloatField" positionIncrementGap="0" precisionStep="0"/>
+  <fieldType name="int" class="solr.TrieIntField" positionIncrementGap="0" precisionStep="0"/>
+  <fieldType name="long" class="solr.TrieLongField" positionIncrementGap="0" precisionStep="0"/>
+  <fieldType name="lowercase" class="solr.TextField" positionIncrementGap="100">
+    <analyzer>
+      <tokenizer class="solr.KeywordTokenizerFactory"/>
+      <filter class="solr.LowerCaseFilterFactory"/>
+    </analyzer>
+  </fieldType>
+  <fieldType name="random" class="solr.RandomSortField" indexed="true"/>
+  <fieldType name="string" class="solr.StrField" sortMissingLast="true"/>
+  <fieldType name="string_ci" class="solr.SortableTextField" omitNorms="true" sortMissingLast="true">
+    <analyzer type="index">
+      <tokenizer class="solr.KeywordTokenizerFactory"/>
+      <filter class="solr.LowerCaseFilterFactory"/>
+      <filter class="solr.WordDelimiterGraphFilterFactory" catenateNumbers="1" generateNumberParts="1" stemEnglishPossessive="1" splitOnCaseChange="1" generateWordParts="1" splitOnNumerics="1" preserveOriginal="1" catenateAll="1" catenateWords="1"/>
+      <filter class="solr.FlattenGraphFilterFactory"/>
+    </analyzer>
+    <analyzer type="query">
+      <tokenizer class="solr.KeywordTokenizerFactory"/>
+      <filter class="solr.LowerCaseFilterFactory"/>
+      <filter class="solr.WordDelimiterGraphFilterFactory" catenateNumbers="1" generateNumberParts="1" stemEnglishPossessive="1" splitOnCaseChange="1" generateWordParts="1" splitOnNumerics="1" preserveOriginal="1" catenateAll="1" catenateWords="1"/>
+    </analyzer>
+  </fieldType>
+  <fieldType name="tdate" class="solr.TrieDateField" positionIncrementGap="0" precisionStep="6"/>
+  <fieldType name="tdouble" class="solr.TrieDoubleField" positionIncrementGap="0" precisionStep="8"/>
+  <fieldType name="textSpell" class="solr.TextField" positionIncrementGap="100">
+    <analyzer>
+      <tokenizer class="solr.StandardTokenizerFactory"/>
+      <filter class="solr.StandardFilterFactory"/>
+      <filter class="solr.LowerCaseFilterFactory"/>
+    </analyzer>
+  </fieldType>
+  <fieldType name="text_custom" class="solr.TextField" positionIncrementGap="100">
+    <analyzer type="index">
+      <tokenizer class="solr.WhitespaceTokenizerFactory"/>
+      <filter class="solr.WordDelimiterGraphFilterFactory" catenateNumbers="1" generateNumberParts="1" splitOnCaseChange="0" generateWordParts="1" splitOnNumerics="1" preserveOriginal="1" catenateAll="1" catenateWords="1"/>
+      <filter class="solr.FlattenGraphFilterFactory"/>
+      <filter class="solr.LowerCaseFilterFactory"/>
+    </analyzer>
+    <analyzer type="query">
+      <tokenizer class="solr.WhitespaceTokenizerFactory"/>
+      <filter class="solr.WordDelimiterGraphFilterFactory" catenateNumbers="0" generateNumberParts="1" splitOnCaseChange="0" generateWordParts="1" splitOnNumerics="1" preserveOriginal="0" catenateAll="0" catenateWords="0"/>
+      <filter class="solr.LowerCaseFilterFactory"/>
+    </analyzer>
+  </fieldType>
+  <fieldType name="text_custom_rev" class="solr.TextField" positionIncrementGap="100">
+    <analyzer type="index">
+      <tokenizer class="solr.WhitespaceTokenizerFactory"/>
+      <filter class="solr.WordDelimiterGraphFilterFactory" catenateNumbers="1" generateNumberParts="1" splitOnCaseChange="0" generateWordParts="1" splitOnNumerics="1" preserveOriginal="1" catenateAll="1" catenateWords="1"/>
+      <filter class="solr.FlattenGraphFilterFactory"/>
+      <filter class="solr.LowerCaseFilterFactory"/>
+      <filter class="solr.ReversedWildcardFilterFactory" maxPosQuestion="2" maxFractionAsterisk="0.33" maxPosAsterisk="3" withOriginal="true"/>
+    </analyzer>
+    <analyzer type="query">
+      <tokenizer class="solr.WhitespaceTokenizerFactory"/>
+      <filter class="solr.WordDelimiterGraphFilterFactory" catenateNumbers="0" generateNumberParts="1" splitOnCaseChange="0" generateWordParts="1" splitOnNumerics="1" preserveOriginal="0" catenateAll="0" catenateWords="0"/>
+      <filter class="solr.LowerCaseFilterFactory"/>
+    </analyzer>
+  </fieldType>
+  <fieldType name="text_general" class="solr.TextField" positionIncrementGap="100">
+    <analyzer type="index">
+      <tokenizer class="solr.StandardTokenizerFactory"/>
+      <filter class="solr.LowerCaseFilterFactory"/>
+    </analyzer>
+    <analyzer type="query">
+      <tokenizer class="solr.StandardTokenizerFactory"/>
+      <filter class="solr.LowerCaseFilterFactory"/>
+    </analyzer>
+  </fieldType>
+  <fieldType name="text_general_rev" class="solr.TextField" positionIncrementGap="100">
+    <analyzer type="index">
+      <tokenizer class="solr.StandardTokenizerFactory"/>
+      <filter class="solr.LowerCaseFilterFactory"/>
+      <filter class="solr.ReversedWildcardFilterFactory" maxPosQuestion="2" maxFractionAsterisk="0.33" maxPosAsterisk="3" withOriginal="true"/>
+    </analyzer>
+    <analyzer type="query">
+      <tokenizer class="solr.StandardTokenizerFactory"/>
+      <filter class="solr.LowerCaseFilterFactory"/>
+    </analyzer>
+  </fieldType>
+  <fieldType name="text_ws" class="solr.TextField" positionIncrementGap="100">
+    <analyzer>
+      <tokenizer class="solr.WhitespaceTokenizerFactory"/>
+    </analyzer>
+  </fieldType>
+  <fieldType name="tfloat" class="solr.TrieFloatField" positionIncrementGap="0" precisionStep="8"/>
+  <fieldType name="tint" class="solr.TrieIntField" positionIncrementGap="0" precisionStep="8"/>
+  <fieldType name="tlong" class="solr.TrieLongField" positionIncrementGap="0" precisionStep="8"/>
+  <fieldType name="uuid" class="solr.UUIDField" indexed="true"/>
+  <field name="_text_" type="text_general" multiValued="true" indexed="true" stored="false"/>
+  <field name="_version_" type="long" indexed="true" stored="true"/>
+  <field name="abbreviation" type="string_ci" docValues="true" indexed="true" stored="true"/>
+  <field name="abstract_compound" type="string" indexed="true" stored="true"/>
+  <field name="aliases" type="string_ci" docValues="true" multiValued="true" indexed="true" stored="true"/>
+  <field name="charge" type="float" indexed="true" stored="true"/>
+  <field name="comprised_of" type="string" indexed="true" stored="true"/>
+  <field name="date_inserted" type="tdate" default="NOW" indexed="true" stored="true"/>
+  <field name="date_modified" type="tdate" default="NOW" indexed="true" stored="true"/>
+  <field name="deltag" type="float" indexed="true" stored="true"/>
+  <field name="deltagerr" type="float" indexed="true" stored="true"/>
+  <field name="formula" type="string" docValues="true" indexed="true" stored="true"/>
+  <field name="id" type="string" indexed="true" stored="true"/>
+  <field name="inchikey" type="string" indexed="true" stored="true"/>
+  <field name="is_cofactor" type="boolean" indexed="true" stored="true"/>
+  <field name="is_core" type="boolean" indexed="true" stored="true"/>
+  <field name="is_obsolete" type="boolean" indexed="true" stored="true"/>
+  <field name="linked_compound" type="string" indexed="true" stored="true"/>
+  <field name="mass" type="float" indexed="true" stored="true"/>
+  <field name="name" type="string_ci" docValues="true" indexed="true" stored="true"/>
+  <field name="pka" type="string" multiValued="true" indexed="true" stored="true"/>
+  <field name="pkb" type="string" multiValued="true" indexed="true" stored="true"/>
+  <field name="smiles" type="string" indexed="true" stored="true"/>
+  <field name="source" type="string" indexed="true" stored="true"/>
+  <field name="structure" type="string" indexed="true" stored="true"/>
+  <copyField source="abbreviation" dest="_text_"/>
+  <copyField source="aliases" dest="_text_"/>
+  <copyField source="formula" dest="_text_"/>
+  <copyField source="id" dest="_text_"/>
+  <copyField source="name" dest="_text_"/>
+</schema>
