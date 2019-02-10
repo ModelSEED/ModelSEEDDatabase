@@ -133,9 +133,11 @@ and I can query the reactions indexes.
 =========================================================================
 
 4. The above procedures are for running Solr on my Mac laptop.  To run similar procedure on the megilen cloud,
-where the cloud version of Solr (7) was installed, every step is the same, except the core creation (via the browser UI) requires the elevation.xml file in addition to the other .xml files.  So I simply copy-pasted the eleveation.xml file from
-the megilen_solr_installation_dir/solr/server/solr/configsets/sample_techproducts_configs/conf/
-directory into each of the compounds and reactions' conf directory.  Then run the following:
+where the cloud version of Solr (7) was installed, every step is the same, except the core creation (via the browser UI) requires the elevate.xml file in addition to the other .xml files.  So I simply copy-pasted the eleveate.xml file from the megilen_solr_installation_dir/solr/server/solr/configsets/sample_techproducts_configs/conf/
+directory into each of the compounds and reactions' conf directory. For now elevate.xml only serves as a placeholder.  When we need to configure the top results for a given query by using the Query Elevation Component, we will have
+to make changes to the solrconfig.xml file. 
+
+Then run the following:
 
 -------------------------------------------------------------------------
 
