@@ -57,13 +57,14 @@ class Compounds:
             if("cpd" not in line['ModelSEED ID']):
                 continue
 
-            if(line['Source'] not in aliases_dict):
-                   aliases_dict[line['Source']]=dict()
+            for source in line['Source'].split('|'):
+                if(source not in aliases_dict):
+                    aliases_dict[source]=dict()
 
-            if(line['External ID'] not in aliases_dict[line['Source']]):
-                aliases_dict[line['Source']][line['External ID']]=list()
+                if(line['External ID'] not in aliases_dict[source]):
+                    aliases_dict[source][line['External ID']]=list()
 
-            aliases_dict[line['Source']][line['External ID']].append(line['ModelSEED ID'])
+                aliases_dict[source][line['External ID']].append(line['ModelSEED ID'])
 
         return aliases_dict
 
@@ -75,14 +76,9 @@ class Compounds:
                 continue
 
             if(line['ModelSEED ID'] not in names_dict):
-                   names_dict[line['ModelSEED ID']]=dict()
+                   names_dict[line['ModelSEED ID']]=list()
 
-            #redundant as only one source but keep this just in case
-            for source in line['Source'].split('|'):
-                if(source not in names_dict[line['ModelSEED ID']]):
-                    names_dict[line['ModelSEED ID']][source]=list()
-
-                names_dict[line['ModelSEED ID']][source].append(line['External ID'])
+            names_dict[line['ModelSEED ID']].append(line['External ID'])
 
         return names_dict
 
@@ -126,8 +122,34 @@ class Compounds:
                             structures_dict[struct_type][line['ID']][struct_stage]=dict()
 
                         structures_dict[struct_type][line['ID']][struct_stage][line['Structure']]=1
+
         return structures_dict
-        
+
+    @staticmethod
+    def searchname(name):
+        searchname = name.lower()
+
+        #try to keep/maintain charges
+        ending = ""
+        if(searchname.endswith("-")):
+            ending="-"
+
+        if(searchname.endswith("+")):
+            ending="+"
+
+        searchname = ''.join(char for char in searchname if char.isalnum())
+
+        #attempting to match fatty acids
+        searchname = re.sub('icacid','ate',searchname)
+
+        #remove redundant articles
+        if(re.search('^an?\s',name)):
+            searchname = re.sub('^an?','',searchname)
+
+        searchname+=ending
+
+        return searchname
+
     @staticmethod
     def parseFormula(formula):
         if (formula.strip() in {None, "", "noFormula", "null"}):
@@ -154,6 +176,7 @@ class Compounds:
         Notes = ""
         if (formula is None or formula == "" or "null" in formula or len(
                 re.findall("no[Ff]ormula", formula)) > 0):
+            print("Warning: not a formula: "+str(formula))
             return ("null", Notes)
 
         if (len(re.findall("(\)[nx])", formula)) > 0):
@@ -210,6 +233,29 @@ class Compounds:
             yield "H"
         for atom in sorted(atoms):
             yield atom
+
+    def saveNames(self, names_dict):
+        names_root = os.path.splitext(self.NameFile)[0]
+
+        # Print to TXT
+        names_file = open(names_root + ".txt", 'w')
+        names_file.write("\t".join(("ModelSEED ID","External ID","Source")) + "\n")
+        for cpd in sorted(names_dict.keys()):
+            for name in sorted(names_dict[cpd]):
+                names_file.write("\t".join((cpd,name,'name')) + "\n")
+        names_file.close()
+
+    def saveAliases(self, alias_dict):
+        alias_root = os.path.splitext(self.AliasFile)[0]
+
+        # Print to TXT
+        alias_file = open(alias_root + ".txt", 'w')
+        alias_file.write("\t".join(("ModelSEED ID","External ID","Source")) + "\n")
+        for cpd in sorted(alias_dict.keys()):
+            for source in sorted (alias_dict[cpd].keys()):
+                for alias in sorted(alias_dict[cpd][source]):
+                    alias_file.write("\t".join((cpd,alias,source)) + "\n")
+        alias_file.close()
 
     def saveCompounds(self, compounds_dict):
         cpds_root = os.path.splitext(self.CpdsFile)[0]

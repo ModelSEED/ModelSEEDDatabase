@@ -76,7 +76,7 @@ def charge(q_layer,p_layer):
     #So this is an explicit warning, using it directly 
     #will raise an error
     if(";" in p_layer):
-        print "Warning: multiple components in mobile proton layer"
+        print("Warning: multiple components in mobile proton layer")
 
     #protons have positive charge
     if(p_layer != ''):
@@ -98,8 +98,8 @@ def adjust_protons(formula, protons):
     #If the formula can be broken into components, it must first be merged
     #This is because the proton layer only ever has a single component
     if(len(formula.split('.'))>1):
-        print "Error: you must merge the formula components into a single formula string"
-        print "You can do so using Compounds.mergeFormula()"
+        print("Error: you must merge the formula components into a single formula string")
+        print("You can do so using Compounds.mergeFormula()")
         return formula,"Unadjustable due to multiple components"
 
     atoms = Compounds.parseFormula(formula)

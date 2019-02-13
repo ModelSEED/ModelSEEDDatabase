@@ -19,19 +19,17 @@ Structures_Dict = CompoundsHelper.loadStructures(["InChI","SMILE"],["ModelSEED"]
 Update_Compounds=0
 Update_Formula=0
 Update_Charge=0
+unresolved_structures=open('Unresolved_Structures.txt','w')
 for cpd in sorted(Compounds_Dict.keys()):
     if(cpd not in Structures_Dict):
         continue
 
-    print(cpd)
-
     if('InChI' not in Structures_Dict[cpd] and 'SMILE' not in Structures_Dict[cpd]):
         continue
-
-    print(cpd)
     
     mol=None
     mol_source=""
+    mol_structure=""
     try:
         if('InChI' in Structures_Dict[cpd]):
             mol = AllChem.MolFromInchi(Structures_Dict[cpd]['InChI'])
@@ -39,8 +37,10 @@ for cpd in sorted(Compounds_Dict.keys()):
                 mol=pybel.readstring("inchi",Structures_Dict[cpd]['InChI'])
                 if(mol):
                     mol_source="OpenBabel"
+                    mol_structure="InChI"
             else:
                 mol_source="RDKit"
+                mol_structure="InChI"
 
         elif('SMILE' in Structures_Dict[cpd]):
             mol = AllChem.MolFromSmiles(Structures_Dict[cpd]['SMILE'])
@@ -48,12 +48,16 @@ for cpd in sorted(Compounds_Dict.keys()):
                 mol=pybel.readstring("smiles",Structures_Dict[cpd]['SMILE'])
                 if(mol):
                     mol_source="OpenBabel"
+                    mol_structure="SMILE"
             else:
                 mol_source="RDKit"
+                mol_structure="SMILE"
+
     except Exception as e:
         pass
 
     if(mol == None):
+        unresolved_structures.write(cpd+"\t"+str(Structures_Dict[cpd])+"\n")
         continue
 
     new_formula=""
@@ -74,14 +78,18 @@ for cpd in sorted(Compounds_Dict.keys()):
         if(match):
             new_formula = new_formula.replace(match.group(),'')
 
+    #For SMILES, generic groups are given a '*' character
+    #We're normalizing these as 'R' groups in MSD
+    norm_formula = re.sub('\*','R',new_formula)
+
     #normalizing formula my own way, so I can be consistent
     #these are hill-sorted, and merges molecular fragments
-    new_formula = Compounds.mergeFormula(new_formula)[0]
+    norm_formula = Compounds.mergeFormula(norm_formula)[0]
 
     current_formula = Compounds_Dict[cpd]['formula']
-    if(new_formula != current_formula):
-        print("Updating formula for "+cpd+" with "+new_formula)
-        Compounds_Dict[cpd]['formula']=new_formula
+    if(norm_formula != current_formula):
+        print("Updating formula for "+cpd+" with "+norm_formula)
+        Compounds_Dict[cpd]['formula']=norm_formula
         Update_Formula+=1
         Update_Compounds=1
         
