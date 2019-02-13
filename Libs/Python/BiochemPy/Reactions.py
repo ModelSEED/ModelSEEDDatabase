@@ -62,10 +62,13 @@ class Reactions:
                 rgt_id = cpd + "_" + cpt + str(index)
                 cpt = int(cpt)
                 name = self.Compounds_Dict[cpd]["name"]
-                
+                formula = self.Compounds_Dict[cpd]["formula"]
+                charge = self.Compounds_Dict[cpd]["charge"]
+
                 rxn_cpds_array.append({"reagent": rgt_id, "coefficient": coeff,
                                        "compound": cpd, "compartment": cpt,
-                                       "index": index, "name": name})
+                                       "index": index, "name": name,
+                                       "formula": formula, "charge": charge})
 
                 #Need to reset coeff for next compound
                 coeff=1
@@ -352,6 +355,11 @@ class Reactions:
 
         if(len(cpd_remove.keys())>0):
             rxn_cpds_array.remove(cpd_remove)
+
+        #Got to adjust for floats
+        for rgt in rxn_cpds_array:
+            if (str(rgt["coefficient"])[-2:] == ".0"):
+                rgt["coefficient"] = int(round(rgt["coefficient"]))
 
         return
 
