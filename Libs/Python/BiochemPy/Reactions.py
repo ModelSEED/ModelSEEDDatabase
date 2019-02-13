@@ -3,7 +3,6 @@ import re
 import json
 from csv import DictReader
 
-
 class Reactions:
     def __init__(self, biochem_root='../../Biochemistry/',
                  rxns_file='reactions.tsv'):
@@ -354,6 +353,25 @@ class Reactions:
             rxn_cpds_array.remove(cpd_remove)
 
         return
+
+    def replaceCompound(self, rxn_cpds_array, old_compound, new_compound):
+
+        ######################################################################
+        # We will always assume that we will maintain the coefficient.
+        # We will always assume that we will replace in all compartments.
+        # The adjustment will fail silently, returning an empty array
+        # if the old_compound cannot be found.
+        ######################################################################
+
+        found_cpd=False
+        for rgt in rxn_cpds_array:
+            if (rgt["compound"] == old_compound):
+                found_cpd=True
+                rgt["compound"]=new_compound
+                rgt["reagent"]=new_compound + "_" + str(rgt["compartment"]) + "0"
+                rgt["name"]=self.Compounds_Dict[new_compound]['name']
+
+        return found_cpd
 
     def rebuildReaction(self, reaction_dict, stoichiometry):
         # Assign stoich
