@@ -94,7 +94,7 @@ for alias in Structures_Dict['SMILE']:
 last_identifier = list(sorted(compounds_dict))[-1]
 identifier_count = int(re.sub('^cpd','',last_identifier))
 
-Biochem="KEGG"
+Biochem="MetaCyc"
 Biochem_Root="../../Biochemistry/Aliases/Provenance/Primary_Databases/";
 
 Default_Cpd = OrderedDict({ "id":"cpd00000","name":"null","abbreviation":"null","aliases":"null",
@@ -225,7 +225,7 @@ with open(Biochem_Root+Biochem+"_Compounds.tbl") as fh:
             new_cpd['charge']=cpd['CHARGE']
             new_cpd['formula']=cpd['FORMULA']
 
-            #Add new identifier with KEGG ID as alias
+            #Add new identifier with original ID as alias
             original_alias_dict[new_cpd['id']]={Biochem:[cpd['ID']]}
             new_alias_count[new_cpd['id']]=1
 
@@ -259,11 +259,11 @@ print("Compounds matched via:")
 for src in sorted(Matched_Cpd_Count):
     print("\t"+src+": "+str(len(Matched_Cpd_Count[src])))
 print("Saving additional names for "+str(len(new_name_count))+" compounds")
-compounds_helper.saveNames(names_dict)
+#compounds_helper.saveNames(names_dict)
 print("Saving additional "+Biochem+" aliases for "+str(len(new_alias_count))+" compounds")
-compounds_helper.saveAliases(original_alias_dict)
+#compounds_helper.saveAliases(original_alias_dict)
 print("Saving "+str(len(New_Cpd_Count))+" new compounds from "+Biochem)
-compounds_helper.saveCompounds(compounds_dict)
+#compounds_helper.saveCompounds(compounds_dict)
 
 #Scripts to run afterwards
 #./Merge_Formulas.py
