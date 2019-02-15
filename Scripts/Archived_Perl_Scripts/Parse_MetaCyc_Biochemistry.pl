@@ -977,6 +977,7 @@ sub generate_reaction{
     }
     
     $Reactions{$tmpid}{"EC"}=join("|",@EC);
+    $Reactions{$tmpid}{"EC"}="-" if scalar(@EC)==0;
     ($Reactions{$tmpid}{"Equation"},$Reactions{$tmpid}{"Rev"},$Reactions{$tmpid}{"Compartment"})=cyc_reaction_2_string($Reactions{$tmpid}{"Left"},$Reactions{$tmpid}{"Right"},$direction);
 #    print STDERR $ID,"\t",$tmpid,"\t",$comp,"\t",$Reactions{$tmpid}{"Equation"},"\n";
 
