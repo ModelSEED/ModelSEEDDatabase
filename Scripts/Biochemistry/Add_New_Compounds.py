@@ -204,6 +204,8 @@ with open(Biochem_Root+Biochem+"_Compounds.tbl") as fh:
                 
             #if matching structure or name, add ID to aliases
             if(matched_src != 'ID'):
+                if(matched_cpd not in original_alias_dict):
+                    original_alias_dict[matched_cpd]={Biochem:list()}
                 if(matched_cpd in original_alias_dict and Biochem not in original_alias_dict[matched_cpd]):
                     original_alias_dict[matched_cpd][Biochem]=list()
                 original_alias_dict[matched_cpd][Biochem].append(cpd['ID'])
