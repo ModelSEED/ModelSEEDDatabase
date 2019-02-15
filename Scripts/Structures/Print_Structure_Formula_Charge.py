@@ -25,11 +25,9 @@ for source in "KEGG","MetaCyc":
             file_name=Structures_Root+source+"/"+struct_type+"_"+struct_stage+"_Formulas_Charges.txt"
             file_handle_dict[file_string]=open(file_name,"w")
 
+unresolved_structures=open('Unresolved_Structures.txt','w')
 for struct_type in sorted(Structures_Dict.keys()):
     for external_id in sorted(Structures_Dict[struct_type]):
-#        if(external_id !="CHLOROPHYLLIDE-A"):
-#            continue
-
         source="MetaCyc"
         if(re.search("^[CR]\d{5}$",external_id)):
             source="KEGG"
@@ -60,6 +58,7 @@ for struct_type in sorted(Structures_Dict.keys()):
                     pass
 
                 if(mol is None):
+                    unresolved_structures.write(cpd+"\t"+str(Structures_Dict[cpd])+"\n")
                     continue
 
                 new_formula=""
