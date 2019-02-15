@@ -92,22 +92,24 @@ class Compounds:
         structures_dict = dict()
         if(len(db_array)==1 and db_array[0]=="ModelSEED"):
             struct_file = "Unique_ModelSEED_Structures.txt"
-            fields_array= ['ID','Source','Aliases','Structure']
+            fields_array= ['ID','Source','Aliases','Formula','Charge','Structure']
 
             if(unique==False):
                 struct_file = "All_ModelSEED_Structures.txt"
-                fields_array = ['ID','Source','Type','Alias','DB','Structure']
+                fields_array = ['ID','Source','Type','Alias','DB','Formula','Charge','Structure']
 
             struct_file = self.StructRoot+struct_file
             reader = DictReader(open(struct_file), dialect = "excel-tab", fieldnames = fields_array)
             for line in reader:
+                print(line)
                 if(line['ID'] not in structures_dict):
                     structures_dict[line['ID']]={}
 
                 if(line['Source'] in sources_array):
                     if(line['Source'] not in structures_dict[line['ID']]):
                         structures_dict[line['ID']][line['Source']]=dict()
-                    structures_dict[line['ID']][line['Source']][line['Structure']]=1
+                    structures_dict[line['ID']][line['Source']][line['Structure']]={'formula':line['Formula'],
+                                                                                    'charge':line['Charge']}
 
             return structures_dict
 

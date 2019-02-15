@@ -140,17 +140,40 @@ for msid in sorted(MS_Aliases_Dict.keys()):
     if(struct_pass):
         #Only one formula/charge combination possible here
         formula_charge_dict=json.loads(list(Formulas[struct_type][struct_stage].keys())[0])
+
         #In order to replicate, print SMILE, InChIKey, InChI in order
         for structure_type in "SMILE","InChIKey","InChI":
             if(structure_type not in Structs):
                 continue
+
+            #It's possible that there's a structural conflict but formula/charge combination is unique
+            #In which case, we'd still like to use a single structure, and we will default to MetaCyc
+            aliases=dict()
+            sources_structures=dict()
+            structure = None
             for structure in sorted(Structs[structure_type][struct_stage].keys()):
-                unique_structs_file.write("\t".join((msid,\
-                                                         structure_type,\
-                                                         ";".join(sorted(Structs[structure_type][struct_stage][structure])),\
-                                                         formula_charge_dict['formula'],\
-                                                         formula_charge_dict['charge'],\
-                                                         structure))+"\n")
+                for alias in Structs[structure_type][struct_stage][structure]:
+                    aliases[alias]=1
+                    source = Structs[structure_type][struct_stage][structure][alias]
+                    if(source not in sources_structures):
+                        sources_structures[source]=dict()
+                    sources_structures[source][structure]=1
+
+            if("MetaCyc" in sources_structures):
+                structure = sorted(list(sources_structures["MetaCyc"].keys()))[0]
+            elif("KEGG" in sources_structures):
+                structure = sorted(list(sources_structures["KEGG"].keys()))[0]
+
+            if(structure is None):
+                #At time of writing this never happens
+                continue
+
+            unique_structs_file.write("\t".join((msid,\
+                                                     structure_type,\
+                                                     ";".join(sorted(aliases)),\
+                                                     formula_charge_dict['formula'],\
+                                                     formula_charge_dict['charge'],\
+                                                     structure))+"\n")
 
     if(struct_conflict==1):
         for structure in Structs[struct_type][struct_stage]:
