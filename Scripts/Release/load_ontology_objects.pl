@@ -52,3 +52,40 @@ foreach my $f (@files){
 
 
 }
+
+foreach my $f (@files){
+
+    if ($f =~ /KBaseOntology.OntologyTranslation/){
+
+        my @splitN = split /\./, $f;
+        my $Ojson;
+        {
+        local $/; #Enable 'slurp' mode
+        open my $fh, "<", "../../Ontologies/$f";
+        $Ojson = <$fh>;
+        chomp $Ojson;
+        close $fh;
+        }
+        my $co = decode_json($Ojson);
+
+        my $obj_info_list = undef;
+        eval {
+            $obj_info_list = $wsClient->save_objects({
+                'workspace'=>$workspace_name,
+                'objects'=>[{
+                'type'=> $splitN[0].".".$splitN[1],
+                'data'=>$co,
+                'name'=>$splitN[2].".".$splitN[3]
+                }]
+            });
+        };
+        if ($@) {
+            die "Error saving modified Ontology object to workspace:\n".$@;
+        }
+
+        print &Dumper ($obj_info_list);
+    }
+
+
+}
+
