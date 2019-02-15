@@ -101,7 +101,6 @@ class Compounds:
             struct_file = self.StructRoot+struct_file
             reader = DictReader(open(struct_file), dialect = "excel-tab", fieldnames = fields_array)
             for line in reader:
-                print(line)
                 if(line['ID'] not in structures_dict):
                     structures_dict[line['ID']]={}
 

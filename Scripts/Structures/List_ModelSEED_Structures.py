@@ -88,8 +88,7 @@ for msid in sorted(MS_Aliases_Dict.keys()):
                         if(structure not in Structs[struct_type][struct_stage]):
                             Structs[struct_type][struct_stage][structure]=dict()
                         Structs[struct_type][struct_stage][structure][external_id]=source
-                        
-#                        if(formula_charge_dict['formula'] != "null"):
+
                         formula_charge_json = json.dumps(formula_charge_dict)
                         if(formula_charge_json not in Formulas[struct_type][struct_stage]):
                             Formulas[struct_type][struct_stage][formula_charge_json]=dict()
