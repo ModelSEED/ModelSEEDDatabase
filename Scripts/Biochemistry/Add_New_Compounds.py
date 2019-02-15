@@ -146,7 +146,7 @@ with open(Biochem_Root+Biochem+"_Compounds.tbl") as fh:
                 matched_cpd=msids[0]
                 matched_src='InChI'
 
-        if(matched_cpd is None and cpd['SMILE'] and cpd['SMILE'] in all_smiles):
+        elif(matched_cpd is None and cpd['SMILE'] and cpd['SMILE'] in all_smiles):
 
             msids = dict()
             for alias in all_smiles[cpd['SMILE']]:
@@ -163,7 +163,7 @@ with open(Biochem_Root+Biochem+"_Compounds.tbl") as fh:
                 matched_src='SMILE'
 
         #Then check that the Name doesn't already exist
-        if(matched_cpd is None):
+        elif(matched_cpd is None):
             msids=dict()
             for name in cpd['NAMES'].split('|'):
                 searchname = compounds_helper.searchname(name)
