@@ -1,11 +1,8 @@
 #!/usr/bin/env python
-import os, sys
-from difflib import Differ
+import os, sys, json
 
 sys.path.append('../../Libs/Python')
 from BiochemPy import Compounds #, Reactions
-
-DifferObj=Differ()
 
 #Load Compounds
 CompoundsHelper = Compounds()
@@ -30,7 +27,7 @@ for source in "KEGG","MetaCyc":
                 for line in file_handle.readlines():
                     line=line.strip()
                     array=line.split('\t')
-                    Formulas_Dict[source][struct_type][struct_stage][array[0]]=array[1]+array[2]
+                    Formulas_Dict[source][struct_type][struct_stage][array[0]]={'formula':array[1],'charge':array[2]}
 
 #Load Curated Structures
 Ignored_Structures=dict()
@@ -46,7 +43,7 @@ MS_Aliases_Dict =  CompoundsHelper.loadMSAliases(["KEGG","MetaCyc"])
 
 master_structs_file = open("../../Biochemistry/Structures/All_ModelSEED_Structures.txt",'w')
 unique_structs_file = open("../../Biochemistry/Structures/Unique_ModelSEED_Structures.txt",'w')
-unique_structs_file.write("ID\tType\tAliases\tStructure\n")
+unique_structs_file.write("ID\tType\tAliases\tFormula\tCharge\tStructure\n")
 structure_conflicts_file = open("Structure_Conflicts.txt",'w')
 formula_conflicts_file = open("Formula_Conflicts.txt",'w')
 for msid in sorted(MS_Aliases_Dict.keys()):
@@ -73,9 +70,17 @@ for msid in sorted(MS_Aliases_Dict.keys()):
                         Formulas[struct_type][struct_stage]=dict()
 
                     for structure in sorted(Structures_Dict[struct_type][external_id][struct_stage].keys()):
-                            
+
+                        formula_charge_dict={'formula':"null",'charge':"null"}
+
+                        if(struct_type in Formulas_Dict[source] and external_id in Formulas_Dict[source][struct_type][struct_stage]):
+                            formula_charge_dict = Formulas_Dict[source][struct_type][struct_stage][external_id]
+
                         #Write to master
-                        master_structs_file.write("\t".join([msid,struct_type,struct_stage,external_id,source,structure])+"\n")    
+                        master_structs_file.write("\t".join([msid,struct_type,struct_stage,external_id,source,\
+                                                                 formula_charge_dict['formula'],\
+                                                                 formula_charge_dict['charge'],\
+                                                                 structure])+"\n")
 
                         if(external_id in Ignored_Structures):
                             continue
@@ -83,29 +88,21 @@ for msid in sorted(MS_Aliases_Dict.keys()):
                         if(structure not in Structs[struct_type][struct_stage]):
                             Structs[struct_type][struct_stage][structure]=dict()
                         Structs[struct_type][struct_stage][structure][external_id]=source
-
-                        if(struct_type in Formulas_Dict[source]):
-
-                            #There's a chance that extracting formula failed, see CHLOROPHYLLIDE-A
-                            if(external_id not in Formulas_Dict[source][struct_type][struct_stage]):
-                                continue
-
-                            formula = Formulas_Dict[source][struct_type][struct_stage][external_id]
-                            if(formula not in Formulas[struct_type][struct_stage]):
-                                Formulas[struct_type][struct_stage][formula]=dict()
-                            Formulas[struct_type][struct_stage][formula][external_id]=source
+                        
+#                        if(formula_charge_dict['formula'] != "null"):
+                        formula_charge_json = json.dumps(formula_charge_dict)
+                        if(formula_charge_json not in Formulas[struct_type][struct_stage]):
+                            Formulas[struct_type][struct_stage][formula_charge_json]=dict()
+                        Formulas[struct_type][struct_stage][formula_charge_json][external_id]=source
 
     if(len(Structs.keys())==0):
         continue
 
+    #Priority is:
     #Charged InChI
-    #Single Formula? Remember!
-    #Check to see if, for one formula, there are multiple charges
-    #If single formula, then print all InChI, InChIKey, SMILE (select SMILE with same formula? select SMILE from KEGG?)
-    #If not single formula, print conflict
-    #If not Charged InChI
-    #Check Original InChI (repeat)
-    #Check Original SMILE (repeat)
+    #Original InChI
+    #Charged SMILE
+    #Original SMILE
 
     struct_type=None
     struct_stage=None
@@ -124,6 +121,7 @@ for msid in sorted(MS_Aliases_Dict.keys()):
 
     if(struct_type is None or struct_stage is None):
         #At time of writing, this doesn't happen
+        print("Warning: no structures used for "+msid)
         continue
 
     struct_pass=0
@@ -140,12 +138,19 @@ for msid in sorted(MS_Aliases_Dict.keys()):
         pass
 
     if(struct_pass):
+        #Only one formula/charge combination possible here
+        formula_charge_dict=json.loads(list(Formulas[struct_type][struct_stage].keys())[0])
         #In order to replicate, print SMILE, InChIKey, InChI in order
         for structure_type in "SMILE","InChIKey","InChI":
             if(structure_type not in Structs):
                 continue
             for structure in sorted(Structs[structure_type][struct_stage].keys()):
-                unique_structs_file.write("\t".join((msid,structure_type,";".join(sorted(Structs[structure_type][struct_stage][structure])),structure))+"\n")
+                unique_structs_file.write("\t".join((msid,\
+                                                         structure_type,\
+                                                         ";".join(sorted(Structs[structure_type][struct_stage][structure])),\
+                                                         formula_charge_dict['formula'],\
+                                                         formula_charge_dict['charge'],\
+                                                         structure))+"\n")
 
     if(struct_conflict==1):
         for structure in Structs[struct_type][struct_stage]:
