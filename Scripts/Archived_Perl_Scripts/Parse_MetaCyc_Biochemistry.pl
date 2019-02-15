@@ -878,7 +878,7 @@ foreach my $cpd (keys %$Compounds){
 	print OUT "\t"; # unless $h eq $Headers[$#Headers];
     }
     foreach my $type ("InChI","SMILE"){
-	if(exists($Structures{$cpd}) && exists($Structures{$cpd}{$type})){
+	if(exists($Structures{$cpd}) && exists($Structures{$cpd}{$type}) && $Structures{$cpd}{$type} ne ""){
 	    print OUT $Structures{$cpd}{$type};
 	}else{
 	    print OUT "-";
@@ -909,7 +909,7 @@ foreach my $cpd (keys %OrphanCs){
 	    print OUT $Classes->{$cpd}{$h};
 	    print OUT "\t" unless $h eq $Headers[$#Headers];
 	}
-	print OUT "\n";
+	print OUT "\t-\t-\n";
     }elsif(exists($Proteins->{$cpd})){
 	print ORPH "Protein\t",$cpd,"\t",join("|",sort keys %{$OrphanCs{$cpd}}),"\n";
 	print OUT $cpd,"\t";
@@ -917,7 +917,7 @@ foreach my $cpd (keys %OrphanCs){
 	    print OUT $Proteins->{$cpd}{$h};
 	    print OUT "\t" unless $h eq $Headers[$#Headers];
 	}
-	print OUT "\n";
+	print OUT "\t-\t-\n";
     }else{
 	foreach my $rxn(keys %{$OrphanCs{$cpd}}){
 	    $Missing_Rxns{$rxn}=1;
