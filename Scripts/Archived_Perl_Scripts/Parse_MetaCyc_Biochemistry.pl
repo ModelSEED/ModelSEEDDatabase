@@ -907,7 +907,7 @@ foreach my $cpd (keys %OrphanCs){
 		print "Missing $h\n";
 	    }
 	    print OUT $Classes->{$cpd}{$h};
-	    print OUT "\t" unless $h eq $Headers[$#Headers];
+	    print OUT "\t";
 	}
 	foreach my $type ("InChI","SMILE"){
 	    if(exists($Structures{$cpd}) && exists($Structures{$cpd}{$type}) && $Structures{$cpd}{$type} ne ""){
@@ -923,7 +923,7 @@ foreach my $cpd (keys %OrphanCs){
 	print OUT $cpd,"\t";
 	foreach my $h ( grep { $_ ne "ID" } @Headers){
 	    print OUT $Proteins->{$cpd}{$h};
-	    print OUT "\t" unless $h eq $Headers[$#Headers];
+	    print OUT "\t";
 	}
 	foreach my $type ("InChI","SMILE"){
 	    if(exists($Structures{$cpd}) && exists($Structures{$cpd}{$type}) && $Structures{$cpd}{$type} ne ""){
