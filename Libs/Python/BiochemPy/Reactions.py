@@ -1,6 +1,7 @@
 import os
 import re
 import json
+import copy
 from csv import DictReader
 
 class Reactions:
@@ -76,6 +77,11 @@ class Reactions:
 
     def parseStoich(self, stoichiometry):
         rxn_cpds_array = list()
+
+        #For empty reaction
+        if(stoichiometry == ""):
+            return rxn_cpds_array
+
         for rgt in stoichiometry.split(";"):
             (coeff, cpd, cpt, index, name) = rgt.split(":", 4)
             rgt_id = cpd + "_" + cpt + index
@@ -229,13 +235,13 @@ class Reactions:
         # Build dict of compounds
         cpds_dict = dict()
         for rgt in rgts_array:
-            rgt["coefficient"] = cpds_coeff_dict[rgt["compound"]]
-
             #Skip trans-compartmental compounds
-            if (rgt["coefficient"] == 0):
+            if (cpds_coeff_dict[rgt["compound"]] == 0):
                 continue
 
-            cpds_dict[rgt["compound"]] = rgt
+            proxy_rgt=copy.deepcopy(rgt)
+            proxy_rgt["coefficient"] = cpds_coeff_dict[rgt["compound"]]
+            cpds_dict[rgt["compound"]] = proxy_rgt
 
         ########################################
         # Check for duplicate elements, across

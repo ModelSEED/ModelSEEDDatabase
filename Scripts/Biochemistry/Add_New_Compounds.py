@@ -5,6 +5,8 @@ from collections import OrderedDict
 temp=list();
 header=True;
 
+Biochem="MetaCyc"
+
 sys.path.append('../../Libs/Python')
 from BiochemPy import Reactions, Compounds, InChIs
 
@@ -94,7 +96,6 @@ for alias in Structures_Dict['SMILE']:
 last_identifier = list(sorted(compounds_dict))[-1]
 identifier_count = int(re.sub('^cpd','',last_identifier))
 
-Biochem="KEGG"
 Biochem_Root="../../Biochemistry/Aliases/Provenance/Primary_Databases/";
 
 Default_Cpd = OrderedDict({ "id":"cpd00000","name":"null","abbreviation":"null","aliases":"null",
@@ -204,6 +205,8 @@ with open(Biochem_Root+Biochem+"_Compounds.tbl") as fh:
                 
             #if matching structure or name, add ID to aliases
             if(matched_src != 'ID'):
+                if(matched_cpd not in original_alias_dict):
+                    original_alias_dict[matched_cpd]={Biochem:list()}
                 if(matched_cpd in original_alias_dict and Biochem not in original_alias_dict[matched_cpd]):
                     original_alias_dict[matched_cpd][Biochem]=list()
                 original_alias_dict[matched_cpd][Biochem].append(cpd['ID'])
@@ -225,7 +228,7 @@ with open(Biochem_Root+Biochem+"_Compounds.tbl") as fh:
             new_cpd['charge']=cpd['CHARGE']
             new_cpd['formula']=cpd['FORMULA']
 
-            #Add new identifier with KEGG ID as alias
+            #Add new identifier with original ID as alias
             original_alias_dict[new_cpd['id']]={Biochem:[cpd['ID']]}
             new_alias_count[new_cpd['id']]=1
 
@@ -269,6 +272,5 @@ compounds_helper.saveCompounds(compounds_dict)
 #./Merge_Formulas.py
 #./Update_Compound_Aliases.py
 #../Structures/List_ModelSEED_Structures.py
-#../Structures/Update_Compound_Structures.py
-#./Update_Formula_Charge.py
+#../Structures/Update_Compound_Structures_Formulas_Charge.py
 #./Rebalance_Reactions.py

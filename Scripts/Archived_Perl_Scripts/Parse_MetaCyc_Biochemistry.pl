@@ -878,7 +878,7 @@ foreach my $cpd (keys %$Compounds){
 	print OUT "\t"; # unless $h eq $Headers[$#Headers];
     }
     foreach my $type ("InChI","SMILE"){
-	if(exists($Structures{$cpd}) && exists($Structures{$cpd}{$type})){
+	if(exists($Structures{$cpd}) && exists($Structures{$cpd}{$type}) && $Structures{$cpd}{$type} ne ""){
 	    print OUT $Structures{$cpd}{$type};
 	}else{
 	    print OUT "-";
@@ -907,7 +907,15 @@ foreach my $cpd (keys %OrphanCs){
 		print "Missing $h\n";
 	    }
 	    print OUT $Classes->{$cpd}{$h};
-	    print OUT "\t" unless $h eq $Headers[$#Headers];
+	    print OUT "\t";
+	}
+	foreach my $type ("InChI","SMILE"){
+	    if(exists($Structures{$cpd}) && exists($Structures{$cpd}{$type}) && $Structures{$cpd}{$type} ne ""){
+		print OUT $Structures{$cpd}{$type};
+	    }else{
+		print OUT "-";
+	    }
+	    print OUT "\t";
 	}
 	print OUT "\n";
     }elsif(exists($Proteins->{$cpd})){
@@ -915,7 +923,15 @@ foreach my $cpd (keys %OrphanCs){
 	print OUT $cpd,"\t";
 	foreach my $h ( grep { $_ ne "ID" } @Headers){
 	    print OUT $Proteins->{$cpd}{$h};
-	    print OUT "\t" unless $h eq $Headers[$#Headers];
+	    print OUT "\t";
+	}
+	foreach my $type ("InChI","SMILE"){
+	    if(exists($Structures{$cpd}) && exists($Structures{$cpd}{$type}) && $Structures{$cpd}{$type} ne ""){
+		print OUT $Structures{$cpd}{$type};
+	    }else{
+		print OUT "-";
+	    }
+	    print OUT "\t";
 	}
 	print OUT "\n";
     }else{
@@ -961,6 +977,7 @@ sub generate_reaction{
     }
     
     $Reactions{$tmpid}{"EC"}=join("|",@EC);
+    $Reactions{$tmpid}{"EC"}="-" if scalar(@EC)==0;
     ($Reactions{$tmpid}{"Equation"},$Reactions{$tmpid}{"Rev"},$Reactions{$tmpid}{"Compartment"})=cyc_reaction_2_string($Reactions{$tmpid}{"Left"},$Reactions{$tmpid}{"Right"},$direction);
 #    print STDERR $ID,"\t",$tmpid,"\t",$comp,"\t",$Reactions{$tmpid}{"Equation"},"\n";
 

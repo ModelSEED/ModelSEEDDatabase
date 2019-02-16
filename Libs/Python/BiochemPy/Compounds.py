@@ -185,7 +185,6 @@ class Compounds:
         Notes = ""
         if (formula is None or formula == "" or "null" in formula or len(
                 re.findall("no[Ff]ormula", formula)) > 0):
-            print("Warning: not a formula: "+str(formula))
             return ("null", Notes)
 
         if (len(re.findall("(\)[nx])", formula)) > 0):
