@@ -5,7 +5,7 @@ from collections import OrderedDict
 temp=list();
 header=True;
 
-Biochem="KEGG"
+Biochem="MetaCyc"
 Biochem_Root="../../Biochemistry/Aliases/Provenance/Primary_Databases/";
 
 sys.path.append('../../Libs/Python')
@@ -88,7 +88,8 @@ with open(Biochem_Root+Biochem+"_Reactions.tbl") as fh:
         for new_cpd in new_cpd_array:
             if(new_cpd in Source_Alias_Dict[Biochem]):
                 msid = sorted(Source_Alias_Dict[Biochem][new_cpd])[0]
-                rxn['EQUATION'] = re.sub(new_cpd,msid,rxn['EQUATION'])
+                esc_cpd = re.escape(new_cpd)
+                rxn['EQUATION'] = re.sub(esc_cpd,msid,rxn['EQUATION'])
             else:
                 missing_cpds[new_cpd]=1
                 all_matched=False
@@ -104,7 +105,6 @@ with open(Biochem_Root+Biochem+"_Reactions.tbl") as fh:
             adjusted=True
 
         rxn_code = reactions_helper.generateCode(new_rxn_cpds_array)
-
         matched_rxn=None        
         if(len(new_rxn_cpds_array)==0):
             matched_rxn = Empty_Rxn_ID
