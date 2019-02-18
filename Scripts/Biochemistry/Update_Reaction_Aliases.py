@@ -56,15 +56,15 @@ for rxn in sorted(Reactions_Dict.keys()):
         Alias_List.append(source_line)
 
     if(rxn in ECs_Dict):
-        for ec in sorted(ECs_Dict[rxn]['Enzyme Class']):
+        for ec in sorted(ECs_Dict[rxn]):
             Rxn_Aliases[ec]=1
 
-        ec_line="E.C.:"+"|".join(sorted(ECs_Dict[rxn]['Enzyme Class']))
+        ec_line="E.C.:"+"|".join(sorted(ECs_Dict[rxn]))
         Alias_List.append(ec_line)
         
     if(rxn in Names_Dict):
         name_list=list()
-        for name in Names_Dict[rxn]['name']:
+        for name in Names_Dict[rxn]:
             if(name in Rxn_Aliases):
                 continue
 

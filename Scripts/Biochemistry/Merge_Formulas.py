@@ -19,10 +19,10 @@ for cpd in sorted(Compounds_Dict.keys()):
         Update_Compounds=1
 
     if(new_formula != old_formula):
-        print "Updating "+cpd+": "+old_formula+" --> "+new_formula
+        print("Updating "+cpd+": "+old_formula+" --> "+new_formula)
         Compounds_Dict[cpd]["formula"]=new_formula
         Update_Compounds=1
 
 if(Update_Compounds==1):
-    print "Saving componds";
+    print("Saving compounds")
     CompoundsHelper.saveCompounds(Compounds_Dict)
