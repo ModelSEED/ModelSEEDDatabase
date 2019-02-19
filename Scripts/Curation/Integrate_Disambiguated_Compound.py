@@ -9,11 +9,14 @@ import json
 from collections import OrderedDict
 from BiochemPy import Reactions, Compounds
 
-compounds_helper = Compounds()
-compounds_dict = compounds_helper.loadCompounds()
-Aliases_Dict = compounds_helper.loadMSAliases()
-Names_Dict = compounds_helper.loadNames()
-Structures_Dict = compounds_helper.loadStructures(["InChI","SMILE"],["KEGG","MetaCyc"])
+arguments = list(sys.argv)
+#Pop filename
+arguments = arguments[1:]
+if(len(arguments) != 1 or os.path.isfile(arguments[0]) is False):
+    print("Error: script must be initiated with the path to the edited json file from Print_Compound_to_Disambiguate.py")
+    sys.exit()
+
+File=arguments[0]
 
 ##########################################################
 #
@@ -21,7 +24,6 @@ Structures_Dict = compounds_helper.loadStructures(["InChI","SMILE"],["KEGG","Met
 #
 ##########################################################
 
-File='Objects/Edited_cpd11665_seaver_Object.json'
 Disambiguated_Compound=None
 with open(File) as jf:
     Disambiguated_Compound = json.load(jf)
@@ -33,6 +35,12 @@ if(len(Disambiguated_Compound['to'])>1):
     for cpd in Disambiguated_Compound['to']:
         print("\t",cpd)
     sys.exit()
+
+compounds_helper = Compounds()
+compounds_dict = compounds_helper.loadCompounds()
+Aliases_Dict = compounds_helper.loadMSAliases()
+Names_Dict = compounds_helper.loadNames()
+Structures_Dict = compounds_helper.loadStructures(["InChI","SMILE"],["KEGG","MetaCyc"])
 
 ##########################################################
 #
@@ -58,9 +66,9 @@ if(len(Disambiguated_Compound['to'])==0 or Disambiguated_Compound['to'][0]['id']
                             "abstract_compound":"null","comprised_of":"null","linked_compound":"null",
                             "source":"" })
 
-    New_Cpd['formula']=Disambiguated_Compound['to']['formula']
-    New_Cpd['charge']=Disambiguated_Compound['to']['charge']
-    New_Cpd['mass']=Disambiguated_Compound['to']['mass']
+    New_Cpd['formula']=Disambiguated_Compound['to'][0]['formula']
+    New_Cpd['charge']=Disambiguated_Compound['to'][0]['charge']
+    New_Cpd['mass']=Disambiguated_Compound['to'][0]['mass']
 
 else:
 

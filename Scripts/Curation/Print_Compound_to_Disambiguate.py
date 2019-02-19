@@ -7,7 +7,14 @@ import copy
 import re
 import json
 
-Compound="cpd11665"
+arguments = list(sys.argv)
+#Pop filename
+arguments = arguments[1:]
+if(len(arguments) != 1 or re.search('^cpd\d{5}$',arguments[0]) is None):
+    print("Error: script must be initiated with a single ModelSEED compound identifier")
+    sys.exit()
+
+Compound=arguments[0]
 Disambiguation_Object = {'metadata':{},'from':{},'to':{}}
 
 ##########################################################
@@ -49,7 +56,8 @@ compounds_dict = compounds_helper.loadCompounds()
 
 Disambiguation_Object['from']={'id':Compound,'structures':{},'aliases':{},'names':{},
                                'formula':compounds_dict[Compound]['formula'],
-                               'charge':compounds_dict[Compound]['charge']}
+                               'charge':compounds_dict[Compound]['charge'],
+                               'mass':compounds_dict[Compound]['mass']}
 
 Aliases_Dict = compounds_helper.loadMSAliases()
 Names_Dict = compounds_helper.loadNames()
