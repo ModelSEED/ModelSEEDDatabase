@@ -88,8 +88,18 @@ with open(Biochem_Root+Biochem+"_Reactions.tbl") as fh:
         for new_cpd in new_cpd_array:
             if(new_cpd in Source_Alias_Dict[Biochem]):
                 msid = sorted(Source_Alias_Dict[Biochem][new_cpd])[0]
-                esc_cpd = re.escape(new_cpd)
-                rxn['EQUATION'] = re.sub(esc_cpd,msid,rxn['EQUATION'])
+
+                #set boundary
+                bound_msid=msid+"["
+                bound_cpd=new_cpd+"["
+                esc_cpd = re.escape(bound_cpd)
+                
+                eqn_array = rxn['EQUATION'].split(" ")
+                new_eqn_array = list()
+                for entry in eqn_array:
+                    entry = re.sub(esc_cpd,bound_msid,entry)
+                    new_eqn_array.append(entry)
+                rxn['EQUATION'] = " ".join(new_eqn_array)
             else:
                 missing_cpds[new_cpd]=1
                 all_matched=False
@@ -105,6 +115,7 @@ with open(Biochem_Root+Biochem+"_Reactions.tbl") as fh:
             adjusted=True
 
         rxn_code = reactions_helper.generateCode(new_rxn_cpds_array)
+
         matched_rxn=None        
         if(len(new_rxn_cpds_array)==0):
             matched_rxn = Empty_Rxn_ID
