@@ -1,10 +1,5 @@
 #!/usr/bin/env python
-import os, sys
-temp=list();
-header=1;
-
-sys.path.append('../../Libs/Python')
-from BiochemPy import Reactions, Compounds
+from BiochemPy import Reactions
 
 ReactionsHelper = Reactions()
 Reactions_Dict = ReactionsHelper.loadReactions()
