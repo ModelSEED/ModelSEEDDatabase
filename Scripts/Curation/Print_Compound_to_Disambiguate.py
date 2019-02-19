@@ -1,5 +1,11 @@
 #!/usr/bin/env python
-import os, sys, subprocess, time, pprint, copy, re, json
+import os
+import sys
+import subprocess
+import time
+import copy
+import re
+import json
 
 Compound="cpd11665"
 Disambiguation_Object = {'metadata':{},'from':{},'to':{}}
@@ -38,16 +44,16 @@ Disambiguation_Object['metadata']['date_time']=time_str
 ##########################################################
 from BiochemPy import Reactions, Compounds
 
-CompoundsHelper = Compounds()
-Compounds_Dict = CompoundsHelper.loadCompounds()
+compounds_helper = Compounds()
+compounds_dict = compounds_helper.loadCompounds()
 
 Disambiguation_Object['from']={'id':Compound,'structures':{},'aliases':{},'names':{},
-                               'formula':Compounds_Dict[Compound]['formula'],
-                               'charge':Compounds_Dict[Compound]['charge']}
+                               'formula':compounds_dict[Compound]['formula'],
+                               'charge':compounds_dict[Compound]['charge']}
 
-Aliases_Dict = CompoundsHelper.loadMSAliases()
-Names_Dict = CompoundsHelper.loadNames()
-Structures_Dict = CompoundsHelper.loadStructures(["InChI","SMILE"],["KEGG","MetaCyc"])
+Aliases_Dict = compounds_helper.loadMSAliases()
+Names_Dict = compounds_helper.loadNames()
+Structures_Dict = compounds_helper.loadStructures(["InChI","SMILE"],["KEGG","MetaCyc"])
 
 names_dict=dict()
 for name in Names_Dict[Compound]:
@@ -107,10 +113,10 @@ if(len(Other_Compounds)==0):
     Disambiguation_Object['to'].append({'id':None,'name':None,'formula':None,'charge':None,'mass':None})
 else:
     for cpd in sorted(Other_Compounds):
-        Disambiguation_Object['to'].append({'id':cpd,'name':Compounds_Dict[cpd]['name'],
-                                            'formula':Compounds_Dict[cpd]['formula'],
-                                            'charge':Compounds_Dict[cpd]['charge'],
-                                            'mass':Compounds_Dict[cpd]['mass']})
+        Disambiguation_Object['to'].append({'id':cpd,'name':compounds_dict[cpd]['name'],
+                                            'formula':compounds_dict[cpd]['formula'],
+                                            'charge':compounds_dict[cpd]['charge'],
+                                            'mass':compounds_dict[cpd]['mass']})
 
 ##########################################################
 #
