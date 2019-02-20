@@ -3,7 +3,6 @@ import os, sys
 temp=list();
 header=1;
 
-sys.path.append('../../Libs/Python')
 from BiochemPy import Compounds
 
 CompoundsHelper = Compounds()

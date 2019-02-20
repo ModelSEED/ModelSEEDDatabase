@@ -1,2 +1,2 @@
-from Reactions import Reactions
-from Compounds import Compounds
+from .Reactions import Reactions
+from .Compounds import Compounds
