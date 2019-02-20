@@ -1,22 +1,28 @@
 #!/usr/bin/env python
 from BiochemPy import Reactions, Compounds
 
-CompoundsHelper = Compounds()
-Compounds_Dict = CompoundsHelper.loadCompounds()
-CompoundsHelper.saveCompounds(Compounds_Dict)
-Aliases_Dict = CompoundsHelper.loadMSAliases()
-CompoundsHelper.saveAliases(Aliases_Dict)
-Names_Dict = CompoundsHelper.loadNames()
-CompoundsHelper.saveNames(Names_Dict)
+##########################################
+# Reprinting compounds, aliases and names
+##########################################
+compounds_helper = Compounds()
+compounds_dict = compounds_helper.loadCompounds()
+compounds_helper.saveCompounds(compounds_dict)
+aliases_dict = compounds_helper.loadMSAliases()
+compounds_helper.saveAliases(aliases_dict)
+names_dict = compounds_helper.loadNames()
+compounds_helper.saveNames(names_dict)
 
-ReactionsHelper = Reactions()
-Reactions_Dict = ReactionsHelper.loadReactions()
-for rxn in Reactions_Dict:
-    ReactionsHelper.rebuildReaction(Reactions_Dict[rxn])
-ReactionsHelper.saveReactions(Reactions_Dict)
-Aliases_Dict = ReactionsHelper.loadMSAliases()
-ReactionsHelper.saveAliases(Aliases_Dict)
-Names_Dict = ReactionsHelper.loadNames()
-ReactionsHelper.saveNames(Names_Dict)
-ECs_Dict = ReactionsHelper.loadECs()
-ReactionsHelper.saveECs(ECs_Dict)
+###############################################
+# Reprinting reactions, aliases, names and ecs
+###############################################
+reactions_helper = Reactions()
+reactions_dict = reactions_helper.loadReactions()
+for rxn in reactions_dict:
+    reactions_helper.rebuildReaction(reactions_dict[rxn])
+reactions_helper.saveReactions(reactions_dict)
+aliases_dict = reactions_helper.loadMSAliases()
+reactions_helper.saveAliases(aliases_dict)
+names_dict = reactions_helper.loadNames()
+reactions_helper.saveNames(names_dict)
+ecs_dict = reactions_helper.loadECs()
+reactions_helper.saveECs(ecs_dict)
