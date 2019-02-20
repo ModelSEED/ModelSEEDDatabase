@@ -5,7 +5,7 @@ import copy
 from csv import DictReader
 
 class Reactions:
-    def __init__(self, biochem_root='../../Biochemistry/',
+    def __init__(self, biochem_root='../../../Biochemistry/',
                  rxns_file='reactions.tsv'):
 
         self.BiochemRoot = os.path.dirname(__file__)+'/'+biochem_root
@@ -388,9 +388,12 @@ class Reactions:
 
         return found_cpd
 
-    def rebuildReaction(self, reaction_dict, stoichiometry):
-        # Assign stoich
-        reaction_dict["stoichiometry"] = stoichiometry
+    def rebuildReaction(self, reaction_dict, stoichiometry=None):
+        # Retrieve/Assign stoich
+        if(stoichiometry is None):
+            stoichiometry = reaction_dict['stoichiometry']
+        else:
+            reaction_dict["stoichiometry"] = stoichiometry
 
         # Build list of "reagents" and "products"
         rxn_cpds_array = self.parseStoich(stoichiometry)
