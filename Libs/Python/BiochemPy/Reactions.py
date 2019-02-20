@@ -7,11 +7,12 @@ from csv import DictReader
 class Reactions:
     def __init__(self, biochem_root='../../Biochemistry/',
                  rxns_file='reactions.tsv'):
-        self.BiochemRoot = biochem_root
-        self.RxnsFile = biochem_root + rxns_file
-        self.AliasFile = biochem_root + "Aliases/Unique_ModelSEED_Reaction_Aliases.txt"
-        self.NameFile = biochem_root + "Aliases/Unique_ModelSEED_Reaction_Names.txt"
-        self.ECFile = biochem_root + "Aliases/Unique_ModelSEED_Reaction_ECs.txt"
+
+        self.BiochemRoot = os.path.dirname(__file__)+'/'+biochem_root
+        self.RxnsFile = self.BiochemRoot + rxns_file
+        self.AliasFile = self.BiochemRoot + "Aliases/Unique_ModelSEED_Reaction_Aliases.txt"
+        self.NameFile = self.BiochemRoot + "Aliases/Unique_ModelSEED_Reaction_Names.txt"
+        self.ECFile = self.BiochemRoot + "Aliases/Unique_ModelSEED_Reaction_ECs.txt"
 
         reader = DictReader(open(self.RxnsFile), dialect='excel-tab')
         self.Headers = reader.fieldnames
