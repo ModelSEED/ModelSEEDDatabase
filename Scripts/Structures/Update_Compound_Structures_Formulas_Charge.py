@@ -1,7 +1,26 @@
 #!/usr/bin/env python
 import os, sys
-temp=list();
-header=1;
+
+Overridden_Fields=dict()
+header=list()
+with open('ACPs_Master_Formula_Charge.txt') as fh:
+    for line in fh.readlines():
+        line=line.strip()
+        array=line.split('\t')
+
+        cpd=array.pop(0)
+
+        if(len(header)==0):
+            header=array
+            continue
+
+        if(cpd not in Overridden_Fields):
+            Overridden_Fields[cpd]=dict()
+
+        for i in range(len(array)):
+            if(array[i] == 'null' or array[i] == 10000000):
+                continue
+            Overridden_Fields[cpd][header[i]]=array[i]
 
 from BiochemPy import Compounds
 
@@ -38,6 +57,11 @@ for cpd in sorted (Compounds_Dict.keys()):
         if(formula_charge_dict['formula'] != "null"):
             Compounds_Dict[cpd]['formula']=formula_charge_dict['formula']
             Compounds_Dict[cpd]['charge']=formula_charge_dict['charge']
+
+        #Override manually
+        for key in 'formula','charge':
+            if(cpd in Overridden_Fields and key in Overridden_Fields[cpd]):
+                Compounds_Dict[cpd][key]=Overridden_Fields[cpd][key]
 
 print("Saving compounds")
 CompoundsHelper.saveCompounds(Compounds_Dict)
