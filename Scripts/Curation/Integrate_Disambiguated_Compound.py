@@ -361,12 +361,29 @@ for original_rxn in sorted(disambiguate_reactions):
                     if(source not in new_reaction_aliases):
                         new_reaction_aliases[source]=list()
                     new_reaction_aliases[source].append(alias)
-            else:
-                #Need to find and retain aliases that are not in loaded provenance
-                #At time of writing, must be careful if some aliases need to be moved
-                if(source not in keep_reaction_aliases):
-                    keep_reaction_aliases[source]=list()
-                keep_reaction_aliases[source].append(alias)
+
+    #Need to find and retain aliases that are not in loaded provenance
+    #This occurs for one or two reasons:
+    #    (i) original provenance is missing
+    #    (ii) source is an abstraction (i.e. BiGG)
+    #Here, we check to see if the alias itself has been moved, regardless of source
+    for original_source in reaction_aliases_dict[original_rxn]:
+        for original_alias in reaction_aliases_dict[original_rxn][original_source]:
+            if(original_source not in Prov_Rxns or original_alias not in Prov_Rxns[original_source]):
+                alias_moved=False
+                for moved_source in new_reaction_aliases:
+                    if(original_alias in new_reaction_aliases[moved_source]):
+                        alias_moved=True
+
+                if(alias_moved==True):
+                    if(original_source not in new_reaction_aliases):
+                        new_reaction_aliases[original_source]=list()
+                    new_reaction_aliases[original_source].append(original_alias)
+                else:
+                    if(original_source not in keep_reaction_aliases):
+                        keep_reaction_aliases[original_source]=list()
+                    if(original_alias not in keep_reaction_aliases[original_source]):
+                        keep_reaction_aliases[original_source].append(original_alias)
 
     reaction_aliases_dict[original_rxn]=keep_reaction_aliases
     reaction_aliases_dict[disambig_rxn]=new_reaction_aliases
