@@ -385,6 +385,12 @@ for original_rxn in sorted(disambiguate_reactions):
                     if(original_alias not in keep_reaction_aliases[original_source]):
                         keep_reaction_aliases[original_source].append(original_alias)
 
+    if(already_in_database is True):
+#        print(original_rxn,keep_reaction_aliases)
+#        print(disambig_rxn,new_reaction_aliases)
+#        print("================================")
+        pass
+
     reaction_aliases_dict[original_rxn]=keep_reaction_aliases
     reaction_aliases_dict[disambig_rxn]=new_reaction_aliases
 

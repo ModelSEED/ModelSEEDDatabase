@@ -47,7 +47,6 @@ for object in disambiguated_reactions:
         if(object['names'][name]=="false" or object['names'][name]=="both"):
             disambig_names.append(name)
 
-    print(object['to']['id'],disambig_names)
     reaction_names_dict[object['from']['id']]=original_names
     reaction_names_dict[object['to']['id']]=disambig_names
 
