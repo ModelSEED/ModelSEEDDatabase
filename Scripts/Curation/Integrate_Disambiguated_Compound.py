@@ -17,6 +17,7 @@ if(len(arguments) != 1 or os.path.isfile(arguments[0]) is False):
     sys.exit()
 
 File=arguments[0]
+Dry_Run=0
 
 ##########################################################
 #
@@ -55,7 +56,7 @@ if(len(Disambiguated_Compound['to'])==0 or Disambiguated_Compound['to'][0]['id']
 
     #Create New Compound!
     #Find last identifier and increment
-    last_identifier = list(sorted(compounds_dict.keys()))[-1]
+    last_identifier = list(sorted(compounds_dict))[-1]
     next_identifier = 'cpd'+str(int(re.sub('^cpd','',last_identifier))+1)
 
     New_Cpd = OrderedDict({ "id":next_identifier,"name":"null","abbreviation":"null","aliases":"null",
@@ -87,7 +88,7 @@ compounds_dict[New_Cpd['id']]=New_Cpd
 Old_Names=list()
 New_Names=list()
 names_dict = Disambiguated_Compound['from']['names']
-for name in sorted(names_dict.keys()):
+for name in sorted(names_dict):
     if(names_dict[name] is True):
         Old_Names.append(name)
     else:
@@ -113,8 +114,8 @@ if New_Cpd['id'] in Names_Dict:
 aliases_dict = Disambiguated_Compound['from']['aliases']
 Old_Aliases=dict()
 New_Aliases=dict()
-for alias in aliases_dict.keys():
-    for source in aliases_dict[alias].keys():
+for alias in aliases_dict:
+    for source in aliases_dict[alias]:
         if(aliases_dict[alias][source] is True):
             if(source not in Old_Aliases):
                 Old_Aliases[source]=list()
@@ -160,19 +161,22 @@ Aliases_Dict[New_Cpd['id']]=New_Aliases
 ##########################################################
 
 if(len(New_Names)>0):
-    print("Saving update to names")
     if(New_Cpd['name'] not in New_Names):
         New_Cpd['name']=New_Names[0]
         New_Cpd['abbreviation']=New_Names[0]
-    Names_Dict[New_Cpd['id']]=New_Names    
-    compounds_helper.saveNames(Names_Dict)
+    Names_Dict[New_Cpd['id']]=New_Names
+    if(Dry_Run==0):
+        print("Saving update to names")
+        compounds_helper.saveNames(Names_Dict)
 
 if(len(New_Aliases)>0):
-    print("Saving update to aliases")
-    compounds_helper.saveAliases(Aliases_Dict)
+    if(Dry_Run==0):
+        print("Saving update to aliases")
+        compounds_helper.saveAliases(Aliases_Dict)
 
-print("Saving disambiguation of "+Old_Cpd_ID+" as "+New_Cpd['id'])
-compounds_helper.saveCompounds(compounds_dict)
+if(Dry_Run==0):
+    print("Saving disambiguation of "+Old_Cpd_ID+" as "+New_Cpd['id'])
+    compounds_helper.saveCompounds(compounds_dict)
 
 ##########################################################
 #
@@ -211,18 +215,22 @@ with open(Provenance_Root+"Original_Reaction_Compound_Links.tsv") as pfh:
 #the original compound or the newly disambiguated compound
 reactions_helper = Reactions()
 reaction_aliases_dict = reactions_helper.loadMSAliases()
+reaction_names_dict = reactions_helper.loadNames()
+reaction_ecs_dict = reactions_helper.loadECs()
 reactions_dict = reactions_helper.loadReactions()
 
+#Three types of reactions:
+# 1) Retain original/old reaction
 keep_reactions=dict()
+# 2) Retain but change compound in stoichiometry
 update_reactions=dict()
-old_prov_reaction_aliases=dict()
-new_prov_reaction_aliases=dict()
+# 3) Split into new reaction with updated stoichiometry
 disambiguate_reactions=dict()
-for rxn in reaction_aliases_dict.keys():
+for rxn in reaction_aliases_dict:
     Is_Old_Dict=dict()
     Source_Alias=dict()
 
-    for source in reaction_aliases_dict[rxn].keys():
+    for source in reaction_aliases_dict[rxn]:
         if(source not in Prov_Rxns):
             continue
 
@@ -237,41 +245,21 @@ for rxn in reaction_aliases_dict.keys():
             if(Old_Cpd_ID not in reactions_dict[rxn]['stoichiometry']):
                 continue
 
-            if(source not in Source_Alias):
-                Source_Alias[source]=dict()
-            Source_Alias[source][alias]=Prov_Rxns[source][alias]
-
             Is_Old_Dict[Prov_Rxns[source][alias]]=1
 
-            #These aliases are retained here if they need disambiguating.
-            if(Prov_Rxns[source][alias] is True):
-                if(rxn not in old_prov_reaction_aliases):
-                    old_prov_reaction_aliases[rxn]=dict()
-                if(source not in old_prov_reaction_aliases[rxn]):
-                    old_prov_reaction_aliases[rxn][source]=list()
-                old_prov_reaction_aliases[rxn][source].append(alias)
-            else:
-                if(rxn not in new_prov_reaction_aliases):
-                    new_prov_reaction_aliases[rxn]=dict()
-                if(source not in new_prov_reaction_aliases[rxn]):
-                    new_prov_reaction_aliases[rxn][source]=list()
-                new_prov_reaction_aliases[rxn][source].append(alias)
-
-    if(len(Is_Old_Dict.keys())==1):
-        if(list(Is_Old_Dict.keys())[0] is True):
+    if(len(Is_Old_Dict)==1):
+        if(list(Is_Old_Dict)[0] is True):
             #This means the reaction is not changed
             keep_reactions[rxn]=1
         else:
             #This means that the reaction's stoichiometry must be updated (in place)
             update_reactions[rxn]=1
-    elif(len(Is_Old_Dict.keys())==2):
+    elif(len(Is_Old_Dict)==2):
         #This means that the reaction has previously incorrectly merged reactions
         #And the reaction needs to be split into two new reactions
-        print("Warning: reaction "+rxn+" has conflicts, code needs to be expanded")
-        print(Source_Alias)
         disambiguate_reactions[rxn]=dict()
 
-if(len(update_reactions.keys())==0):
+if(len(update_reactions)==0 and len(disambiguate_reactions)==0):
     print("No reactions need updating")
     sys.exit()
 
@@ -281,16 +269,8 @@ if(len(update_reactions.keys())==0):
 #
 ##########################################################
 
-print("Updating "+str(len(update_reactions.keys()))+" reactions")
-print("Updating "+Old_Cpd_ID+" with "+New_Cpd['id'])
-
-reactions_codes = reactions_helper.generateCodes(reactions_dict)
-
-#Find last identifier
-last_identifier = list(sorted(reactions_dict.keys()))[-1]
-identifier_count = int(re.sub('^rxn','',last_identifier))
-new_reaction_count=dict()
-for rxn in sorted(update_reactions.keys()):
+print("Updating "+str(len(update_reactions))+" reactions")
+for rxn in sorted(update_reactions):
 
     #Parse old stoichiometry into array
     old_stoichiometry=reactions_dict[rxn]["stoichiometry"]
@@ -303,133 +283,138 @@ for rxn in sorted(update_reactions.keys()):
     new_stoichiometry = reactions_helper.buildStoich(rxn_cpds_array)
     reactions_helper.rebuildReaction(reactions_dict[rxn],new_stoichiometry)
 
-#Scripts to run afterwards
-#./Rebalance_Reactions.py (very important)
-#./Adjust_Reaction_Protons.py
-#./Adjust_Reaction_Water.py
-#./Merge_Reactions.py (merges may happen because of water)
-
-#Names, and ECs are not changed for updated reactions
-#Reasoning being that "updated" reactions don't need disambiguation
-#accordingly to their sources, so their original names and EC numbers
-#can stay the same
-
-reactions_helper.saveReactions(reactions_dict)
-
-sys.exit()
-
 ##########################################################
 #
 # Handle reactions to disambiguate
-# This is a hornet's nest because it arises where
-# original reactions were merged when they shouldn't have
-# and therefore requires disambiguation of aliases, names and ECs
-# At time of coding, I've not yet enountered this problem and
-# so I'm ignoring the preceding code unless I need it as
-# I'm not able to test it properly
-#
+# Names and ECs must be disambiguated further in:
+# 
 ##########################################################
 
-print("Disambiguating "+str(len(update_reactions.keys()))+" reactions")
-print("Updating "+Old_Cpd_ID+" with "+New_Cpd['id'])
+#Find last identifier
+last_identifier = list(sorted(reactions_dict))[-1]
+identifier_count = int(re.sub('^rxn','',last_identifier))
 
-#Handle aliases for disambiguated reactions
-for rxn in disambiguate_reactions:
-    if(rxn not in reaction_aliases_dict):
-        continue
-
-    #Need to find and retain aliases that were never considered
-    for source in reaction_aliases_dict[rxn]:
-        for alias in reaction_aliases_dict[rxn][source]:
-            is_retained=False
-            if(source in new_prov_reaction_aliases[rxn] and alias in new_prov_reaction_aliases[rxn][source]):
-                is_retained=True
-            for old_rxn in keep_reactions:
-                if(source in old_prov_reaction_aliases[old_rxn] and alias in old_prov_reaction_aliases[old_rxn][source]):
-                    is_retained=True
-            if(is_retained==True):
-                continue
-
-            if(source not in new_prov_reaction_aliases[rxn]):
-                new_prov_reaction_aliases[rxn][source]=list()
-            new_prov_reaction_aliases[rxn][source].append(alias)
-
+#Generate codes for matching
 reactions_codes = reactions_helper.generateCodes(reactions_dict)
 
-#Find last identifier
-last_identifier = list(sorted(reactions_dict.keys()))[-1]
-identifier_count = int(re.sub('^rxn','',last_identifier))
+print("Disambiguating "+str(len(disambiguate_reactions))+" reactions")
 new_reaction_count=dict()
-for rxn in sorted(disambiguate_reactions.keys()):
+metadata=Disambiguated_Compound['metadata']
+disambiguation_object = {'metadata':metadata,
+                         'reactions':[],
+                         'method':"disambiguation"}
+
+for original_rxn in sorted(disambiguate_reactions):
 
     #Parse old stoichiometry into array
-    old_stoichiometry=reactions_dict[rxn]["stoichiometry"]
+    old_stoichiometry=reactions_dict[original_rxn]["stoichiometry"]
     rxn_cpds_array=reactions_helper.parseStoich(old_stoichiometry)
+    old_rxn_code = reactions_helper.generateCode(rxn_cpds_array)
 
     #Adjust for new compound and retrieve code for checking against database
     reactions_helper.replaceCompound(rxn_cpds_array,Old_Cpd_ID,New_Cpd['id'])
     rxn_code = reactions_helper.generateCode(rxn_cpds_array)
 
-    matched_rxn = None
+    disambig_rxn = None
+    already_in_database = False
     if(rxn_code in reactions_codes):
-        matched_rxn = sorted(list(reactions_codes[rxn_code]))[0]
+        disambig_rxn = sorted(list(reactions_codes[rxn_code]))[0]
+        already_in_database = True
 
     #If there is a match, we assume nothing needs changing
     #Other than aliases. Move aliases from 'new' to 'matched'
-    if(matched_rxn is not None):
+    if(disambig_rxn is None):
 
-        if(matched_rxn in reaction_aliases_dict):
+        #Increment identifier
+        identifier_count+=1
+        next_identifier = 'rxn'+str(identifier_count)
 
-            #
+        #Copy reaction
+        new_rxn = copy.deepcopy(reactions_dict[original_rxn])
+        new_rxn['id']=next_identifier
+        disambig_rxn = new_rxn['id']
 
-            #Need to retain aliases of matched reaction
-            for source in reaction_aliases_dict[matched_rxn]:
-                for alias in reaction_aliases_dict[matched_rxn][source]:
-                    if(source in new_prov_reaction_aliases[rxn] and alias in new_prov_reaction_aliases[rxn][source]):
-                        continue
+        reactions_dict[new_rxn['id']]=new_rxn
+        new_reaction_count[new_rxn['id']]=1
 
-                    if(source not in new_prov_reaction_aliases[rxn]):
-                        new_prov_reaction_aliases[rxn][source]=list()
-                    new_prov_reaction_aliases[rxn][source].append(alias)
+        #Rebuild with old compound
+        new_stoichiometry = reactions_helper.buildStoich(rxn_cpds_array)
+        reactions_helper.rebuildReaction(new_rxn,new_stoichiometry)
 
-        
-        reaction_aliases_dict[matched_rxn]=new_prov_reaction_aliases[rxn]
-        continue
+        #Finally, because several new reactions may share equations
+        if(rxn_code not in reactions_codes):
+            reactions_codes[rxn_code]=dict()
+        reactions_codes[rxn_code][new_rxn['id']]=1
+
+    #Handle Aliases
+    keep_reaction_aliases = dict()
+    new_reaction_aliases = dict()
+    for source in reaction_aliases_dict[original_rxn]:
+        for alias in reaction_aliases_dict[original_rxn][source]:
+            if(source in Prov_Rxns and alias in Prov_Rxns[source]):
+                #Need to find and handle aliases that are in loaded provenance
+                if(Prov_Rxns[source][alias] is True):
+                    if(source not in keep_reaction_aliases):
+                        keep_reaction_aliases[source]=list()
+                    keep_reaction_aliases[source].append(alias)
+                else:
+                    if(source not in new_reaction_aliases):
+                        new_reaction_aliases[source]=list()
+                    new_reaction_aliases[source].append(alias)
+            else:
+                #Need to find and retain aliases that are not in loaded provenance
+                #At time of writing, must be careful if some aliases need to be moved
+                if(source not in keep_reaction_aliases):
+                    keep_reaction_aliases[source]=list()
+                keep_reaction_aliases[source].append(alias)
+
+    reaction_aliases_dict[original_rxn]=keep_reaction_aliases
+    reaction_aliases_dict[disambig_rxn]=new_reaction_aliases
+
+    #Collect names and EC numbers for disambiguation
+    ecname_disambig_dict={'from':{'id':original_rxn,
+                                  'def':reactions_dict[original_rxn]['definition']},
+                          'to':{'id':disambig_rxn,
+                                'def':reactions_dict[disambig_rxn]['definition']},
+                          'names':{},'ecs':{}}
     
-    #Increment identifier
-    identifier_count+=1
-    next_identifier = 'rxn'+str(identifier_count)
+    for name in reaction_names_dict[original_rxn]:
+        ecname_disambig_dict['names'][name]="true"
+    for ec in reaction_ecs_dict[original_rxn]:
+        ecname_disambig_dict['ecs'][ec]="true"
+    
+    if(disambig_rxn in reaction_names_dict):
+        for name in reaction_names_dict[original_rxn]:
+            if(name in ecname_disambig_dict):
+                ecname_disambig_dict['names'][name]="both"
+            else:
+                ecname_disambig_dict['names'][name]="false"
+        for ec in reaction_ecs_dict[original_rxn]:
+            if(ec in ecname_disambig_dict):
+                ecname_disambig_dict['ecs'][ec]="both"
+            else:
+                ecname_disambig_dict['ecs'][ec]="false"
 
-    #Copy reaction
-    new_rxn = copy.deepcopy(reactions_dict[rxn])
-    new_rxn['id']=next_identifier
+    disambiguation_object['reactions'].append(ecname_disambig_dict)
 
-    reactions_dict[new_rxn['id']]=new_rxn
-    new_reaction_count[new_rxn['id']]=1
+if(Dry_Run==0):
+    print("Saving update to aliases")
+    reactions_helper.saveAliases(reaction_aliases_dict)
+    print("Saving disambiguated reactions")
+    reactions_helper.saveReactions(reactions_dict)
 
-    #Rebuild with old compound
-    new_stoichiometry = reactions_helper.buildStoich(rxn_cpds_array)
-    reactions_helper.rebuildReaction(new_rxn,new_stoichiometry)
-
-    #Can handle Aliases
-    reaction_aliases_dict[new_rxn['id']]=new_prov_reaction_aliases[rxn]
-
-    #Finally, because several new reactions may share equations
-    if(rxn_code not in reactions_codes):
-        reactions_codes[rxn_code]=dict()
-    reactions_codes[rxn_code][new_rxn['id']]=1
-
-reactions_helper.saveAliases(reaction_aliases_dict)
-sys.exit()
-
-#reactions_helper.saveReactions(reactions_dict)
-#with open(Old_Cpd_ID+'_Reactions_Object.json','w') as f:
-#    json_string = json.dumps(reactions_dict,
-#                             indent=4, sort_keys=True,
-#                             separators=(',', ': '), ensure_ascii=True)
-#    f.write(json_string)
+if(len(disambiguation_object['reactions'])>0):
+    print("Saving reaction names and ECs for disambiguation")
+    with open('Objects/'+Old_Cpd_ID+'_'+metadata['user']+'_Reactions_Object.json','w') as f:
+        json_string = json.dumps(disambiguation_object,
+                                 indent=4, sort_keys=True,
+                                 separators=(',', ': '), ensure_ascii=True)
+        f.write(json_string)
 
 #Scripts to run afterwards
+#./List_ModelSEED_Structures.py
+#./Update_Structure_Formula_Charge.py
+#./Update_Compound_Aliases.py
 #./Rebalance_Reactions.py (very important)
 #./Adjust_Reaction_Protons.py
 #./Adjust_Reaction_Water.py

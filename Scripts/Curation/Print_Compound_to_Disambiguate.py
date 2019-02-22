@@ -15,7 +15,7 @@ if(len(arguments) != 1 or re.search('^cpd\d{5}$',arguments[0]) is None):
     sys.exit()
 
 Compound=arguments[0]
-Disambiguation_Object = {'metadata':{},'from':{},'to':{}}
+Disambiguation_Object = {'metadata':{},'from':{},'to':{},'method':"disambiguation"}
 
 ##########################################################
 #
@@ -24,6 +24,7 @@ Disambiguation_Object = {'metadata':{},'from':{},'to':{}}
 ##########################################################
 
 user=subprocess.check_output(['git','config','--global','--get','user.name'],universal_newlines=True).strip()
+user=re.sub(' ','_',user)
 Disambiguation_Object['metadata']['user']=user
 
 output=subprocess.check_output(['git','remote','show','origin'],universal_newlines=True)
@@ -53,6 +54,13 @@ from BiochemPy import Reactions, Compounds
 
 compounds_helper = Compounds()
 compounds_dict = compounds_helper.loadCompounds()
+
+if(Compound not in compounds_dict):
+    print("Error: compound "+Compound+" is not found in the ModelSEED database")
+    sys.exit()
+
+if(compounds_dict[Compound]['is_obsolete']==1):
+    print("Warning: compound "+Compound+" is obsolete, consider using the non-obsolete version")
 
 Disambiguation_Object['from']={'id':Compound,'structures':{},'aliases':{},'names':{},
                                'formula':compounds_dict[Compound]['formula'],
