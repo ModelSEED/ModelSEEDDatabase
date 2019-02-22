@@ -412,10 +412,10 @@ if(len(disambiguation_object['reactions'])>0):
         f.write(json_string)
 
 #Scripts to run afterwards
-#./List_ModelSEED_Structures.py
-#./Update_Structure_Formula_Charge.py
-#./Update_Compound_Aliases.py
-#./Rebalance_Reactions.py (very important)
-#./Adjust_Reaction_Protons.py
-#./Adjust_Reaction_Water.py
-#./Merge_Reactions.py (merges may happen because of water)
+#../Structures/List_ModelSEED_Structures.py
+#../Structures/Update_Structure_Formula_Charge.py
+#../Biochemistry/Update_Compound_Aliases.py
+#../Biochemistry/Rebalance_Reactions.py (very important)
+#../Biochemistry/Adjust_Reaction_Protons.py
+#../Biochemistry/Adjust_Reaction_Water.py
+#../Biochemistry/Merge_Reactions.py (merges may happen because of water)

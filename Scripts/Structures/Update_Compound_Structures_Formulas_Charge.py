@@ -1,9 +1,10 @@
 #!/usr/bin/env python
-import os, sys
+import os
+from BiochemPy import Compounds
 
 Overridden_Fields=dict()
 header=list()
-with open('ACPs_Master_Formula_Charge.txt') as fh:
+with open(os.path.dirname(__file__)+'/ACPs_Master_Formula_Charge.txt') as fh:
     for line in fh.readlines():
         line=line.strip()
         array=line.split('\t')
@@ -22,13 +23,11 @@ with open('ACPs_Master_Formula_Charge.txt') as fh:
                 continue
             Overridden_Fields[cpd][header[i]]=array[i]
 
-from BiochemPy import Compounds
-
 CompoundsHelper = Compounds()
 Structures_Dict = CompoundsHelper.loadStructures(["SMILE","InChI","InChIKey"],["ModelSEED"])
 Compounds_Dict = CompoundsHelper.loadCompounds()
 
-Structures_Root="../../Biochemistry/Structures/"
+Structures_Root=os.path.dirname(__file__)+"/../../Biochemistry/Structures/"
 for cpd in sorted (Compounds_Dict.keys()):
     if(cpd not in Structures_Dict):
         Compounds_Dict[cpd]['inchikey']=""
