@@ -126,7 +126,7 @@ Disambiguation_Object['from']['structures']=structures_dict
 #Array of possible other compounds
 Disambiguation_Object['to']=list()
 if(len(Other_Compounds)==0):
-    Disambiguation_Object['to'].append({'id':None,'name':None,'formula':None,'charge':None,'mass':None})
+    Disambiguation_Object['to'].append({'id':None,'name':None,'formula':None,'charge':"0",'mass':"0"})
 else:
     for cpd in sorted(Other_Compounds):
         Disambiguation_Object['to'].append({'id':cpd,'name':compounds_dict[cpd]['name'],
