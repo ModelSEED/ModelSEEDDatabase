@@ -278,7 +278,16 @@ class Compounds:
                 self.Headers) + "\n")
         cpds_file.close()
 
+        #Re-configure JSON
+        new_compounds_dict = list()
+        for cpd_id in sorted(compounds_dict):
+            cpd_obj = compounds_dict[cpd_id]
+            for key in cpd_obj:
+                if(cpd_obj[key]=="null"):
+                    cpd_obj[key]=None
+            new_compounds_dict.append(cpd_obj)
+
         # Print to JSON
         cpds_file = open(cpds_root + ".json", 'w', newline='\n')
-        cpds_file.write(json.dumps(compounds_dict, indent=4, sort_keys=True))
+        cpds_file.write(json.dumps(new_compounds_dict, indent=4, sort_keys=True))
         cpds_file.close()

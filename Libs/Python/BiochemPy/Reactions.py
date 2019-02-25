@@ -507,9 +507,18 @@ class Reactions:
                 self.Headers) + "\n")
         rxns_file.close()
 
+        #Re-configure JSON
+        new_reactions_dict = list()
+        for rxn_id in sorted(reactions_dict):
+            rxn_obj = reactions_dict[rxn_id]
+            for key in rxn_obj:
+                if(rxn_obj[key]=="null"):
+                    rxn_obj[key]=None
+            new_reactions_dict.append(rxn_obj)
+
         # Print to JSON
         rxns_file = open(rxns_root + ".json", 'w')
-        rxns_file.write(json.dumps(reactions_dict, indent=4, sort_keys=True))
+        rxns_file.write(json.dumps(new_reactions_dict, indent=4, sort_keys=True))
         rxns_file.close()
 
     def loadMSAliases(self,sources_array=[]):
