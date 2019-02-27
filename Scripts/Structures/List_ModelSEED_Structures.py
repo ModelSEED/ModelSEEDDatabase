@@ -1,14 +1,14 @@
 #!/usr/bin/env python
-import os, sys, json
-
-sys.path.append('../../Libs/Python')
-from BiochemPy import Compounds #, Reactions
+import os
+import sys
+import json
+from BiochemPy import Compounds
 
 #Load Compounds
 CompoundsHelper = Compounds()
 Compounds_Dict = CompoundsHelper.loadCompounds()
 
-Structures_Root="../../Biochemistry/Structures/"
+Structures_Root=os.path.dirname(__file__)+"/../../Biochemistry/Structures/"
 Formulas_Dict=dict()
 for source in "KEGG","MetaCyc":
     if(source not in Formulas_Dict):
@@ -31,18 +31,18 @@ for source in "KEGG","MetaCyc":
 
 #Load Curated Structures
 Ignored_Structures=dict()
-with open(Structures_Root+"Curation/Ignore_Structures.txt") as ignore_file:
+with open(Structures_Root+"Ignored_ModelSEED_Structures.txt") as ignore_file:
     for line in ignore_file.readlines():
         array=line.split('\t')
-#        Ignored_Structures[array[0]]=1
+        Ignored_Structures[array[0]]=1
 ignore_file.close()
 
 #Load Structures and Aliases
 Structures_Dict = CompoundsHelper.loadStructures(["SMILE","InChIKey","InChI"],["KEGG","MetaCyc"])
 MS_Aliases_Dict =  CompoundsHelper.loadMSAliases(["KEGG","MetaCyc"])
 
-master_structs_file = open("../../Biochemistry/Structures/All_ModelSEED_Structures.txt",'w')
-unique_structs_file = open("../../Biochemistry/Structures/Unique_ModelSEED_Structures.txt",'w')
+master_structs_file = open(Structures_Root+"All_ModelSEED_Structures.txt",'w')
+unique_structs_file = open(Structures_Root+"Unique_ModelSEED_Structures.txt",'w')
 unique_structs_file.write("ID\tType\tAliases\tFormula\tCharge\tStructure\n")
 structure_conflicts_file = open("Structure_Conflicts.txt",'w')
 formula_conflicts_file = open("Formula_Conflicts.txt",'w')

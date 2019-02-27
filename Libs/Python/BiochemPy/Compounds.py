@@ -4,13 +4,14 @@ import json
 from csv import DictReader
 
 class Compounds:
-    def __init__(self, biochem_root='../../Biochemistry/',
+    def __init__(self, biochem_root='../../../Biochemistry/',
                  cpds_file='compounds.tsv'):
-        self.BiochemRoot = biochem_root
-        self.CpdsFile = biochem_root + cpds_file
-        self.AliasFile = biochem_root + "Aliases/Unique_ModelSEED_Compound_Aliases.txt"
-        self.NameFile = biochem_root + "Aliases/Unique_ModelSEED_Compound_Names.txt"
-        self.StructRoot = biochem_root + "Structures/"
+
+        self.BiochemRoot = os.path.dirname(__file__)+'/'+biochem_root
+        self.CpdsFile = self.BiochemRoot + cpds_file
+        self.AliasFile = self.BiochemRoot + "Aliases/Unique_ModelSEED_Compound_Aliases.txt"
+        self.NameFile = self.BiochemRoot + "Aliases/Unique_ModelSEED_Compound_Names.txt"
+        self.StructRoot = self.BiochemRoot + "Structures/"
 
         reader = DictReader(open(self.CpdsFile), dialect='excel-tab')
         self.Headers = reader.fieldnames
@@ -278,6 +279,6 @@ class Compounds:
         cpds_file.close()
 
         # Print to JSON
-        cpds_file = open(cpds_root + ".json", 'w')
+        cpds_file = open(cpds_root + ".json", 'w', newline='\n')
         cpds_file.write(json.dumps(compounds_dict, indent=4, sort_keys=True))
         cpds_file.close()

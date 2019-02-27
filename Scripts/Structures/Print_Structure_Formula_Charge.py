@@ -3,7 +3,6 @@ import os, sys, re
 temp=list();
 header=1;
 
-sys.path.append('../../Libs/Python')
 from BiochemPy import Compounds
 
 import pybel
@@ -14,9 +13,9 @@ lg.setLevel(RDLogger.ERROR)
 
 #Load Structures and Aliases
 CompoundsHelper = Compounds()
-Structures_Dict = CompoundsHelper.loadStructures(["SMILE","InChIKey","InChI"],["KEGG","MetaCyc"])
+Structures_Dict = CompoundsHelper.loadStructures(["SMILE","InChI"],["KEGG","MetaCyc"])
 
-Structures_Root="../../Biochemistry/Structures/"
+Structures_Root=os.path.dirname(__file__)+"/../../Biochemistry/Structures/"
 file_handle_dict=dict()
 for source in "KEGG","MetaCyc":
     for struct_type in "InChI","SMILE":
@@ -43,7 +42,6 @@ for struct_type in sorted(Structures_Dict.keys()):
                             mol=pybel.readstring("inchi",structure)
                             if(mol):
                                 mol_source="OpenBabel"
-
                         else:
                             mol_source="RDKit"
                     elif(struct_type == 'SMILE'):
@@ -58,7 +56,7 @@ for struct_type in sorted(Structures_Dict.keys()):
                     pass
 
                 if(mol is None):
-                    unresolved_structures.write(cpd+"\t"+str(Structures_Dict[cpd])+"\n")
+                    unresolved_structures.write(external_id+"\t"+struct_stage+"\t"+structure+"\n")
                     continue
 
                 new_formula=""
