@@ -31,11 +31,11 @@ for source in "KEGG","MetaCyc":
 
 #Load Curated Structures
 Ignored_Structures=dict()
-#with open(Structures_Root+"Curation/Ignore_Structures.txt") as ignore_file:
-#    for line in ignore_file.readlines():
-#        array=line.split('\t')
-#        Ignored_Structures[array[0]]=1
-#ignore_file.close()
+with open(Structures_Root+"Ignored_ModelSEED_Structures.txt") as ignore_file:
+    for line in ignore_file.readlines():
+        array=line.split('\t')
+        Ignored_Structures[array[0]]=1
+ignore_file.close()
 
 #Load Structures and Aliases
 Structures_Dict = CompoundsHelper.loadStructures(["SMILE","InChIKey","InChI"],["KEGG","MetaCyc"])
