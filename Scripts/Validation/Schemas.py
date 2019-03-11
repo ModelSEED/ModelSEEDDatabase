@@ -22,7 +22,7 @@ compound_props = {
 }
 
 compounds = {
-    "type": "object",
+    "type": "list",
     "patternProperties": {
         "cpd\d{5}": {
             "type": "object",
@@ -60,7 +60,7 @@ reaction_props = {
 }
 
 reactions = {
-    "type": "object",
+    "type": "list",
     "patternProperties": {
         "rxn\d{5}": {
             "type": "object",
