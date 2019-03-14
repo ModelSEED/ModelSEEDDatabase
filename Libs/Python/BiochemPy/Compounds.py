@@ -18,10 +18,15 @@ class Compounds:
 
     def loadCompounds(self):
         reader = DictReader(open(self.CpdsFile), dialect='excel-tab')
+        type_mapping = {"is_core": int, "is_obsolete": int, "is_cofactor": int, "charge": int,
+                        "mass": float, "deltag": float, "deltagerr": float}
         cpds_dict = {}
         for line in reader:
-            for header in ["is_core", "is_obsolete", "is_cofactor"]:
-                line[header] = int(line[header])
+            for heading, target_type in type_mapping.items():
+                try:
+                    line[heading] = target_type(line[heading])
+                except ValueError:  # Generally caused by "null" strings
+                    line[heading] = None
             cpds_dict[line['id']] = line
 
         return cpds_dict
