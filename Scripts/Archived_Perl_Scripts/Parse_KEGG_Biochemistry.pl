@@ -169,7 +169,7 @@ undef(@NAMES);
 my $EQUATION="";
 my @ECs=();
 
-open(OUT, "> KEGG_Reaction_Pathway_Mapping.txt");
+open(OUT, "> ".$Output_Root."KEGG_Pathways.tbl");
 my @Pathways=();
 
 my $Reactions={};
@@ -202,7 +202,7 @@ while(<FH>){
 
     if($field eq "PATHWAY"){
 	next if $data =~ /rn01100/; #skip generic "Metabolic pathways"
-	next if $data =~ /rn01110/; #skip generic "Biosynthesis of secondary metabolites"
+#	next if $data =~ /rn01110/; #skip generic "Biosynthesis of secondary metabolites"
 	next if $data =~ /rn01120/; #skip generic "Microbial metabolism in diverse environments"
 	push(@Pathways,(split(/\s+/,$data))[0]);
     }
@@ -223,10 +223,10 @@ while(<FH>){
 
 	foreach my $p (@Pathways){
 	    print OUT $ENTRY,"\t";
-	    print OUT join("|",@ECs),"\t";
+#	    print OUT join("|",@ECs),"\t";
 	    print OUT $p,"\t";
-	    print OUT $Pathways->{$p}->{"N"},"\t";
-	    print OUT $Pathways->{$p}->{"C"},"\n";
+	    print OUT $Pathways->{$p}->{"N"},"\n";
+#	    print OUT $Pathways->{$p}->{"C"},"\n";
 	}
 
 	($ENTRY,$EQUATION)=("","");
