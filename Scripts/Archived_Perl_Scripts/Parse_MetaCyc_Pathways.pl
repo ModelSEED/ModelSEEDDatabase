@@ -215,7 +215,7 @@ foreach my $r (sort keys %Rxns_Pwys){
 close(OUT);
 
 open(OUT, "> ".$Output_Root."MetaCyc_Pathways.tbl");
-print OUT "Reaction\tPathway\n";
+print OUT "ModelSEED ID\tExternal ID\tExternal Name\n";
 foreach my $r (sort keys %Rxns_Pwys){
     foreach my $p(sort keys %{$Rxns_Pwys{$r}}){
 	next if $p eq "Biosynthesis";

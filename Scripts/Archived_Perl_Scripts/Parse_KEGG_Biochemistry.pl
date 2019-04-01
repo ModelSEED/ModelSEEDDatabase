@@ -170,6 +170,7 @@ my $EQUATION="";
 my @ECs=();
 
 open(OUT, "> ".$Output_Root."KEGG_Pathways.tbl");
+print OUT "ModelSEED ID\tExternal ID\tExternal Name\n";
 my @Pathways=();
 
 my $Reactions={};
