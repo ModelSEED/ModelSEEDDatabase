@@ -1,17 +1,15 @@
 #!/usr/bin/env python
-import os, sys, re
+import re
+from BiochemPy import Reactions
 from csv import DictReader
-temp=list();
-header=1;
 
-sys.path.append('../../Libs/Python')
-from BiochemPy import Reactions, Compounds, InChIs
 
 ReactionsHelper = Reactions()
 Reactions_Dict = ReactionsHelper.loadReactions()
 Aliases_Dict = ReactionsHelper.loadMSAliases()
 Names_Dict = ReactionsHelper.loadNames()
 ECs_Dict = ReactionsHelper.loadECs()
+Pwys_Dict = ReactionsHelper.loadPathways()
 
 Source_Classes=dict()
 reader = DictReader(open('../../Biochemistry/Aliases/Source_Classifiers.txt'), dialect='excel-tab')
