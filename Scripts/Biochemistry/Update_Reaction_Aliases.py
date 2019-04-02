@@ -79,4 +79,17 @@ for rxn in sorted(Reactions_Dict.keys()):
         Alias_Line="null"
     Reactions_Dict[rxn]['aliases']=Alias_Line
 
+    Pwys_List=list()
+    if(rxn in Pwys_Dict):
+        for biochem in Pwys_Dict[rxn]:
+            pwy_list=list()
+            for pwy in Pwys_Dict[rxn][biochem]:
+                pwy_list.append(pwy)
+            pwy_string = biochem+":"+";".join(pwy_list)
+            Pwys_List.append(pwy_string)
+    Pwy_Line = "|".join(Pwys_List)
+    if(Pwy_Line==""):
+        Pwy_Line="null"
+    Reactions_Dict[rxn]['pathways']=Pwy_Line
+
 ReactionsHelper.saveReactions(Reactions_Dict)
