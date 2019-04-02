@@ -1,45 +1,56 @@
 #!/usr/bin/env perl
 use warnings;
 use strict;
+use JSON;
+my @temp=();
 
-#######################################################
-#Initialization
-#######################################################
+my $AliasRoot = "../../Biochemistry/Aliases/";
+my $PwyRoot = $AliasRoot."Provenance/Primary_Databases/";
 
-use Bio::KBase::fbaModelServices::ScriptHelpers qw( getToken );
-my $AToken = getToken();
+open(FH, "< ../../Biochemistry/Aliases/Unique_ModelSEED_Reaction_Aliases.txt");
+my %Aliases_Reactions=();
+while(<FH>){
+    chomp;
+    @temp=split(/\t/,$_,-1);
+    $Aliases_Reactions{$temp[2]}{$temp[1]}{$temp[0]}=1;
 
-use Bio::KBase::fbaModelServices::Impl;
-my $FBAImpl = Bio::KBase::fbaModelServices::Impl->new({'fbajobcache' => "/homes/seaver/Projects/KBase_Scripts/FBA_Scripts/JobsCache",
-						       'jobserver-url' => "http://kbase.us/services/workspace",
-						       'fbajobdir' => "/tmp/fbajobs",
-						       'mfatoolkitbin' => "/vol/model-prod/kbase/MFAToolkit/bin/mfatoolkit",
-#						       'mfatoolkitbin' => "/homes/seaver/Software/MFAToolkit/bin/mfatoolkit",
-						       'probanno-url' => "http://140.221.85.86:7073/",
-						       'mssserver-url' => "http://bio-data-1.mcs.anl.gov/services/ms_fba",
-						       'accounttype' => "kbase",
-						       'workspace-url' => "http://kbase.us/services/ws",
-						       'defaultJobState' => "queued",
-						       'gaserver-url' => "http://kbase.us/services/genome_annotation",
-						       'idserver-url' => "http://kbase.us/services/idserver"});
-$FBAImpl->_setContext(undef,{auth=>$AToken});
+    if($temp[2] eq "KEGG"){
+	if($temp[1] =~ /_/){
+	    $temp[1] = (split(/_/,$temp[1]))[0];
+	    $Aliases_Reactions{$temp[2]}{$temp[1]}{$temp[0]}=1;
+	}
+    }
 
-my $bioObj = $FBAImpl->_get_msobject("Biochemistry","kbase","plantdefault");
-
-my %Rxns_Pathways=();
-my %Pathways=();
-foreach my $rxnset (@{$bioObj->reactionSets()}){
-    $Pathways{$rxnset->type()}=1;
-
-    foreach my $ref (@{$rxnset->reaction_refs()}){
-	my $obj = $bioObj->getLinkedObject($ref);
-	$Rxns_Pathways{$obj->id()}{$rxnset->type()}{$rxnset->id()}=1;
+    if($temp[2] eq "MetaCyc"){
+	if($temp[1] =~ /exp/){
+	    $temp[1]=(split(/\.[a-z]+(\.metaexp)?/,$temp[1]))[0];
+	    $Aliases_Reactions{$temp[2]}{$temp[1]}{$temp[0]}=1;
+	}elsif($temp[1] =~ /\.[a-z]$/){
+	    $temp[1] =~ s/\.[a-z]$//;
+	    $Aliases_Reactions{$temp[2]}{$temp[1]}{$temp[0]}=1;
+	}
     }
 }
+close(FH);
 
-open(OUT, "> ../Pathways/plantdefault.pathways.tsv");
-print OUT "ID\t".join("\t",sort keys %Pathways)."\n";
-foreach my $rxn (sort { $a cmp $b } keys %Rxns_Pathways){
-    print OUT $rxn,"\t",join("\t", map { exists($Rxns_Pathways{$rxn}{$_}) ? join("|", sort keys %{$Rxns_Pathways{$rxn}{$_}}) : "null" } sort keys %Pathways ),"\n"; 
+my %Lines=();
+foreach my $biochem ("KEGG","MetaCyc"){
+    open(FH, "< ".$PwyRoot."/".$biochem."_Pathways.tbl");
+    while(<FH>){
+	chomp;
+	@temp=split(/\t/,$_,-1);
+	if(exists($Aliases_Reactions{$biochem}) && exists($Aliases_Reactions{$biochem}{$temp[0]})){
+	    foreach my $ms_rxn (keys %{$Aliases_Reactions{$biochem}{$temp[0]}}){
+		my $line = $ms_rxn."\t".$temp[1]." (".$temp[2].")\t".$biochem;
+		$Lines{$ms_rxn}{$line}=1;
+	    }
+	}
+    }
 }
-close(OUT);
+open(OUT, "> ".$AliasRoot."Unique_ModelSEED_Reaction_Pathways.txt");
+print OUT "ModelSEED ID\tExternal ID\tSource\n";
+foreach my $rxn (sort keys %Lines){
+    foreach my $line (sort keys %{$Lines{$rxn}}){
+	print OUT $line."\n";
+    }
+}
