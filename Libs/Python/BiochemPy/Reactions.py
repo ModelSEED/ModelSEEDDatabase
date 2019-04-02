@@ -23,10 +23,15 @@ class Reactions:
 
     def loadReactions(self):
         reader = DictReader(open(self.RxnsFile), dialect='excel-tab')
+        type_mapping = {"is_transport": int, "is_obsolete": int,
+                        "deltag": float, "deltagerr": float}
         rxns_dict = dict()
         for line in reader:
-            for header in ["is_transport", "is_obsolete"]:
-                line[header] = int(line[header])
+            for heading, target_type in type_mapping.items():
+                try:
+                    line[heading] = target_type(line[heading])
+                except ValueError:  # Generally caused by "null" strings
+                    line[heading] = None
             rxns_dict[line['id']] = line
 
         return rxns_dict
