@@ -75,6 +75,8 @@ for rxn in sorted(Reactions_Dict.keys()):
         Alias_List.append(name_line)
 
     Alias_Line = ";".join(Alias_List)
+    if(Alias_Line==""):
+        Alias_Line="null"
     Reactions_Dict[rxn]['aliases']=Alias_Line
 
 ReactionsHelper.saveReactions(Reactions_Dict)
