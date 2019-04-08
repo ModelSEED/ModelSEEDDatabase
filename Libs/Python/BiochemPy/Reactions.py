@@ -120,35 +120,44 @@ class Reactions:
         else:
             return 0
 
-    def generateCodes(self, rxns_dict):
+    def generateCodes(self, rxns_dict,stoich=True,transport=True):
         codes_dict=dict()
         for rxn in rxns_dict:
             if(rxns_dict[rxn]['status']=="EMPTY"):
                 continue
             rxn_cpds_array = self.parseStoich(rxns_dict[rxn]['stoichiometry'])
-            code = self.generateCode(rxn_cpds_array)
+            code = self.generateCode(rxn_cpds_array,stoich,transport)
             if(code not in codes_dict):
                 codes_dict[code]=dict()
             codes_dict[code][rxn]=1
         return codes_dict
 
-    def generateCode(self,rxn_cpds_array):
+    def generateCode(self,rxn_cpds_array,stoich=True,transport=True):
 
         #It matters if its a transport reaction, and we include protons when matching transport
+        #Unless we specifically designate that we're note checking transport
         is_transport = self.isTransport(rxn_cpds_array)
-
+        
         #It matters which side of the equation, so build reagents and products arrays
         reagents=list()
         products=list()
         for rgt in sorted(rxn_cpds_array, key=lambda x: ( x["reagent"], x["coefficient"] )):
             #skip protons
-            if("cpd00067" in rgt["reagent"] and is_transport == 0):
+            if("cpd00067" in rgt["reagent"] and (is_transport == 0 or transport is False)):
                 continue
 
+            reagent=rgt["reagent"]
+
+            if(transport is False):
+                reagent=reagent[:-3]
+
+            if(stoich is True):
+                reagent+=":"+str(abs(rgt["coefficient"]))
+
             if(rgt["coefficient"]<0):
-                reagents.append(rgt["reagent"]+":"+str(abs(rgt["coefficient"])))
+                reagents.append(reagent)
             if(rgt["coefficient"]>0):
-                products.append(rgt["reagent"]+":"+str(abs(rgt["coefficient"])))
+                products.append(reagent)
 
         rgt_string = "|".join(reagents)
         pdt_string = "|".join(products)
