@@ -5,7 +5,7 @@ before_install:
   - sudo apt-get update
   - wget https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh;
   - bash miniconda.sh -b -p $HOME/miniconda
-  - export PATH="$HOME/miniconda/bin:$PATH"
+  - export PATH="$HOME/miniconda/bin:./Libs/Python/:$PATH"
   - hash -r
   - conda config --set always_yes yes --set changeps1 no
   - conda update -q conda
@@ -18,5 +18,5 @@ install:
 script:
   - python -m Scripts.Validation.Validate_Templates
   - python -m Scripts.Validation.Validate_Annotations_Media
-  - python -m Scripts.Validation.Validate_Compounds_JSON -ds Biochemistry/compounds.json
-  - python -m Scripts.Validation.Validate_Reactions_JSON -dsc Biochemistry/reactions.json
+  - python -m Scripts.Validation.Validate_Compounds_JSON -s Biochemistry/compounds.json
+  - python -m Scripts.Validation.Validate_Reactions_JSON -sc Biochemistry/reactions.json
