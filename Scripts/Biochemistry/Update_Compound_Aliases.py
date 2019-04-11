@@ -51,6 +51,8 @@ for cpd in sorted(Compounds_Dict.keys()):
         Alias_List.append(name_line)
 
     Alias_Line = ";".join(Alias_List)
+    if(Alias_Line==""):
+        Alias_Line="null"
     Compounds_Dict[cpd]['aliases']=Alias_Line
 
 CompoundsHelper.saveCompounds(Compounds_Dict)

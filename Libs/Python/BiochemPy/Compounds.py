@@ -18,10 +18,15 @@ class Compounds:
 
     def loadCompounds(self):
         reader = DictReader(open(self.CpdsFile), dialect='excel-tab')
+        type_mapping = {"is_core": int, "is_obsolete": int, "is_cofactor": int, "charge": int,
+                        "mass": float, "deltag": float, "deltagerr": float}
         cpds_dict = {}
         for line in reader:
-            for header in ["is_core", "is_obsolete", "is_cofactor"]:
-                line[header] = int(line[header])
+            for heading, target_type in type_mapping.items():
+                try:
+                    line[heading] = target_type(line[heading])
+                except ValueError:  # Generally caused by "null" strings
+                    line[heading] = None
             cpds_dict[line['id']] = line
 
         return cpds_dict
@@ -278,7 +283,16 @@ class Compounds:
                 self.Headers) + "\n")
         cpds_file.close()
 
+        #Re-configure JSON
+        new_compounds_dict = list()
+        for cpd_id in sorted(compounds_dict):
+            cpd_obj = compounds_dict[cpd_id]
+            for key in cpd_obj:
+                if(cpd_obj[key]=="null"):
+                    cpd_obj[key]=None
+            new_compounds_dict.append(cpd_obj)
+
         # Print to JSON
         cpds_file = open(cpds_root + ".json", 'w', newline='\n')
-        cpds_file.write(json.dumps(compounds_dict, indent=4, sort_keys=True))
+        cpds_file.write(json.dumps(new_compounds_dict, indent=4, sort_keys=True))
         cpds_file.close()
