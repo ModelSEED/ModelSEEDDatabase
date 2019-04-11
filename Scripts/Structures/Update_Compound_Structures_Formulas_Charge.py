@@ -55,12 +55,13 @@ for cpd in sorted (Compounds_Dict.keys()):
 
         if(formula_charge_dict['formula'] != "null"):
             Compounds_Dict[cpd]['formula']=formula_charge_dict['formula']
-            Compounds_Dict[cpd]['charge']=formula_charge_dict['charge']
+            Compounds_Dict[cpd]['charge']=int(formula_charge_dict['charge'])
 
         #Override manually
-        for key in 'formula','charge':
-            if(cpd in Overridden_Fields and key in Overridden_Fields[cpd]):
-                Compounds_Dict[cpd][key]=Overridden_Fields[cpd][key]
+        if(cpd in Overridden_Fields and 'formula' in Overridden_Fields[cpd]):
+            Compounds_Dict[cpd]['formula']=Overridden_Fields[cpd]['formula']
+        if(cpd in Overridden_Fields and 'charge' in Overridden_Fields[cpd]):
+            Compounds_Dict[cpd]['charge']=int(Overridden_Fields[cpd]['charge'])
 
 print("Saving compounds")
 CompoundsHelper.saveCompounds(Compounds_Dict)
