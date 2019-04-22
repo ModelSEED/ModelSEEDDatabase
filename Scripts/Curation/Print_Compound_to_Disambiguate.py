@@ -71,6 +71,28 @@ Aliases_Dict = compounds_helper.loadMSAliases()
 Names_Dict = compounds_helper.loadNames()
 Structures_Dict = compounds_helper.loadStructures(["InChI","SMILE"],["KEGG","MetaCyc"])
 
+#For reverse lookup
+reverse_aliases_dict = dict()
+for cpd in Aliases_Dict:
+    for source in Aliases_Dict[cpd]:
+        for alias in Aliases_Dict[cpd][source]:
+            if(alias not in reverse_aliases_dict):
+                reverse_aliases_dict[alias]=dict()
+            if(source not in reverse_aliases_dict[alias]):
+                reverse_aliases_dict[alias][source]=dict()
+            reverse_aliases_dict[alias][source][cpd]=1
+
+reverse_structures_dict = dict()
+for type in Structures_Dict:
+    for alias in Structures_Dict[type]:
+        for stage in Structures_Dict[type][alias]:
+            for structure in Structures_Dict[type][alias][stage]:
+                if(structure not in reverse_structures_dict):
+                    reverse_structures_dict[structure]=dict()
+                if(stage not in reverse_structures_dict[structure]):
+                    reverse_structures_dict[structure][stage]=dict()
+                reverse_structures_dict[structure][stage][alias]=1
+
 names_dict=dict()
 for name in Names_Dict[Compound]:
     names_dict[name]=True
@@ -84,7 +106,7 @@ for source in Aliases_Dict[Compound]:
         aliases_dict[alias][source]=True
 Disambiguation_Object['from']['aliases']=aliases_dict
 
-#It's possible that the alias is associated with another compound
+#It's possible that the structure and/or alias is associated with another compound
 #Need to find and report
 Other_Compounds=list()
 for cpd in Aliases_Dict.keys():
@@ -122,6 +144,18 @@ if(inchi is not True):
                 for structure in Structures_Dict['SMILE'][alias]['Original']:
                     structures_dict[alias][structure]=True
 Disambiguation_Object['from']['structures']=structures_dict
+
+#Find Other_Compounds using structures
+#This should work regardless of whether the structure is an InChI or a SMILE
+for current_alias in structures_dict:
+    for current_structure in structures_dict[current_alias]:
+        if(current_structure in reverse_structures_dict):
+            if('Charged' in reverse_structures_dict[current_structure]):
+                for other_alias in reverse_structures_dict[current_structure]['Charged']:
+                    for source in reverse_aliases_dict[other_alias]:
+                        for cpd in reverse_aliases_dict[other_alias][source]:
+                            if(cpd != Compound and cpd not in Other_Compounds):
+                                Other_Compounds.append(cpd)
 
 #Array of possible other compounds
 Disambiguation_Object['to']=list()
