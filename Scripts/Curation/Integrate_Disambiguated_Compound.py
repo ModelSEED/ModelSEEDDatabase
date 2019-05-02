@@ -65,7 +65,7 @@ if(len(Disambiguated_Compound['to'])==0 or Disambiguated_Compound['to'][0]['id']
                             "inchikey":"","smiles":"",
                             "is_cofactor":0,"is_core":0,"is_obsolete":0,
                             "abstract_compound":"null","comprised_of":"null","linked_compound":"null",
-                            "source":"" })
+                            "source":"","ontology":"class:null|context:null"})
 
     New_Cpd['formula']=Disambiguated_Compound['to'][0]['formula']
     New_Cpd['charge']=Disambiguated_Compound['to'][0]['charge']
