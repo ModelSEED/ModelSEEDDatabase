@@ -8,14 +8,25 @@ from collections import defaultdict, Counter
 import re
 import argparse
 import json
-
+import sys
 
 def parse_rxn(_rxn):
     # returns a tuple of dicts with compounds as keys and stoich as values
     _rxn = _rxn.translate(str.maketrans("", "", "()"))
-    return [dict([compound[:-3].split()[::-1] for compound in half.split(' + ')])
-            if half else {} for half in re.split(' <?=>? ', _rxn)]
-
+    reactants = dict()
+    products = dict()
+    halves = re.split(' <?=>? ', _rxn)
+    for half in halves:
+        if(half == ''):
+            continue
+        for compound in half.split(' + '):
+            compound=re.sub(r"\[\d\]","",compound)
+            (cpd,cft) = compound.split()[::-1]
+            if(half==halves[0]):
+                reactants[cpd]=cft
+            else:
+                products[cpd]=cft
+    return [reactants,products]
 
 def get_atom_count(compoundDict, complist):
     atom_counts = Counter()
@@ -86,8 +97,10 @@ def check_compounds(_rxns, verbose, compound_loc='./Biochemistry/compounds.json'
             reactants, products = parse_rxn(rxn['equation'])
             rxn_cpds_array=reactions_helper.parseStoich(rxn["stoichiometry"])
         except ValueError as e:
+            print(rxn['id'],rxn['equation'])
             print("Unable to parse {}: {}".format(rxn['equation'], e))
             err['invalid_equation'] += 1
+            sys.exit()
 
         try:
             new_status = reactions_helper.balanceReaction(rxn_cpds_array)
