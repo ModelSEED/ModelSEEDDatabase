@@ -99,7 +99,7 @@ for rxn in sorted(reactions_dict.keys()):
     rxn_dg_transport = 0.0
     
     stored_max=rxn_dg+rxn_dg_transport+rxn_dge
-    stored_min=rxn_dg+rxn_dg_transport+rxn_dge
+    stored_min=rxn_dg+rxn_dg_transport-rxn_dge
 
     stored_max+=(RT_CONST*pdt_max)+(RT_CONST*rct_min)
     stored_min+=(RT_CONST*pdt_min)+(RT_CONST*rct_max)
