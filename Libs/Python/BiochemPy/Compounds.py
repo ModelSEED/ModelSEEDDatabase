@@ -278,9 +278,13 @@ class Compounds:
         cpds_file = open(cpds_root + ".tsv", 'w')
         cpds_file.write("\t".join(self.Headers) + "\n")
         for cpd in sorted(compounds_dict.keys()):
-            cpds_file.write("\t".join(
-                str(compounds_dict[cpd][header]) for header in
-                self.Headers) + "\n")
+            values_list=list()
+            for header in self.Headers:
+                value=compounds_dict[cpd][header]
+                if(isinstance(value,list)):
+                    value = "|".join(value)
+                values_list.append(str(value))
+            cpds_file.write("\t".join(values_list)+"\n")
         cpds_file.close()
 
         #Re-configure JSON
