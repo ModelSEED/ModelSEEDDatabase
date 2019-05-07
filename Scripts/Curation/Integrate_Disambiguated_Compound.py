@@ -65,7 +65,7 @@ if(len(Disambiguated_Compound['to'])==0 or Disambiguated_Compound['to'][0]['id']
                             "inchikey":"","smiles":"",
                             "is_cofactor":0,"is_core":0,"is_obsolete":0,
                             "abstract_compound":"null","comprised_of":"null","linked_compound":"null",
-                            "source":"" })
+                            "source":"","ontology":"class:null|context:null"})
 
     New_Cpd['formula']=Disambiguated_Compound['to'][0]['formula']
     New_Cpd['charge']=Disambiguated_Compound['to'][0]['charge']
@@ -99,6 +99,9 @@ for name in sorted(names_dict):
         New_Names.append(name)
 
 Names_Dict[Old_Cpd_ID]=Old_Names
+if(compounds_dict[Old_Cpd_ID]['name'] not in Old_Names):
+    compounds_dict[Old_Cpd_ID]['name'] = sorted(Old_Names)[0]
+    compounds_dict[Old_Cpd_ID]['abbreviation'] = sorted(Old_Names)[0]
 
 #Retain names if they exist
 if New_Cpd['id'] in Names_Dict:

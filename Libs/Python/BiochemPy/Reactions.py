@@ -12,6 +12,7 @@ class Reactions:
         self.RxnsFile = self.BiochemRoot + rxns_file
         self.AliasFile = self.BiochemRoot + "Aliases/Unique_ModelSEED_Reaction_Aliases.txt"
         self.NameFile = self.BiochemRoot + "Aliases/Unique_ModelSEED_Reaction_Names.txt"
+        self.PwyFile = self.BiochemRoot + "Aliases/Unique_ModelSEED_Reaction_Pathways.txt"
         self.ECFile = self.BiochemRoot + "Aliases/Unique_ModelSEED_Reaction_ECs.txt"
 
         reader = DictReader(open(self.RxnsFile), dialect='excel-tab')
@@ -563,6 +564,23 @@ class Reactions:
             names_dict[line['ModelSEED ID']].append(line['External ID'])
 
         return names_dict
+
+    def loadPathways(self):
+        pathways_dict = dict()
+        reader = DictReader(open(self.PwyFile), dialect = 'excel-tab')
+        for line in reader:
+            if("rxn" not in line['ModelSEED ID']):
+                continue
+
+            if(line['ModelSEED ID'] not in pathways_dict):
+                   pathways_dict[line['ModelSEED ID']]=dict()
+
+            if(line['Source'] not in pathways_dict[line['ModelSEED ID']]):
+                pathways_dict[line['ModelSEED ID']][line['Source']]=list()
+
+            pathways_dict[line['ModelSEED ID']][line['Source']].append(line['External ID'])
+
+        return pathways_dict
 
     def loadECs(self):
         ecs_dict = dict()
