@@ -1,4 +1,7 @@
 from . import Schemas as schemas
+from BiochemPy import Reactions
+reactions_helper = Reactions()
+
 from .error_reporting import find_new_errors, report_errors
 from jsonschema import Draft4Validator
 from collections import defaultdict, Counter
@@ -48,6 +51,9 @@ def check_dups(_rxns, verbose, unique_fields=('id', 'stoichiometry')):
     for rxn in _rxns:
         if rxn['is_obsolete']:
             continue
+        if 'EMPTY' in rxn['status']:
+            continue
+
         for key in unique_values:
             unique_values[key][rxn[key]].append(rxn['id'])
 
@@ -78,16 +84,21 @@ def check_compounds(_rxns, verbose, compound_loc='./Biochemistry/compounds.json'
             err['obsolete_comps'] += 1
         try:
             reactants, products = parse_rxn(rxn['equation'])
+            rxn_cpds_array=reactions_helper.parseStoich(rxn["stoichiometry"])
         except ValueError as e:
             print("Unable to parse {}: {}".format(rxn['equation'], e))
             err['invalid_equation'] += 1
+
         try:
-            reactant_atoms = get_atom_count(compounds, reactants)
-            product_atoms = get_atom_count(compounds, products)
+            new_status = reactions_helper.balanceReaction(rxn_cpds_array)
+#            reactant_atoms = get_atom_count(compounds, reactants)
+#            product_atoms = get_atom_count(compounds, products)
         except KeyError as e:
             print('Invalid id {} in equation {}'.format(rxn['id'], e))
             err['invalid_equation'] += 1
-        if reactant_atoms - product_atoms or product_atoms - reactant_atoms:
+
+#        if reactant_atoms - product_atoms or product_atoms - reactant_atoms:
+        if 'OK' not in new_status:
             err['unbalanced_reactions'] += 1
             if rxn['status'] == 'OK':
                 if verbose:
