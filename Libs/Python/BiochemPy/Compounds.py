@@ -20,8 +20,13 @@ class Compounds:
         reader = DictReader(open(self.CpdsFile), dialect='excel-tab')
         type_mapping = {"is_core": int, "is_obsolete": int, "is_cofactor": int, "charge": int,
                         "mass": float, "deltag": float, "deltagerr": float}
+        lists = ["aliases"]
+
         cpds_dict = {}
         for line in reader:
+            for list_type in lists:
+                if(line[list_type] != "null"):
+                    line[list_type]=line[list_type].split("|")
             for heading, target_type in type_mapping.items():
                 try:
                     line[heading] = target_type(line[heading])
