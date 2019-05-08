@@ -41,18 +41,18 @@ for cpd in sorted(Compounds_Dict.keys()):
                     Cpd_Aliases[source][alias]=1
                     Alias_Count+=1
 
-    Alias_List=list()
-    for source in sorted(Cpd_Aliases.keys()):
-        source_line=source+":"+"|".join(sorted(Cpd_Aliases[source].keys()))
-        Alias_List.append(source_line)
-        
+    Alias_List=list()        
     if(cpd in Names_Dict):
-        name_line="name:"+"|".join(sorted(Names_Dict[cpd]))
+        name_line="Name: "+"; ".join(sorted(Names_Dict[cpd]))
         Alias_List.append(name_line)
 
-    Alias_Line = ";".join(Alias_List)
-    if(Alias_Line==""):
-        Alias_Line="null"
-    Compounds_Dict[cpd]['aliases']=Alias_Line
+    for source in sorted(Cpd_Aliases.keys()):
+        source_line=source+": "+"; ".join(sorted(Cpd_Aliases[source].keys()))
+        Alias_List.append(source_line)
+
+    if(len(Alias_List)==0):
+        Compounds_Dict[cpd]['aliases']="null"
+    else:
+        Compounds_Dict[cpd]['aliases']=Alias_List
 
 CompoundsHelper.saveCompounds(Compounds_Dict)
