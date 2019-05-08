@@ -1,4 +1,7 @@
 from . import Schemas as schemas
+from BiochemPy import Reactions
+reactions_helper = Reactions()
+
 from .error_reporting import find_new_errors, report_errors
 from jsonschema import Draft4Validator
 from collections import defaultdict, Counter
@@ -17,13 +20,16 @@ def parse_rxn(_rxn):
 def get_atom_count(compoundDict, complist):
     atom_counts = Counter()
     for id, stoich in complist.items():
-        if compoundDict[id]['formula'] == 'null':
-            continue
-        for pair in re.findall('([A-Z][a-z]?)(\d*)', compoundDict[id]['formula']):
-            if not pair[1]:
-                atom_counts[pair[0]] += float(stoich)
-            else:
-                atom_counts[pair[0]] += float(pair[1]) * float(stoich)
+        for comp in compoundDict:
+            if(id != comp['id']):
+                continue
+            if comp['formula'] is None or comp['formula'] == 'null':
+                continue
+            for pair in re.findall('([A-Z][a-z]?)(\d*)', comp['formula']):
+                if not pair[1]:
+                    atom_counts[pair[0]] += float(stoich)
+                else:
+                    atom_counts[pair[0]] += float(pair[1]) * float(stoich)
     atom_counts = Counter({k: round(v, 1) for k, v in atom_counts.items()})
     return atom_counts
 
@@ -42,11 +48,14 @@ def check_dups(_rxns, verbose, unique_fields=('id', 'stoichiometry')):
     # build a nested dict for uniqueness checking
     # {field: {value: [ids_with_this_value]}}
     unique_values = dict([(key, defaultdict(list)) for key in unique_fields])
-    for id, rxn in _rxns.items():
+    for rxn in _rxns:
         if rxn['is_obsolete']:
             continue
+        if 'EMPTY' in rxn['status']:
+            continue
+
         for key in unique_values:
-            unique_values[key][rxn[key]].append(id)
+            unique_values[key][rxn[key]].append(rxn['id'])
 
     # if the unique_values dict for a field has more than one id, it's not unique
     duplicated = defaultdict(int)
@@ -62,42 +71,47 @@ def check_dups(_rxns, verbose, unique_fields=('id', 'stoichiometry')):
 def check_compounds(_rxns, verbose, compound_loc='./Biochemistry/compounds.json'):
     err = defaultdict(int)
     compounds = json.load(open(compound_loc))
-    obsolete_comps = set(cid for cid, comp in compounds.items()
+    obsolete_comps = set(comp['id'] for comp in compounds
                          if comp['is_obsolete'] == '1')
-    for id, rxn in _rxns.items():
+    for rxn in _rxns:
         if rxn['is_obsolete'] == "1":
             continue
         comp_ids = set(rxn['compound_ids'].split(';'))
         if comp_ids & obsolete_comps:
             if verbose:
                 print('Obsolete compounds in {}: {}'
-                      .format(id, comp_ids & obsolete_comps))
+                      .format(rxn['id'], comp_ids & obsolete_comps))
             err['obsolete_comps'] += 1
         try:
             reactants, products = parse_rxn(rxn['equation'])
+            rxn_cpds_array=reactions_helper.parseStoich(rxn["stoichiometry"])
         except ValueError as e:
             print("Unable to parse {}: {}".format(rxn['equation'], e))
             err['invalid_equation'] += 1
+
         try:
-            reactant_atoms = get_atom_count(compounds, reactants)
-            product_atoms = get_atom_count(compounds, products)
+            new_status = reactions_helper.balanceReaction(rxn_cpds_array)
+#            reactant_atoms = get_atom_count(compounds, reactants)
+#            product_atoms = get_atom_count(compounds, products)
         except KeyError as e:
-            print('Invalid id {} in equation {}'.format(id, e))
+            print('Invalid id {} in equation {}'.format(rxn['id'], e))
             err['invalid_equation'] += 1
-        if reactant_atoms - product_atoms or product_atoms - reactant_atoms:
+
+#        if reactant_atoms - product_atoms or product_atoms - reactant_atoms:
+        if 'OK' not in new_status:
             err['unbalanced_reactions'] += 1
             if rxn['status'] == 'OK':
                 if verbose:
                     print('Unbalanced reaction marked OK {}\n{}\n{}'
-                          .format(id, reactant_atoms, product_atoms))
+                          .format(rxn['id'], reactant_atoms, product_atoms))
                 err['unbalanced_marked_OK'] += 1
         if rxn['status'] == "EMPTY":
-            print("Empty Reaction: " + id)
+            print("Empty Reaction: " + rxn['id'])
             continue
         if comp_ids ^ set(list(reactants.keys()) + list(products.keys())):
             if verbose:
                 print('"compound_ids" and "equation" are inconsistant in {}:\n{}\n{}'
-                      .format(id, rxn['compound_ids'], rxn['code']))
+                      .format(rxn['id'], rxn['compound_ids'], rxn['code']))
             err['inconsistent_equation_compids'] += 1
     return err
 

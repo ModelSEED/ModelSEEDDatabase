@@ -1,9 +1,4 @@
 #!/usr/bin/env python
-import os, sys
-temp=list();
-header=1;
-
-sys.path.append('../../Libs/Python')
 from BiochemPy import Reactions
 
 ReactionsHelper = Reactions()
@@ -15,10 +10,13 @@ for rxn in sorted(Reactions_Dict.keys()):
         continue
 
     Rxn_Cpds_Array = ReactionsHelper.parseStoich(Reactions_Dict[rxn]["stoichiometry"])
-    Stoichiometry=ReactionsHelper.buildStoich(Rxn_Cpds_Array)
+    New_Rxn_Cpds_Array = ReactionsHelper.removeCpdRedundancy(Rxn_Cpds_Array)
+    Stoichiometry=ReactionsHelper.buildStoich(New_Rxn_Cpds_Array)
     if(Stoichiometry != Reactions_Dict[rxn]["stoichiometry"]):
+        print("Rebuilding "+rxn)
         ReactionsHelper.rebuildReaction(Reactions_Dict[rxn],Stoichiometry)
         Update_Reactions+=1
 
-print "Saving rebuilt equations for "+str(Update_Reactions)+" reactions";
-ReactionsHelper.saveReactions(Reactions_Dict)
+if(Update_Reactions>0):
+    print("Saving rebuilt equations for "+str(Update_Reactions)+" reactions")
+    ReactionsHelper.saveReactions(Reactions_Dict)

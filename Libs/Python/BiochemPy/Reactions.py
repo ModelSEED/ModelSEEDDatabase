@@ -1,16 +1,19 @@
 import os
+import re
 import json
+import copy
 from csv import DictReader
 
-
 class Reactions:
-    def __init__(self, biochem_root='../../Biochemistry/',
+    def __init__(self, biochem_root='../../../Biochemistry/',
                  rxns_file='reactions.tsv'):
-        self.BiochemRoot = biochem_root
-        self.RxnsFile = biochem_root + rxns_file
-        self.AliasFile = biochem_root + "Aliases/Unique_ModelSEED_Reaction_Aliases.txt"
-        self.NameFile = biochem_root + "Aliases/Unique_ModelSEED_Reaction_Names.txt"
-        self.ECFile = biochem_root + "Aliases/Unique_ModelSEED_Reaction_ECs.txt"
+
+        self.BiochemRoot = os.path.dirname(__file__)+'/'+biochem_root
+        self.RxnsFile = self.BiochemRoot + rxns_file
+        self.AliasFile = self.BiochemRoot + "Aliases/Unique_ModelSEED_Reaction_Aliases.txt"
+        self.NameFile = self.BiochemRoot + "Aliases/Unique_ModelSEED_Reaction_Names.txt"
+        self.PwyFile = self.BiochemRoot + "Aliases/Unique_ModelSEED_Reaction_Pathways.txt"
+        self.ECFile = self.BiochemRoot + "Aliases/Unique_ModelSEED_Reaction_ECs.txt"
 
         reader = DictReader(open(self.RxnsFile), dialect='excel-tab')
         self.Headers = reader.fieldnames
@@ -21,16 +24,71 @@ class Reactions:
 
     def loadReactions(self):
         reader = DictReader(open(self.RxnsFile), dialect='excel-tab')
+        type_mapping = {"is_transport": int, "is_obsolete": int,
+                        "deltag": float, "deltagerr": float}
         rxns_dict = dict()
         for line in reader:
-            for header in ["is_transport", "is_obsolete"]:
-                line[header] = int(line[header])
+            for heading, target_type in type_mapping.items():
+                try:
+                    line[heading] = target_type(line[heading])
+                except ValueError:  # Generally caused by "null" strings
+                    line[heading] = None
             rxns_dict[line['id']] = line
 
         return rxns_dict
 
+    def parseEquation(self, equation_string):
+        rxn_cpds_array = list()
+        reagent=-1
+        coeff=1
+        index=0
+        for text in equation_string.split(" "):
+            if(text == "+"):
+                continue
+
+            match=re.search('^<?=>?$',text)
+            if(match is not None):
+                reagent=1
+
+            match=re.search('^\((\d+(?:\.\d+)?)\)$',text)
+            if(match is not None):
+                coeff=match.group(1)
+
+                # Correct for redundant ".0" in floats
+                coeff = float(coeff)
+                if (str(coeff)[-2:] == ".0"):
+                    coeff = int(round(coeff))
+
+            match=re.search('^(cpd\d{5})\[(\d)\]$',text)
+            if(match is not None):
+
+                #Side of equation
+                coeff=coeff*reagent
+
+                (cpd,cpt)=(match.group(1),match.group(2))
+                rgt_id = cpd + "_" + cpt + str(index)
+                cpt = int(cpt)
+                name = self.Compounds_Dict[cpd]["name"]
+                formula = self.Compounds_Dict[cpd]["formula"]
+                charge = self.Compounds_Dict[cpd]["charge"]
+
+                rxn_cpds_array.append({"reagent": rgt_id, "coefficient": coeff,
+                                       "compound": cpd, "compartment": cpt,
+                                       "index": index, "name": name,
+                                       "formula": formula, "charge": charge})
+
+                #Need to reset coeff for next compound
+                coeff=1
+
+        return rxn_cpds_array
+
     def parseStoich(self, stoichiometry):
         rxn_cpds_array = list()
+
+        #For empty reaction
+        if(stoichiometry == ""):
+            return rxn_cpds_array
+
         for rgt in stoichiometry.split(";"):
             (coeff, cpd, cpt, index, name) = rgt.split(":", 4)
             rgt_id = cpd + "_" + cpt + index
@@ -52,7 +110,7 @@ class Reactions:
                                    "charge": self.Compounds_Dict[cpd][
                                        "charge"]})
         return rxn_cpds_array
-
+        
     @staticmethod
     def isTransport(rxn_cpds_array):
         compartments_dict=dict()
@@ -68,16 +126,16 @@ class Reactions:
         for rxn in rxns_dict:
             if(rxns_dict[rxn]['status']=="EMPTY"):
                 continue
-            code = self.generateCode(rxns_dict[rxn]['stoichiometry'])
+            rxn_cpds_array = self.parseStoich(rxns_dict[rxn]['stoichiometry'])
+            code = self.generateCode(rxn_cpds_array)
             if(code not in codes_dict):
                 codes_dict[code]=dict()
             codes_dict[code][rxn]=1
         return codes_dict
 
-    def generateCode(self,stoichiometry):
-        rxn_cpds_array = self.parseStoich(stoichiometry)
+    def generateCode(self,rxn_cpds_array):
 
-        #It matters if its a transport reaction, and we include protons when matching transpor
+        #It matters if its a transport reaction, and we include protons when matching transport
         is_transport = self.isTransport(rxn_cpds_array)
 
         #It matters which side of the equation, so build reagents and products arrays
@@ -103,7 +161,7 @@ class Reactions:
     def buildStoich(rxn_cpds_array):
         stoichiometry_array = list()
         for rgt in sorted(rxn_cpds_array, key=lambda x: (
-        int(x["coefficient"] > 0), x["reagent"])):
+                int(x["coefficient"] > 0), x["reagent"])):
 
             # Correct for redundant ".0" in floats
             if (str(rgt["coefficient"])[-2:] == ".0"):
@@ -119,6 +177,34 @@ class Reactions:
             stoichiometry_array.append(rgt_string)
         stoichiometry_string = ";".join(stoichiometry_array)
         return stoichiometry_string
+
+    @staticmethod
+    def removeCpdRedundancy(rgts_array):
+
+        rgts_dict = dict()
+        for rgt in rgts_array:
+            if (rgt["reagent"] not in rgts_dict):
+                rgts_dict[rgt["reagent"]] = 0
+            rgts_dict[rgt["reagent"]] += float(rgt["coefficient"])
+
+        new_rgts_array=list()
+        for rgt in rgts_array:
+            if (rgts_dict[rgt["reagent"]] == 0):
+                continue
+
+            rgt["coefficient"]=rgts_dict[rgt["reagent"]]
+
+            # Correct for redundant ".0" in floats
+            if (str(rgt["coefficient"])[-2:] == ".0"):
+                rgt["coefficient"] = int(round(rgt["coefficient"]))
+
+            new_rgts_array.append(rgt)
+            
+            #Trick to exclude reagent if it appears in array more than once
+            rgts_dict[rgt["reagent"]]=0
+            
+
+        return new_rgts_array
 
     def balanceReaction(self, rgts_array):
         if (len(rgts_array) == 0):
@@ -137,7 +223,7 @@ class Reactions:
 
         for rgt in rgts_dict.keys():
             if (rgts_dict[rgt] > 1):
-                return "ERROR: Duplicate reagents"
+                return "Duplicate reagents"
 
         ########################################
         # Check for duplicate compounds in
@@ -156,8 +242,13 @@ class Reactions:
         # Build dict of compounds
         cpds_dict = dict()
         for rgt in rgts_array:
-            rgt["coefficient"] = cpds_coeff_dict[rgt["compound"]]
-            cpds_dict[rgt["compound"]] = rgt
+            #Skip trans-compartmental compounds
+            if (cpds_coeff_dict[rgt["compound"]] == 0):
+                continue
+
+            proxy_rgt=copy.deepcopy(rgt)
+            proxy_rgt["coefficient"] = cpds_coeff_dict[rgt["compound"]]
+            cpds_dict[rgt["compound"]] = proxy_rgt
 
         ########################################
         # Check for duplicate elements, across
@@ -166,12 +257,18 @@ class Reactions:
         #######################################
         rxn_net_charge = 0.0
         rxn_net_mass = dict()
+        cpdformerror=list()
         for cpd in cpds_dict.keys():
             cpd_atoms = self.CompoundsHelper.parseFormula(
                 cpds_dict[cpd]["formula"])
 
             if (len(cpd_atoms.keys()) == 0):
-                return "CPDFORMERROR"
+                #Here we can skip photons and electrons
+                #They are the valid compounds with no mass
+                if(cpd=='cpd11632' or cpd=='cpd12713'):
+                    pass
+                else:
+                    cpdformerror.append(cpd)
 
             cpd_coeff_charge = float(cpds_dict[cpd]["charge"]) * float(
                 cpds_dict[cpd]["coefficient"])
@@ -185,6 +282,9 @@ class Reactions:
                     rxn_net_mass[atom] = 0.0
 
                 rxn_net_mass[atom] += atom_coeff_mass
+
+        if(len(cpdformerror)>0):
+            return "CPDFORMERROR"
 
         # Round out tiny numbers that occur because we add/substract floats
         # Threshold of 1e-6 found to capture all these instances without
@@ -229,7 +329,7 @@ class Reactions:
 
         if (status == ""):
             status = "OK"
-
+            
         return status
 
     def adjustCompound(self, rxn_cpds_array, compound, adjustment,
@@ -268,11 +368,38 @@ class Reactions:
         if(len(cpd_remove.keys())>0):
             rxn_cpds_array.remove(cpd_remove)
 
+        #Got to adjust for floats
+        for rgt in rxn_cpds_array:
+            if (str(rgt["coefficient"])[-2:] == ".0"):
+                rgt["coefficient"] = int(round(rgt["coefficient"]))
+
         return
 
-    def rebuildReaction(self, reaction_dict, stoichiometry):
-        # Assign stoich
-        reaction_dict["stoichiometry"] = stoichiometry
+    def replaceCompound(self, rxn_cpds_array, old_compound, new_compound):
+
+        ######################################################################
+        # We will always assume that we will maintain the coefficient.
+        # We will always assume that we will replace in all compartments.
+        # The adjustment will fail silently, returning an empty array
+        # if the old_compound cannot be found.
+        ######################################################################
+
+        found_cpd=False
+        for rgt in rxn_cpds_array:
+            if (rgt["compound"] == old_compound):
+                found_cpd=True
+                rgt["compound"]=new_compound
+                rgt["reagent"]=new_compound + "_" + str(rgt["compartment"]) + "0"
+                rgt["name"]=self.Compounds_Dict[new_compound]['name']
+
+        return found_cpd
+
+    def rebuildReaction(self, reaction_dict, stoichiometry=None):
+        # Retrieve/Assign stoich
+        if(stoichiometry is None):
+            stoichiometry = reaction_dict['stoichiometry']
+        else:
+            reaction_dict["stoichiometry"] = stoichiometry
 
         # Build list of "reagents" and "products"
         rxn_cpds_array = self.parseStoich(stoichiometry)
@@ -336,7 +463,43 @@ class Reactions:
                     "definition"].replace(cpd_id,
                                           self.Compounds_Dict[cpd_id]["name"])
 
+        # Define if transport?
+
         return
+
+    def saveECs(self, ecs_dict):
+        ecs_root = os.path.splitext(self.ECFile)[0]
+
+        # Print to TXT
+        ecs_file = open(ecs_root + ".txt", 'w')
+        ecs_file.write("\t".join(("ModelSEED ID","External ID","Source")) + "\n")
+        for rxn in sorted(ecs_dict.keys()):
+            for name in sorted(ecs_dict[rxn]):
+                ecs_file.write("\t".join((rxn,name,'Enzyme Class')) + "\n")
+        ecs_file.close()
+
+    def saveNames(self, names_dict):
+        names_root = os.path.splitext(self.NameFile)[0]
+
+        # Print to TXT
+        names_file = open(names_root + ".txt", 'w')
+        names_file.write("\t".join(("ModelSEED ID","External ID","Source")) + "\n")
+        for rxn in sorted(names_dict.keys()):
+            for name in sorted(names_dict[rxn]):
+                names_file.write("\t".join((rxn,name,'name')) + "\n")
+        names_file.close()
+
+    def saveAliases(self, alias_dict):
+        alias_root = os.path.splitext(self.AliasFile)[0]
+
+        # Print to TXT
+        alias_file = open(alias_root + ".txt", 'w')
+        alias_file.write("\t".join(("ModelSEED ID","External ID","Source")) + "\n")
+        for rxn in sorted(alias_dict.keys()):
+            for source in sorted (alias_dict[rxn].keys()):
+                for alias in sorted(alias_dict[rxn][source]):
+                    alias_file.write("\t".join((rxn,alias,source)) + "\n")
+        alias_file.close()
 
     def saveReactions(self, reactions_dict):
         rxns_root = os.path.splitext(self.RxnsFile)[0]
@@ -350,9 +513,18 @@ class Reactions:
                 self.Headers) + "\n")
         rxns_file.close()
 
+        #Re-configure JSON
+        new_reactions_dict = list()
+        for rxn_id in sorted(reactions_dict):
+            rxn_obj = reactions_dict[rxn_id]
+            for key in rxn_obj:
+                if(rxn_obj[key]=="null"):
+                    rxn_obj[key]=None
+            new_reactions_dict.append(rxn_obj)
+
         # Print to JSON
         rxns_file = open(rxns_root + ".json", 'w')
-        rxns_file.write(json.dumps(reactions_dict, indent=4, sort_keys=True))
+        rxns_file.write(json.dumps(new_reactions_dict, indent=4, sort_keys=True))
         rxns_file.close()
 
     def loadMSAliases(self,sources_array=[]):
@@ -387,16 +559,28 @@ class Reactions:
                 continue
 
             if(line['ModelSEED ID'] not in names_dict):
-                   names_dict[line['ModelSEED ID']]=dict()
+                   names_dict[line['ModelSEED ID']]=list()
 
-            #redundant as only one source but keep this just in case
-            for source in line['Source'].split('|'):
-                if(source not in names_dict[line['ModelSEED ID']]):
-                    names_dict[line['ModelSEED ID']][source]=list()
-
-                names_dict[line['ModelSEED ID']][source].append(line['External ID'])
+            names_dict[line['ModelSEED ID']].append(line['External ID'])
 
         return names_dict
+
+    def loadPathways(self):
+        pathways_dict = dict()
+        reader = DictReader(open(self.PwyFile), dialect = 'excel-tab')
+        for line in reader:
+            if("rxn" not in line['ModelSEED ID']):
+                continue
+
+            if(line['ModelSEED ID'] not in pathways_dict):
+                   pathways_dict[line['ModelSEED ID']]=dict()
+
+            if(line['Source'] not in pathways_dict[line['ModelSEED ID']]):
+                pathways_dict[line['ModelSEED ID']][line['Source']]=list()
+
+            pathways_dict[line['ModelSEED ID']][line['Source']].append(line['External ID'])
+
+        return pathways_dict
 
     def loadECs(self):
         ecs_dict = dict()
@@ -406,13 +590,8 @@ class Reactions:
                 continue
 
             if(line['ModelSEED ID'] not in ecs_dict):
-                   ecs_dict[line['ModelSEED ID']]=dict()
+                   ecs_dict[line['ModelSEED ID']]=list()
 
-            #redundant as only one source but keep this just in case
-            for source in line['Source'].split('|'):
-                if(source not in ecs_dict[line['ModelSEED ID']]):
-                    ecs_dict[line['ModelSEED ID']][source]=list()
-
-                ecs_dict[line['ModelSEED ID']][source].append(line['External ID'])
+            ecs_dict[line['ModelSEED ID']].append(line['External ID'])
 
         return ecs_dict

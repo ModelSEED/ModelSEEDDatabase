@@ -1,17 +1,15 @@
 #!/usr/bin/env python
-import os, sys, re
+import re
+from BiochemPy import Reactions
 from csv import DictReader
-temp=list();
-header=1;
 
-sys.path.append('../../Libs/Python')
-from BiochemPy import Reactions, Compounds, InChIs
 
 ReactionsHelper = Reactions()
 Reactions_Dict = ReactionsHelper.loadReactions()
 Aliases_Dict = ReactionsHelper.loadMSAliases()
 Names_Dict = ReactionsHelper.loadNames()
 ECs_Dict = ReactionsHelper.loadECs()
+Pwys_Dict = ReactionsHelper.loadPathways()
 
 Source_Classes=dict()
 reader = DictReader(open('../../Biochemistry/Aliases/Source_Classifiers.txt'), dialect='excel-tab')
@@ -56,15 +54,15 @@ for rxn in sorted(Reactions_Dict.keys()):
         Alias_List.append(source_line)
 
     if(rxn in ECs_Dict):
-        for ec in sorted(ECs_Dict[rxn]['Enzyme Class']):
+        for ec in sorted(ECs_Dict[rxn]):
             Rxn_Aliases[ec]=1
 
-        ec_line="E.C.:"+"|".join(sorted(ECs_Dict[rxn]['Enzyme Class']))
+        ec_line="E.C.:"+"|".join(sorted(ECs_Dict[rxn]))
         Alias_List.append(ec_line)
         
     if(rxn in Names_Dict):
         name_list=list()
-        for name in Names_Dict[rxn]['name']:
+        for name in Names_Dict[rxn]:
             if(name in Rxn_Aliases):
                 continue
 
@@ -77,6 +75,21 @@ for rxn in sorted(Reactions_Dict.keys()):
         Alias_List.append(name_line)
 
     Alias_Line = ";".join(Alias_List)
+    if(Alias_Line==""):
+        Alias_Line="null"
     Reactions_Dict[rxn]['aliases']=Alias_Line
+
+    Pwys_List=list()
+    if(rxn in Pwys_Dict):
+        for biochem in Pwys_Dict[rxn]:
+            pwy_list=list()
+            for pwy in Pwys_Dict[rxn][biochem]:
+                pwy_list.append(pwy)
+            pwy_string = biochem+":"+";".join(pwy_list)
+            Pwys_List.append(pwy_string)
+    Pwy_Line = "|".join(Pwys_List)
+    if(Pwy_Line==""):
+        Pwy_Line="null"
+    Reactions_Dict[rxn]['pathways']=Pwy_Line
 
 ReactionsHelper.saveReactions(Reactions_Dict)

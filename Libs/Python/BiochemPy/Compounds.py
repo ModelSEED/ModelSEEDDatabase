@@ -4,23 +4,34 @@ import json
 from csv import DictReader
 
 class Compounds:
-    def __init__(self, biochem_root='../../Biochemistry/',
+    def __init__(self, biochem_root='../../../Biochemistry/',
                  cpds_file='compounds.tsv'):
-        self.BiochemRoot = biochem_root
-        self.CpdsFile = biochem_root + cpds_file
-        self.AliasFile = biochem_root + "Aliases/Unique_ModelSEED_Compound_Aliases.txt"
-        self.NameFile = biochem_root + "Aliases/Unique_ModelSEED_Compound_Names.txt"
-        self.StructRoot = biochem_root + "Structures/"
+
+        self.BiochemRoot = os.path.dirname(__file__)+'/'+biochem_root
+        self.CpdsFile = self.BiochemRoot + cpds_file
+        self.AliasFile = self.BiochemRoot + "Aliases/Unique_ModelSEED_Compound_Aliases.txt"
+        self.NameFile = self.BiochemRoot + "Aliases/Unique_ModelSEED_Compound_Names.txt"
+        self.StructRoot = self.BiochemRoot + "Structures/"
 
         reader = DictReader(open(self.CpdsFile), dialect='excel-tab')
         self.Headers = reader.fieldnames
 
     def loadCompounds(self):
         reader = DictReader(open(self.CpdsFile), dialect='excel-tab')
+        type_mapping = {"is_core": int, "is_obsolete": int, "is_cofactor": int, "charge": int,
+                        "mass": float, "deltag": float, "deltagerr": float}
+        lists = ["aliases"]
+
         cpds_dict = {}
         for line in reader:
-            for header in ["is_core", "is_obsolete", "is_cofactor"]:
-                line[header] = int(line[header])
+            for list_type in lists:
+                if(line[list_type] != "null"):
+                    line[list_type]=line[list_type].split("|")
+            for heading, target_type in type_mapping.items():
+                try:
+                    line[heading] = target_type(line[heading])
+                except ValueError:  # Generally caused by "null" strings
+                    line[heading] = None
             cpds_dict[line['id']] = line
 
         return cpds_dict
@@ -57,13 +68,14 @@ class Compounds:
             if("cpd" not in line['ModelSEED ID']):
                 continue
 
-            if(line['Source'] not in aliases_dict):
-                   aliases_dict[line['Source']]=dict()
+            for source in line['Source'].split('|'):
+                if(source not in aliases_dict):
+                    aliases_dict[source]=dict()
 
-            if(line['External ID'] not in aliases_dict[line['Source']]):
-                aliases_dict[line['Source']][line['External ID']]=list()
+                if(line['External ID'] not in aliases_dict[source]):
+                    aliases_dict[source][line['External ID']]=list()
 
-            aliases_dict[line['Source']][line['External ID']].append(line['ModelSEED ID'])
+                aliases_dict[source][line['External ID']].append(line['ModelSEED ID'])
 
         return aliases_dict
 
@@ -75,18 +87,13 @@ class Compounds:
                 continue
 
             if(line['ModelSEED ID'] not in names_dict):
-                   names_dict[line['ModelSEED ID']]=dict()
+                   names_dict[line['ModelSEED ID']]=list()
 
-            #redundant as only one source but keep this just in case
-            for source in line['Source'].split('|'):
-                if(source not in names_dict[line['ModelSEED ID']]):
-                    names_dict[line['ModelSEED ID']][source]=list()
-
-                names_dict[line['ModelSEED ID']][source].append(line['External ID'])
+            names_dict[line['ModelSEED ID']].append(line['External ID'])
 
         return names_dict
 
-    def loadStructures(self,sources_array=[],db_array=[]):
+    def loadStructures(self,sources_array=[],db_array=[],unique=True):
         if(len(sources_array)==0):
             sources_array=["SMILE","InChIKey","InChI"]
 
@@ -96,14 +103,23 @@ class Compounds:
         structures_dict = dict()
         if(len(db_array)==1 and db_array[0]=="ModelSEED"):
             struct_file = "Unique_ModelSEED_Structures.txt"
+            fields_array= ['ID','Source','Aliases','Formula','Charge','Structure']
+
+            if(unique==False):
+                struct_file = "All_ModelSEED_Structures.txt"
+                fields_array = ['ID','Source','Type','Alias','DB','Formula','Charge','Structure']
+
             struct_file = self.StructRoot+struct_file
-            reader = DictReader(open(struct_file), dialect = "excel-tab", fieldnames = ['ID','Source','Aliases','Structure'])
+            reader = DictReader(open(struct_file), dialect = "excel-tab", fieldnames = fields_array)
             for line in reader:
                 if(line['ID'] not in structures_dict):
                     structures_dict[line['ID']]={}
 
                 if(line['Source'] in sources_array):
-                    structures_dict[line['ID']][line['Source']]=line['Structure']
+                    if(line['Source'] not in structures_dict[line['ID']]):
+                        structures_dict[line['ID']][line['Source']]=dict()
+                    structures_dict[line['ID']][line['Source']][line['Structure']]={'formula':line['Formula'],
+                                                                                    'charge':line['Charge']}
 
             return structures_dict
 
@@ -126,8 +142,34 @@ class Compounds:
                             structures_dict[struct_type][line['ID']][struct_stage]=dict()
 
                         structures_dict[struct_type][line['ID']][struct_stage][line['Structure']]=1
+
         return structures_dict
-        
+
+    @staticmethod
+    def searchname(name):
+        searchname = name.lower()
+
+        #try to keep/maintain charges
+        ending = ""
+        if(searchname.endswith("-")):
+            ending="-"
+
+        if(searchname.endswith("+")):
+            ending="+"
+
+        searchname = ''.join(char for char in searchname if char.isalnum())
+
+        #attempting to match fatty acids
+        searchname = re.sub('icacid','ate',searchname)
+
+        #remove redundant articles
+        if(re.search('^an?\s',name)):
+            searchname = re.sub('^an?','',searchname)
+
+        searchname+=ending
+
+        return searchname
+
     @staticmethod
     def parseFormula(formula):
         if (formula.strip() in {None, "", "noFormula", "null"}):
@@ -211,6 +253,29 @@ class Compounds:
         for atom in sorted(atoms):
             yield atom
 
+    def saveNames(self, names_dict):
+        names_root = os.path.splitext(self.NameFile)[0]
+
+        # Print to TXT
+        names_file = open(names_root + ".txt", 'w')
+        names_file.write("\t".join(("ModelSEED ID","External ID","Source")) + "\n")
+        for cpd in sorted(names_dict.keys()):
+            for name in sorted(names_dict[cpd]):
+                names_file.write("\t".join((cpd,name,'name')) + "\n")
+        names_file.close()
+
+    def saveAliases(self, alias_dict):
+        alias_root = os.path.splitext(self.AliasFile)[0]
+
+        # Print to TXT
+        alias_file = open(alias_root + ".txt", 'w')
+        alias_file.write("\t".join(("ModelSEED ID","External ID","Source")) + "\n")
+        for cpd in sorted(alias_dict.keys()):
+            for source in sorted (alias_dict[cpd].keys()):
+                for alias in sorted(alias_dict[cpd][source]):
+                    alias_file.write("\t".join((cpd,alias,source)) + "\n")
+        alias_file.close()
+
     def saveCompounds(self, compounds_dict):
         cpds_root = os.path.splitext(self.CpdsFile)[0]
 
@@ -218,12 +283,25 @@ class Compounds:
         cpds_file = open(cpds_root + ".tsv", 'w')
         cpds_file.write("\t".join(self.Headers) + "\n")
         for cpd in sorted(compounds_dict.keys()):
-            cpds_file.write("\t".join(
-                str(compounds_dict[cpd][header]) for header in
-                self.Headers) + "\n")
+            values_list=list()
+            for header in self.Headers:
+                value=compounds_dict[cpd][header]
+                if(isinstance(value,list)):
+                    value = "|".join(value)
+                values_list.append(str(value))
+            cpds_file.write("\t".join(values_list)+"\n")
         cpds_file.close()
 
+        #Re-configure JSON
+        new_compounds_dict = list()
+        for cpd_id in sorted(compounds_dict):
+            cpd_obj = compounds_dict[cpd_id]
+            for key in cpd_obj:
+                if(cpd_obj[key]=="null"):
+                    cpd_obj[key]=None
+            new_compounds_dict.append(cpd_obj)
+
         # Print to JSON
-        cpds_file = open(cpds_root + ".json", 'w')
-        cpds_file.write(json.dumps(compounds_dict, indent=4, sort_keys=True))
+        cpds_file = open(cpds_root + ".json", 'w', newline='\n')
+        cpds_file.write(json.dumps(new_compounds_dict, indent=4, sort_keys=True))
         cpds_file.close()

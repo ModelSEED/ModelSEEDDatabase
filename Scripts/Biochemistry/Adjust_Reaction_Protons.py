@@ -1,10 +1,5 @@
 #!/usr/bin/env python
-import os, sys
-temp=list();
-header=1;
-
-sys.path.append('../../Libs/Python')
-from BiochemPy import Reactions, Compounds
+from BiochemPy import Reactions
 
 ReactionsHelper = Reactions()
 Reactions_Dict = ReactionsHelper.loadReactions()
@@ -34,7 +29,7 @@ for rxn in sorted(Reactions_Dict.keys()):
             continue
         
         (element,number)=elements[0].split(":")
-        print("Adjusting: "+rxn,element,number)
+        #print("Adjusting: "+rxn,element,number)
 
         #Parse old stoichiometry into array
         old_stoichiometry=Reactions_Dict[rxn]["stoichiometry"]
