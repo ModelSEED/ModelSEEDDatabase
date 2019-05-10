@@ -56,9 +56,7 @@ for rxn in sorted(Reactions_Dict.keys()):
         name_list=list()
         for name in Names_Dict[rxn]:
             if(name in Rxn_Aliases):
-                continue
-
-            if(bool(re.search('.[a-z]$',name)) and re.sub(".[a-z]$","",name) in Rxn_Aliases):
+                #This happens because often a reaction identifier is used as a name
                 continue
 
             name_list.append(name)
