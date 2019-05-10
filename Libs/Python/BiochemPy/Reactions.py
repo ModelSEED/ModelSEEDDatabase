@@ -26,8 +26,13 @@ class Reactions:
         reader = DictReader(open(self.RxnsFile), dialect='excel-tab')
         type_mapping = {"is_transport": int, "is_obsolete": int,
                         "deltag": float, "deltagerr": float}
+        lists = ["aliases","pathways","ec_numbers"]
+
         rxns_dict = dict()
         for line in reader:
+            for list_type in lists:
+                if(line[list_type] != "null"):
+                    line[list_type]=line[list_type].split("|")
             for heading, target_type in type_mapping.items():
                 try:
                     line[heading] = target_type(line[heading])
