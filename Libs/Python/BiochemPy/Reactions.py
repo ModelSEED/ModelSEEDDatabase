@@ -513,9 +513,13 @@ class Reactions:
         rxns_file = open(rxns_root + ".tsv", 'w')
         rxns_file.write("\t".join(self.Headers) + "\n")
         for rxn in sorted(reactions_dict.keys()):
-            rxns_file.write("\t".join(
-                str(reactions_dict[rxn][header]) for header in
-                self.Headers) + "\n")
+            values_list=list()
+            for header in self.Headers:
+                value=reactions_dict[rxn][header]
+                if(isinstance(value,list)):
+                    value = "|".join(value)
+                values_list.append(str(value))
+            rxns_file.write("\t".join(values_list)+"\n")
         rxns_file.close()
 
         #Re-configure JSON
