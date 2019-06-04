@@ -14,17 +14,18 @@ e.g., on my laptop suppose Solr is installed under my_solr_install_dir and
 my_solr_install_dir=/Users/qzhang/SOLR/solr-7.7.0
 
 2.1) create one folder for each core (and subfolders of conf and data for that core)
-mkdir my_solr_install_dir/server/solr/compounds
-mkdir -p my_solr_install_dir/server/solr/compounds/conf
-mkdir -p my_solr_install_dir/server/solr/compounds/data
-mkdir my_solr_install_dir/server/solr/reactions
-mkdir -p my_solr_install_dir/server/solr/reactions/conf
-mkdir -p my_solr_install_dir/server/solr/reactions/data
+
+    mkdir my_solr_install_dir/server/solr/compounds
+    mkdir -p my_solr_install_dir/server/solr/compounds/conf
+    mkdir -p my_solr_install_dir/server/solr/compounds/data
+    mkdir my_solr_install_dir/server/solr/reactions
+    mkdir -p my_solr_install_dir/server/solr/reactions/conf
+    mkdir -p my_solr_install_dir/server/solr/reactions/data
 
 -------------------------------------------------------------------------
 
 2.2) Inside each of the above conf folders, create/copy-paste the solrconfig.xml and elevate.xml from
-my_solr_install_dir/server/solr/configsets/sample_techproducts_configs/conf/.
+    my_solr_install_dir/server/solr/configsets/sample_techproducts_configs/conf/.
 
 And to keep data consistency for ModelSEEDDatabase, copy-paste files schema.xml and schema_types.xml
 from the corresponding dirs of the model_compound and model_reaction of the patricbrc github repo
@@ -49,7 +50,7 @@ At the shell go to folder `my_solr_install_dir/bin/` and run the following comma
 into the corresponding core we have just created in the browser UI. [Note: if you skipped step 2.3),
 you will get "HTTP ERROR 404" (Not Found) error.]
 
-localhost:my_solr_install_dir qzhang$ bin/post -c core_name path-to-data/datafile.json
+    localhost:my_solr_install_dir qzhang$ bin/post -c core_name path-to-data/datafile.json
 
 When data loading returns error (it happens, probably due to file format or acceptable string values, etc.), 
 fix the causes and reload until it succeeds.
@@ -71,4 +72,4 @@ where the cloud version of Solr (7) has been installed.
 
 For example, run the following command to load the data from compounds.json in the `compounds` core
 
-megilen-cloud-server:modelseedSolrUser$ megilen_solr_installation_dir/bin/post -c compounds path-to-biochem_data/compounds.json
+    megilen-cloud-server:modelseedSolrUser$ megilen_solr_installation_dir/bin/post -c compounds path-to-biochem_data/compounds.json
