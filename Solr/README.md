@@ -46,6 +46,7 @@ e.g., for compounds:
         dataDir= my_solr_install_dir/server/solr/reactions/data
 
 3. Load data into Solr
+-------------------------------------------------------------------------
 At the shell go to folder `my_solr_install_dir/bin/` and run the following commands to load data
 into the corresponding core we have just created in the browser UI. [Note: if you skipped step 2.3),
 you will get "HTTP ERROR 404" (Not Found) error.]
@@ -56,6 +57,7 @@ When data loading returns error (it happens, probably due to file format or acce
 fix the causes and reload until it succeeds.
 
 4. To access the local Solr instance from locally installed modelseed-ui
+-------------------------------------------------------------------------
 Inside the config.js of modelseed-ui folder, add an entry of 'local_solr_url: "http://0.0.0.0:8983/solr/"' to this.services.
 
 Then in file 'modelseed-ui/app/services/biochem.js' and module 'Biochem', find the following line and set the solr_endpoint:
