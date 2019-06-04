@@ -102,7 +102,6 @@
   <field name="aliases" type="string_ci" multiValued="true" indexed="true" stored="true"/>
   <field name="code" type="string" indexed="true" stored="true"/>
   <field name="compound_ids" type="string" multiValued="true" indexed="true" stored="true"/>
-  <field name="data_source" type="string" indexed="true" stored="true"/>
   <field name="date_inserted" type="tdate" default="NOW" indexed="true" stored="true"/>
   <field name="date_modified" type="tdate" default="NOW" indexed="true" stored="true"/>
   <field name="definition" type="string" indexed="true" stored="true"/>
@@ -117,15 +116,18 @@
   <field name="linked_reaction" type="string" indexed="true" stored="true"/>
   <field name="name" type="string" indexed="true" stored="true"/>
   <field name="notes" type="string" indexed="true" stored="true"/>
+  <field name="ontology" type="string" uninvertible="true" indexed="true" stored="true"/>
   <field name="pathways" type="string" multiValued="true" indexed="true" stored="true"/>
   <field name="reversibility" type="string" indexed="true" stored="true"/>
+  <field name="source" type="string" indexed="true" stored="true"/>
   <field name="status" type="string" indexed="true" stored="true"/>
   <field name="stoichiometry" type="string" indexed="true" stored="true"/>
   <field name="text" type="text_custom" multiValued="true" indexed="true" stored="false"/>
   <copyField source="abbreviation" dest="text"/>
   <copyField source="aliases" dest="text"/>
   <copyField source="code" dest="text"/>
-  <copyField source="data_source" dest="text"/>
   <copyField source="id" dest="text"/>
   <copyField source="name" dest="text"/>
-</schema>
+  <copyField source="ontology" dest="text"/>
+  <copyField source="pathways" dest="text"/>
+ </schema>

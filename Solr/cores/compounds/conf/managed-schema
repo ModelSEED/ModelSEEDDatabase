@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- Solr managed schema - automatically generated - DO NOT EDIT -->
-<schema name="model_compound" version="1.5">
+<schema name="compounds" version="1.5">
   <uniqueKey>id</uniqueKey>
   <fieldType name="binary" class="solr.BinaryField"/>
   <fieldType name="boolean" class="solr.BoolField" sortMissingLast="true"/>
@@ -96,7 +96,6 @@
   <fieldType name="tint" class="solr.TrieIntField" positionIncrementGap="0" precisionStep="8"/>
   <fieldType name="tlong" class="solr.TrieLongField" positionIncrementGap="0" precisionStep="8"/>
   <fieldType name="uuid" class="solr.UUIDField" indexed="true"/>
-  <field name="_text_" type="text_general" multiValued="true" indexed="true" stored="false"/>
   <field name="_version_" type="long" indexed="true" stored="true"/>
   <field name="abbreviation" type="string_ci" docValues="true" indexed="true" stored="true"/>
   <field name="abstract_compound" type="string" indexed="true" stored="true"/>
@@ -116,14 +115,15 @@
   <field name="linked_compound" type="string" indexed="true" stored="true"/>
   <field name="mass" type="float" indexed="true" stored="true"/>
   <field name="name" type="string_ci" docValues="true" indexed="true" stored="true"/>
+  <field name="ontology" type="string" uninvertible="true" indexed="true" stored="true"/>
   <field name="pka" type="string" multiValued="true" indexed="true" stored="true"/>
   <field name="pkb" type="string" multiValued="true" indexed="true" stored="true"/>
   <field name="smiles" type="string" indexed="true" stored="true"/>
   <field name="source" type="string" indexed="true" stored="true"/>
-  <field name="structure" type="string" indexed="true" stored="true"/>
-  <copyField source="abbreviation" dest="_text_"/>
-  <copyField source="aliases" dest="_text_"/>
-  <copyField source="formula" dest="_text_"/>
-  <copyField source="id" dest="_text_"/>
-  <copyField source="name" dest="_text_"/>
-</schema>
+  <field name="text" type="text_custom" multiValued="true" indexed="true" stored="false"/>
+  <copyField source="abbreviation" dest="text"/>
+  <copyField source="aliases" dest="text"/>
+  <copyField source="formula" dest="text"/>
+  <copyField source="id" dest="text"/>
+  <copyField source="name" dest="text"/>
+  <copyField source="ontology" dest="text"/>
