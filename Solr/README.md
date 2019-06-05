@@ -24,15 +24,9 @@ my_solr_install_dir=/Users/qzhang/SOLR/solr-7.7.0
 
 -------------------------------------------------------------------------
 
-2.2) Inside each of the above conf folders, create/copy-paste the solrconfig.xml and elevate.xml from
-    my_solr_install_dir/server/solr/configsets/sample_techproducts_configs/conf/.
-
-And to keep data consistency for ModelSEEDDatabase, copy-paste files schema.xml and schema_types.xml
-from the corresponding dirs of the model_compound and model_reaction of the patricbrc github repo
-(https://github.com/PATRIC3/patric_solr) into folders compounds/conf/ and reactions/conf/ respectively.
-
-Because the patricbrc repo was based on Solr5.3, we need to replace 'solr.TextDocValueField' with
-'solr.SortableTextField' in file schema_types.xml.
+2.2) Inside each of the above conf folders, create/copy-paste files solrconfig.xml, schema.xml,
+managed_schema, schema_types.xml and elevate.xml from the corresponding folders
+(e.g., 'Solr/compounds/conf/' for compounds and 'Solr/reactions/conf/' for reactions) of this repo.
 
 At this point the data folders are empty.
 
@@ -47,11 +41,13 @@ e.g., for compounds:
 
 3. Load data into Solr
 -------------------------------------------------------------------------
-At the shell go to folder `my_solr_install_dir/bin/` and run the following commands to load data
+Either check out the datafiles from 'Biochemistry/' of this repo, e.g., compounds.json and/or reactions.json,
+or go to where your datafiles reside on your local machine, get the full path to the datafile. Then,
+from the shell go to folder `my_solr_install_dir/bin/` and run the following commands to load data
 into the corresponding core we have just created in the browser UI. [Note: if you skipped step 2.3),
 you will get "HTTP ERROR 404" (Not Found) error.]
 
-    localhost:my_solr_install_dir qzhang$ bin/post -c core_name path-to-data/datafile.json
+    localhost:my_solr_install_dir qzhang$ bin/post -c [core_name] [path-to-data/datafile.json]
 
 When data loading returns error (it happens, probably due to file format or acceptable string values, etc.), 
 fix the causes and reload until it succeeds.
@@ -74,4 +70,4 @@ where the cloud version of Solr (7) has been installed.
 
 For example, run the following command to load the data from compounds.json in the `compounds` core
 
-    megilen-cloud-server:modelseedSolrUser$ megilen_solr_installation_dir/bin/post -c compounds path-to-biochem_data/compounds.json
+    megilen-cloud-server:modelseedSolrUser$ megilen_solr_installation_dir/bin/post -c compounds [path-to-biochem_data]/compounds.json

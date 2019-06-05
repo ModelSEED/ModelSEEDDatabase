@@ -3,7 +3,6 @@ import re
 from BiochemPy import Reactions
 from csv import DictReader
 
-
 ReactionsHelper = Reactions()
 Reactions_Dict = ReactionsHelper.loadReactions()
 Aliases_Dict = ReactionsHelper.loadMSAliases()
@@ -50,34 +49,36 @@ for rxn in sorted(Reactions_Dict.keys()):
 
     Alias_List=list()
     for source in sorted(Rxn_Source_Aliases.keys()):
-        source_line=source+":"+"|".join(sorted(Rxn_Source_Aliases[source].keys()))
+        source_line=source+": "+"; ".join(sorted(Rxn_Source_Aliases[source].keys()))
         Alias_List.append(source_line)
-
-    if(rxn in ECs_Dict):
-        for ec in sorted(ECs_Dict[rxn]):
-            Rxn_Aliases[ec]=1
-
-        ec_line="E.C.:"+"|".join(sorted(ECs_Dict[rxn]))
-        Alias_List.append(ec_line)
         
     if(rxn in Names_Dict):
         name_list=list()
         for name in Names_Dict[rxn]:
             if(name in Rxn_Aliases):
-                continue
-
-            if(bool(re.search('.[a-z]$',name)) and re.sub(".[a-z]$","",name) in Rxn_Aliases):
+                #This happens because often a reaction identifier is used as a name
                 continue
 
             name_list.append(name)
             
-        name_line="name:"+"|".join(sorted(name_list))
+        name_line="Name: "+"; ".join(sorted(name_list))
         Alias_List.append(name_line)
 
-    Alias_Line = ";".join(Alias_List)
-    if(Alias_Line==""):
-        Alias_Line="null"
-    Reactions_Dict[rxn]['aliases']=Alias_Line
+    if(len(Alias_List)==0):
+        Reactions_Dict[rxn]['aliases']="null"
+    else:
+        Reactions_Dict[rxn]['aliases']=Alias_List
+
+    ECs_List=list()
+    if(rxn in ECs_Dict):
+        for ec in sorted(ECs_Dict[rxn]):
+            Rxn_Aliases[ec]=1
+            ECs_List.append(ec)
+
+    if(len(ECs_List)==0):
+        Reactions_Dict[rxn]['ec_numbers']="null"
+    else:
+        Reactions_Dict[rxn]['ec_numbers']=ECs_List
 
     Pwys_List=list()
     if(rxn in Pwys_Dict):
@@ -85,11 +86,12 @@ for rxn in sorted(Reactions_Dict.keys()):
             pwy_list=list()
             for pwy in Pwys_Dict[rxn][biochem]:
                 pwy_list.append(pwy)
-            pwy_string = biochem+":"+";".join(pwy_list)
+            pwy_string = biochem+": "+"; ".join(pwy_list)
             Pwys_List.append(pwy_string)
-    Pwy_Line = "|".join(Pwys_List)
-    if(Pwy_Line==""):
-        Pwy_Line="null"
-    Reactions_Dict[rxn]['pathways']=Pwy_Line
+
+    if(len(Pwys_List)==0):
+        Reactions_Dict[rxn]['pathways']="null"
+    else:
+        Reactions_Dict[rxn]['pathways']=Pwys_List
 
 ReactionsHelper.saveReactions(Reactions_Dict)

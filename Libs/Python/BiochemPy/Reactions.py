@@ -26,8 +26,13 @@ class Reactions:
         reader = DictReader(open(self.RxnsFile), dialect='excel-tab')
         type_mapping = {"is_transport": int, "is_obsolete": int,
                         "deltag": float, "deltagerr": float}
+        lists = ["aliases","pathways","ec_numbers"]
+
         rxns_dict = dict()
         for line in reader:
+            for list_type in lists:
+                if(line[list_type] != "null"):
+                    line[list_type]=line[list_type].split("|")
             for heading, target_type in type_mapping.items():
                 try:
                     line[heading] = target_type(line[heading])
@@ -508,9 +513,13 @@ class Reactions:
         rxns_file = open(rxns_root + ".tsv", 'w')
         rxns_file.write("\t".join(self.Headers) + "\n")
         for rxn in sorted(reactions_dict.keys()):
-            rxns_file.write("\t".join(
-                str(reactions_dict[rxn][header]) for header in
-                self.Headers) + "\n")
+            values_list=list()
+            for header in self.Headers:
+                value=reactions_dict[rxn][header]
+                if(isinstance(value,list)):
+                    value = "|".join(value)
+                values_list.append(str(value))
+            rxns_file.write("\t".join(values_list)+"\n")
         rxns_file.close()
 
         #Re-configure JSON
