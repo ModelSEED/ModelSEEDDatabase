@@ -20,8 +20,13 @@ class Compounds:
         reader = DictReader(open(self.CpdsFile), dialect='excel-tab')
         type_mapping = {"is_core": int, "is_obsolete": int, "is_cofactor": int, "charge": int,
                         "mass": float, "deltag": float, "deltagerr": float}
+        lists = ["aliases"]
+
         cpds_dict = {}
         for line in reader:
+            for list_type in lists:
+                if(line[list_type] != "null"):
+                    line[list_type]=line[list_type].split("|")
             for heading, target_type in type_mapping.items():
                 try:
                     line[heading] = target_type(line[heading])
@@ -278,9 +283,13 @@ class Compounds:
         cpds_file = open(cpds_root + ".tsv", 'w')
         cpds_file.write("\t".join(self.Headers) + "\n")
         for cpd in sorted(compounds_dict.keys()):
-            cpds_file.write("\t".join(
-                str(compounds_dict[cpd][header]) for header in
-                self.Headers) + "\n")
+            values_list=list()
+            for header in self.Headers:
+                value=compounds_dict[cpd][header]
+                if(isinstance(value,list)):
+                    value = "|".join(value)
+                values_list.append(str(value))
+            cpds_file.write("\t".join(values_list)+"\n")
         cpds_file.close()
 
         #Re-configure JSON
