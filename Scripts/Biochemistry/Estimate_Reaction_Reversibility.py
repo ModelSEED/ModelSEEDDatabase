@@ -38,7 +38,7 @@ for rxn in sorted(reactions_dict.keys()):
     proton_cpt_dict = dict()
 
     if(reactions_dict[rxn]['status'] == "EMPTY"):
-        print(rxn+":EMPTY")
+        print("\t".join([rxn,"EMPTY","?"]))
         reactions_dict[rxn]['reversibility']="?"
         continue
 
@@ -46,8 +46,7 @@ for rxn in sorted(reactions_dict.keys()):
     rxn_dge = reactions_dict[rxn]['deltagerr']
 
     if(rxn_dg == 10000000 or rxn_dg is None):
-        print(rxn+":Incomplete:"+reactions_dict[rxn]["reversibility"])
-        reactions_dict[rxn]['reversibility']="?"
+        print("\t".join([rxn,"Incomplete","?"]))
         continue
 
     #Calculate MdeltaG
@@ -60,7 +59,7 @@ for rxn in sorted(reactions_dict.keys()):
     #Capture specific compounds for heuristics
     Phosphates=dict()
     for rgt in reactions_dict[rxn]['stoichiometry'].split(';'):
-        (coeff,cpd,cpt,idx,name)=rgt.split(":",maxsplit=4)
+        (coeff,cpd,cpt,idx,name)=rgt.split(":", maxsplit=4)
         coeff=float(coeff)
 
         if(cpd == 'cpd00067'):
@@ -106,12 +105,13 @@ for rxn in sorted(reactions_dict.keys()):
 
     if(stored_max < 0):
         thermoreversibility = ">"
-        print(rxn+":MdeltaG:>:{0:.4f}".format(stored_max))
+        print("\t".join([rxn,"MdeltaG:{0:.4f}".format(stored_max),">"]))
         reactions_dict[rxn]['reversibility']=">"
         continue
+
     if(stored_min > 0):
         thermoreversibility = "<"
-        print(rxn+":MdeltaG:<:{0:.4f}".format(stored_min))
+        print("\t".join([rxn,"MdeltaG:{0:.4f}".format(stored_min),"<"]))
         reactions_dict[rxn]['reversibility']="<"
         continue
 
@@ -149,8 +149,8 @@ for rxn in sorted(reactions_dict.keys()):
 
     if(is_atp_synthase is True):
         thermoreversibility="="
-        reactions_dict[rxn]['reversibility']="="
-        print(rxn+":ATPS:"+thermoreversibility)
+        reactions_dict[rxn]['reversibility']=thermoreversibility
+        print("\t".join([rxn,"ATPS",thermoreversibility]))
         continue
 
     #1b: Find ABC Transporters (but not ATP Synthase)
@@ -165,14 +165,14 @@ for rxn in sorted(reactions_dict.keys()):
             thermoreversibility="="
         
         reactions_dict[rxn]['reversibility']=thermoreversibility
-        print(rxn+":ABCT:"+str(Phosphates['cpd00002'])+":"+thermoreversibility)
+        print("\t".join([rxn,"ABCT:"+str(Phosphates['cpd00002']),thermoreversibility]))
 
     #2: Calculate and evaluate mMdeltaG
     mMdeltaG=rxn_dg+(RT_CONST*rgt_sum);
     if(mMdeltaG >= -2.0 and mMdeltaG <= 2.0):
         thermoreversibility="="
-        reactions_dict[rxn]['reversibility']="="
-        print(rxn+":mMdeltaG:=:{0:.4f}".format(mMdeltaG))
+        reactions_dict[rxn]['reversibility']=thermoreversibility
+        print("\t".join([rxn,"mMdeltaG:{0:.4f}".format(mMdeltaG),thermoreversibility]))
         continue
 
     #3: Calculate low energy points
@@ -181,7 +181,6 @@ for rxn in sorted(reactions_dict.keys()):
     #3a: Find minimum phosphate-related coefficient
     min_coeff = 10000000
     if('cpd00002' in Phosphates and len(Phosphates.keys())>2):
-        print(":Phos",Phosphates)
         for pho in Phosphates.keys():
             if(Phosphates[pho]<min_coeff):
                 min_coeff = Phosphates[pho]
@@ -201,15 +200,15 @@ for rxn in sorted(reactions_dict.keys()):
     if((low_energy_points*mMdeltaG) > 2 and mMdeltaG < 0):
         thermoreversibility = ">"
         reactions_dict[rxn]['reversibility']=">"
-        print(rxn+":lowE:=:{0:.4f}:".format(mMdeltaG)+str(low_energy_points)+":>")
+        print("\t".join([rxn,"lowE:{0:.4f}".format(mMdeltaG)+":"+str(low_energy_points),thermoreversibility]))
         continue
     elif((low_energy_points*mMdeltaG) > 2 and mMdeltaG > 0):
         thermoreversibility = "<"
         reactions_dict[rxn]['reversibility']="<"
-        print(rxn+":lowE:=:{0:.4f}:".format(mMdeltaG)+str(low_energy_points)+":<")
+        print("\t".join([rxn,"lowE:{0:.4f}".format(mMdeltaG)+":"+str(low_energy_points),thermoreversibility]))
         continue
 
     thermoreversibility = "="
     reactions_dict[rxn]['reversibility']="="
-    print(rxn+":Defaut:=")
+    print("\t".join([rxn,"default",thermoreversibility]))
 reactions_helper.saveReactions(reactions_dict)
