@@ -85,7 +85,7 @@ for cpd in sorted (compounds_dict.keys()):
 
         compounds_dict[cpd]['deltag']=lowest_dg
         compounds_dict[cpd]['deltagerr']=lowest_dge
-        compounds_dict[cpd]['notes']='gf' #Meaning group formation approach
+        compounds_dict[cpd]['notes']='GF' #Meaning group formation approach
 
 print("Saving compounds")
 compounds_helper.saveCompounds(compounds_dict)
