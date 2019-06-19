@@ -55,7 +55,7 @@ for cpd in sorted (compounds_dict.keys()):
     if(cpd not in structures_dict):
         compounds_dict[cpd]['deltag']=10000000
         compounds_dict[cpd]['deltagerr']=10000000
-        compounds_dict[cpd]['notes']=""
+        compounds_dict[cpd]['notes']="null"
 
     else:
 
