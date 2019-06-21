@@ -31,22 +31,29 @@ low_energy_cpds=("cpd00011", #CO2
                  "cpd00449", #Dihydrolipoamide
                  "cpd00242") #HCO3
 
+reversibility_report=dict()
 for rxn in sorted(reactions_dict.keys()):
     
     #defaults
     thermoreversibility = "?"
-    proton_cpt_dict = dict()
 
     if(reactions_dict[rxn]['status'] == "EMPTY"):
-        print("\t".join([rxn,"EMPTY","?"]))
-        reactions_dict[rxn]['reversibility']="?"
+
+        thermoreversibility = "?"
+        reversibility_report[rxn]=["Empty",reactions_dict[rxn]["reversibility"],thermoreversibility]
+        reactions_dict[rxn]['reversibility']=thermoreversibility
+
         continue
 
     rxn_dg = reactions_dict[rxn]['deltag']
     rxn_dge = reactions_dict[rxn]['deltagerr']
 
-    if(rxn_dg == 10000000 or rxn_dg is None):
-        print("\t".join([rxn,"Incomplete","?"]))
+    if(rxn_dg == 10000000 or rxn_dg is None or "GFC" not in reactions_dict[rxn]["notes"]):
+
+        thermoreversibility = "?"
+        reversibility_report[rxn]=["Incomplete",reactions_dict[rxn]["reversibility"],thermoreversibility]
+        reactions_dict[rxn]['reversibility']=thermoreversibility
+
         continue
 
     #Calculate MdeltaG
@@ -57,20 +64,23 @@ for rxn in sorted(reactions_dict.keys()):
     rgt_sum=0.0
 
     #Capture specific compounds for heuristics
-    Phosphates=dict()
+    proton_cpt_dict = dict()
+    phosphates = dict()
     for rgt in reactions_dict[rxn]['stoichiometry'].split(';'):
         (coeff,cpd,cpt,idx,name)=rgt.split(":", maxsplit=4)
         coeff=float(coeff)
 
         if(cpd == 'cpd00067'):
             proton_cpt_dict[cpt]=1
+            if(cpt == "1"):
+                print(rxn,reactions_dict[rxn]['definition'])
 
         #Find phosphates
         for cpd in phosphate_ids:
             if(cpd in rgt):
-                if(cpd not in Phosphates):
-                    Phosphates[cpd]=0.0
-                Phosphates[cpd]+=coeff
+                if(cpd not in phosphates):
+                    phosphates[cpd]=0.0
+                phosphates[cpd]+=coeff
 
         #ignore protons and water for following computation
         if(cpd == 'cpd00067' or cpd == 'cpd00001'):
@@ -104,15 +114,19 @@ for rxn in sorted(reactions_dict.keys()):
     stored_min+=(RT_CONST*pdt_min)+(RT_CONST*rct_max)
 
     if(stored_max < 0):
+
         thermoreversibility = ">"
-        print("\t".join([rxn,"MdeltaG:{0:.4f}".format(stored_max),">"]))
-        reactions_dict[rxn]['reversibility']=">"
+        reversibility_report[rxn]=["MdeltaG(Max): {0:.2f}".format(stored_max),reactions_dict[rxn]["reversibility"],thermoreversibility]
+        reactions_dict[rxn]['reversibility']=thermoreversibility
+
         continue
 
     if(stored_min > 0):
+
         thermoreversibility = "<"
-        print("\t".join([rxn,"MdeltaG:{0:.4f}".format(stored_min),"<"]))
-        reactions_dict[rxn]['reversibility']="<"
+        reversibility_report[rxn]=["MdeltaG(Min): {0:.2f}".format(stored_min),reactions_dict[rxn]["reversibility"],thermoreversibility]
+        reactions_dict[rxn]['reversibility']=thermoreversibility
+
         continue
 
     #Do heuristics
@@ -120,7 +134,7 @@ for rxn in sorted(reactions_dict.keys()):
     #1a: ATP Synthase is reversible, but cannot involve any other compound, and can only transport protons
     is_atp_synthase=False
     if(reactions_dict[rxn]['is_transport']==1 and len(proton_cpt_dict.keys())>1):
-
+        print(rxn)
         cpds_cpts_dict=dict()
         #Collect compound compartments
         for rgt in reactions_dict[rxn]['stoichiometry'].split(';'):
@@ -148,31 +162,40 @@ for rxn in sorted(reactions_dict.keys()):
                 is_atp_synthase = False
 
     if(is_atp_synthase is True):
-        thermoreversibility="="
+
+        thermoreversibility = "="
+        reversibility_report[rxn]=["ATPS",reactions_dict[rxn]["reversibility"],thermoreversibility]
         reactions_dict[rxn]['reversibility']=thermoreversibility
-        print("\t".join([rxn,"ATPS",thermoreversibility]))
+
         continue
 
     #1b: Find ABC Transporters (but not ATP Synthase)
-    if(reactions_dict[rxn]['is_transport']==1 and 'cpd00002' in Phosphates):
-        if(Phosphates['cpd00002']<0):
+    if(reactions_dict[rxn]['is_transport']==1 and 'cpd00002' in phosphates):
+
+        thermoreversibility="="
+
+        if(phosphates['cpd00002']<0):
             thermoreversibility=">"
-        elif(Phosphates['cpd00002']>0):
+        elif(phosphates['cpd00002']>0):
             thermoreversibility="<"
         else:
             #If zero, then itself ATP is transported
             #I manually reviewed these, these are not chemical reactions
-            thermoreversibility="="
+            pass
         
+        reversibility_report[rxn]=["ABCT: "+str(phosphates['cpd00002']),reactions_dict[rxn]["reversibility"],thermoreversibility]
         reactions_dict[rxn]['reversibility']=thermoreversibility
-        print("\t".join([rxn,"ABCT:"+str(Phosphates['cpd00002']),thermoreversibility]))
+
+        continue
 
     #2: Calculate and evaluate mMdeltaG
     mMdeltaG=rxn_dg+(RT_CONST*rgt_sum);
     if(mMdeltaG >= -2.0 and mMdeltaG <= 2.0):
-        thermoreversibility="="
+
+        thermoreversibility = "="
+        reversibility_report[rxn]=["mMdeltaG: {0:.2f}".format(mMdeltaG),reactions_dict[rxn]["reversibility"],thermoreversibility]
         reactions_dict[rxn]['reversibility']=thermoreversibility
-        print("\t".join([rxn,"mMdeltaG:{0:.4f}".format(mMdeltaG),thermoreversibility]))
+
         continue
 
     #3: Calculate low energy points
@@ -180,10 +203,10 @@ for rxn in sorted(reactions_dict.keys()):
 
     #3a: Find minimum phosphate-related coefficient
     min_coeff = 10000000
-    if('cpd00002' in Phosphates and len(Phosphates.keys())>2):
-        for pho in Phosphates.keys():
-            if(Phosphates[pho]<min_coeff):
-                min_coeff = Phosphates[pho]
+    if('cpd00002' in phosphates and len(phosphates.keys())>2):
+        for pho in phosphates.keys():
+            if(phosphates[pho]<min_coeff):
+                min_coeff = phosphates[pho]
 
     if(min_coeff != 10000000):
         low_energy_points-=(abs(min_coeff))
@@ -198,17 +221,29 @@ for rxn in sorted(reactions_dict.keys()):
 
     #Evaluate low energy
     if((low_energy_points*mMdeltaG) > 2 and mMdeltaG < 0):
+
         thermoreversibility = ">"
-        reactions_dict[rxn]['reversibility']=">"
-        print("\t".join([rxn,"lowE:{0:.4f}".format(mMdeltaG)+":"+str(low_energy_points),thermoreversibility]))
+        reversibility_report[rxn]=["lowE: {0:.2f}".format(mMdeltaG)+":"+str(low_energy_points),reactions_dict[rxn]["reversibility"],thermoreversibility]
+        reactions_dict[rxn]['reversibility']=thermoreversibility
+
         continue
+
     elif((low_energy_points*mMdeltaG) > 2 and mMdeltaG > 0):
+
         thermoreversibility = "<"
-        reactions_dict[rxn]['reversibility']="<"
-        print("\t".join([rxn,"lowE:{0:.4f}".format(mMdeltaG)+":"+str(low_energy_points),thermoreversibility]))
+        reversibility_report[rxn]=["lowE: {0:.2f}".format(mMdeltaG)+":"+str(low_energy_points),reactions_dict[rxn]["reversibility"],thermoreversibility]
+        reactions_dict[rxn]['reversibility']=thermoreversibility
+
         continue
 
     thermoreversibility = "="
-    reactions_dict[rxn]['reversibility']="="
-    print("\t".join([rxn,"default",thermoreversibility]))
+    reversibility_report[rxn]=["default",reactions_dict[rxn]["reversibility"],thermoreversibility]
+    reactions_dict[rxn]['reversibility']=thermoreversibility
+
+with open("Estimated_Reaction_Reversibility_Report.txt","w") as fh:
+    for rxn in sorted(reversibility_report):
+        fh.write(rxn+"\t"+"\t".join(reversibility_report[rxn])+"\n")
+fh.close()
+
+print("Saving reactions")
 reactions_helper.saveReactions(reactions_dict)
