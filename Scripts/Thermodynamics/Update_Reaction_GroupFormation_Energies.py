@@ -25,9 +25,6 @@ for rxn in reactions_dict:
     if(reactions_dict[rxn]['is_obsolete']):
         continue
 
-    if(reactions_dict[rxn]['is_transport']):
-        continue
-
     if(reactions_dict[rxn]['status']=='EMPTY'):
         continue
 
@@ -47,29 +44,36 @@ for rxn in reactions_dict:
 
 for rxn in reactions_dict:
 
-    notes_list=reactions_dict[rxn]['notes'].split('|')
-    if('null' in notes_list):
-         notes_list.remove('null')
+    notes_list=reactions_dict[rxn]['notes']
+    if(not isinstance(notes_list,list)):
+        notes_list=list()
 
     if(rxn not in complete_mol_rxns_dict):
 
         #'GF' means group formation approach to calculating energies
         #'P' means partial, as in some of the reagents have energies calculated thus
         if(rxn in incomplete_mol_rxns_dict):
-            notes_list.append('GFP')
+            if('GFC' in notes_list):
+                notes_list.remove('GFC')
+            if('GFP' not in notes_list):
+                notes_list.append('GFP')
 
         reactions_dict[rxn]['deltag']=10000000.0
         reactions_dict[rxn]['deltagerr']=10000000.0
 
         if(len(notes_list)==0):
-            reactions_dict[rxn]['notes']=None
+            reactions_dict[rxn]['notes']="null"
         else:
-            reactions_dict[rxn]['notes']="|".join(notes_list)
+            reactions_dict[rxn]['notes']=notes_list
         continue
 
     #'GF' means group formation approach to calculating energies
     #'C' means complete, as in all of the reagents have energies calculated thus
-    notes_list.append('GFC')
+    if('GFP' in notes_list):
+        notes_list.remove('GFP')
+    if('GFC' not in notes_list):
+        notes_list.append('GFC')
+
     rxn_cpds_array=reactions_helper.parseStoich(reactions_dict[rxn]["stoichiometry"])
 
     #thermodynamics
@@ -87,7 +91,7 @@ for rxn in reactions_dict:
 
     reactions_dict[rxn]['deltag']=float(dg_sum)
     reactions_dict[rxn]['deltagerr']=float(dge_sum)
-    reactions_dict[rxn]['notes']="|".join(sorted(notes_list))
+    reactions_dict[rxn]['notes']=notes_list
 
 print("Saving reactions")
 reactions_helper.saveReactions(reactions_dict)
