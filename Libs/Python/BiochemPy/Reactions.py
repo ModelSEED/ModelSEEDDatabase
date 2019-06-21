@@ -26,7 +26,7 @@ class Reactions:
         reader = DictReader(open(self.RxnsFile), dialect='excel-tab')
         type_mapping = {"is_transport": int, "is_obsolete": int,
                         "deltag": float, "deltagerr": float}
-        lists = ["aliases","pathways","ec_numbers"]
+        lists = ["aliases","pathways","ec_numbers","notes"]
         dicts = ["ontology"]
 
         rxns_dict = dict()

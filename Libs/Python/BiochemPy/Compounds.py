@@ -20,10 +20,10 @@ class Compounds:
         reader = DictReader(open(self.CpdsFile), dialect='excel-tab')
         type_mapping = {"is_core": int, "is_obsolete": int, "is_cofactor": int, "charge": int,
                         "mass": float, "deltag": float, "deltagerr": float}
-        lists = ["aliases"]
+        lists = ["aliases","notes"]
         dicts = ["ontology"]
 
-        cpds_dict = {}
+        cpds_dict = dict()
         for line in reader:
             for list_type in lists:
                 if(line[list_type] != "null"):
