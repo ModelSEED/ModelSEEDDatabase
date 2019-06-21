@@ -716,10 +716,13 @@ class AbstractEnergyCalculatorFromEquilibrator(metaclass=ABCMeta):
 
         dG0_prime, uncertainty = self.calculator.standard_dg_prime(equilibrator_reaction)
         dGm_prime, uncertainty = self.calculator.physiological_dg_prime(equilibrator_reaction)
+        ln_RI = self.calculator.ln_reversibility_index(equilibrator_reaction)
+        if not type(ln_RI) == float:
+            ln_RI = ln_RI.magnitude
         dG0_prime = dG0_prime.to(units).magnitude
         dGm_prime = dGm_prime.to(units).magnitude
         uncertainty = uncertainty.to(units).magnitude
-        return dG0_prime, dGm_prime, uncertainty
+        return dG0_prime, dGm_prime, uncertainty, ln_RI
     
 class ReactionEnergyCalculatorFromEquilibrator(AbstractEnergyCalculatorFromEquilibrator):
     
@@ -732,8 +735,8 @@ class ReactionEnergyCalculatorFromEquilibrator(AbstractEnergyCalculatorFromEquil
         eq = self.eq_builder.build_equilibrator_equation2(stoich)
         equilibrator_reaction = Reaction.parse_formula(eq)
         logger.debug('Equilibrator reaction: %s', equilibrator_reaction)
-        dG0_prime, dGm_prime, uncertainty = self.get_deltag(equilibrator_reaction)
-        return dG0_prime, uncertainty, {'dGm' : dGm_prime}
+        dG0_prime, dGm_prime, uncertainty, ln_RI = self.get_deltag(equilibrator_reaction)
+        return dG0_prime, uncertainty, {'dGm' : dGm_prime, 'ln_RI' : ln_RI}
 
 class CompoundEnergyCalculatorFromEquilibrator(AbstractEnergyCalculatorFromEquilibrator):
         
@@ -742,7 +745,7 @@ class CompoundEnergyCalculatorFromEquilibrator(AbstractEnergyCalculatorFromEquil
         if seed_id in self.mapping:
             logger.debug('[%s] eQuilibrator alias: %s', seed_id, self.mapping[seed_id])
             equilibrator_reaction = Reaction.parse_formula(' = ' + self.mapping[seed_id])
-            dG0_prime, dGm_prime, uncertainty = self.get_deltag(equilibrator_reaction)
+            dG0_prime, dGm_prime, uncertainty, ln_RI = self.get_deltag(equilibrator_reaction)
             return dG0_prime, uncertainty, {'dGm' : dGm_prime}
         return None, None, {}
     
