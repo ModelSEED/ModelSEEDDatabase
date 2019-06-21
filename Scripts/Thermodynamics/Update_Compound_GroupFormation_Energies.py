@@ -48,13 +48,18 @@ for source in ["KEGG","MetaCyc"]:
                 array=line.split('\t')
                 if(array[0] not in thermodynamics_dict):
                     thermodynamics_dict[array[0]]={'dg':"{0:.2f}".format(float(array[7])),'dge':"{0:.2f}".format(float(array[8]))}
+                else:
+                    #There's a few (~20) cases where the protonated mol file had a 'NoGroup' cue added by MFAToolkit
+                    #So using Original energy
+                    if(thermodynamics_dict[array[0]]['dg'] == "10000000.00" and array[7] != "1e+07"):
+                        thermodynamics_dict[array[0]]={'dg':"{0:.2f}".format(float(array[7])),'dge':"{0:.2f}".format(float(array[8]))}
 
 for cpd in sorted (compounds_dict.keys()):
 
     #Energies computed from structures, if no structure, don't even _have_ energies
     if(cpd not in structures_dict):
-        compounds_dict[cpd]['deltag']=10000000
-        compounds_dict[cpd]['deltagerr']=10000000
+        compounds_dict[cpd]['deltag']=10000000.0
+        compounds_dict[cpd]['deltagerr']=10000000.0
         compounds_dict[cpd]['notes']="null"
 
     else:
@@ -73,8 +78,8 @@ for cpd in sorted (compounds_dict.keys()):
 
         #In case where multiple energies because of distribution of bonds
         #Take lowest energy as most likely result of equilibrium
-        lowest_dg=10000000
-        lowest_dge=10000000
+        lowest_dg=10000000.0
+        lowest_dge=10000000.0
         for energy in energies_dict:
             if(energy < lowest_dg):
                 lowest_dg=energy
@@ -85,7 +90,7 @@ for cpd in sorted (compounds_dict.keys()):
 
         compounds_dict[cpd]['deltag']=lowest_dg
         compounds_dict[cpd]['deltagerr']=lowest_dge
-        compounds_dict[cpd]['notes']='GF' #Meaning group formation approach
+        compounds_dict[cpd]['notes']=['GF'] #Meaning group formation approach
 
 print("Saving compounds")
 compounds_helper.saveCompounds(compounds_dict)
