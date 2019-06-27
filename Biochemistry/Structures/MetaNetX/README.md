@@ -5,7 +5,7 @@ So, here is a means to make sure that you retrieve the cache from quilt that wil
 
 ```
 bash-3.2$ pip install quilt
-bash-3.2$ quilt install equilibrator/cache -x 7a100a35d3ddd4cb3848e3b750763bda341245cdbf4d71e24c16e4b3e53f5879
+bash-3.2$ quilt install equilibrator/cache -x 7a100a
 ```
 
 ## Dumping structures from eQuilibrator cache
