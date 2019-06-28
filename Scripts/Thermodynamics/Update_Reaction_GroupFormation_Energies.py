@@ -21,10 +21,6 @@ reactions_dict = reactions_helper.loadReactions()
 complete_mol_rxns_dict=dict()
 incomplete_mol_rxns_dict=dict()
 for rxn in reactions_dict:
-
-    if(reactions_dict[rxn]['is_obsolete']):
-        continue
-
     if(reactions_dict[rxn]['status']=='EMPTY'):
         continue
 

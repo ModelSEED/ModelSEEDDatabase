@@ -72,8 +72,6 @@ for rxn in sorted(reactions_dict.keys()):
 
         if(cpd == 'cpd00067'):
             proton_cpt_dict[cpt]=1
-            if(cpt == "1"):
-                print(rxn,reactions_dict[rxn]['definition'])
 
         #Find phosphates
         for cpd in phosphate_ids:
@@ -134,7 +132,6 @@ for rxn in sorted(reactions_dict.keys()):
     #1a: ATP Synthase is reversible, but cannot involve any other compound, and can only transport protons
     is_atp_synthase=False
     if(reactions_dict[rxn]['is_transport']==1 and len(proton_cpt_dict.keys())>1):
-        print(rxn)
         cpds_cpts_dict=dict()
         #Collect compound compartments
         for rgt in reactions_dict[rxn]['stoichiometry'].split(';'):
