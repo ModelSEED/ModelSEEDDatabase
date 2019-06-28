@@ -95,19 +95,26 @@ for cpd in sorted (compounds_dict.keys()):
     if(cpd not in seed_mnx_map):
         continue
 
+    notes_list=compounds_dict[cpd]['notes']
+    if(not isinstance(notes_list,list)):
+        notes_list=list()
+
+    #We indicate that an estimate is available
+    if('EQ' not in notes_list):
+        notes_list.append('EQ')
+
     #Here we establish an arbitrary threshold of 50 for the error, if the error
     #is too big, we don't use it
-
     if(float(seed_mnx_map[cpd]['dge']) > 50):
         continue
 
-    if(compounds_dict[cpd]['notes'] == "null"):
-        compounds_dict[cpd]['notes']=list()
-
     compounds_dict[cpd]['deltag']=float(seed_mnx_map[cpd]['dg'])
     compounds_dict[cpd]['deltagerr']=float(seed_mnx_map[cpd]['dge'])
-    if('EQ' not in compounds_dict[cpd]['notes']):
-        compounds_dict[cpd]['notes'].append('EQ')
+
+    #Here we indicate that we use the equilibrator value
+    if('EQU' not in notes_list):
+        notes_list.append('EQU')
+    compounds_dict[cpd]['notes']=notes_list
 
 file_handle.close()
 print("Saving compounds")
