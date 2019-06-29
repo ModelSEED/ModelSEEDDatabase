@@ -8,6 +8,7 @@ structures_root=os.path.dirname(__file__)+"/../../Biochemistry/Structures/"
 thermodynamics_root=os.path.dirname(__file__)+"/../../Biochemistry/Thermodynamics/"
 file_name=structures_root+'MetaNetX/Structures_in_ModelSEED_and_eQuilibrator.txt'
 output_name=thermodynamics_root+'eQuilibrator/MetaNetX_Compound_Energies.tbl'
+output_handle=open(output_name,'w')
 mnx_inchikey_dict=dict()
 with open(file_name) as file_handle:
     for line in file_handle.readlines():
@@ -21,6 +22,6 @@ with open(file_name) as file_handle:
             dG0_prime = str(dG0_prime.to('kilocal / mole').magnitude)
             uncertainty = str(uncertainty.to('kilocal / mole').magnitude)
 
-            print("\t".join([mnx,dG0_prime,uncertainty]))
+            output_handle.write("\t".join([mnx,dG0_prime,uncertainty])+"\n")
         except:
-            print("\t".join([mnx,"Unable to retrieve energy"]))
+            output_handle.write("\t".join([mnx,"Unable to retrieve energy"])+"\n")
