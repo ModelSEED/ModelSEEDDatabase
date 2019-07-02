@@ -1,8 +1,13 @@
 #!/usr/bin/env python
 from BiochemPy import Reactions
 from math import log
+import sys
 reactions_helper = Reactions()
 reactions_dict = reactions_helper.loadReactions()
+
+DB_Level = ''
+if(len(sys.argv)>1 and (sys.argv[1] == 'EQ' or sys.argv[1] == 'GF')):
+    DB_Level = sys.argv[1]
 
 #Constants
 TEMPERATURE=298.15
@@ -48,7 +53,18 @@ for rxn in sorted(reactions_dict.keys()):
     rxn_dg = reactions_dict[rxn]['deltag']
     rxn_dge = reactions_dict[rxn]['deltagerr']
 
-    if(rxn_dg == 10000000 or rxn_dg is None or "GFC" not in reactions_dict[rxn]["notes"]):
+    # Here, if I'm specifying either GF or EQ,
+    # Then I want to check that I should estimate for this reaction
+    # (I.e. either "GFC" or "EQC")
+    # Otherwise its labeled as incomplete
+    DB_Rxn=True
+    if(len(DB_Level)>0):
+        DB_Rxn=False
+        for entry in reactions_dict[rxn]["notes"]:
+            if(DB_Level in entry and entry == DB_Level+"C"):
+                DB_Rxn=True
+
+    if(rxn_dg == 10000000 or rxn_dg is None or DB_Level is False):
 
         thermoreversibility = "?"
         reversibility_report[rxn]=["Incomplete",reactions_dict[rxn]["reversibility"],thermoreversibility]
@@ -237,7 +253,11 @@ for rxn in sorted(reactions_dict.keys()):
     reversibility_report[rxn]=["default",reactions_dict[rxn]["reversibility"],thermoreversibility]
     reactions_dict[rxn]['reversibility']=thermoreversibility
 
-with open("Estimated_Reaction_Reversibility_Report.txt","w") as fh:
+file_name="Estimated_Reaction_Reversibility_Report"
+if(len(DB_Level)>0):
+    file_name+="_"+DB_Level
+file_name+=".txt"
+with open(file_name,"w") as fh:
     for rxn in sorted(reversibility_report):
         fh.write(rxn+"\t"+"\t".join(reversibility_report[rxn])+"\n")
 fh.close()
