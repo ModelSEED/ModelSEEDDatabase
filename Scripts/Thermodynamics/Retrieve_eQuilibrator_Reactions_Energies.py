@@ -176,3 +176,9 @@ for rxn in reactions_dict:
         output_handle.write("\t".join([rxn,dG0_prime,uncertainty,ln_RI])+"\n")
     except:
         output_handle.write("\t".join([rxn,"Unable to retrieve energy"])+"\n")
+
+    #These are all true, as per earlier condition
+    #print(OK)
+
+print("Saving reactions")
+reactions_helper.saveReactions(reactions_dict)
