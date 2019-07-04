@@ -26,7 +26,7 @@ with open(file_name) as file_handle:
 
 file_handle.close()
 
-print(len(eq_reactions))
+# print(len(eq_reactions))
 # 13, 874 ModelSEED Reactions
 
 file_handle = open('Reactions_GroupFormation_eQuilibrator_Comparison.txt', 'w')
