@@ -61,10 +61,10 @@ for rxn in sorted(reactions_dict.keys()):
     if(len(DB_Level)>0):
         DB_Rxn=False
         for entry in reactions_dict[rxn]["notes"]:
-            if(DB_Level in entry and entry == DB_Level+"C"):
+            if(DB_Level in entry and (entry == "GFC" or entry == "EQU")):
                 DB_Rxn=True
 
-    if(rxn_dg == 10000000 or rxn_dg is None or DB_Level is False):
+    if(rxn_dg == 10000000 or rxn_dg is None or DB_Rxn is False):
 
         thermoreversibility = "?"
         reversibility_report[rxn]=["Incomplete",reactions_dict[rxn]["reversibility"],thermoreversibility]
