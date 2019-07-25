@@ -20,13 +20,21 @@ class Compounds:
         reader = DictReader(open(self.CpdsFile), dialect='excel-tab')
         type_mapping = {"is_core": int, "is_obsolete": int, "is_cofactor": int, "charge": int,
                         "mass": float, "deltag": float, "deltagerr": float}
-        lists = ["aliases"]
+        lists = ["aliases","notes"]
+        dicts = ["ontology"]
 
-        cpds_dict = {}
+        cpds_dict = dict()
         for line in reader:
             for list_type in lists:
                 if(line[list_type] != "null"):
                     line[list_type]=line[list_type].split("|")
+            for dict_type in dicts:
+                if(line[dict_type] != "null"):
+                    entries = line[dict_type].split('|')
+                    line[dict_type]=dict()
+                    for entry in entries:
+                        (type,list) = entry.split(':')
+                        line[dict_type][type]=list
             for heading, target_type in type_mapping.items():
                 try:
                     line[heading] = target_type(line[heading])
@@ -103,7 +111,7 @@ class Compounds:
         structures_dict = dict()
         if(len(db_array)==1 and db_array[0]=="ModelSEED"):
             struct_file = "Unique_ModelSEED_Structures.txt"
-            fields_array= ['ID','Source','Aliases','Formula','Charge','Structure']
+            fields_array= ['ID','Source','Alias','Formula','Charge','Structure']
 
             if(unique==False):
                 struct_file = "All_ModelSEED_Structures.txt"
@@ -112,6 +120,9 @@ class Compounds:
             struct_file = self.StructRoot+struct_file
             reader = DictReader(open(struct_file), dialect = "excel-tab", fieldnames = fields_array)
             for line in reader:
+                if("cpd" not in line['ID']):
+                    continue
+
                 if(line['ID'] not in structures_dict):
                     structures_dict[line['ID']]={}
 
@@ -119,7 +130,8 @@ class Compounds:
                     if(line['Source'] not in structures_dict[line['ID']]):
                         structures_dict[line['ID']][line['Source']]=dict()
                     structures_dict[line['ID']][line['Source']][line['Structure']]={'formula':line['Formula'],
-                                                                                    'charge':line['Charge']}
+                                                                                    'charge':line['Charge'],
+                                                                                    'alias':line['Alias'].split(';')}
 
             return structures_dict
 
@@ -288,6 +300,11 @@ class Compounds:
                 value=compounds_dict[cpd][header]
                 if(isinstance(value,list)):
                     value = "|".join(value)
+                if(isinstance(value,dict)):
+                    entries = list()
+                    for entry in value:
+                        entries.append(entry+':'+value[entry])
+                    value = "|".join(entries)
                 values_list.append(str(value))
             cpds_file.write("\t".join(values_list)+"\n")
         cpds_file.close()
@@ -297,6 +314,10 @@ class Compounds:
         for cpd_id in sorted(compounds_dict):
             cpd_obj = compounds_dict[cpd_id]
             for key in cpd_obj:
+                if(isinstance(cpd_obj[key],dict)):
+                    for entry in cpd_obj[key]:
+                        if(cpd_obj[key][entry]=="null"):
+                            cpd_obj[key][entry]=None
                 if(cpd_obj[key]=="null"):
                     cpd_obj[key]=None
             new_compounds_dict.append(cpd_obj)
