@@ -67,7 +67,16 @@ for rxn in sorted(reactions_dict.keys()):
     if(rxn_dg == 10000000 or rxn_dg is None or DB_Rxn is False):
 
         thermoreversibility = "?"
-        reversibility_report[rxn]=["Incomplete",reactions_dict[rxn]["reversibility"],thermoreversibility]
+        status="Incomplete"
+
+        #Here, if using EQ, but incomplete/not-updated reaction
+        #Can still fall back onto GF if complete by GF standards
+
+        if(DB_Level == "EQ" and "GFC" in reactions_dict[rxn]['notes']):
+            thermoreversibility=reactions_dict[rxn]["reversibility"]
+            status+=" (GFC)"
+
+        reversibility_report[rxn]=[status,reactions_dict[rxn]["reversibility"],thermoreversibility]
         reactions_dict[rxn]['reversibility']=thermoreversibility
 
         continue
