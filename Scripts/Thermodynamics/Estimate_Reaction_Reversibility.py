@@ -259,7 +259,10 @@ if(len(DB_Level)>0):
 file_name+=".txt"
 with open(file_name,"w") as fh:
     for rxn in sorted(reversibility_report):
-        fh.write(rxn+"\t"+"\t".join(reversibility_report[rxn])+"\n")
+        report_array=list(reversibility_report[rxn])
+        if(DB_Level == "GF"):
+            del(report_array[1])
+        fh.write(rxn+"\t"+"\t".join(report_array)+"\n")
 fh.close()
 
 print("Saving reactions")
