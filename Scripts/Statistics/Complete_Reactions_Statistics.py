@@ -2,7 +2,6 @@
 import os, sys
 from BiochemPy import Compounds, Reactions,InChIs
 
-
 compounds_helper = Compounds()
 compounds_dict = compounds_helper.loadCompounds()
 
@@ -33,6 +32,7 @@ reactions_dict = reactions_helper.loadReactions()
 
 
 sys.exit()
+
 compounds_helper = Compounds()
 compounds_dict = compounds_helper.loadCompounds()
 aliases_dict =  compounds_helper.loadMSAliases()
