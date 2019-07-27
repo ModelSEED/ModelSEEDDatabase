@@ -43,6 +43,10 @@ for year in ['2010','2014']:
     for rxn in reactions_dict:
         reaction_counts['rxn']+=1
 
+        #Skip empty reactions
+        if(reactions_dict[rxn]['eqn'] == " <=> "):
+            continue
+
         complete=True
         generic=False
 
