@@ -31,7 +31,7 @@ close(FH);
 my @compounds=@{$doc->getElementsByTagName('listOfSpecies')}[0]->getChildrenByTagName('*');
 my ($id,$name,$cpt,$charge,$bC)=('','','',0,0);
 open(FH,"> ".$filestub."_Compound_Table.txt");
-print FH "#ID\tName\tCompartment\tCharge\tboundary Condition\n";
+print FH "ID\tName\tCompartment\tCharge\tboundary Condition\n";
 foreach my $c (@compounds){
     $id=$c->getAttribute('id');
     $name=$c->getAttribute('name');
