@@ -5,7 +5,25 @@ from collections import OrderedDict
 temp=list();
 header=True;
 
-Biochem="MetaCyc"
+if(len(sys.argv)<5):
+    print("Not enough arguments!")
+    print("./Add_New_Compounds.py <file> <biochemistry> <primary identifiers:(0|1)> <source>")
+    sys.exit()
+
+Biochem_File=sys.argv[1]
+Primary_Biochem=sys.argv[2]
+Primary_IDs=int(sys.argv[3])
+Biochem_Source=sys.argv[4]
+Biochem_Source="Published Model"
+
+Biochem=Primary_Biochem
+#If it isn't the actual biochemistry database, then use proper name
+if(Biochem not in Biochem_File):
+    dir=Biochem_File.split('/')[0]
+    array=dir.split('_')
+    Biochem=array[0]
+    if(array[1].isdigit() is False):
+        Biochem='_'.join([Biochem,array[1]])
 
 sys.path.append('../../Libs/Python')
 from BiochemPy import Reactions, Compounds, InChIs
@@ -96,41 +114,48 @@ for alias in Structures_Dict['SMILE']:
 last_identifier = list(sorted(compounds_dict))[-1]
 identifier_count = int(re.sub('^cpd','',last_identifier))
 
-Biochem_Root="../../Biochemistry/Aliases/Provenance/Primary_Databases/";
-
 Default_Cpd = OrderedDict({ "id":"cpd00000","name":"null","abbreviation":"null","aliases":"null",
                              "formula":"null","mass":"10000000","charge":"0",
                              "deltag":"10000000","deltagerr":"10000000","pka":"","pkb":"",
                              "inchikey":"","smiles":"",
                              "is_cofactor":0,"is_core":0,"is_obsolete":0,
                              "abstract_compound":"null","comprised_of":"null","linked_compound":"null",
-                             "source":"" })
+                             "source":"", "ontology":"", "notes":"" })
 
 Matched_Cpd_Count=dict()
 New_Cpd_Count=dict()
 Headers=list()
 cpds=list()
-with open(Biochem_Root+Biochem+"_Compounds.tbl") as fh:
+with open(Biochem_File) as fh:
     for line in fh.readlines():
-        line=line.strip()
+        line=line.strip('\r\n')
+
         if(len(Headers)==0):
             Headers=line.split('\t')
             continue
 
         cpd=dict()
-        array=line.split('\t',len(Headers))
+        array=line.split('\t',-1)#,len(Headers))
         for i in range(len(Headers)):
             cpd[Headers[i]]=array[i]
 
         (matched_cpd,matched_src)=(None,None)
 
+        #Check to see if using primary id or ids in another column
+        id_to_check = cpd['ID']
+        if(Primary_IDs==0 and Primary_Biochem in cpd and cpd[Primary_Biochem] != ''):
+            id_to_check=cpd[Primary_Biochem]
+
         #First check that the Alias doesn't already exist
-        if(cpd['ID'] in source_alias_dict[Biochem]):
-            matched_cpd = sorted(source_alias_dict[Biochem][cpd['ID']])[0]
-            matched_src="ID"
+        if(id_to_check in source_alias_dict[Primary_Biochem]):
+            matched_cpd = sorted(source_alias_dict[Primary_Biochem][id_to_check])[0]
+            if(Primary_IDs==1):
+                matched_src="ID"
+            else:
+                matched_src=Primary_Biochem
 
         #Then check that the Structure doesn't already exist, first as InChI, then as SMILE
-        if(matched_cpd is None and cpd['InChI'] and cpd['InChI'] in all_inchis):
+        if(matched_cpd is None and 'InChI' in cpd and cpd['InChI'] and cpd['InChI'] in all_inchis):
 
             msids = dict()
             for alias in all_inchis[cpd['InChI']]:
@@ -147,7 +172,7 @@ with open(Biochem_Root+Biochem+"_Compounds.tbl") as fh:
                 matched_cpd=msids[0]
                 matched_src='InChI'
 
-        elif(matched_cpd is None and cpd['SMILE'] and cpd['SMILE'] in all_smiles):
+        elif(matched_cpd is None and 'SMILE' in cpd and cpd['SMILE'] and cpd['SMILE'] in all_smiles):
 
             msids = dict()
             for alias in all_smiles[cpd['SMILE']]:
@@ -194,14 +219,14 @@ with open(Biochem_Root+Biochem+"_Compounds.tbl") as fh:
                     new_name_count[matched_cpd]=1
 
             #print warning if multiple structures
-            if(cpd['InChI'] in all_inchis):
-                if(cpd['ID'] not in all_aliases_InChIs or cpd['ID'] not in all_inchis[cpd['InChI']]):
-                    print("Warning: InChI structure for "+cpd['ID']+" assigned to different compounds: "+",".join(all_inchis[cpd['InChI']]))
+            if('InChI' in cpd and cpd['InChI'] in all_inchis):
+                if(id_to_check not in all_aliases_InChIs or id_to_check not in all_inchis[cpd['InChI']]):
+                    print("Warning: InChI structure for "+id_to_check+" assigned to different compounds: "+",".join(all_inchis[cpd['InChI']]))
 
             #print warning if multiple structures
-            if(cpd['SMILE'] in all_smiles):
-                if(cpd['ID'] not in all_aliases_SMILEs or cpd['ID'] not in all_smiles[cpd['SMILE']]):
-                    print("Warning: SMILE structure for "+cpd['ID']+" assigned to different compounds: "+",".join(all_smiles[cpd['SMILE']]))
+            if('SMILE' in cpd and cpd['SMILE'] in all_smiles):
+                if(id_to_check not in all_aliases_SMILEs or id_to_check not in all_smiles[cpd['SMILE']]):
+                    print("Warning: SMILE structure for "+id_to_check+" assigned to different compounds: "+",".join(all_smiles[cpd['SMILE']]))
                 
             #if matching structure or name, add ID to aliases
             if(matched_src != 'ID'):
@@ -213,7 +238,12 @@ with open(Biochem_Root+Biochem+"_Compounds.tbl") as fh:
                 new_alias_count[matched_cpd]=1
 
             #Update source type
-            compounds_dict[matched_cpd]['source']='Primary Database'
+            if(Biochem_Source=='Primary Database'):
+                compounds_dict[matched_cpd]['source']=Biochem_Source
+            elif(Biochem_Source=='Secondary Database' and compounds_dict[matched_cpd]['source'] != 'Primary Database'):
+                compounds_dict[matched_cpd]['source']=Biochem_Source
+            elif(Biochem_Source=='Published Model' and 'Database' not in compounds_dict[matched_cpd]['source']):
+                compounds_dict[matched_cpd]['source']=Biochem_Source
 
         else:
 
@@ -224,9 +254,12 @@ with open(Biochem_Root+Biochem+"_Compounds.tbl") as fh:
 
             new_cpd = copy.deepcopy(Default_Cpd)
             new_cpd['id']=new_identifier
-            new_cpd['mass']=cpd['MASS']
-            new_cpd['charge']=cpd['CHARGE']
-            new_cpd['formula']=cpd['FORMULA']
+            if('MASS' in cpd):
+                new_cpd['mass']=cpd['MASS']
+            if('CHARGE' in cpd):
+                new_cpd['charge']=cpd['CHARGE']
+            if('FORMULA' in cpd):
+                new_cpd['formula']=cpd['FORMULA']
 
             #Add new identifier with original ID as alias
             original_alias_dict[new_cpd['id']]={Biochem:[cpd['ID']]}
@@ -253,7 +286,7 @@ with open(Biochem_Root+Biochem+"_Compounds.tbl") as fh:
                 new_cpd['abbreviation']=cpd['ID']
 
             #Add source type
-            new_cpd['source']='Primary Database'
+            new_cpd['source']=Biochem_Source
             compounds_dict[new_cpd['id']]=new_cpd
             New_Cpd_Count[new_cpd['id']]=1
 
@@ -262,9 +295,9 @@ print("Compounds matched via:")
 for src in sorted(Matched_Cpd_Count):
     print("\t"+src+": "+str(len(Matched_Cpd_Count[src])))
 print("Saving additional names for "+str(len(new_name_count))+" compounds")
-compounds_helper.saveNames(names_dict)
+#compounds_helper.saveNames(names_dict)
 print("Saving additional "+Biochem+" aliases for "+str(len(new_alias_count))+" compounds")
-compounds_helper.saveAliases(original_alias_dict)
+#compounds_helper.saveAliases(original_alias_dict)
 print("Saving "+str(len(New_Cpd_Count))+" new compounds from "+Biochem)
 compounds_helper.saveCompounds(compounds_dict)
 
