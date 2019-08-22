@@ -5,14 +5,31 @@ from collections import OrderedDict
 temp=list();
 header=True;
 
-Biochem="MetaCyc"
-Biochem_Root="../../Biochemistry/Aliases/Provenance/Primary_Databases/";
+if(len(sys.argv)<3):
+    print("Not enough arguments!")
+    print("./Add_New_Reactions.py <file> <biochemistry> <source> <prefix>")
+    sys.exit()
+
+Biochem_File=sys.argv[1]
+Biochem_Dir=Biochem_File.split('/')[0]
+Biochem_Source=sys.argv[2]
+Biochem_Source="Published Model"
+ID_Prefix=""
+if(len(sys.argv)==4):
+    ID_Prefix=sys.argv[3]
+
+Biochem=""
+array=Biochem_Dir.split('_')
+Biochem=array[0]
+if(array[1].isdigit() is False):
+    Biochem='_'.join([Biochem,array[1]])
 
 sys.path.append('../../Libs/Python')
 from BiochemPy import Reactions, Compounds, InChIs
 
 compounds_helper = Compounds()
 compounds_dict = compounds_helper.loadCompounds()
+
 reactions_helper = Reactions()
 reactions_dict = reactions_helper.loadReactions()
 reactions_codes = reactions_helper.generateCodes(reactions_dict)
@@ -64,9 +81,10 @@ New_Rxn_Count=dict()
 Headers=list()
 rxns=list()
 missing_cpds=dict()
-with open(Biochem_Root+Biochem+"_Reactions.tbl") as fh:
+rxn_integration_report=dict()
+with open(Biochem_File) as fh:
     for line in fh.readlines():
-        line=line.strip()
+        line=line.strip('\r\n')
         if(len(Headers)==0):
             Headers=line.split('\t')
             continue
@@ -75,6 +93,8 @@ with open(Biochem_Root+Biochem+"_Reactions.tbl") as fh:
         array=line.split('\t',len(Headers))
         for i in range(len(Headers)):
             rxn[Headers[i]]=array[i]
+
+        rxn_integration_report[rxn['ID']]=array
 
         #Retrieve identifiers from within equation
         #Split based on whitespace, and remove compartment index
@@ -154,14 +174,15 @@ with open(Biochem_Root+Biochem+"_Reactions.tbl") as fh:
                     All_Names[name]=1
                     New_Name_Count[matched_rxn]=1
 
-            for ec in rxn['ECs'].split('|'):
-                if(ec not in All_ECs):
-                    #Possible for there to be no ecs in biochemistry?
-                    if(matched_rxn not in ECs_Dict):
-                        ECs_Dict[matched_rxn]=list()
-                    ECs_Dict[matched_rxn].append(ec)
-                    All_ECs[ec]=1
-                    New_EC_Count[matched_rxn]=1
+            if('ECs' in rxn):
+                for ec in rxn['ECs'].split('|'):
+                    if(ec not in All_ECs):
+                        #Possible for there to be no ecs in biochemistry?
+                        if(matched_rxn not in ECs_Dict):
+                            ECs_Dict[matched_rxn]=list()
+                        ECs_Dict[matched_rxn].append(ec)
+                        All_ECs[ec]=1
+                        New_EC_Count[matched_rxn]=1
 
             #Add ID to aliases if the match is with a different reaction
             if(matched_rxn not in Original_Alias_Dict):
@@ -173,14 +194,24 @@ with open(Biochem_Root+Biochem+"_Reactions.tbl") as fh:
                 New_Alias_Count[matched_rxn]=1
 
             #Update source type
-            reactions_dict[matched_rxn]['source']='Primary Database'
+            if(Biochem_Source=='Primary Database'):
+                reactions_dict[matched_rxn]['source']=Biochem_Source
+            elif(Biochem_Source=='Secondary Database' and reactions_dict[matched_rxn]['source'] != 'Primary Database'):
+                reactions_dict[matched_rxn]['source']=Biochem_Source
+            elif(Biochem_Source=='Published Model' and 'Database' not in reactions_dict[matched_rxn]['source']):
+                reactions_dict[matched_rxn]['source']=Biochem_Source
+
+            #Matched
+            rxn_integration_report[rxn['ID']].append('Y')
+            rxn_integration_report[rxn['ID']].append(matched_rxn)
+            rxn_integration_report[rxn['ID']].append(reactions_dict[matched_rxn]['definition'])
 
         else:
             
             #New Reaction!
             #Generate new identifier
             identifier_count+=1
-            new_identifier = 'rxn'+str(identifier_count)
+            new_identifier = ID_Prefix+'rxn'+str(identifier_count)
 
             new_rxn = copy.deepcopy(Default_Rxn)
             new_rxn['id']=new_identifier
@@ -210,17 +241,18 @@ with open(Biochem_Root+Biochem+"_Reactions.tbl") as fh:
                 new_rxn['abbreviation']=rxn['ID']
 
             #ECs
-            for ec in rxn['ECs'].split('|'):
-                if(ec not in All_ECs):
-                    #Possible for there to be no ecs in biochemistry?
-                    if(new_rxn['id'] not in ECs_Dict):
-                        ECs_Dict[new_rxn['id']]=list()
-                    ECs_Dict[new_rxn['id']].append(ec)
-                    All_ECs[ec]=1
-                    New_EC_Count[new_rxn['id']]=1
+            if('ECs' in rxn):
+                for ec in rxn['ECs'].split('|'):
+                    if(ec not in All_ECs):
+                        #Possible for there to be no ecs in biochemistry?
+                        if(new_rxn['id'] not in ECs_Dict):
+                            ECs_Dict[new_rxn['id']]=list()
+                        ECs_Dict[new_rxn['id']].append(ec)
+                        All_ECs[ec]=1
+                        New_EC_Count[new_rxn['id']]=1
 
             #Add source type
-            new_rxn['source']='Primary Database'
+            new_rxn['source']=Biochem_Source
 
             reactions_dict[new_rxn['id']]=new_rxn
             New_Rxn_Count[new_rxn['id']]=1
@@ -235,16 +267,27 @@ with open(Biochem_Root+Biochem+"_Reactions.tbl") as fh:
             reactions_codes[rxn_code][new_rxn['id']]=1
 #            print(new_rxn['id'],rxn_code,rxn['ID'])
 
+            #Matched
+            rxn_integration_report[rxn['ID']].append('N')
+            rxn_integration_report[rxn['ID']].append(new_rxn['id'])
+            rxn_integration_report[rxn['ID']].append('')
+
+with open(Biochem_Dir+'/'+Biochem+'_Reaction_Integration_Report.txt','w') as fh:
+    fh.write('\t'.join(Headers)+'\t'+'\t'.join(['MATCH','MODELSEED','MS DEFINITION'])+'\n')
+    for cpd in sorted(rxn_integration_report):
+        fh.write('\t'.join(rxn_integration_report[cpd])+'\n')
+fh.close()
+
 print("Missing Compounds: "+"|".join(sorted(missing_cpds)))
 #Here, for matches, re-write names, ecs and aliases
 print("Saving additional ECs for "+str(len(New_EC_Count))+" reactions")
-reactions_helper.saveECs(ECs_Dict)
+#reactions_helper.saveECs(ECs_Dict)
 print("Saving additional names for "+str(len(New_Name_Count))+" reactions")
-reactions_helper.saveNames(Names_Dict)
+#reactions_helper.saveNames(Names_Dict)
 print("Saving additional "+Biochem+" aliases for "+str(len(New_Alias_Count))+" reactions")
-reactions_helper.saveAliases(Original_Alias_Dict)
+#reactions_helper.saveAliases(Original_Alias_Dict)
 print("Saving "+str(len(New_Rxn_Count))+" new reactions from "+Biochem)
-reactions_helper.saveReactions(reactions_dict)
+#reactions_helper.saveReactions(reactions_dict)
 
 #Scripts to run afterwards
 #./Rebuild_Reactions.py (in theory, because we adjust in this script, nothing should change)
