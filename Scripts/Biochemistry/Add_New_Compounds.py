@@ -7,7 +7,7 @@ header=True;
 
 if(len(sys.argv)<5):
     print("Not enough arguments!")
-    print("./Add_New_Compounds.py <file> <biochemistry> <primary identifiers:(0|1)> <source>")
+    print("./Add_New_Compounds.py <file> <biochemistry> <primary identifiers:(0|1)> <source> <prefix>")
     sys.exit()
 
 Biochem_File=sys.argv[1]
@@ -16,6 +16,9 @@ Primary_Biochem=sys.argv[2]
 Primary_IDs=int(sys.argv[3])
 Biochem_Source=sys.argv[4]
 Biochem_Source="Published Model"
+ID_Prefix=""
+if(len(sys.argv)==6):
+    ID_Prefix=sys.argv[5]
 
 Biochem=Primary_Biochem
 #If it isn't the actual biochemistry database, then use proper name
@@ -120,7 +123,7 @@ Default_Cpd = OrderedDict({ "id":"cpd00000","name":"null","abbreviation":"null",
                              "inchikey":"","smiles":"",
                              "is_cofactor":0,"is_core":0,"is_obsolete":0,
                              "abstract_compound":"null","comprised_of":"null","linked_compound":"null",
-                             "source":"", "ontology":"", "notes":"" })
+                             "source":"", "ontology":"null", "notes":"null" })
 
 Matched_Cpd_Count=dict()
 New_Cpd_Count=dict()
@@ -263,7 +266,7 @@ with open(Biochem_File) as fh:
             #New Compound!
             #Generate new identifier
             identifier_count+=1
-            new_identifier = 'cpd'+str(identifier_count)
+            new_identifier = ID_Prefix+'cpd'+str(identifier_count)
 
             new_cpd = copy.deepcopy(Default_Cpd)
             new_cpd['id']=new_identifier
@@ -324,9 +327,9 @@ print("Compounds matched via:")
 for src in sorted(Matched_Cpd_Count):
     print("\t"+src+": "+str(len(Matched_Cpd_Count[src])))
 print("Saving additional names for "+str(len(new_name_count))+" compounds")
-#compounds_helper.saveNames(names_dict)
+compounds_helper.saveNames(names_dict)
 print("Saving additional "+Biochem+" aliases for "+str(len(new_alias_count))+" compounds")
-#compounds_helper.saveAliases(original_alias_dict)
+compounds_helper.saveAliases(original_alias_dict)
 print("Saving "+str(len(New_Cpd_Count))+" new compounds from "+Biochem)
 compounds_helper.saveCompounds(compounds_dict)
 
