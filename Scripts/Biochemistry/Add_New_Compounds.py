@@ -11,6 +11,7 @@ if(len(sys.argv)<5):
     sys.exit()
 
 Biochem_File=sys.argv[1]
+Biochem_Dir=Biochem_File.split('/')[0]
 Primary_Biochem=sys.argv[2]
 Primary_IDs=int(sys.argv[3])
 Biochem_Source=sys.argv[4]
@@ -19,8 +20,7 @@ Biochem_Source="Published Model"
 Biochem=Primary_Biochem
 #If it isn't the actual biochemistry database, then use proper name
 if(Biochem not in Biochem_File):
-    dir=Biochem_File.split('/')[0]
-    array=dir.split('_')
+    array=Biochem_Dir.split('_')
     Biochem=array[0]
     if(array[1].isdigit() is False):
         Biochem='_'.join([Biochem,array[1]])
@@ -126,6 +126,7 @@ Matched_Cpd_Count=dict()
 New_Cpd_Count=dict()
 Headers=list()
 cpds=list()
+cpd_integration_report=dict()
 with open(Biochem_File) as fh:
     for line in fh.readlines():
         line=line.strip('\r\n')
@@ -135,9 +136,11 @@ with open(Biochem_File) as fh:
             continue
 
         cpd=dict()
-        array=line.split('\t',-1)#,len(Headers))
+        array=line.split('\t',len(Headers))
         for i in range(len(Headers)):
             cpd[Headers[i]]=array[i]
+
+        cpd_integration_report[cpd['ID']]=array
 
         (matched_cpd,matched_src)=(None,None)
 
@@ -218,6 +221,11 @@ with open(Biochem_File) as fh:
                     all_names_dict[name]=1
                     new_name_count[matched_cpd]=1
 
+                    #here, check and add searchname too, if its new
+                    searchname = compounds_helper.searchname(name)
+                    if(searchname not in searchnames_dict):
+                        searchnames_dict[searchname]=matched_cpd
+
             #print warning if multiple structures
             if('InChI' in cpd and cpd['InChI'] in all_inchis):
                 if(id_to_check not in all_aliases_InChIs or id_to_check not in all_inchis[cpd['InChI']]):
@@ -244,6 +252,11 @@ with open(Biochem_File) as fh:
                 compounds_dict[matched_cpd]['source']=Biochem_Source
             elif(Biochem_Source=='Published Model' and 'Database' not in compounds_dict[matched_cpd]['source']):
                 compounds_dict[matched_cpd]['source']=Biochem_Source
+
+            #Matched
+            cpd_integration_report[cpd['ID']].append('Y')
+            cpd_integration_report[cpd['ID']].append(matched_cpd)
+            cpd_integration_report[cpd['ID']].append(compounds_dict[matched_cpd]['name'])
 
         else:
 
@@ -280,6 +293,11 @@ with open(Biochem_File) as fh:
                     all_names_dict[name]=1
                     new_name_count[new_cpd['id']]=1
 
+                    #here, check and add searchname too, if its new
+                    searchname = compounds_helper.searchname(name)
+                    if(searchname not in searchnames_dict):
+                        searchnames_dict[searchname]=new_cpd['id']
+
             #If no names at all
             if(new_cpd['name']=='null'):
                 new_cpd['name']=cpd['ID']
@@ -289,6 +307,17 @@ with open(Biochem_File) as fh:
             new_cpd['source']=Biochem_Source
             compounds_dict[new_cpd['id']]=new_cpd
             New_Cpd_Count[new_cpd['id']]=1
+
+            #Matched
+            cpd_integration_report[cpd['ID']].append('N')
+            cpd_integration_report[cpd['ID']].append(new_cpd['id'])
+            cpd_integration_report[cpd['ID']].append('')
+
+with open(Biochem_Dir+'/'+Biochem+'_Compound_Integration_Report.txt','w') as fh:
+    fh.write('\t'.join(Headers)+'\t'+'\t'.join(['MATCH','MODELSEED','MS NAMES'])+'\n')
+    for cpd in sorted(cpd_integration_report):
+        fh.write('\t'.join(cpd_integration_report[cpd])+'\n')
+fh.close()
 
 #Here, for matches, re-write names and aliases
 print("Compounds matched via:")
