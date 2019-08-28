@@ -24,7 +24,8 @@ while(<FH>){
 
     #Remove Compartment
     my $cpd = $temp[0];
-    $cpd =~ s/\[\w+\]$//;
+    $cpd =~ s/\[(\w+)\]$//;
+    my $cpt = $1;
 
     #Strip name
     $temp[1] =~ s/(\s\[[\w\s]+\])$//;
@@ -34,6 +35,7 @@ while(<FH>){
 
     $Original_Compounds{$cpd_cpt}={'ID'=>$cpd,
 				   'NAMES'=>$temp[1],
+				   'COMPARTMENT'=>$cpt,
 				   'KEGG'=>$temp[5]};
 }
 close(FH);
@@ -42,7 +44,7 @@ my $filestub = $Compounds;
 $filestub =~ s/_Compound_Table\.txt$//;
 
 open(OUT, "> ".$filestub."_Compounds.tbl");
-my @Headers=("ID","NAMES","KEGG");
+my @Headers=("ID","NAMES","KEGG","COMPARTMENT");
 print OUT join("\t",@Headers),"\n";
 foreach my $id (sort keys %Original_Compounds){
     foreach my $h (@Headers){

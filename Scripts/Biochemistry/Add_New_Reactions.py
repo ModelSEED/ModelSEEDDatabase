@@ -105,9 +105,16 @@ with open(Biochem_File) as fh:
                 new_cpd_array.append(re.sub('\[[01]\]$','',original_cpd_array[i]))
 
         all_matched=True
+        original_matched_cpds=list()
+        local_missing_cpds=list()
         for new_cpd in new_cpd_array:
             if(new_cpd in Source_Alias_Dict[Biochem]):
                 msid = sorted(Source_Alias_Dict[Biochem][new_cpd])[0]
+
+                if(msid[0:3] == 'cpd'):
+
+#len(ID_Prefix)] == ID_Prefix):
+                    
 
                 #set boundary
                 bound_msid=msid+"["
@@ -202,7 +209,8 @@ with open(Biochem_File) as fh:
                 reactions_dict[matched_rxn]['source']=Biochem_Source
 
             #Matched
-            rxn_integration_report[rxn['ID']].append('Y')
+            rxn_integration_report[rxn['ID']].append('Y') #match
+            rxn_integration_report[rxn['ID']].append('Y') #complete
             rxn_integration_report[rxn['ID']].append(matched_rxn)
             rxn_integration_report[rxn['ID']].append(reactions_dict[matched_rxn]['definition'])
 
@@ -268,12 +276,13 @@ with open(Biochem_File) as fh:
 #            print(new_rxn['id'],rxn_code,rxn['ID'])
 
             #Matched
-            rxn_integration_report[rxn['ID']].append('N')
+            rxn_integration_report[rxn['ID']].append('N') #match
+            rxn_integration_report[rxn['ID']].append('N') #complete
             rxn_integration_report[rxn['ID']].append(new_rxn['id'])
             rxn_integration_report[rxn['ID']].append('')
 
 with open(Biochem_Dir+'/'+Biochem+'_Reaction_Integration_Report.txt','w') as fh:
-    fh.write('\t'.join(Headers)+'\t'+'\t'.join(['MATCH','MODELSEED','MS DEFINITION'])+'\n')
+    fh.write('\t'.join(Headers)+'\t'+'\t'.join(['MATCH','COMPLETE','MODELSEED','MS DEFINITION'])+'\n')
     for cpd in sorted(rxn_integration_report):
         fh.write('\t'.join(rxn_integration_report[cpd])+'\n')
 fh.close()

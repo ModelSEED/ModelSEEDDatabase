@@ -257,7 +257,11 @@ with open(Biochem_File) as fh:
                 compounds_dict[matched_cpd]['source']=Biochem_Source
 
             #Matched
-            cpd_integration_report[cpd['ID']].append('Y')
+            if(matched_cpd in New_Cpd_Count):
+                #Can't be a match if its with a new compound (duplicate matches are OK)
+                cpd_integration_report[cpd['ID']].append('N')
+            else:
+                cpd_integration_report[cpd['ID']].append('Y')
             cpd_integration_report[cpd['ID']].append(matched_cpd)
             cpd_integration_report[cpd['ID']].append(compounds_dict[matched_cpd]['name'])
 
