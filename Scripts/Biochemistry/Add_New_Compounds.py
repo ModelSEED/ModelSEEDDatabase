@@ -115,7 +115,7 @@ for alias in Structures_Dict['SMILE']:
 
 #Find last identifier and increment
 last_identifier = list(sorted(compounds_dict))[-1]
-identifier_count = int(re.sub('^cpd','',last_identifier))
+identifier_count = int(re.sub('^\w*cpd','',last_identifier))
 
 Default_Cpd = OrderedDict({ "id":"cpd00000","name":"null","abbreviation":"null","aliases":"null",
                              "formula":"null","mass":"10000000","charge":"0",
