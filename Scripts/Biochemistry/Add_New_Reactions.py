@@ -80,7 +80,7 @@ Empty_Rxn_ID="rxn14003"
 New_Rxn_Count=dict()
 Headers=list()
 rxns=list()
-missing_cpds=dict()
+mismatched_cpds=dict()
 rxn_integration_report=dict()
 with open(Biochem_File) as fh:
     for line in fh.readlines():
@@ -94,52 +94,59 @@ with open(Biochem_File) as fh:
         for i in range(len(Headers)):
             rxn[Headers[i]]=array[i]
 
-        rxn_integration_report[rxn['ID']]=array
+        rxn_integration_report[rxn['ID']]=array[0:2]
 
-        #Retrieve identifiers from within equation
-        #Split based on whitespace, and remove compartment index
+        is_transport='N'
+        if('[0]' in rxn['EQUATION'] and '[1]' in rxn['EQUATION']):
+            is_transport='Y'
+
+        #To replace identifiers within equation
+        #They are retrieved and then have the compartment index removed
         original_cpd_array=rxn['EQUATION'].split(' ')
-        new_cpd_array=list()
+        original_stripped_cpd_array=list()
         for i in range(len(original_cpd_array)):
             if(re.search('\[[01]\]$',original_cpd_array[i])):
-                new_cpd_array.append(re.sub('\[[01]\]$','',original_cpd_array[i]))
+                original_stripped_cpd_array.append(re.sub('\[[01]\]$','',original_cpd_array[i]))
 
-        all_matched=True
+
+
+        #For rebuilding equation array that's useful for integration
+        rxn['REPORT_EQUATION']=rxn['EQUATION']
+
         original_matched_cpds=list()
-        local_missing_cpds=list()
-        for new_cpd in new_cpd_array:
-            if(new_cpd in Source_Alias_Dict[Biochem]):
-                msid = sorted(Source_Alias_Dict[Biochem][new_cpd])[0]
+        for original_cpd in original_stripped_cpd_array:
+            if(original_cpd in Source_Alias_Dict[Biochem]):
+                msid = sorted(Source_Alias_Dict[Biochem][original_cpd])[0]
 
-                if(msid[0:3] == 'cpd'):
-
-#len(ID_Prefix)] == ID_Prefix):
-                    
-
-                #set boundary
+                #set boundary for regular expression
                 bound_msid=msid+"["
-                bound_cpd=new_cpd+"["
+                bound_cpd=original_cpd+"["
                 esc_cpd = re.escape(bound_cpd)
                 
                 eqn_array = rxn['EQUATION'].split(" ")
-                new_eqn_array = list()
+                match_eqn_array = list()
                 for entry in eqn_array:
-                    entry = re.sub(esc_cpd,bound_msid,entry)
-                    new_eqn_array.append(entry)
-                rxn['EQUATION'] = " ".join(new_eqn_array)
-            else:
-                missing_cpds[new_cpd]=1
-                all_matched=False
+                    match_entry = re.sub(esc_cpd,bound_msid,entry)
+                    match_eqn_array.append(match_entry)
+                rxn['EQUATION'] = " ".join(match_eqn_array)
 
-        if(all_matched is False):
-            print("Warning: missing "+Biochem+" identifiers for reaction "+rxn['ID']+": "+rxn['EQUATION'])
-            continue
+                #if original ms compound, update report
+                if(msid[0:3] == 'cpd'):
+                    original_matched_cpds.append(msid)
+
+                    bound_msid=original_cpd+"("+msid+")["
+                    eqn_array = rxn['REPORT_EQUATION'].split(" ")
+                    report_eqn_array = list()
+                    for entry in eqn_array:
+                        report_entry = re.sub(esc_cpd,bound_msid,entry)
+                        report_eqn_array.append(report_entry)
+                    rxn['REPORT_EQUATION'] = " ".join(report_eqn_array)
 
         rxn_cpds_array = reactions_helper.parseEquation(rxn['EQUATION'])
-        adjusted=False
+        adjusted='N'
         new_rxn_cpds_array = reactions_helper.removeCpdRedundancy(rxn_cpds_array)
         if(len(new_rxn_cpds_array)!=len(rxn_cpds_array)):
-            adjusted=True
+            adjusted='Y'
 
         rxn_code = reactions_helper.generateCode(new_rxn_cpds_array)
 
@@ -166,6 +173,28 @@ with open(Biochem_File) as fh:
                 rxn_code = reactions_helper.generateCode(new_rxn_cpds_array)
                 if(rxn_code in reactions_codes):
                     matched_rxn = sorted(list(reactions_codes[rxn_code]))[0]
+                    adjusted='W'
+
+        rxn_integration_report[rxn['ID']].append(rxn['REPORT_EQUATION']) #equation
+        rxn_integration_report[rxn['ID']].append(is_transport) #transport
+        rxn_integration_report[rxn['ID']].append(adjusted) #adjustments made before match
+
+        if(matched_rxn is not None and matched_rxn not in New_Rxn_Count):
+            rxn_integration_report[rxn['ID']].append('Y') #match
+        else:
+            rxn_integration_report[rxn['ID']].append('N') #match
+
+            eqn_array = rxn['REPORT_EQUATION'].split(" ")
+            for entry in eqn_array:
+                if(re.search('\[[01]\]$',entry) and 'cpd' not in entry):
+                    if(entry not in mismatched_cpds):
+                        mismatched_cpds[entry]=list()
+                    mismatched_cpds[entry].append(rxn['ID'])
+
+        if(len(original_matched_cpds)==len(original_stripped_cpd_array)):
+            rxn_integration_report[rxn['ID']].append('Y') #complete
+        else:
+            rxn_integration_report[rxn['ID']].append('N') #complete
 
         if(matched_rxn is not None):
             #Add Names, EC and Alias
@@ -209,8 +238,6 @@ with open(Biochem_File) as fh:
                 reactions_dict[matched_rxn]['source']=Biochem_Source
 
             #Matched
-            rxn_integration_report[rxn['ID']].append('Y') #match
-            rxn_integration_report[rxn['ID']].append('Y') #complete
             rxn_integration_report[rxn['ID']].append(matched_rxn)
             rxn_integration_report[rxn['ID']].append(reactions_dict[matched_rxn]['definition'])
 
@@ -276,18 +303,21 @@ with open(Biochem_File) as fh:
 #            print(new_rxn['id'],rxn_code,rxn['ID'])
 
             #Matched
-            rxn_integration_report[rxn['ID']].append('N') #match
-            rxn_integration_report[rxn['ID']].append('N') #complete
             rxn_integration_report[rxn['ID']].append(new_rxn['id'])
             rxn_integration_report[rxn['ID']].append('')
 
 with open(Biochem_Dir+'/'+Biochem+'_Reaction_Integration_Report.txt','w') as fh:
-    fh.write('\t'.join(Headers)+'\t'+'\t'.join(['MATCH','COMPLETE','MODELSEED','MS DEFINITION'])+'\n')
+    fh.write('\t'.join(Headers)+'\t'+'\t'.join(['TRANSPORT','ADJUSTED','MATCH','COMPLETE','MODELSEED','MS DEFINITION'])+'\n')
     for cpd in sorted(rxn_integration_report):
         fh.write('\t'.join(rxn_integration_report[cpd])+'\n')
 fh.close()
 
-print("Missing Compounds: "+"|".join(sorted(missing_cpds)))
+with open(Biochem_Dir+'/'+Biochem+'_Mismatched_Compound_Integration_Report.txt','w') as fh:
+    for cpd in sorted(mismatched_cpds, key=lambda k: len(mismatched_cpds[k]), reverse=True):
+        fh.write('\t'.join([cpd,str(len(mismatched_cpds[cpd])),'|'.join(sorted(mismatched_cpds[cpd]))]))
+fh.close()
+
+print("Mismatched Compounds: "+str(len(mismatched_cpds.keys())))
 #Here, for matches, re-write names, ecs and aliases
 print("Saving additional ECs for "+str(len(New_EC_Count))+" reactions")
 #reactions_helper.saveECs(ECs_Dict)
