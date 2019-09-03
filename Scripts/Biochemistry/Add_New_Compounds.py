@@ -28,6 +28,17 @@ if(Biochem not in Biochem_File):
     if(array[1].isdigit() is False):
         Biochem='_'.join([Biochem,array[1]])
 
+#Find curated compound mappings
+import os.path
+curated_mappings=dict()
+if(os.path.exists(Biochem_Dir+'/Curated_Compound_Mappings.tsv')):
+    with open(Biochem_Dir+'/Curated_Compound_Mappings.tsv') as fh:
+        for line in fh.readlines():
+            line=line.strip()
+            (original_cpd,ms_cpd)=line.split('\t')
+            curated_mappings[original_cpd]=ms_cpd
+    fh.close()
+
 sys.path.append('../../Libs/Python')
 from BiochemPy import Reactions, Compounds, InChIs
 
@@ -142,23 +153,29 @@ with open(Biochem_File) as fh:
         array=line.split('\t',len(Headers))
         for i in range(len(Headers)):
             cpd[Headers[i]]=array[i]
-
+            
         cpd_integration_report[cpd['ID']]=array
 
         (matched_cpd,matched_src)=(None,None)
 
-        #Check to see if using primary id or ids in another column
-        id_to_check = cpd['ID']
-        if(Primary_IDs==0 and Primary_Biochem in cpd and cpd[Primary_Biochem] != ''):
-            id_to_check=cpd[Primary_Biochem]
+        #First check that the compound hasn't been manually curated
+        if(cpd['ID'] in curated_mappings):
+            matched_cpd=curated_mappings[cpd['ID']]
+            matched_src="MANUAL"
 
-        #First check that the Alias doesn't already exist
-        if(id_to_check in source_alias_dict[Primary_Biochem]):
-            matched_cpd = sorted(source_alias_dict[Primary_Biochem][id_to_check])[0]
-            if(Primary_IDs==1):
-                matched_src="ID"
-            else:
-                matched_src=Primary_Biochem
+        if(matched_cpd is None):
+            #Check to see if using primary id or ids in another column
+            id_to_check = cpd['ID']
+            if(Primary_IDs==0 and Primary_Biochem in cpd and cpd[Primary_Biochem] != ''):
+                id_to_check=cpd[Primary_Biochem]
+
+            #First check that the Alias doesn't already exist
+            if(id_to_check in source_alias_dict[Primary_Biochem]):
+                matched_cpd = sorted(source_alias_dict[Primary_Biochem][id_to_check])[0]
+                if(Primary_IDs==1):
+                    matched_src="ID"
+                else:
+                    matched_src=Primary_Biochem
 
         #Then check that the Structure doesn't already exist, first as InChI, then as SMILE
         if(matched_cpd is None and 'InChI' in cpd and cpd['InChI'] and cpd['InChI'] in all_inchis):
@@ -240,11 +257,11 @@ with open(Biochem_File) as fh:
                     print("Warning: SMILE structure for "+id_to_check+" assigned to different compounds: "+",".join(all_smiles[cpd['SMILE']]))
                 
             #if matching structure or name, add ID to aliases
-            if(matched_src != 'ID'):
-                if(matched_cpd not in original_alias_dict):
-                    original_alias_dict[matched_cpd]={Biochem:list()}
-                if(matched_cpd in original_alias_dict and Biochem not in original_alias_dict[matched_cpd]):
-                    original_alias_dict[matched_cpd][Biochem]=list()
+            if(matched_cpd not in original_alias_dict):
+                original_alias_dict[matched_cpd]={Biochem:list()}
+            if(Biochem not in original_alias_dict[matched_cpd]):
+                original_alias_dict[matched_cpd][Biochem]=list()
+            if(cpd['ID'] not in original_alias_dict[matched_cpd][Biochem]):
                 original_alias_dict[matched_cpd][Biochem].append(cpd['ID'])
                 new_alias_count[matched_cpd]=1
 
