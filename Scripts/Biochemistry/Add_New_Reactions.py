@@ -314,7 +314,7 @@ fh.close()
 
 with open(Biochem_Dir+'/'+Biochem+'_Mismatched_Compound_Integration_Report.txt','w') as fh:
     for cpd in sorted(mismatched_cpds, key=lambda k: len(mismatched_cpds[k]), reverse=True):
-        fh.write('\t'.join([cpd,str(len(mismatched_cpds[cpd])),'|'.join(sorted(mismatched_cpds[cpd]))]))
+        fh.write('\t'.join([cpd,str(len(mismatched_cpds[cpd])),'|'.join(sorted(mismatched_cpds[cpd]))])+'\n')
 fh.close()
 
 print("Mismatched Compounds: "+str(len(mismatched_cpds.keys())))
