@@ -80,6 +80,10 @@ while(<FH>){
     #Skipping all boundary exchange reactions
     next if !$products;
 
+    #Skipping pseudo reactions related to lipid formation
+    next if $temp[1] =~ /SLIME/i;
+    next if $temp[1] =~ /^MLCL/;
+
     my @reactants = split(/;/,$reactants);
     my @eqn=();
     my %cpts = (); #got to double-check
