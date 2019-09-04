@@ -214,7 +214,7 @@ with open(Biochem_File) as fh:
         #Then check that the Name doesn't already exist
         elif(matched_cpd is None):
             msids=dict()
-            for name in cpd['NAMES'].split('|'):
+            for name in re.split('[|;]',cpd['NAMES']):
                 searchname = compounds_helper.searchname(name)
                 if(searchname in searchnames_dict):
                     msids[searchnames_dict[searchname]]=1
