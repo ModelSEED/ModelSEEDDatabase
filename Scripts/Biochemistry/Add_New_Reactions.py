@@ -108,8 +108,6 @@ with open(Biochem_File) as fh:
             if(re.search('\[[01]\]$',original_cpd_array[i])):
                 original_stripped_cpd_array.append(re.sub('\[[01]\]$','',original_cpd_array[i]))
 
-
-
         #For rebuilding equation array that's useful for integration
         rxn['REPORT_EQUATION']=rxn['EQUATION']
 
@@ -122,7 +120,8 @@ with open(Biochem_File) as fh:
                 bound_msid=msid+"["
                 bound_cpd=original_cpd+"["
                 esc_cpd = re.escape(bound_cpd)
-                
+                esc_cpd="^"+esc_cpd
+
                 eqn_array = rxn['EQUATION'].split(" ")
                 match_eqn_array = list()
                 for entry in eqn_array:
