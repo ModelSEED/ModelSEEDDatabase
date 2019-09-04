@@ -40,25 +40,11 @@ while(<FH>){
 }
 close(FH);
 
-my $filestub = $Compounds;
-$filestub =~ s/_Compound_Table\.txt$//;
-
-open(OUT, "> ".$filestub."_Compounds.tbl");
-my @Headers=("ID","NAMES","KEGG","COMPARTMENT");
-print OUT join("\t",@Headers),"\n";
-foreach my $id (sort keys %Original_Compounds){
-    foreach my $h (@Headers){
-	print OUT $Original_Compounds{$id}{$h};
-	print OUT "\t" unless $h eq $Headers[$#Headers];
-    }
-    print OUT "\n";
-}
-close(OUT);
-
 my $Reactions = "yeastGEM_Reaction_Table.txt";
 open(FH, "< $Reactions");
 $header=1;
 my %Original_Reactions=();
+my %Cpds_in_Rxns=();
 while(<FH>){
     chomp;
     if($header){$header--;next}
@@ -92,6 +78,8 @@ while(<FH>){
 	$rct =~ /s_(\d+)\[(\w+)\]\[(\d+(\.[\de-]+)*)\]/;
 	my ($cpd,$cpt,$coeff)=($1,$2,$3);
 
+	$Cpds_in_Rxns{$cpd}=1;
+
 	if(defined($coeff) && $coeff != 1){
 	    $coeff="(".$coeff.")";
 	}else{
@@ -124,6 +112,7 @@ while(<FH>){
 	$pdt =~ /s_(\d+)\[(\w+)\]\[(\d+(\.[\de-]+)*)\]/;
 	my ($cpd,$cpt,$coeff)=($1,$2,$3);
 
+	$Cpds_in_Rxns{$cpd}=1;
 
 	if(defined($coeff) && $coeff != 1){
 	    $coeff="(".$coeff.")";
@@ -151,6 +140,25 @@ while(<FH>){
 			       'EQUATION'=>$eqn_str};
 }
 close(FH);
+
+my $filestub = $Compounds;
+$filestub =~ s/_Compound_Table\.txt$//;
+
+open(OUT, "> ".$filestub."_Compounds.tbl");
+my @Headers=("ID","NAMES","KEGG","COMPARTMENT");
+print OUT join("\t",@Headers),"\n";
+foreach my $id (sort keys %Original_Compounds){
+    next if !exists($Cpds_in_Rxns{$Original_Compounds{$id}{'ID'}});
+
+    print($id,"\t",$Original_Compounds{$id}{'ID'},"\n");
+
+    foreach my $h (@Headers){
+	print OUT $Original_Compounds{$id}{$h};
+	print OUT "\t" unless $h eq $Headers[$#Headers];
+    }
+    print OUT "\n";
+}
+close(OUT);
 
 open(OUT, "> ".$filestub."_Reactions.tbl");
 @Headers=("ID","NAMES","EQUATION");
