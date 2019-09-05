@@ -66,10 +66,6 @@ while(<FH>){
     #Skipping all boundary exchange reactions
     next if !$products;
 
-    #Skipping pseudo reactions related to lipid formation
-    next if $temp[1] =~ /SLIME/i;
-    next if $temp[1] =~ /^MLCL/;
-
     my @reactants = split(/;/,$reactants);
     my @eqn=();
     my %cpts = (); #got to double-check
@@ -149,8 +145,6 @@ my @Headers=("ID","NAMES","KEGG","COMPARTMENT");
 print OUT join("\t",@Headers),"\n";
 foreach my $id (sort keys %Original_Compounds){
     next if !exists($Cpds_in_Rxns{$Original_Compounds{$id}{'ID'}});
-
-    print($id,"\t",$Original_Compounds{$id}{'ID'},"\n");
 
     foreach my $h (@Headers){
 	print OUT $Original_Compounds{$id}{$h};
