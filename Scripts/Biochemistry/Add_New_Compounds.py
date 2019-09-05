@@ -232,7 +232,7 @@ with open(Biochem_File) as fh:
             #Regardless of match-type, add new names
             #NB at this point, names shouldn't match _anything_ already in the database
             #Names are saved separately as part of the aliases at the end of the script
-            for name in cpd['NAMES'].split('|'):
+            for name in re.split('[|;]',cpd['NAMES']):
                 if(name not in all_names_dict):
                     #Possible for there to be no names in biochemistry?
                     if(matched_cpd not in names_dict):
@@ -304,7 +304,7 @@ with open(Biochem_File) as fh:
 
             #Add new names
             #Names are saved separately as part of the aliases at the end of the script
-            for name in cpd['NAMES'].split('|'):
+            for name in re.split('[|;]',cpd['NAMES']):
                 if(new_cpd['name']=='null'):
                     new_cpd['name']=name
                     new_cpd['abbreviation']=name
