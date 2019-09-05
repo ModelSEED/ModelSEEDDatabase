@@ -14,9 +14,9 @@ Biochem_File=sys.argv[1]
 Biochem_Dir=Biochem_File.split('/')[0]
 Biochem_Source=sys.argv[2]
 Biochem_Source="Published Model"
-ID_Prefix=""
+ID_Prefix="rxn"
 if(len(sys.argv)==4):
-    ID_Prefix=sys.argv[3]
+    ID_Prefix=sys.argv[3]+ID_Prefix
 
 Biochem=""
 array=Biochem_Dir.split('_')
@@ -70,8 +70,11 @@ for msid in sorted(ECs_Dict):
         All_ECs[name]=1
 
 #Find last identifier and increment
-last_identifier = list(sorted(reactions_dict))[-1]
-identifier_count = int(re.sub('^rxn','',last_identifier))
+identifier_count=0
+identifiers = list(sorted(filter(lambda x:ID_Prefix in x, reactions_dict)))
+if(len(identifiers)>0):
+    last_identifier = identifiers[-1]
+    identifier_count = int(re.sub('^\w*cpd','',last_identifier))
 
 #If a reaction, after removing cpd redundancy, is empty
 #We use a placeholder
@@ -245,7 +248,7 @@ with open(Biochem_File) as fh:
             #New Reaction!
             #Generate new identifier
             identifier_count+=1
-            new_identifier = ID_Prefix+'rxn'+str(identifier_count)
+            new_identifier = ID_Prefix+str(identifier_count).zfill(5)
 
             new_rxn = copy.deepcopy(Default_Rxn)
             new_rxn['id']=new_identifier

@@ -16,9 +16,9 @@ Primary_Biochem=sys.argv[2]
 Primary_IDs=int(sys.argv[3])
 Biochem_Source=sys.argv[4]
 Biochem_Source="Published Model"
-ID_Prefix=""
+ID_Prefix="cpd"
 if(len(sys.argv)==6):
-    ID_Prefix=sys.argv[5]
+    ID_Prefix=sys.argv[5]+ID_Prefix
 
 Biochem=Primary_Biochem
 #If it isn't the actual biochemistry database, then use proper name
@@ -125,8 +125,11 @@ for alias in Structures_Dict['SMILE']:
             all_aliases_SMILEs[alias].append(struct)
 
 #Find last identifier and increment
-last_identifier = list(sorted(compounds_dict))[-1]
-identifier_count = int(re.sub('^\w*cpd','',last_identifier))
+identifier_count=0
+identifiers = list(sorted(filter(lambda x:ID_Prefix in x, compounds_dict)))
+if(len(identifiers)>0):
+    last_identifier = identifiers[-1]
+    identifier_count = int(re.sub('^\w*cpd','',last_identifier))
 
 Default_Cpd = OrderedDict({ "id":"cpd00000","name":"null","abbreviation":"null","aliases":"null",
                              "formula":"null","mass":"10000000","charge":"0",
@@ -287,7 +290,7 @@ with open(Biochem_File) as fh:
             #New Compound!
             #Generate new identifier
             identifier_count+=1
-            new_identifier = ID_Prefix+'cpd'+str(identifier_count)
+            new_identifier = ID_Prefix+str(identifier_count).zfill(5)
 
             new_cpd = copy.deepcopy(Default_Cpd)
             new_cpd['id']=new_identifier
