@@ -72,7 +72,7 @@ class Reactions:
                 if (str(coeff)[-2:] == ".0"):
                     coeff = int(round(coeff))
 
-            match=re.search('^(cpd\d{5})\[(\d)\]$',text)
+            match=re.search('^(\w*cpd\d{5})\[(\d)\]$',text)
             if(match is not None):
 
                 #Side of equation

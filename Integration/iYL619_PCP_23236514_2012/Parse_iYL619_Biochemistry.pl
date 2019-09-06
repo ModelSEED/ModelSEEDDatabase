@@ -4,8 +4,9 @@ use warnings;
 use strict;
 my @temp=();
 
-my $Compounds = "iCY1106_Compound_Table.txt";
-my $Reactions = "iCY1106_Reaction_Table.txt";
+my $Biochemistry = "iYL619_PCP";
+my $Compounds = $Biochemistry."_Compound_Table.txt";
+my $Reactions = $Biochemistry."_Reaction_Table.txt";
 
 open(FH, "< $Compounds");
 my $header=1;
@@ -18,16 +19,18 @@ while(<FH>){
     my $cpd_cpt = $temp[0];
 
     #Convert ASCII codes
-    $temp[0] =~ s/_LPAREN_/(/;
-    $temp[0] =~ s/_RPAREN_/)/;
+    #$temp[0] =~ s/_DASH_/-/;
 
     #Clean up identifier
     $temp[0] =~ s/^M_+//;
 
     #Remove Compartment
     my $cpd = $temp[0];
-    $cpd =~ s/_(\w+)$//;
-    my $cpt = $1;
+    #Fixing unusual case of spaces being inserted before compartment identifier
+    $cpd =~ s/\s_c$/_c/;
+
+    $cpd =~ s/(\w+)_(\w+?)$/$1/;
+    my $cpt = $2;
 
     $Original_Compounds{$cpd_cpt}={'ID'=>$cpd,
 				   'NAMES'=>$temp[1],
@@ -43,18 +46,12 @@ while(<FH>){
     chomp;
     if($header){$header--;next}
 
-    #Convert ascii codes
-    $_ =~ s/_LPAREN_/(/g;
-    $_ =~ s/_RPAREN_/)/g;
-    $_ =~ s/_LSQBKT_/[/g;
-    $_ =~ s/_RSQBKT_/]/g;
-    $_ =~ s/_FSLASH_/\//g;
     @temp=split(/\t/,$_);
 
     my $rxn = $temp[0];
 
     #Clean up identifier
-    $rxn =~ s/^R_+//;
+    $rxn =~ s/^R//;
 
     #Go through reactants
     my ($rev,$reactants,$products)=@temp[2..5];
@@ -63,11 +60,16 @@ while(<FH>){
     next if !$products;
     
     my @reactants = split(/;/,$reactants);
+
     my @eqn=();
     my %cpts = (); #got to double-check
     my $cpt_count = 0;
     foreach my $rct (@reactants){
-	$rct =~ /M_([\(\)\w]+)_(\w+)\[(\d+(\.[\de-]+)*)\]/;
+
+	#Fixing unusual case of spaces being inserted before compartment identifier
+	$rct =~ s/\s_c\[/_c[/;
+
+	$rct =~ /M_([\(\)\w-]+)_(\w+)\[\s*(\d*?(\.[\de-]+)*)\s*\]/;
 	my ($cpd,$cpt,$coeff)=($1,$2,$3);
 
 	$Cpds_in_Rxns{$cpd}=1;
@@ -101,7 +103,11 @@ while(<FH>){
 
     my @products = split(/;/,$products);
     foreach my $pdt (@products){
-	$pdt =~ /M_([\(\)\w]+)_(\w+)\[(\d+(\.[\de-]+)*)\]/;
+
+	#Fixing unusual case of spaces being inserted before compartment identifier
+	$pdt =~ s/\s_c\[/_c[/;
+
+	$pdt =~ /M_([\(\)\w-]+)_(\w+)\[\s*(\d*?(\.[\de-]+)*)\s*\]/;
 	my ($cpd,$cpt,$coeff)=($1,$2,$3);
 
 	$Cpds_in_Rxns{$cpd}=1;

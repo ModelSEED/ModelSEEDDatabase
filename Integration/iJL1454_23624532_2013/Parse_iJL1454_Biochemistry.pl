@@ -4,8 +4,9 @@ use warnings;
 use strict;
 my @temp=();
 
-my $Compounds = "iCY1106_Compound_Table.txt";
-my $Reactions = "iCY1106_Reaction_Table.txt";
+my $Biochemistry = "iJL1454";
+my $Compounds = $Biochemistry."_Compound_Table.txt";
+my $Reactions = $Biochemistry."_Reaction_Table.txt";
 
 open(FH, "< $Compounds");
 my $header=1;
@@ -16,10 +17,6 @@ while(<FH>){
     @temp=split(/\t/,$_);
 
     my $cpd_cpt = $temp[0];
-
-    #Convert ASCII codes
-    $temp[0] =~ s/_LPAREN_/(/;
-    $temp[0] =~ s/_RPAREN_/)/;
 
     #Clean up identifier
     $temp[0] =~ s/^M_+//;
@@ -43,12 +40,6 @@ while(<FH>){
     chomp;
     if($header){$header--;next}
 
-    #Convert ascii codes
-    $_ =~ s/_LPAREN_/(/g;
-    $_ =~ s/_RPAREN_/)/g;
-    $_ =~ s/_LSQBKT_/[/g;
-    $_ =~ s/_RSQBKT_/]/g;
-    $_ =~ s/_FSLASH_/\//g;
     @temp=split(/\t/,$_);
 
     my $rxn = $temp[0];
@@ -63,6 +54,7 @@ while(<FH>){
     next if !$products;
     
     my @reactants = split(/;/,$reactants);
+
     my @eqn=();
     my %cpts = (); #got to double-check
     my $cpt_count = 0;

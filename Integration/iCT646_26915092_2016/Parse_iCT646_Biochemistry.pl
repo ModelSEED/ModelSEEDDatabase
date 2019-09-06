@@ -4,8 +4,9 @@ use warnings;
 use strict;
 my @temp=();
 
-my $Compounds = "iCY1106_Compound_Table.txt";
-my $Reactions = "iCY1106_Reaction_Table.txt";
+my $Biochemistry = "iCT646";
+my $Compounds = $Biochemistry."_Compound_Table.txt";
+my $Reactions = $Biochemistry."_Reaction_Table.txt";
 
 open(FH, "< $Compounds");
 my $header=1;
@@ -18,16 +19,15 @@ while(<FH>){
     my $cpd_cpt = $temp[0];
 
     #Convert ASCII codes
-    $temp[0] =~ s/_LPAREN_/(/;
-    $temp[0] =~ s/_RPAREN_/)/;
+    $temp[0] =~ s/_DASH_/-/;
 
     #Clean up identifier
     $temp[0] =~ s/^M_+//;
 
     #Remove Compartment
     my $cpd = $temp[0];
-    $cpd =~ s/_(\w+)$//;
-    my $cpt = $1;
+    $cpd =~ s/(\w+)_(\w+?)$/$1/;
+    my $cpt = $2;
 
     $Original_Compounds{$cpd_cpt}={'ID'=>$cpd,
 				   'NAMES'=>$temp[1],
@@ -44,11 +44,8 @@ while(<FH>){
     if($header){$header--;next}
 
     #Convert ascii codes
-    $_ =~ s/_LPAREN_/(/g;
-    $_ =~ s/_RPAREN_/)/g;
-    $_ =~ s/_LSQBKT_/[/g;
-    $_ =~ s/_RSQBKT_/]/g;
-    $_ =~ s/_FSLASH_/\//g;
+    $_ =~ s/_DASH_/-/g;
+
     @temp=split(/\t/,$_);
 
     my $rxn = $temp[0];
@@ -63,11 +60,12 @@ while(<FH>){
     next if !$products;
     
     my @reactants = split(/;/,$reactants);
+
     my @eqn=();
     my %cpts = (); #got to double-check
     my $cpt_count = 0;
     foreach my $rct (@reactants){
-	$rct =~ /M_([\(\)\w]+)_(\w+)\[(\d+(\.[\de-]+)*)\]/;
+	$rct =~ /M_([\(\)\w-]+)_(\w+)\[(\d+(\.[\de-]+)*)\]/;
 	my ($cpd,$cpt,$coeff)=($1,$2,$3);
 
 	$Cpds_in_Rxns{$cpd}=1;
@@ -101,7 +99,7 @@ while(<FH>){
 
     my @products = split(/;/,$products);
     foreach my $pdt (@products){
-	$pdt =~ /M_([\(\)\w]+)_(\w+)\[(\d+(\.[\de-]+)*)\]/;
+	$pdt =~ /M_([\(\)\w-]+)_(\w+)\[(\d+(\.[\de-]+)*)\]/;
 	my ($cpd,$cpt,$coeff)=($1,$2,$3);
 
 	$Cpds_in_Rxns{$cpd}=1;

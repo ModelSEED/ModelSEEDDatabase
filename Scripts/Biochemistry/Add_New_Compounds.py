@@ -16,9 +16,9 @@ Primary_Biochem=sys.argv[2]
 Primary_IDs=int(sys.argv[3])
 Biochem_Source=sys.argv[4]
 Biochem_Source="Published Model"
-ID_Prefix=""
+ID_Prefix="cpd"
 if(len(sys.argv)==6):
-    ID_Prefix=sys.argv[5]
+    ID_Prefix=sys.argv[5]+ID_Prefix
 
 Biochem=Primary_Biochem
 #If it isn't the actual biochemistry database, then use proper name
@@ -27,6 +27,17 @@ if(Biochem not in Biochem_File):
     Biochem=array[0]
     if(array[1].isdigit() is False):
         Biochem='_'.join([Biochem,array[1]])
+
+#Find curated compound mappings
+import os.path
+curated_mappings=dict()
+if(os.path.exists(Biochem_Dir+'/Curated_Compound_Mappings.tsv')):
+    with open(Biochem_Dir+'/Curated_Compound_Mappings.tsv') as fh:
+        for line in fh.readlines():
+            line=line.strip()
+            (original_cpd,ms_cpd)=line.split('\t')
+            curated_mappings[original_cpd]=ms_cpd
+    fh.close()
 
 sys.path.append('../../Libs/Python')
 from BiochemPy import Reactions, Compounds, InChIs
@@ -114,8 +125,11 @@ for alias in Structures_Dict['SMILE']:
             all_aliases_SMILEs[alias].append(struct)
 
 #Find last identifier and increment
-last_identifier = list(sorted(compounds_dict))[-1]
-identifier_count = int(re.sub('^\w*cpd','',last_identifier))
+identifier_count=0
+identifiers = list(sorted(filter(lambda x:ID_Prefix in x, compounds_dict)))
+if(len(identifiers)>0):
+    last_identifier = identifiers[-1]
+    identifier_count = int(re.sub('^\w*cpd','',last_identifier))
 
 Default_Cpd = OrderedDict({ "id":"cpd00000","name":"null","abbreviation":"null","aliases":"null",
                              "formula":"null","mass":"10000000","charge":"0",
@@ -142,23 +156,29 @@ with open(Biochem_File) as fh:
         array=line.split('\t',len(Headers))
         for i in range(len(Headers)):
             cpd[Headers[i]]=array[i]
-
+            
         cpd_integration_report[cpd['ID']]=array
 
         (matched_cpd,matched_src)=(None,None)
 
-        #Check to see if using primary id or ids in another column
-        id_to_check = cpd['ID']
-        if(Primary_IDs==0 and Primary_Biochem in cpd and cpd[Primary_Biochem] != ''):
-            id_to_check=cpd[Primary_Biochem]
+        #First check that the compound hasn't been manually curated
+        if(cpd['ID'] in curated_mappings):
+            matched_cpd=curated_mappings[cpd['ID']]
+            matched_src="MANUAL"
 
-        #First check that the Alias doesn't already exist
-        if(id_to_check in source_alias_dict[Primary_Biochem]):
-            matched_cpd = sorted(source_alias_dict[Primary_Biochem][id_to_check])[0]
-            if(Primary_IDs==1):
-                matched_src="ID"
-            else:
-                matched_src=Primary_Biochem
+        if(matched_cpd is None):
+            #Check to see if using primary id or ids in another column
+            id_to_check = cpd['ID']
+            if(Primary_IDs==0 and Primary_Biochem in cpd and cpd[Primary_Biochem] != ''):
+                id_to_check=cpd[Primary_Biochem]
+
+            #First check that the Alias doesn't already exist
+            if(id_to_check in source_alias_dict[Primary_Biochem]):
+                matched_cpd = sorted(source_alias_dict[Primary_Biochem][id_to_check])[0]
+                if(Primary_IDs==1):
+                    matched_src="ID"
+                else:
+                    matched_src=Primary_Biochem
 
         #Then check that the Structure doesn't already exist, first as InChI, then as SMILE
         if(matched_cpd is None and 'InChI' in cpd and cpd['InChI'] and cpd['InChI'] in all_inchis):
@@ -197,7 +217,7 @@ with open(Biochem_File) as fh:
         #Then check that the Name doesn't already exist
         elif(matched_cpd is None):
             msids=dict()
-            for name in cpd['NAMES'].split('|'):
+            for name in re.split('[|;]',cpd['NAMES']):
                 searchname = compounds_helper.searchname(name)
                 if(searchname in searchnames_dict):
                     msids[searchnames_dict[searchname]]=1
@@ -215,7 +235,7 @@ with open(Biochem_File) as fh:
             #Regardless of match-type, add new names
             #NB at this point, names shouldn't match _anything_ already in the database
             #Names are saved separately as part of the aliases at the end of the script
-            for name in cpd['NAMES'].split('|'):
+            for name in re.split('[|;]',cpd['NAMES']):
                 if(name not in all_names_dict):
                     #Possible for there to be no names in biochemistry?
                     if(matched_cpd not in names_dict):
@@ -240,11 +260,11 @@ with open(Biochem_File) as fh:
                     print("Warning: SMILE structure for "+id_to_check+" assigned to different compounds: "+",".join(all_smiles[cpd['SMILE']]))
                 
             #if matching structure or name, add ID to aliases
-            if(matched_src != 'ID'):
-                if(matched_cpd not in original_alias_dict):
-                    original_alias_dict[matched_cpd]={Biochem:list()}
-                if(matched_cpd in original_alias_dict and Biochem not in original_alias_dict[matched_cpd]):
-                    original_alias_dict[matched_cpd][Biochem]=list()
+            if(matched_cpd not in original_alias_dict):
+                original_alias_dict[matched_cpd]={Biochem:list()}
+            if(Biochem not in original_alias_dict[matched_cpd]):
+                original_alias_dict[matched_cpd][Biochem]=list()
+            if(cpd['ID'] not in original_alias_dict[matched_cpd][Biochem]):
                 original_alias_dict[matched_cpd][Biochem].append(cpd['ID'])
                 new_alias_count[matched_cpd]=1
 
@@ -270,7 +290,7 @@ with open(Biochem_File) as fh:
             #New Compound!
             #Generate new identifier
             identifier_count+=1
-            new_identifier = ID_Prefix+'cpd'+str(identifier_count)
+            new_identifier = ID_Prefix+str(identifier_count).zfill(5)
 
             new_cpd = copy.deepcopy(Default_Cpd)
             new_cpd['id']=new_identifier
@@ -287,7 +307,7 @@ with open(Biochem_File) as fh:
 
             #Add new names
             #Names are saved separately as part of the aliases at the end of the script
-            for name in cpd['NAMES'].split('|'):
+            for name in re.split('[|;]',cpd['NAMES']):
                 if(new_cpd['name']=='null'):
                     new_cpd['name']=name
                     new_cpd['abbreviation']=name
