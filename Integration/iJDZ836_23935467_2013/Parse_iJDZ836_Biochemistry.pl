@@ -61,7 +61,7 @@ while(<FH>){
     $_ =~ s/__45__/-/g;
     $_ =~ s/__91__/[/g;
     $_ =~ s/__93__/]/g;
-;
+
     @temp=split(/\t/,$_);
 
     my $rxn = $temp[0];
@@ -81,17 +81,17 @@ while(<FH>){
     my %cpts = (); #got to double-check
     my $cpt_count = 0;
     foreach my $rct (@reactants){
+	$rct =~ s/^M_//;
 	my ($cpd,$cpt,$coeff)=($rct,"c","0");
 	$rct =~ s/\[([\d\.]+)\]$//;
 	$coeff=$1;
+	$cpd=$rct;
 	if($rct =~ /\[/){
-	    $cpd = $rct;
 	    $cpd =~ s/([\w+-]+)\[([\w-]+?)\]$/$1/;
 	    if(defined($2)){
 		$cpt = $2;
 	    }
 	}elsif($rct =~ /_bm$/){
-	    $cpd = $rct;
 	    $cpd =~ s/([\w+-]+)_(\w+?)$/$1/;
 	    if(defined($2)){
 		$cpt = $2;
@@ -130,17 +130,17 @@ while(<FH>){
     my @products = split(/;/,$products);
     foreach my $pdt (@products){
 
+	$pdt =~ s/^M_//;
 	my ($cpd,$cpt,$coeff)=($pdt,"c","0");
 	$pdt =~ s/\[([\d\.]+)\]$//;
 	$coeff=$1;
+	$cpd=$pdt;
 	if($pdt =~ /\[/){
-	    $cpd = $pdt;
 	    $cpd =~ s/([\w+-]+)\[([\w-]+?)\]$/$1/;
 	    if(defined($2)){
 		$cpt = $2;
 	    }
 	}elsif($pdt =~ /_bm$/){
-	    $cpd = $pdt;
 	    $cpd =~ s/([\w+-]+)_(\w+?)$/$1/;
 	    if(defined($2)){
 		$cpt = $2;
