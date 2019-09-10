@@ -1,9 +1,21 @@
 #!/bin/bash
 export PYTHONPATH=/Users/seaver/Projects/ModelSEEDDatabase/Libs/Python/
 git checkout ../Biochemistry/compounds.* ../Biochemistry/Aliases/Unique_ModelSEED_Compound_*.txt
+
 #Yeast Consensus Model (8.3.4)
-../Scripts/Biochemistry/Add_New_Compounds.py Yeast_8.3.4_2019/yeastGEM_Compounds.tbl KEGG 0 'Published Model' f
-../Scripts/Biochemistry/Add_New_Reactions.py Yeast_8.3.4_2019/yeastGEM_Reactions.tbl 'Published Model' f
+#../Scripts/Biochemistry/Add_New_Compounds.py Yeast_8.3.4_2019/yeastGEM_Compounds.tbl KEGG 0 'Published Model' f
+#../Scripts/Biochemistry/Add_New_Reactions.py Yeast_8.3.4_2019/yeastGEM_Reactions.tbl 'Published Model' f
+
+#iJDZ836 (MetaCyc)
+#../Scripts/Biochemistry/Add_New_Compounds.py iJDZ836_23935467_2013/iJDZ836_Compounds.tbl MetaCyc 1 'Published Model' f
+#../Scripts/Biochemistry/Add_New_Reactions.py iJDZ836_23935467_2013/iJDZ836_Reactions.tbl 'Published Model' f
+
+#iAL1006 (RAVEN)
+../Scripts/Biochemistry/Add_New_Compounds.py iAL1006_23555215_2013/iAL1006_Compounds.tbl InChI 0 'Published Model' f
+../Scripts/Biochemistry/Add_New_Reactions.py iAL1006_23555215_2013/iAL1006_Reactions.tbl 'Published Model' f
+
+
+exit
 #iCY1106
 ../Scripts/Biochemistry/Add_New_Compounds.py iCY1106_25582171_2015/iCY1106_Compounds.tbl BiGG 1 'Published Model' f
 ../Scripts/Biochemistry/Add_New_Reactions.py iCY1106_25582171_2015/iCY1106_Reactions.tbl 'Published Model' f
