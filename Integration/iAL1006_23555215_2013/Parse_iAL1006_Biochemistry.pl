@@ -52,7 +52,7 @@ while(<FH>){
     my $rxn = $temp[0];
 
     #Clean up identifier
-    $rxn =~ s/^r_+//;
+    $rxn =~ s/^R_+//;
 
     #Go through reactants
     my ($rev,$reactants,$products)=@temp[2..5];

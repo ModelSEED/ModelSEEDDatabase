@@ -14,6 +14,9 @@ git checkout ../Biochemistry/compounds.* ../Biochemistry/Aliases/Unique_ModelSEE
 ../Scripts/Biochemistry/Add_New_Compounds.py iAL1006_23555215_2013/iAL1006_Compounds.tbl InChI 0 'Published Model' f
 ../Scripts/Biochemistry/Add_New_Reactions.py iAL1006_23555215_2013/iAL1006_Reactions.tbl 'Published Model' f
 
+#iWV1314 (RAVEN)
+../Scripts/Biochemistry/Add_New_Compounds.py iWV1314_18500999_2008/iWV1314_Compounds.tbl iAL1006 0 'Published Model' f
+../Scripts/Biochemistry/Add_New_Reactions.py iWV1314_18500999_2008/iWV1314_Reactions.tbl 'Published Model' f
 
 exit
 #iCY1106
