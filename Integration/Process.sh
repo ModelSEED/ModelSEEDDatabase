@@ -19,8 +19,8 @@ git checkout ../Biochemistry/compounds.* ../Biochemistry/Aliases/Unique_ModelSEE
 ../Scripts/Biochemistry/Add_New_Reactions.py iNX804_23172360_2013/iNX804_Reactions.tbl 'Published Model' f
 
 #iJB1325 (RAVEN;KEGG)
-../Scripts/Biochemistry/Add_New_Compounds.py iJB1325_30275963_2018/iJB1325_Compounds.tbl KEGG 0 'Published Model' f
-../Scripts/Biochemistry/Add_New_Reactions.py iJB1325_30275963_2018/iJB1325_Reactions.tbl 'Published Model' f
+../Scripts/Biochemistry/Add_New_Compounds.py iJB1325_30275963_2018/iJB1325_ATCC1015_Compounds.tbl KEGG 0 'Published Model' f
+../Scripts/Biochemistry/Add_New_Reactions.py iJB1325_30275963_2018/iJB1325_ATCC1015_Reactions.tbl 'Published Model' f
 
 #iWV1314 (RAVEN)
 ../Scripts/Biochemistry/Add_New_Compounds.py iWV1314_18500999_2008/iWV1314_Compounds.tbl iJB1325 1 'Published Model' f
