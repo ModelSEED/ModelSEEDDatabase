@@ -16,10 +16,32 @@ while(<FH>){
     if($header){$header--;next}
     @temp=split(/\t/,$_);
 
+    #Redundant code for finding unicode hexademical code points
+    foreach my $temp (@temp){
+	my $found=0;
+	foreach my $char (split(//,$temp)){
+	    if($char =~ /[^\x00-\x7F]+/){
+		$found=1;
+		my $n = ord $char;
+		open my $BYTE, '>:utf8', \ my $bytes;
+		print {$BYTE} $char;
+#		printf "%s\t%s\t%x\t%b\t%x %x\t %b %b\n", $char, $n, $n, $n, (unpack('CC', $bytes)) x 2;
+	    }
+	}
+#	print $temp,"\n" if $found;
+    }
+    
     my $cpd_cpt = $temp[0];
-
+    
     #Clean up identifier
     $temp[0] =~ s/^M_+//;
+
+    #Clean up name
+    $temp[1] =~ s/\x{ce}\x{b1}/alpha/;
+    $temp[1] =~ s/\x{ce}\x{b2}/beta/;
+    $temp[1] =~ s/\x{ce}\x{b3}/gamma/;
+    $temp[1] =~ s/\x{e4}/e/;
+    $temp[1] =~ s/\x{e2}\x{88}\x{92}/-/;
 
     #Remove Compartment
     my $cpd = $temp[0];
@@ -47,14 +69,15 @@ while(<FH>){
     chomp;
     if($header){$header--;next}
 
-    print $_,"\n";
-
     @temp=split(/\t/,$_);
 
     my $rxn = $temp[0];
 
     #Clean up identifier
     $rxn =~ s/^R_+//;
+
+    #Clean up unicode character in name
+    $temp[1] =~ s/\x{a0}//;
 
     #Go through reactants
     my ($rev,$reactants,$products)=@temp[2..5];
@@ -77,8 +100,6 @@ while(<FH>){
 	}
 
 	my $cpd = $rct;
-
-	print($cpd,"\n");
 
 	$Cpds_in_Rxns{$cpd}=1;
 
