@@ -11,11 +11,13 @@ my $Reactions = $Biochemistry."_Reaction_Table.txt";
 open(FH, "< $Compounds");
 my $header=1;
 my %Original_Compounds=();
+my $Default_Cpt="";
 while(<FH>){
     chomp;
     if($header){$header--;next}
     @temp=split(/\t/,$_);
 
+    ###############################################################
     #Redundant code for finding unicode hexademical code points
     foreach my $temp (@temp){
 	my $found=0;
@@ -30,7 +32,8 @@ while(<FH>){
 	}
 #	print $temp,"\n" if $found;
     }
-    
+    ###############################################################
+
     my $cpd_cpt = $temp[0];
     
     #Clean up identifier
@@ -54,9 +57,13 @@ while(<FH>){
     #Define KEGG
     $temp[5] = "" if !$temp[5];
 
+    if($Default_Cpt eq ""){
+	$Default_Cpt = $temp[2];
+    }
+
     $Original_Compounds{$cpd_cpt}={'ID'=>$cpd,
 				   'NAMES'=>$temp[1],
-				   'COMPARTMENT'=>$cpt,
+				   'COMPARTMENT'=>$temp[2],
 				   'KEGG'=>$temp[5]};
 }
 close(FH);
@@ -89,17 +96,18 @@ while(<FH>){
     my @eqn=();
     my %cpts = (); #got to double-check
     my $cpt_count = 0;
-    foreach my $rct (@reactants){
-	$rct =~ s/^M_//;
-	$rct =~ s/\[([\d.]+)\]$//;
+    foreach my $entry (@reactants){
+	$entry =~ s/\[([-eE\d.]+)\]$//;
 	my $coeff = $1;
 
-	my $cpt = "c";
-	if($rct =~ s/([a-z])$//){
-	    $cpt = $1;
+	my $cpt = $Default_Cpt;
+	my $cpd = $entry;
+	if(!exists($Original_Compounds{$entry})){
+	    print "Warning: cannot find ".$entry."\n";
+	}else{
+	    $cpt = $Original_Compounds{$entry}{'COMPARTMENT'};
+	    $cpd = $Original_Compounds{$entry}{'ID'};
 	}
-
-	my $cpd = $rct;
 
 	$Cpds_in_Rxns{$cpd}=1;
 
@@ -131,17 +139,18 @@ while(<FH>){
     push(@eqn,$reversibility);
 
     my @products = split(/;/,$products);
-    foreach my $pdt (@products){
-	$pdt =~ s/^M_//;
-	$pdt =~ s/\[([\d.]+)\]$//;
+    foreach my $entry (@products){
+	$entry =~ s/\[([-eE\d.]+)\]$//;
 	my $coeff = $1;
 
-	my $cpt = "c";
-	if($pdt =~ s/([a-z])$//){
-	    $cpt = $1;
+	my $cpt = $Default_Cpt;
+	my $cpd = $entry;
+	if(!exists($Original_Compounds{$entry})){
+	    print "Warning: cannot find ".$entry."\n";
+	}else{
+	    $cpt = $Original_Compounds{$entry}{'COMPARTMENT'};
+	    $cpd = $Original_Compounds{$entry}{'ID'};
 	}
-
-	my $cpd = $pdt;
 
 	$Cpds_in_Rxns{$cpd}=1;
 

@@ -49,3 +49,7 @@ git checkout ../Biochemistry/compounds.* ../Biochemistry/Aliases/Unique_ModelSEE
 #iCT646 (BiGG)
 ../Scripts/Biochemistry/Add_New_Compounds.py iCT646_26915092_2016/iCT646_Compounds.tbl BiGG 1 'Published Model' f
 ../Scripts/Biochemistry/Add_New_Reactions.py iCT646_26915092_2016/iCT646_Reactions.tbl 'Published Model' f
+
+#iOD907 (RAVEN;KEGG)
+../Scripts/Biochemistry/Add_New_Compounds.py iOD907_24777859_2014/iOD907_Compounds.tbl KEGG 0 'Published Model' f
+../Scripts/Biochemistry/Add_New_Reactions.py iOD907_24777859_2014/iOD907_Reactions.tbl 'Published Model' f
