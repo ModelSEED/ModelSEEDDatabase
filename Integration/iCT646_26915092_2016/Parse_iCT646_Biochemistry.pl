@@ -11,27 +11,32 @@ my $Reactions = $Biochemistry."_Reaction_Table.txt";
 open(FH, "< $Compounds");
 my $header=1;
 my %Original_Compounds=();
+my $Default_Cpt="";
 while(<FH>){
     chomp;
     if($header){$header--;next}
     @temp=split(/\t/,$_);
 
-    my $cpd_cpt = $temp[0];
-
     #Convert ASCII codes
-    $temp[0] =~ s/_DASH_/-/;
+    $temp[0] =~ s/_DASH_/-/g;
+
+    my $cpd_cpt = $temp[0];
 
     #Clean up identifier
     $temp[0] =~ s/^M_+//;
 
     #Remove Compartment
     my $cpd = $temp[0];
-    $cpd =~ s/(\w+)_(\w+?)$/$1/;
+    $cpd =~ s/(\w+)_([a-z]+?)$/$1/;
     my $cpt = $2;
+
+    if($Default_Cpt eq ""){
+	$Default_Cpt = $temp[2];
+    }
 
     $Original_Compounds{$cpd_cpt}={'ID'=>$cpd,
 				   'NAMES'=>$temp[1],
-				   'COMPARTMENT'=>$cpt};
+				   'COMPARTMENT'=>$temp[2]};
 }
 close(FH);
 
@@ -64,9 +69,18 @@ while(<FH>){
     my @eqn=();
     my %cpts = (); #got to double-check
     my $cpt_count = 0;
-    foreach my $rct (@reactants){
-	$rct =~ /M_([\(\)\w-]+)_(\w+)\[(\d+(\.[\de-]+)*)\]/;
-	my ($cpd,$cpt,$coeff)=($1,$2,$3);
+    foreach my $entry (@reactants){
+	$entry =~ s/\[([-eE\d.]+)\]$//;
+	my $coeff = $1;
+
+	my $cpt = $Default_Cpt;
+	my $cpd = $entry;
+	if(!exists($Original_Compounds{$entry})){
+	    print "Warning: cannot find ".$entry."\n";
+	}else{
+	    $cpt = $Original_Compounds{$entry}{'COMPARTMENT'};
+	    $cpd = $Original_Compounds{$entry}{'ID'};
+	}
 
 	$Cpds_in_Rxns{$cpd}=1;
 
@@ -98,9 +112,18 @@ while(<FH>){
     push(@eqn,$reversibility);
 
     my @products = split(/;/,$products);
-    foreach my $pdt (@products){
-	$pdt =~ /M_([\(\)\w-]+)_(\w+)\[(\d+(\.[\de-]+)*)\]/;
-	my ($cpd,$cpt,$coeff)=($1,$2,$3);
+    foreach my $entry (@products){
+	$entry =~ s/\[([-eE\d.]+)\]$//;
+	my $coeff = $1;
+
+	my $cpt = $Default_Cpt;
+	my $cpd = $entry;
+	if(!exists($Original_Compounds{$entry})){
+	    print "Warning: cannot find ".$entry."\n";
+	}else{
+	    $cpt = $Original_Compounds{$entry}{'COMPARTMENT'};
+	    $cpd = $Original_Compounds{$entry}{'ID'};
+	}
 
 	$Cpds_in_Rxns{$cpd}=1;
 

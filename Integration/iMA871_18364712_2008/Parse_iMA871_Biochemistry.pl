@@ -11,27 +11,29 @@ my $Reactions = $Biochemistry."_Reaction_Table.txt";
 open(FH, "< $Compounds");
 my $header=1;
 my %Original_Compounds=();
+my $Default_Cpt="";
 while(<FH>){
     chomp;
     if($header){$header--;next}
     @temp=split(/\t/,$_);
+
+    #Weird problem where hyphens and underscores inconsistently used in compounds and reactions table
+    $temp[0] =~ s/-/_/g;
 
     my $cpd_cpt = $temp[0];
 
     #Clean up identifier
     $temp[0] =~ s/^M_+//;
 
-    #Remove Compartment
     my $cpd = $temp[0];
-    my $cpt = "c";
 
-    if($cpd =~ s/([a-z])$//){
-	$cpt = $1;
+    if($Default_Cpt eq ""){
+	$Default_Cpt = $temp[2];
     }
 
     $Original_Compounds{$cpd_cpt}={'ID'=>$cpd,
 				   'NAMES'=>$temp[1],
-				   'COMPARTMENT'=>$cpt};
+				   'COMPARTMENT'=>$temp[2]};
 }
 close(FH);
 
@@ -60,17 +62,19 @@ while(<FH>){
     my @eqn=();
     my %cpts = (); #got to double-check
     my $cpt_count = 0;
-    foreach my $rct (@reactants){
-	$rct =~ s/^M_//;
-	$rct =~ s/\[([\d.]+)\]$//;
+    foreach my $entry (@reactants){
+	$entry =~ s/\[([-eE\d.]+)\]$//;
 	my $coeff = $1;
 
-	my $cpt = "c";
-	if($rct =~ s/([a-z])$//){
-	    $cpt = $1;
+	my $cpt = $Default_Cpt;
+	my $cpd = $entry;
+	$entry =~ s/-/_/g;
+	if(!exists($Original_Compounds{$entry})){
+	    print "Warning: cannot find ".$entry."\n";
+	}else{
+	    $cpt = $Original_Compounds{$entry}{'COMPARTMENT'};
+	    $cpd = $Original_Compounds{$entry}{'ID'};
 	}
-
-	my $cpd = $rct;
 
 	$Cpds_in_Rxns{$cpd}=1;
 
@@ -102,18 +106,19 @@ while(<FH>){
     push(@eqn,$reversibility);
 
     my @products = split(/;/,$products);
-    foreach my $pdt (@products){
-
-	$pdt =~ s/^M_//;
-	$pdt =~ s/\[([\d.]+)\]$//;
+    foreach my $entry (@products){
+	$entry =~ s/\[([-eE\d.]+)\]$//;
 	my $coeff = $1;
 
-	my $cpt = "c";
-	if($pdt =~ s/([a-z])$//){
-	    $cpt = $1;
+	my $cpt = $Default_Cpt;
+	my $cpd = $entry;
+	$entry =~ s/-/_/g;
+	if(!exists($Original_Compounds{$entry})){
+	    print "Warning: cannot find ".$entry."\n";
+	}else{
+	    $cpt = $Original_Compounds{$entry}{'COMPARTMENT'};
+	    $cpd = $Original_Compounds{$entry}{'ID'};
 	}
-
-	my $cpd = $pdt;
 
 	$Cpds_in_Rxns{$cpd}=1;
 
