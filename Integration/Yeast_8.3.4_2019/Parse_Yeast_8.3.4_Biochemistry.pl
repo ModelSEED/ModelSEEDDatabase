@@ -25,11 +25,11 @@ while(<FH>){
 
     #Remove Compartment
     my $cpd = $temp[0];
-    $cpd =~ s/\[(\w+)\]$//;
+    $cpd =~ s/\[([a-z]+)\]$//;
     my $cpt = $1;
 
     #Strip name
-    $temp[1] =~ s/(\s\[[\w\s]+\])$//;
+    $temp[1] =~ s/(\s\[[[a-z]\s]+\])$//;
 
     #Define KEGG
     $temp[5] = "" if !$temp[5];

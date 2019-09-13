@@ -24,7 +24,7 @@ while(<FH>){
 
     #Remove Compartment
     my $cpd = $temp[0];
-    $cpd =~ s/_(\w+)$//;
+    $cpd =~ s/_([a-z]+)$//;
     my $cpt = $1;
 
     #Define KEGG

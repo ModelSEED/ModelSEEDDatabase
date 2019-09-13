@@ -33,12 +33,12 @@ while(<FH>){
 
     my $cpt="c";
     if($cpd =~ /\[/){
-	$cpd =~ s/([\w+-]+)\[([\w-]+?)\]$/$1/;
+	$cpd =~ s/([\w+-]+)\[([a-zA-Z-]+?)\]$/$1/;
 	if(defined($2)){
 	    $cpt = $2;
 	}
     }elsif($cpd =~ /_bm$/){
-	$cpd =~ s/([\w+-]+)_(\w+?)$/$1/;
+	$cpd =~ s/([\w+-]+)_([a-zA-Z]+?)$/$1/;
 	if(defined($2)){
 	    $cpt = $2;
 	}
