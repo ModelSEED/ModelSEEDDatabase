@@ -53,3 +53,19 @@ git checkout ../Biochemistry/compounds.* ../Biochemistry/Aliases/Unique_ModelSEE
 #iOD907 (RAVEN;KEGG)
 ../Scripts/Biochemistry/Add_New_Compounds.py iOD907_24777859_2014/iOD907_Compounds.tbl KEGG 0 'Published Model' f
 ../Scripts/Biochemistry/Add_New_Reactions.py iOD907_24777859_2014/iOD907_Reactions.tbl 'Published Model' f
+
+#iNL895 (Name)
+../Scripts/Biochemistry/Add_New_Compounds.py iNL895_22558935_2012/iNL895_Compounds.tbl None 1 'Published Model' f
+../Scripts/Biochemistry/Add_New_Reactions.py iNL895_22558935_2012/iNL895_Reactions.tbl 'Published Model' f
+
+#iLC915 (Name)
+../Scripts/Biochemistry/Add_New_Compounds.py iLC915_22472172_2012/iLC915_Compounds.tbl None 1 'Published Model' f
+../Scripts/Biochemistry/Add_New_Reactions.py iLC915_22472172_2012/iLC915_Reactions.tbl 'Published Model' f
+
+#iSS884 (Name)
+../Scripts/Biochemistry/Add_New_Compounds.py iSS884_22472172_2012/iSS884_Compounds.tbl None 1 'Published Model' f
+../Scripts/Biochemistry/Add_New_Reactions.py iSS884_22472172_2012/iSS884_Reactions.tbl 'Published Model' f
+
+#iRL766 (Name)
+../Scripts/Biochemistry/Add_New_Compounds.py iRL766_24374726_2014/iRL766_Compounds.tbl None 1 'Published Model' f
+../Scripts/Biochemistry/Add_New_Reactions.py iRL766_24374726_2014/iRL766_Reactions.tbl 'Published Model' f
