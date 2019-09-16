@@ -167,7 +167,7 @@ with open(Biochem_File) as fh:
             matched_src="MANUAL"
 
         id_to_check = cpd['ID']
-        if(matched_cpd is None and Primary_Biochem != "InChI"):
+        if(matched_cpd is None and Primary_Biochem != "None" and Primary_Biochem != "InChI"):
             #Check to see if using primary id or ids in another column
             if(Primary_IDs==0 and Primary_Biochem in cpd and cpd[Primary_Biochem] != ''):
                 id_to_check=cpd[Primary_Biochem]

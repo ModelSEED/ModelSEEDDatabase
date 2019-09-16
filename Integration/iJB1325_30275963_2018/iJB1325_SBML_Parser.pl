@@ -36,6 +36,7 @@ print FH "ID\tName\tCompartment\tCharge\tboundary Condition\tKEGG\tInChI\n";
 foreach my $c (@compounds){
     $id=$c->getAttribute('id');
     $name=$c->getAttribute('name');
+    $name =~ s/\x{A}//;
     $cpt=$c->getAttribute('compartment');
     $charge=$c->getAttribute('charge');
     $bC=$c->getAttribute('boundaryCondition');

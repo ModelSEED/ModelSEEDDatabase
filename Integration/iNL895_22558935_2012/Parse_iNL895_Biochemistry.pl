@@ -4,7 +4,7 @@ use warnings;
 use strict;
 my @temp=();
 
-my $Biochemistry = "iMA871";
+my $Biochemistry = "iNL895";
 my $Compounds = $Biochemistry."_Compound_Table.txt";
 my $Reactions = $Biochemistry."_Reaction_Table.txt";
 
@@ -17,15 +17,17 @@ while(<FH>){
     if($header){$header--;next}
     @temp=split(/\t/,$_);
 
-    #Weird problem where hyphens and underscores inconsistently used in compounds and reactions table
-    $temp[0] =~ s/-/_/g;
-
     my $cpd_cpt = $temp[0];
 
     #Clean up identifier
-    $temp[0] =~ s/^M_+//;
+    $temp[0] =~ s/^s_+//;
+    $temp[0] =~ s/_b$//;
 
     my $cpd = $temp[0];
+
+    #Strip compartment from name
+    $temp[1] =~ s/\[([\w\s]+)\]$//;
+    $temp[1] =~ s/\s+$//;
 
     if($Default_Cpt eq ""){
 	$Default_Cpt = $temp[2];
@@ -51,6 +53,7 @@ while(<FH>){
 
     #Clean up identifier
     $rxn =~ s/^R_+//;
+    $rxn =~ s/_+$//;
 
     #Go through reactants
     my ($rev,$reactants,$products)=@temp[2..5];
@@ -68,7 +71,6 @@ while(<FH>){
 
 	my $cpt = $Default_Cpt;
 	my $cpd = $entry;
-	$entry =~ s/-/_/g;
 	if(!exists($Original_Compounds{$entry})){
 	    print "Warning: cannot find ".$entry."\n";
 	}else{
@@ -112,7 +114,6 @@ while(<FH>){
 
 	my $cpt = $Default_Cpt;
 	my $cpd = $entry;
-	$entry =~ s/-/_/g;
 	if(!exists($Original_Compounds{$entry})){
 	    print "Warning: cannot find ".$entry."\n";
 	}else{
