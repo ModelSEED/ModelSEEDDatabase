@@ -94,77 +94,77 @@ r1080	r1080	O2(cpd00007)[0] CPGIII(cpd02083)[0] => (2) H2O(cpd00001)[0] (2) CO2(
 r1081	r1081	(3) O2(cpd00007)[0] PPGIX(cpd00791)[0] => (3) H2O(cpd00001)[0] PPRIX(cpd01476)[0]	N	N	N	Y	frxn00013	
 r1082	r1082	PPRIX(cpd01476)[0] FE(cpd10515)[0] => PHEME(cpd00028)[0]	N	N	Y	Y	rxn00224	(1) Protoporphyrin[0] + (1) Fe+2[0] <=> (1) Heme[0] + (2) H+[0]
 r1083	r1083	PPRIX(cpd01476)[0] FE(cpd10515)[0] => PHEME(cpd00028)[0]	N	N	Y	Y	rxn00224	(1) Protoporphyrin[0] + (1) Fe+2[0] <=> (1) Heme[0] + (2) H+[0]
-r1084	r1084	PHEME(cpd00028)[0] => HEME(cpd11312)[1]	Y	N	N	Y	frxn00014	
-r1085	r1085	HEME(cpd11312)[0] => HEME(cpd11312)[1]	Y	N	N	Y	frxn00015	
+r1084	r1084	PHEME(cpd00028)[0] => HEME_O(cpd11313)[0]	N	N	Y	Y	rxn31334	(1) Heme[0] <= (1) hemeO[0]
+r1085	r1085	HEME_O(cpd11313)[0] => HEME_A(cpd11312)[0]	N	N	Y	Y	rxn05121	(1) hemeO[0] => (1) hemeA[0]
 r1086	r1086	PHEME(cpd00028)[0] APOCE(cpd12052)[0] => CYMEC(cpd00410)[0]	N	N	Y	Y	rxn06171	(1) Cytochrome c[0] => (1) Heme[0] + (1) Apocytochrome c[0]
 r1087	r1087	PHEME(cpd00028)[0] APOCE(cpd12052)[0] => CYMEC(cpd00410)[0]	N	N	Y	Y	rxn06171	(1) Cytochrome c[0] => (1) Heme[0] + (1) Apocytochrome c[0]
-r1088	r1088	SAM(cpd00017)[0] UPGIII(cpd00774)[0] => SAH(cpd00019)[0] PRECOR[0]	N	N	N	N	frxn00016	
-r1089	r1089	NAD(cpd00003)[0] PRECOR[0] => NADH(cpd00004)[0] SHCR(cpd03426)[0]	N	N	N	N	frxn00017	
-r109	r109	H2O(cpd00001)[0] CRONYLCOA(cpd00650)[0] => C4HCOA(cpd03043)[1]	Y	N	N	Y	frxn00018	
-r1090	r1090	SHCR(cpd03426)[0] => SIHM(cpd00557)[0]	N	N	N	Y	frxn00019	
+r1088	r1088	SAM(cpd00017)[0] UPGIII(cpd00774)[0] => SAH(cpd00019)[0] PRECOR[0]	N	N	N	N	frxn00014	
+r1089	r1089	NAD(cpd00003)[0] PRECOR[0] => NADH(cpd00004)[0] SHCR(cpd03426)[0]	N	N	N	N	frxn00015	
+r109	r109	H2O(cpd00001)[0] CRONYLCOA(cpd00650)[0] => C4HCOA_R(cpd02234)[0]	N	N	Y	Y	rxn02168	(1) (R)-3-Hydroxybutanoyl-CoA[0] <=> (1) H2O[0] + (1) Crotonyl-CoA[0]
+r1090	r1090	SHCR(cpd03426)[0] => SIHM(cpd00557)[0]	N	N	N	Y	frxn00016	
 r1091	r1091	CHOR(cpd00216)[0] => PYR(cpd00020)[0] 4HBZ(cpd00136)[0]	N	N	Y	Y	rxn00966	(1) Pyruvate[0] + (1) 4-Hydroxybenzoate[0] <= (1) Chorismate[0]
-r1092	r1092	ATP(cpd00002)[0] COBNM(cpd03422)[0] => (3) PI(cpd00009)[0] ADCOBNM(cpd03918)[0]	N	N	N	Y	frxn00020	
+r1092	r1092	ATP(cpd00002)[0] COBNM(cpd03422)[0] => (3) PI(cpd00009)[0] ADCOBNM(cpd03918)[0]	N	N	N	Y	frxn00017	
 r1093	r1093	4HBZ(cpd00136)[0] NPP(cpd30761)[0] => PPI(cpd00012)[0] N4HBZ(cpd03443)[0]	N	N	Y	Y	rxn18965	(1) 4-Hydroxybenzoate[0] + (1) OPP[0] => (1) PPi[0] + (1) H+[0] + (1) 3-Octaprenyl-4-hydroxybenzoate[0]
 r1094	r1094	N4HBZ(cpd03443)[0] => CO2(cpd00011)[0] 2NPPP(cpd03444)[0]	N	N	Y	Y	rxn03393	(1) H+[0] + (1) 3-Octaprenyl-4-hydroxybenzoate[0] => (1) CO2[0] + (1) 2-Octaprenylphenol[0]
-r1095	r1095	O2(cpd00007)[0] 2NPPP(cpd03444)[0] => 2N6H[0]	N	N	N	N	frxn00021	
-r1096	r1096	SAM(cpd00017)[0] 2N6H[0] => SAH(cpd00019)[0] 2NPMP[0]	N	N	N	N	frxn00022	
-r1097	r1097	O2(cpd00007)[0] 2NPMP[0] => 2NPMB[0]	N	N	N	N	frxn00023	
-r1098	r1098	SAM(cpd00017)[0] 2NPMB[0] => SAH(cpd00019)[0] 2NPMMB(cpd03448)[0]	N	N	N	N	frxn00024	
-r1099	r1099	O2(cpd00007)[0] 2NPMMB(cpd03448)[0] => 2NMHMB[0]	N	N	N	N	frxn00025	
+r1095	r1095	O2(cpd00007)[0] 2NPPP(cpd03444)[0] => 2N6H[0]	N	N	N	N	frxn00018	
+r1096	r1096	SAM(cpd00017)[0] 2N6H[0] => SAH(cpd00019)[0] 2NPMP[0]	N	N	N	N	frxn00019	
+r1097	r1097	O2(cpd00007)[0] 2NPMP[0] => 2NPMB[0]	N	N	N	N	frxn00020	
+r1098	r1098	SAM(cpd00017)[0] 2NPMB[0] => SAH(cpd00019)[0] 2NPMMB(cpd03448)[0]	N	N	N	N	frxn00021	
+r1099	r1099	O2(cpd00007)[0] 2NPMMB(cpd03448)[0] => 2NMHMB[0]	N	N	N	N	frxn00022	
 r11	r11	ATP(cpd00002)[0] F6P(cpd19035)[0] => ADP(cpd00008)[0] FDP(cpd19036)[0]	N	N	Y	Y	rxn15493	(1) ATP[0] + (1) beta-D-Fructose 6-phosphate[0] => (1) ADP[0] + (1) H+[0] + (1) beta-D-Fructose 1,6-bisphosphate[0]
-r110	r110	C4HCOA(cpd03043)[0] => C4HCOA(cpd03043)[1]	Y	N	N	Y	frxn00026	
-r1100	r1100	O2(cpd00007)[0] 2NPMMB(cpd03448)[0] => 2NMHMB[0]	N	N	N	N	frxn00025	(1) O2[0] + (1) 2-Octaprenyl-3-methyl-6-methoxy-1,4-benzoquinone[0] <=> (1) 3-demethylubiquinone-8_[0]
-r1101	r1101	SAM(cpd00017)[0] 2NMHMB[0] => Q(cpd01351)[0] SAH(cpd00019)[0]	N	N	N	N	frxn00027	
+r110	r110	C4HCOA_R(cpd02234)[0] => C4HCOA(cpd03043)[0]	N	N	N	Y	frxn00023	
+r1100	r1100	O2(cpd00007)[0] 2NPMMB(cpd03448)[0] => 2NMHMB[0]	N	N	N	N	frxn00022	(1) O2[0] + (1) 2-Octaprenyl-3-methyl-6-methoxy-1,4-benzoquinone[0] <=> (1) 3-demethylubiquinone-8[0]
+r1101	r1101	SAM(cpd00017)[0] 2NMHMB[0] => Q(cpd01351)[0] SAH(cpd00019)[0]	N	N	N	N	frxn00024	
 r1102	r1102	NADPH(cpd00005)[0] O2(cpd00007)[0] 4HBZ(cpd00136)[0] => H2O(cpd00001)[0] NADP(cpd00006)[0] PCACE(cpd00197)[0]	N	N	Y	Y	rxn00962	(1) NADPH[0] + (1) O2[0] + (1) H+[0] + (1) 4-Hydroxybenzoate[0] => (1) H2O[0] + (1) NADP[0] + (1) Protocatechuate[0]
-r1103	r1103	SAM(cpd00017)[0] 2N6H[0] => SAH(cpd00019)[0] 2NPMP[0]	N	N	N	N	frxn00022	(1) S-Adenosyl-L-methionine[0] + (1) 6-hydroxy-2-octaprenylphenol[0] <=> (1) S-Adenosyl-homocysteine[0] + (1) 6-methoxy-2-octaprenylphenol[0]
+r1103	r1103	SAM(cpd00017)[0] 2N6H[0] => SAH(cpd00019)[0] 2NPMP[0]	N	N	N	N	frxn00019	(1) S-Adenosyl-L-methionine[0] + (1) 6-hydroxy-2-octaprenylphenol[0] <=> (1) S-Adenosyl-homocysteine[0] + (1) 6-methoxy-2-octaprenylphenol[0]
 r1104	r1104	GTP(cpd00038)[0] => PPI(cpd00012)[0] FOR(cpd00047)[0] D6RP5P(cpd00957)[0]	N	N	Y	Y	rxn30691	(1) GTP[0] => (1) PPi[0] + (1) Formate[0] + (1) 2,5-Diamino-6-(5'-phosphoribosylamino)-4-pyrimidineone[0]
 r1105	r1105	D6RP5P(cpd00957)[0] => NH3(cpd00013)[0] A6RP5P(cpd00931)[0]	N	N	Y	Y	rxn30764	(1) 2,5-Diamino-6-(5'-phosphoribosylamino)-4-pyrimidineone[0] => (1) NH3[0] + (1) 5-Amino-6--5-phosphoribosylaminouracil[0]
-r1106	r1106	D6RP5P(cpd00957)[0] => NH3(cpd00013)[1] A6RP5P(cpd00931)[0]	Y	N	N	Y	frxn00028	
+r1106	r1106	D6RP5P(cpd00957)[0] => NH3(cpd00013)[1] A6RP5P(cpd00931)[0]	Y	N	N	Y	frxn00025	
 r1107	r1107	NADPH(cpd00005)[0] A6RP5P(cpd00931)[0] => NADP(cpd00006)[0] A6RP5P2(cpd02720)[0]	N	N	Y	Y	rxn02474	(1) NADP[0] + (1) 5-Amino-6--5-phosphoribitylaminouracil[0] <=> (1) NADPH[0] + (1) H+[0] + (1) 5-Amino-6--5-phosphoribosylaminouracil[0]
-r1108	r1108	H2O(cpd00001)[0] A6RP5P2(cpd02720)[0] => PI(cpd00009)[0] A6RP[0]	N	N	N	N	frxn00029	
+r1108	r1108	H2O(cpd00001)[0] A6RP5P2(cpd02720)[0] => PI(cpd00009)[0] A6RP[0]	N	N	N	N	frxn00026	
 r1109	r1109	RL5P(cpd00171)[0] => FOR(cpd00047)[0] DB4P(cpd11225)[0]	N	N	Y	Y	rxn05040	(1) D-Ribulose5-phosphate[0] => (1) Formate[0] + (1) H+[0] + (1) 3-4-dihydroxy-2-butanone4-phosphate[0]
 r111	r111	CRONYLCOA(cpd00650)[0] => C4HCOA(cpd03043)[0]	N	W	Y	Y	rxn03874	(1) H2O[0] + (1) Crotonyl-CoA[0] <=> (1) 3-Hydroxybutanoyl-CoA[0]
-r1110	r1110	A6RP[0] DB4P(cpd11225)[0] => PI(cpd00009)[0] (2) H2O(cpd00001)[0] D8RL(cpd02656)[0]	N	N	N	N	frxn00030	
-r1111	r1111	D8RL(cpd02656)[0] => A6RP[0] RIBFLAV(cpd00220)[0]	N	N	N	N	frxn00031	
+r1110	r1110	A6RP[0] DB4P(cpd11225)[0] => PI(cpd00009)[0] (2) H2O(cpd00001)[0] D8RL(cpd02656)[0]	N	N	N	N	frxn00027	
+r1111	r1111	D8RL(cpd02656)[0] => A6RP[0] RIBFLAV(cpd00220)[0]	N	N	N	N	frxn00028	
 r1112	r1112	ATP(cpd00002)[0] RIBFLAV(cpd00220)[0] => ADP(cpd00008)[0] FMN(cpd00050)[0]	N	N	Y	Y	rxn00392	(1) ATP[0] + (1) Riboflavin[0] => (1) ADP[0] + (1) FMN[0]
 r1113	r1113	ATP(cpd00002)[0] FMN(cpd00050)[0] => PPI(cpd00012)[0] FAD(cpd00015)[0]	N	N	Y	Y	rxn00122	(1) ATP[0] + (1) FMN[0] <=> (1) PPi[0] + (1) FAD[0]
-r1114	r1114	FMN(cpd00050)[0] => PI(cpd00009)[0] RIBFLAV(cpd00220)[0]	N	N	N	Y	frxn00032	
+r1114	r1114	FMN(cpd00050)[0] => PI(cpd00009)[0] RIBFLAV(cpd00220)[0]	N	N	N	Y	frxn00029	
 r1115	r1115	ATP(cpd00002)[0] COA(cpd00010)[0] 6CARHEX(cpd01727)[0] => AMP(cpd00018)[0] PPI(cpd00012)[0] CHCOA(cpd00782)[0]	N	N	Y	Y	rxn02296	(1) ATP[0] + (1) CoA[0] + (1) Pimelate[0] => (1) PPi[0] + (1) AMP[0] + (1) H+[0] + (1) Pimeloyl-CoA[0]
 r1116	r1116	ALA(cpd00035)[0] CHCOA(cpd00782)[0] => CO2(cpd00011)[0] COA(cpd00010)[0] AONA(cpd00800)[0]	N	N	Y	Y	rxn02297	(1) L-Alanine[0] + (1) H+[0] + (1) Pimeloyl-CoA[0] => (1) CoA[0] + (1) CO2[0] + (1) 8-Amino-7-oxononanoate[0]
 r1117	r1117	ALA(cpd00035)[0] CHCOA(cpd00782)[0] => COA(cpd00010)[0] CO2(cpd00011)[0] AONA(cpd00800)[0]	N	N	Y	Y	rxn02297	(1) L-Alanine[0] + (1) H+[0] + (1) Pimeloyl-CoA[0] => (1) CoA[0] + (1) CO2[0] + (1) 8-Amino-7-oxononanoate[0]
 r1118	r1118	SAM(cpd00017)[0] AONA(cpd00800)[0] => SAMOB(cpd02701)[0] DANNA(cpd00764)[0]	N	N	Y	Y	rxn02312	(1) S-Adenosyl-L-methionine[0] + (1) 8-Amino-7-oxononanoate[0] <=> (1) 7-8-Diaminononanoate[0] + (1) S-Adenosyl-4-methylthio-2-oxobutanoate[0]
 r1119	r1119	ATP(cpd00002)[0] CO2(cpd00011)[0] DANNA(cpd00764)[0] => ADP(cpd00008)[0] PI(cpd00009)[0] DTB(cpd01311)[0]	N	N	Y	Y	rxn02277	(1) ATP[0] + (1) CO2[0] + (1) 7-8-Diaminononanoate[0] => (1) ADP[0] + (1) Phosphate[0] + (3) H+[0] + (1) Dethiobiotin[0]
 r112	r112	CRONYLCOA(cpd00650)[0] => C4HCOA(cpd03043)[0]	N	W	Y	Y	rxn03874	(1) H2O[0] + (1) Crotonyl-CoA[0] <=> (1) 3-Hydroxybutanoyl-CoA[0]
-r1120	r1120	(2) SAM(cpd00017)[0] DTB(cpd01311)[0] S(cpd00074)[0] => (2) MET(cpd00060)[0] (2) DA(cpd00438)[0] BT(cpd00104)[0]	N	N	N	Y	frxn00033	
-r1121	r1121	(2) SAM(cpd00017)[0] DTB(cpd01311)[0] S(cpd00074)[0] => (2) MET(cpd00060)[0] BT(cpd00104)[0] (2) DA(cpd00438)[0]	N	N	N	Y	frxn00033	(2) S-Adenosyl-L-methionine[0] + (1) S[0] + (1) Dethiobiotin[0] <=> (2) L-Methionine[0] + (1) BIOT[0] + (2) Deoxyadenosine[0]
+r1120	r1120	(2) SAM(cpd00017)[0] DTB(cpd01311)[0] S(cpd00074)[0] => (2) MET(cpd00060)[0] (2) DA(cpd00438)[0] BT(cpd00104)[0]	N	N	N	Y	frxn00030	
+r1121	r1121	(2) SAM(cpd00017)[0] DTB(cpd01311)[0] S(cpd00074)[0] => (2) MET(cpd00060)[0] BT(cpd00104)[0] (2) DA(cpd00438)[0]	N	N	N	Y	frxn00030	(2) S-Adenosyl-L-methionine[0] + (1) S[0] + (1) Dethiobiotin[0] <=> (2) L-Methionine[0] + (1) BIOT[0] + (2) Deoxyadenosine[0]
 r1122	r1122	ATP(cpd00002)[0] BT(cpd00104)[0] => PPI(cpd00012)[0] BTAMP(cpd03517)[0]	N	N	Y	Y	rxn00792	(1) ATP[0] + (1) BIOT[0] => (1) PPi[0] + (1) Biotinyl-5-AMP[0]
 r1123	r1123	BTAMP(cpd03517)[0] APOCARB(cpd12847)[0] => AMP(cpd00018)[0] BCCP(cpd12848)[0]	N	N	Y	Y	rxn06864	(1) Biotinyl-5-AMP[0] + (1) Apo-[carboxylase][0] => (1) AMP[0] + (2) H+[0] + (1) Holo-[carboxylase][0]
-r1124	r1124	SAM(cpd00017)[0] MALACP(cpd11492)[0] => SAH(cpd00019)[0] MALACP(cpd11492)[1]	Y	N	N	Y	frxn00034	
+r1124	r1124	SAM(cpd00017)[0] MALACP(cpd11492)[0] => SAH(cpd00019)[0] MALACP_MES(cpd20921)[0]	N	N	Y	Y	rxn39955	(1) S-Adenosyl-L-methionine[0] + (1) Malonyl-acyl-carrierprotein-[0] <=> (1) S-Adenosyl-homocysteine[0] + (1) Malonyl-CoA methyl ester[0]
 r1125	r1125	CYSTE(cpd00395)[0] => CO2(cpd00011)[0] TAUR(cpd00210)[0]	N	N	Y	Y	rxn01231	(1) H+[0] + (1) L-Cysteate[0] => (1) CO2[0] + (1) Taurine[0]
 r1126	r1126	CYSTE(cpd00395)[0] => CO2(cpd00011)[0] TAUR(cpd00210)[0]	N	N	Y	Y	rxn01231	(1) H+[0] + (1) L-Cysteate[0] => (1) CO2[0] + (1) Taurine[0]
-r1127	r1127	AKG(cpd00024)[0] O2(cpd00007)[0] TAUR(cpd00210)[0] => CO2(cpd00011)[0] SUCC(cpd00036)[0] H2S(cpd00239)[0] AMIACE(cpd04122)[0]	N	N	N	Y	frxn00035	
+r1127	r1127	AKG(cpd00024)[0] O2(cpd00007)[0] TAUR(cpd00210)[0] => CO2(cpd00011)[0] SUCC(cpd00036)[0] H2S(cpd00239)[0] AMIACE(cpd04122)[0]	N	N	N	Y	frxn00031	
 r1128	r1128	ATP(cpd00002)[0] GLU(cpd00023)[0] CYS(cpd00084)[0] => ADP(cpd00008)[0] PI(cpd00009)[0] GC(cpd00506)[0]	N	N	Y	Y	rxn00646	(1) ATP[0] + (1) L-Glutamate[0] + (1) L-Cysteine[0] => (1) ADP[0] + (1) Phosphate[0] + (1) H+[0] + (1) gamma-Glutamylcysteine[0]
 r1129	r1129	ATP(cpd00002)[0] GLY(cpd00033)[0] GC(cpd00506)[0] => ADP(cpd00008)[0] PI(cpd00009)[0] RGT(cpd00042)[0]	N	N	Y	Y	rxn00351	(1) ATP[0] + (1) Glycine[0] + (1) gamma-Glutamylcysteine[0] => (1) ADP[0] + (1) Phosphate[0] + (1) GSH[0] + (1) H+[0]
 r113	r113	MALCOA(cpd00070)[0] => CO2(cpd00011)[0] ACCOA(cpd00022)[0]	N	N	Y	Y	rxn00174	(1) H+[0] + (1) Malonyl-CoA[0] => (1) CO2[0] + (1) Acetyl-CoA[0]
-r1130	r1130	RGT(cpd00042)[0] ALA(cpd00035)[0] => CGLY(cpd01017)[0] ALAGLY(cpd02343)[0]	N	N	N	Y	frxn00036	
+r1130	r1130	RGT(cpd00042)[0] ALA(cpd00035)[0] => CGLY(cpd01017)[0] ALAGLY[0]	N	N	N	N	frxn00032	
 r1131	r1131	H2O(cpd00001)[0] CGLY(cpd01017)[0] => GLY(cpd00033)[0] CYS(cpd00084)[0]	N	N	Y	Y	rxn00650	(1) H2O[0] + (1) Cys-Gly[0] <=> (1) Glycine[0] + (1) L-Cysteine[0]
 r1132	r1132	ATP(cpd00002)[0] (2) H2O(cpd00001)[0] 5OXOPRO(cpd01293)[0] => ADP(cpd00008)[0] PI(cpd00009)[0] GLU(cpd00023)[0]	N	N	Y	Y	rxn00186	(2) H2O[0] + (1) ATP[0] + (1) 5-Oxoproline[0] => (1) ADP[0] + (1) Phosphate[0] + (1) L-Glutamate[0] + (1) H+[0]
 r1133	r1133	(2) RGT(cpd00042)[0] H2O2(cpd00025)[0] => (2) H2O(cpd00001)[0] OGT(cpd00111)[0]	N	N	Y	Y	rxn00205	(1) H2O2[0] + (2) GSH[0] => (2) H2O[0] + (1) Oxidized glutathione[0]
-r1134	r1134	RGT(cpd00042)[0] RX(cpd11846)[0] => OGT(cpd00111)[0] HX(cpd11684)[0]	N	N	N	Y	frxn00037	
-r1135	r1135	RGT(cpd00042)[0] RX(cpd11846)[0] => HX(cpd11684)[0] OGT(cpd00111)[0]	N	N	N	Y	frxn00037	(1) GSH[0] + (1) RX[0] <=> (1) Oxidized glutathione[0] + (1) Halide[0]
+r1134	r1134	RGT(cpd00042)[0] RX(cpd11846)[0] => OGT(cpd00111)[0] HX(cpd11684)[0]	N	N	N	Y	frxn00033	
+r1135	r1135	RGT(cpd00042)[0] RX(cpd11846)[0] => HX(cpd11684)[0] OGT(cpd00111)[0]	N	N	N	Y	frxn00033	(1) GSH[0] + (1) RX[0] <=> (1) Oxidized glutathione[0] + (1) Halide[0]
 r1136	r1136	NADPH(cpd00005)[0] OGT(cpd00111)[0] => NADP(cpd00006)[0] (2) RGT(cpd00042)[0]	N	N	Y	Y	rxn00086	(1) NADP[0] + (2) GSH[0] <=> (1) NADPH[0] + (1) H+[0] + (1) Oxidized glutathione[0]
 r1137	r1137	H2O(cpd00001)[0] CGLY(cpd01017)[0] => GLY(cpd00033)[0] CYS(cpd00084)[0]	N	N	Y	Y	rxn00650	(1) H2O[0] + (1) Cys-Gly[0] <=> (1) Glycine[0] + (1) L-Cysteine[0]
-r1138	r1138	(2) SAM(cpd00017)[0] C80ACP(cpd11470)[0] (2) SSC[0] (2) RFERN[0] => (2) MET(cpd00060)[0] LIPACP(cpd14956)[0] (2) SCARR[0] (2) 5DA(cpd03091)[0] (2) OFERN[0]	N	N	N	N	frxn00038	
-r1139	r1139	LIPACP(cpd14956)[0] PROTEIN(cpd11463)[0] => PROTEIN(cpd11463)[1] ACP[2]	Y	N	N	Y	frxn00039	
+r1138	r1138	(2) SAM(cpd00017)[0] C80ACP(cpd11470)[0] (2) SSC[0] (2) RFERN[0] => (2) MET(cpd00060)[0] LIPACP(cpd14956)[0] (2) SCARR[0] (2) 5DA(cpd03091)[0] (2) OFERN[0]	N	N	N	N	frxn00034	
+r1139	r1139	LIPACP(cpd14956)[0] PROTEIN(cpd11463)[0] => PROTEIN_LIPL_LSQBKT_c_RSQBKT_(cpd14954)[0] ACP_LSQBKT_c_RSQBKT_(cpd00909)[0]	N	N	N	Y	frxn00035	
 r114	r114	ATP(cpd00002)[0] GLAC(cpd00108)[0] => ADP(cpd00008)[0] GAL1P(cpd00348)[0]	N	N	Y	Y	rxn00808	(1) ATP[0] + (1) Galactose[0] => (1) ADP[0] + (1) H+[0] + (1) D-Galactose 1-phosphate[0]
-r1140	r1140	C80ACP(cpd11470)[0] PROTEIN(cpd11463)[0] => ACP(cpd11493)[1] PROTEIN(cpd11463)[2]	Y	N	N	Y	frxn00040	
-r1141	r1141	(2) SAM(cpd00017)[0] (2) SSC[0] (2) RFERN[0] PROTEIN(cpd11463)[1] => (2) MET(cpd00060)[0] (2) SCARR[0] (2) 5DA(cpd03091)[0] (2) OFERN[0] PROTEIN(cpd11463)[2]	Y	N	N	N	frxn00041	
+r1140	r1140	C80ACP(cpd11470)[0] PROTEIN(cpd11463)[0] => ACP_LSQBKT_c_RSQBKT_(cpd00909)[0] PROTEIN_C80L_LSQBKT_c_RSQBKT_(cpd14953)[0]	N	N	N	Y	frxn00036	
+r1141	r1141	(2) SAM(cpd00017)[0] (2) SSC[0] (2) RFERN[0] PROTEIN_C80L(cpd14953)[0] => (2) MET(cpd00060)[0] (2) SCARR[0] (2) 5DA(cpd03091)[0] (2) OFERN[0] PROTEIN_LIPL(cpd14954)[0]	N	N	N	N	frxn00037	
 r1142	r1142	ATP(cpd00002)[0] LIPIC(cpd00541)[0] => PPI(cpd00012)[0] LIPAMP(cpd14955)[0]	N	N	Y	Y	rxn07584	(1) ATP[0] + (1) Lipoate[0] => (1) PPi[0] + (1) Lipoyl-AMP[0]
-r1143	r1143	LIPAMP(cpd14955)[0] APOPROT(cpd14957)[0] => AMP(cpd00018)[0] PROTEIN(cpd11463)[1]	Y	N	N	Y	frxn00042	
-r1144	r1144	(5.168) ATP(cpd00002)[0] (0.059) GLU(cpd00023)[0] (0.058) ASP(cpd00041)[0] (0.073) ALA(cpd00035)[0] (0.052) GLY(cpd00033)[0] (0.046) GLN(cpd00053)[0] (0.046) ASN(cpd00132)[0] (0.048) ARG(cpd00051)[0] (0.047) PRO(cpd00129)[0] (0.014) CYS(cpd00084)[0] (0.078) SER(cpd00054)[0] (0.06) THR(cpd00161)[0] (0.026) HIS(cpd00119)[0] (0.058) ILE(cpd00322)[0] (0.073) VAL(cpd00156)[0] (0.091) LEU(cpd00107)[0] (0.034) TYR(cpd00069)[0] (0.06) LYS(cpd00039)[0] (0.025) MET(cpd00060)[0] (0.012) TRP(cpd00065)[0] (0.041) PHE(cpd00066)[0] => (5.168) ADP(cpd00008)[0] (5.168) PI(cpd00009)[0] Protein(cpd11463)[0]	N	N	N	Y	frxn00043	
-r1145	r1145	(2.544) ATP(cpd00002)[0] (0.241) GTP(cpd00038)[0] (0.225) UTP(cpd00062)[0] (0.253) CTP(cpd00052)[0] => (2.544) ADP(cpd00008)[0] (2.544) PI(cpd00009)[0] RNA(cpd11613)[0]	N	N	N	Y	frxn00044	
-r1146	r1146	(3.739) ATP(cpd00002)[0] (0.302) DATP(cpd00115)[0] (0.198) DGTP(cpd00241)[0] (0.197) DCTP(cpd00356)[0] (0.303) DTTP(cpd00357)[0] => (3.739) ADP(cpd00008)[0] (3.739) PI(cpd00009)[0] DNA(cpd11461)[0]	N	N	N	Y	frxn00045	
-r1147	r1147	(72) ATP(cpd00002)[0] (0.77927) UDPGE(cpd00144)[0] (0.29678) GDPFUC(cpd00272)[0] (0.11386) MAN(cpd00138)[0] (0.0018) GLYNIN(cpd11937)[0] (0.00258) CHIT(cpd11683)[0] CHITO_c[6e-005][0] (0.00093) PINS(cpd11715)[0] (3.1232) Protein(cpd11463)[0] (0.11785) ERGOSE(cpd16803)[0] (0.725) TAGLY(cpd11677)[0] (0.01955) DAGLY(cpd11423)[0] (0.03188) PC(cpd11624)[0] (0.00684) PA(cpd11422)[0] (0.04264) PE(cpd11456)[0] (0.00302) PS(cpd11455)[0] (0.05227) FFA[0] (0.04677) RNA(cpd11613)[0] (0.01152) DNA(cpd11461)[0] => (72) ADP(cpd00008)[0] (72) PI(cpd00009)[0] BIOMASS[0]	N	N	N	N	frxn00046	
+r1143	r1143	LIPAMP(cpd14955)[0] APOPROT(cpd14957)[0] => AMP(cpd00018)[0] PROTEIN_LIPL(cpd14954)[0]	N	N	Y	Y	rxn07585	(1) Lipoyl-AMP[0] + (1) Apoprotein[0] => (1) AMP[0] + (2) H+[0] + (1) Protein N6-(lipoyl)lysine[0]
+r1144	r1144	(5.168) ATP(cpd00002)[0] (0.059) GLU(cpd00023)[0] (0.058) ASP(cpd00041)[0] (0.073) ALA(cpd00035)[0] (0.052) GLY(cpd00033)[0] (0.046) GLN(cpd00053)[0] (0.046) ASN(cpd00132)[0] (0.048) ARG(cpd00051)[0] (0.047) PRO(cpd00129)[0] (0.014) CYS(cpd00084)[0] (0.078) SER(cpd00054)[0] (0.06) THR(cpd00161)[0] (0.026) HIS(cpd00119)[0] (0.058) ILE(cpd00322)[0] (0.073) VAL(cpd00156)[0] (0.091) LEU(cpd00107)[0] (0.034) TYR(cpd00069)[0] (0.06) LYS(cpd00039)[0] (0.025) MET(cpd00060)[0] (0.012) TRP(cpd00065)[0] (0.041) PHE(cpd00066)[0] => (5.168) ADP(cpd00008)[0] (5.168) PI(cpd00009)[0] Protein(cpd11463)[0]	N	N	N	Y	frxn00038	
+r1145	r1145	(2.544) ATP(cpd00002)[0] (0.241) GTP(cpd00038)[0] (0.225) UTP(cpd00062)[0] (0.253) CTP(cpd00052)[0] => (2.544) ADP(cpd00008)[0] (2.544) PI(cpd00009)[0] RNA(cpd11613)[0]	N	N	N	Y	frxn00039	
+r1146	r1146	(3.739) ATP(cpd00002)[0] (0.302) DATP(cpd00115)[0] (0.198) DGTP(cpd00241)[0] (0.197) DCTP(cpd00356)[0] (0.303) DTTP(cpd00357)[0] => (3.739) ADP(cpd00008)[0] (3.739) PI(cpd00009)[0] DNA(cpd11461)[0]	N	N	N	Y	frxn00040	
+r1147	r1147	(72) ATP(cpd00002)[0] (0.77927) UDPGE(cpd00144)[0] (0.29678) GDPFUC(cpd00272)[0] (0.11386) MAN(cpd00138)[0] (0.0018) GLYNIN(cpd11937)[0] (0.00258) CHIT(cpd11683)[0] (6e-005) CHITO(cpd11741)[0] (0.00093) PINS(cpd11715)[0] (3.1232) Protein(cpd11463)[0] (0.11785) ERGOSE(cpd16803)[0] (0.725) TAGLY(cpd11677)[0] (0.01955) DAGLY(cpd11423)[0] (0.03188) PC(cpd11624)[0] (0.00684) PA(cpd11422)[0] (0.04264) PE(cpd11456)[0] (0.00302) PS(cpd11455)[0] (0.05227) FFA[0] (0.04677) RNA(cpd11613)[0] (0.01152) DNA(cpd11461)[0] => (72) ADP(cpd00008)[0] (72) PI(cpd00009)[0] BIOMASS[0]	N	N	N	N	frxn00041	
 r1148	r1148	ATP(cpd00002)[0] H2O(cpd00001)[0] => ADP(cpd00008)[0] PI(cpd00009)[0]	N	N	Y	Y	rxn00062	(1) H2O[0] + (1) ATP[0] => (1) ADP[0] + (1) Phosphate[0] + (1) H+[0]
 r1149	r1149	GLC(cpd19001)[0] => GLC(cpd19001)[1]	Y	N	Y	Y	rxn28570	(1) alpha-D-Glucose[1] <=> (1) alpha-D-Glucose[0]
 r115	r115	UDPGAL(cpd00043)[0] => UDPG(cpd00026)[0]	N	N	Y	Y	rxn00214	(1) UDP-glucose[0] <=> (1) UDP-galactose[0]
@@ -172,7 +172,7 @@ r1150	r1150	GLAC(cpd00108)[0] => GLAC(cpd00108)[1]	Y	N	Y	Y	rxn08585	(1) Galactos
 r1151	r1151	NH3(cpd00013)[0] => NH3(cpd00013)[1]	Y	N	Y	Y	rxn05466	(1) NH3[1] <=> (1) NH3[0]
 r1152	r1152	O2(cpd00007)[0] => O2(cpd00007)[1]	Y	N	Y	Y	rxn05468	(1) O2[1] <=> (1) O2[0]
 r1153	r1153	H2O(cpd00001)[0] => H2O(cpd00001)[1]	Y	N	Y	Y	rxn05319	(1) H2O[1] <=> (1) H2O[0]
-r1154	r1154	H(cpd00067)[0] => H(cpd00067)[1]	Y	N	Y	Y	rxn08730	(1) H+[0] <=> (1) H+[1]
+r1154	r1154	H_PO(cpd00067)[0] => H_PO(cpd00067)[1]	Y	N	Y	Y	rxn08730	(1) H+[0] <=> (1) H+[1]
 r1155	r1155	SLF(cpd00048)[0] => SLF(cpd00048)[1]	Y	N	Y	Y	rxn05238	(1) Sulfate[1] <=> (1) Sulfate[0]
 r1156	r1156	PI(cpd00009)[0] => PI(cpd00009)[1]	Y	N	Y	Y	rxn09121	(1) Phosphate[0] <=> (1) Phosphate[1]
 r1157	r1157	CO2(cpd00011)[0] => CO2(cpd00011)[1]	Y	N	Y	Y	rxn05467	(1) CO2[1] <=> (1) CO2[0]
@@ -196,25 +196,25 @@ r1172	r1172	NADPH(cpd00005)[0] => NADPH(cpd00005)[1]	Y	N	Y	Y	rxn33186	(1) NADPH[
 r1173	r1173	NADH(cpd00004)[0] => NADH(cpd00004)[1]	Y	N	Y	Y	rxn29785	(1) NADH[1] <=> (1) NADH[0]
 r1174	r1174	LACT(cpd00208)[0] => LACT(cpd00208)[1]	Y	N	Y	Y	rxn08780	(1) LACT[0] <=> (1) LACT[1]
 r1175	r1175	GL(cpd00100)[0] => GL(cpd00100)[1]	Y	N	Y	Y	rxn05581	(1) Glycerol[0] <=> (1) Glycerol[1]
-r1176	r1176	FFA[0] => FFA[1]	Y	N	N	N	frxn00047	
-r1177	r1177	TAGLY(cpd11677)[0] => TAGLY(cpd11677)[1]	Y	N	N	Y	frxn00048	
-r1178	r1178	DAGLY(cpd11423)[0] => DAGLY(cpd11423)[1]	Y	N	N	Y	frxn00049	
+r1176	r1176	FFA[0] => FFA[1]	Y	N	N	N	frxn00042	
+r1177	r1177	TAGLY(cpd11677)[0] => TAGLY(cpd11677)[1]	Y	N	N	Y	frxn00043	
+r1178	r1178	DAGLY(cpd11423)[0] => DAGLY(cpd11423)[1]	Y	N	N	Y	frxn00044	
 r1179	r1179	PA(cpd11422)[0] => PA(cpd11422)[1]	Y	N	Y	Y	rxn13123	(1) 1,2-diacyl-sn-glycerol 3-phosphate[0] <=> (1) 1,2-diacyl-sn-glycerol 3-phosphate[1]
 r118	r118	UDPGE(cpd00144)[0] => CO2(cpd00011)[0] UDPXYL(cpd00163)[0]	N	N	Y	Y	rxn01007	(1) H+[0] + (1) UDPglucuronate[0] => (1) CO2[0] + (1) UDP-xylose[0]
-r1180	r1180	ERGOSE(cpd16803)[0] => ERGOSE(cpd16803)[1]	Y	N	N	Y	frxn00050	
+r1180	r1180	ERGOSE(cpd16803)[0] => ERGOSE(cpd16803)[1]	Y	N	N	Y	frxn00045	
 r1181	r1181	PE(cpd11456)[0] => PE(cpd11456)[1]	Y	N	Y	Y	rxn09704	(1) Phosphatidylethanolamine[0] <=> (1) Phosphatidylethanolamine[1]
 r1182	r1182	PC(cpd11624)[0] => PC(cpd11624)[1]	Y	N	Y	Y	rxn32547	(1) Lecithin[0] <=> (1) Lecithin[1]
 r1183	r1183	PS(cpd11455)[0] => PS(cpd11455)[1]	Y	N	Y	Y	rxn09703	(1) ps_BS[0] <=> (1) ps_BS[1]
-r1184	r1184	PINS(cpd11715)[0] => PINS(cpd11715)[1]	Y	N	N	Y	frxn00051	
+r1184	r1184	PINS(cpd11715)[0] => PINS(cpd11715)[1]	Y	N	N	Y	frxn00046	
 r1185	r1185	14GLUCAN(cpd11735)[0] => 14GLUCAN(cpd11735)[1]	Y	N	Y	Y	rxn07924	(1) Amylose[0] <=> (1) Amylose[1]
-r1186	r1186	LPC(cpd16818)[0] => LPC(cpd16818)[1]	Y	N	N	Y	frxn00052	
-r1187	r1187	ACGLPE(cpd19395)[0] => ACGLPE(cpd19395)[1]	Y	N	N	Y	frxn00053	
-r1188	r1188	LPE[0] => LPE[1]	Y	N	N	N	frxn00054	
-r1189	r1189	DAGLY(cpd11423)[0] => DAGLY(cpd11423)[1]	Y	N	N	Y	frxn00049	(1) 1,2-Diacyl-sn-glycerol[0] <=> (1) 1,2-Diacyl-sn-glycerol[1]
+r1186	r1186	LPC(cpd16818)[0] => LPC(cpd16818)[1]	Y	N	N	Y	frxn00047	
+r1187	r1187	ACGLPE(cpd19395)[0] => ACGLPE(cpd19395)[1]	Y	N	N	Y	frxn00048	
+r1188	r1188	LPE[0] => LPE[1]	Y	N	N	N	frxn00049	
+r1189	r1189	DAGLY(cpd11423)[0] => DAGLY(cpd11423)[1]	Y	N	N	Y	frxn00044	(1) 1,2-Diacyl-sn-glycerol[0] <=> (1) 1,2-Diacyl-sn-glycerol[1]
 r119	r119	UDPGE(cpd00144)[0] => CO2(cpd00011)[0] UDPXYL(cpd00163)[0]	N	N	Y	Y	rxn01007	(1) H+[0] + (1) UDPglucuronate[0] => (1) CO2[0] + (1) UDP-xylose[0]
-r1190	r1190	TAGLY(cpd11677)[0] => TAGLY(cpd11677)[1]	Y	N	N	Y	frxn00048	(1) Triglyceride[0] <=> (1) Triglyceride[1]
+r1190	r1190	TAGLY(cpd11677)[0] => TAGLY(cpd11677)[1]	Y	N	N	Y	frxn00043	(1) Triglyceride[0] <=> (1) Triglyceride[1]
 r1191	r1191	ACCOA(cpd00022)[0] => ACCOA(cpd00022)[1]	Y	N	Y	Y	rxn13213	(1) Acetyl-CoA[0] <=> (1) Acetyl-CoA[1]
-r1192	r1192	BIOMASS[0] => BIOMASS[1]	Y	N	N	N	frxn00055	
+r1192	r1192	BIOMASS[0] => BIOMASS[1]	Y	N	N	N	frxn00050	
 r1193	r1193	CO2(cpd00011)[0] => CO2(cpd00011)[1]	Y	N	Y	Y	rxn05467	(1) CO2[1] <=> (1) CO2[0]
 r1194	r1194	H2O(cpd00001)[0] => H2O(cpd00001)[1]	Y	N	Y	Y	rxn05319	(1) H2O[1] <=> (1) H2O[0]
 r1195	r1195	O2(cpd00007)[0] => O2(cpd00007)[1]	Y	N	Y	Y	rxn05468	(1) O2[1] <=> (1) O2[0]
@@ -236,16 +236,16 @@ r1208	r1208	AKG(cpd00024)[0] => AKG(cpd00024)[1]	Y	N	Y	Y	rxn08096	(1) 2-Oxogluta
 r1209	r1209	MYOI(cpd00121)[0] => MYOI(cpd00121)[1]	Y	N	Y	Y	rxn08755	(1) L-Inositol[0] <=> (1) L-Inositol[1]
 r121	r121	UDPG(cpd00026)[0] GAL1P(cpd00348)[0] => UDPGAL(cpd00043)[0] G1P(cpd00089)[0]	N	N	Y	Y	rxn00701	(1) UDP-glucose[0] + (1) D-Galactose 1-phosphate[0] <=> (1) UDP-galactose[0] + (1) Glucose-1-phosphate[0]
 r1210	r1210	PS(cpd11455)[0] => PS(cpd11455)[1]	Y	N	Y	Y	rxn09703	(1) ps_BS[0] <=> (1) ps_BS[1]
-r1211	r1211	PINS(cpd11715)[0] => PINS(cpd11715)[1]	Y	N	N	Y	frxn00051	(1) Phosphatidylinositol[0] <=> (1) Phosphatidylinositol[1]
+r1211	r1211	PINS(cpd11715)[0] => PINS(cpd11715)[1]	Y	N	N	Y	frxn00046	(1) Phosphatidylinositol[0] <=> (1) Phosphatidylinositol[1]
 r1212	r1212	P5C(cpd02431)[0] => P5C(cpd02431)[1]	Y	N	Y	Y	rxn34140	(1) 1-Pyrroline-5-carboxylate[0] <=> (1) 1-Pyrroline-5-carboxylate[1]
-r1213	r1213	GLUGSAL(cpd00858)[0] => GLUGSAL(cpd00858)[1]	Y	N	N	Y	frxn00056	
-r1214	r1214	GLUP(cpd02339)[0] => GLUP(cpd02339)[1]	Y	N	N	Y	frxn00057	
+r1213	r1213	GLUGSAL(cpd00858)[0] => GLUGSAL(cpd00858)[1]	Y	N	N	Y	frxn00051	
+r1214	r1214	GLUP(cpd02339)[0] => GLUP(cpd02339)[1]	Y	N	N	Y	frxn00052	
 r1215	r1215	SME(cpd00383)[0] => SME(cpd00383)[1]	Y	N	Y	Y	rxn09257	(1) Shikimate[0] <=> (1) Shikimate[1]
-r1216	r1216	DHSK(cpd01716)[0] => DHSK(cpd01716)[1]	Y	N	N	Y	frxn00058	
+r1216	r1216	DHSK(cpd01716)[0] => DHSK(cpd01716)[1]	Y	N	N	Y	frxn00053	
 r1217	r1217	GLN(cpd00053)[0] => GLN(cpd00053)[1]	Y	N	Y	Y	rxn08625	(1) L-Glutamine[0] <=> (1) L-Glutamine[1]
 r1218	r1218	ACCOA(cpd00022)[0] => ACCOA(cpd00022)[1]	Y	N	Y	Y	rxn13213	(1) Acetyl-CoA[0] <=> (1) Acetyl-CoA[1]
 r1219	r1219	ASP(cpd00041)[0] => ASP(cpd00041)[1]	Y	N	Y	Y	rxn08170	(1) L-Aspartate[0] <=> (1) L-Aspartate[1]
-r122	r122	GLAC(cpd00108)[0] O2(cpd00007)[0] => GALNT(cpd00653)[0] H2O2(cpd00025)[0]	N	N	N	Y	frxn00059	
+r122	r122	GLAC(cpd00108)[0] O2(cpd00007)[0] => GALNT(cpd00653)[0] H2O2(cpd00025)[0]	N	N	N	Y	frxn00054	
 r1220	r1220	AC(cpd00029)[0] => AC(cpd00029)[1]	Y	N	Y	Y	rxn08063	(1) Acetate[0] <=> (1) Acetate[1]
 r1221	r1221	FOR(cpd00047)[0] => FOR(cpd00047)[1]	Y	N	Y	Y	rxn08525	(1) Formate[0] <=> (1) Formate[1]
 r1222	r1222	CO2(cpd00011)[0] => CO2(cpd00011)[1]	Y	N	Y	Y	rxn05467	(1) CO2[1] <=> (1) CO2[0]
@@ -259,8 +259,8 @@ r1229	r1229	THR(cpd00161)[0] => THR(cpd00161)[1]	Y	N	Y	Y	rxn09307	(1) L-Threonin
 r123	r123	ATP(cpd00002)[0] XUL(cpd00259)[0] => ADP(cpd00008)[0] XUL5P(cpd00198)[0]	N	N	Y	Y	rxn01199	(1) ATP[0] + (1) D-Lyxulose[0] => (1) ADP[0] + (1) H+[0] + (1) D-Xylulose5-phosphate[0]
 r1230	r1230	OICAP(cpd02605)[0] => OICAP(cpd02605)[1]	Y	N	Y	Y	rxn09800	(1) 2-isopropyl-3-oxosuccinate[0] <=> (1) 2-isopropyl-3-oxosuccinate[1]
 r1231	r1231	CAP(cpd00146)[0] => CAP(cpd00146)[1]	Y	N	Y	Y	rxn09823	(1) Carbamoylphosphate[0] <=> (1) Carbamoylphosphate[1]
-r1232	r1232	KYN(cpd00275)[0] => KYN(cpd00275)[1]	Y	N	N	Y	frxn00060	
-r1233	r1233	HKYN(cpd01804)[0] => HKYN(cpd01804)[1]	Y	N	N	Y	frxn00061	
+r1232	r1232	KYN(cpd00275)[0] => KYN(cpd00275)[1]	Y	N	N	Y	frxn00055	
+r1233	r1233	HKYN(cpd01804)[0] => HKYN(cpd01804)[1]	Y	N	N	Y	frxn00056	
 r1234	r1234	DOROA(cpd00282)[0] => DOROA(cpd00282)[1]	Y	N	Y	Y	rxn09817	(1) S-Dihydroorotate[0] <=> (1) S-Dihydroorotate[1]
 r1235	r1235	OROA(cpd00247)[0] => OROA(cpd00247)[1]	Y	N	Y	Y	rxn09050	(1) Orotate[0] <=> (1) Orotate[1]
 r1236	r1236	THF(cpd00087)[0] => THF(cpd00087)[1]	Y	N	Y	Y	rxn09711	(1) Tetrahydrofolate[0] <=> (1) Tetrahydrofolate[1]
@@ -299,10 +299,10 @@ r1265	r1265	PROPCOA(cpd00086)[0] => PROPCOA(cpd00086)[1]	Y	N	Y	Y	rxn32564	(1) Pr
 r1266	r1266	GLAL(cpd00229)[0] => GLAL(cpd00229)[1]	Y	N	Y	Y	rxn09680	(1) Glycolaldehyde[1] <=> (1) Glycolaldehyde[0]
 r1267	r1267	OA(cpd00032)[0] => OA(cpd00032)[1]	Y	N	Y	Y	rxn13365	(1) Oxaloacetate[0] <=> (1) Oxaloacetate[1]
 r1268	r1268	XAN(cpd00309)[0] => XAN(cpd00309)[1]	Y	N	Y	Y	rxn09378	(1) XAN[0] <=> (1) XAN[1]
-r1269	r1269	UGC(cpd00465)[0] => UGC(cpd00465)[1]	Y	N	N	Y	frxn00062	
+r1269	r1269	UGC(cpd00465)[0] => UGC(cpd00465)[1]	Y	N	N	Y	frxn00057	
 r127	r127	NADP(cpd00006)[0] ARAB(cpd00185)[0] => NADPH(cpd00005)[0] ARABLAC(cpd00496)[0]	N	N	Y	Y	rxn01150	(1) NADP[0] + (1) D-Arabinose[0] <=> (1) NADPH[0] + (1) H+[0] + (1) D-Arabinono-1,4-lactone[0]
 r1270	r1270	H2O2(cpd00025)[0] => H2O2(cpd00025)[1]	Y	N	Y	Y	rxn08685	(1) H2O2[0] <=> (1) H2O2[1]
-r1271	r1271	ADP(cpd00008)[0] PI(cpd00009)[0] ATP(cpd00002)[1] => ATP(cpd00002)[0] PI(cpd00009)[1] ADP(cpd00008)[1] H(cpd00067)[1]	Y	N	N	Y	frxn00063	
+r1271	r1271	ADP(cpd00008)[0] PI(cpd00009)[0] ATP(cpd00002)[1] => ATP(cpd00002)[0] PI(cpd00009)[1] ADP(cpd00008)[1] H(cpd00067)[1]	Y	N	N	Y	frxn00058	
 r1272	r1272	CIT(cpd00137)[0] MAL(cpd00130)[1] => CIT(cpd00137)[1] MAL(cpd00130)[0]	Y	N	Y	Y	rxn09779	(1) L-Malate[1] + (1) Citrate[0] <=> (1) L-Malate[0] + (1) Citrate[1]
 r1273	r1273	CIT(cpd00137)[0] ICIT(cpd00260)[1] => CIT(cpd00137)[1] ICIT(cpd00260)[0]	Y	N	Y	Y	rxn09777	(1) Citrate[0] + (1) Isocitrate[1] <=> (1) Citrate[1] + (1) Isocitrate[0]
 r1274	r1274	CIT(cpd00137)[0] PEP(cpd00061)[1] => PEP(cpd00061)[0] CIT(cpd00137)[1]	Y	N	Y	Y	rxn09778	(1) Phosphoenolpyruvate[1] + (1) Citrate[0] <=> (1) Phosphoenolpyruvate[0] + (1) Citrate[1]
@@ -324,8 +324,8 @@ r131	r131	ATP(cpd00002)[0] FRU(cpd00082)[0] => ADP(cpd00008)[0] F6P(cpd19035)[0]
 r132	r132	ATP(cpd00002)[0] FRU(cpd00082)[0] => ADP(cpd00008)[0] F6P(cpd19035)[0]	N	N	Y	Y	rxn15081	(1) ATP[0] + (1) D-Fructose[0] => (1) ADP[0] + (1) H+[0] + (1) beta-D-Fructose 6-phosphate[0]
 r133	r133	ATP(cpd00002)[0] F6P(cpd19035)[0] => ADP(cpd00008)[0] F26P(cpd00503)[0]	N	N	Y	Y	rxn39359	(1) ATP[0] + (1) beta-D-Fructose 6-phosphate[0] <=> (1) ADP[0] + (1) H+[0] + (1) D-Fructose 2,6-bisphosphate[0]
 r134	r134	H2O(cpd00001)[0] F26P(cpd00503)[0] => F6P(cpd19035)[0] PI(cpd00009)[0]	N	N	Y	Y	rxn15361	(1) H2O[0] + (1) D-Fructose 2,6-bisphosphate[0] <=> (1) Phosphate[0] + (1) beta-D-Fructose 6-phosphate[0]
-r135	r135	FUCUL1P(cpd00806)[0] => T3P2(cpd00095)[0] LACAL(cpd00693)[0]	N	N	N	Y	frxn00064	
-r136	r136	FUCUL1P(cpd00806)[0] => T3P2(cpd00095)[0] LACAL(cpd00693)[0]	N	N	N	Y	frxn00064	(1) L-Fuculose1-phosphate[0] <=> (1) Glycerone-phosphate[0] + (1) D-Lactaldehyde[0]
+r135	r135	FUCUL1P(cpd00806)[0] => T3P2(cpd00095)[0] LACAL(cpd00693)[0]	N	N	N	Y	frxn00059	
+r136	r136	FUCUL1P(cpd00806)[0] => T3P2(cpd00095)[0] LACAL(cpd00693)[0]	N	N	N	Y	frxn00059	(1) L-Fuculose1-phosphate[0] <=> (1) Glycerone-phosphate[0] + (1) D-Lactaldehyde[0]
 r137	r137	MAN1P(cpd00485)[0] => MAN6P(cpd00235)[0]	N	N	Y	Y	rxn01329	(1) D-mannose-6-phosphate[0] <=> (1) D-Mannose1-phosphate[0]
 r138	r138	MAN1P(cpd00485)[0] => MAN6P(cpd00235)[0]	N	N	Y	Y	rxn01329	(1) D-mannose-6-phosphate[0] <=> (1) D-Mannose1-phosphate[0]
 r139	r139	GTP(cpd00038)[0] MAN1P(cpd00485)[0] => PPI(cpd00012)[0] GDPMAN(cpd00083)[0]	N	N	Y	Y	rxn00641	(1) GTP[0] + (1) D-Mannose1-phosphate[0] <=> (1) PPi[0] + (1) GDP-mannose[0]
@@ -341,7 +341,7 @@ r147	r147	GLC(cpd19001)[0] FRU(cpd00082)[0] => GLCLACNE(cpd00170)[0] GLCOL(cpd00
 r148	r148	GLC(cpd19001)[0] FRU(cpd00082)[0] => GLCLACNE(cpd00170)[0] GLCOL(cpd00588)[0]	N	N	Y	Y	rxn15083	(1) D-Fructose[0] + (1) alpha-D-Glucose[0] <=> (1) Gluconolactone[0] + (1) Sorbitol[0]
 r149	r149	H2O(cpd00001)[0] MELI(cpd03198)[0] => GLC(cpd19001)[0] GLAC(cpd00108)[0]	N	N	Y	Y	rxn31411	(1) H2O[0] + (1) Melibiose[0] => (1) Galactose[0] + (1) alpha-D-Glucose[0]
 r15	r15	ADP(cpd00008)[0] 13PDG(cpd00203)[0] => ATP(cpd00002)[0] 3PG(cpd00169)[0]	N	N	Y	Y	rxn01100	(1) ATP[0] + (1) 3-Phosphoglycerate[0] <=> (1) ADP[0] + (1) 1,3-Bisphospho-D-glycerate[0]
-r150	r150	H2O(cpd00001)[0] STAOSE(cpd01133)[0] => GLAC(cpd00108)[0] MELI(cpd03198)[0]	N	N	N	Y	frxn00065	
+r150	r150	H2O(cpd00001)[0] STAOSE(cpd01133)[0] => GLAC(cpd00108)[0] MELI(cpd03198)[0]	N	N	N	Y	frxn00060	
 r151	r151	GLACMYOI(cpd00910)[0] RAF(cpd00382)[0] => MYOI(cpd00121)[0] STAOSE(cpd01133)[0]	N	N	Y	Y	rxn02451	(1) Melitose[0] + (1) Galactinol[0] <=> (1) L-Inositol[0] + (1) Stachyose[0]
 r152	r152	G6P(cpd19006)[0] UDPG(cpd00026)[0] => UDP(cpd00014)[0] TRE6P(cpd00523)[0]	N	N	Y	Y	rxn15362	(1) UDP-glucose[0] + (1) alpha-D-Glucose 6-phosphate[0] <=> (1) UDP[0] + (1) Trehalose 6-phosphate[0]
 r153	r153	H2O(cpd00001)[0] TRE(cpd00794)[0] => (2) DGLC(cpd00027)[0]	N	N	Y	Y	rxn00007	(1) H2O[0] + (1) TRHL[0] => (2) D-Glucose[0]
@@ -358,32 +358,32 @@ r162	r162	NAGA6P(cpd00293)[0] => NAGA1P(cpd02611)[0]	N	N	Y	Y	rxn01505	(1) N-Acet
 r163	r163	UTP(cpd00062)[0] NAGA1P(cpd02611)[0] => PPI(cpd00012)[0] UDPNAG(cpd00037)[0]	N	N	Y	Y	rxn00293	(1) UTP[0] + (1) N-Acetyl-D-glucosamine1-phosphate[0] <=> (1) PPi[0] + (1) UDP-N-acetylglucosamine[0]
 r164	r164	UDPG(cpd00026)[0] => UDP(cpd00014)[0] 13GLUCAN(cpd11791)[0]	N	N	Y	Y	rxn09400	(1) UDP-glucose[0] <=> (1) UDP[0] + (1) 1,3-beta-Glucan[0]
 r165	r165	UDPG(cpd00026)[0] => UDP(cpd00014)[0] 13GLUCAN(cpd11791)[0]	N	N	Y	Y	rxn09400	(1) UDP-glucose[0] <=> (1) UDP[0] + (1) 1,3-beta-Glucan[0]
-r166	r166	CELLU(cpd11746)[0] => 14GLUCAN(cpd11735)[0] CELLOB(cpd00158)[0]	N	N	N	Y	frxn00066	
-r167	r167	CELLOB(cpd00158)[0] => bDGLC(cpd00190)[0]	N	N	N	Y	frxn00067	
-r168	r168	14GLUCAN(cpd11735)[0] => bDGLC(cpd00190)[0]	N	N	N	Y	frxn00068	
-r169	r169	GDPMAN(cpd00083)[0] => MANNAN(cpd11685)[0]	N	N	N	Y	frxn00069	
+r166	r166	CELLU(cpd11746)[0] => 14GLUCAN(cpd11735)[0] CELLOB(cpd00158)[0]	N	N	N	Y	frxn00061	
+r167	r167	CELLOB(cpd00158)[0] => bDGLC(cpd00190)[0]	N	N	N	Y	frxn00062	
+r168	r168	14GLUCAN(cpd11735)[0] => bDGLC(cpd00190)[0]	N	N	N	Y	frxn00063	
+r169	r169	GDPMAN(cpd00083)[0] => MANNAN(cpd11685)[0]	N	N	N	Y	frxn00064	
 r17	r17	2PG(cpd00482)[0] => PEP(cpd00061)[0] H2O(cpd00001)[0]	N	N	Y	Y	rxn00459	(1) 2-Phospho-D-glycerate[0] <=> (1) H2O[0] + (1) Phosphoenolpyruvate[0]
-r170	r170	MANNAN(cpd11685)[0] => MAN(cpd00138)[0]	N	N	N	Y	frxn00070	
-r171	r171	STAR(cpd11594)[0] => GLC(cpd19001)[0]	N	N	N	Y	frxn00071	
-r172	r172	STAR(cpd11594)[0] => GLC(cpd19001)[0]	N	N	N	Y	frxn00071	(1) Dextrin[0] <=> (1) alpha-D-Glucose[0]
-r173	r173	STAR(cpd11594)[0] => GLC(cpd19001)[0]	N	N	N	Y	frxn00071	(1) Dextrin[0] <=> (1) alpha-D-Glucose[0]
-r174	r174	UDPG(cpd00026)[0] => UDP(cpd00014)[0] GLYNIN(cpd11937)[0]	N	N	N	Y	frxn00072	
+r170	r170	MANNAN(cpd11685)[0] => MAN(cpd00138)[0]	N	N	N	Y	frxn00065	
+r171	r171	STAR(cpd11594)[0] => GLC(cpd19001)[0]	N	N	N	Y	frxn00066	
+r172	r172	STAR(cpd11594)[0] => GLC(cpd19001)[0]	N	N	N	Y	frxn00066	(1) Dextrin[0] <=> (1) alpha-D-Glucose[0]
+r173	r173	STAR(cpd11594)[0] => GLC(cpd19001)[0]	N	N	N	Y	frxn00066	(1) Dextrin[0] <=> (1) alpha-D-Glucose[0]
+r174	r174	UDPG(cpd00026)[0] => UDP(cpd00014)[0] GLYNIN(cpd11937)[0]	N	N	N	Y	frxn00067	
 r175	r175	ATP(cpd00002)[0] G1P(cpd00089)[0] => PPI(cpd00012)[0] ADPGLC(cpd00387)[0]	N	N	Y	Y	rxn00695	(1) ATP[0] + (1) Glucose-1-phosphate[0] <=> (1) PPi[0] + (1) ADPglucose[0]
-r176	r176	ADPGLC(cpd00387)[0] => ADP(cpd00008)[0] GLYNIN(cpd11937)[0]	N	N	N	Y	frxn00073	
-r177	r177	ADPGLC(cpd00387)[0] => ADP(cpd00008)[0] GLYNIN(cpd11937)[0]	N	N	N	Y	frxn00073	(1) ADPglucose[0] <=> (1) ADP[0] + (1) Glycogenin[0]
-r178	r178	GLYNIN(cpd11937)[0] => STAR(cpd11594)[0]	N	N	N	Y	frxn00074	
-r179	r179	PI(cpd00009)[0] STAR(cpd11594)[0] => G1P(cpd00089)[0] GLYCODEX[0]	N	N	N	N	frxn00075	
+r176	r176	ADPGLC(cpd00387)[0] => ADP(cpd00008)[0] GLYNIN(cpd11937)[0]	N	N	N	Y	frxn00068	
+r177	r177	ADPGLC(cpd00387)[0] => ADP(cpd00008)[0] GLYNIN(cpd11937)[0]	N	N	N	Y	frxn00068	(1) ADPglucose[0] <=> (1) ADP[0] + (1) Glycogenin[0]
+r178	r178	GLYNIN(cpd11937)[0] => STAR(cpd11594)[0]	N	N	N	Y	frxn00069	
+r179	r179	PI(cpd00009)[0] STAR(cpd11594)[0] => G1P(cpd00089)[0] GLYCODEX[0]	N	N	N	N	frxn00070	
 r18	r18	ADP(cpd00008)[0] PEP(cpd00061)[0] => ATP(cpd00002)[0] PYR(cpd00020)[0]	N	N	Y	Y	rxn00148	(1) ATP[0] + (1) Pyruvate[0] <=> (1) ADP[0] + (1) Phosphoenolpyruvate[0] + (1) H+[0]
-r180	r180	STAR(cpd11594)[0] PI(cpd00009)[0] => G1P(cpd00089)[0] GLYCODEX[0]	N	N	N	N	frxn00075	(1) Phosphate[0] + (1) Dextrin[0] <=> (1) Glucose-1-phosphate[0] + (1) limited dextrin-[glycogen phosphorylase]_[0]
-r181	r181	GLYCODEX[0] => bDGLC(cpd00190)[0]	N	N	N	N	frxn00076	
-r182	r182	PI(cpd00009)[0] MLTOSE(cpd00537)[0] => G1P(cpd00089)[0] MLTIOSE(cpd01262)[0]	N	N	N	Y	frxn00077	
-r183	r183	H2O(cpd00001)[0] MLTIOSE(cpd01262)[0] => GLC(cpd19001)[0] MLT(cpd00179)[0]	N	N	N	Y	frxn00078	
-r184	r184	H2O(cpd00001)[0] MLTIOSE(cpd01262)[0] => GLC(cpd19001)[0] MLT(cpd00179)[0]	N	N	N	Y	frxn00078	(1) H2O[0] + (1) Amylotriose[0] <=> (1) Maltose[0] + (1) alpha-D-Glucose[0]
-r185	r185	H2O(cpd00001)[0] CHIB(cpd01157)[0] => NAG(cpd00122)[0]	N	N	N	Y	frxn00079	
-r186	r186	H2O(cpd00001)[0] CHIB(cpd01157)[0] => NAG(cpd00122)[0]	N	N	N	Y	frxn00079	(1) H2O[0] + (1) Chitobiose[0] <=> (1) N-Acetyl-D-glucosamine[0]
-r187	r187	H2O(cpd00001)[0] CHIT(cpd11683)[0] => CHIB(cpd01157)[0]	N	N	N	Y	frxn00080	
-r188	r188	H2O(cpd00001)[0] CHIT(cpd11683)[0] => CHIB(cpd01157)[0]	N	N	N	Y	frxn00080	(1) H2O[0] + (1) Chitin[0] <=> (1) Chitobiose[0]
-r189	r189	H2O(cpd00001)[0] CHIT(cpd11683)[0] => CHIB(cpd01157)[0]	N	N	N	Y	frxn00080	(1) H2O[0] + (1) Chitin[0] <=> (1) Chitobiose[0]
+r180	r180	STAR(cpd11594)[0] PI(cpd00009)[0] => G1P(cpd00089)[0] GLYCODEX[0]	N	N	N	N	frxn00070	(1) Phosphate[0] + (1) Dextrin[0] <=> (1) Glucose-1-phosphate[0] + (1) limited dextrin-[glycogen phosphorylase][0]
+r181	r181	GLYCODEX[0] => bDGLC(cpd00190)[0]	N	N	N	N	frxn00071	
+r182	r182	PI(cpd00009)[0] MLTOSE(cpd00537)[0] => G1P(cpd00089)[0] MLTIOSE(cpd01262)[0]	N	N	N	Y	frxn00072	
+r183	r183	H2O(cpd00001)[0] MLTIOSE(cpd01262)[0] => GLC(cpd19001)[0] MLT(cpd00179)[0]	N	N	N	Y	frxn00073	
+r184	r184	H2O(cpd00001)[0] MLTIOSE(cpd01262)[0] => GLC(cpd19001)[0] MLT(cpd00179)[0]	N	N	N	Y	frxn00073	(1) H2O[0] + (1) Amylotriose[0] <=> (1) Maltose[0] + (1) alpha-D-Glucose[0]
+r185	r185	H2O(cpd00001)[0] CHIB(cpd01157)[0] => NAG(cpd00122)[0]	N	N	N	Y	frxn00074	
+r186	r186	H2O(cpd00001)[0] CHIB(cpd01157)[0] => NAG(cpd00122)[0]	N	N	N	Y	frxn00074	(1) H2O[0] + (1) Chitobiose[0] <=> (1) N-Acetyl-D-glucosamine[0]
+r187	r187	H2O(cpd00001)[0] CHIT(cpd11683)[0] => CHIB(cpd01157)[0]	N	N	N	Y	frxn00075	
+r188	r188	H2O(cpd00001)[0] CHIT(cpd11683)[0] => CHIB(cpd01157)[0]	N	N	N	Y	frxn00075	(1) H2O[0] + (1) Chitin[0] <=> (1) Chitobiose[0]
+r189	r189	H2O(cpd00001)[0] CHIT(cpd11683)[0] => CHIB(cpd01157)[0]	N	N	N	Y	frxn00075	(1) H2O[0] + (1) Chitin[0] <=> (1) Chitobiose[0]
 r19	r19	FDP(cpd19036)[0] H2O(cpd00001)[0] => F6P(cpd19035)[0] PI(cpd00009)[0]	N	N	Y	Y	rxn15494	(1) H2O[0] + (1) beta-D-Fructose 1,6-bisphosphate[0] <=> (1) Phosphate[0] + (1) beta-D-Fructose 6-phosphate[0]
 r190	r190	H2O(cpd00001)[0] CHIT(cpd11683)[0] => NAG(cpd00122)[0]	N	N	Y	Y	rxn15578	(1) H2O[0] + (1) Chitin[0] <=> (1) N-Acetyl-D-glucosamine[0]
 r191	r191	H2O(cpd00001)[0] CHIT(cpd11683)[0] => NAG(cpd00122)[0]	N	N	Y	Y	rxn15578	(1) H2O[0] + (1) Chitin[0] <=> (1) N-Acetyl-D-glucosamine[0]
@@ -399,18 +399,18 @@ r2	r2	DGLC(cpd00027)[0] => (0.33) GLC(cpd19001)[0] (0.67) bDGLC(cpd00190)[0]	N	N
 r20	r20	ATP(cpd00002)[0] OA(cpd00032)[0] => ADP(cpd00008)[0] PEP(cpd00061)[0] CO2(cpd00011)[0]	N	N	Y	Y	rxn00247	(1) ATP[0] + (1) Oxaloacetate[0] => (1) ADP[0] + (1) CO2[0] + (1) Phosphoenolpyruvate[0]
 r200	r200	H2O(cpd00001)[0] CHIT(cpd11683)[0] => AC(cpd00029)[0] CHITO(cpd11741)[0]	N	N	Y	Y	rxn09401	(1) H2O[0] + (1) Chitin[0] <=> (1) Acetate[0] + (1) H+[0] + (1) Chitosan[0]
 r201	r201	H2O(cpd00001)[0] CHIT(cpd11683)[0] => AC(cpd00029)[0] CHITO(cpd11741)[0]	N	N	Y	Y	rxn09401	(1) H2O[0] + (1) Chitin[0] <=> (1) Acetate[0] + (1) H+[0] + (1) Chitosan[0]
-r202	r202	CHITO(cpd11741)[0] => GLCMNIDE[0]	N	N	N	N	frxn00081	
-r203	r203	13GLUCAN(cpd11791)[0] => DGLC(cpd00027)[0]	N	N	N	Y	frxn00082	
-r204	r204	13GLUCAN(cpd11791)[0] => GLC(cpd19001)[0]	N	N	N	Y	frxn00083	
+r202	r202	CHITO(cpd11741)[0] => GLCMNIDE[0]	N	N	N	N	frxn00076	
+r203	r203	13GLUCAN(cpd11791)[0] => DGLC(cpd00027)[0]	N	N	N	Y	frxn00077	
+r204	r204	13GLUCAN(cpd11791)[0] => GLC(cpd19001)[0]	N	N	N	Y	frxn00078	
 r205	r205	ACCOA(cpd00022)[0] GA1P(cpd03671)[0] => COA(cpd00010)[0] NAGA1P(cpd02611)[0]	N	N	Y	Y	rxn03638	(1) Acetyl-CoA[0] + (1) D-Glucosamine1-phosphate[0] => (1) CoA[0] + (1) H+[0] + (1) N-Acetyl-D-glucosamine1-phosphate[0]
-r206	r206	PTATE(cpd11686)[0] => GALUNT(cpd00280)[0]	N	N	N	Y	frxn00084	
+r206	r206	PTATE(cpd11686)[0] => GALUNT(cpd00280)[0]	N	N	N	Y	frxn00079	
 r207	r207	O2(cpd00007)[0] (4) ASCOBATE(cpd00059)[0] => (2) H2O(cpd00001)[0] (4) MASCORBATE(cpd00766)[0]	N	N	Y	Y	rxn23860	(1) O2[0] + (4) L-Ascorbate[0] => (2) H2O[0] + (4) H+[0] + (4) Ascorbate radical[0]
 r208	r208	(4) ASCOBATE(cpd00059)[0] O2(cpd00007)[0] => (2) H2O(cpd00001)[0] (4) MASCORBATE(cpd00766)[0]	N	N	Y	Y	rxn23860	(1) O2[0] + (4) L-Ascorbate[0] => (2) H2O[0] + (4) H+[0] + (4) Ascorbate radical[0]
 r209	r209	(4) ASCOBATE(cpd00059)[0] O2(cpd00007)[0] => (2) H2O(cpd00001)[0] (4) MASCORBATE(cpd00766)[0]	N	N	Y	Y	rxn23860	(1) O2[0] + (4) L-Ascorbate[0] => (2) H2O[0] + (4) H+[0] + (4) Ascorbate radical[0]
 r21	r21	ETH(cpd00363)[0] NADP(cpd00006)[0] => ACAL(cpd00071)[0] NADPH(cpd00005)[0]	N	N	Y	Y	rxn00536	(1) NADP[0] + (1) Ethanol[0] <=> (1) NADPH[0] + (1) H+[0] + (1) Acetaldehyde[0]
 r210	r210	O2(cpd00007)[0] GULACNE(cpd00765)[0] => XYLACNE(cpd02098)[0] H2O2(cpd00025)[0]	N	N	Y	Y	rxn02279	(1) O2[0] + (1) L-Gulonolactone[0] => (1) H2O2[0] + (1) L-xylo-Hexulonolactone[0]
 r211	r211	XYLACNE(cpd02098)[0] => ASCOBATE(cpd00059)[0]	N	N	Y	Y	rxn00449	(1) L-Ascorbate[0] + (1) H+[0] => (1) L-xylo-Hexulonolactone[0]
-r212	r212	(2) RGT(cpd00042)[0] MASCORBATE(cpd00766)[0] => ASCOBATE(cpd00059)[0] RGTDS(cpd00111)[0]	N	N	N	Y	frxn00085	
+r212	r212	(2) RGT(cpd00042)[0] MASCORBATE(cpd00766)[0] => ASCOBATE(cpd00059)[0] RGTDS(cpd00111)[0]	N	N	N	Y	frxn00080	
 r213	r213	CDPDG(cpd11427)[0] MYOI(cpd00121)[0] => CMP(cpd00046)[0] PINS(cpd11715)[0]	N	N	Y	Y	rxn39311	(1) L-Inositol[0] + (1) CDP-diacylglycerol[0] <=> (1) CMP[0] + (1) H+[0] + (1) Phosphatidylinositol[0]
 r214	r214	G6P(cpd19006)[0] => MI1P(cpd02484)[0]	N	N	Y	Y	rxn15668	(1) alpha-D-Glucose 6-phosphate[0] <=> (1) Inositol 3-phosphate[0]
 r215	r215	MI1P(cpd02484)[0] => PI(cpd00009)[0] MYOI(cpd00121)[0]	N	W	Y	Y	rxn00883	(1) H2O[0] + (1) Inositol 3-phosphate[0] <=> (1) Phosphate[0] + (1) L-Inositol[0]
@@ -428,42 +428,42 @@ r225	r225	MYOI(cpd00121)[0] O2(cpd00007)[0] => H2O(cpd00001)[0] GLUCN(cpd00164)[
 r226	r226	UDPNAG(cpd00037)[0] DOLP(cpd11619)[0] => UMP(cpd00091)[0] NAGDPD(cpd12559)[0]	N	N	Y	Y	rxn05916	(1) UDP-N-acetylglucosamine[0] + (1) Dolichyl phosphate[0] <=> (1) UMP[0] + (1) N-Acetyl-D-glucosaminyldiphosphodolichol[0]
 r227	r227	UDPNAG(cpd00037)[0] NAGDPD(cpd12559)[0] => UDP(cpd00014)[0] CHIBDPD(cpd12568)[0]	N	N	Y	Y	rxn06709	(1) UDP-N-acetylglucosamine[0] + (1) N-Acetyl-D-glucosaminyldiphosphodolichol[0] <=> (1) UDP[0] + (1) Chitobiosyldiphosphodolichol[0]
 r228	r228	GDPMAN(cpd00083)[0] CHIBDPD(cpd12568)[0] => GDP(cpd00031)[0] MANCHIBDPD(cpd12789)[0]	N	N	Y	Y	rxn06712	(1) GDP-mannose[0] + (1) Chitobiosyldiphosphodolichol[0] <=> (1) GDP[0] + (1) Man-beta1->4GlcNAc-beta1->4GlcNAc-PP-Dol[0]
-r229	r229	GDPMAN(cpd00083)[0] MANCHIBDPD(cpd12789)[0] => GDP(cpd00031)[0] MANDPP[0]	N	N	N	N	frxn00086	
+r229	r229	GDPMAN(cpd00083)[0] MANCHIBDPD(cpd12789)[0] => GDP(cpd00031)[0] MANDPP[0]	N	N	N	N	frxn00081	
 r23	r23	ETH(cpd00363)[0] NAD(cpd00003)[0] => ACAL(cpd00071)[0] NADH(cpd00004)[0]	N	N	Y	Y	rxn00543	(1) NAD[0] + (1) Ethanol[0] <=> (1) NADH[0] + (1) H+[0] + (1) Acetaldehyde[0]
-r230	r230	GDPMAN(cpd00083)[0] MANDPP[0] => GDP(cpd00031)[0] MANDPPD[0]	N	N	N	N	frxn00087	
-r231	r231	(2) GDPMAN(cpd00083)[0] MANDPPD[0] => (2) GDP(cpd00031)[0] MANNACD[0]	N	N	N	N	frxn00088	
-r232	r232	GDPMAN(cpd00083)[0] DOLP(cpd11619)[0] => GDP(cpd00031)[0] DOLMANP(cpd12504)[0]	N	N	N	Y	frxn00089	
-r233	r233	MANNACD[0] DOLMANP(cpd12504)[0] => DOLP(cpd11619)[0] MANNACDD[0]	N	Y	N	N	frxn00090	
-r234	r234	DOLGPI(cpd11831)[0] MANNACDDD[0] => DOLP(cpd11619)[0] GLCAADPP[0]	N	N	N	N	frxn00091	
-r235	r235	DOLGPI(cpd11831)[0] GLCAADPP[0] => DOLP(cpd11619)[0] GLCADP[0]	N	N	N	N	frxn00092	
-r236	r236	DOLGPI(cpd11831)[0] GLCADP[0] => DOLP(cpd11619)[0] GLCADPP[0]	N	N	N	N	frxn00093	
-r237	r237	DOLDLS(cpd12494)[0] PROTASN[0] => DOLP(cpd11619)[0] GLCPASN[0]	N	N	N	N	frxn00094	
+r230	r230	GDPMAN(cpd00083)[0] MANDPP[0] => GDP(cpd00031)[0] MANDPPD[0]	N	N	N	N	frxn00082	
+r231	r231	(2) GDPMAN(cpd00083)[0] MANDPPD[0] => (2) GDP(cpd00031)[0] MANNACD[0]	N	N	N	N	frxn00083	
+r232	r232	GDPMAN(cpd00083)[0] DOLP(cpd11619)[0] => GDP(cpd00031)[0] DOLMANP(cpd12504)[0]	N	N	N	Y	frxn00084	
+r233	r233	MANNACD[0] DOLMANP(cpd12504)[0] => DOLP(cpd11619)[0] MANNACDD[0]	N	Y	N	N	frxn00085	
+r234	r234	DOLGPI(cpd11831)[0] MANNACDDD[0] => DOLP(cpd11619)[0] GLCAADPP[0]	N	N	N	N	frxn00086	
+r235	r235	DOLGPI(cpd11831)[0] GLCAADPP[0] => DOLP(cpd11619)[0] GLCADP[0]	N	N	N	N	frxn00087	
+r236	r236	DOLGPI(cpd11831)[0] GLCADP[0] => DOLP(cpd11619)[0] GLCADPP[0]	N	N	N	N	frxn00088	
+r237	r237	DOLDLS(cpd12494)[0] PROTASN[0] => DOLP(cpd11619)[0] GLCPASN[0]	N	N	N	N	frxn00089	
 r238	r238	UDPG(cpd00026)[0] DOLP(cpd11619)[0] => UDP(cpd00014)[0] DOLGPI(cpd11831)[0]	N	N	Y	Y	rxn05914	(1) UDP-glucose[0] + (1) H+[0] + (1) Dolichyl phosphate[0] <=> (1) UDP[0] + (1) Dolichyl beta-D-glucosyl phosphate[0]
 r239	r239	H2O(cpd00001)[0] DOLDP(cpd11713)[0] => PI(cpd00009)[0] DOLP(cpd11619)[0]	N	N	Y	Y	rxn05913	(1) H2O[0] + (1) Dolichyl diphosphate[0] => (1) Phosphate[0] + (2) H+[0] + (1) Dolichyl phosphate[0]
 r24	r24	NADP(cpd00006)[0] GL(cpd00100)[0] => NADPH(cpd00005)[0] GLYAL(cpd00448)[0]	N	N	Y	Y	rxn00765	(1) NADP[0] + (1) Glycerol[0] <=> (1) NADPH[0] + (1) H+[0] + (1) D-Glyceraldehyde[0]
-r240	r240	DOLMANP(cpd12504)[0] Protein(cpd11463)[0] => DOLP(cpd11619)[0] MANNP(cpd12205)[0]	N	N	N	Y	frxn00095	
+r240	r240	DOLMANP(cpd12504)[0] Protein(cpd11463)[0] => DOLP(cpd11619)[0] MANNP(cpd12205)[0]	N	N	N	Y	frxn00090	
 r241	r241	UDPNAG(cpd00037)[0] PINS(cpd11715)[0] => UDP(cpd00014)[0] NAGPMIL(cpd11839)[0]	N	N	Y	Y	rxn39349	(1) UDP-N-acetylglucosamine[0] + (1) Phosphatidylinositol[0] <=> (1) UDP[0] + (1) N-Acetyl-D-glucosaminylphosphatidylinositol[0]
 r242	r242	PPI(cpd00012)[0] => (2) PI(cpd00009)[0]	N	N	Y	Y	rxn11226	(1) PPi[0] => (2) Phosphate[0]
 r243	r243	ATP(cpd00002)[0] H2O(cpd00001)[0] => ADP(cpd00008)[0] PI(cpd00009)[0]	N	N	Y	Y	rxn00062	(1) H2O[0] + (1) ATP[0] => (1) ADP[0] + (1) Phosphate[0] + (1) H+[0]
 r244	r244	H2O(cpd00001)[0] ATP(cpd00002)[0] => PI(cpd00009)[0] ADP(cpd00008)[0]	N	N	Y	Y	rxn00062	(1) H2O[0] + (1) ATP[0] => (1) ADP[0] + (1) Phosphate[0] + (1) H+[0]
-r245	r245	NADH(cpd00004)[0] Q(cpd01351)[0] (4) H(cpd00067)[1] => NAD(cpd00003)[0] QH2[0] (4) H(cpd00067)[2]	Y	N	N	N	frxn00096	
-r246	r246	ATP(cpd00002)[0] H2O(cpd00001)[0] (3.87) H(cpd00067)[1] => ADP(cpd00008)[0] PI(cpd00009)[0] (3.87) H(cpd00067)[2]	Y	N	N	Y	frxn00097	
-r247	r247	H2O(cpd00001)[0] ATP(cpd00002)[0] (3.87) H(cpd00067)[1] => PI(cpd00009)[0] ADP(cpd00008)[0] (3.87) H(cpd00067)[2]	Y	N	N	Y	frxn00097	(1) H2O[0] + (1) ATP[0] + (3.87) H+[1] <=> (1) ADP[0] + (1) Phosphate[0] + (3.87) H+[2]
-r248	r248	QH2[0] (2) FERI(cpd00109)[0] (4) H(cpd00067)[1] => Q(cpd01351)[0] (2) FERO(cpd00110)[0] (4) H(cpd00067)[2]	Y	N	N	N	frxn00098	
-r249	r249	QH2[0] (2) FERI(cpd00109)[0] (4) H(cpd00067)[1] => Q(cpd01351)[0] (2) FERO(cpd00110)[0] (4) H(cpd00067)[2]	Y	N	N	N	frxn00098	(4) H+[1] + (2) Cytochrome c3+[0] + (1) Ubiquinol (mitochondrial)[0] <=> (4) H+[2] + (2) Cytochrome c2+[0] + (1) Ubiquinone-9[0]
+r245	r245	NADH(cpd00004)[0] Q(cpd01351)[0] (4) H_PO(cpd00067)[0] => NAD(cpd00003)[0] QH2[0] (4) H_PO(cpd00067)[1]	Y	N	N	N	frxn00091	
+r246	r246	ATP(cpd00002)[0] H2O(cpd00001)[0] (3.87) H_PO(cpd00067)[0] => ADP(cpd00008)[0] PI(cpd00009)[0] (3.87) H_PO(cpd00067)[1]	Y	N	N	Y	frxn00092	
+r247	r247	H2O(cpd00001)[0] ATP(cpd00002)[0] (3.87) H_PO(cpd00067)[0] => PI(cpd00009)[0] ADP(cpd00008)[0] (3.87) H_PO(cpd00067)[1]	Y	N	N	Y	frxn00092	(1) H2O[0] + (1) ATP[0] + (3.87) H+[0] <=> (1) ADP[0] + (1) Phosphate[0] + (3.87) H+[1]
+r248	r248	QH2[0] (2) FERI(cpd00109)[0] (4) H_PO(cpd00067)[0] => Q(cpd01351)[0] (2) FERO(cpd00110)[0] (4) H_PO(cpd00067)[1]	Y	N	N	N	frxn00093	
+r249	r249	QH2[0] (2) FERI(cpd00109)[0] (4) H_PO(cpd00067)[0] => Q(cpd01351)[0] (2) FERO(cpd00110)[0] (4) H_PO(cpd00067)[1]	Y	N	N	N	frxn00093	(4) H+[0] + (2) Cytochrome c3+[0] + (1) Ubiquinol (mitochondrial)[0] <=> (4) H+[1] + (2) Cytochrome c2+[0] + (1) Ubiquinone-9[0]
 r25	r25	NAD(cpd00003)[0] GL(cpd00100)[0] => NADH(cpd00004)[0] GLYAL(cpd00448)[0]	N	N	Y	Y	rxn00763	(1) NAD[0] + (1) Glycerol[0] <=> (1) NADH[0] + (1) H+[0] + (1) D-Glyceraldehyde[0]
-r250	r250	NADPH(cpd00005)[0] (2) FERI(cpd00109)[1] => NADP(cpd00006)[0] (2) FERO(cpd00110)[1]	Y	N	N	Y	frxn00099	
-r251	r251	Q(cpd01351)[0] FADH2(cpd00982)[1] => QH2[0] FAD(cpd00015)[1]	Y	N	N	N	frxn00100	
-r252	r252	(2) FERO(cpd00110)[0] (0.5) O2(cpd00007)[0] (4) H(cpd00067)[1] => H2O(cpd00001)[0] (2) FERI(cpd00109)[0] (4) H(cpd00067)[2]	Y	N	N	Y	frxn00101	
-r253	r253	(2) FERO(cpd00110)[0] (0.5) O2(cpd00007)[0] (4) H(cpd00067)[1] => H2O(cpd00001)[0] (2) FERI(cpd00109)[0] (4) H(cpd00067)[2]	Y	N	N	Y	frxn00101	(0.5) O2[0] + (4) H+[1] + (2) Cytochrome c2+[0] <=> (1) H2O[0] + (4) H+[2] + (2) Cytochrome c3+[0]
-r254	r254	(2) FERO(cpd00110)[0] (0.5) O2(cpd00007)[0] (4) H(cpd00067)[1] => H2O(cpd00001)[0] (4) H(cpd00067)[2] (2) FERI(cpd00109)[0]	Y	N	N	Y	frxn00101	(0.5) O2[0] + (4) H+[1] + (2) Cytochrome c2+[0] <=> (1) H2O[0] + (4) H+[2] + (2) Cytochrome c3+[0]
+r250	r250	NADPH(cpd00005)[0] (2) FERI(cpd00109)[1] => NADP(cpd00006)[0] (2) FERO(cpd00110)[1]	Y	N	N	Y	frxn00094	
+r251	r251	Q(cpd01351)[0] FADH2(cpd00982)[1] => QH2[0] FAD(cpd00015)[1]	Y	N	N	N	frxn00095	
+r252	r252	(2) FERO(cpd00110)[0] (0.5) O2(cpd00007)[0] (4) H_PO(cpd00067)[0] => H2O(cpd00001)[0] (2) FERI(cpd00109)[0] (4) H_PO(cpd00067)[1]	Y	N	N	Y	frxn00096	
+r253	r253	(2) FERO(cpd00110)[0] (0.5) O2(cpd00007)[0] (4) H_PO(cpd00067)[0] => H2O(cpd00001)[0] (2) FERI(cpd00109)[0] (4) H_PO(cpd00067)[1]	Y	N	N	Y	frxn00096	(0.5) O2[0] + (4) H+[0] + (2) Cytochrome c2+[0] <=> (1) H2O[0] + (4) H+[1] + (2) Cytochrome c3+[0]
+r254	r254	(2) FERO(cpd00110)[0] (0.5) O2(cpd00007)[0] (4) H_PO(cpd00067)[0] => H2O(cpd00001)[0] (4) H_PO(cpd00067)[1] (2) FERI(cpd00109)[0]	Y	N	N	Y	frxn00096	(0.5) O2[0] + (4) H+[0] + (2) Cytochrome c2+[0] <=> (1) H2O[0] + (4) H+[1] + (2) Cytochrome c3+[0]
 r255	r255	PAPS(cpd00044)[0] RTHIO(cpd11421)[0] => OTHIO(cpd11420)[0] H2SO3(cpd00081)[0] PAP(cpd00045)[0]	N	N	Y	Y	rxn05239	(1) 3-phosphoadenylylsulfate[0] + (1) trdrd[0] <=> (1) Adenosine 3-5-bisphosphate[0] + (1) H+[0] + (1) Sulfite[0] + (1) trdox[0]
 r256	r256	(3) NADPH(cpd00005)[0] H2SO3(cpd00081)[0] => (3) H2O(cpd00001)[0] (3) NADP(cpd00006)[0] H2S(cpd00239)[0]	N	N	Y	Y	rxn00623	(3) H2O[0] + (3) NADP[0] + (1) H2S[0] <= (3) NADPH[0] + (3) H+[0] + (1) Sulfite[0]
 r257	r257	(3) NADPH(cpd00005)[0] H2SO3(cpd00081)[0] => (3) H2O(cpd00001)[0] (3) NADP(cpd00006)[0] H2S(cpd00239)[0]	N	N	Y	Y	rxn00623	(3) H2O[0] + (3) NADP[0] + (1) H2S[0] <= (3) NADPH[0] + (3) H+[0] + (1) Sulfite[0]
 r258	r258	H2O(cpd00001)[0] O2(cpd00007)[0] H2SO3(cpd00081)[0] => SLF(cpd00048)[0] H2O2(cpd00025)[0]	N	N	Y	Y	rxn00383	(1) H2O[0] + (1) O2[0] + (1) Sulfite[0] => (1) H2O2[0] + (1) Sulfate[0] + (1) H+[0]
-r259	r259	PI(cpd00009)[0] ADP(cpd00008)[0] (3.87) H(cpd00067)[1] => H2O(cpd00001)[0] ATP(cpd00002)[0] (3.87) H(cpd00067)[2]	Y	N	N	Y	frxn00102	
+r259	r259	PI(cpd00009)[0] ADP(cpd00008)[0] (3.87) H_PO(cpd00067)[1] => H2O(cpd00001)[0] ATP(cpd00002)[0] (3.87) H_PO(cpd00067)[0]	Y	N	N	Y	frxn00092	(1) H2O[0] + (1) ATP[0] + (3.87) H+[0] <=> (1) ADP[0] + (1) Phosphate[0] + (3.87) H+[1]
 r26	r26	NAD(cpd00003)[0] GL(cpd00100)[0] => NADH(cpd00004)[0] GLYAL(cpd00448)[0]	N	N	Y	Y	rxn00763	(1) NAD[0] + (1) Glycerol[0] <=> (1) NADH[0] + (1) H+[0] + (1) D-Glyceraldehyde[0]
-r260	r260	ADP(cpd00008)[0] PI(cpd00009)[0] H2O(cpd00001)[1] ATP(cpd00002)[1] H[2] => ATP(cpd00002)[0] H2O(cpd00001)[0] PI(cpd00009)[1] ADP(cpd00008)[1] H[3]	Y	N	N	Y	frxn00103	
+r260	r260	ADP(cpd00008)[0] PI(cpd00009)[0] H2O(cpd00001)[1] ATP(cpd00002)[1] H_PO(cpd00067)[0] => ATP(cpd00002)[0] H2O(cpd00001)[0] PI(cpd00009)[1] ADP(cpd00008)[1] H_PO(cpd00067)[1]	Y	N	N	Y	frxn00097	
 r261	r261	NADH(cpd00004)[0] (2) FERRIB5(cpd11795)[0] => NAD(cpd00003)[0] (2) FERROB5(cpd11797)[0]	N	N	Y	Y	rxn05772	(1) NADH[0] + (1) H+[0] + (2) Ferricytochrome b5[0] => (1) NAD[0] + (2) Ferrocytochrome b5[0]
 r262	r262	(3) NADPH(cpd00005)[0] HNO2(cpd00075)[0] => H2O(cpd00001)[0] (3) NADP(cpd00006)[0] NH4OH(cpd00985)[0]	N	N	Y	Y	rxn14395	(1) H2O[0] + (3) NADP[0] + (1) NH4OH[0] <= (3) NADPH[0] + (4) H+[0] + (1) Nitrite[0]
 r263	r263	NADH(cpd00004)[0] HNO3(cpd00209)[0] => NAD(cpd00003)[0] H2O(cpd00001)[0] HNO2(cpd00075)[0]	N	N	Y	Y	rxn00571	(1) H2O[0] + (1) NAD[0] + (1) Nitrite[0] <= (1) NADH[0] + (2) H+[0] + (1) Nitrate[0]
@@ -471,12 +471,12 @@ r264	r264	O2(cpd00007)[0] (2) NITROPRO(cpd01433)[0] => (2) HNO2(cpd00075)[0] (2)
 r265	r265	H2O(cpd00001)[0] NH3(cpd00013)[0] => NH4OH(cpd00985)[0]	N	N	Y	Y	rxn10772	(1) NH4OH[0] => (1) H2O[0] + (1) NH3[0]
 r266	r266	H2O(cpd00001)[0] CYNE(cpd01015)[0] => CABM(cpd01101)[0]	N	N	Y	Y	rxn05063	(1) H2O[0] + (1) Cyanate[0] => (1) Carbamate[0]
 r267	r267	CABM(cpd01101)[0] => CO2(cpd00011)[0] NH3(cpd00013)[0]	N	N	Y	Y	rxn05064	(2) H+[0] + (1) Carbamate[0] <=> (1) CO2[0] + (1) NH3[0]
-r268	r268	ATN(cpd01092)[0] => ATT(cpd00388)[0]	N	N	N	Y	frxn00104	
+r268	r268	ATN(cpd01092)[0] => ATT(cpd00388)[0]	N	N	N	Y	frxn00098	
 r269	r269	ATT(cpd00388)[0] => UGC(cpd00465)[0] UREA(cpd00073)[0]	N	W	Y	Y	rxn01746	(1) H2O[0] + (1) Allantoate[0] <=> (1) Urea[0] + (1) Ureidoglycolate[0]
 r27	r27	GL(cpd00100)[0] NAD(cpd00003)[0] => GLYAL(cpd00448)[0] NADH(cpd00004)[0]	N	N	Y	Y	rxn00763	(1) NAD[0] + (1) Glycerol[0] <=> (1) NADH[0] + (1) H+[0] + (1) D-Glyceraldehyde[0]
 r270	r270	H2O(cpd00001)[0] UREA(cpd00073)[0] => CO2(cpd00011)[0] (2) NH3(cpd00013)[0]	N	N	Y	Y	rxn00101	(1) H2O[0] + (2) H+[0] + (1) Urea[0] => (1) CO2[0] + (2) NH3[0]
-r271	r271	NITE(cpd00542)[0] => NH3(cpd00013)[0] CARBO[0]	N	N	N	N	frxn00105	
-r272	r272	H2O(cpd00001)[0] CO2(cpd00011)[0] => HCO3(cpd00242)[0] H(cpd00067)[1]	Y	N	N	Y	frxn00106	
+r271	r271	NITE(cpd00542)[0] => NH3(cpd00013)[0] CARBO[0]	N	N	N	N	frxn00099	
+r272	r272	H2O(cpd00001)[0] CO2(cpd00011)[0] => HCO3(cpd00242)[0] H_PO(cpd00067)[0]	N	N	Y	Y	rxn00102	(1) H+[0] + (1) H2CO3[0] <=> (1) H2O[0] + (1) CO2[0]
 r273	r273	OA(cpd00032)[0] GLU(cpd00023)[0] => AKG(cpd00024)[0] ASP(cpd00041)[0]	N	N	Y	Y	rxn00260	(1) 2-Oxoglutarate[0] + (1) L-Aspartate[0] <=> (1) L-Glutamate[0] + (1) Oxaloacetate[0]
 r274	r274	OA(cpd00032)[0] GLU(cpd00023)[0] => AKG(cpd00024)[0] ASP(cpd00041)[0]	N	N	Y	Y	rxn00260	(1) 2-Oxoglutarate[0] + (1) L-Aspartate[0] <=> (1) L-Glutamate[0] + (1) Oxaloacetate[0]
 r275	r275	PYR(cpd00020)[0] GLU(cpd00023)[0] => AKG(cpd00024)[0] ALA(cpd00035)[0]	N	N	Y	Y	rxn00191	(1) 2-Oxoglutarate[0] + (1) L-Alanine[0] <=> (1) Pyruvate[0] + (1) L-Glutamate[0]
@@ -486,12 +486,12 @@ r278	r278	H2O(cpd00001)[0] O2(cpd00007)[0] DASP(cpd00320)[0] => H2O2(cpd00025)[0
 r279	r279	H2O(cpd00001)[0] O2(cpd00007)[0] GLY(cpd00033)[0] => GLX(cpd00040)[0] H2O2(cpd00025)[0] NH3(cpd00013)[0]	N	N	Y	Y	rxn00269	(1) H2O[0] + (1) O2[0] + (1) Glycine[0] => (1) NH3[0] + (1) H2O2[0] + (1) Glyoxalate[0]
 r28	r28	NAD(cpd00003)[0] PYR(cpd00020)[0] COA(cpd00010)[0] => NADH(cpd00004)[0] ACCOA(cpd00022)[0] CO2(cpd00011)[0]	N	N	Y	Y	rxn00154	(1) NAD[0] + (1) CoA[0] + (1) Pyruvate[0] => (1) NADH[0] + (1) CO2[0] + (1) Acetyl-CoA[0]
 r280	r280	H2O(cpd00001)[0] O2(cpd00007)[0] GLY(cpd00033)[0] => GLX(cpd00040)[0] H2O2(cpd00025)[0] NH3(cpd00013)[0]	N	N	Y	Y	rxn00269	(1) H2O[0] + (1) O2[0] + (1) Glycine[0] => (1) NH3[0] + (1) H2O2[0] + (1) Glyoxalate[0]
-r281	r281	CYS(cpd00084)[0] ECYS[0] => ALA(cpd00035)[0] ESULFCYS[0]	N	N	N	N	frxn00107	
+r281	r281	CYS(cpd00084)[0] ECYS[0] => ALA(cpd00035)[0] ESULFCYS[0]	N	N	N	N	frxn00100	
 r282	r282	ATP(cpd00002)[0] ASP(cpd00041)[0] GLN(cpd00053)[0] => AMP(cpd00018)[0] PPI(cpd00012)[0] GLU(cpd00023)[0] ASN(cpd00132)[0]	N	N	Y	Y	rxn11214	(1) ATP[0] + (1) L-Aspartate[0] + (1) L-Glutamine[0] => (1) PPi[0] + (1) AMP[0] + (1) L-Glutamate[0] + (1) L-Asparagine[0]
 r283	r283	NADPH(cpd00005)[0] BASP(cpd01977)[0] => PI(cpd00009)[0] NADP(cpd00006)[0] ASPSA(cpd00346)[0]	N	N	Y	Y	rxn01643	(1) NADP[0] + (1) Phosphate[0] + (1) L-Aspartate4-semialdehyde[0] <=> (1) NADPH[0] + (1) H+[0] + (1) 4-Phospho-L-aspartate[0]
 r284	r284	ATP(cpd00002)[0] ASP(cpd00041)[0] => ADP(cpd00008)[0] BASP(cpd01977)[0]	N	N	Y	Y	rxn00337	(1) ATP[0] + (1) L-Aspartate[0] <=> (1) ADP[0] + (1) 4-Phospho-L-aspartate[0]
-r285	r285	ATP(cpd00002)[0] ALA(cpd00035)[0] TRNA(cpd11615)[0] => AMP(cpd00018)[0] PPI(cpd00012)[0] LAlaTRNA(cpd11770)[0]	N	N	N	Y	frxn00108	
-r286	r286	ATP(cpd00002)[0] ASP(cpd00041)[0] TRNA(cpd11615)[0] => AMP(cpd00018)[0] PPI(cpd00012)[0] ASPTRNA(cpd12226)[0]	N	N	N	Y	frxn00109	
+r285	r285	ATP(cpd00002)[0] ALA(cpd00035)[0] TRNA(cpd11615)[0] => AMP(cpd00018)[0] PPI(cpd00012)[0] LAlaTRNA(cpd11770)[0]	N	N	N	Y	frxn00101	
+r286	r286	ATP(cpd00002)[0] ASP(cpd00041)[0] TRNA(cpd11615)[0] => AMP(cpd00018)[0] PPI(cpd00012)[0] ASPTRNA(cpd12226)[0]	N	N	N	Y	frxn00102	
 r287	r287	ATP(cpd00002)[0] ASN(cpd00132)[0] TRNA(cpd11615)[0] => AMP(cpd00018)[0] PPI(cpd00012)[0] ASNTRNA(cpd12313)[0]	N	N	Y	Y	rxn12891	(1) ATP[0] + (1) L-Asparagine[0] + (1) tRNA[0] => (1) PPi[0] + (1) AMP[0] + (2) H+[0] + (1) Asn-tRNA(Asn)[0]
 r288	r288	ATP(cpd00002)[0] ASN(cpd00132)[0] TRNA(cpd11615)[0] => PPI(cpd00012)[0] AMP(cpd00018)[0] ASNTRNA(cpd12313)[0]	N	N	Y	Y	rxn12891	(1) ATP[0] + (1) L-Asparagine[0] + (1) tRNA[0] => (1) PPi[0] + (1) AMP[0] + (2) H+[0] + (1) Asn-tRNA(Asn)[0]
 r289	r289	H2O(cpd00001)[0] OXOSUCC(cpd01577)[0] => OA(cpd00032)[0] NH3(cpd00013)[0]	N	N	Y	Y	rxn00254	(1) H2O[0] + (1) 2-Oxosuccinamate[0] => (1) NH3[0] + (1) Oxaloacetate[0]
@@ -513,9 +513,9 @@ r301	r301	H2O(cpd00001)[0] AGMT(cpd00152)[0] => UREA(cpd00073)[0] PTRSC(cpd00118
 r302	r302	ATP(cpd00002)[0] GLU(cpd00023)[0] => ADP(cpd00008)[0] GLUP(cpd02339)[0]	N	N	Y	Y	rxn00180	(1) ATP[0] + (1) L-Glutamate[0] <=> (1) ADP[0] + (1) alpha-D-Glutamyl phosphate[0]
 r303	r303	ATP(cpd00002)[0] GLU(cpd00023)[0] => ADP(cpd00008)[0] GLUP(cpd02339)[0]	N	N	Y	Y	rxn00180	(1) ATP[0] + (1) L-Glutamate[0] <=> (1) ADP[0] + (1) alpha-D-Glutamyl phosphate[0]
 r304	r304	NADPH(cpd00005)[0] GLUP(cpd02339)[0] => PI(cpd00009)[0] NADP(cpd00006)[0] GLUGSAL(cpd00858)[0]	N	N	Y	Y	rxn13072	(1) NADPH[0] + (1) H+[0] + (1) alpha-D-Glutamyl phosphate[0] <=> (1) NADP[0] + (1) Phosphate[0] + (1) L-Glutamate5-semialdehyde[0]
-r305	r305	FAD(cpd00015)[0] PRO(cpd00129)[1] => FADH2(cpd00982)[0] P5C(cpd02431)[1]	Y	N	N	Y	frxn00110	
+r305	r305	FAD(cpd00015)[0] PRO(cpd00129)[1] => FADH2(cpd00982)[0] P5C(cpd02431)[1]	Y	N	N	Y	frxn00103	
 r306	r306	GLUGSAL(cpd00858)[0] => H2O(cpd00001)[0] P5C(cpd02431)[0]	N	N	Y	Y	rxn02374	(1) L-Glutamate5-semialdehyde[0] => (1) H2O[0] + (1) H+[0] + (1) 1-Pyrroline-5-carboxylate[0]
-r307	r307	NADP(cpd00006)[0] GLUGSAL(cpd00858)[0] => NADPH(cpd00005)[0] GLU(cpd00023)[0]	N	N	N	Y	frxn00111	
+r307	r307	NADP(cpd00006)[0] GLUGSAL(cpd00858)[0] => NADPH(cpd00005)[0] GLU(cpd00023)[0]	N	N	N	Y	frxn00104	
 r308	r308	NADPH(cpd00005)[0] P5C(cpd02431)[0] => NADP(cpd00006)[0] PRO(cpd00129)[0]	N	N	Y	Y	rxn00931	(1) NADP[0] + (1) L-Proline[0] => (1) NADPH[0] + (2) H+[0] + (1) 1-Pyrroline-5-carboxylate[0]
 r309	r309	GLU(cpd00023)[0] NAORN(cpd00342)[0] => ORN(cpd00064)[0] NAGLU(cpd00477)[0]	N	N	Y	Y	rxn01636	(1) L-Glutamate[0] + (1) N-Acetylornithine[0] <=> (1) Ornithine[0] + (1) N-Acetyl-L-glutamate[0]
 r31	r31	NADP(cpd00006)[0] D6PGC(cpd00284)[0] => CO2(cpd00011)[0] NADPH(cpd00005)[0] RL5P(cpd00171)[0]	N	N	Y	Y	rxn01115	(1) NADP[0] + (1) 6-Phospho-D-gluconate[0] => (1) NADPH[0] + (1) CO2[0] + (1) D-Ribulose5-phosphate[0]
@@ -524,18 +524,18 @@ r311	r311	ACCOA(cpd00022)[0] GLU(cpd00023)[0] => COA(cpd00010)[0] NAGLU(cpd00477
 r312	r312	AKG(cpd00024)[0] ORN(cpd00064)[0] => GLU(cpd00023)[0] GLUGSAL(cpd00858)[0]	N	N	Y	Y	rxn00467	(1) 2-Oxoglutarate[0] + (1) Ornithine[0] <=> (1) L-Glutamate[0] + (1) L-Glutamate5-semialdehyde[0]
 r313	r313	ORN(cpd00064)[0] => CO2(cpd00011)[0] PTRSC(cpd00118)[0]	N	N	Y	Y	rxn00470	(1) Ornithine[0] + (1) H+[0] => (1) CO2[0] + (1) Putrescine[0]
 r314	r314	ACCOA(cpd00022)[0] PTRSC(cpd00118)[0] => COA(cpd00010)[0] APRUT(cpd01758)[0]	N	N	Y	Y	rxn00855	(1) Acetyl-CoA[0] + (1) Putrescine[0] => (1) CoA[0] + (1) H+[0] + (1) N-Acetylputrescine[0]
-r315	r315	H2O(cpd00001)[0] O2(cpd00007)[0] APRUT(cpd01758)[0] => H2O2(cpd00025)[0] NH3(cpd00013)[0] AABUTNOL[0]	N	N	N	N	frxn00112	
-r316	r316	ATP(cpd00002)[0] TRNA(cpd11615)[0] ARG(cpd00051)[0] => AMP(cpd00018)[0] PPI(cpd00012)[0] ALTRNA(cpd12036)[0]	N	N	N	Y	frxn00113	
-r317	r317	ATP(cpd00002)[0] TRNA(cpd11615)[0] ARG(cpd00051)[0] => PPI(cpd00012)[0] AMP(cpd00018)[0] ALTRNA(cpd12036)[0]	N	N	N	Y	frxn00113	(1) ATP[0] + (1) L-Arginine[0] + (1) tRNA[0] <=> (1) PPi[0] + (1) AMP[0] + (1) L-Arginyl-tRNA[0]
-r318	r318	ATP(cpd00002)[0] TRNA(cpd11615)[0] PRO(cpd00129)[0] => AMP(cpd00018)[0] PPI(cpd00012)[0] LPROTRNA(cpd12164)[0]	N	N	N	Y	frxn00114	
-r319	r319	ATP(cpd00002)[0] TRNA(cpd11615)[0] PRO(cpd00129)[0] => PPI(cpd00012)[0] AMP(cpd00018)[0] LPROTRNA(cpd12164)[0]	N	N	N	Y	frxn00114	(1) ATP[0] + (1) L-Proline[0] + (1) tRNA[0] <=> (1) PPi[0] + (1) AMP[0] + (1) L-Prolyl-tRNA(Pro)[0]
+r315	r315	H2O(cpd00001)[0] O2(cpd00007)[0] APRUT(cpd01758)[0] => H2O2(cpd00025)[0] NH3(cpd00013)[0] AABUTNOL[0]	N	N	N	N	frxn00105	
+r316	r316	ATP(cpd00002)[0] TRNA(cpd11615)[0] ARG(cpd00051)[0] => AMP(cpd00018)[0] PPI(cpd00012)[0] ALTRNA(cpd12036)[0]	N	N	N	Y	frxn00106	
+r317	r317	ATP(cpd00002)[0] TRNA(cpd11615)[0] ARG(cpd00051)[0] => PPI(cpd00012)[0] AMP(cpd00018)[0] ALTRNA(cpd12036)[0]	N	N	N	Y	frxn00106	(1) ATP[0] + (1) L-Arginine[0] + (1) tRNA[0] <=> (1) PPi[0] + (1) AMP[0] + (1) L-Arginyl-tRNA[0]
+r318	r318	ATP(cpd00002)[0] TRNA(cpd11615)[0] PRO(cpd00129)[0] => AMP(cpd00018)[0] PPI(cpd00012)[0] LPROTRNA(cpd12164)[0]	N	N	N	Y	frxn00107	
+r319	r319	ATP(cpd00002)[0] TRNA(cpd11615)[0] PRO(cpd00129)[0] => PPI(cpd00012)[0] AMP(cpd00018)[0] LPROTRNA(cpd12164)[0]	N	N	N	Y	frxn00107	(1) ATP[0] + (1) L-Proline[0] + (1) tRNA[0] <=> (1) PPi[0] + (1) AMP[0] + (1) L-Prolyl-tRNA(Pro)[0]
 r32	r32	RL5P(cpd00171)[0] => XUL5P(cpd00198)[0]	N	N	Y	Y	rxn01116	(1) D-Ribulose5-phosphate[0] <=> (1) D-Xylulose5-phosphate[0]
 r320	r320	ORN(cpd00064)[0] => NH3(cpd00013)[0] PRO(cpd00129)[0]	N	N	Y	Y	rxn00471	(1) Ornithine[0] <=> (1) NH3[0] + (1) L-Proline[0]
 r321	r321	ORN(cpd00064)[0] => NH3(cpd00013)[0] PRO(cpd00129)[0]	N	N	Y	Y	rxn00471	(1) Ornithine[0] <=> (1) NH3[0] + (1) L-Proline[0]
 r322	r322	ATP(cpd00002)[0] NAGLU(cpd00477)[0] => ADP(cpd00008)[0] NAGLUP(cpd02552)[0]	N	N	Y	Y	rxn01917	(1) ATP[0] + (1) N-Acetyl-L-glutamate[0] <=> (1) ADP[0] + (1) n-acetylglutamyl-phosphate[0]
-r323	r323	PI(cpd00009)[0] NADP(cpd00006)[0] NAGLUP(cpd02552)[0] => NADPH(cpd00005)[0] ACGLU5PI(cpd02552)[0]	N	Y	N	Y	frxn00115	
+r323	r323	PI(cpd00009)[0] NADP(cpd00006)[0] NAGLUP(cpd02552)[0] => NADPH(cpd00005)[0] ACGLU5PI(cpd02552)[0]	N	Y	N	Y	frxn00108	
 r324	r324	AKG(cpd00024)[0] O2(cpd00007)[0] PRO(cpd00129)[0] => CO2(cpd00011)[0] SUCC(cpd00036)[0] HYPRO(cpd00851)[0]	N	N	Y	Y	rxn00932	(1) O2[0] + (1) 2-Oxoglutarate[0] + (1) L-Proline[0] => (1) CO2[0] + (1) Succinate[0] + (1) trans-4-Hydroxy-L-proline[0]
-r325	r325	ATP(cpd00002)[0] TRNA(cpd11615)[0] CYS(cpd00084)[0] => AMP(cpd00018)[0] PPI(cpd00012)[0] LCysTRNA(cpd12255)[0]	N	N	N	Y	frxn00116	
+r325	r325	ATP(cpd00002)[0] TRNA(cpd11615)[0] CYS(cpd00084)[0] => AMP(cpd00018)[0] PPI(cpd00012)[0] LCysTRNA(cpd12255)[0]	N	N	N	Y	frxn00109	
 r326	r326	H2O(cpd00001)[0] PAP(cpd00045)[0] => PI(cpd00009)[0] AMP(cpd00018)[0]	N	N	Y	Y	rxn00137	(1) H2O[0] + (1) Adenosine 3-5-bisphosphate[0] <=> (1) Phosphate[0] + (1) AMP[0]
 r327	r327	O2(cpd00007)[0] CYS(cpd00084)[0] => 3SULALA(cpd00467)[0]	N	N	Y	Y	rxn00645	(1) O2[0] + (1) L-Cysteine[0] <=> (1) H+[0] + (1) 3-Sulfinoalanine[0]
 r328	r328	SER(cpd00054)[0] => PYR(cpd00020)[0] NH3(cpd00013)[0]	N	N	Y	Y	rxn00165	(1) L-Serine[0] => (1) NH3[0] + (1) Pyruvate[0]
@@ -547,13 +547,13 @@ r332	r332	H2S(cpd00239)[0] ASER(cpd00722)[0] => AC(cpd00029)[0] CYS(cpd00084)[0]
 r333	r333	H2S(cpd00239)[0] ASER(cpd00722)[0] => AC(cpd00029)[0] CYS(cpd00084)[0]	N	N	Y	Y	rxn00649	(1) H2S[0] + (1) O-Acetyl-L-serine[0] <=> (1) Acetate[0] + (1) L-Cysteine[0]
 r334	r334	AKG(cpd00024)[0] CYS(cpd00084)[0] => GLU(cpd00023)[0] MECPYR(cpd00706)[0]	N	N	Y	Y	rxn00647	(1) 2-Oxoglutarate[0] + (1) L-Cysteine[0] <=> (1) L-Glutamate[0] + (1) Mercaptopyruvate[0]
 r335	r335	AKG(cpd00024)[0] CYS(cpd00084)[0] => GLU(cpd00023)[0] MECPYR(cpd00706)[0]	N	N	Y	Y	rxn00647	(1) 2-Oxoglutarate[0] + (1) L-Cysteine[0] <=> (1) L-Glutamate[0] + (1) Mercaptopyruvate[0]
-r336	r336	SAM(cpd00017)[0] DNACYS(cpd26892)[0] => SAH(cpd00019)[0] DNAMCYS(cpd12223)[0]	N	N	N	Y	frxn00117	
+r336	r336	SAM(cpd00017)[0] DNACYS(cpd26892)[0] => SAH(cpd00019)[0] DNAMCYS(cpd12223)[0]	N	N	N	Y	frxn00110	
 r337	r337	GLU(cpd00023)[0] => CO2(cpd00011)[0] GABA(cpd00281)[0]	N	N	Y	Y	rxn00194	(1) L-Glutamate[0] + (1) H+[0] => (1) CO2[0] + (1) GABA[0]
 r338	r338	GLU(cpd00023)[0] => CO2(cpd00011)[0] GABA(cpd00281)[0]	N	N	Y	Y	rxn00194	(1) L-Glutamate[0] + (1) H+[0] => (1) CO2[0] + (1) GABA[0]
-r339	r339	O2(cpd00007)[0] DHYXPENT[0] => FOR(cpd00047)[0] MTHIOBUT(cpd00869)[0]	N	N	N	N	frxn00118	
+r339	r339	O2(cpd00007)[0] DHYXPENT[0] => FOR(cpd00047)[0] MTHIOBUT(cpd00869)[0]	N	N	N	N	frxn00111	
 r34	r34	XUL5P(cpd00198)[0] R5P(cpd00101)[0] => T3P1(cpd00102)[0] S7P(cpd00238)[0]	N	N	Y	Y	rxn01200	(1) Glyceraldehyde3-phosphate[0] + (1) Sedoheptulose7-phosphate[0] <=> (1) ribose-5-phosphate[0] + (1) D-Xylulose5-phosphate[0]
 r340	r340	NAD(cpd00003)[0] H2O(cpd00001)[0] SUCCSAL(cpd00199)[0] => NADH(cpd00004)[0] SUCC(cpd00036)[0]	N	N	Y	Y	rxn00508	(1) H2O[0] + (1) NAD[0] + (1) 4-Oxobutanoate[0] <=> (1) NADH[0] + (1) Succinate[0] + (2) H+[0]
-r341	r341	NADP(cpd00006)[0] SUCCSAL(cpd00199)[0] UNDEF[0] => NADPH(cpd00005)[0] SUCC(cpd00036)[0]	N	N	N	N	frxn00119	
+r341	r341	NADP(cpd00006)[0] SUCCSAL(cpd00199)[0] UNDEF[0] => NADPH(cpd00005)[0] SUCC(cpd00036)[0]	N	N	N	N	frxn00112	
 r342	r342	NADPH(cpd00005)[0] AKG(cpd00024)[0] GLN(cpd00053)[0] => NADP(cpd00006)[0] (2) GLU(cpd00023)[0]	N	N	Y	Y	rxn00085	(1) NADP[0] + (2) L-Glutamate[0] <=> (1) NADPH[0] + (1) 2-Oxoglutarate[0] + (1) L-Glutamine[0] + (1) H+[0]
 r343	r343	NADH(cpd00004)[0] AKG(cpd00024)[0] GLN(cpd00053)[0] => NAD(cpd00003)[0] (2) GLU(cpd00023)[0]	N	N	Y	Y	rxn00069	(1) NAD[0] + (2) L-Glutamate[0] <=> (1) NADH[0] + (1) 2-Oxoglutarate[0] + (1) L-Glutamine[0] + (1) H+[0]
 r344	r344	NAD(cpd00003)[0] GLU(cpd00023)[0] => NADH(cpd00004)[0] AKG(cpd00024)[0] NH3(cpd00013)[0]	N	N	Y	Y	rxn30678	(1) NAD[0] + (1) L-Glutamate[0] => (1) NADH[0] + (1) NH3[0] + (1) 2-Oxoglutarate[0]
@@ -566,9 +566,9 @@ r35	r35	XUL5P(cpd00198)[0] E4P(cpd00236)[0] => F6P(cpd19035)[0] T3P1(cpd00102)[0
 r350	r350	AKG(cpd00024)[0] GABA(cpd00281)[0] => GLU(cpd00023)[0] SUCCSAL(cpd00199)[0]	N	N	Y	Y	rxn01204	(1) 2-Oxoglutarate[0] + (1) GABA[0] <=> (1) L-Glutamate[0] + (1) 4-Oxobutanoate[0]
 r351	r351	ATP(cpd00002)[0] NH3(cpd00013)[0] GLU(cpd00023)[0] => ADP(cpd00008)[0] PI(cpd00009)[0] GLN(cpd00053)[0]	N	N	Y	Y	rxn00187	(1) ATP[0] + (1) NH3[0] + (1) L-Glutamate[0] => (1) ADP[0] + (1) Phosphate[0] + (1) L-Glutamine[0] + (1) H+[0]
 r352	r352	F6P(cpd19035)[0] GLN(cpd00053)[0] => GA6P(cpd00288)[0] GLU(cpd00023)[0]	N	N	Y	Y	rxn15064	(1) L-Glutamine[0] + (1) beta-D-Fructose 6-phosphate[0] <=> (1) L-Glutamate[0] + (1) D-Glucosamine phosphate[0]
-r353	r353	ATP(cpd00002)[0] GLU(cpd00023)[0] TRNA(cpd11615)[0] => AMP(cpd00018)[0] PPI(cpd00012)[0] LGLUTRNA(cpd12227)[0]	N	N	N	Y	frxn00120	
-r354	r354	ATP(cpd00002)[0] GLU(cpd00023)[0] TRNA(cpd11615)[0] => PPI(cpd00012)[0] AMP(cpd00018)[0] LGLUTRNA(cpd12227)[0]	N	N	N	Y	frxn00120	(1) ATP[0] + (1) L-Glutamate[0] + (1) tRNA[0] <=> (1) PPi[0] + (1) AMP[0] + (1) L-Glutamyl-tRNA-Glu[0]
-r355	r355	ATP(cpd00002)[0] GLN(cpd00053)[0] TRNA(cpd11615)[0] => AMP(cpd00018)[0] PPI(cpd00012)[0] LGLNTRNA(cpd12060)[0]	N	N	N	Y	frxn00121	
+r353	r353	ATP(cpd00002)[0] GLU(cpd00023)[0] TRNA(cpd11615)[0] => AMP(cpd00018)[0] PPI(cpd00012)[0] LGLUTRNA(cpd12227)[0]	N	N	N	Y	frxn00113	
+r354	r354	ATP(cpd00002)[0] GLU(cpd00023)[0] TRNA(cpd11615)[0] => PPI(cpd00012)[0] AMP(cpd00018)[0] LGLUTRNA(cpd12227)[0]	N	N	N	Y	frxn00113	(1) ATP[0] + (1) L-Glutamate[0] + (1) tRNA[0] <=> (1) PPi[0] + (1) AMP[0] + (1) L-Glutamyl-tRNA-Glu[0]
+r355	r355	ATP(cpd00002)[0] GLN(cpd00053)[0] TRNA(cpd11615)[0] => AMP(cpd00018)[0] PPI(cpd00012)[0] LGLNTRNA(cpd12060)[0]	N	N	N	Y	frxn00114	
 r356	r356	NAD(cpd00003)[0] 3PG(cpd00169)[0] => NADH(cpd00004)[0] PHP(cpd02069)[0]	N	N	Y	Y	rxn01101	(1) NAD[0] + (1) 3-Phosphoglycerate[0] <=> (1) NADH[0] + (1) H+[0] + (1) 3-Phosphonooxypyruvate[0]
 r357	r357	NAD(cpd00003)[0] 3PG(cpd00169)[0] => NADH(cpd00004)[0] PHP(cpd02069)[0]	N	N	Y	Y	rxn01101	(1) NAD[0] + (1) 3-Phosphoglycerate[0] <=> (1) NADH[0] + (1) H+[0] + (1) 3-Phosphonooxypyruvate[0]
 r358	r358	ATP(cpd00002)[0] GLYCTE(cpd00223)[0] => ADP(cpd00008)[0] 3PG(cpd00169)[0]	N	N	Y	Y	rxn01102	(1) ATP[0] + (1) Glycerate[0] => (1) ADP[0] + (1) H+[0] + (1) 3-Phosphoglycerate[0]
@@ -590,10 +590,10 @@ r371	r371	CHO(cpd00098)[0] PQ(cpd00097)[0] => BETALD(cpd00447)[0] PQH2(cpd00986)
 r372	r372	H2O(cpd00001)[0] O2(cpd00007)[0] SARC(cpd00183)[0] => FALD(cpd00055)[0] H2O2(cpd00025)[0] GLY(cpd00033)[0]	N	N	Y	Y	rxn00433	(1) H2O[0] + (1) O2[0] + (1) Sarcosine[0] => (1) H2O2[0] + (1) Glycine[0] + (1) Formaldehyde[0]
 r373	r373	SER(cpd00054)[0] HCYS(cpd00135)[0] => LLCT(cpd19019)[0]	N	W	Y	Y	rxn15167	(1) L-Serine[0] + (1) Homocysteine[0] <=> (1) H2O[0] + (1) L-Cystathionine[0]
 r374	r374	SER(cpd00054)[0] HCYS(cpd00135)[0] => LLCT(cpd19019)[0]	N	W	Y	Y	rxn15167	(1) L-Serine[0] + (1) Homocysteine[0] <=> (1) H2O[0] + (1) L-Cystathionine[0]
-r375	r375	ATP(cpd00002)[0] TRNA(cpd11615)[0] SER(cpd00054)[0] => PPI(cpd00012)[0] AMP(cpd00018)[0] LSERTRNA(cpd12132)[0]	N	N	N	Y	frxn00122	
-r376	r376	ATP(cpd00002)[0] TRNA(cpd11615)[0] SER(cpd00054)[0] => AMP(cpd00018)[0] PPI(cpd00012)[0] LSERTRNA(cpd12132)[0]	N	N	N	Y	frxn00122	(1) ATP[0] + (1) L-Serine[0] + (1) tRNA[0] <=> (1) PPi[0] + (1) AMP[0] + (1) L-Seryl-tRNA(Ser)[0]
-r377	r377	ATP(cpd00002)[0] GLY(cpd00033)[0] TRNA(cpd11615)[0] => AMP(cpd00018)[0] PPI(cpd00012)[0] GLYTRNA(cpd12100)[0]	N	N	N	Y	frxn00123	
-r378	r378	ATP(cpd00002)[0] TRNA(cpd11615)[0] THR(cpd00161)[0] => AMP(cpd00018)[0] PPI(cpd00012)[0] LTHETRNA(cpd12229)[0]	N	N	N	Y	frxn00124	
+r375	r375	ATP(cpd00002)[0] TRNA(cpd11615)[0] SER(cpd00054)[0] => PPI(cpd00012)[0] AMP(cpd00018)[0] LSERTRNA(cpd12132)[0]	N	N	N	Y	frxn00115	
+r376	r376	ATP(cpd00002)[0] TRNA(cpd11615)[0] SER(cpd00054)[0] => AMP(cpd00018)[0] PPI(cpd00012)[0] LSERTRNA(cpd12132)[0]	N	N	N	Y	frxn00115	(1) ATP[0] + (1) L-Serine[0] + (1) tRNA[0] <=> (1) PPi[0] + (1) AMP[0] + (1) L-Seryl-tRNA(Ser)[0]
+r377	r377	ATP(cpd00002)[0] GLY(cpd00033)[0] TRNA(cpd11615)[0] => AMP(cpd00018)[0] PPI(cpd00012)[0] GLYTRNA(cpd12100)[0]	N	N	N	Y	frxn00116	
+r378	r378	ATP(cpd00002)[0] TRNA(cpd11615)[0] THR(cpd00161)[0] => AMP(cpd00018)[0] PPI(cpd00012)[0] LTHETRNA(cpd12229)[0]	N	N	N	Y	frxn00117	
 r379	r379	H2O(cpd00001)[0] PHSER(cpd00809)[0] => PI(cpd00009)[0] THR(cpd00161)[0]	N	N	Y	Y	rxn01069	(1) H2O[0] + (1) O-Phospho-L-homoserine[0] <=> (1) Phosphate[0] + (1) L-Threonine[0]
 r38	r38	ATP(cpd00002)[0] RIB(cpd00105)[0] => ADP(cpd00008)[0] R5P(cpd00101)[0]	N	N	Y	Y	rxn00772	(1) ATP[0] + (1) D-Ribose[0] => (1) ADP[0] + (1) H+[0] + (1) ribose-5-phosphate[0]
 r380	r380	THR(cpd00161)[0] => NH3(cpd00013)[0] OBUT(cpd00094)[0]	N	N	Y	Y	rxn00737	(1) L-Threonine[0] => (1) NH3[0] + (1) 2-Oxobutyrate[0]
@@ -607,10 +607,10 @@ r387	r387	PRFP(cpd02979)[0] => PRLP(cpd02991)[0]	N	N	Y	Y	rxn03175	(1) phosphorib
 r388	r388	GLU(cpd00023)[0] IMACP(cpd00930)[0] => AKG(cpd00024)[0] HISOLP(cpd00807)[0]	N	N	Y	Y	rxn02320	(1) 2-Oxoglutarate[0] + (1) L-histidinol-phosphate[0] <=> (1) L-Glutamate[0] + (1) imidazole acetol-phosphate[0]
 r389	r389	HISOLP(cpd00807)[0] => PI(cpd00009)[0] HISOL(cpd00641)[0]	N	W	Y	Y	rxn02160	(1) H2O[0] + (1) L-histidinol-phosphate[0] <=> (1) Phosphate[0] + (1) L-Histidinol[0]
 r39	r39	ATP(cpd00002)[0] GLCNT(cpd00222)[0] => ADP(cpd00008)[0] D6PGC(cpd00284)[0]	N	N	Y	Y	rxn01275	(1) ATP[0] + (1) GLCN[0] => (1) ADP[0] + (1) H+[0] + (1) 6-Phospho-D-gluconate[0]
-r390	r390	(2) NAD(cpd00003)[0] HISOL(cpd00641)[0] => (2) NADH(cpd00004)[0] HIS(cpd00119)[0]	N	N	N	Y	frxn00125	
+r390	r390	(2) NAD(cpd00003)[0] HISOL(cpd00641)[0] => (2) NADH(cpd00004)[0] HIS(cpd00119)[0]	N	N	N	Y	frxn00118	
 r391	r391	ATP(cpd00002)[0] PRPP(cpd00103)[0] => PPI(cpd00012)[0] PRBATP(cpd01775)[0]	N	N	Y	Y	rxn00789	(1) PPi[0] + (1) H+[0] + (1) Phosphoribosyl-ATP[0] <= (1) ATP[0] + (1) PRPP[0]
 r392	r392	DIMGP(cpd02843)[0] => IMACP(cpd00930)[0]	N	W	Y	Y	rxn02473	(1) D-erythro-imidazol-glycerol-phosphate[0] => (1) H2O[0] + (1) imidazole acetol-phosphate[0]
-r393	r393	ATP(cpd00002)[0] TRNA(cpd11615)[0] HIS(cpd00119)[0] => AMP(cpd00018)[0] PPI(cpd00012)[0] HHTRNA(cpd12228)[0]	N	N	N	Y	frxn00126	
+r393	r393	ATP(cpd00002)[0] TRNA(cpd11615)[0] HIS(cpd00119)[0] => AMP(cpd00018)[0] PPI(cpd00012)[0] HHTRNA(cpd12228)[0]	N	N	N	Y	frxn00119	
 r394	r394	ARG(cpd00051)[0] NADPH(cpd00005)[0] O2(cpd00007)[0] => CITR(cpd00274)[0] NITOXE(cpd00418)[0] NADP(cpd00006)[0]	N	N	Y	Y	rxn05859	(1) NADPH[0] + (1) O2[0] + (1) L-Arginine[0] => (1) NADP[0] + (3) H+[0] + (1) Citrulline[0] + (1) NO[0]
 r395	r395	PRBATP(cpd01775)[0] => PPI(cpd00012)[0] PRBAMP(cpd01777)[0]	N	N	Y	Y	rxn30699	(1) Phosphoribosyl-ATP[0] => (1) PPi[0] + (1) Phosphoribosyl-AMP[0]
 r396	r396	PRBAMP(cpd01777)[0] => PRFP(cpd02979)[0]	N	W	Y	Y	rxn02835	(1) H2O[0] + (1) Phosphoribosyl-AMP[0] <=> (1) phosphoribosylformiminoaicar-phosphate[0]
@@ -621,14 +621,14 @@ r4	r4	GLC(cpd19001)[0] => bDGLC(cpd00190)[0]	N	N	Y	Y	rxn27702	(1) alpha-D-Glucos
 r40	r40	R5P(cpd00101)[0] => R1P(cpd00475)[0]	N	N	Y	Y	rxn00778	(1) Ribose 1-phosphate[0] <=> (1) ribose-5-phosphate[0]
 r400	r400	AKG(cpd00024)[0] VAL(cpd00156)[0] => GLU(cpd00023)[0] OIVAL(cpd00123)[0]	N	N	Y	Y	rxn00903	(1) 2-Oxoglutarate[0] + (1) L-Valine[0] <=> (1) L-Glutamate[0] + (1) 3-Methyl-2-oxobutanoate[0]
 r401	r401	AKG(cpd00024)[0] VAL(cpd00156)[0] => GLU(cpd00023)[0] OIVAL(cpd00123)[0]	N	N	Y	Y	rxn00903	(1) 2-Oxoglutarate[0] + (1) L-Valine[0] <=> (1) L-Glutamate[0] + (1) 3-Methyl-2-oxobutanoate[0]
-r402	r402	AKG(cpd00024)[0] LEU(cpd00107)[0] => GLU(cpd00023)[0] OICAP(cpd02605)[0]	N	N	N	Y	frxn00127	
-r403	r403	AKG(cpd00024)[0] LEU(cpd00107)[0] => GLU(cpd00023)[0] OICAP(cpd02605)[0]	N	N	N	Y	frxn00127	(1) 2-Oxoglutarate[0] + (1) L-Leucine[0] <=> (1) L-Glutamate[0] + (1) 2-isopropyl-3-oxosuccinate[0]
+r402	r402	AKG(cpd00024)[0] LEU(cpd00107)[0] => GLU(cpd00023)[0] OICAP(cpd02605)[0]	N	N	N	Y	frxn00120	
+r403	r403	AKG(cpd00024)[0] LEU(cpd00107)[0] => GLU(cpd00023)[0] OICAP(cpd02605)[0]	N	N	N	Y	frxn00120	(1) 2-Oxoglutarate[0] + (1) L-Leucine[0] <=> (1) L-Glutamate[0] + (1) 2-isopropyl-3-oxosuccinate[0]
 r404	r404	PYR(cpd00020)[0] OBUT(cpd00094)[0] => CO2(cpd00011)[0] ABUT(cpd19045)[0]	N	N	Y	Y	rxn30333	(1) Pyruvate[0] + (1) H+[0] + (1) 2-Oxobutyrate[0] => (1) CO2[0] + (1) (S)-2-Aceto-2-hydroxybutanoate[0]
 r405	r405	PYR(cpd00020)[0] OBUT(cpd00094)[0] => CO2(cpd00011)[0] ABUT(cpd19045)[0]	N	N	Y	Y	rxn30333	(1) Pyruvate[0] + (1) H+[0] + (1) 2-Oxobutyrate[0] => (1) CO2[0] + (1) (S)-2-Aceto-2-hydroxybutanoate[0]
 r406	r406	(2) PYR(cpd00020)[0] => CO2(cpd00011)[0] ACLAC(cpd00668)[0]	N	N	Y	Y	rxn00003	(1) CO2[0] + (1) ALCTT[0] <= (2) Pyruvate[0] + (1) H+[0]
 r407	r407	(2) PYR(cpd00020)[0] => CO2(cpd00011)[0] ACLAC(cpd00668)[0]	N	N	Y	Y	rxn00003	(1) CO2[0] + (1) ALCTT[0] <= (2) Pyruvate[0] + (1) H+[0]
 r408	r408	ALA(cpd00035)[0] OIVAL(cpd00123)[0] => PYR(cpd00020)[0] VAL(cpd00156)[0]	N	N	Y	Y	rxn00904	(1) Pyruvate[0] + (1) L-Valine[0] <=> (1) L-Alanine[0] + (1) 3-Methyl-2-oxobutanoate[0]
-r409	r409	NADPH(cpd00005)[0] ACLAC(cpd00668)[0] => NADP(cpd00006)[0] DHVAL(cpd19030)[0]	N	N	N	Y	frxn00128	
+r409	r409	NADPH(cpd00005)[0] ACLAC(cpd00668)[0] => NADP(cpd00006)[0] DHVAL(cpd19030)[0]	N	N	N	Y	frxn00121	
 r41	r41	ACCOA(cpd00022)[0] H2O(cpd00001)[0] OA(cpd00032)[0] => COA(cpd00010)[0] CIT(cpd00137)[0]	N	N	Y	Y	rxn00256	(1) CoA[0] + (1) H+[0] + (1) Citrate[0] <= (1) H2O[0] + (1) Acetyl-CoA[0] + (1) Oxaloacetate[0]
 r410	r410	NADPH(cpd00005)[0] ABUT(cpd19045)[0] => NADP(cpd00006)[0] DHMVA(cpd19046)[0]	N	N	Y	Y	rxn30403	(1) NADPH[0] + (1) H+[0] + (1) (S)-2-Aceto-2-hydroxybutanoate[0] <=> (1) NADP[0] + (1) (R)-2,3-Dihydroxy-3-methylpentanoate[0]
 r411	r411	DHVAL(cpd19030)[0] => OIVAL(cpd00123)[0]	N	W	Y	Y	rxn15467	(1) (R)-2,3-Dihydroxy-3-methylbutanoate[0] => (1) H2O[0] + (1) 3-Methyl-2-oxobutanoate[0]
@@ -638,43 +638,43 @@ r414	r414	DHMVA(cpd19046)[0] => OMVAL(cpd00508)[0]	N	W	Y	Y	rxn30145	(1) (R)-2,3-
 r415	r415	ACCOA(cpd00022)[0] OIVAL(cpd00123)[0] => COA(cpd00010)[0] IPPMAL(cpd01646)[0]	N	N	Y	Y	rxn30571	(1) Acetyl-CoA[0] + (1) 3-Methyl-2-oxobutanoate[0] => (1) CoA[0] + (1) 2-Isopropylmalate[0]
 r416	r416	CBHCAP(cpd02693)[0] => IPPMAL(cpd01646)[0]	N	N	Y	Y	rxn12193	(1) 2-Isopropylmalate[0] <=> (1) 3-Isopropylmalate[0]
 r417	r417	PPMAL(cpd01710)[0] => IPPMAL(cpd01646)[0]	N	W	Y	Y	rxn02789	(1) 2-Isopropylmalate[0] <=> (1) H2O[0] + (1) 2-Isopropylmaleate[0]
-r418	r418	NAD(cpd00003)[0] IPPMAL(cpd01646)[0] => NADH(cpd00004)[0] CO2(cpd00011)[0] OICAP(cpd02605)[0]	N	N	N	Y	frxn00129	
+r418	r418	NAD(cpd00003)[0] IPPMAL(cpd01646)[0] => NADH(cpd00004)[0] CO2(cpd00011)[0] OICAP(cpd02605)[0]	N	N	N	Y	frxn00122	
 r419	r419	NAD(cpd00003)[0] COA(cpd00010)[0] OIVAL(cpd00123)[0] => NADH(cpd00004)[0] CO2(cpd00011)[0] ISOBUCOA(cpd00481)[0]	N	N	Y	Y	rxn00899	(1) NAD[0] + (1) CoA[0] + (1) 3-Methyl-2-oxobutanoate[0] => (1) NADH[0] + (1) CO2[0] + (1) Isobutyryl-CoA[0]
 r42	r42	CIT(cpd00137)[0] => H2O(cpd00001)[0] ACO(cpd00331)[0]	N	N	Y	Y	rxn00974	(1) Citrate[0] <=> (1) H2O[0] + (1) cis-Aconitate[0]
 r420	r420	NAD(cpd00003)[0] COA(cpd00010)[0] OMVAL(cpd00508)[0] => NADH(cpd00004)[0] CO2(cpd00011)[0] METBUCOA(cpd00760)[0]	N	N	Y	Y	rxn02269	(1) NAD[0] + (1) CoA[0] + (1) 3MOP[0] => (1) NADH[0] + (1) CO2[0] + (1) 2-Methylbutyryl-CoA[0]
-r421	r421	NAD(cpd00003)[0] COA(cpd00010)[0] OICAP(cpd02605)[0] => NADH(cpd00004)[0] CO2(cpd00011)[0] ISOVACOA[0]	N	N	N	N	frxn00130	
-r422	r422	FAD(cpd00015)[0] METBUCOA(cpd00760)[0] => FADH2(cpd00982)[0] MCRCOA(cpd01966)[0]	N	N	N	Y	frxn00131	
-r423	r423	FAD(cpd00015)[0] METBUCOA(cpd00760)[1] => FADH2(cpd00982)[0] MCRCOA(cpd01966)[1]	Y	N	N	Y	frxn00132	
+r421	r421	NAD(cpd00003)[0] COA(cpd00010)[0] OICAP(cpd02605)[0] => NADH(cpd00004)[0] CO2(cpd00011)[0] ISOVACOA[0]	N	N	N	N	frxn00123	
+r422	r422	FAD(cpd00015)[0] METBUCOA(cpd00760)[0] => FADH2(cpd00982)[0] MCRCOA(cpd01966)[0]	N	N	N	Y	frxn00124	
+r423	r423	FAD(cpd00015)[0] METBUCOA(cpd00760)[1] => FADH2(cpd00982)[0] MCRCOA(cpd01966)[1]	Y	N	N	Y	frxn00125	
 r424	r424	ATP(cpd00002)[0] HCO3(cpd00242)[0] MCRCOA(cpd01966)[0] => ADP(cpd00008)[0] PI(cpd00009)[0] MGCOA(cpd02068)[0]	N	N	Y	Y	rxn02889	(1) ATP[0] + (1) H2CO3[0] + (1) Dimethylacryloyl-CoA[0] <=> (1) ADP[0] + (1) Phosphate[0] + (1) H+[0] + (1) 3-Methylglutaconyl-CoA[0]
 r425	r425	ATP(cpd00002)[0] HCO3(cpd00242)[0] MCRCOA(cpd01966)[0] => PI(cpd00009)[0] ADP(cpd00008)[0] MGCOA(cpd02068)[0]	N	N	Y	Y	rxn02889	(1) ATP[0] + (1) H2CO3[0] + (1) Dimethylacryloyl-CoA[0] <=> (1) ADP[0] + (1) Phosphate[0] + (1) H+[0] + (1) 3-Methylglutaconyl-CoA[0]
 r426	r426	H2O(cpd00001)[0] MGCOA(cpd02068)[0] => H3MCOA(cpd00292)[0]	N	N	Y	Y	rxn01504	(1) HMG-CoA[0] <=> (1) H2O[0] + (1) 3-Methylglutaconyl-CoA[0]
-r427	r427	COA(cpd00010)[0] H3MCOA(cpd00292)[0] => ACCOA(cpd00022)[0] ACTAC(cpd00142)[0]	N	N	N	Y	frxn00133	
-r428	r428	FAD(cpd00015)[0] ISOBUCOA(cpd00481)[1] => FADH2(cpd00982)[0] MCRLCOA(cpd02187)[1]	Y	N	N	Y	frxn00134	
+r427	r427	COA(cpd00010)[0] H3MCOA(cpd00292)[0] => ACCOA(cpd00022)[0] ACTAC(cpd00142)[0]	N	N	N	Y	frxn00126	
+r428	r428	FAD(cpd00015)[0] ISOBUCOA(cpd00481)[1] => FADH2(cpd00982)[0] MCRLCOA(cpd02187)[1]	Y	N	N	Y	frxn00127	
 r429	r429	H2O(cpd00001)[0] MCRLCOA(cpd02187)[0] => HYISOBYCOA(cpd03572)[0]	N	N	Y	Y	rxn02949	(1) H2O[0] + (1) Methacrylyl-CoA[0] <=> (1) (S)-3-Hydroxyisobutyryl-CoA[0]
 r43	r43	CIT(cpd00137)[0] => H2O(cpd00001)[0] ACO(cpd00331)[0]	N	N	Y	Y	rxn00974	(1) Citrate[0] <=> (1) H2O[0] + (1) cis-Aconitate[0]
 r430	r430	H2O(cpd00001)[0] MCRLCOA(cpd02187)[0] => HYISOBYCOA(cpd03572)[0]	N	N	Y	Y	rxn02949	(1) H2O[0] + (1) Methacrylyl-CoA[0] <=> (1) (S)-3-Hydroxyisobutyryl-CoA[0]
 r431	r431	H2O(cpd00001)[0] HYISOBYCOA(cpd03572)[0] => COA(cpd00010)[0] HYISOBYR(cpd19043)[0]	N	N	Y	Y	rxn39480	(1) H2O[0] + (1) (S)-3-Hydroxyisobutyryl-CoA[0] <=> (1) CoA[0] + (1) H+[0] + (1) (S)-3-Hydroxyisobutyrate[0]
 r432	r432	H2O(cpd00001)[0] HYISOBYCOA(cpd03572)[0] => COA(cpd00010)[0] HYISOBYR(cpd19043)[0]	N	N	Y	Y	rxn39480	(1) H2O[0] + (1) (S)-3-Hydroxyisobutyryl-CoA[0] <=> (1) CoA[0] + (1) H+[0] + (1) (S)-3-Hydroxyisobutyrate[0]
-r433	r433	NAD(cpd00003)[0] HYISOBYR(cpd19043)[0] => NADH(cpd00004)[0] MMSHY(cpd00287)[0]	N	N	N	Y	frxn00135	
+r433	r433	NAD(cpd00003)[0] HYISOBYR(cpd19043)[0] => NADH(cpd00004)[0] MMSHY(cpd00287)[0]	N	N	N	Y	frxn00128	
 r434	r434	NAD(cpd00003)[0] COA(cpd00010)[0] MMSHY(cpd00287)[0] => NADH(cpd00004)[0] CO2(cpd00011)[0] PROPCOA(cpd00086)[0]	N	N	Y	Y	rxn00671	(1) NAD[0] + (1) CoA[0] + (1) 3-Oxo-2-methylpropanoate[0] => (1) NADH[0] + (1) CO2[0] + (1) Propionyl-CoA[0]
 r435	r435	NAD(cpd00003)[0] COA(cpd00010)[0] MMSHY(cpd00287)[0] => NADH(cpd00004)[0] CO2(cpd00011)[0] PROPCOA(cpd00086)[0]	N	N	Y	Y	rxn00671	(1) NAD[0] + (1) CoA[0] + (1) 3-Oxo-2-methylpropanoate[0] => (1) NADH[0] + (1) CO2[0] + (1) Propionyl-CoA[0]
-r436	r436	FAD(cpd00015)[0] METBUCOA(cpd00760)[1] => FADH2(cpd00982)[0] MEBUELCOA(cpd02125)[1]	Y	N	N	Y	frxn00136	
-r437	r437	H2O(cpd00001)[0] MEBUELCOA(cpd02125)[0] => METBYCOA[0]	N	N	N	N	frxn00137	
-r438	r438	H2O(cpd00001)[0] MEBUELCOA(cpd02125)[0] => METBYCOA[0]	N	N	N	N	frxn00137	(1) H2O[0] + (1) Tiglyl-CoA[0] <=> (1) 2-methyl-2-hydroxybutyryl-CoA_[0]
-r439	r439	NAD(cpd00003)[0] METBYCOA[0] => NADH(cpd00004)[0] MCECOA(cpd02124)[0]	N	N	N	N	frxn00138	
+r436	r436	FAD(cpd00015)[0] METBUCOA(cpd00760)[1] => FADH2(cpd00982)[0] MEBUELCOA(cpd02125)[1]	Y	N	N	Y	frxn00129	
+r437	r437	H2O(cpd00001)[0] MEBUELCOA(cpd02125)[0] => METBYCOA[0]	N	N	N	N	frxn00130	
+r438	r438	H2O(cpd00001)[0] MEBUELCOA(cpd02125)[0] => METBYCOA[0]	N	N	N	N	frxn00130	(1) H2O[0] + (1) Tiglyl-CoA[0] <=> (1) 2-methyl-2-hydroxybutyryl-CoA[0]
+r439	r439	NAD(cpd00003)[0] METBYCOA[0] => NADH(cpd00004)[0] MCECOA(cpd02124)[0]	N	N	N	N	frxn00131	
 r44	r44	H2O(cpd00001)[0] ACO(cpd00331)[0] => ICIT(cpd00260)[0]	N	N	Y	Y	rxn01388	(1) Isocitrate[0] <=> (1) H2O[0] + (1) cis-Aconitate[0]
-r440	r440	NAD(cpd00003)[0] METBYCOA[0] => NADH(cpd00004)[0] MCECOA(cpd02124)[0]	N	N	N	N	frxn00138	(1) NAD[0] + (1) 2-methyl-2-hydroxybutyryl-CoA_[0] <=> (1) NADH[0] + (1) 2-Methylacetoacetyl-CoA[0]
+r440	r440	NAD(cpd00003)[0] METBYCOA[0] => NADH(cpd00004)[0] MCECOA(cpd02124)[0]	N	N	N	N	frxn00131	(1) NAD[0] + (1) 2-methyl-2-hydroxybutyryl-CoA[0] <=> (1) NADH[0] + (1) 2-Methylacetoacetyl-CoA[0]
 r441	r441	COA(cpd00010)[0] MCECOA(cpd02124)[0] => ACCOA(cpd00022)[0] PROPCOA(cpd00086)[0]	N	N	Y	Y	rxn00676	(1) Acetyl-CoA[0] + (1) Propionyl-CoA[0] <=> (1) CoA[0] + (1) 2-Methylacetoacetyl-CoA[0]
 r442	r442	COA(cpd00010)[0] MCECOA(cpd02124)[0] => ACCOA(cpd00022)[0] PROPCOA(cpd00086)[0]	N	N	Y	Y	rxn00676	(1) Acetyl-CoA[0] + (1) Propionyl-CoA[0] <=> (1) CoA[0] + (1) 2-Methylacetoacetyl-CoA[0]
 r443	r443	COA(cpd00010)[0] MCECOA(cpd02124)[0] => ACCOA(cpd00022)[0] PROPCOA(cpd00086)[0]	N	N	Y	Y	rxn00676	(1) Acetyl-CoA[0] + (1) Propionyl-CoA[0] <=> (1) CoA[0] + (1) 2-Methylacetoacetyl-CoA[0]
 r444	r444	ATP(cpd00002)[0] PROPCOA(cpd00086)[0] HCO3(cpd00242)[0] => ADP(cpd00008)[0] PI(cpd00009)[0] SMMNYLCOA(cpd00519)[0]	N	N	Y	Y	rxn01355	(1) ATP[0] + (1) Propionyl-CoA[0] + (1) H2CO3[0] => (1) ADP[0] + (1) Phosphate[0] + (1) H+[0] + (1) D-methylmalonyl-CoA[0]
 r445	r445	ATP(cpd00002)[0] PROPCOA(cpd00086)[0] HCO3(cpd00242)[0] => PI(cpd00009)[0] ADP(cpd00008)[0] SMMNYLCOA(cpd00519)[0]	N	N	Y	Y	rxn01355	(1) ATP[0] + (1) Propionyl-CoA[0] + (1) H2CO3[0] => (1) ADP[0] + (1) Phosphate[0] + (1) H+[0] + (1) D-methylmalonyl-CoA[0]
-r446	r446	ATP(cpd00002)[0] TRNA(cpd11615)[0] ILE(cpd00322)[0] => AMP(cpd00018)[0] PPI(cpd00012)[0] LILEUTRNA(cpd12256)[0]	N	N	N	Y	frxn00139	
-r447	r447	ATP(cpd00002)[0] TRNA(cpd11615)[0] ILE(cpd00322)[0] => PPI(cpd00012)[0] AMP(cpd00018)[0] LILEUTRNA(cpd12256)[0]	N	N	N	Y	frxn00139	(1) ATP[0] + (1) L-Isoleucine[0] + (1) tRNA[0] <=> (1) PPi[0] + (1) AMP[0] + (1) L-Isoleucyl-tRNA(Ile)[0]
-r448	r448	ATP(cpd00002)[0] TRNA(cpd11615)[0] VAL(cpd00156)[0] => AMP(cpd00018)[0] PPI(cpd00012)[0] LValTRNA(cpd12133)[0]	N	N	N	Y	frxn00140	
-r449	r449	ATP(cpd00002)[0] TRNA(cpd11615)[0] LEU(cpd00107)[0] => AMP(cpd00018)[0] PPI(cpd00012)[0] LLeuTRNA(cpd12003)[0]	N	N	N	Y	frxn00141	
+r446	r446	ATP(cpd00002)[0] TRNA(cpd11615)[0] ILE(cpd00322)[0] => AMP(cpd00018)[0] PPI(cpd00012)[0] LILEUTRNA(cpd12256)[0]	N	N	N	Y	frxn00132	
+r447	r447	ATP(cpd00002)[0] TRNA(cpd11615)[0] ILE(cpd00322)[0] => PPI(cpd00012)[0] AMP(cpd00018)[0] LILEUTRNA(cpd12256)[0]	N	N	N	Y	frxn00132	(1) ATP[0] + (1) L-Isoleucine[0] + (1) tRNA[0] <=> (1) PPi[0] + (1) AMP[0] + (1) L-Isoleucyl-tRNA(Ile)[0]
+r448	r448	ATP(cpd00002)[0] TRNA(cpd11615)[0] VAL(cpd00156)[0] => AMP(cpd00018)[0] PPI(cpd00012)[0] LValTRNA(cpd12133)[0]	N	N	N	Y	frxn00133	
+r449	r449	ATP(cpd00002)[0] TRNA(cpd11615)[0] LEU(cpd00107)[0] => AMP(cpd00018)[0] PPI(cpd00012)[0] LLeuTRNA(cpd12003)[0]	N	N	N	Y	frxn00134	
 r45	r45	H2O(cpd00001)[0] ACO(cpd00331)[0] => ICIT(cpd00260)[0]	N	N	Y	Y	rxn01388	(1) Isocitrate[0] <=> (1) H2O[0] + (1) cis-Aconitate[0]
-r450	r450	ATP(cpd00002)[0] TRNA(cpd11615)[0] LEU(cpd00107)[0] => PPI(cpd00012)[0] AMP(cpd00018)[0] LLeuTRNA(cpd12003)[0]	N	N	N	Y	frxn00141	(1) ATP[0] + (1) L-Leucine[0] + (1) tRNA[0] <=> (1) PPi[0] + (1) AMP[0] + (1) L-Leucyl-tRNA[0]
+r450	r450	ATP(cpd00002)[0] TRNA(cpd11615)[0] LEU(cpd00107)[0] => PPI(cpd00012)[0] AMP(cpd00018)[0] LLeuTRNA(cpd12003)[0]	N	N	N	Y	frxn00134	(1) ATP[0] + (1) L-Leucine[0] + (1) tRNA[0] <=> (1) PPi[0] + (1) AMP[0] + (1) L-Leucyl-tRNA[0]
 r451	r451	H2O(cpd00001)[0] AKG(cpd00024)[0] ACCOA(cpd00022)[0] => COA(cpd00010)[0] HCIT(cpd00919)[0]	N	N	Y	Y	rxn00202	(1) CoA[0] + (1) H+[0] + (1) Homocitrate[0] => (1) H2O[0] + (1) Acetyl-CoA[0] + (1) 2-Oxoglutarate[0]
 r452	r452	ACCOA(cpd00022)[0] H2O(cpd00001)[0] AKG(cpd00024)[0] => COA(cpd00010)[0] HCIT(cpd00919)[0]	N	N	Y	Y	rxn00202	(1) CoA[0] + (1) H+[0] + (1) Homocitrate[0] => (1) H2O[0] + (1) Acetyl-CoA[0] + (1) 2-Oxoglutarate[0]
 r453	r453	HCIT(cpd00919)[0] => HICIT(cpd03372)[0]	N	N	Y	Y	rxn16566	(1) Homocitrate[0] <=> (1) Homoisocitrate[0]
@@ -682,7 +682,7 @@ r454	r454	NAD(cpd00003)[0] HICIT(cpd03372)[0] => NADH(cpd00004)[0] CO2(cpd00011)
 r455	r455	AKG(cpd00024)[0] TYR(cpd00069)[0] => GLU(cpd00023)[0] 4HPP(cpd00868)[0]	N	N	Y	Y	rxn00527	(1) 2-Oxoglutarate[0] + (1) L-Tyrosine[0] <=> (1) L-Glutamate[0] + (1) p-hydroxyphenylpyruvate[0]
 r456	r456	ATP(cpd00002)[0] NADPH(cpd00005)[0] AMA(cpd00705)[0] => NADP(cpd00006)[0] AMP(cpd00018)[0] PPI(cpd00012)[0] AMASA(cpd01046)[0]	N	N	Y	Y	rxn41952	(1) NADP[0] + (1) PPi[0] + (1) AMP[0] + (1) Allysine[0] <=> (1) ATP[0] + (1) NADPH[0] + (1) L-2-Aminoadipate[0]
 r457	r457	ATP(cpd00002)[0] NADPH(cpd00005)[0] AMA(cpd00705)[0] => NADP(cpd00006)[0] AMASA(cpd01046)[0] AMP(cpd00018)[0] PPI(cpd00012)[0]	N	N	Y	Y	rxn41952	(1) NADP[0] + (1) PPi[0] + (1) AMP[0] + (1) Allysine[0] <=> (1) ATP[0] + (1) NADPH[0] + (1) L-2-Aminoadipate[0]
-r458	r458	NADPH(cpd00005)[0] GLU(cpd00023)[0] AMASA(cpd01046)[0] => NADP(cpd00006)[0] SACP(cpd00351)[0]	N	N	N	Y	frxn00142	
+r458	r458	NADPH(cpd00005)[0] GLU(cpd00023)[0] AMASA(cpd01046)[0] => NADP(cpd00006)[0] SACP(cpd00351)[0]	N	N	N	Y	frxn00135	
 r459	r459	NADH(cpd00004)[0] GLU(cpd00023)[0] AMASA(cpd01046)[0] => NAD(cpd00003)[0] SACP(cpd00351)[0]	N	N	Y	Y	rxn30568	(1) NAD[0] + (1) Saccharopine[0] => (1) NADH[0] + (1) L-Glutamate[0] + (1) Allysine[0]
 r46	r46	NAD(cpd00003)[0] ICIT(cpd00260)[0] => NADH(cpd00004)[0] CO2(cpd00011)[0] AKG(cpd00024)[0]	N	N	Y	Y	rxn00505	(1) NAD[0] + (1) Isocitrate[0] => (1) NADH[0] + (1) CO2[0] + (1) 2-Oxoglutarate[0]
 r460	r460	AKG(cpd00024)[0] NADPH(cpd00005)[0] LYS(cpd00039)[0] => NADP(cpd00006)[0] SACP(cpd00351)[0]	N	N	Y	Y	rxn30567	(1) NADP[0] + (1) Saccharopine[0] => (1) NADPH[0] + (1) 2-Oxoglutarate[0] + (1) L-Lysine[0]
@@ -691,8 +691,8 @@ r462	r462	NADH(cpd00004)[0] AKG(cpd00024)[0] LYS(cpd00039)[0] => NAD(cpd00003)[0
 r463	r463	NAD(cpd00003)[0] H2O(cpd00001)[0] ALA(cpd00035)[0] => NADH(cpd00004)[0] PYR(cpd00020)[0] NH3(cpd00013)[0]	N	N	Y	Y	rxn00278	(1) H2O[0] + (1) NAD[0] + (1) L-Alanine[0] <=> (1) NADH[0] + (1) NH3[0] + (1) Pyruvate[0] + (1) H+[0]
 r464	r464	NAD(cpd00003)[0] H2O(cpd00001)[0] ALA(cpd00035)[0] => NADH(cpd00004)[0] PYR(cpd00020)[0] NH3(cpd00013)[0]	N	N	Y	Y	rxn00278	(1) H2O[0] + (1) NAD[0] + (1) L-Alanine[0] <=> (1) NADH[0] + (1) NH3[0] + (1) Pyruvate[0] + (1) H+[0]
 r465	r465	PYR(cpd00020)[0] ASPSA(cpd00346)[0] => (2) H2O(cpd00001)[0] DIDIPC(cpd02120)[0]	N	N	Y	Y	rxn01644	(1) Pyruvate[0] + (1) L-Aspartate4-semialdehyde[0] => (2) H2O[0] + (1) H+[0] + (1) Dihydrodipicolinate[0]
-r466	r466	ATP(cpd00002)[0] TRNA(cpd11615)[0] LYS(cpd00039)[0] => AMP(cpd00018)[0] PPI(cpd00012)[0] LLTRNA(cpd01326)[0]	N	N	N	Y	frxn00143	
-r467	r467	SAM(cpd00017)[0] HISLYS(cpd12101)[0] => SAH(cpd00019)[0] TMLS(cpd02374)[0]	N	N	N	Y	frxn00144	
+r466	r466	ATP(cpd00002)[0] TRNA(cpd11615)[0] LYS(cpd00039)[0] => AMP(cpd00018)[0] PPI(cpd00012)[0] LLTRNA(cpd01326)[0]	N	N	N	Y	frxn00136	
+r467	r467	SAM(cpd00017)[0] HISLYS(cpd12101)[0] => SAH(cpd00019)[0] TMLS(cpd02374)[0]	N	N	N	Y	frxn00137	
 r468	r468	AKG(cpd00024)[0] O2(cpd00007)[0] TMLS(cpd02374)[0] => CO2(cpd00011)[0] SUCC(cpd00036)[0] HTMLS(cpd00923)[0]	N	N	Y	Y	rxn02469	(1) O2[0] + (1) 2-Oxoglutarate[0] + (1) N6,N6,N6-Trimethyl-L-lysine[0] => (1) CO2[0] + (1) Succinate[0] + (1) 3-Hydroxy-N6,N6,N6-trimethyl-L-lysine[0]
 r469	r469	HTMLS(cpd00923)[0] => GLY(cpd00033)[0] TMAMMOBNAL(cpd00845)[0]	N	N	Y	Y	rxn02351	(1) Glycine[0] + (1) 4-Trimethylammoniobutanal[0] <=> (1) 3-Hydroxy-N6,N6,N6-trimethyl-L-lysine[0]
 r47	r47	NADP(cpd00006)[0] ICIT(cpd00260)[0] => CO2(cpd00011)[0] NADPH(cpd00005)[0] AKG(cpd00024)[0]	N	N	Y	Y	rxn00198	(1) NADP[0] + (1) Isocitrate[0] => (1) NADPH[0] + (1) CO2[0] + (1) 2-Oxoglutarate[0]
@@ -704,8 +704,8 @@ r474	r474	PI(cpd00009)[0] 5MTA(cpd00147)[0] => 5THR1P(cpd02574)[0] AD(cpd00128)[
 r475	r475	5THR1P(cpd02574)[0] => METHIR1P(cpd02791)[0]	N	N	Y	Y	rxn03057	(1) methylthioribose-1-phosphate[0] <=> (1) methylthioribulose-1-phosphate[0]
 r476	r476	METHIR1P(cpd02791)[0] => H2O(cpd00001)[0] METHPENP(cpd11295)[0]	N	N	Y	Y	rxn05104	(1) methylthioribulose-1-phosphate[0] => (1) H2O[0] + (1) 2,3-diketo5-methylthio-1-phosphopentane[0]
 r477	r477	METHIR1P(cpd02791)[0] => H2O(cpd00001)[0] METHPENP(cpd11295)[0]	N	N	Y	Y	rxn05104	(1) methylthioribulose-1-phosphate[0] => (1) H2O[0] + (1) 2,3-diketo5-methylthio-1-phosphopentane[0]
-r478	r478	H2O(cpd00001)[0] METHPENP(cpd11295)[0] => PI(cpd00009)[0] DHYXPENT[0]	N	N	N	N	frxn00145	
-r479	r479	CYS(cpd00084)[0] PHSER(cpd00809)[0] => SUCC(cpd00036)[0] LLCT(cpd19019)[0]	N	N	N	Y	frxn00146	
+r478	r478	H2O(cpd00001)[0] METHPENP(cpd11295)[0] => PI(cpd00009)[0] DHYXPENT[0]	N	N	N	N	frxn00138	
+r479	r479	CYS(cpd00084)[0] PHSER(cpd00809)[0] => SUCC(cpd00036)[0] LLCT(cpd19019)[0]	N	N	N	Y	frxn00139	
 r48	r48	NAD(cpd00003)[0] COA(cpd00010)[0] AKG(cpd00024)[0] => NADH(cpd00004)[0] CO2(cpd00011)[0] SUCCOA(cpd00078)[0]	N	N	Y	Y	rxn08094	(1) NAD[0] + (1) CoA[0] + (1) 2-Oxoglutarate[0] => (1) NADH[0] + (1) CO2[0] + (1) Succinyl-CoA[0]
 r480	r480	H2O(cpd00001)[0] LLCT(cpd19019)[0] => PYR(cpd00020)[0] NH3(cpd00013)[0] HCYS(cpd00135)[0]	N	N	Y	Y	rxn15166	(1) H2O[0] + (1) L-Cystathionine[0] => (1) NH3[0] + (1) Pyruvate[0] + (1) Homocysteine[0]
 r481	r481	HCYS(cpd00135)[0] MTHPTGLU(cpd02738)[0] => THPTGLU(cpd02555)[0] MET(cpd00060)[0]	N	N	Y	Y	rxn03052	(1) Homocysteine[0] + (1) 5-Methyltetrahydropteroyltri-L-glutamate[0] <=> (1) L-Methionine[0] + (1) Tetrahydropteroyltri-L-glutamate[0]
@@ -718,8 +718,8 @@ r487	r487	LLCT(cpd19019)[0] => NH3(cpd00013)[0] CYS(cpd00084)[0] OBUT(cpd00094)[
 r488	r488	SAM(cpd00017)[0] HCYS(cpd00135)[0] => SAH(cpd00019)[0] MET(cpd00060)[0]	N	N	Y	Y	rxn00452	(1) S-Adenosyl-L-methionine[0] + (1) Homocysteine[0] => (1) S-Adenosyl-homocysteine[0] + (1) L-Methionine[0] + (1) H+[0]
 r489	r489	SAM(cpd00017)[0] CALH(cpd02710)[0] => SAH(cpd00019)[0] DPTH(cpd02858)[0]	N	N	Y	Y	rxn03091	(1) S-Adenosyl-L-methionine[0] + (1) 2-(3-Carboxy-3-aminopropyl)-L-histidine[0] => (1) S-Adenosyl-homocysteine[0] + (1) H+[0] + (1) 2-[3-Carboxy-3-(methylammonio)propyl]-L-histidine[0]
 r49	r49	SUCCOA(cpd00078)[0] GDP(cpd00031)[0] PI(cpd00009)[0] => COA(cpd00010)[0] GTP(cpd00038)[0] SUCC(cpd00036)[0]	N	N	Y	Y	rxn00306	(1) CoA[0] + (1) Succinate[0] + (1) GTP[0] <=> (1) Phosphate[0] + (1) GDP[0] + (1) Succinyl-CoA[0]
-r490	r490	ATP(cpd00002)[0] TRNA(cpd11615)[0] MET(cpd00060)[0] => AMP(cpd00018)[0] PPI(cpd00012)[0] LMETTRNA(cpd12105)[0]	N	N	N	Y	frxn00147	
-r491	r491	ATP(cpd00002)[0] TRNA(cpd11615)[0] MET(cpd00060)[0] => PPI(cpd00012)[0] AMP(cpd00018)[0] LMETTRNA(cpd12105)[0]	N	N	N	Y	frxn00147	(1) ATP[0] + (1) L-Methionine[0] + (1) tRNA[0] <=> (1) PPi[0] + (1) AMP[0] + (1) L-Methionyl-tRNA[0]
+r490	r490	ATP(cpd00002)[0] TRNA(cpd11615)[0] MET(cpd00060)[0] => AMP(cpd00018)[0] PPI(cpd00012)[0] LMETTRNA(cpd12105)[0]	N	N	N	Y	frxn00140	
+r491	r491	ATP(cpd00002)[0] TRNA(cpd11615)[0] MET(cpd00060)[0] => PPI(cpd00012)[0] AMP(cpd00018)[0] LMETTRNA(cpd12105)[0]	N	N	N	Y	frxn00140	(1) ATP[0] + (1) L-Methionine[0] + (1) tRNA[0] <=> (1) PPi[0] + (1) AMP[0] + (1) L-Methionyl-tRNA[0]
 r492	r492	PEP(cpd00061)[0] E4P(cpd00236)[0] => PI(cpd00009)[0] 3DDAH7P(cpd02857)[0]	N	W	Y	Y	rxn01332	(1) H2O[0] + (1) Phosphoenolpyruvate[0] + (1) D-Erythrose4-phosphate[0] => (1) Phosphate[0] + (1) DAHP[0]
 r493	r493	3DDAH7P(cpd02857)[0] => PI(cpd00009)[0] DQT(cpd00699)[0]	N	N	Y	Y	rxn02212	(1) DAHP[0] => (1) Phosphate[0] + (1) 5-Dehydroquinate[0]
 r494	r494	DQT(cpd00699)[0] => DHSK(cpd01716)[0]	N	W	Y	Y	rxn02213	(1) 5-Dehydroquinate[0] => (1) H2O[0] + (1) 3-Dehydroshikimate[0]
@@ -737,11 +737,11 @@ r503	r503	NPRAN(cpd02642)[0] => CPAD5P(cpd00956)[0]	N	N	Y	Y	rxn02508	(1) N-5-pho
 r504	r504	CPAD5P(cpd00956)[0] => CO2(cpd00011)[0] IGP(cpd02210)[0]	N	N	Y	Y	rxn30707	(1) 1-(2-carboxyphenylamino)-1-deoxyribulose 5-phosphate[0] <= (1) CO2[0] + (1) Indoleglycerol phosphate[0]
 r505	r505	SER(cpd00054)[0] IGP(cpd02210)[0] => T3P1(cpd00102)[0] TRP(cpd00065)[0]	N	W	Y	Y	rxn01964	(1) L-Serine[0] + (1) Indoleglycerol phosphate[0] <=> (1) H2O[0] + (1) L-Tryptophan[0] + (1) Glyceraldehyde3-phosphate[0]
 r506	r506	O2(cpd00007)[0] TRP(cpd00065)[0] => FKYN(cpd01749)[0]	N	N	Y	Y	rxn00478	(1) O2[0] + (1) L-Tryptophan[0] => (1) N-Formylkynurenine[0]
-r507	r507	FKYN(cpd01749)[0] => FOR(cpd00047)[0] KYN(cpd00275)[0]	N	N	N	Y	frxn00148	
+r507	r507	FKYN(cpd01749)[0] => FOR(cpd00047)[0] KYN(cpd00275)[0]	N	N	N	Y	frxn00141	
 r508	r508	NADPH(cpd00005)[0] O2(cpd00007)[0] KYN(cpd00275)[0] => H2O(cpd00001)[0] NADP(cpd00006)[0] HKYN(cpd01804)[0]	N	N	Y	Y	rxn13171	(1) NADPH[0] + (1) O2[0] + (1) H+[0] + (1) L-Kynurenine[0] => (1) H2O[0] + (1) NADP[0] + (1) 3-Hydroxykynurenine[0]
-r509	r509	KYN(cpd00275)[0] => ALA(cpd00035)[0] AN(cpd00093)[0]	N	N	N	Y	frxn00149	
+r509	r509	KYN(cpd00275)[0] => ALA(cpd00035)[0] AN(cpd00093)[0]	N	N	N	Y	frxn00142	
 r51	r51	SUCCOA(cpd00078)[0] PI(cpd00009)[0] ADP(cpd00008)[0] => COA(cpd00010)[0] SUCC(cpd00036)[0] ATP(cpd00002)[0]	N	N	Y	Y	rxn00285	(1) ATP[0] + (1) CoA[0] + (1) Succinate[0] <=> (1) ADP[0] + (1) Phosphate[0] + (1) Succinyl-CoA[0]
-r510	r510	HKYN(cpd01804)[0] => ALA(cpd00035)[0] HAN(cpd00483)[0]	N	N	N	Y	frxn00150	
+r510	r510	HKYN(cpd01804)[0] => ALA(cpd00035)[0] HAN(cpd00483)[0]	N	N	N	Y	frxn00143	
 r511	r511	O2(cpd00007)[0] HAN(cpd00483)[0] => CMUSA(cpd02692)[0]	N	N	Y	Y	rxn01927	(1) O2[0] + (1) 3-Hydroxyanthranilate[0] => (1) 2-Amino-3-carboxymuconate semialdehyde[0]
 r512	r512	CHOR(cpd00216)[0] => PHEN(cpd00219)[0]	N	N	Y	Y	rxn01256	(1) Chorismate[0] => (1) Prephenate[0]
 r513	r513	NADP(cpd00006)[0] PHEN(cpd00219)[0] => CO2(cpd00011)[0] NADPH(cpd00005)[0] 4HPP(cpd00868)[0]	N	N	Y	Y	rxn01269	(1) NADP[0] + (1) Prephenate[0] => (1) NADPH[0] + (1) CO2[0] + (1) p-hydroxyphenylpyruvate[0]
@@ -755,26 +755,26 @@ r52	r52	ADP(cpd00008)[0] PI(cpd00009)[0] SUCCOA(cpd00078)[0] => ATP(cpd00002)[0]
 r520	r520	O2(cpd00007)[0] GEN(cpd00479)[0] => MAYLPYR(cpd01466)[0]	N	N	Y	Y	rxn01919	(1) O2[0] + (1) Gentisate[0] => (1) H+[0] + (1) Maleylpyruvate[0]
 r521	r521	MACAC(cpd00763)[0] => FUACAC(cpd00780)[0]	N	N	Y	Y	rxn02276	(1) 4-Maleylacetoacetate[0] <=> (1) Fumarylacetoacetate[0]
 r522	r522	FUACAC(cpd00780)[0] => FUM(cpd00106)[0] ACTAC(cpd00142)[0]	N	N	Y	Y	rxn30672	(1) Fumarylacetoacetate[0] => (1) Fumarate[0] + (1) Acetoacetate[0]
-r523	r523	H2O(cpd00001)[0] ACYLPYR(cpd12028)[0] => PYR(cpd00020)[0] FUM(cpd00106)[0]	N	N	N	Y	frxn00151	
-r524	r524	H2O(cpd00001)[0] ACYLPYR(cpd12028)[0] => PYR(cpd00020)[0] FUM(cpd00106)[0]	N	N	N	Y	frxn00151	(1) H2O[0] + (1) 3-Acylpyruvate[0] <=> (1) Pyruvate[0] + (1) Fumarate[0]
+r523	r523	H2O(cpd00001)[0] ACYLPYR(cpd12028)[0] => PYR(cpd00020)[0] FUM(cpd00106)[0]	N	N	N	Y	frxn00144	
+r524	r524	H2O(cpd00001)[0] ACYLPYR(cpd12028)[0] => PYR(cpd00020)[0] FUM(cpd00106)[0]	N	N	N	Y	frxn00144	(1) H2O[0] + (1) 3-Acylpyruvate[0] <=> (1) Pyruvate[0] + (1) Fumarate[0]
 r525	r525	(2) H2O2(cpd00025)[0] => (2) H2O(cpd00001)[0] O2(cpd00007)[0]	N	N	Y	Y	rxn00006	(2) H2O2[0] => (2) H2O[0] + (1) O2[0]
 r526	r526	(2) H2O2(cpd00025)[0] => (2) H2O(cpd00001)[0] O2(cpd00007)[0]	N	N	Y	Y	rxn00006	(2) H2O2[0] => (2) H2O[0] + (1) O2[0]
-r527	r527	AKA(cpd00269)[0] => CO2(cpd00011)[0] GLTCOA(cpd00413)[0]	N	N	N	Y	frxn00152	
-r528	r528	AKA(cpd00269)[0] => CO2(cpd00011)[0] GLTCOA(cpd00413)[0]	N	N	N	Y	frxn00152	(1) 2-Oxoadipate[0] <=> (1) CO2[0] + (1) Glutaryl-CoA[0]
+r527	r527	AKA(cpd00269)[0] => CO2(cpd00011)[0] GLTCOA(cpd00413)[0]	N	N	N	Y	frxn00145	
+r528	r528	AKA(cpd00269)[0] => CO2(cpd00011)[0] GLTCOA(cpd00413)[0]	N	N	N	Y	frxn00145	(1) 2-Oxoadipate[0] <=> (1) CO2[0] + (1) Glutaryl-CoA[0]
 r529	r529	O2(cpd00007)[0] ASPERMD(cpd00470)[0] => H2O2(cpd00025)[0] APRUT(cpd01758)[0] APROA(cpd01504)[0]	N	W	Y	Y	rxn09878	(1) H2O[0] + (1) O2[0] + (1) N1-Acetylspermidine[0] => (1) H2O2[0] + (1) 3-Aminopropanal[0] + (1) N-Acetylputrescine[0]
-r53	r53	SUCC(cpd00036)[0] Q(cpd01351)[0] => FUM(cpd00106)[0] QH2[0]	N	N	N	N	frxn00153	
-r530	r530	O2(cpd00007)[0] APRUT(cpd01758)[0] => H2O2(cpd00025)[0] APROA(cpd01504)[0] GABAL(cpd00434)[0]	N	N	N	Y	frxn00154	
+r53	r53	SUCC(cpd00036)[0] Q(cpd01351)[0] => FUM(cpd00106)[0] QH2[0]	N	N	N	N	frxn00146	
+r530	r530	O2(cpd00007)[0] APRUT(cpd01758)[0] => H2O2(cpd00025)[0] APROA(cpd01504)[0] GABAL(cpd00434)[0]	N	N	N	Y	frxn00147	
 r531	r531	AKG(cpd00024)[0] KYN(cpd00275)[0] => GLU(cpd00023)[0] APEBU(cpd00920)[0]	N	N	Y	Y	rxn01435	(1) 2-Oxoglutarate[0] + (1) L-Kynurenine[0] <=> (1) L-Glutamate[0] + (1) 4-(2-Aminophenyl)-2,4-dioxobutanoate[0]
-r532	r532	ATP(cpd00002)[0] TRNA(cpd11615)[0] TYR(cpd00069)[0] => PPI(cpd00012)[0] AMP(cpd00018)[0] LTyrTRNA(cpd12194)[0]	N	N	N	Y	frxn00155	
-r533	r533	ATP(cpd00002)[0] TRNA(cpd11615)[0] TYR(cpd00069)[0] => AMP(cpd00018)[0] PPI(cpd00012)[0] LTyrTRNA(cpd12194)[0]	N	N	N	Y	frxn00155	(1) ATP[0] + (1) L-Tyrosine[0] + (1) tRNA[0] <=> (1) PPi[0] + (1) AMP[0] + (1) L-Tyrosyl-tRNA(Tyr)[0]
+r532	r532	ATP(cpd00002)[0] TRNA(cpd11615)[0] TYR(cpd00069)[0] => PPI(cpd00012)[0] AMP(cpd00018)[0] LTyrTRNA(cpd12194)[0]	N	N	N	Y	frxn00148	
+r533	r533	ATP(cpd00002)[0] TRNA(cpd11615)[0] TYR(cpd00069)[0] => AMP(cpd00018)[0] PPI(cpd00012)[0] LTyrTRNA(cpd12194)[0]	N	N	N	Y	frxn00148	(1) ATP[0] + (1) L-Tyrosine[0] + (1) tRNA[0] <=> (1) PPi[0] + (1) AMP[0] + (1) L-Tyrosyl-tRNA(Tyr)[0]
 r534	r534	ATP(cpd00002)[0] TRNA(cpd11615)[0] TRP(cpd00065)[0] => PPI(cpd00012)[0] AMP(cpd00018)[0] TRPTRNA(cpd12336)[0]	N	N	Y	Y	rxn13033	(1) ATP[0] + (1) L-Tryptophan[0] + (1) tRNA[0] <=> (1) PPi[0] + (1) AMP[0] + (1) L-Tryptophanyl-tRNA(Trp)[0]
 r535	r535	ATP(cpd00002)[0] TRNA(cpd11615)[0] TRP(cpd00065)[0] => AMP(cpd00018)[0] PPI(cpd00012)[0] TRPTRNA(cpd12336)[0]	N	N	Y	Y	rxn13033	(1) ATP[0] + (1) L-Tryptophan[0] + (1) tRNA[0] <=> (1) PPi[0] + (1) AMP[0] + (1) L-Tryptophanyl-tRNA(Trp)[0]
-r536	r536	ATP(cpd00002)[0] TRNA(cpd11615)[0] PHE(cpd00066)[0] => AMP(cpd00018)[0] PPI(cpd00012)[0] LPheTRNA(cpd12335)[0]	N	N	N	Y	frxn00156	
+r536	r536	ATP(cpd00002)[0] TRNA(cpd11615)[0] PHE(cpd00066)[0] => AMP(cpd00018)[0] PPI(cpd00012)[0] LPheTRNA(cpd12335)[0]	N	N	N	Y	frxn00149	
 r537	r537	4CMCOA(cpd00192)[0] => CAFFCOA(cpd00270)[0]	N	N	Y	Y	rxn05139	(1) 4-Coumaroyl-CoA[0] => (1) Caffeoyl-CoA[0]
 r538	r538	SAM(cpd00017)[0] CAFFCOA(cpd00270)[0] => SAH(cpd00019)[0] FERYLCOA(cpd00321)[0]	N	N	Y	Y	rxn01426	(1) S-Adenosyl-L-methionine[0] + (1) Caffeoyl-CoA[0] <=> (1) S-Adenosyl-homocysteine[0] + (1) H+[0] + (1) Feruloyl-CoA[0]
 r539	r539	ACCOA(cpd00022)[0] SERNIN(cpd00579)[0] => COA(cpd00010)[0] NSERNIN(cpd00721)[0]	N	N	Y	Y	rxn02084	(1) Acetyl-CoA[0] + (1) Serotonin[0] => (1) CoA[0] + (1) H+[0] + (1) N-Acetylserotonin[0]
-r54	r54	SUCC(cpd00036)[0] Q(cpd01351)[0] => FUM(cpd00106)[0] QH2[0]	N	N	N	N	frxn00153	(1) Succinate[0] + (1) Ubiquinone-9[0] <=> (1) Fumarate[0] + (1) Ubiquinol (mitochondrial)[0]
-r540	r540	PHEN(cpd00219)[0] => CO2(cpd00011)[0] PHPYR(cpd00143)[0]	N	N	N	Y	frxn00157	
+r54	r54	SUCC(cpd00036)[0] Q(cpd01351)[0] => FUM(cpd00106)[0] QH2[0]	N	N	N	N	frxn00146	(1) Succinate[0] + (1) Ubiquinone-9[0] <=> (1) Fumarate[0] + (1) Ubiquinol (mitochondrial)[0]
+r540	r540	PHEN(cpd00219)[0] => CO2(cpd00011)[0] PHPYR(cpd00143)[0]	N	N	N	Y	frxn00150	
 r541	r541	GLU(cpd00023)[0] PHPYR(cpd00143)[0] => AKG(cpd00024)[0] PHE(cpd00066)[0]	N	N	Y	Y	rxn00493	(1) 2-Oxoglutarate[0] + (1) L-Phenylalanine[0] <=> (1) L-Glutamate[0] + (1) Phenylpyruvate[0]
 r542	r542	GLU(cpd00023)[0] PHPYR(cpd00143)[0] => AKG(cpd00024)[0] PHE(cpd00066)[0]	N	N	Y	Y	rxn00493	(1) 2-Oxoglutarate[0] + (1) L-Phenylalanine[0] <=> (1) L-Glutamate[0] + (1) Phenylpyruvate[0]
 r543	r543	ACCOA(cpd00022)[0] PHOPTRIN(cpd02834)[0] => COA(cpd00010)[0] APHOPTRIN(cpd17938)[0]	N	N	Y	Y	rxn15875	(1) Acetyl-CoA[0] + (1) L-2-Amino-4-(hydroxymethylphosphinyl)butanoate[0] => (1) CoA[0] + (1) H+[0] + (1) N-Acetylphinothricin[0]
@@ -784,10 +784,10 @@ r546	r546	ATP(cpd00002)[0] => PPI(cpd00012)[0] cAMP(cpd00446)[0]	N	N	Y	Y	rxn0006
 r547	r547	CAIR(cpd02893)[0] => CO2(cpd00011)[0] AIR(cpd02140)[0]	N	N	Y	Y	rxn02938	(1) H+[0] + (1) 5'-Phosphoribosyl-4-carboxy-5-aminoimidazole[0] => (1) CO2[0] + (1) AIR[0]
 r548	r548	ATP(cpd00002)[0] ASP(cpd00041)[0] CAIR(cpd02893)[0] => ADP(cpd00008)[0] PI(cpd00009)[0] SAICAR(cpd19032)[0]	N	N	Y	Y	rxn35571	(1) ATP[0] + (1) L-Aspartate[0] + (1) 5'-Phosphoribosyl-4-carboxy-5-aminoimidazole[0] => (1) ADP[0] + (1) Phosphate[0] + (2) H+[0] + (1) 1-(5'-Phosphoribosyl)-5-amino-4-(N-succinocarboxamide)-imidazole[0]
 r549	r549	SAICAR(cpd19032)[0] => FUM(cpd00106)[0] AICAR(cpd02851)[0]	N	N	Y	Y	rxn35572	(1) 1-(5'-Phosphoribosyl)-5-amino-4-(N-succinocarboxamide)-imidazole[0] <=> (1) Fumarate[0] + (1) AICAR[0]
-r55	r55	FUM(cpd00106)[0] FADH2(cpd00982)[1] => SUCC(cpd00036)[0] FAD(cpd00015)[1]	Y	N	N	Y	frxn00158	
+r55	r55	FUM(cpd00106)[0] FADH2(cpd00982)[1] => SUCC(cpd00036)[0] FAD(cpd00015)[1]	Y	N	N	Y	frxn00151	
 r550	r550	ATP(cpd00002)[0] FGAM(cpd02826)[0] => ADP(cpd00008)[0] PI(cpd00009)[0] AIR(cpd02140)[0]	N	N	Y	Y	rxn02937	(1) ATP[0] + (1) 5'-Phosphoribosylformylglycinamidine[0] <= (1) ADP[0] + (1) Phosphate[0] + (1) H+[0] + (1) AIR[0]
 r551	r551	ATP(cpd00002)[0] GLY(cpd00033)[0] PRAM(cpd01982)[0] => ADP(cpd00008)[0] PI(cpd00009)[0] GAR(cpd02394)[0]	N	N	Y	Y	rxn02895	(1) ATP[0] + (1) Glycine[0] + (1) 5-Phosphoribosylamine[0] => (1) ADP[0] + (1) Phosphate[0] + (1) H+[0] + (1) GAR[0]
-r552	r552	ATP(cpd00002)[0] GLN(cpd00053)[0] FGAR(cpd02678)[0] => ADP(cpd00008)[0] PI(cpd00009)[0] GLU(cpd00023)[0] FGAM(cpd02826)[0]	N	N	N	Y	frxn00159	
+r552	r552	ATP(cpd00002)[0] GLN(cpd00053)[0] FGAR(cpd02678)[0] => ADP(cpd00008)[0] PI(cpd00009)[0] GLU(cpd00023)[0] FGAM(cpd02826)[0]	N	N	N	Y	frxn00152	
 r553	r553	GAR(cpd02394)[0] FTHF(cpd00201)[0] => THF(cpd00087)[0] FGAR(cpd02678)[0]	N	N	Y	Y	rxn03004	(1) 10-Formyltetrahydrofolate[0] + (1) GAR[0] => (1) H+[0] + (1) Tetrahydrofolate[0] + (1) N-Formyl-GAR[0]
 r554	r554	GLN(cpd00053)[0] PRPP(cpd00103)[0] => PPI(cpd00012)[0] GLU(cpd00023)[0] PRAM(cpd01982)[0]	N	N	Y	Y	rxn30751	(1) PPi[0] + (1) L-Glutamate[0] + (1) 5-Phosphoribosylamine[0] <= (1) L-Glutamine[0] + (1) PRPP[0]
 r555	r555	AICAR(cpd02851)[0] FTHF(cpd00201)[0] => THF(cpd00087)[0] PRFICA(cpd02884)[0]	N	N	Y	Y	rxn03137	(1) 10-Formyltetrahydrofolate[0] + (1) AICAR[0] => (1) Tetrahydrofolate[0] + (1) FAICAR[0]
@@ -804,7 +804,7 @@ r564	r564	H2O(cpd00001)[0] cGMP(cpd00697)[0] => GMP(cpd00126)[0]	N	N	Y	Y	rxn0092
 r565	r565	H2O(cpd00001)[0] cGMP(cpd00697)[0] => GMP(cpd00126)[0]	N	N	Y	Y	rxn00920	(1) H2O[0] + (1) cGMP[0] => (1) H+[0] + (1) GMP[0]
 r566	r566	H2O(cpd00001)[0] cAMP(cpd00446)[0] => AMP(cpd00018)[0]	N	N	Y	Y	rxn00140	(1) H2O[0] + (1) cAMP[0] => (1) AMP[0] + (1) H+[0]
 r567	r567	H2O(cpd00001)[0] cAMP(cpd00446)[0] => AMP(cpd00018)[0]	N	N	Y	Y	rxn00140	(1) H2O[0] + (1) cAMP[0] => (1) AMP[0] + (1) H+[0]
-r568	r568	H2O(cpd00001)[0] ADPRIB[0] => R5P(cpd00101)[0] AMP(cpd00018)[0]	N	N	N	N	frxn00160	
+r568	r568	H2O(cpd00001)[0] ADPRIB[0] => R5P(cpd00101)[0] AMP(cpd00018)[0]	N	N	N	N	frxn00153	
 r569	r569	H2O(cpd00001)[0] GN(cpd00207)[0] => NH3(cpd00013)[0] XAN(cpd00309)[0]	N	N	Y	Y	rxn01225	(1) H2O[0] + (1) H+[0] + (1) Guanine[0] => (1) NH3[0] + (1) XAN[0]
 r57	r57	H2O(cpd00001)[0] FUM(cpd00106)[0] => MAL(cpd00130)[0]	N	N	Y	Y	rxn00799	(1) L-Malate[0] <=> (1) H2O[0] + (1) Fumarate[0]
 r570	r570	H2O(cpd00001)[0] GN(cpd00207)[0] => NH3(cpd00013)[0] XAN(cpd00309)[0]	N	N	Y	Y	rxn01225	(1) H2O[0] + (1) H+[0] + (1) Guanine[0] => (1) NH3[0] + (1) XAN[0]
@@ -849,12 +849,12 @@ r604	r604	DC(cpd00654)[0] => NH3(cpd00013)[0] DU(cpd00412)[0]	N	N	Y	Y	rxn30636	(
 r605	r605	H2O(cpd00001)[0] DUTP(cpd00358)[0] => PPI(cpd00012)[0] DUMP(cpd00299)[0]	N	N	Y	Y	rxn01519	(1) H2O[0] + (1) dUTP[0] => (1) PPi[0] + (2) H+[0] + (1) dUMP[0]
 r606	r606	H2O(cpd00001)[0] DUTP(cpd00358)[0] => PPI(cpd00012)[0] DUMP(cpd00299)[0]	N	N	Y	Y	rxn01519	(1) H2O[0] + (1) dUTP[0] => (1) PPi[0] + (2) H+[0] + (1) dUMP[0]
 r607	r607	METTHF(cpd00125)[0] DUMP(cpd00299)[0] => DHF(cpd00330)[0] DTMP(cpd00298)[0]	N	N	Y	Y	rxn01520	(1) 5-10-Methylenetetrahydrofolate[0] + (1) dUMP[0] => (1) dTMP[0] + (1) Dihydrofolate[0]
-r608	r608	ATP(cpd00002)[0] UTP(cpd00062)[0] GLN(cpd00053)[0] => ADP(cpd00008)[0] PI(cpd00009)[0] GLU(cpd00023)[0] CTP(cpd00052)[0]	N	N	N	Y	frxn00161	
+r608	r608	ATP(cpd00002)[0] UTP(cpd00062)[0] GLN(cpd00053)[0] => ADP(cpd00008)[0] PI(cpd00009)[0] GLU(cpd00023)[0] CTP(cpd00052)[0]	N	N	N	Y	frxn00154	
 r609	r609	R5P(cpd00101)[0] URA(cpd00092)[0] => PURI5P(cpd00859)[0]	N	W	Y	Y	rxn00776	(1) Uracil[0] + (1) ribose-5-phosphate[0] <=> (1) H2O[0] + (1) Pseudouridine 5'-phosphate[0]
 r61	r61	CIT(cpd00137)[0] => OA(cpd00032)[0] AC(cpd00029)[0]	N	N	Y	Y	rxn00265	(1) Citrate[0] <=> (1) Acetate[0] + (1) Oxaloacetate[0]
 r610	r610	H2O(cpd00001)[0] DCMP(cpd00206)[0] => NH3(cpd00013)[0] DUMP(cpd00299)[0]	N	N	Y	Y	rxn01217	(1) H2O[0] + (1) H+[0] + (1) dCMP[0] => (1) NH3[0] + (1) dUMP[0]
-r611	r611	(2) ATP(cpd00002)[0] HCO3(cpd00242)[0] GLN(cpd00053)[0] => (2) ADP(cpd00008)[0] PI(cpd00009)[0] GLU(cpd00023)[0] CAP(cpd00146)[0]	N	N	N	Y	frxn00162	
-r612	r612	(2) ATP(cpd00002)[0] HCO3(cpd00242)[0] GLN(cpd00053)[0] => (2) ADP(cpd00008)[0] PI(cpd00009)[0] GLU(cpd00023)[0] CAP(cpd00146)[0]	N	N	N	Y	frxn00162	(2) ATP[0] + (1) L-Glutamine[0] + (1) H2CO3[0] <=> (2) ADP[0] + (1) Phosphate[0] + (1) L-Glutamate[0] + (1) Carbamoylphosphate[0]
+r611	r611	(2) ATP(cpd00002)[0] HCO3(cpd00242)[0] GLN(cpd00053)[0] => (2) ADP(cpd00008)[0] PI(cpd00009)[0] GLU(cpd00023)[0] CAP(cpd00146)[0]	N	N	N	Y	frxn00155	
+r612	r612	(2) ATP(cpd00002)[0] HCO3(cpd00242)[0] GLN(cpd00053)[0] => (2) ADP(cpd00008)[0] PI(cpd00009)[0] GLU(cpd00023)[0] CAP(cpd00146)[0]	N	N	N	Y	frxn00155	(2) ATP[0] + (1) L-Glutamine[0] + (1) H2CO3[0] <=> (2) ADP[0] + (1) Phosphate[0] + (1) L-Glutamate[0] + (1) Carbamoylphosphate[0]
 r613	r613	H2O(cpd00001)[0] CYTS(cpd00307)[0] => NH3(cpd00013)[0] URA(cpd00092)[0]	N	N	Y	Y	rxn00717	(1) H2O[0] + (1) H+[0] + (1) Cytosine[0] => (1) NH3[0] + (1) Uracil[0]
 r614	r614	H2O(cpd00001)[0] CYTS(cpd00307)[0] => NH3(cpd00013)[0] URA(cpd00092)[0]	N	N	Y	Y	rxn00717	(1) H2O[0] + (1) H+[0] + (1) Cytosine[0] => (1) NH3[0] + (1) Uracil[0]
 r615	r615	NADPH(cpd00005)[0] OTHIO(cpd11420)[0] => NADP(cpd00006)[0] RTHIO(cpd11421)[0]	N	N	Y	Y	rxn05289	(1) NADPH[0] + (1) H+[0] + (1) trdox[0] <=> (1) NADP[0] + (1) trdrd[0]
@@ -944,56 +944,56 @@ r690	r690	NADPH(cpd00005)[0] O2(cpd00007)[0] SQL(cpd00559)[0] => NADP(cpd00006)[
 r691	r691	S23E(cpd00776)[0] => LNST(cpd01188)[0]	N	N	Y	Y	rxn02290	(1) Squalene 2,3-oxide[0] => (1) Lanosterol[0]
 r692	r692	(3) NADPH(cpd00005)[0] (3) O2(cpd00007)[0] LNST(cpd01188)[0] => (4) H2O(cpd00001)[0] (3) NADP(cpd00006)[0] FOR(cpd00047)[0] 44MACHL(cpd08302)[0]	N	N	Y	Y	rxn03912	(3) NADPH[0] + (3) O2[0] + (2) H+[0] + (1) Lanosterol[0] => (4) H2O[0] + (3) NADP[0] + (1) Formate[0] + (1) 4,4-Dimethyl-5alpha-cholesta-8,14,24-trien-3beta-ol[0]
 r693	r693	NADPH(cpd00005)[0] 44MACHL(cpd08302)[0] => NADP(cpd00006)[0] 14MLNST(cpd03038)[0]	N	N	Y	Y	rxn03911	(1) NADP[0] + (1) 14-Demethyllanosterol[0] <=> (1) NADPH[0] + (1) H+[0] + (1) 4,4-Dimethyl-5alpha-cholesta-8,14,24-trien-3beta-ol[0]
-r694	r694	(3) NADPH(cpd00005)[0] (3) O2(cpd00007)[0] 14MLNST(cpd03038)[0] => (3) NADP(cpd00006)[0] ICZYMST[0]	N	N	N	N	frxn00163	
-r695	r695	NADP(cpd00006)[0] ICZYMST[0] => CO2(cpd00011)[0] NADPH(cpd00005)[0] IIZYMST(cpd15300)[0]	N	N	N	N	frxn00164	
+r694	r694	(3) NADPH(cpd00005)[0] (3) O2(cpd00007)[0] 14MLNST(cpd03038)[0] => (3) NADP(cpd00006)[0] ICZYMST[0]	N	N	N	N	frxn00156	
+r695	r695	NADP(cpd00006)[0] ICZYMST[0] => CO2(cpd00011)[0] NADPH(cpd00005)[0] IIZYMST(cpd15300)[0]	N	N	N	N	frxn00157	
 r696	r696	NADPH(cpd00005)[0] IIZYMST(cpd15300)[0] => NADP(cpd00006)[0] ZYMST(cpd03221)[0]	N	N	Y	Y	rxn09623	(1) NADPH[0] + (1) H+[0] + (1) zymosterol intermediate 2[0] <= (1) NADP[0] + (1) Zymosterol[0]
-r697	r697	ZYMST(cpd03221)[0] => DMSTL(cpd01243)[0]	N	N	N	Y	frxn00165	
+r697	r697	ZYMST(cpd03221)[0] => DMSTL(cpd01243)[0]	N	N	N	Y	frxn00158	
 r698	r698	SAM(cpd00017)[0] ZYMST(cpd03221)[0] => SAH(cpd00019)[0] FEST(cpd02755)[0]	N	N	Y	Y	rxn03063	(1) S-Adenosyl-L-methionine[0] + (1) Zymosterol[0] => (1) S-Adenosyl-homocysteine[0] + (1) H+[0] + (1) Fecosterol[0]
 r699	r699	FEST(cpd02755)[0] => EPST(cpd14514)[0]	N	N	Y	Y	rxn07328	(1) Fecosterol[0] => (1) Episterol[0]
 r7	r7	ATP(cpd00002)[0] FRU(cpd00082)[0] => ADP(cpd00008)[0] FRU1P(cpd00802)[0]	N	N	Y	Y	rxn00627	(1) ATP[0] + (1) D-Fructose[0] => (1) ADP[0] + (1) H+[0] + (1) D-fructose-1-phosphate[0]
 r70	r70	RGT(cpd00042)[0] MTHGXL(cpd00428)[0] => LGT(cpd02182)[0]	N	N	Y	Y	rxn01834	(1) (R)-S-Lactoylglutathione[0] <=> (1) GSH[0] + (1) 2-Oxopropanal[0]
 r700	r700	NADPH(cpd00005)[0] O2(cpd00007)[0] EPST(cpd14514)[0] => NADP(cpd00006)[0] ERGOTRI(cpd14515)[0]	N	N	Y	Y	rxn31015	(1) NADPH[0] + (1) O2[0] + (1) Episterol[0] <=> (1) NADP[0] + (1) 5,7,24(28)-Ergostatrienol[0]
-r701	r701	NADPH(cpd00005)[0] O2(cpd00007)[0] ERGOTRI(cpd14515)[0] => NADP(cpd00006)[0] ERGOTET(cpd03223)[0]	N	N	N	Y	frxn00166	
+r701	r701	NADPH(cpd00005)[0] O2(cpd00007)[0] ERGOTRI(cpd14515)[0] => NADP(cpd00006)[0] ERGOTET(cpd03223)[0]	N	N	N	Y	frxn00159	
 r702	r702	NADPH(cpd00005)[0] ERGOTET(cpd03223)[0] => NADP(cpd00006)[0] ERGOST(cpd01170)[0]	N	N	Y	Y	rxn03913	(1) NADP[0] + (1) Ergosterol[0] <= (1) NADPH[0] + (1) H+[0] + (1) 5,7,22,24(28)-Ergostatetraenol[0]
-r703	r703	ERGOST(cpd01170)[0] (0.076) C160COA(cpd00134)[0] (0.312) C181COA(cpd00399)[0] (0.281) C182COA(cpd01398)[0] (0.317) C183COA(cpd14883)[0] (0.014) C180COA(cpd00327)[0] => COA(cpd00010)[0] ERGOSE(cpd16803)[0]	N	N	N	Y	frxn00167	
-r704	r704	H2O(cpd00001)[0] ERGOSE(cpd16803)[0] => ERGOST(cpd01170)[0] (0.076) C160(cpd00214)[0] (0.312) C181(cpd00536)[0] (0.281) C182(cpd01122)[0] (0.317) C183(cpd03850)[0] (0.014) C180(cpd01080)[0]	N	N	N	Y	frxn00168	
+r703	r703	ERGOST(cpd01170)[0] (0.076) C160COA(cpd00134)[0] (0.312) C181COA(cpd00399)[0] (0.281) C182COA(cpd01398)[0] (0.317) C183COA(cpd14883)[0] (0.014) C180COA(cpd00327)[0] => COA(cpd00010)[0] ERGOSE(cpd16803)[0]	N	N	N	Y	frxn00160	
+r704	r704	H2O(cpd00001)[0] ERGOSE(cpd16803)[0] => ERGOST(cpd01170)[0] (0.076) C160(cpd00214)[0] (0.312) C181(cpd00536)[0] (0.281) C182(cpd01122)[0] (0.317) C183(cpd03850)[0] (0.014) C180(cpd01080)[0]	N	N	N	Y	frxn00161	
 r705	r705	S23E(cpd00776)[0] => CCANOL(cpd01306)[0]	N	N	Y	Y	rxn02291	(1) Squalene 2,3-oxide[0] <=> (1) Cycloartenol[0]
-r706	r706	SAM(cpd00017)[0] CCANOL(cpd01306)[0] => SAH(cpd00019)[0] MCCANOL[0]	N	N	N	N	frxn00169	
-r707	r707	(3) NADPH(cpd00005)[0] (3) O2(cpd00007)[0] MCCANOL[0] => (3) NADP(cpd00006)[0] CCECNOL(cpd01451)[0]	N	N	N	N	frxn00170	
+r706	r706	SAM(cpd00017)[0] CCANOL(cpd01306)[0] => SAH(cpd00019)[0] MCCANOL[0]	N	N	N	N	frxn00162	
+r707	r707	(3) NADPH(cpd00005)[0] (3) O2(cpd00007)[0] MCCANOL[0] => (3) NADP(cpd00006)[0] CCECNOL(cpd01451)[0]	N	N	N	N	frxn00163	
 r708	r708	CCECNOL(cpd01451)[0] => OBSFUL(cpd01334)[0]	N	N	Y	Y	rxn02677	(1) Cycloeucalenol[0] <=> (1) Obtusifoliol[0]
 r709	r709	(3) NADPH(cpd00005)[0] (3) O2(cpd00007)[0] OBSFUL(cpd01334)[0] => (4) H2O(cpd00001)[0] (3) NADP(cpd00006)[0] FOR(cpd00047)[0] 45ERSOL(cpd08347)[0]	N	N	Y	Y	rxn03996	(3) NADPH[0] + (3) O2[0] + (2) H+[0] + (1) Obtusifoliol[0] => (4) H2O[0] + (3) NADP[0] + (1) Formate[0] + (1) delta8,14 -Sterol[0]
 r71	r71	H2O(cpd00001)[0] LGT(cpd02182)[0] => RGT(cpd00042)[0] LAC(cpd00221)[0]	N	N	Y	Y	rxn01274	(1) H2O[0] + (1) (R)-S-Lactoylglutathione[0] => (1) GSH[0] + (1) H+[0] + (1) D-Lactate[0]
-r710	r710	NADPH(cpd00005)[0] 45ERSOL(cpd08347)[0] => NADP(cpd00006)[0] MFEST[0]	N	N	N	N	frxn00171	
-r711	r711	MFEST[0] => MLEPNOL(cpd08359)[0]	N	N	N	N	frxn00172	
-r712	r712	(3) NADPH(cpd00005)[0] (3) O2(cpd00007)[0] MLEPL(cpd02759)[0] => (3) NADP(cpd00006)[0] EPST(cpd14514)[0]	N	N	N	Y	frxn00173	
-r713	r713	H2O(cpd00001)[0] MAGLY(cpd01297)[0] => GL(cpd00100)[0] (0.272) C160(cpd00214)[0] (0.1534) C181(cpd00536)[0] (0.6673) C182(cpd01122)[0] (0.0404) C183(cpd03850)[0] (0.0304) C180(cpd01080)[0] (0.0051) C161(cpd05274)[0]	N	N	N	Y	frxn00174	
-r714	r714	H2O(cpd00001)[0] TAGLY(cpd11677)[0] => (0.3544) C160(cpd00214)[0] (0.3423) C181(cpd00536)[0] (0.1421) C182(cpd01122)[0] (0.1201) C183(cpd03850)[0] (0.041) C180(cpd01080)[0] DAGLY(cpd11423)[0]	N	N	N	Y	frxn00175	
-r715	r715	H2O(cpd00001)[0] TAGLY(cpd11677)[0] => DAGLY(cpd11423)[0] (0.3544) C160(cpd00214)[0] (0.3423) C181(cpd00536)[0] (0.1421) C182(cpd01122)[0] (0.1201) C183(cpd03850)[0] (0.041) C180(cpd01080)[0]	N	N	N	Y	frxn00175	(1) H2O[0] + (1) Triglyceride[0] <=> (0.3544) Palmitate[0] + (0.3423) Oleate[0] + (0.041) ocdca[0] + (0.1421) Linoleate[0] + (0.1201) Linolenate[0] + (1) 1,2-Diacyl-sn-glycerol[0]
-r716	r716	H2O(cpd00001)[0] DAGLY(cpd11423)[0] => (0.2938) C160(cpd00214)[0] (0.3994) C181(cpd00536)[0] (0.1544) C182(cpd01122)[0] (0.1295) C183(cpd03850)[0] (0.0229) C180(cpd01080)[0] MAGLY(cpd01297)[0]	N	N	N	Y	frxn00176	
-r717	r717	H2O(cpd00001)[0] DAGLY(cpd11423)[0] => (0.2938) C160(cpd00214)[0] (0.3994) C181(cpd00536)[0] (0.1544) C182(cpd01122)[0] (0.1295) C183(cpd03850)[0] (0.0229) C180(cpd01080)[0] MAGLY(cpd01297)[0]	N	N	N	Y	frxn00176	(1) H2O[0] + (1) 1,2-Diacyl-sn-glycerol[0] <=> (0.2938) Palmitate[0] + (0.3994) Oleate[0] + (0.0229) ocdca[0] + (0.1544) Linoleate[0] + (1) Glyceride[0] + (0.1295) Linolenate[0]
-r718	r718	(0.2938) C160COA(cpd00134)[0] (0.3994) C181COA(cpd00399)[0] (0.1544) C182COA(cpd01398)[0] (0.1295) C183COA(cpd14883)[0] (0.0229) C180COA(cpd00327)[0] GL3P(cpd00080)[0] => COA(cpd00010)[0] DAGLYP(cpd11422)[0]	N	N	N	Y	frxn00177	
+r710	r710	NADPH(cpd00005)[0] 45ERSOL(cpd08347)[0] => NADP(cpd00006)[0] MFEST[0]	N	N	N	N	frxn00164	
+r711	r711	MFEST[0] => MLEPNOL(cpd08359)[0]	N	N	N	N	frxn00165	
+r712	r712	(3) NADPH(cpd00005)[0] (3) O2(cpd00007)[0] MLEPL(cpd02759)[0] => (3) NADP(cpd00006)[0] EPST(cpd14514)[0]	N	N	N	Y	frxn00166	
+r713	r713	H2O(cpd00001)[0] MAGLY(cpd01297)[0] => GL(cpd00100)[0] (0.272) C160(cpd00214)[0] (0.1534) C181(cpd00536)[0] (0.6673) C182(cpd01122)[0] (0.0404) C183(cpd03850)[0] (0.0304) C180(cpd01080)[0] (0.0051) C161(cpd05274)[0]	N	N	N	Y	frxn00167	
+r714	r714	H2O(cpd00001)[0] TAGLY(cpd11677)[0] => (0.3544) C160(cpd00214)[0] (0.3423) C181(cpd00536)[0] (0.1421) C182(cpd01122)[0] (0.1201) C183(cpd03850)[0] (0.041) C180(cpd01080)[0] DAGLY(cpd11423)[0]	N	N	N	Y	frxn00168	
+r715	r715	H2O(cpd00001)[0] TAGLY(cpd11677)[0] => DAGLY(cpd11423)[0] (0.3544) C160(cpd00214)[0] (0.3423) C181(cpd00536)[0] (0.1421) C182(cpd01122)[0] (0.1201) C183(cpd03850)[0] (0.041) C180(cpd01080)[0]	N	N	N	Y	frxn00168	(1) H2O[0] + (1) Triglyceride[0] <=> (0.3544) Palmitate[0] + (0.3423) Oleate[0] + (0.041) ocdca[0] + (0.1421) Linoleate[0] + (0.1201) Linolenate[0] + (1) 1,2-Diacyl-sn-glycerol[0]
+r716	r716	H2O(cpd00001)[0] DAGLY(cpd11423)[0] => (0.2938) C160(cpd00214)[0] (0.3994) C181(cpd00536)[0] (0.1544) C182(cpd01122)[0] (0.1295) C183(cpd03850)[0] (0.0229) C180(cpd01080)[0] MAGLY(cpd01297)[0]	N	N	N	Y	frxn00169	
+r717	r717	H2O(cpd00001)[0] DAGLY(cpd11423)[0] => (0.2938) C160(cpd00214)[0] (0.3994) C181(cpd00536)[0] (0.1544) C182(cpd01122)[0] (0.1295) C183(cpd03850)[0] (0.0229) C180(cpd01080)[0] MAGLY(cpd01297)[0]	N	N	N	Y	frxn00169	(1) H2O[0] + (1) 1,2-Diacyl-sn-glycerol[0] <=> (0.2938) Palmitate[0] + (0.3994) Oleate[0] + (0.0229) ocdca[0] + (0.1544) Linoleate[0] + (1) Glyceride[0] + (0.1295) Linolenate[0]
+r718	r718	(0.2938) C160COA(cpd00134)[0] (0.3994) C181COA(cpd00399)[0] (0.1544) C182COA(cpd01398)[0] (0.1295) C183COA(cpd14883)[0] (0.0229) C180COA(cpd00327)[0] GL3P(cpd00080)[0] => COA(cpd00010)[0] DAGLYP(cpd11422)[0]	N	N	N	Y	frxn00170	
 r719	r719	H2O(cpd00001)[0] DAGLYP(cpd11422)[0] => PI(cpd00009)[0] DAGLY(cpd11423)[0]	N	N	Y	Y	rxn06138	(1) H2O[0] + (1) 1,2-diacyl-sn-glycerol 3-phosphate[0] => (1) Phosphate[0] + (1) 1,2-Diacyl-sn-glycerol[0]
 r72	r72	LGT(cpd02182)[0] H2O(cpd00001)[0] => RGT(cpd00042)[0] LAC(cpd00221)[0]	N	N	Y	Y	rxn01274	(1) H2O[0] + (1) (R)-S-Lactoylglutathione[0] => (1) GSH[0] + (1) H+[0] + (1) D-Lactate[0]
-r720	r720	(0.3544) C160COA(cpd00134)[0] (0.3423) C181COA(cpd00399)[0] (0.1421) C182COA(cpd01398)[0] (0.1201) C183COA(cpd14883)[0] (0.041) C180COA(cpd00327)[0] DAGLY(cpd11423)[0] => COA(cpd00010)[0] TAGLY(cpd11677)[0]	N	N	N	Y	frxn00178	
-r721	r721	DAGLY(cpd11423)[0] PC(cpd11624)[0] => TAGLY(cpd11677)[0] LPC(cpd16818)[0]	N	N	N	Y	frxn00179	
+r720	r720	(0.3544) C160COA(cpd00134)[0] (0.3423) C181COA(cpd00399)[0] (0.1421) C182COA(cpd01398)[0] (0.1201) C183COA(cpd14883)[0] (0.041) C180COA(cpd00327)[0] DAGLY(cpd11423)[0] => COA(cpd00010)[0] TAGLY(cpd11677)[0]	N	N	N	Y	frxn00171	
+r721	r721	DAGLY(cpd11423)[0] PC(cpd11624)[0] => TAGLY(cpd11677)[0] LPC(cpd16818)[0]	N	N	N	Y	frxn00172	
 r722	r722	ATP(cpd00002)[0] GLYN(cpd00157)[0] => ADP(cpd00008)[0] T3P2(cpd00095)[0]	N	N	Y	Y	rxn00744	(1) ATP[0] + (1) Glycerone[0] => (1) ADP[0] + (1) H+[0] + (1) Glycerone-phosphate[0]
 r723	r723	ATP(cpd00002)[0] GL(cpd00100)[0] => ADP(cpd00008)[0] GL3P(cpd00080)[0]	N	N	Y	Y	rxn00615	(1) ATP[0] + (1) Glycerol[0] => (1) ADP[0] + (1) H+[0] + (1) Glycerol-3-phosphate[0]
 r724	r724	ATP(cpd00002)[0] GL(cpd00100)[0] => ADP(cpd00008)[0] GL3P(cpd00080)[0]	N	N	Y	Y	rxn00615	(1) ATP[0] + (1) Glycerol[0] => (1) ADP[0] + (1) H+[0] + (1) Glycerol-3-phosphate[0]
-r725	r725	Q(cpd01351)[0] GL3P(cpd00080)[0] => T3P2(cpd00095)[0] QH2[0]	N	N	N	N	frxn00180	
+r725	r725	Q(cpd01351)[0] GL3P(cpd00080)[0] => T3P2(cpd00095)[0] QH2[0]	N	N	N	N	frxn00173	
 r726	r726	NAD(cpd00003)[0] GL3P(cpd00080)[0] => T3P2(cpd00095)[0] NADH(cpd00004)[0]	N	N	Y	Y	rxn00611	(1) NAD[0] + (1) Glycerol-3-phosphate[0] <=> (1) NADH[0] + (1) H+[0] + (1) Glycerone-phosphate[0]
 r727	r727	SER(cpd00054)[0] C160COA(cpd00134)[0] => COA(cpd00010)[0] CO2(cpd00011)[0] DHSPH(cpd01879)[0]	N	N	Y	Y	rxn00948	(1) L-Serine[0] + (1) H+[0] + (1) Palmitoyl-CoA[0] => (1) CoA[0] + (1) CO2[0] + (1) 3-Dehydrosphinganine[0]
 r728	r728	SER(cpd00054)[0] C160COA(cpd00134)[0] => COA(cpd00010)[0] CO2(cpd00011)[0] DHSPH(cpd01879)[0]	N	N	Y	Y	rxn00948	(1) L-Serine[0] + (1) H+[0] + (1) Palmitoyl-CoA[0] => (1) CoA[0] + (1) CO2[0] + (1) 3-Dehydrosphinganine[0]
 r729	r729	SER(cpd00054)[0] C160COA(cpd00134)[0] => CO2(cpd00011)[0] COA(cpd00010)[0] DHSPH(cpd01879)[0]	N	N	Y	Y	rxn00948	(1) L-Serine[0] + (1) H+[0] + (1) Palmitoyl-CoA[0] => (1) CoA[0] + (1) CO2[0] + (1) 3-Dehydrosphinganine[0]
 r73	r73	ATP(cpd00002)[0] COA(cpd00010)[0] AC(cpd00029)[0] => ACCOA(cpd00022)[0] AMP(cpd00018)[0] PPI(cpd00012)[0]	N	N	Y	Y	rxn00175	(1) ATP[0] + (1) CoA[0] + (1) Acetate[0] => (1) PPi[0] + (1) AMP[0] + (1) Acetyl-CoA[0] + (1) H+[0]
 r730	r730	NADPH(cpd00005)[0] DHSPH(cpd01879)[0] => NADP(cpd00006)[0] SPH(cpd00623)[0]	N	N	Y	Y	rxn02134	(1) NADP[0] + (1) Sphinganine[0] <=> (1) NADPH[0] + (1) H+[0] + (1) 3-Dehydrosphinganine[0]
-r731	r731	ACOA[0] SPH(cpd00623)[0] => COA(cpd00010)[0] CER2(cpd08908)[0]	N	N	N	N	frxn00181	
-r732	r732	SPH(cpd00623)[0] => PSPH(cpd08926)[0]	N	N	N	Y	frxn00182	
-r733	r733	CER2(cpd08908)[0] => CER3(cpd27876)[0]	N	N	N	Y	frxn00183	
+r731	r731	ACOA[0] SPH(cpd00623)[0] => COA(cpd00010)[0] CER2(cpd08908)[0]	N	N	N	N	frxn00174	
+r732	r732	SPH(cpd00623)[0] => PSPH(cpd08926)[0]	N	N	N	Y	frxn00175	
+r733	r733	CER2(cpd08908)[0] => CER3(cpd27876)[0]	N	N	N	Y	frxn00176	
 r734	r734	H2O(cpd00001)[0] CER2(cpd08908)[0] => SPH(cpd00623)[0] ACOOH(cpd00049)[0]	N	N	Y	Y	rxn04375	(1) H2O[0] + (1) Dihydroceramide[0] => (1) Carboxylic acid[0] + (1) Sphinganine[0]
-r735	r735	H2O(cpd00001)[0] SPMYLIN[0] => CER1(cpd26685)[0] PCHO(cpd00457)[0]	N	N	N	N	frxn00184	
-r736	r736	H2O(cpd00001)[0] SPMYLIN[0] => CER1(cpd26685)[0] PCHO(cpd00457)[0]	N	N	N	N	frxn00184	(1) H2O[0] + (1) ceramide phosphocholines_[0] <=> (1) Phosphocholine[0] + (1) Ceramides[0]
-r737	r737	UDPG(cpd00026)[0] CER1(cpd26685)[0] => UDP(cpd00014)[0] GLYLCR(cpd00878)[0]	N	N	N	Y	frxn00185	
-r738	r738	NADPH(cpd00005)[0] O2(cpd00007)[0] PSPH(cpd08926)[0] => NADP(cpd00006)[0] (2) H2O(cpd00001)[0] C18PSPG(cpd22780)[0]	N	N	N	Y	frxn00186	
+r735	r735	H2O(cpd00001)[0] SPMYLIN[0] => CER1(cpd26685)[0] PCHO(cpd00457)[0]	N	N	N	N	frxn00177	
+r736	r736	H2O(cpd00001)[0] SPMYLIN[0] => CER1(cpd26685)[0] PCHO(cpd00457)[0]	N	N	N	N	frxn00177	(1) H2O[0] + (1) ceramide phosphocholines[0] <=> (1) Phosphocholine[0] + (1) Ceramides[0]
+r737	r737	UDPG(cpd00026)[0] CER1(cpd26685)[0] => UDP(cpd00014)[0] GLYLCR(cpd00878)[0]	N	N	N	Y	frxn00178	
+r738	r738	NADPH(cpd00005)[0] O2(cpd00007)[0] PSPH(cpd08926)[0] => NADP(cpd00006)[0] (2) H2O(cpd00001)[0] C18PSPG(cpd22780)[0]	N	N	N	Y	frxn00179	
 r739	r739	ATP(cpd00002)[0] SPH(cpd00623)[0] => ADP(cpd00008)[0] DHSP(cpd00824)[0]	N	N	Y	Y	rxn02133	(1) ATP[0] + (1) Sphinganine[0] => (1) ADP[0] + (1) H+[0] + (1) Sphinganine 1-phosphate[0]
 r74	r74	COA(cpd00010)[0] ATP(cpd00002)[0] AC(cpd00029)[0] => ACCOA(cpd00022)[0] AMP(cpd00018)[0] PPI(cpd00012)[0]	N	N	Y	Y	rxn00175	(1) ATP[0] + (1) CoA[0] + (1) Acetate[0] => (1) PPi[0] + (1) AMP[0] + (1) Acetyl-CoA[0] + (1) H+[0]
 r740	r740	ATP(cpd00002)[0] SPH(cpd00623)[0] => ADP(cpd00008)[0] DHSP(cpd00824)[0]	N	N	Y	Y	rxn02133	(1) ATP[0] + (1) Sphinganine[0] => (1) ADP[0] + (1) H+[0] + (1) Sphinganine 1-phosphate[0]
@@ -1002,42 +1002,42 @@ r742	r742	ATP(cpd00002)[0] PSPH(cpd08926)[0] => ADP(cpd00008)[0] PHSP(cpd15283)[
 r743	r743	ATP(cpd00002)[0] SPSE(cpd00267)[0] => ADP(cpd00008)[0] SHSP(cpd03651)[0]	N	N	Y	Y	rxn01411	(1) ATP[0] + (1) Sphingoid[0] => (1) ADP[0] + (1) H+[0] + (1) Sphingosine 1-phosphate[0]
 r744	r744	ATP(cpd00002)[0] SPSE(cpd00267)[0] => ADP(cpd00008)[0] SHSP(cpd03651)[0]	N	N	Y	Y	rxn01411	(1) ATP[0] + (1) Sphingoid[0] => (1) ADP[0] + (1) H+[0] + (1) Sphingosine 1-phosphate[0]
 r745	r745	DHSP(cpd00824)[0] => PETHM(cpd00285)[0] C16A(cpd00405)[0]	N	N	Y	Y	rxn01783	(1) Sphinganine 1-phosphate[0] <=> (1) Phosphoethanolamine[0] + (1) Hexadecanal[0]
-r746	r746	PHSP(cpd15283)[0] => PETHM(cpd00285)[0] C16A(cpd00405)[0]	N	N	N	Y	frxn00187	
-r747	r747	PHSP(cpd15283)[0] => PI(cpd00009)[0] PSPH(cpd08926)[0]	N	N	N	Y	frxn00188	
+r746	r746	PHSP(cpd15283)[0] => PETHM(cpd00285)[0] C16A(cpd00405)[0]	N	N	N	Y	frxn00180	
+r747	r747	PHSP(cpd15283)[0] => PI(cpd00009)[0] PSPH(cpd08926)[0]	N	N	N	Y	frxn00181	
 r748	r748	DHSP(cpd00824)[0] => PI(cpd00009)[0] SPH(cpd00623)[0]	N	W	Y	Y	rxn04376	(1) H2O[0] + (1) Sphinganine 1-phosphate[0] <=> (1) Phosphate[0] + (1) Sphinganine[0]
 r749	r749	SHSP(cpd03651)[0] => PI(cpd00009)[0] SPSE(cpd00267)[0]	N	W	Y	Y	rxn04377	(1) H2O[0] + (1) Sphingosine 1-phosphate[0] <=> (1) Phosphate[0] + (1) Sphingoid[0]
 r75	r75	NAD(cpd00003)[0] H2O(cpd00001)[0] ACAL(cpd00071)[0] => NADH(cpd00004)[0] AC(cpd00029)[0]	N	N	Y	Y	rxn00506	(1) H2O[0] + (1) NAD[0] + (1) Acetaldehyde[0] => (1) NADH[0] + (1) Acetate[0] + (2) H+[0]
-r750	r750	H2O(cpd00001)[0] CER3(cpd27876)[0] => ACOOH(cpd00049)[0] PSPH(cpd08926)[0]	N	N	N	Y	frxn00189	
+r750	r750	H2O(cpd00001)[0] CER3(cpd27876)[0] => ACOOH(cpd00049)[0] PSPH(cpd08926)[0]	N	N	N	Y	frxn00182	
 r751	r751	H2O(cpd00001)[0] CER2(cpd08908)[0] => ACOOH(cpd00049)[0] SPH(cpd00623)[0]	N	N	Y	Y	rxn04375	(1) H2O[0] + (1) Dihydroceramide[0] => (1) Carboxylic acid[0] + (1) Sphinganine[0]
-r752	r752	H2O(cpd00001)[0] CER1(cpd26685)[0] => ACOOH(cpd00049)[0] SPSE(cpd00267)[0]	N	N	N	Y	frxn00190	
+r752	r752	H2O(cpd00001)[0] CER1(cpd26685)[0] => ACOOH(cpd00049)[0] SPSE(cpd00267)[0]	N	N	N	Y	frxn00183	
 r753	r753	DAGLYP(cpd11422)[0] CTP(cpd00052)[0] => PPI(cpd00012)[0] CLCDPDG(cpd11427)[0]	N	N	Y	Y	rxn06043	(1) CTP[0] + (1) 1,2-diacyl-sn-glycerol 3-phosphate[0] <=> (1) PPi[0] + (1) CDP-diacylglycerol[0]
 r754	r754	CLCDPDG(cpd11427)[0] GL3P(cpd00080)[0] => CMP(cpd00046)[0] CLPIGP(cpd11454)[0]	N	N	Y	Y	rxn06045	(1) Glycerol-3-phosphate[0] + (1) CDP-diacylglycerol[0] <=> (1) CMP[0] + (1) H+[0] + (1) Phosphatidylglycerophosphate[0]
 r755	r755	GL3P(cpd00080)[0] CLCDPDG(cpd11427)[0] => CMP(cpd00046)[0] CLPIGP(cpd11454)[0]	N	N	Y	Y	rxn06045	(1) Glycerol-3-phosphate[0] + (1) CDP-diacylglycerol[0] <=> (1) CMP[0] + (1) H+[0] + (1) Phosphatidylglycerophosphate[0]
 r756	r756	H2O(cpd00001)[0] CLPIGP(cpd11454)[0] => PI(cpd00009)[0] PG(cpd11652)[0]	N	N	Y	Y	rxn06080	(1) H2O[0] + (1) Phosphatidylglycerophosphate[0] => (1) Phosphate[0] + (1) Phosphatidylglycerol[0]
 r757	r757	CLCDPDG(cpd11427)[0] PG(cpd11652)[0] => CMP(cpd00046)[0] CL(cpd12801)[0]	N	N	Y	Y	rxn06081	(1) CDP-diacylglycerol[0] + (1) Phosphatidylglycerol[0] => (1) CMP[0] + (1) H+[0] + (1) Cardiolipin[0]
-r758	r758	T3P2(cpd00095)[0] (0.243) C160COA(cpd00134)[0] (0.264) C181COA(cpd00399)[0] (0.255) C182COA(cpd01398)[0] (0.209) C183COA(cpd14883)[0] (0.029) C180COA(cpd00327)[0] => COA(cpd00010)[0] AT3P2[0]	N	N	N	N	frxn00191	
-r759	r759	T3P2(cpd00095)[0] (0.243) C160COA(cpd00134)[0] (0.264) C181COA(cpd00399)[0] (0.255) C182COA(cpd01398)[0] (0.209) C183COA(cpd14883)[0] (0.029) C180COA(cpd00327)[0] => COA(cpd00010)[0] AT3P2[0]	N	N	N	N	frxn00191	(1) Glycerone-phosphate[0] + (0.243) Palmitoyl-CoA[0] + (0.029) strcoa[0] + (0.264) Oleoyl-CoA[0] + (0.255) Linoleoyl-CoA[0] + (0.209) alpha-Linolenoyl-CoA[0] <=> (1) CoA[0] + (1) acylglycerone phosphates_[0]
+r758	r758	T3P2(cpd00095)[0] (0.243) C160COA(cpd00134)[0] (0.264) C181COA(cpd00399)[0] (0.255) C182COA(cpd01398)[0] (0.209) C183COA(cpd14883)[0] (0.029) C180COA(cpd00327)[0] => COA(cpd00010)[0] AT3P2[0]	N	N	N	N	frxn00184	
+r759	r759	T3P2(cpd00095)[0] (0.243) C160COA(cpd00134)[0] (0.264) C181COA(cpd00399)[0] (0.255) C182COA(cpd01398)[0] (0.209) C183COA(cpd14883)[0] (0.029) C180COA(cpd00327)[0] => COA(cpd00010)[0] AT3P2[0]	N	N	N	N	frxn00184	(1) Glycerone-phosphate[0] + (0.243) Palmitoyl-CoA[0] + (0.029) strcoa[0] + (0.264) Oleoyl-CoA[0] + (0.255) Linoleoyl-CoA[0] + (0.209) alpha-Linolenoyl-CoA[0] <=> (1) CoA[0] + (1) acylglycerone phosphates[0]
 r76	r76	NAD(cpd00003)[0] ACAL(cpd00071)[0] H2O(cpd00001)[0] => NADH(cpd00004)[0] AC(cpd00029)[0]	N	N	Y	Y	rxn00506	(1) H2O[0] + (1) NAD[0] + (1) Acetaldehyde[0] => (1) NADH[0] + (1) Acetate[0] + (2) H+[0]
-r760	r760	NADPH(cpd00005)[0] AT3P2[0] => NADP(cpd00006)[0] LPA(cpd00517)[0]	N	N	N	N	frxn00192	
-r761	r761	(0.243) C160COA(cpd00134)[0] (0.264) C181COA(cpd00399)[0] (0.255) C182COA(cpd01398)[0] (0.209) C183COA(cpd14883)[0] (0.029) C180COA(cpd00327)[0] LPA(cpd00517)[0] => COA(cpd00010)[0] PA(cpd11422)[0]	N	N	N	Y	frxn00193	
-r762	r762	(0.243) C160COA(cpd00134)[0] (0.264) C181COA(cpd00399)[0] (0.255) C182COA(cpd01398)[0] (0.209) C183COA(cpd14883)[0] (0.029) C180COA(cpd00327)[0] LPA(cpd00517)[0] => COA(cpd00010)[0] PA(cpd11422)[0]	N	N	N	Y	frxn00193	(0.243) Palmitoyl-CoA[0] + (0.029) strcoa[0] + (0.264) Oleoyl-CoA[0] + (1) 1-Acyl-sn-glycerol 3-phosphate[0] + (0.255) Linoleoyl-CoA[0] + (0.209) alpha-Linolenoyl-CoA[0] <=> (1) CoA[0] + (1) 1,2-diacyl-sn-glycerol 3-phosphate[0]
+r760	r760	NADPH(cpd00005)[0] AT3P2[0] => NADP(cpd00006)[0] LPA(cpd00517)[0]	N	N	N	N	frxn00185	
+r761	r761	(0.243) C160COA(cpd00134)[0] (0.264) C181COA(cpd00399)[0] (0.255) C182COA(cpd01398)[0] (0.209) C183COA(cpd14883)[0] (0.029) C180COA(cpd00327)[0] LPA(cpd00517)[0] => COA(cpd00010)[0] PA(cpd11422)[0]	N	N	N	Y	frxn00186	
+r762	r762	(0.243) C160COA(cpd00134)[0] (0.264) C181COA(cpd00399)[0] (0.255) C182COA(cpd01398)[0] (0.209) C183COA(cpd14883)[0] (0.029) C180COA(cpd00327)[0] LPA(cpd00517)[0] => COA(cpd00010)[0] PA(cpd11422)[0]	N	N	N	Y	frxn00186	(0.243) Palmitoyl-CoA[0] + (0.029) strcoa[0] + (0.264) Oleoyl-CoA[0] + (1) 1-Acyl-sn-glycerol 3-phosphate[0] + (0.255) Linoleoyl-CoA[0] + (0.209) alpha-Linolenoyl-CoA[0] <=> (1) CoA[0] + (1) 1,2-diacyl-sn-glycerol 3-phosphate[0]
 r763	r763	H2O(cpd00001)[0] PA(cpd11422)[0] => PI(cpd00009)[0] DAGLY(cpd11423)[0]	N	N	Y	Y	rxn06138	(1) H2O[0] + (1) 1,2-diacyl-sn-glycerol 3-phosphate[0] => (1) Phosphate[0] + (1) 1,2-Diacyl-sn-glycerol[0]
 r764	r764	ATP(cpd00002)[0] DAGLY(cpd11423)[0] => ADP(cpd00008)[0] PA(cpd11422)[0]	N	N	Y	Y	rxn06139	(1) ATP[0] + (1) 1,2-Diacyl-sn-glycerol[0] <=> (1) ADP[0] + (1) H+[0] + (1) 1,2-diacyl-sn-glycerol 3-phosphate[0]
 r765	r765	ATP(cpd00002)[0] DAGLY(cpd11423)[0] => ADP(cpd00008)[0] PA(cpd11422)[0]	N	N	Y	Y	rxn06139	(1) ATP[0] + (1) 1,2-Diacyl-sn-glycerol[0] <=> (1) ADP[0] + (1) H+[0] + (1) 1,2-diacyl-sn-glycerol 3-phosphate[0]
 r766	r766	DAGLY(cpd11423)[0] CDPETN(cpd00444)[0] => CMP(cpd00046)[0] PE(cpd11456)[0]	N	N	Y	Y	rxn06092	(1) CDPethanolamine[0] + (1) 1,2-Diacyl-sn-glycerol[0] <=> (1) CMP[0] + (1) H+[0] + (1) Phosphatidylethanolamine[0]
 r767	r767	CTP(cpd00052)[0] PCHO(cpd00457)[0] => PPI(cpd00012)[0] CDPCHO(cpd00256)[0]	N	N	Y	Y	rxn01380	(1) CTP[0] + (1) Phosphocholine[0] <=> (1) PPi[0] + (1) CDPcholine[0]
 r768	r768	ATP(cpd00002)[0] CHO(cpd00098)[0] => ADP(cpd00008)[0] PCHO(cpd00457)[0]	N	N	Y	Y	rxn00751	(1) ATP[0] + (1) Choline[0] => (1) ADP[0] + (1) H+[0] + (1) Phosphocholine[0]
-r769	r769	SAM(cpd00017)[0] PE(cpd11456)[0] => SAH(cpd00019)[0] PMME[0]	N	N	N	N	frxn00194	
+r769	r769	SAM(cpd00017)[0] PE(cpd11456)[0] => SAH(cpd00019)[0] PMME[0]	N	N	N	N	frxn00187	
 r77	r77	NAD(cpd00003)[0] H2O(cpd00001)[0] ACAL(cpd00071)[0] => NADH(cpd00004)[0] AC(cpd00029)[0]	N	N	Y	Y	rxn00506	(1) H2O[0] + (1) NAD[0] + (1) Acetaldehyde[0] => (1) NADH[0] + (1) Acetate[0] + (2) H+[0]
 r770	r770	SAM(cpd00017)[0] POFA(cpd11827)[0] => SAH(cpd00019)[0] PMFA(cpd12496)[0]	N	N	Y	Y	rxn06372	(1) S-Adenosyl-L-methionine[0] + (1) Phospholipid olefinic fatty acid[0] => (1) S-Adenosyl-homocysteine[0] + (1) H+[0] + (1) Phospholipid methylene fatty acid[0]
-r771	r771	H2O(cpd00001)[0] PC(cpd11624)[0] => (0.057) C160(cpd00214)[0] (0.211) C181(cpd00536)[0] (0.357) C182(cpd01122)[0] (0.361) C183(cpd03850)[0] (0.014) C180(cpd01080)[0] LPC(cpd16818)[0]	N	N	N	Y	frxn00195	
-r772	r772	(0.057) C160COA(cpd00134)[0] (0.211) C181COA(cpd00399)[0] (0.357) C182COA(cpd01398)[0] (0.361) C183COA(cpd14883)[0] (0.014) C180COA(cpd00327)[0] LPC(cpd16818)[0] => COA(cpd00010)[0] PC(cpd11624)[0]	N	N	N	Y	frxn00196	
-r773	r773	H2O(cpd00001)[0] PE(cpd11456)[0] => (0.1898) C160(cpd00214)[0] (0.3193) C181(cpd00536)[0] (0.2108) C182(cpd01122)[0] (0.2751) C183(cpd03850)[0] (0.005) C180(cpd01080)[0] LPE[0]	N	N	N	N	frxn00197	
-r774	r774	(0.1898) C160COA(cpd00134)[0] (0.3193) C181COA(cpd00399)[0] (0.2108) C182COA(cpd01398)[0] (0.2751) C183COA(cpd14883)[0] (0.005) C180COA(cpd00327)[0] LPE[0] => COA(cpd00010)[0] PE(cpd11456)[0]	N	N	N	N	frxn00198	
-r775	r775	H2O(cpd00001)[0] LPC(cpd16818)[0] => ACOOH(cpd00049)[0] GLYCEROCHO(cpd00507)[0]	N	N	N	Y	frxn00199	
-r776	r776	H2O(cpd00001)[0] LPC(cpd16818)[0] => ACOOH(cpd00049)[0] GLYCEROCHO(cpd00507)[0]	N	N	N	Y	frxn00199	(1) H2O[0] + (1) lysophosphatidylcholine[0] <=> (1) Carboxylic acid[0] + (1) Glycerophosphocholine[0]
-r777	r777	H2O(cpd00001)[0] LPE[0] => ACOOH(cpd00049)[0] GLYCEROETM(cpd00908)[0]	N	N	N	N	frxn00200	
-r778	r778	H2O(cpd00001)[0] LPE[0] => ACOOH(cpd00049)[0] GLYCEROETM(cpd00908)[0]	N	N	N	N	frxn00200	(1) H2O[0] + (1) Lysophosphatidylethanolamine[0] <=> (1) Carboxylic acid[0] + (1) Glycerophosphoethanolamine[0]
+r771	r771	H2O(cpd00001)[0] PC(cpd11624)[0] => (0.057) C160(cpd00214)[0] (0.211) C181(cpd00536)[0] (0.357) C182(cpd01122)[0] (0.361) C183(cpd03850)[0] (0.014) C180(cpd01080)[0] LPC(cpd16818)[0]	N	N	N	Y	frxn00188	
+r772	r772	(0.057) C160COA(cpd00134)[0] (0.211) C181COA(cpd00399)[0] (0.357) C182COA(cpd01398)[0] (0.361) C183COA(cpd14883)[0] (0.014) C180COA(cpd00327)[0] LPC(cpd16818)[0] => COA(cpd00010)[0] PC(cpd11624)[0]	N	N	N	Y	frxn00189	
+r773	r773	H2O(cpd00001)[0] PE(cpd11456)[0] => (0.1898) C160(cpd00214)[0] (0.3193) C181(cpd00536)[0] (0.2108) C182(cpd01122)[0] (0.2751) C183(cpd03850)[0] (0.005) C180(cpd01080)[0] LPE[0]	N	N	N	N	frxn00190	
+r774	r774	(0.1898) C160COA(cpd00134)[0] (0.3193) C181COA(cpd00399)[0] (0.2108) C182COA(cpd01398)[0] (0.2751) C183COA(cpd14883)[0] (0.005) C180COA(cpd00327)[0] LPE[0] => COA(cpd00010)[0] PE(cpd11456)[0]	N	N	N	N	frxn00191	
+r775	r775	H2O(cpd00001)[0] LPC(cpd16818)[0] => ACOOH(cpd00049)[0] GLYCEROCHO(cpd00507)[0]	N	N	N	Y	frxn00192	
+r776	r776	H2O(cpd00001)[0] LPC(cpd16818)[0] => ACOOH(cpd00049)[0] GLYCEROCHO(cpd00507)[0]	N	N	N	Y	frxn00192	(1) H2O[0] + (1) lysophosphatidylcholine[0] <=> (1) Carboxylic acid[0] + (1) Glycerophosphocholine[0]
+r777	r777	H2O(cpd00001)[0] LPE[0] => ACOOH(cpd00049)[0] GLYCEROETM(cpd00908)[0]	N	N	N	N	frxn00193	
+r778	r778	H2O(cpd00001)[0] LPE[0] => ACOOH(cpd00049)[0] GLYCEROETM(cpd00908)[0]	N	N	N	N	frxn00193	(1) H2O[0] + (1) Lysophosphatidylethanolamine[0] <=> (1) Carboxylic acid[0] + (1) Glycerophosphoethanolamine[0]
 r779	r779	H2O(cpd00001)[0] PC(cpd11624)[0] => CHO(cpd00098)[0] PA(cpd11422)[0]	N	N	Y	Y	rxn05963	(1) H2O[0] + (1) Lecithin[0] <=> (1) H+[0] + (1) Choline[0] + (1) 1,2-diacyl-sn-glycerol 3-phosphate[0]
 r78	r78	NADP(cpd00006)[0] ACAL(cpd00071)[0] H2O(cpd00001)[0] => AC(cpd00029)[0] NADPH(cpd00005)[0]	N	N	Y	Y	rxn00507	(1) H2O[0] + (1) NADP[0] + (1) Acetaldehyde[0] => (1) NADPH[0] + (1) Acetate[0] + (2) H+[0]
 r780	r780	H2O(cpd00001)[0] PC(cpd11624)[0] => CHO(cpd00098)[0] PA(cpd11422)[0]	N	N	Y	Y	rxn05963	(1) H2O[0] + (1) Lecithin[0] <=> (1) H+[0] + (1) Choline[0] + (1) 1,2-diacyl-sn-glycerol 3-phosphate[0]
@@ -1048,11 +1048,11 @@ r784	r784	CDPDG(cpd11427)[0] SER(cpd00054)[0] => CMP(cpd00046)[0] PS(cpd11455)[0
 r785	r785	SER(cpd00054)[0] PE(cpd11456)[0] => PS(cpd11455)[0] ETHAM(cpd00162)[0]	N	N	Y	Y	rxn07254	(1) L-Serine[0] + (1) Phosphatidylethanolamine[0] <=> (1) Aminoethanol[0] + (1) ps_BS[0]
 r786	r786	ATP(cpd00002)[0] ETHAM(cpd00162)[0] => ADP(cpd00008)[0] PETHM(cpd00285)[0]	N	N	Y	Y	rxn01071	(1) ATP[0] + (1) Aminoethanol[0] => (1) ADP[0] + (1) H+[0] + (1) Phosphoethanolamine[0]
 r787	r787	PS(cpd11455)[0] => CO2(cpd00011)[0] PE(cpd11456)[0]	N	N	Y	Y	rxn06090	(1) H+[0] + (1) ps_BS[0] => (1) CO2[0] + (1) Phosphatidylethanolamine[0]
-r788	r788	SAM(cpd00017)[0] PMME[0] => SAH(cpd00019)[0] PDME(cpd12514)[0]	N	N	N	N	frxn00201	
+r788	r788	SAM(cpd00017)[0] PMME[0] => SAH(cpd00019)[0] PDME(cpd12514)[0]	N	N	N	N	frxn00194	
 r789	r789	SAM(cpd00017)[0] PDME(cpd12514)[0] => SAH(cpd00019)[0] PC(cpd11624)[0]	N	N	Y	Y	rxn05970	(1) S-Adenosyl-L-methionine[0] + (1) Phosphatidyl-N-dimethylethanolamine[0] <= (1) S-Adenosyl-homocysteine[0] + (1) H+[0] + (1) Lecithin[0]
 r79	r79	ACAL(cpd00071)[0] H2O(cpd00001)[0] NADP(cpd00006)[0] => AC(cpd00029)[0] NADPH(cpd00005)[0]	N	N	Y	Y	rxn00507	(1) H2O[0] + (1) NADP[0] + (1) Acetaldehyde[0] => (1) NADPH[0] + (1) Acetate[0] + (2) H+[0]
-r790	r790	(0.2827) C160COA(cpd00134)[0] (0.3435) C181COA(cpd00399)[0] (0.1388) C182COA(cpd01398)[0] (0.2239) C183COA(cpd14883)[0] (0.0111) C180COA(cpd00327)[0] ACGLPE(cpd19395)[0] => COA(cpd00010)[0] PS(cpd11455)[0]	N	N	N	Y	frxn00202	
-r791	r791	(0.5488) C160COA(cpd00134)[0] (0.2336) C181COA(cpd00399)[0] (0.145) C182COA(cpd01398)[0] (0.0504) C183COA(cpd14883)[0] (0.0222) C180COA(cpd00327)[0] => COA(cpd00010)[0] PINS(cpd11715)[0]	N	N	N	Y	frxn00203	
+r790	r790	(0.2827) C160COA(cpd00134)[0] (0.3435) C181COA(cpd00399)[0] (0.1388) C182COA(cpd01398)[0] (0.2239) C183COA(cpd14883)[0] (0.0111) C180COA(cpd00327)[0] ACGLPE(cpd19395)[0] => COA(cpd00010)[0] PS(cpd11455)[0]	N	N	N	Y	frxn00195	
+r791	r791	(0.5488) C160COA(cpd00134)[0] (0.2336) C181COA(cpd00399)[0] (0.145) C182COA(cpd01398)[0] (0.0504) C183COA(cpd14883)[0] (0.0222) C180COA(cpd00327)[0] => COA(cpd00010)[0] PINS(cpd11715)[0]	N	N	N	Y	frxn00196	
 r792	r792	ACCOA(cpd00022)[0] LYSOPAF(cpd02649)[0] => COA(cpd00010)[0] PAF(cpd02803)[0]	N	N	Y	Y	rxn02462	(1) Acetyl-CoA[0] + (1) 1-Alkyl-sn-glycero-3-phosphocholine[0] => (1) CoA[0] + (1) 2-Acetyl-1-alkyl-sn-glycero-3-phosphocholine[0]
 r793	r793	ATP(cpd00002)[0] HCO3(cpd00242)[0] BCCP(cpd12848)[0] => ADP(cpd00008)[0] PI(cpd00009)[0] CBCCP(cpd12543)[0]	N	N	Y	Y	rxn06672	(1) ATP[0] + (1) H2CO3[0] + (1) Holo-[carboxylase][0] <= (1) ADP[0] + (1) Phosphate[0] + (1) H+[0] + (1) Carboxybiotin-carboxyl-carrier protein[0]
 r794	r794	ATP(cpd00002)[0] ACCOA(cpd00022)[0] HCO3(cpd00242)[0] => ADP(cpd00008)[0] PI(cpd00009)[0] MALCOA(cpd00070)[0]	N	N	Y	Y	rxn00533	(1) ATP[0] + (1) Acetyl-CoA[0] + (1) H2CO3[0] <=> (1) ADP[0] + (1) Phosphate[0] + (1) H+[0] + (1) Malonyl-CoA[0]
@@ -1060,87 +1060,87 @@ r795	r795	ACCOA(cpd00022)[0] ACP(cpd11493)[0] => COA(cpd00010)[0] ACACP(cpd11494
 r796	r796	MALCOA(cpd00070)[0] ACP(cpd11493)[0] => COA(cpd00010)[0] MALACP(cpd11492)[0]	N	N	Y	Y	rxn05465	(1) Malonyl-CoA[0] + (1) ACP[0] <=> (1) CoA[0] + (1) Malonyl-acyl-carrierprotein-[0]
 r797	r797	MALCOA(cpd00070)[0] ACP(cpd11493)[0] => COA(cpd00010)[0] MALACP(cpd11492)[0]	N	N	Y	Y	rxn05465	(1) Malonyl-CoA[0] + (1) ACP[0] <=> (1) CoA[0] + (1) Malonyl-acyl-carrierprotein-[0]
 r798	r798	ACACP(cpd11494)[0] MALACP(cpd11492)[0] => CO2(cpd00011)[0] ACP(cpd11493)[0] AACACP(cpd11488)[0]	N	N	Y	Y	rxn05347	(1) H+[0] + (1) Malonyl-acyl-carrierprotein-[0] + (1) Acetyl-ACP[0] => (1) CO2[0] + (1) Acetoacetyl-ACP[0] + (1) ACP[0]
-r799	r799	NADPH(cpd00005)[0] AACACP(cpd11488)[0] => NADP(cpd00006)[0] C4HACP[0]	N	N	N	N	frxn00204	
+r799	r799	NADPH(cpd00005)[0] AACACP(cpd11488)[0] => NADP(cpd00006)[0] C4HACP[0]	N	N	N	N	frxn00197	
 r8	r8	ATP(cpd00002)[0] FRU(cpd00082)[0] => ADP(cpd00008)[0] FRU1P(cpd00802)[0]	N	N	Y	Y	rxn00627	(1) ATP[0] + (1) D-Fructose[0] => (1) ADP[0] + (1) H+[0] + (1) D-fructose-1-phosphate[0]
 r80	r80	NAD(cpd00003)[0] HYGTA(cpd09879)[0] => NADH(cpd00004)[0] FGT(cpd00759)[0]	N	N	Y	Y	rxn04792	(1) NAD[0] + (1) S-(Hydroxymethyl)glutathione[0] <=> (1) NADH[0] + (1) H+[0] + (1) S-Formylglutathione[0]
-r800	r800	NADPH(cpd00005)[0] AACACP(cpd11488)[0] => NADP(cpd00006)[0] C4HACP[0]	N	N	N	N	frxn00204	(1) NADPH[0] + (1) Acetoacetyl-ACP[0] <=> (1) NADP[0] + (1) 3-hydroxybutanoyl-[acyl-carrier protein][0]
-r801	r801	C4HACP[0] => H2O(cpd00001)[0] C4DACP(cpd11465)[0]	N	N	N	N	frxn00205	
+r800	r800	NADPH(cpd00005)[0] AACACP(cpd11488)[0] => NADP(cpd00006)[0] C4HACP[0]	N	N	N	N	frxn00197	(1) NADPH[0] + (1) Acetoacetyl-ACP[0] <=> (1) NADP[0] + (1) 3-hydroxybutanoyl-[acyl-carrier protein][0]
+r801	r801	C4HACP[0] => H2O(cpd00001)[0] C4DACP(cpd11465)[0]	N	N	N	N	frxn00198	
 r802	r802	NADH(cpd00004)[0] C4DACP(cpd11465)[0] => NAD(cpd00003)[0] C40ACP(cpd11464)[0]	N	N	Y	Y	rxn05322	(1) NAD[0] + (1) Butyryl-ACP[0] <= (1) NADH[0] + (1) H+[0] + (1) But-2-enoyl-[acyl-carrier protein][0]
-r803	r803	(2) NADPH(cpd00005)[0] ACCOA(cpd00022)[0] MALCOA(cpd00070)[0] => CO2(cpd00011)[0] (2) NADP(cpd00006)[0] COA(cpd00010)[0] C40COA(cpd00120)[0]	N	N	N	Y	frxn00206	
-r804	r804	ACCOA(cpd00022)[0] (2) NADPH(cpd00005)[0] MALCOA(cpd00070)[0] => COA(cpd00010)[0] CO2(cpd00011)[0] (2) NADP(cpd00006)[0] C40COA(cpd00120)[0]	N	N	N	Y	frxn00206	(2) NADPH[0] + (1) Acetyl-CoA[0] + (1) Malonyl-CoA[0] <=> (2) NADP[0] + (1) CoA[0] + (1) CO2[0] + (1) Butyryl-CoA[0]
+r803	r803	(2) NADPH(cpd00005)[0] ACCOA(cpd00022)[0] MALCOA(cpd00070)[0] => CO2(cpd00011)[0] (2) NADP(cpd00006)[0] COA(cpd00010)[0] C40COA(cpd00120)[0]	N	N	N	Y	frxn00199	
+r804	r804	ACCOA(cpd00022)[0] (2) NADPH(cpd00005)[0] MALCOA(cpd00070)[0] => COA(cpd00010)[0] CO2(cpd00011)[0] (2) NADP(cpd00006)[0] C40COA(cpd00120)[0]	N	N	N	Y	frxn00199	(2) NADPH[0] + (1) Acetyl-CoA[0] + (1) Malonyl-CoA[0] <=> (2) NADP[0] + (1) CoA[0] + (1) CO2[0] + (1) Butyryl-CoA[0]
 r805	r805	MALACP(cpd11492)[0] C40ACP(cpd11464)[0] => CO2(cpd00011)[0] ACP(cpd11493)[0] C6OACP(cpd11486)[0]	N	N	Y	Y	rxn05346	(1) H+[0] + (1) Butyryl-ACP[0] + (1) Malonyl-acyl-carrierprotein-[0] => (1) CO2[0] + (1) 3-Oxohexanoyl-[acp][0] + (1) ACP[0]
 r806	r806	NADPH(cpd00005)[0] C6OACP(cpd11486)[0] => NADP(cpd00006)[0] C6HACP(cpd11479)[0]	N	N	Y	Y	rxn05337	(1) NADP[0] + (1) D-3-Hydroxyhexanoyl-[acp][0] <=> (1) NADPH[0] + (1) 3-Oxohexanoyl-[acp][0]
 r807	r807	NADPH(cpd00005)[0] C6OACP(cpd11486)[0] => NADP(cpd00006)[0] C6HACP(cpd11479)[0]	N	N	Y	Y	rxn05337	(1) NADP[0] + (1) D-3-Hydroxyhexanoyl-[acp][0] <=> (1) NADPH[0] + (1) 3-Oxohexanoyl-[acp][0]
-r808	r808	C6HACP(cpd11479)[0] => H2O(cpd00001)[0] C6DACP[0]	N	N	N	N	frxn00207	
-r809	r809	NADH(cpd00004)[0] C6DACP[0] => NAD(cpd00003)[0] C60ACP(cpd11472)[0]	N	N	N	N	frxn00208	
+r808	r808	C6HACP(cpd11479)[0] => H2O(cpd00001)[0] C6DACP[0]	N	N	N	N	frxn00200	
+r809	r809	NADH(cpd00004)[0] C6DACP[0] => NAD(cpd00003)[0] C60ACP(cpd11472)[0]	N	N	N	N	frxn00201	
 r81	r81	H2O(cpd00001)[0] ACCOA(cpd00022)[0] => COA(cpd00010)[0] AC(cpd00029)[0]	N	N	Y	Y	rxn00170	(1) H2O[0] + (1) Acetyl-CoA[0] => (1) CoA[0] + (1) Acetate[0] + (1) H+[0]
-r810	r810	(2) NADPH(cpd00005)[0] MALCOA(cpd00070)[0] C40COA(cpd00120)[0] => CO2(cpd00011)[0] (2) NADP(cpd00006)[0] COA(cpd00010)[0] C60COA(cpd03124)[0]	N	N	N	Y	frxn00209	
-r811	r811	(2) NADPH(cpd00005)[0] MALCOA(cpd00070)[0] C40COA(cpd00120)[0] => COA(cpd00010)[0] CO2(cpd00011)[0] (2) NADP(cpd00006)[0] C60COA(cpd03124)[0]	N	N	N	Y	frxn00209	(2) NADPH[0] + (1) Malonyl-CoA[0] + (1) Butyryl-CoA[0] <=> (2) NADP[0] + (1) CoA[0] + (1) CO2[0] + (1) Hexanoyl-CoA[0]
+r810	r810	(2) NADPH(cpd00005)[0] MALCOA(cpd00070)[0] C40COA(cpd00120)[0] => CO2(cpd00011)[0] (2) NADP(cpd00006)[0] COA(cpd00010)[0] C60COA(cpd03124)[0]	N	N	N	Y	frxn00202	
+r811	r811	(2) NADPH(cpd00005)[0] MALCOA(cpd00070)[0] C40COA(cpd00120)[0] => COA(cpd00010)[0] CO2(cpd00011)[0] (2) NADP(cpd00006)[0] C60COA(cpd03124)[0]	N	N	N	Y	frxn00202	(2) NADPH[0] + (1) Malonyl-CoA[0] + (1) Butyryl-CoA[0] <=> (2) NADP[0] + (1) CoA[0] + (1) CO2[0] + (1) Hexanoyl-CoA[0]
 r812	r812	MALACP(cpd11492)[0] C60ACP(cpd11472)[0] => CO2(cpd00011)[0] ACP(cpd11493)[0] C8OACP(cpd11490)[0]	N	N	Y	Y	rxn05350	(1) H+[0] + (1) Hexanoyl-ACP[0] + (1) Malonyl-acyl-carrierprotein-[0] => (1) CO2[0] + (1) 3-oxooctanoyl-acp[0] + (1) ACP[0]
 r813	r813	NADPH(cpd00005)[0] C8OACP(cpd11490)[0] => NADP(cpd00006)[0] C8HACP(cpd11483)[0]	N	N	Y	Y	rxn05341	(1) NADP[0] + (1) (R)-3-Hydroxyoctanoyl-[acyl-carrier protein][0] <=> (1) NADPH[0] + (1) H+[0] + (1) 3-oxooctanoyl-acp[0]
 r814	r814	NADPH(cpd00005)[0] C8OACP(cpd11490)[0] => NADP(cpd00006)[0] C8HACP(cpd11483)[0]	N	N	Y	Y	rxn05341	(1) NADP[0] + (1) (R)-3-Hydroxyoctanoyl-[acyl-carrier protein][0] <=> (1) NADPH[0] + (1) H+[0] + (1) 3-oxooctanoyl-acp[0]
 r815	r815	C8HACP(cpd11483)[0] => H2O(cpd00001)[0] C8DACP(cpd11471)[0]	N	N	Y	Y	rxn05334	(1) (R)-3-Hydroxyoctanoyl-[acyl-carrier protein][0] <=> (1) H2O[0] + (1) (2E)-Octenoyl-[acp][0]
 r816	r816	NADH(cpd00004)[0] C8DACP(cpd11471)[0] => NAD(cpd00003)[0] C80ACP(cpd11470)[0]	N	N	Y	Y	rxn05325	(1) NAD[0] + (1) Octanoyl-ACP[0] <= (1) NADH[0] + (1) H+[0] + (1) (2E)-Octenoyl-[acp][0]
-r817	r817	(2) NADPH(cpd00005)[0] MALCOA(cpd00070)[0] C60COA(cpd03124)[0] => CO2(cpd00011)[0] (2) NADP(cpd00006)[0] COA(cpd00010)[0] C80COA(cpd01335)[0]	N	N	N	Y	frxn00210	
-r818	r818	(2) NADPH(cpd00005)[0] MALCOA(cpd00070)[0] C60COA(cpd03124)[0] => COA(cpd00010)[0] CO2(cpd00011)[0] (2) NADP(cpd00006)[0] C80COA(cpd01335)[0]	N	N	N	Y	frxn00210	(2) NADPH[0] + (1) Malonyl-CoA[0] + (1) Hexanoyl-CoA[0] <=> (2) NADP[0] + (1) CoA[0] + (1) CO2[0] + (1) Octanoyl-CoA[0]
+r817	r817	(2) NADPH(cpd00005)[0] MALCOA(cpd00070)[0] C60COA(cpd03124)[0] => CO2(cpd00011)[0] (2) NADP(cpd00006)[0] COA(cpd00010)[0] C80COA(cpd01335)[0]	N	N	N	Y	frxn00203	
+r818	r818	(2) NADPH(cpd00005)[0] MALCOA(cpd00070)[0] C60COA(cpd03124)[0] => COA(cpd00010)[0] CO2(cpd00011)[0] (2) NADP(cpd00006)[0] C80COA(cpd01335)[0]	N	N	N	Y	frxn00203	(2) NADPH[0] + (1) Malonyl-CoA[0] + (1) Hexanoyl-CoA[0] <=> (2) NADP[0] + (1) CoA[0] + (1) CO2[0] + (1) Octanoyl-CoA[0]
 r819	r819	MALACP(cpd11492)[0] C80ACP(cpd11470)[0] => CO2(cpd00011)[0] ACP(cpd11493)[0] C10OACP(cpd11487)[0]	N	N	Y	Y	rxn05343	(1) H+[0] + (1) Octanoyl-ACP[0] + (1) Malonyl-acyl-carrierprotein-[0] => (1) CO2[0] + (1) 3-oxodecanoyl-acp[0] + (1) ACP[0]
 r82	r82	NAD(cpd00003)[0] METHOL(cpd00116)[0] => NADH(cpd00004)[0] FALD(cpd00055)[0]	N	N	Y	Y	rxn00430	(1) NAD[0] + (1) Methanol[0] <=> (1) NADH[0] + (1) Formaldehyde[0] + (1) H+[0]
 r820	r820	NADPH(cpd00005)[0] C10OACP(cpd11487)[0] => NADP(cpd00006)[0] C10HACP(cpd11482)[0]	N	N	Y	Y	rxn05338	(1) NADP[0] + (1) (R)-3-Hydroxydecanoyl-[acyl-carrier protein][0] <= (1) NADPH[0] + (1) H+[0] + (1) 3-oxodecanoyl-acp[0]
 r821	r821	NADPH(cpd00005)[0] C10OACP(cpd11487)[0] => NADP(cpd00006)[0] C10HACP(cpd11482)[0]	N	N	Y	Y	rxn05338	(1) NADP[0] + (1) (R)-3-Hydroxydecanoyl-[acyl-carrier protein][0] <= (1) NADPH[0] + (1) H+[0] + (1) 3-oxodecanoyl-acp[0]
 r822	r822	C10HACP(cpd11482)[0] => H2O(cpd00001)[0] C10DACP(cpd11475)[0]	N	N	Y	Y	rxn05333	(1) (R)-3-Hydroxydecanoyl-[acyl-carrier protein][0] <=> (1) H2O[0] + (1) (2E)-Decenoyl-[acp][0]
 r823	r823	NADH(cpd00004)[0] C10DACP(cpd11475)[0] => NAD(cpd00003)[0] C100ACP(cpd11474)[0]	N	N	Y	Y	rxn05327	(1) NAD[0] + (1) Decanoyl-ACP[0] <= (1) NADH[0] + (1) H+[0] + (1) (2E)-Decenoyl-[acp][0]
-r824	r824	(2) NADPH(cpd00005)[0] MALCOA(cpd00070)[0] C80COA(cpd01335)[0] => CO2(cpd00011)[0] (2) NADP(cpd00006)[0] COA(cpd00010)[0] C100COA(cpd03128)[0]	N	N	N	Y	frxn00211	
-r825	r825	(2) NADPH(cpd00005)[0] MALCOA(cpd00070)[0] C80COA(cpd01335)[0] => COA(cpd00010)[0] CO2(cpd00011)[0] (2) NADP(cpd00006)[0] C100COA(cpd03128)[0]	N	N	N	Y	frxn00211	(2) NADPH[0] + (1) Malonyl-CoA[0] + (1) Octanoyl-CoA[0] <=> (2) NADP[0] + (1) CoA[0] + (1) CO2[0] + (1) Decanoyl-CoA[0]
+r824	r824	(2) NADPH(cpd00005)[0] MALCOA(cpd00070)[0] C80COA(cpd01335)[0] => CO2(cpd00011)[0] (2) NADP(cpd00006)[0] COA(cpd00010)[0] C100COA(cpd03128)[0]	N	N	N	Y	frxn00204	
+r825	r825	(2) NADPH(cpd00005)[0] MALCOA(cpd00070)[0] C80COA(cpd01335)[0] => COA(cpd00010)[0] CO2(cpd00011)[0] (2) NADP(cpd00006)[0] C100COA(cpd03128)[0]	N	N	N	Y	frxn00204	(2) NADPH[0] + (1) Malonyl-CoA[0] + (1) Octanoyl-CoA[0] <=> (2) NADP[0] + (1) CoA[0] + (1) CO2[0] + (1) Decanoyl-CoA[0]
 r826	r826	MALACP(cpd11492)[0] C100ACP(cpd11474)[0] => CO2(cpd00011)[0] ACP(cpd11493)[0] C12OACP(cpd11489)[0]	N	N	Y	Y	rxn05348	(1) H+[0] + (1) Decanoyl-ACP[0] + (1) Malonyl-acyl-carrierprotein-[0] => (1) CO2[0] + (1) 3-oxododecanoyl-acp[0] + (1) ACP[0]
-r827	r827	NADPH(cpd00005)[0] C12OACP(cpd11489)[0] => NADP(cpd00006)[0] C12HACP[0]	N	N	N	N	frxn00212	
-r828	r828	NADPH(cpd00005)[0] C12OACP(cpd11489)[0] => NADP(cpd00006)[0] C12HACP[0]	N	N	N	N	frxn00212	(1) NADPH[0] + (1) 3-oxododecanoyl-acp[0] <=> (1) NADP[0] + (1) 3-hydroxydodecanoyl-[acyl-carrier protein][0]
-r829	r829	C12HACP[0] => H2O(cpd00001)[0] C12DACP[0]	N	N	N	N	frxn00213	
+r827	r827	NADPH(cpd00005)[0] C12OACP(cpd11489)[0] => NADP(cpd00006)[0] C12HACP[0]	N	N	N	N	frxn00205	
+r828	r828	NADPH(cpd00005)[0] C12OACP(cpd11489)[0] => NADP(cpd00006)[0] C12HACP[0]	N	N	N	N	frxn00205	(1) NADPH[0] + (1) 3-oxododecanoyl-acp[0] <=> (1) NADP[0] + (1) 3-hydroxydodecanoyl-[acyl-carrier protein][0]
+r829	r829	C12HACP[0] => H2O(cpd00001)[0] C12DACP[0]	N	N	N	N	frxn00206	
 r83	r83	NAD(cpd00003)[0] METHOL(cpd00116)[0] => NADH(cpd00004)[0] FALD(cpd00055)[0]	N	N	Y	Y	rxn00430	(1) NAD[0] + (1) Methanol[0] <=> (1) NADH[0] + (1) Formaldehyde[0] + (1) H+[0]
-r830	r830	NADH(cpd00004)[0] C12DACP[0] => NAD(cpd00003)[0] C120ACP(cpd11468)[0]	N	N	N	N	frxn00214	
-r831	r831	(2) NADPH(cpd00005)[0] MALCOA(cpd00070)[0] C100COA(cpd03128)[0] => CO2(cpd00011)[0] (2) NADP(cpd00006)[0] COA(cpd00010)[0] C120COA(cpd01260)[0]	N	N	N	Y	frxn00215	
-r832	r832	(2) NADPH(cpd00005)[0] MALCOA(cpd00070)[0] C100COA(cpd03128)[0] => COA(cpd00010)[0] CO2(cpd00011)[0] (2) NADP(cpd00006)[0] C120COA(cpd01260)[0]	N	N	N	Y	frxn00215	(2) NADPH[0] + (1) Malonyl-CoA[0] + (1) Decanoyl-CoA[0] <=> (2) NADP[0] + (1) CoA[0] + (1) CO2[0] + (1) Lauroyl-CoA[0]
+r830	r830	NADH(cpd00004)[0] C12DACP[0] => NAD(cpd00003)[0] C120ACP(cpd11468)[0]	N	N	N	N	frxn00207	
+r831	r831	(2) NADPH(cpd00005)[0] MALCOA(cpd00070)[0] C100COA(cpd03128)[0] => CO2(cpd00011)[0] (2) NADP(cpd00006)[0] COA(cpd00010)[0] C120COA(cpd01260)[0]	N	N	N	Y	frxn00208	
+r832	r832	(2) NADPH(cpd00005)[0] MALCOA(cpd00070)[0] C100COA(cpd03128)[0] => COA(cpd00010)[0] CO2(cpd00011)[0] (2) NADP(cpd00006)[0] C120COA(cpd01260)[0]	N	N	N	Y	frxn00208	(2) NADPH[0] + (1) Malonyl-CoA[0] + (1) Decanoyl-CoA[0] <=> (2) NADP[0] + (1) CoA[0] + (1) CO2[0] + (1) Lauroyl-CoA[0]
 r833	r833	MALACP(cpd11492)[0] C120ACP(cpd11468)[0] => CO2(cpd00011)[0] ACP(cpd11493)[0] C14OACP(cpd11491)[0]	N	N	Y	Y	rxn05345	(1) H+[0] + (1) Dodecanoyl-ACP[0] + (1) Malonyl-acyl-carrierprotein-[0] => (1) CO2[0] + (1) 3-oxotetradecanoyl-acp[0] + (1) ACP[0]
-r834	r834	NADPH(cpd00005)[0] C14OACP(cpd11491)[0] => NADP(cpd00006)[0] C14HACP[0]	N	N	N	N	frxn00216	
-r835	r835	NADPH(cpd00005)[0] C14OACP(cpd11491)[0] => NADP(cpd00006)[0] C14HACP[0]	N	N	N	N	frxn00216	(1) NADPH[0] + (1) 3-oxotetradecanoyl-acp[0] <=> (1) NADP[0] + (1) 3-hydroxytetradecanoyl-[acyl-carrier protein][0]
-r836	r836	C14HACP[0] => H2O(cpd00001)[0] C14DACP[0]	N	N	N	N	frxn00217	
-r837	r837	NADH(cpd00004)[0] C14DACP[0] => NAD(cpd00003)[0] C140ACP(cpd11466)[0]	N	N	N	N	frxn00218	
+r834	r834	NADPH(cpd00005)[0] C14OACP(cpd11491)[0] => NADP(cpd00006)[0] C14HACP[0]	N	N	N	N	frxn00209	
+r835	r835	NADPH(cpd00005)[0] C14OACP(cpd11491)[0] => NADP(cpd00006)[0] C14HACP[0]	N	N	N	N	frxn00209	(1) NADPH[0] + (1) 3-oxotetradecanoyl-acp[0] <=> (1) NADP[0] + (1) 3-hydroxytetradecanoyl-[acyl-carrier protein][0]
+r836	r836	C14HACP[0] => H2O(cpd00001)[0] C14DACP[0]	N	N	N	N	frxn00210	
+r837	r837	NADH(cpd00004)[0] C14DACP[0] => NAD(cpd00003)[0] C140ACP(cpd11466)[0]	N	N	N	N	frxn00211	
 r838	r838	H2O(cpd00001)[0] C140ACP(cpd11466)[0] => ACP(cpd11493)[0] C140(cpd03847)[0]	N	N	Y	Y	rxn08434	(1) H2O[0] + (1) Myristoyl-ACP[0] => (1) H+[0] + (1) Myristic acid[0] + (1) ACP[0]
-r839	r839	(2) NADPH(cpd00005)[0] MALCOA(cpd00070)[0] C120COA(cpd01260)[0] => CO2(cpd00011)[0] (2) NADP(cpd00006)[0] COA(cpd00010)[0] C140COA(cpd01695)[0]	N	N	N	Y	frxn00219	
+r839	r839	(2) NADPH(cpd00005)[0] MALCOA(cpd00070)[0] C120COA(cpd01260)[0] => CO2(cpd00011)[0] (2) NADP(cpd00006)[0] COA(cpd00010)[0] C140COA(cpd01695)[0]	N	N	N	Y	frxn00212	
 r84	r84	NAD(cpd00003)[0] METHOL(cpd00116)[0] => NADH(cpd00004)[0] FALD(cpd00055)[0]	N	N	Y	Y	rxn00430	(1) NAD[0] + (1) Methanol[0] <=> (1) NADH[0] + (1) Formaldehyde[0] + (1) H+[0]
-r840	r840	(2) NADPH(cpd00005)[0] MALCOA(cpd00070)[0] C120COA(cpd01260)[0] => COA(cpd00010)[0] CO2(cpd00011)[0] (2) NADP(cpd00006)[0] C140COA(cpd01695)[0]	N	N	N	Y	frxn00219	(2) NADPH[0] + (1) Malonyl-CoA[0] + (1) Lauroyl-CoA[0] <=> (2) NADP[0] + (1) CoA[0] + (1) CO2[0] + (1) Myristoyl-CoA[0]
+r840	r840	(2) NADPH(cpd00005)[0] MALCOA(cpd00070)[0] C120COA(cpd01260)[0] => COA(cpd00010)[0] CO2(cpd00011)[0] (2) NADP(cpd00006)[0] C140COA(cpd01695)[0]	N	N	N	Y	frxn00212	(2) NADPH[0] + (1) Malonyl-CoA[0] + (1) Lauroyl-CoA[0] <=> (2) NADP[0] + (1) CoA[0] + (1) CO2[0] + (1) Myristoyl-CoA[0]
 r841	r841	MALACP(cpd11492)[0] C140ACP(cpd11466)[0] => CO2(cpd00011)[0] ACP(cpd11493)[0] C16OACP(cpd11485)[0]	N	N	Y	Y	rxn05344	(1) H+[0] + (1) Myristoyl-ACP[0] + (1) Malonyl-acyl-carrierprotein-[0] => (1) CO2[0] + (1) 3-oxohexadecanoyl-acp[0] + (1) ACP[0]
-r842	r842	NADPH(cpd00005)[0] C16OACP(cpd11485)[0] => NADP(cpd00006)[0] C16HACP[0]	N	N	N	N	frxn00220	
-r843	r843	NADPH(cpd00005)[0] C16OACP(cpd11485)[0] => NADP(cpd00006)[0] C16HACP[0]	N	N	N	N	frxn00220	(1) NADPH[0] + (1) 3-oxohexadecanoyl-acp[0] <=> (1) NADP[0] + (1) 3-hydroxyhexadecanoyl-[acyl-carrier protein][0]
-r844	r844	C16HACP[0] => H2O(cpd00001)[0] C16DACP[0]	N	N	N	N	frxn00221	
-r845	r845	NADH(cpd00004)[0] C16DACP[0] => NAD(cpd00003)[0] C160ACP(cpd11476)[0]	N	N	N	N	frxn00222	
+r842	r842	NADPH(cpd00005)[0] C16OACP(cpd11485)[0] => NADP(cpd00006)[0] C16HACP[0]	N	N	N	N	frxn00213	
+r843	r843	NADPH(cpd00005)[0] C16OACP(cpd11485)[0] => NADP(cpd00006)[0] C16HACP[0]	N	N	N	N	frxn00213	(1) NADPH[0] + (1) 3-oxohexadecanoyl-acp[0] <=> (1) NADP[0] + (1) 3-hydroxyhexadecanoyl-[acyl-carrier protein][0]
+r844	r844	C16HACP[0] => H2O(cpd00001)[0] C16DACP[0]	N	N	N	N	frxn00214	
+r845	r845	NADH(cpd00004)[0] C16DACP[0] => NAD(cpd00003)[0] C160ACP(cpd11476)[0]	N	N	N	N	frxn00215	
 r846	r846	H2O(cpd00001)[0] C160ACP(cpd11476)[0] => C160(cpd00214)[0] ACP(cpd11493)[0]	N	N	Y	Y	rxn06033	(1) H2O[0] + (1) hexadecanoyl-acp[0] => (1) H+[0] + (1) Palmitate[0] + (1) ACP[0]
 r847	r847	ATP(cpd00002)[0] COA(cpd00010)[0] C160(cpd00214)[0] => AMP(cpd00018)[0] PPI(cpd00012)[0] C160COA(cpd00134)[0]	N	N	Y	Y	rxn00947	(1) ATP[0] + (1) CoA[0] + (1) Palmitate[0] => (1) PPi[0] + (1) AMP[0] + (1) H+[0] + (1) Palmitoyl-CoA[0]
 r848	r848	COA(cpd00010)[0] ATP(cpd00002)[0] C160(cpd00214)[0] => PPI(cpd00012)[0] AMP(cpd00018)[0] C160COA(cpd00134)[0]	N	N	Y	Y	rxn00947	(1) ATP[0] + (1) CoA[0] + (1) Palmitate[0] => (1) PPi[0] + (1) AMP[0] + (1) H+[0] + (1) Palmitoyl-CoA[0]
 r849	r849	ATP(cpd00002)[0] COA(cpd00010)[0] C160(cpd00214)[0] => AMP(cpd00018)[0] PPI(cpd00012)[0] C160COA(cpd00134)[0]	N	N	Y	Y	rxn00947	(1) ATP[0] + (1) CoA[0] + (1) Palmitate[0] => (1) PPi[0] + (1) AMP[0] + (1) H+[0] + (1) Palmitoyl-CoA[0]
 r85	r85	ATP(cpd00002)[0] PYR(cpd00020)[0] HCO3(cpd00242)[0] => ADP(cpd00008)[0] PI(cpd00009)[0] OA(cpd00032)[0]	N	N	Y	Y	rxn00250	(1) ATP[0] + (1) Pyruvate[0] + (1) H2CO3[0] <=> (1) ADP[0] + (1) Phosphate[0] + (1) Oxaloacetate[0] + (1) H+[0]
-r850	r850	(2) NADPH(cpd00005)[0] MALCOA(cpd00070)[0] C140COA(cpd01695)[0] => CO2(cpd00011)[0] (2) NADP(cpd00006)[0] COA(cpd00010)[0] C160COA(cpd00134)[0]	N	N	N	Y	frxn00223	
-r851	r851	(2) NADPH(cpd00005)[0] MALCOA(cpd00070)[0] C140COA(cpd01695)[0] => COA(cpd00010)[0] CO2(cpd00011)[0] (2) NADP(cpd00006)[0] C160COA(cpd00134)[0]	N	N	N	Y	frxn00223	(2) NADPH[0] + (1) Malonyl-CoA[0] + (1) Myristoyl-CoA[0] <=> (2) NADP[0] + (1) CoA[0] + (1) CO2[0] + (1) Palmitoyl-CoA[0]
+r850	r850	(2) NADPH(cpd00005)[0] MALCOA(cpd00070)[0] C140COA(cpd01695)[0] => CO2(cpd00011)[0] (2) NADP(cpd00006)[0] COA(cpd00010)[0] C160COA(cpd00134)[0]	N	N	N	Y	frxn00216	
+r851	r851	(2) NADPH(cpd00005)[0] MALCOA(cpd00070)[0] C140COA(cpd01695)[0] => COA(cpd00010)[0] CO2(cpd00011)[0] (2) NADP(cpd00006)[0] C160COA(cpd00134)[0]	N	N	N	Y	frxn00216	(2) NADPH[0] + (1) Malonyl-CoA[0] + (1) Myristoyl-CoA[0] <=> (2) NADP[0] + (1) CoA[0] + (1) CO2[0] + (1) Palmitoyl-CoA[0]
 r852	r852	MALACP(cpd11492)[0] C160ACP(cpd11476)[0] => CO2(cpd00011)[0] ACP(cpd11493)[0] C18OACP(cpd14938)[0]	N	N	Y	Y	rxn07576	(1) H+[0] + (1) hexadecanoyl-acp[0] + (1) Malonyl-acyl-carrierprotein-[0] => (1) CO2[0] + (1) ACP[0] + (1) 3-Oxostearoyl-[acp][0]
-r853	r853	NADPH(cpd00005)[0] C18OACP(cpd14938)[0] => NADP(cpd00006)[0] C18HACP[0]	N	N	N	N	frxn00224	
-r854	r854	NADPH(cpd00005)[0] C18OACP(cpd14938)[0] => NADP(cpd00006)[0] C18HACP[0]	N	N	N	N	frxn00224	(1) NADPH[0] + (1) 3-Oxostearoyl-[acp][0] <=> (1) NADP[0] + (1) 3-hydroxyoctadecanoyl-[acyl-carrier protein][0]
-r855	r855	C18HACP[0] => H2O(cpd00001)[0] C18DACP(cpd14940)[0]	N	N	N	N	frxn00225	
+r853	r853	NADPH(cpd00005)[0] C18OACP(cpd14938)[0] => NADP(cpd00006)[0] C18HACP[0]	N	N	N	N	frxn00217	
+r854	r854	NADPH(cpd00005)[0] C18OACP(cpd14938)[0] => NADP(cpd00006)[0] C18HACP[0]	N	N	N	N	frxn00217	(1) NADPH[0] + (1) 3-Oxostearoyl-[acp][0] <=> (1) NADP[0] + (1) 3-hydroxyoctadecanoyl-[acyl-carrier protein][0]
+r855	r855	C18HACP[0] => H2O(cpd00001)[0] C18DACP(cpd14940)[0]	N	N	N	N	frxn00218	
 r856	r856	NADH(cpd00004)[0] C18DACP(cpd14940)[0] => NAD(cpd00003)[0] C180ACP(cpd12458)[0]	N	N	Y	Y	rxn07579	(1) NADH[0] + (1) H+[0] + (1) (2E)-Octadecenoyl-[acp][0] => (1) NAD[0] + (1) Stearoyl-[acyl-carrier protein][0]
 r857	r857	H2O(cpd00001)[0] C180ACP(cpd12458)[0] => C180(cpd01080)[0] ACP(cpd11493)[0]	N	N	Y	Y	rxn11700	(1) H2O[0] + (1) Stearoyl-[acyl-carrier protein][0] <=> (1) H+[0] + (1) ocdca[0] + (1) ACP[0]
-r858	r858	(2) NADPH(cpd00005)[0] MALCOA(cpd00070)[0] C160COA(cpd00134)[0] => CO2(cpd00011)[0] (2) NADP(cpd00006)[0] COA(cpd00010)[0] C180COA(cpd00327)[0]	N	N	N	Y	frxn00226	
-r859	r859	(2) NADPH(cpd00005)[0] C160COA(cpd00134)[0] MALCOA(cpd00070)[0] => COA(cpd00010)[0] CO2(cpd00011)[0] (2) NADP(cpd00006)[0] C180COA(cpd00327)[0]	N	N	N	Y	frxn00226	(2) NADPH[0] + (1) Malonyl-CoA[0] + (1) Palmitoyl-CoA[0] <=> (2) NADP[0] + (1) CoA[0] + (1) CO2[0] + (1) strcoa[0]
+r858	r858	(2) NADPH(cpd00005)[0] MALCOA(cpd00070)[0] C160COA(cpd00134)[0] => CO2(cpd00011)[0] (2) NADP(cpd00006)[0] COA(cpd00010)[0] C180COA(cpd00327)[0]	N	N	N	Y	frxn00219	
+r859	r859	(2) NADPH(cpd00005)[0] C160COA(cpd00134)[0] MALCOA(cpd00070)[0] => COA(cpd00010)[0] CO2(cpd00011)[0] (2) NADP(cpd00006)[0] C180COA(cpd00327)[0]	N	N	N	Y	frxn00219	(2) NADPH[0] + (1) Malonyl-CoA[0] + (1) Palmitoyl-CoA[0] <=> (2) NADP[0] + (1) CoA[0] + (1) CO2[0] + (1) strcoa[0]
 r86	r86	NADP(cpd00006)[0] MAL(cpd00130)[0] => PYR(cpd00020)[0] CO2(cpd00011)[0] NADPH(cpd00005)[0]	N	N	Y	Y	rxn00161	(1) NADP[0] + (1) L-Malate[0] => (1) NADPH[0] + (1) CO2[0] + (1) Pyruvate[0]
-r860	r860	NADH(cpd00004)[0] O2(cpd00007)[0] C160COA(cpd00134)[0] => NAD(cpd00003)[0] (2) H2O(cpd00001)[0] C161COA(cpd15238)[0]	N	N	N	Y	frxn00227	
-r861	r861	O2(cpd00007)[0] NADH(cpd00004)[0] C160COA(cpd00134)[0] => (2) H2O(cpd00001)[0] NAD(cpd00003)[0] C161COA(cpd15238)[0]	N	N	N	Y	frxn00227	(1) NADH[0] + (1) O2[0] + (1) Palmitoyl-CoA[0] <=> (2) H2O[0] + (1) NAD[0] + (1) Hexadecenoyl-CoA[0]
-r862	r862	NADH(cpd00004)[0] O2(cpd00007)[0] C180COA(cpd00327)[0] => NAD(cpd00003)[0] (2) H2O(cpd00001)[0] C181COA(cpd00399)[0]	N	N	N	Y	frxn00228	
-r863	r863	O2(cpd00007)[0] NADH(cpd00004)[0] C180COA(cpd00327)[0] => (2) H2O(cpd00001)[0] NAD(cpd00003)[0] C181COA(cpd00399)[0]	N	N	N	Y	frxn00228	(1) NADH[0] + (1) O2[0] + (1) strcoa[0] <=> (2) H2O[0] + (1) NAD[0] + (1) Oleoyl-CoA[0]
-r864	r864	NADH(cpd00004)[0] O2(cpd00007)[0] C181COA(cpd00399)[0] => NAD(cpd00003)[0] (2) H2O(cpd00001)[0] C182COA(cpd01398)[0]	N	N	N	Y	frxn00229	
-r865	r865	O2(cpd00007)[0] NADH(cpd00004)[0] C181COA(cpd00399)[0] => (2) H2O(cpd00001)[0] NAD(cpd00003)[0] C182COA(cpd01398)[0]	N	N	N	Y	frxn00229	(1) NADH[0] + (1) O2[0] + (1) Oleoyl-CoA[0] <=> (2) H2O[0] + (1) NAD[0] + (1) Linoleoyl-CoA[0]
-r866	r866	NADH(cpd00004)[0] O2(cpd00007)[0] C182COA(cpd01398)[0] => NAD(cpd00003)[0] (2) H2O(cpd00001)[0] C183COA(cpd14883)[0]	N	N	N	Y	frxn00230	
-r867	r867	O2(cpd00007)[0] NADH(cpd00004)[0] C182COA(cpd01398)[0] => (2) H2O(cpd00001)[0] NAD(cpd00003)[0] C183COA(cpd14883)[0]	N	N	N	Y	frxn00230	(1) NADH[0] + (1) O2[0] + (1) Linoleoyl-CoA[0] <=> (2) H2O[0] + (1) NAD[0] + (1) alpha-Linolenoyl-CoA[0]
-r868	r868	ATP(cpd00002)[0] COA(cpd00010)[0] C161(cpd05274)[0] => AMP(cpd00018)[0] PPI(cpd00012)[0] C161COA(cpd15238)[0]	N	N	N	Y	frxn00231	
-r869	r869	COA(cpd00010)[0] ATP(cpd00002)[0] C161(cpd05274)[0] => PPI(cpd00012)[0] AMP(cpd00018)[0] C161COA(cpd15238)[0]	N	N	N	Y	frxn00231	(1) ATP[0] + (1) CoA[0] + (1) Palmitoleic acid[0] <=> (1) PPi[0] + (1) AMP[0] + (1) Hexadecenoyl-CoA[0]
+r860	r860	NADH(cpd00004)[0] O2(cpd00007)[0] C160COA(cpd00134)[0] => NAD(cpd00003)[0] (2) H2O(cpd00001)[0] C161COA(cpd15238)[0]	N	N	N	Y	frxn00220	
+r861	r861	O2(cpd00007)[0] NADH(cpd00004)[0] C160COA(cpd00134)[0] => (2) H2O(cpd00001)[0] NAD(cpd00003)[0] C161COA(cpd15238)[0]	N	N	N	Y	frxn00220	(1) NADH[0] + (1) O2[0] + (1) Palmitoyl-CoA[0] <=> (2) H2O[0] + (1) NAD[0] + (1) Hexadecenoyl-CoA[0]
+r862	r862	NADH(cpd00004)[0] O2(cpd00007)[0] C180COA(cpd00327)[0] => NAD(cpd00003)[0] (2) H2O(cpd00001)[0] C181COA(cpd00399)[0]	N	N	N	Y	frxn00221	
+r863	r863	O2(cpd00007)[0] NADH(cpd00004)[0] C180COA(cpd00327)[0] => (2) H2O(cpd00001)[0] NAD(cpd00003)[0] C181COA(cpd00399)[0]	N	N	N	Y	frxn00221	(1) NADH[0] + (1) O2[0] + (1) strcoa[0] <=> (2) H2O[0] + (1) NAD[0] + (1) Oleoyl-CoA[0]
+r864	r864	NADH(cpd00004)[0] O2(cpd00007)[0] C181COA(cpd00399)[0] => NAD(cpd00003)[0] (2) H2O(cpd00001)[0] C182COA(cpd01398)[0]	N	N	N	Y	frxn00222	
+r865	r865	O2(cpd00007)[0] NADH(cpd00004)[0] C181COA(cpd00399)[0] => (2) H2O(cpd00001)[0] NAD(cpd00003)[0] C182COA(cpd01398)[0]	N	N	N	Y	frxn00222	(1) NADH[0] + (1) O2[0] + (1) Oleoyl-CoA[0] <=> (2) H2O[0] + (1) NAD[0] + (1) Linoleoyl-CoA[0]
+r866	r866	NADH(cpd00004)[0] O2(cpd00007)[0] C182COA(cpd01398)[0] => NAD(cpd00003)[0] (2) H2O(cpd00001)[0] C183COA(cpd14883)[0]	N	N	N	Y	frxn00223	
+r867	r867	O2(cpd00007)[0] NADH(cpd00004)[0] C182COA(cpd01398)[0] => (2) H2O(cpd00001)[0] NAD(cpd00003)[0] C183COA(cpd14883)[0]	N	N	N	Y	frxn00223	(1) NADH[0] + (1) O2[0] + (1) Linoleoyl-CoA[0] <=> (2) H2O[0] + (1) NAD[0] + (1) alpha-Linolenoyl-CoA[0]
+r868	r868	ATP(cpd00002)[0] COA(cpd00010)[0] C161(cpd05274)[0] => AMP(cpd00018)[0] PPI(cpd00012)[0] C161COA(cpd15238)[0]	N	N	N	Y	frxn00224	
+r869	r869	COA(cpd00010)[0] ATP(cpd00002)[0] C161(cpd05274)[0] => PPI(cpd00012)[0] AMP(cpd00018)[0] C161COA(cpd15238)[0]	N	N	N	Y	frxn00224	(1) ATP[0] + (1) CoA[0] + (1) Palmitoleic acid[0] <=> (1) PPi[0] + (1) AMP[0] + (1) Hexadecenoyl-CoA[0]
 r87	r87	MAL(cpd00130)[0] NADP(cpd00006)[0] => PYR(cpd00020)[0] CO2(cpd00011)[0] NADPH(cpd00005)[0]	N	N	Y	Y	rxn00161	(1) NADP[0] + (1) L-Malate[0] => (1) NADPH[0] + (1) CO2[0] + (1) Pyruvate[0]
-r870	r870	ATP(cpd00002)[0] COA(cpd00010)[0] C161(cpd05274)[0] => AMP(cpd00018)[0] PPI(cpd00012)[0] C161COA(cpd15238)[0]	N	N	N	Y	frxn00231	(1) ATP[0] + (1) CoA[0] + (1) Palmitoleic acid[0] <=> (1) PPi[0] + (1) AMP[0] + (1) Hexadecenoyl-CoA[0]
+r870	r870	ATP(cpd00002)[0] COA(cpd00010)[0] C161(cpd05274)[0] => AMP(cpd00018)[0] PPI(cpd00012)[0] C161COA(cpd15238)[0]	N	N	N	Y	frxn00224	(1) ATP[0] + (1) CoA[0] + (1) Palmitoleic acid[0] <=> (1) PPi[0] + (1) AMP[0] + (1) Hexadecenoyl-CoA[0]
 r871	r871	ATP(cpd00002)[0] COA(cpd00010)[0] C181(cpd00536)[0] => AMP(cpd00018)[0] PPI(cpd00012)[0] C181COA(cpd00399)[0]	N	N	Y	Y	rxn32436	(1) ATP[0] + (1) CoA[0] + (1) Oleate[0] => (1) PPi[0] + (1) AMP[0] + (1) H+[0] + (1) Oleoyl-CoA[0]
 r872	r872	COA(cpd00010)[0] ATP(cpd00002)[0] C181(cpd00536)[0] => PPI(cpd00012)[0] AMP(cpd00018)[0] C181COA(cpd00399)[0]	N	N	Y	Y	rxn32436	(1) ATP[0] + (1) CoA[0] + (1) Oleate[0] => (1) PPi[0] + (1) AMP[0] + (1) H+[0] + (1) Oleoyl-CoA[0]
 r873	r873	ATP(cpd00002)[0] COA(cpd00010)[0] C181(cpd00536)[0] => AMP(cpd00018)[0] PPI(cpd00012)[0] C181COA(cpd00399)[0]	N	N	Y	Y	rxn32436	(1) ATP[0] + (1) CoA[0] + (1) Oleate[0] => (1) PPi[0] + (1) AMP[0] + (1) H+[0] + (1) Oleoyl-CoA[0]
@@ -1151,63 +1151,63 @@ r877	r877	ATP(cpd00002)[0] COA(cpd00010)[0] C183(cpd03850)[0] => AMP(cpd00018)[0
 r878	r878	COA(cpd00010)[0] ATP(cpd00002)[0] C183(cpd03850)[0] => PPI(cpd00012)[0] AMP(cpd00018)[0] C183COA(cpd14883)[0]	N	N	Y	Y	rxn20045	(1) PPi[0] + (1) AMP[0] + (1) H+[0] + (1) alpha-Linolenoyl-CoA[0] <= (1) ATP[0] + (1) CoA[0] + (1) Linolenate[0]
 r879	r879	ATP(cpd00002)[0] COA(cpd00010)[0] C183(cpd03850)[0] => AMP(cpd00018)[0] PPI(cpd00012)[0] C183COA(cpd14883)[0]	N	N	Y	Y	rxn20045	(1) PPi[0] + (1) AMP[0] + (1) H+[0] + (1) alpha-Linolenoyl-CoA[0] <= (1) ATP[0] + (1) CoA[0] + (1) Linolenate[0]
 r88	r88	NAD(cpd00003)[0] LLAC(cpd00159)[0] => NADH(cpd00004)[0] PYR(cpd00020)[0]	N	N	Y	Y	rxn00499	(1) NAD[0] + (1) L-Lactate[0] <=> (1) NADH[0] + (1) Pyruvate[0] + (1) H+[0]
-r880	r880	(0.272) C160COA(cpd00134)[0] (0.1534) C181COA(cpd00399)[0] (0.6673) C182COA(cpd01398)[0] (0.0404) C183COA(cpd14883)[0] (0.0304) C180COA(cpd00327)[0] (0.0051) C161COA(cpd15238)[0] => COA(cpd00010)[0] FFA[0]	N	N	N	N	frxn00232	
-r881	r881	ACCOA(cpd00022)[0] C40COA(cpd00120)[0] => COA(cpd00010)[0] C60COA(cpd03124)[0]	N	N	N	Y	frxn00233	
-r882	r882	NADH(cpd00004)[0] C60COA(cpd03124)[0] => NAD(cpd00003)[0] C6HCOA(cpd03122)[0]	N	N	N	Y	frxn00234	
+r880	r880	(0.272) C160COA(cpd00134)[0] (0.1534) C181COA(cpd00399)[0] (0.6673) C182COA(cpd01398)[0] (0.0404) C183COA(cpd14883)[0] (0.0304) C180COA(cpd00327)[0] (0.0051) C161COA(cpd15238)[0] => COA(cpd00010)[0] FFA[0]	N	N	N	N	frxn00225	
+r881	r881	ACCOA(cpd00022)[0] C40COA(cpd00120)[0] => COA(cpd00010)[0] C60COA(cpd03124)[0]	N	N	N	Y	frxn00226	
+r882	r882	NADH(cpd00004)[0] C60COA(cpd03124)[0] => NAD(cpd00003)[0] C6HCOA(cpd03122)[0]	N	N	N	Y	frxn00227	
 r883	r883	C6HCOA(cpd03122)[0] => C6DCOA(cpd03125)[0]	N	W	Y	Y	rxn03250	(1) (S)-Hydroxyhexanoyl-CoA[0] <=> (1) H2O[0] + (1) (2E)-Hexenoyl-CoA[0]
 r884	r884	C6HCOA(cpd03122)[0] => C6DCOA(cpd03125)[0]	N	W	Y	Y	rxn03250	(1) (S)-Hydroxyhexanoyl-CoA[0] <=> (1) H2O[0] + (1) (2E)-Hexenoyl-CoA[0]
 r885	r885	C6HCOA(cpd03122)[0] => C6DCOA(cpd03125)[0]	N	W	Y	Y	rxn03250	(1) (S)-Hydroxyhexanoyl-CoA[0] <=> (1) H2O[0] + (1) (2E)-Hexenoyl-CoA[0]
-r886	r886	NADP(cpd00006)[0] C6DCOA(cpd03125)[0] => NADPH(cpd00005)[0] UNDEF[1]	Y	N	N	N	frxn00235	
-r887	r887	ACCOA(cpd00022)[0] C60COA(cpd03124)[0] => COA(cpd00010)[0] C80COA(cpd01335)[0]	N	N	N	Y	frxn00236	
-r888	r888	NADH(cpd00004)[0] C80COA(cpd01335)[0] => NAD(cpd00003)[0] C8HCOA(cpd03120)[0]	N	N	N	Y	frxn00237	
+r886	r886	NADP(cpd00006)[0] C6DCOA(cpd03125)[0] => NADPH(cpd00005)[0] UNDEF[1]	Y	N	N	N	frxn00228	
+r887	r887	ACCOA(cpd00022)[0] C60COA(cpd03124)[0] => COA(cpd00010)[0] C80COA(cpd01335)[0]	N	N	N	Y	frxn00229	
+r888	r888	NADH(cpd00004)[0] C80COA(cpd01335)[0] => NAD(cpd00003)[0] C8HCOA(cpd03120)[0]	N	N	N	Y	frxn00230	
 r889	r889	C8HCOA(cpd03120)[0] => C8DCOA(cpd03130)[0]	N	W	Y	Y	rxn03247	(1) (S)-Hydroxyoctanoyl-CoA[0] <=> (1) H2O[0] + (1) (2E)-Octenoyl-CoA[0]
 r89	r89	LLAC(cpd00159)[0] (2) FERI(cpd00109)[0] => PYR(cpd00020)[0] (2) FERO(cpd00110)[0]	N	N	Y	Y	rxn00145	(2) Cytochrome c3+[0] + (1) L-Lactate[0] <=> (1) Pyruvate[0] + (2) H+[0] + (2) Cytochrome c2+[0]
 r890	r890	C8HCOA(cpd03120)[0] => C8DCOA(cpd03130)[0]	N	W	Y	Y	rxn03247	(1) (S)-Hydroxyoctanoyl-CoA[0] <=> (1) H2O[0] + (1) (2E)-Octenoyl-CoA[0]
 r891	r891	C8HCOA(cpd03120)[0] => C8DCOA(cpd03130)[0]	N	W	Y	Y	rxn03247	(1) (S)-Hydroxyoctanoyl-CoA[0] <=> (1) H2O[0] + (1) (2E)-Octenoyl-CoA[0]
-r892	r892	NADP(cpd00006)[0] C8DCOA(cpd03130)[0] => NADPH(cpd00005)[0] UNDEF[1]	Y	N	N	N	frxn00238	
-r893	r893	ACCOA(cpd00022)[0] C80COA(cpd01335)[0] => COA(cpd00010)[0] C100COA(cpd03128)[0]	N	N	N	Y	frxn00239	
-r894	r894	NADH(cpd00004)[0] C100COA(cpd03128)[0] => NAD(cpd00003)[0] C10HCOA(cpd03118)[0]	N	N	N	Y	frxn00240	
+r892	r892	NADP(cpd00006)[0] C8DCOA(cpd03130)[0] => NADPH(cpd00005)[0] UNDEF[1]	Y	N	N	N	frxn00231	
+r893	r893	ACCOA(cpd00022)[0] C80COA(cpd01335)[0] => COA(cpd00010)[0] C100COA(cpd03128)[0]	N	N	N	Y	frxn00232	
+r894	r894	NADH(cpd00004)[0] C100COA(cpd03128)[0] => NAD(cpd00003)[0] C10HCOA(cpd03118)[0]	N	N	N	Y	frxn00233	
 r895	r895	C10HCOA(cpd03118)[0] => C10DCOA(cpd03129)[0]	N	W	Y	Y	rxn03245	(1) (S)-Hydroxydecanoyl-CoA[0] <=> (1) H2O[0] + (1) (2E)-Decenoyl-CoA[0]
 r896	r896	C10HCOA(cpd03118)[0] => C10DCOA(cpd03129)[0]	N	W	Y	Y	rxn03245	(1) (S)-Hydroxydecanoyl-CoA[0] <=> (1) H2O[0] + (1) (2E)-Decenoyl-CoA[0]
 r897	r897	C10HCOA(cpd03118)[0] => C10DCOA(cpd03129)[0]	N	W	Y	Y	rxn03245	(1) (S)-Hydroxydecanoyl-CoA[0] <=> (1) H2O[0] + (1) (2E)-Decenoyl-CoA[0]
-r898	r898	NADP(cpd00006)[0] C10DCOA(cpd03129)[0] => NADPH(cpd00005)[0] UNDEF[1]	Y	N	N	N	frxn00241	
-r899	r899	ACCOA(cpd00022)[0] C100COA(cpd03128)[0] => COA(cpd00010)[0] C120COA(cpd01260)[0]	N	N	N	Y	frxn00242	
+r898	r898	NADP(cpd00006)[0] C10DCOA(cpd03129)[0] => NADPH(cpd00005)[0] UNDEF[1]	Y	N	N	N	frxn00234	
+r899	r899	ACCOA(cpd00022)[0] C100COA(cpd03128)[0] => COA(cpd00010)[0] C120COA(cpd01260)[0]	N	N	N	Y	frxn00235	
 r9	r9	G6P(cpd19006)[0] => F6P(cpd19035)[0]	N	N	Y	Y	rxn15364	(1) alpha-D-Glucose 6-phosphate[0] <=> (1) beta-D-Fructose 6-phosphate[0]
 r90	r90	(2) NAD(cpd00003)[0] H2O(cpd00001)[0] UDPG(cpd00026)[0] => (2) NADH(cpd00004)[0] UDPGE(cpd00144)[0]	N	N	Y	Y	rxn00211	(1) H2O[0] + (2) NAD[0] + (1) UDP-glucose[0] <=> (2) NADH[0] + (3) H+[0] + (1) UDPglucuronate[0]
-r900	r900	NADH(cpd00004)[0] C120COA(cpd01260)[0] => NAD(cpd00003)[0] C120HCOA(cpd16778)[0]	N	N	N	Y	frxn00243	
-r901	r901	C120HCOA(cpd16778)[0] => C120DCOA(cpd02060)[0]	N	N	N	Y	frxn00244	
-r902	r902	C120HCOA(cpd16778)[0] => C120DCOA(cpd02060)[0]	N	N	N	Y	frxn00244	(1) 3-hydroxylauroyl-CoA[0] <=> (1) (2E)-Dodecenoyl-CoA[0]
-r903	r903	C120HCOA(cpd16778)[0] => C120DCOA(cpd02060)[0]	N	N	N	Y	frxn00244	(1) 3-hydroxylauroyl-CoA[0] <=> (1) (2E)-Dodecenoyl-CoA[0]
-r904	r904	NADP(cpd00006)[0] C120DCOA(cpd02060)[0] => NADPH(cpd00005)[0] UNDEF[1]	Y	N	N	N	frxn00245	
-r905	r905	ACCOA(cpd00022)[0] C120COA(cpd01260)[0] => COA(cpd00010)[0] C140COA(cpd01695)[0]	N	N	N	Y	frxn00246	
-r906	r906	NADH(cpd00004)[0] C140COA(cpd01695)[0] => NAD(cpd00003)[0] C140HCOA[0]	N	N	N	N	frxn00247	
-r907	r907	C140HCOA[0] => C140DCOA(cpd03127)[0]	N	N	N	N	frxn00248	
-r908	r908	C140HCOA[0] => C140DCOA(cpd03127)[0]	N	N	N	N	frxn00248	(1) 3-hydroxymyristoyl-CoA[0] <=> (1) (2E)-Tetradecenoyl-CoA[0]
-r909	r909	C140HCOA[0] => C140DCOA(cpd03127)[0]	N	N	N	N	frxn00248	(1) 3-hydroxymyristoyl-CoA[0] <=> (1) (2E)-Tetradecenoyl-CoA[0]
-r91	r91	H2O(cpd00001)[0] UDPGE(cpd00144)[0] => UDP(cpd00014)[0] GLUCRE[0]	N	N	N	N	frxn00249	
-r910	r910	NADP(cpd00006)[0] C140DCOA(cpd03127)[0] => NADPH(cpd00005)[0] UNDEF[1]	Y	N	N	N	frxn00250	
-r911	r911	ACCOA(cpd00022)[0] C140COA(cpd01695)[0] => COA(cpd00010)[0] C160COA(cpd00134)[0]	N	N	N	Y	frxn00251	
-r912	r912	NADH(cpd00004)[0] C160COA(cpd00134)[0] => NAD(cpd00003)[0] C160HCOA[0]	N	N	N	N	frxn00252	
-r913	r913	C160HCOA[0] => C160DCOA(cpd03126)[0]	N	N	N	N	frxn00253	
-r914	r914	C160HCOA[0] => C160DCOA(cpd03126)[0]	N	N	N	N	frxn00253	(1) 3-hydroxypalmitoyl-CoA[0] <=> (1) (2E)-Hexadecenoyl-CoA[0]
-r915	r915	C160HCOA[0] => C160DCOA(cpd03126)[0]	N	N	N	N	frxn00253	(1) 3-hydroxypalmitoyl-CoA[0] <=> (1) (2E)-Hexadecenoyl-CoA[0]
-r916	r916	NADP(cpd00006)[0] C160DCOA(cpd03126)[0] => NADPH(cpd00005)[0] UNDEF[1]	Y	N	N	N	frxn00254	
+r900	r900	NADH(cpd00004)[0] C120COA(cpd01260)[0] => NAD(cpd00003)[0] C120HCOA(cpd16778)[0]	N	N	N	Y	frxn00236	
+r901	r901	C120HCOA(cpd16778)[0] => C120DCOA(cpd02060)[0]	N	N	N	Y	frxn00237	
+r902	r902	C120HCOA(cpd16778)[0] => C120DCOA(cpd02060)[0]	N	N	N	Y	frxn00237	(1) 3-hydroxylauroyl-CoA[0] <=> (1) (2E)-Dodecenoyl-CoA[0]
+r903	r903	C120HCOA(cpd16778)[0] => C120DCOA(cpd02060)[0]	N	N	N	Y	frxn00237	(1) 3-hydroxylauroyl-CoA[0] <=> (1) (2E)-Dodecenoyl-CoA[0]
+r904	r904	NADP(cpd00006)[0] C120DCOA(cpd02060)[0] => NADPH(cpd00005)[0] UNDEF[1]	Y	N	N	N	frxn00238	
+r905	r905	ACCOA(cpd00022)[0] C120COA(cpd01260)[0] => COA(cpd00010)[0] C140COA(cpd01695)[0]	N	N	N	Y	frxn00239	
+r906	r906	NADH(cpd00004)[0] C140COA(cpd01695)[0] => NAD(cpd00003)[0] C140HCOA[0]	N	N	N	N	frxn00240	
+r907	r907	C140HCOA[0] => C140DCOA(cpd03127)[0]	N	N	N	N	frxn00241	
+r908	r908	C140HCOA[0] => C140DCOA(cpd03127)[0]	N	N	N	N	frxn00241	(1) 3-hydroxymyristoyl-CoA[0] <=> (1) (2E)-Tetradecenoyl-CoA[0]
+r909	r909	C140HCOA[0] => C140DCOA(cpd03127)[0]	N	N	N	N	frxn00241	(1) 3-hydroxymyristoyl-CoA[0] <=> (1) (2E)-Tetradecenoyl-CoA[0]
+r91	r91	H2O(cpd00001)[0] UDPGE(cpd00144)[0] => UDP(cpd00014)[0] GLUCRE[0]	N	N	N	N	frxn00242	
+r910	r910	NADP(cpd00006)[0] C140DCOA(cpd03127)[0] => NADPH(cpd00005)[0] UNDEF[1]	Y	N	N	N	frxn00243	
+r911	r911	ACCOA(cpd00022)[0] C140COA(cpd01695)[0] => COA(cpd00010)[0] C160COA(cpd00134)[0]	N	N	N	Y	frxn00244	
+r912	r912	NADH(cpd00004)[0] C160COA(cpd00134)[0] => NAD(cpd00003)[0] C160HCOA[0]	N	N	N	N	frxn00245	
+r913	r913	C160HCOA[0] => C160DCOA(cpd03126)[0]	N	N	N	N	frxn00246	
+r914	r914	C160HCOA[0] => C160DCOA(cpd03126)[0]	N	N	N	N	frxn00246	(1) 3-hydroxypalmitoyl-CoA[0] <=> (1) (2E)-Hexadecenoyl-CoA[0]
+r915	r915	C160HCOA[0] => C160DCOA(cpd03126)[0]	N	N	N	N	frxn00246	(1) 3-hydroxypalmitoyl-CoA[0] <=> (1) (2E)-Hexadecenoyl-CoA[0]
+r916	r916	NADP(cpd00006)[0] C160DCOA(cpd03126)[0] => NADPH(cpd00005)[0] UNDEF[1]	Y	N	N	N	frxn00247	
 r917	r917	H2O(cpd00001)[0] C160COA(cpd00134)[0] => COA(cpd00010)[0] C160(cpd00214)[0]	N	N	Y	Y	rxn00943	(1) H2O[0] + (1) Palmitoyl-CoA[0] => (1) CoA[0] + (1) H+[0] + (1) Palmitate[0]
-r918	r918	MALCOA(cpd00070)[0] C160COA(cpd00134)[0] => CO2(cpd00011)[0] COA(cpd00010)[0] C180COA(cpd00327)[0]	N	N	N	Y	frxn00255	
-r919	r919	CAR(cpd19003)[0] C120COA(cpd01260)[0] => COA(cpd00010)[0] C120CAR[0]	N	N	N	N	frxn00256	
-r92	r92	H2O(cpd00001)[0] UDPGE(cpd00144)[0] => UDP(cpd00014)[0] GLUCRE[0]	N	N	N	N	frxn00249	(1) H2O[0] + (1) UDPglucuronate[0] <=> (1) UDP[0] + (1) beta-D-glucosiduronic acids[0]
-r920	r920	C120CAR[0] CAR(cpd19003)[1] => CAR(cpd19003)[0] C120CAR[1]	Y	N	N	N	frxn00257	
-r921	r921	COA(cpd00010)[0] C120CAR[0] => C120COA(cpd01260)[0] CAR(cpd19003)[0]	N	N	N	N	frxn00256	(1) Lauroyl-CoA[0] + (1) Carnitine[0] <=> (1) CoA[0] + (1) Dodecanoyl-carnitine[0]
-r922	r922	CAR(cpd19003)[0] C140COA(cpd01695)[0] => COA(cpd00010)[0] C140CAR[0]	N	N	N	N	frxn00258	
-r923	r923	CAR(cpd19003)[0] C140CAR[1] => CAR(cpd19003)[1] C140CAR[0]	Y	N	N	N	frxn00259	
-r924	r924	COA(cpd00010)[0] C140CAR[0] => C140COA(cpd01695)[0] CAR(cpd19003)[0]	N	N	N	N	frxn00258	(1) Myristoyl-CoA[0] + (1) Carnitine[0] <=> (1) CoA[0] + (1) Tetradecanoyl-carnitine[0]
-r925	r925	CAR(cpd19003)[0] C160COA(cpd00134)[0] => COA(cpd00010)[0] C160CAR(cpd01915)[0]	N	N	N	Y	frxn00260	
-r926	r926	CAR(cpd19003)[0] C160CAR(cpd01915)[1] => CAR(cpd19003)[1] C160CAR(cpd01915)[0]	Y	N	N	Y	frxn00261	
-r927	r927	COA(cpd00010)[0] C160CAR(cpd01915)[0] => C160COA(cpd00134)[0] CAR(cpd19003)[0]	N	N	N	Y	frxn00260	(1) Palmitoyl-CoA[0] + (1) Carnitine[0] <=> (1) CoA[0] + (1) L-Palmitoylcarnitine[0]
-r928	r928	CAR(cpd19003)[0] C180COA(cpd00327)[0] => COA(cpd00010)[0] C180CAR[0]	N	N	N	N	frxn00262	
-r929	r929	CAR(cpd19003)[0] C180CAR[1] => CAR(cpd19003)[1] C180CAR[0]	Y	N	N	N	frxn00263	
-r93	r93	H2O(cpd00001)[0] UDPGE(cpd00144)[0] => UDP(cpd00014)[0] GLUCRE[0]	N	N	N	N	frxn00249	(1) H2O[0] + (1) UDPglucuronate[0] <=> (1) UDP[0] + (1) beta-D-glucosiduronic acids[0]
-r930	r930	COA(cpd00010)[0] C180CAR[0] => C180COA(cpd00327)[0] CAR(cpd19003)[0]	N	N	N	N	frxn00262	(1) strcoa[0] + (1) Carnitine[0] <=> (1) CoA[0] + (1) Octadecanoyl-carnitine[0]
+r918	r918	MALCOA(cpd00070)[0] C160COA(cpd00134)[0] => CO2(cpd00011)[0] COA(cpd00010)[0] C180COA(cpd00327)[0]	N	N	N	Y	frxn00248	
+r919	r919	CAR(cpd19003)[0] C120COA(cpd01260)[0] => COA(cpd00010)[0] C120CAR[0]	N	N	N	N	frxn00249	
+r92	r92	H2O(cpd00001)[0] UDPGE(cpd00144)[0] => UDP(cpd00014)[0] GLUCRE[0]	N	N	N	N	frxn00242	(1) H2O[0] + (1) UDPglucuronate[0] <=> (1) UDP[0] + (1) beta-D-glucosiduronic acids[0]
+r920	r920	C120CAR[0] CAR(cpd19003)[1] => CAR(cpd19003)[0] C120CAR[1]	Y	N	N	N	frxn00250	
+r921	r921	COA(cpd00010)[0] C120CAR[0] => C120COA(cpd01260)[0] CAR(cpd19003)[0]	N	N	N	N	frxn00249	(1) Lauroyl-CoA[0] + (1) Carnitine[0] <=> (1) CoA[0] + (1) Dodecanoyl-carnitine[0]
+r922	r922	CAR(cpd19003)[0] C140COA(cpd01695)[0] => COA(cpd00010)[0] C140CAR[0]	N	N	N	N	frxn00251	
+r923	r923	CAR(cpd19003)[0] C140CAR[1] => CAR(cpd19003)[1] C140CAR[0]	Y	N	N	N	frxn00252	
+r924	r924	COA(cpd00010)[0] C140CAR[0] => C140COA(cpd01695)[0] CAR(cpd19003)[0]	N	N	N	N	frxn00251	(1) Myristoyl-CoA[0] + (1) Carnitine[0] <=> (1) CoA[0] + (1) Tetradecanoyl-carnitine[0]
+r925	r925	CAR(cpd19003)[0] C160COA(cpd00134)[0] => COA(cpd00010)[0] C160CAR(cpd01915)[0]	N	N	N	Y	frxn00253	
+r926	r926	CAR(cpd19003)[0] C160CAR(cpd01915)[1] => CAR(cpd19003)[1] C160CAR(cpd01915)[0]	Y	N	N	Y	frxn00254	
+r927	r927	COA(cpd00010)[0] C160CAR(cpd01915)[0] => C160COA(cpd00134)[0] CAR(cpd19003)[0]	N	N	N	Y	frxn00253	(1) Palmitoyl-CoA[0] + (1) Carnitine[0] <=> (1) CoA[0] + (1) L-Palmitoylcarnitine[0]
+r928	r928	CAR(cpd19003)[0] C180COA(cpd00327)[0] => COA(cpd00010)[0] C180CAR[0]	N	N	N	N	frxn00255	
+r929	r929	CAR(cpd19003)[0] C180CAR[1] => CAR(cpd19003)[1] C180CAR[0]	Y	N	N	N	frxn00256	
+r93	r93	H2O(cpd00001)[0] UDPGE(cpd00144)[0] => UDP(cpd00014)[0] GLUCRE[0]	N	N	N	N	frxn00242	(1) H2O[0] + (1) UDPglucuronate[0] <=> (1) UDP[0] + (1) beta-D-glucosiduronic acids[0]
+r930	r930	COA(cpd00010)[0] C180CAR[0] => C180COA(cpd00327)[0] CAR(cpd19003)[0]	N	N	N	N	frxn00255	(1) strcoa[0] + (1) Carnitine[0] <=> (1) CoA[0] + (1) Octadecanoyl-carnitine[0]
 r931	r931	COA(cpd00010)[0] C160ACP(cpd11476)[0] => C160COA(cpd00134)[0] ACP(cpd11493)[0]	N	N	Y	Y	rxn05458	(1) CoA[0] + (1) hexadecanoyl-acp[0] <=> (1) Palmitoyl-CoA[0] + (1) ACP[0]
 r932	r932	COA(cpd00010)[0] C180ACP(cpd12458)[0] => C180COA(cpd00327)[0] ACP(cpd11493)[0]	N	N	Y	Y	rxn40849	(1) CoA[0] + (1) Stearoyl-[acyl-carrier protein][0] <=> (1) strcoa[0] + (1) ACP[0]
 r933	r933	H2O(cpd00001)[0] LEUKA(cpd00675)[0] => LEUKB(cpd01464)[0]	N	N	Y	Y	rxn02192	(1) H2O[0] + (1) LTA4[0] <=> (1) Leukotriene B4[0]
@@ -1215,23 +1215,23 @@ r934	r934	O2(cpd00007)[0] C160COA(cpd00134)[0] => H2O2(cpd00025)[0] C16DCOA(cpd0
 r935	r935	O2(cpd00007)[0] C160COA(cpd00134)[0] => H2O2(cpd00025)[0] C16DCOA(cpd03126)[0]	N	N	Y	Y	rxn09476	(1) O2[0] + (1) Palmitoyl-CoA[0] => (1) H2O2[0] + (1) (2E)-Hexadecenoyl-CoA[0]
 r936	r936	O2(cpd00007)[0] C160COA(cpd00134)[0] => H2O2(cpd00025)[0] C16DCOA(cpd03126)[0]	N	N	Y	Y	rxn09476	(1) O2[0] + (1) Palmitoyl-CoA[0] => (1) H2O2[0] + (1) (2E)-Hexadecenoyl-CoA[0]
 r937	r937	O2(cpd00007)[0] C160COA(cpd00134)[0] => H2O2(cpd00025)[0] C16DCOA(cpd03126)[0]	N	N	Y	Y	rxn09476	(1) O2[0] + (1) Palmitoyl-CoA[0] => (1) H2O2[0] + (1) (2E)-Hexadecenoyl-CoA[0]
-r938	r938	FAD(cpd00015)[0] C160COA(cpd00134)[1] => FADH2(cpd00982)[0] C16DCOA(cpd03126)[1]	Y	N	N	Y	frxn00264	
-r939	r939	C16HCOA[0] => C16DCOA(cpd03126)[0]	N	N	N	N	frxn00265	
-r94	r94	H2O(cpd00001)[0] UDPGE(cpd00144)[0] => UDP(cpd00014)[0] GLUCRE[0]	N	N	N	N	frxn00249	(1) H2O[0] + (1) UDPglucuronate[0] <=> (1) UDP[0] + (1) beta-D-glucosiduronic acids[0]
-r940	r940	C16HCOA[0] => C16DCOA(cpd03126)[0]	N	N	N	N	frxn00265	(1) 3-hydroxyhexadecanoyl-CoA[0] <=> (1) (2E)-Hexadecenoyl-CoA[0]
-r941	r941	C16HCOA[0] => C16DCOA(cpd03126)[0]	N	N	N	N	frxn00265	(1) 3-hydroxyhexadecanoyl-CoA[0] <=> (1) (2E)-Hexadecenoyl-CoA[0]
-r942	r942	NADH(cpd00004)[0] C16OCOA(cpd03114)[0] => NAD(cpd00003)[0] C16HCOA[0]	N	N	N	N	frxn00266	
+r938	r938	FAD(cpd00015)[0] C160COA(cpd00134)[1] => FADH2(cpd00982)[0] C16DCOA(cpd03126)[1]	Y	N	N	Y	frxn00257	
+r939	r939	C16HCOA[0] => C16DCOA(cpd03126)[0]	N	N	N	N	frxn00258	
+r94	r94	H2O(cpd00001)[0] UDPGE(cpd00144)[0] => UDP(cpd00014)[0] GLUCRE[0]	N	N	N	N	frxn00242	(1) H2O[0] + (1) UDPglucuronate[0] <=> (1) UDP[0] + (1) beta-D-glucosiduronic acids[0]
+r940	r940	C16HCOA[0] => C16DCOA(cpd03126)[0]	N	N	N	N	frxn00258	(1) 3-hydroxyhexadecanoyl-CoA[0] <=> (1) (2E)-Hexadecenoyl-CoA[0]
+r941	r941	C16HCOA[0] => C16DCOA(cpd03126)[0]	N	N	N	N	frxn00258	(1) 3-hydroxyhexadecanoyl-CoA[0] <=> (1) (2E)-Hexadecenoyl-CoA[0]
+r942	r942	NADH(cpd00004)[0] C16OCOA(cpd03114)[0] => NAD(cpd00003)[0] C16HCOA[0]	N	N	N	N	frxn00259	
 r943	r943	COA(cpd00010)[0] C16OCOA(cpd03114)[0] => ACCOA(cpd00022)[0] C140COA(cpd01695)[0]	N	N	Y	Y	rxn02804	(1) Acetyl-CoA[0] + (1) Myristoyl-CoA[0] <=> (1) CoA[0] + (1) 3-Oxopalmitoyl-CoA[0]
 r944	r944	COA(cpd00010)[0] C16OCOA(cpd03114)[0] => ACCOA(cpd00022)[0] C140COA(cpd01695)[0]	N	N	Y	Y	rxn02804	(1) Acetyl-CoA[0] + (1) Myristoyl-CoA[0] <=> (1) CoA[0] + (1) 3-Oxopalmitoyl-CoA[0]
-r945	r945	O2(cpd00007)[0] C140COA(cpd01695)[0] => H2O2(cpd00025)[0] C14DCOA[0]	N	N	N	N	frxn00267	
-r946	r946	O2(cpd00007)[0] C140COA(cpd01695)[0] => H2O2(cpd00025)[0] C14DCOA[0]	N	N	N	N	frxn00267	(1) O2[0] + (1) Myristoyl-CoA[0] <=> (1) H2O2[0] + (1) Tetradec-2-enoyl-CoA[0]
-r947	r947	O2(cpd00007)[0] C140COA(cpd01695)[0] => H2O2(cpd00025)[0] C14DCOA[0]	N	N	N	N	frxn00267	(1) O2[0] + (1) Myristoyl-CoA[0] <=> (1) H2O2[0] + (1) Tetradec-2-enoyl-CoA[0]
-r948	r948	O2(cpd00007)[0] C140COA(cpd01695)[0] => H2O2(cpd00025)[0] C14DCOA[0]	N	N	N	N	frxn00267	(1) O2[0] + (1) Myristoyl-CoA[0] <=> (1) H2O2[0] + (1) Tetradec-2-enoyl-CoA[0]
-r949	r949	FAD(cpd00015)[0] C140COA(cpd01695)[1] => FADH2(cpd00982)[0] C14DCOA[1]	Y	N	N	N	frxn00268	
+r945	r945	O2(cpd00007)[0] C140COA(cpd01695)[0] => H2O2(cpd00025)[0] C14DCOA[0]	N	N	N	N	frxn00260	
+r946	r946	O2(cpd00007)[0] C140COA(cpd01695)[0] => H2O2(cpd00025)[0] C14DCOA[0]	N	N	N	N	frxn00260	(1) O2[0] + (1) Myristoyl-CoA[0] <=> (1) H2O2[0] + (1) Tetradec-2-enoyl-CoA[0]
+r947	r947	O2(cpd00007)[0] C140COA(cpd01695)[0] => H2O2(cpd00025)[0] C14DCOA[0]	N	N	N	N	frxn00260	(1) O2[0] + (1) Myristoyl-CoA[0] <=> (1) H2O2[0] + (1) Tetradec-2-enoyl-CoA[0]
+r948	r948	O2(cpd00007)[0] C140COA(cpd01695)[0] => H2O2(cpd00025)[0] C14DCOA[0]	N	N	N	N	frxn00260	(1) O2[0] + (1) Myristoyl-CoA[0] <=> (1) H2O2[0] + (1) Tetradec-2-enoyl-CoA[0]
+r949	r949	FAD(cpd00015)[0] C140COA(cpd01695)[1] => FADH2(cpd00982)[0] C14DCOA[1]	Y	N	N	N	frxn00261	
 r95	r95	NAD(cpd00003)[0] DEXG(cpd01795)[0] => NADH(cpd00004)[0] DEHXG(cpd02441)[0]	N	N	Y	Y	rxn02842	(1) NAD[0] + (1) 2-Deoxy-D-gluconate[0] <=> (1) NADH[0] + (1) H+[0] + (1) 3-Dehydro-2-deoxy-D-gluconate[0]
-r950	r950	C14HCOA(cpd03115)[0] => C14DCOA[0]	N	N	N	N	frxn00269	
-r951	r951	C14HCOA(cpd03115)[0] => C14DCOA[0]	N	N	N	N	frxn00269	(1) (S)-3-Hydroxytetradecanoyl-CoA[0] <=> (1) Tetradec-2-enoyl-CoA[0]
-r952	r952	C14HCOA(cpd03115)[0] => C14DCOA[0]	N	N	N	N	frxn00269	(1) (S)-3-Hydroxytetradecanoyl-CoA[0] <=> (1) Tetradec-2-enoyl-CoA[0]
+r950	r950	C14HCOA(cpd03115)[0] => C14DCOA[0]	N	N	N	N	frxn00262	
+r951	r951	C14HCOA(cpd03115)[0] => C14DCOA[0]	N	N	N	N	frxn00262	(1) (S)-3-Hydroxytetradecanoyl-CoA[0] <=> (1) Tetradec-2-enoyl-CoA[0]
+r952	r952	C14HCOA(cpd03115)[0] => C14DCOA[0]	N	N	N	N	frxn00262	(1) (S)-3-Hydroxytetradecanoyl-CoA[0] <=> (1) Tetradec-2-enoyl-CoA[0]
 r953	r953	NADH(cpd00004)[0] C14OCOA(cpd12689)[0] => NAD(cpd00003)[0] C14HCOA(cpd03115)[0]	N	N	Y	Y	rxn06777	(1) NAD[0] + (1) (S)-3-Hydroxytetradecanoyl-CoA[0] <= (1) NADH[0] + (1) H+[0] + (1) 3-Oxotetradecanoyl-CoA[0]
 r954	r954	COA(cpd00010)[0] C14OCOA(cpd12689)[0] => ACCOA(cpd00022)[0] C120COA(cpd01260)[0]	N	N	Y	Y	rxn06510	(1) Acetyl-CoA[0] + (1) Lauroyl-CoA[0] <=> (1) CoA[0] + (1) 3-Oxotetradecanoyl-CoA[0]
 r955	r955	COA(cpd00010)[0] C14OCOA(cpd12689)[0] => ACCOA(cpd00022)[0] C120COA(cpd01260)[0]	N	N	Y	Y	rxn06510	(1) Acetyl-CoA[0] + (1) Lauroyl-CoA[0] <=> (1) CoA[0] + (1) 3-Oxotetradecanoyl-CoA[0]
@@ -1240,11 +1240,11 @@ r957	r957	O2(cpd00007)[0] C120COA(cpd01260)[0] => H2O2(cpd00025)[0] C12DCOA(cpd0
 r958	r958	O2(cpd00007)[0] C120COA(cpd01260)[0] => H2O2(cpd00025)[0] C12DCOA(cpd02060)[0]	N	N	Y	Y	rxn09478	(1) O2[0] + (1) Lauroyl-CoA[0] => (1) H2O2[0] + (1) (2E)-Dodecenoyl-CoA[0]
 r959	r959	O2(cpd00007)[0] C120COA(cpd01260)[0] => H2O2(cpd00025)[0] C12DCOA(cpd02060)[0]	N	N	Y	Y	rxn09478	(1) O2[0] + (1) Lauroyl-CoA[0] => (1) H2O2[0] + (1) (2E)-Dodecenoyl-CoA[0]
 r96	r96	NAD(cpd00003)[0] DEXG(cpd01795)[0] => NADH(cpd00004)[0] DEHXG(cpd02441)[0]	N	N	Y	Y	rxn02842	(1) NAD[0] + (1) 2-Deoxy-D-gluconate[0] <=> (1) NADH[0] + (1) H+[0] + (1) 3-Dehydro-2-deoxy-D-gluconate[0]
-r960	r960	FAD(cpd00015)[0] C120COA(cpd01260)[1] => FADH2(cpd00982)[0] C12DCOA(cpd02060)[1]	Y	N	N	Y	frxn00270	
-r961	r961	C12HCOA[0] => C12DCOA(cpd02060)[0]	N	N	N	N	frxn00271	
-r962	r962	C12HCOA[0] => C12DCOA(cpd02060)[0]	N	N	N	N	frxn00271	(1) 3-hydroxydodecanoyl-CoA[0] <=> (1) (2E)-Dodecenoyl-CoA[0]
-r963	r963	C12HCOA[0] => C12DCOA(cpd02060)[0]	N	N	N	N	frxn00271	(1) 3-hydroxydodecanoyl-CoA[0] <=> (1) (2E)-Dodecenoyl-CoA[0]
-r964	r964	NADH(cpd00004)[0] C12OCOA(cpd03117)[0] => NAD(cpd00003)[0] C12HCOA[0]	N	N	N	N	frxn00272	
+r960	r960	FAD(cpd00015)[0] C120COA(cpd01260)[1] => FADH2(cpd00982)[0] C12DCOA(cpd02060)[1]	Y	N	N	Y	frxn00263	
+r961	r961	C12HCOA[0] => C12DCOA(cpd02060)[0]	N	N	N	N	frxn00264	
+r962	r962	C12HCOA[0] => C12DCOA(cpd02060)[0]	N	N	N	N	frxn00264	(1) 3-hydroxydodecanoyl-CoA[0] <=> (1) (2E)-Dodecenoyl-CoA[0]
+r963	r963	C12HCOA[0] => C12DCOA(cpd02060)[0]	N	N	N	N	frxn00264	(1) 3-hydroxydodecanoyl-CoA[0] <=> (1) (2E)-Dodecenoyl-CoA[0]
+r964	r964	NADH(cpd00004)[0] C12OCOA(cpd03117)[0] => NAD(cpd00003)[0] C12HCOA[0]	N	N	N	N	frxn00265	
 r965	r965	COA(cpd00010)[0] C12OCOA(cpd03117)[0] => ACCOA(cpd00022)[0] C100COA(cpd03128)[0]	N	N	Y	Y	rxn03243	(1) Acetyl-CoA[0] + (1) Decanoyl-CoA[0] <=> (1) CoA[0] + (1) 3-Oxododecanoyl-CoA[0]
 r966	r966	COA(cpd00010)[0] C12OCOA(cpd03117)[0] => ACCOA(cpd00022)[0] C100COA(cpd03128)[0]	N	N	Y	Y	rxn03243	(1) Acetyl-CoA[0] + (1) Decanoyl-CoA[0] <=> (1) CoA[0] + (1) 3-Oxododecanoyl-CoA[0]
 r967	r967	C12DCOA(cpd02060)[0] => C12CCOA(cpd01887)[0]	N	N	Y	Y	rxn02869	(1) (3Z)-Dodecenoyl-CoA[0] <=> (1) (2E)-Dodecenoyl-CoA[0]
@@ -1253,7 +1253,7 @@ r969	r969	O2(cpd00007)[0] C100COA(cpd03128)[0] => H2O2(cpd00025)[0] C10DCOA(cpd0
 r97	r97	NAD(cpd00003)[0] DEXG(cpd01795)[0] => NADH(cpd00004)[0] DEHXG(cpd02441)[0]	N	N	Y	Y	rxn02842	(1) NAD[0] + (1) 2-Deoxy-D-gluconate[0] <=> (1) NADH[0] + (1) H+[0] + (1) 3-Dehydro-2-deoxy-D-gluconate[0]
 r970	r970	O2(cpd00007)[0] C100COA(cpd03128)[0] => H2O2(cpd00025)[0] C10DCOA(cpd03129)[0]	N	N	Y	Y	rxn09479	(1) O2[0] + (1) Decanoyl-CoA[0] => (1) H2O2[0] + (1) (2E)-Decenoyl-CoA[0]
 r971	r971	O2(cpd00007)[0] C100COA(cpd03128)[0] => H2O2(cpd00025)[0] C10DCOA(cpd03129)[0]	N	N	Y	Y	rxn09479	(1) O2[0] + (1) Decanoyl-CoA[0] => (1) H2O2[0] + (1) (2E)-Decenoyl-CoA[0]
-r972	r972	FAD(cpd00015)[0] C100COA(cpd03128)[1] => FADH2(cpd00982)[0] C10DCOA(cpd03129)[1]	Y	N	N	Y	frxn00273	
+r972	r972	FAD(cpd00015)[0] C100COA(cpd03128)[1] => FADH2(cpd00982)[0] C10DCOA(cpd03129)[1]	Y	N	N	Y	frxn00266	
 r973	r973	C10HCOA(cpd03118)[0] => C10DCOA(cpd03129)[0]	N	W	Y	Y	rxn03245	(1) (S)-Hydroxydecanoyl-CoA[0] <=> (1) H2O[0] + (1) (2E)-Decenoyl-CoA[0]
 r974	r974	C10HCOA(cpd03118)[0] => C10DCOA(cpd03129)[0]	N	W	Y	Y	rxn03245	(1) (S)-Hydroxydecanoyl-CoA[0] <=> (1) H2O[0] + (1) (2E)-Decenoyl-CoA[0]
 r975	r975	C10HCOA(cpd03118)[0] => C10DCOA(cpd03129)[0]	N	W	Y	Y	rxn03245	(1) (S)-Hydroxydecanoyl-CoA[0] <=> (1) H2O[0] + (1) (2E)-Decenoyl-CoA[0]
@@ -1265,7 +1265,7 @@ r98	r98	H2O(cpd00001)[0] FGT(cpd00759)[0] => RGT(cpd00042)[0] FOR(cpd00047)[0]	N
 r980	r980	O2(cpd00007)[0] C80COA(cpd01335)[0] => H2O2(cpd00025)[0] C8DCOA(cpd03130)[0]	N	N	Y	Y	rxn19050	(1) O2[0] + (1) Octanoyl-CoA[0] => (1) H2O2[0] + (1) (2E)-Octenoyl-CoA[0]
 r981	r981	O2(cpd00007)[0] C80COA(cpd01335)[0] => H2O2(cpd00025)[0] C8DCOA(cpd03130)[0]	N	N	Y	Y	rxn19050	(1) O2[0] + (1) Octanoyl-CoA[0] => (1) H2O2[0] + (1) (2E)-Octenoyl-CoA[0]
 r982	r982	O2(cpd00007)[0] C80COA(cpd01335)[0] => H2O2(cpd00025)[0] C8DCOA(cpd03130)[0]	N	N	Y	Y	rxn19050	(1) O2[0] + (1) Octanoyl-CoA[0] => (1) H2O2[0] + (1) (2E)-Octenoyl-CoA[0]
-r983	r983	FAD(cpd00015)[0] C80COA(cpd01335)[1] => FADH2(cpd00982)[0] C8DCOA(cpd03130)[1]	Y	N	N	Y	frxn00274	
+r983	r983	FAD(cpd00015)[0] C80COA(cpd01335)[1] => FADH2(cpd00982)[0] C8DCOA(cpd03130)[1]	Y	N	N	Y	frxn00267	
 r984	r984	C8HCOA(cpd03120)[0] => C8DCOA(cpd03130)[0]	N	W	Y	Y	rxn03247	(1) (S)-Hydroxyoctanoyl-CoA[0] <=> (1) H2O[0] + (1) (2E)-Octenoyl-CoA[0]
 r985	r985	C8HCOA(cpd03120)[0] => C8DCOA(cpd03130)[0]	N	W	Y	Y	rxn03247	(1) (S)-Hydroxyoctanoyl-CoA[0] <=> (1) H2O[0] + (1) (2E)-Octenoyl-CoA[0]
 r986	r986	C8HCOA(cpd03120)[0] => C8DCOA(cpd03130)[0]	N	W	Y	Y	rxn03247	(1) (S)-Hydroxyoctanoyl-CoA[0] <=> (1) H2O[0] + (1) (2E)-Octenoyl-CoA[0]
@@ -1273,11 +1273,11 @@ r987	r987	NADH(cpd00004)[0] C8OCOA(cpd03121)[0] => NAD(cpd00003)[0] C8HCOA(cpd03
 r988	r988	COA(cpd00010)[0] C8OCOA(cpd03121)[0] => ACCOA(cpd00022)[0] C60COA(cpd03124)[0]	N	N	Y	Y	rxn03248	(1) Acetyl-CoA[0] + (1) Hexanoyl-CoA[0] <=> (1) CoA[0] + (1) 3-Oxooctanoyl-CoA[0]
 r989	r989	COA(cpd00010)[0] C8OCOA(cpd03121)[0] => ACCOA(cpd00022)[0] C60COA(cpd03124)[0]	N	N	Y	Y	rxn03248	(1) Acetyl-CoA[0] + (1) Hexanoyl-CoA[0] <=> (1) CoA[0] + (1) 3-Oxooctanoyl-CoA[0]
 r99	r99	LAC(cpd00221)[0] (2) FERI(cpd00109)[0] => PYR(cpd00020)[0] (2) FERO(cpd00110)[0]	N	N	Y	Y	rxn00146	(2) Cytochrome c3+[0] + (1) D-Lactate[0] <=> (1) Pyruvate[0] + (2) H+[0] + (2) Cytochrome c2+[0]
-r990	r990	O2(cpd00007)[0] C60COA(cpd03124)[0] => H2O2(cpd00025)[0] C6HCOA(cpd03122)[0]	N	N	N	Y	frxn00275	
-r991	r991	O2(cpd00007)[0] C60COA(cpd03124)[0] => H2O2(cpd00025)[0] C6HCOA(cpd03122)[0]	N	W	N	Y	frxn00275	(1) H2O[0] + (1) O2[0] + (1) Hexanoyl-CoA[0] <=> (1) H2O2[0] + (1) (S)-Hydroxyhexanoyl-CoA[0]
+r990	r990	O2(cpd00007)[0] C60COA(cpd03124)[0] => H2O2(cpd00025)[0] C6HCOA(cpd03122)[0]	N	N	N	Y	frxn00268	
+r991	r991	O2(cpd00007)[0] C60COA(cpd03124)[0] => H2O2(cpd00025)[0] C6HCOA(cpd03122)[0]	N	W	N	Y	frxn00268	(1) H2O[0] + (1) O2[0] + (1) Hexanoyl-CoA[0] <=> (1) H2O2[0] + (1) (S)-Hydroxyhexanoyl-CoA[0]
 r992	r992	O2(cpd00007)[0] C60COA(cpd03124)[0] => H2O2(cpd00025)[0] C6DCOA(cpd03125)[0]	N	N	Y	Y	rxn31260	(1) O2[0] + (1) Hexanoyl-CoA[0] => (1) H2O2[0] + (1) (2E)-Hexenoyl-CoA[0]
 r993	r993	O2(cpd00007)[0] C60COA(cpd03124)[0] => H2O2(cpd00025)[0] C6DCOA(cpd03125)[0]	N	N	Y	Y	rxn31260	(1) O2[0] + (1) Hexanoyl-CoA[0] => (1) H2O2[0] + (1) (2E)-Hexenoyl-CoA[0]
-r994	r994	FAD(cpd00015)[0] C60COA(cpd03124)[1] => FADH2(cpd00982)[0] C6DCOA(cpd03125)[1]	Y	N	N	Y	frxn00276	
+r994	r994	FAD(cpd00015)[0] C60COA(cpd03124)[1] => FADH2(cpd00982)[0] C6DCOA(cpd03125)[1]	Y	N	N	Y	frxn00269	
 r995	r995	C6HCOA(cpd03122)[0] => C6DCOA(cpd03125)[0]	N	W	Y	Y	rxn03250	(1) (S)-Hydroxyhexanoyl-CoA[0] <=> (1) H2O[0] + (1) (2E)-Hexenoyl-CoA[0]
 r996	r996	C6HCOA(cpd03122)[0] => C6DCOA(cpd03125)[0]	N	W	Y	Y	rxn03250	(1) (S)-Hydroxyhexanoyl-CoA[0] <=> (1) H2O[0] + (1) (2E)-Hexenoyl-CoA[0]
 r997	r997	C6HCOA(cpd03122)[0] => C6DCOA(cpd03125)[0]	N	W	Y	Y	rxn03250	(1) (S)-Hydroxyhexanoyl-CoA[0] <=> (1) H2O[0] + (1) (2E)-Hexenoyl-CoA[0]

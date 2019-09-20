@@ -463,7 +463,7 @@ MAL0461	aldehyde dehydrogenase (NAD[c] +)	nad(cpd00003)[0] h2o(cpd00001)[0] gaba
 MAL0462	glutamate decarboxylase	h(cpd00067)[0] asp(cpd00041)[0] => co2(cpd00011)[0] bala(cpd00085)[0]	N	N	Y	Y	rxn00346	(1) L-Aspartate[0] + (1) H+[0] => (1) CO2[0] + (1) beta-Alanine[0]
 MAL0463	Pantoate-beta-alanine ligase	atp(cpd00002)[0] bala(cpd00085)[0] pant(cpd00408)[0] => h(cpd00067)[0] amp(cpd00018)[0] ppi(cpd00012)[0] pnto(cpd00644)[0]	N	N	Y	Y	rxn01791	(1) ATP[0] + (1) beta-Alanine[0] + (1) Pantoate[0] => (1) PPi[0] + (1) AMP[0] + (2) H+[0] + (1) PAN[0]
 MAL0464	glutamate decarboxylase	h(cpd00067)[0] cyse(cpd00395)[0] => co2(cpd00011)[0] taur(cpd00210)[0]	N	N	Y	Y	rxn01231	(1) H+[0] + (1) L-Cysteate[0] => (1) CO2[0] + (1) Taurine[0]
-MAL0465	gamma-glutamyltransferase	gsh(cpd00042)[0] ala(cpd00035)[0] => alagly(cpd02343)[0] cgly(cpd01017)[0]	N	N	N	Y	frxn00041	
+MAL0465	gamma-glutamyltransferase	gsh(cpd00042)[0] ala(cpd00035)[0] => alagly[0] cgly(cpd01017)[0]	N	N	N	N	frxn00041	
 MAL0466	taurine dioxygenase	akg(cpd00024)[0] o2(cpd00007)[0] taur(cpd00210)[0] => co2(cpd00011)[0] slfi(cpd00081)[0] succ(cpd00036)[0] amiace(cpd04122)[0]	N	N	Y	Y	rxn03630	(1) O2[0] + (1) 2-Oxoglutarate[0] + (1) Taurine[0] => (1) CO2[0] + (1) Succinate[0] + (1) Sulfite[0] + (1) Aminoacetaldehyde[0]
 MAL0467	ethanolamine-phosphate cytidylyltransferase	pen(cpd00285)[0] ctp(cpd00052)[0] => ppi(cpd00012)[0] cdpea(cpd00444)[0]	N	N	Y	Y	rxn01479	(1) CTP[0] + (1) Phosphoethanolamine[0] <=> (1) PPi[0] + (1) CDPethanolamine[0]
 MAL0468	ethanolaminephosphotransferase	(3) h(cpd00067)[0] dagly(cpd19004)[0] cdpea(cpd00444)[0] => cmp(cpd00046)[0] pe(cpd11456)[0]	N	N	Y	Y	rxn39322	(1) CDPethanolamine[0] + (1) 1,2-Diacyl-sn-glycerol[0] <=> (1) CMP[0] + (1) H+[0] + (1) Phosphatidylethanolamine[0]
@@ -757,16 +757,16 @@ MAL0755	alkaline phosphatase	h(cpd00067)[0] (3) h2o(cpd00001)[0] ahtd(cpd02978)[
 MAL0756	alkaline phosphatase	h(cpd00067)[0] (3) h2o(cpd00001)[0] ahtd(cpd02978)[0] => (3) pi(cpd00009)[0] dhp(cpd02961)[0]	N	N	Y	Y	rxn03167	(3) H2O[0] + (1) 7,8-Dihydroneopterin 3'-triphosphate[0] => (3) Phosphate[0] + (2) H+[0] + (1) Dihydroneopterin[0]
 MAL0757	alkaline phosphatase	(3) h2o(cpd00001)[0] h(cpd00067)[0] ahtd(cpd02978)[0] => (3) pi(cpd00009)[0] dhp(cpd02961)[0]	N	N	Y	Y	rxn03167	(3) H2O[0] + (1) 7,8-Dihydroneopterin 3'-triphosphate[0] => (3) Phosphate[0] + (2) H+[0] + (1) Dihydroneopterin[0]
 MAL0758	Dihydroneopterin aldolase	dhp(cpd02961)[0] => glal(cpd00229)[0] ahhmp(cpd16763)[0]	N	N	Y	Y	rxn12952	(1) Dihydroneopterin[0] <=> (1) Glycolaldehyde[0] + (1) 2-amino-6-(hydroxymethyl)-7,8-dihydropteridin-4-ol[0]
-MAL0759	2-amino-4-hydroxy-6-hydroxymethyldihydropteridine diphosphokinase	atp(cpd00002)[0] ahhmp(cpd16763)[0] => h(cpd00067)[0] amp(cpd00018)[0] ahhmd(cpd02920)[0]	N	N	N	Y	frxn00070	
+MAL0759	2-amino-4-hydroxy-6-hydroxymethyldihydropteridine diphosphokinase	atp(cpd00002)[0] ahhmp(cpd16763)[0] => h(cpd00067)[0] amp(cpd00018)[0] ahhmd(cpd16760)[0]	N	N	Y	Y	rxn12953	(1) ATP[0] + (1) 2-amino-6-(hydroxymethyl)-7,8-dihydropteridin-4-ol[0] <= (1) AMP[0] + (1) (2-amino-4-hydroxy-7,8-dihydropteridin-6-yl)methyl-trihydrogen-diphosphate[0]
 MAL0760	Dihydropteroate synthase	abee(cpd00443)[0] ahhmp(cpd16763)[0] => h2o(cpd00001)[0] dhpt(cpd00683)[0]	N	N	Y	Y	rxn12955	(1) ABEE[0] + (1) 2-amino-6-(hydroxymethyl)-7,8-dihydropteridin-4-ol[0] <=> (1) H2O[0] + (1) Dihydropteroate[0]
-MAL0761	Dihydropteroate synthase	abee(cpd00443)[0] ahhmd(cpd02920)[0] => ppi(cpd00012)[0] dhpt(cpd00683)[0]	N	N	Y	Y	rxn02201	(1) ABEE[0] + (1) 2-Amino-4-hydroxy-6-hydroxymethyl-7-8-dihydropteridinediphosphate[0] => (1) PPi[0] + (1) Dihydropteroate[0]
+MAL0761	Dihydropteroate synthase	abee(cpd00443)[0] ahhmd(cpd16760)[0] => ppi(cpd00012)[0] dhpt(cpd00683)[0]	N	N	Y	Y	rxn12954	(1) ABEE[0] + (1) (2-amino-4-hydroxy-7,8-dihydropteridin-6-yl)methyl-trihydrogen-diphosphate[0] => (1) PPi[0] + (1) Dihydropteroate[0]
 MAL0762	Dihydropteroate synthase	ahhmp(cpd16763)[0] abee(cpd00443)[0] => h2o(cpd00001)[0] dhpt(cpd00683)[0]	N	N	Y	Y	rxn12955	(1) ABEE[0] + (1) 2-amino-6-(hydroxymethyl)-7,8-dihydropteridin-4-ol[0] <=> (1) H2O[0] + (1) Dihydropteroate[0]
-MAL0763	Dihydropteroate synthase	ahhmd(cpd02920)[0] abee(cpd00443)[0] => ppi(cpd00012)[0] dhpt(cpd00683)[0]	N	N	Y	Y	rxn02201	(1) ABEE[0] + (1) 2-Amino-4-hydroxy-6-hydroxymethyl-7-8-dihydropteridinediphosphate[0] => (1) PPi[0] + (1) Dihydropteroate[0]
+MAL0763	Dihydropteroate synthase	ahhmd(cpd16760)[0] abee(cpd00443)[0] => ppi(cpd00012)[0] dhpt(cpd00683)[0]	N	N	Y	Y	rxn12954	(1) ABEE[0] + (1) (2-amino-4-hydroxy-7,8-dihydropteridin-6-yl)methyl-trihydrogen-diphosphate[0] => (1) PPi[0] + (1) Dihydropteroate[0]
 MAL0764	Dihydrofolate reductase	h(cpd00067)[0] nadph(cpd00005)[0] dhf(cpd00330)[0] => nadp(cpd00006)[0] thf(cpd00087)[0]	N	N	Y	Y	rxn00686	(1) NADP[0] + (1) Tetrahydrofolate[0] <=> (1) NADPH[0] + (1) H+[0] + (1) Dihydrofolate[0]
 MAL0765	Dihydrofolate reductase	(2) h(cpd00067)[0] (2) nadph(cpd00005)[0] fot(cpd00393)[0] => (2) nadp(cpd00006)[0] thf(cpd00087)[0]	N	N	Y	Y	rxn12649	(2) NADPH[0] + (2) H+[0] + (1) Folate[0] <=> (2) NADP[0] + (1) Tetrahydrofolate[0]
 MAL0766	Dihydrofolate reductase	nadp(cpd00006)[0] dhf(cpd00330)[0] => h(cpd00067)[0] nadph(cpd00005)[0] fot(cpd00393)[0]	N	N	Y	Y	rxn01602	(1) NADP[0] + (1) Dihydrofolate[0] <=> (1) NADPH[0] + (1) H+[0] + (1) Folate[0]
 MAL0767	folylpolyglutamate synthase	atp(cpd00002)[0] glu(cpd00023)[0] dhpt(cpd00683)[0] => adp(cpd00008)[0] pi(cpd00009)[0] dhf(cpd00330)[0]	N	N	Y	Y	rxn01603	(1) ATP[0] + (1) L-Glutamate[0] + (1) Dihydropteroate[0] => (1) ADP[0] + (1) Phosphate[0] + (1) H+[0] + (1) Dihydrofolate[0]
-MAL0768	6-pyruvoyltetrahydropterin synthase/sepiapterin reductase	(2) h(cpd00067)[0] (2) nadph(cpd00005)[0] ahtd(cpd02978)[0] => (2) nadp(cpd00006)[0] bh4(cpd00233)[0] pppi(cpd00421)[0]	N	N	N	Y	frxn00071	
+MAL0768	6-pyruvoyltetrahydropterin synthase/sepiapterin reductase	(2) h(cpd00067)[0] (2) nadph(cpd00005)[0] ahtd(cpd02978)[0] => (2) nadp(cpd00006)[0] bh4(cpd00233)[0] pppi(cpd00421)[0]	N	N	N	Y	frxn00070	
 MAL0769	6,7-dihydropteridine reductase	nadp(cpd00006)[0] bh4(cpd00233)[0] => h(cpd00067)[0] nadph(cpd00005)[0] bh2(cpd00231)[0]	N	N	Y	Y	rxn01314	(1) NADPH[0] + (1) H+[0] + (1) Dihydrobiopterin[0] <=> (1) NADP[0] + (1) Tetrahydrobiopterin[0]
 MAL0770	aminodeoxychorismate synthase	gln(cpd00053)[0] chor(cpd00216)[0] => glu(cpd00023)[0] adchor(cpd08210)[0]	N	N	Y	Y	rxn01257	(1) L-Glutamine[0] + (1) Chorismate[0] <=> (1) L-Glutamate[0] + (1) ADC[0]
 MAL0771	4-amino-4-deoxychorismate lyase	adchor(cpd08210)[0] => h(cpd00067)[0] pyr(cpd00020)[0] abee(cpd00443)[0]	N	N	Y	Y	rxn03841	(1) ADC[0] => (1) Pyruvate[0] + (1) H+[0] + (1) ABEE[0]
@@ -775,8 +775,8 @@ MAL0773	alkaline phosphatase	h(cpd00067)[0] h2o(cpd00001)[0] d6pgc(cpd00284)[0] 
 MAL0774	alkaline phosphatase	h2o(cpd00001)[0] h(cpd00067)[0] d6pgc(cpd00284)[0] => pi(cpd00009)[0] glcnt(cpd00222)[0]	N	N	Y	Y	rxn26129	(1) H2O[0] + (1) 6-Phospho-D-gluconate[0] <=> (1) Phosphate[0] + (1) GLCN[0]
 MAL0775	methylenetetrahydrofolate dehydrogenase (NADP[c] +)	nadph(cpd00005)[0] methf(cpd00347)[0] => nadp(cpd00006)[0] metthf(cpd00125)[0]	N	N	Y	Y	rxn00907	(1) NADP[0] + (1) 5-10-Methylenetetrahydrofolate[0] <=> (1) NADPH[0] + (1) 5-10-Methenyltetrahydrofolate[0]
 MAL0776	Phosphoribosylglycinamide formyltransferase	h2o(cpd00001)[0] gar(cpd02394)[0] methf(cpd00347)[0] => (2) h(cpd00067)[0] thf(cpd00087)[0] fgar(cpd02678)[0]	N	N	Y	Y	rxn03005	(2) H+[0] + (1) Tetrahydrofolate[0] + (1) N-Formyl-GAR[0] <= (1) H2O[0] + (1) 5-10-Methenyltetrahydrofolate[0] + (1) GAR[0]
-MAL0777	5-methyltetrahydrofolate--homocysteine methyltransferase	fthf(cpd00201)[0] lmettrna(cpd12105)[0] => h(cpd00067)[0] thf(cpd00087)[0] fofmet(cpd12285)[0]	N	N	Y	Y	rxn06538	(1) 10-Formyltetrahydrofolate[0] + (1) L-Methionyl-tRNA[0] => (1) H+[0] + (1) Tetrahydrofolate[0] + (1) N-Formylmethionyl-tRNA[0]
-MAL0778	5-methyltetrahydrofolate--homocysteine methyltransferase	fthf(cpd00201)[0] lmettrna(cpd12105)[0] => h(cpd00067)[0] thf(cpd00087)[0] fofmet(cpd12285)[0]	N	N	Y	Y	rxn06538	(1) 10-Formyltetrahydrofolate[0] + (1) L-Methionyl-tRNA[0] => (1) H+[0] + (1) Tetrahydrofolate[0] + (1) N-Formylmethionyl-tRNA[0]
+MAL0777	5-methyltetrahydrofolate--homocysteine methyltransferase	fthf(cpd00201)[0] lmettrna(cpd12105)[0] => h(cpd00067)[0] thf(cpd00087)[0] fofmet[0]	N	N	N	N	frxn00071	
+MAL0778	5-methyltetrahydrofolate--homocysteine methyltransferase	fthf(cpd00201)[0] lmettrna(cpd12105)[0] => h(cpd00067)[0] thf(cpd00087)[0] fofmet[0]	N	N	N	N	frxn00071	(1) 10-Formyltetrahydrofolate[0] + (1) L-Methionyl-tRNA[0] <=> (1) H+[0] + (1) Tetrahydrofolate[0] + (1) fMet-tRNA(fMet)[0]
 MAL0779	Aminomethyltransferase	nh3(cpd00013)[0] metthf(cpd00125)[0] dhplys(cpd12225)[0] => h(cpd00067)[0] thf(cpd00087)[0] hpsamlys(cpd11830)[0]	N	N	Y	Y	rxn06600	(1) Tetrahydrofolate[0] + (1) S-Aminomethyldihydrolipoylprotein[0] => (1) NH3[0] + (1) 5-10-Methylenetetrahydrofolate[0] + (1) Dihydrolipolprotein[0]
 MAL0780	5-formyltetrahydrofolate cyclo-ligase	atp(cpd00002)[0] h(cpd00067)[0] foli(cpd02197)[0] => pi(cpd00009)[0] adp(cpd00008)[0] methf(cpd00347)[0]	N	N	Y	Y	rxn01653	(1) ATP[0] + (1) 5-Formyltetrahydrofolate[0] => (1) ADP[0] + (1) Phosphate[0] + (1) 5-10-Methenyltetrahydrofolate[0]
 MAL0781	glutamyl-tRNA synthetase	atp(cpd00002)[0] glu(cpd00023)[0] glutrna(cpd12227)[0] => amp(cpd00018)[0] ppi(cpd00012)[0] lglutrna(cpd12227)[0]	N	Y	N	Y	frxn00072	
@@ -875,7 +875,7 @@ MAL0873	Oxidoreductases	o2(cpd00007)[0] (2) dibzpne(cpd09919)[0] => (2) 4h4hbzte
 MAL0874	Oxidoreductases	o2(cpd00007)[0] (2) dibzpne(cpd09919)[0] => (2) 4h4hbzte(cpd19484)[0]	N	N	N	Y	frxn00091	(1) O2[0] + (2) 4,4'-Dihydroxybenzophenone[0] <=> (2) 4-Hydroxyphenyl-4-hydroxybenzoate[0]
 MAL0875	Oxidoreductases	h(cpd00067)[0] o2(cpd00007)[0] nbze(cpd04184)[0] => hno2(cpd00075)[0] ccl(cpd00077)[0]	N	N	Y	Y	rxn07520	(1) O2[0] + (2) H+[0] + (1) Nitrobenzol[0] <=> (1) Nitrite[0] + (1) Catechol[0]
 MAL0876	Sterigmatocystin biosynthesis monooxygenase	nadph(cpd00005)[0] h(cpd00067)[0] o2(cpd00007)[0] avn[0] => nadp(cpd00006)[0] h2o(cpd00001)[0] havn(cpd22585)[0]	N	N	N	N	frxn00092	
-MAL0877	Sterigmatocystin biosynthesis monooxygenase	h(cpd00067)[0] nadph(cpd00005)[0] o2(cpd00007)[0] avn[0] => h2o(cpd00001)[0] nadp(cpd00006)[0] havn(cpd22585)[0]	N	N	N	N	frxn00092	(1) NADPH[0] + (1) O2[0] + (1) H+[0] + (1) averantin_[0] <=> (1) H2O[0] + (1) NADP[0] + (1) (1'S,5'R)-hydroxyaverantin[0]
+MAL0877	Sterigmatocystin biosynthesis monooxygenase	h(cpd00067)[0] nadph(cpd00005)[0] o2(cpd00007)[0] avn[0] => h2o(cpd00001)[0] nadp(cpd00006)[0] havn(cpd22585)[0]	N	N	N	N	frxn00092	(1) NADPH[0] + (1) O2[0] + (1) H+[0] + (1) averantin[0] <=> (1) H2O[0] + (1) NADP[0] + (1) (1'S,5'R)-hydroxyaverantin[0]
 MAL0878	phenol 2-monooxygenase	nadph(cpd00005)[0] h(cpd00067)[0] o2(cpd00007)[0] 3csol(cpd01041)[0] => nadp(cpd00006)[0] h2o(cpd00001)[0] 23dlne(cpd01871)[0]	N	N	Y	Y	rxn02545	(1) NADPH[0] + (1) O2[0] + (1) H+[0] + (1) m-Cresol[0] => (1) H2O[0] + (1) NADP[0] + (1) 3-Methylcatechol[0]
 MAL0879	phenol 2-monooxygenase	nadph(cpd00005)[0] h(cpd00067)[0] o2(cpd00007)[0] pnol(cpd00127)[0] => nadp(cpd00006)[0] h2o(cpd00001)[0] ccl(cpd00077)[0]	N	N	Y	Y	rxn00586	(1) NADPH[0] + (1) O2[0] + (1) H+[0] + (1) Phenol[0] => (1) H2O[0] + (1) NADP[0] + (1) Catechol[0]
 MAL0880	phenol 2-monooxygenase	nadph(cpd00005)[0] h(cpd00067)[0] o2(cpd00007)[0] rsnol(cpd01208)[0] => nadp(cpd00006)[0] h2o(cpd00001)[0] btol(cpd01822)[0]	N	N	Y	Y	rxn03563	(1) NADPH[0] + (1) O2[0] + (1) H+[0] + (1) Resorcin[0] => (1) H2O[0] + (1) NADP[0] + (1) Hydroxyquinol[0]
@@ -959,26 +959,26 @@ MAL0957	3-oxoacyl-acyl carrier protein synthase II	h(cpd00067)[0] malacp(cpd1149
 MAL0958	3-oxoacyl-acyl carrier protein synthase II	h(cpd00067)[0] malacp(cpd11492)[0] c140acp(cpd27551)[0] => co2(cpd00011)[0] acp(cpd11493)[0] c16oacp(cpd11485)[0]	N	N	Y	Y	rxn25647	(1) Malonyl-acyl-carrierprotein-[0] + (1) Myristoyl-ACPs[0] => (1) CO2[0] + (1) 3-oxohexadecanoyl-acp[0] + (1) ACP[0]
 MAL0959	3-oxoacyl-acyl carrier protein synthase II	h(cpd00067)[0] malacp(cpd11492)[0] c160acp(cpd11476)[0] => co2(cpd00011)[0] acp(cpd11493)[0] c18oacp(cpd14938)[0]	N	N	Y	Y	rxn07576	(1) H+[0] + (1) hexadecanoyl-acp[0] + (1) Malonyl-acyl-carrierprotein-[0] => (1) CO2[0] + (1) ACP[0] + (1) 3-Oxostearoyl-[acp][0]
 MAL0960	beta-ketoacyl-[acyl-carrier protein](ACP) reductase	nadp(cpd00006)[0] c4hacp(cpd11478)[0] => nadph(cpd00005)[0] h(cpd00067)[0] aacacp(cpd11488)[0]	N	N	Y	Y	rxn05339	(1) NADP[0] + (1) (R)-3-Hydroxybutanoyl-[acyl-carrier protein][0] <=> (1) NADPH[0] + (1) H+[0] + (1) Acetoacetyl-ACP[0]
-MAL0961	beta-ketoacyl-[acyl-carrier protein](ACP) reductase	nadp(cpd00006)[0] c6hacp(cpd11479)[0] => nadph(cpd00005)[0] h(cpd00067)[0] c6oacp(cpd11486)[0]	N	N	Y	Y	rxn05337	(1) NADP[0] + (1) D-3-Hydroxyhexanoyl-[acp][0] <=> (1) NADPH[0] + (1) 3-Oxohexanoyl-[acp][0]
-MAL0962	beta-ketoacyl-[acyl-carrier protein](ACP) reductase	nadp(cpd00006)[0] c8hacp(cpd14939)[0] => nadph(cpd00005)[0] h(cpd00067)[0] c8oacp(cpd11490)[0]	N	N	N	Y	frxn00101	
+MAL0961	beta-ketoacyl-[acyl-carrier protein](ACP) reductase	nadp(cpd00006)[0] c6hacp(cpd16856)[0] => nadph(cpd00005)[0] h(cpd00067)[0] c6oacp(cpd11486)[0]	N	N	Y	Y	rxn12939	(1) NADPH[0] + (1) H+[0] + (1) 3-Oxohexanoyl-[acp][0] <=> (1) NADP[0] + (1) 3-hydroxyhexanoyl-acp[0]
+MAL0962	beta-ketoacyl-[acyl-carrier protein](ACP) reductase	nadp(cpd00006)[0] c8hacp(cpd16857)[0] => nadph(cpd00005)[0] h(cpd00067)[0] c8oacp(cpd11490)[0]	N	N	Y	Y	rxn12940	(1) NADPH[0] + (1) H+[0] + (1) 3-oxooctanoyl-acp[0] <=> (1) NADP[0] + (1) 3-hydroxyoctanoyl-acp[0]
 MAL0963	beta-ketoacyl-[acyl-carrier protein](ACP) reductase	nadp(cpd00006)[0] c10hacp(cpd16855)[0] => nadph(cpd00005)[0] h(cpd00067)[0] c10oacp(cpd11487)[0]	N	N	Y	Y	rxn12941	(1) NADPH[0] + (1) H+[0] + (1) 3-oxodecanoyl-acp[0] <=> (1) NADP[0] + (1) 3-hydroxydecanoyl-acp[0]
-MAL0964	beta-ketoacyl-[acyl-carrier protein](ACP) reductase	nadp(cpd00006)[0] c12hacp[0] => nadph(cpd00005)[0] h(cpd00067)[0] c12oacp(cpd11489)[0]	N	N	N	N	frxn00102	
-MAL0965	beta-ketoacyl-[acyl-carrier protein](ACP) reductase	nadp(cpd00006)[0] c14hacp[0] => nadph(cpd00005)[0] h(cpd00067)[0] c14oacp(cpd11491)[0]	N	N	N	N	frxn00103	
+MAL0964	beta-ketoacyl-[acyl-carrier protein](ACP) reductase	nadp(cpd00006)[0] c12hacp[0] => nadph(cpd00005)[0] h(cpd00067)[0] c12oacp(cpd11489)[0]	N	N	N	N	frxn00101	
+MAL0965	beta-ketoacyl-[acyl-carrier protein](ACP) reductase	nadp(cpd00006)[0] c14hacp[0] => nadph(cpd00005)[0] h(cpd00067)[0] c14oacp(cpd11491)[0]	N	N	N	N	frxn00102	
 MAL0966	beta-ketoacyl-[acyl-carrier protein](ACP) reductase	nadp(cpd00006)[0] c16hacp(cpd11481)[0] => nadph(cpd00005)[0] h(cpd00067)[0] c16oacp(cpd11485)[0]	N	N	Y	Y	rxn05336	(1) NADP[0] + (1) R-3-hydroxypalmitoyl-acyl-carrierprotein-[0] <=> (1) NADPH[0] + (1) H+[0] + (1) 3-oxohexadecanoyl-acp[0]
 MAL0967	beta-ketoacyl-ACP synthase I	h(cpd00067)[0] malacp(cpd11492)[0] acacp(cpd11494)[0] => co2(cpd00011)[0] acp(cpd11493)[0] aacacp(cpd11488)[0]	N	N	Y	Y	rxn05347	(1) H+[0] + (1) Malonyl-acyl-carrierprotein-[0] + (1) Acetyl-ACP[0] => (1) CO2[0] + (1) Acetoacetyl-ACP[0] + (1) ACP[0]
 MAL0968	3-oxoacyl-[acyl-carrier-protein] reductase	nadp(cpd00006)[0] c4hacp(cpd11478)[0] => h(cpd00067)[0] nadph(cpd00005)[0] aacacp(cpd11488)[0]	N	N	Y	Y	rxn05339	(1) NADP[0] + (1) (R)-3-Hydroxybutanoyl-[acyl-carrier protein][0] <=> (1) NADPH[0] + (1) H+[0] + (1) Acetoacetyl-ACP[0]
 MAL0969	fatty-acyl-CoA synthase	c4hacp(cpd11478)[0] => h2o(cpd00001)[0] c4dacp(cpd11465)[0]	N	N	Y	Y	rxn05329	(1) (R)-3-Hydroxybutanoyl-[acyl-carrier protein][0] <=> (1) H2O[0] + (1) But-2-enoyl-[acyl-carrier protein][0]
 MAL0970	fatty-acyl-CoA synthase	nadp(cpd00006)[0] c40acp(cpd11464)[0] => h(cpd00067)[0] nadph(cpd00005)[0] c4dacp(cpd11465)[0]	N	N	Y	Y	rxn05353	(1) NADP[0] + (1) Butyryl-ACP[0] <= (1) NADPH[0] + (1) H+[0] + (1) But-2-enoyl-[acyl-carrier protein][0]
 MAL0971	beta-ketoacyl-ACP synthase I	h(cpd00067)[0] malacp(cpd11492)[0] c40acp(cpd11464)[0] => co2(cpd00011)[0] acp(cpd11493)[0] c6oacp(cpd11486)[0]	N	N	Y	Y	rxn05346	(1) H+[0] + (1) Butyryl-ACP[0] + (1) Malonyl-acyl-carrierprotein-[0] => (1) CO2[0] + (1) 3-Oxohexanoyl-[acp][0] + (1) ACP[0]
-MAL0972	oleoyl-[ACP] hydrolase	h2o(cpd00001)[0] c40acp(cpd11464)[0] => h(cpd00067)[0] acp(cpd11493)[0] c40(cpd00211)[0]	N	N	N	Y	frxn00104	
+MAL0972	oleoyl-[ACP] hydrolase	h2o(cpd00001)[0] c40acp(cpd11464)[0] => h(cpd00067)[0] acp(cpd11493)[0] c40(cpd00211)[0]	N	N	N	Y	frxn00103	
 MAL0973	Long-chain acyl-CoA synthetase	atp(cpd00002)[0] coa(cpd00010)[0] c40(cpd00211)[0] => amp(cpd00018)[0] ppi(cpd00012)[0] c40coa(cpd00120)[0]	N	N	Y	Y	rxn00873	(1) ATP[0] + (1) CoA[0] + (1) Butyrate[0] => (1) PPi[0] + (1) AMP[0] + (1) H+[0] + (1) Butyryl-CoA[0]
-MAL0974	3-oxoacyl-[acyl-carrier-protein] reductase	nadp(cpd00006)[0] c6hacp(cpd11479)[0] => h(cpd00067)[0] nadph(cpd00005)[0] c6oacp(cpd11486)[0]	N	N	Y	Y	rxn05337	(1) NADP[0] + (1) D-3-Hydroxyhexanoyl-[acp][0] <=> (1) NADPH[0] + (1) 3-Oxohexanoyl-[acp][0]
-MAL0975	fatty-acyl-CoA synthase	c6hacp(cpd11479)[0] => h2o(cpd00001)[0] c6dacp[0]	N	N	N	N	frxn00105	
-MAL0976	fatty-acyl-CoA synthase	nadp(cpd00006)[0] c60acp(cpd11472)[0] => h(cpd00067)[0] nadph(cpd00005)[0] c6dacp[0]	N	N	N	N	frxn00106	
-MAL0977	oleoyl-[ACP] hydrolase	h2o(cpd00001)[0] c60acp(cpd11472)[0] => h(cpd00067)[0] acp(cpd11493)[0] c60(cpd01113)[0]	N	N	N	Y	frxn00107	
+MAL0974	3-oxoacyl-[acyl-carrier-protein] reductase	nadp(cpd00006)[0] c6hacp(cpd16856)[0] => h(cpd00067)[0] nadph(cpd00005)[0] c6oacp(cpd11486)[0]	N	N	Y	Y	rxn12939	(1) NADPH[0] + (1) H+[0] + (1) 3-Oxohexanoyl-[acp][0] <=> (1) NADP[0] + (1) 3-hydroxyhexanoyl-acp[0]
+MAL0975	fatty-acyl-CoA synthase	c6hacp(cpd16856)[0] => h2o(cpd00001)[0] c6dacp[0]	N	N	N	N	frxn00104	
+MAL0976	fatty-acyl-CoA synthase	nadp(cpd00006)[0] c60acp(cpd11472)[0] => h(cpd00067)[0] nadph(cpd00005)[0] c6dacp[0]	N	N	N	N	frxn00105	
+MAL0977	oleoyl-[ACP] hydrolase	h2o(cpd00001)[0] c60acp(cpd11472)[0] => h(cpd00067)[0] acp(cpd11493)[0] c60(cpd01113)[0]	N	N	N	Y	frxn00106	
 MAL0978	beta-ketoacyl-ACP synthase I	h(cpd00067)[0] malacp(cpd11492)[0] c60acp(cpd11472)[0] => co2(cpd00011)[0] acp(cpd11493)[0] c8oacp(cpd11490)[0]	N	N	Y	Y	rxn05350	(1) H+[0] + (1) Hexanoyl-ACP[0] + (1) Malonyl-acyl-carrierprotein-[0] => (1) CO2[0] + (1) 3-oxooctanoyl-acp[0] + (1) ACP[0]
-MAL0979	3-oxoacyl-[acyl-carrier-protein] reductase	nadp(cpd00006)[0] c8hacp(cpd14939)[0] => h(cpd00067)[0] nadph(cpd00005)[0] c8oacp(cpd11490)[0]	N	N	N	Y	frxn00101	(1) NADP[0] + (1) 3-Hydroxystearoyl-[acp][0] <=> (1) NADPH[0] + (1) H+[0] + (1) 3-oxooctanoyl-acp[0]
-MAL0980	fatty-acyl-CoA synthase	c8hacp(cpd14939)[0] => h2o(cpd00001)[0] c8dacp(cpd11471)[0]	N	N	N	Y	frxn00108	
+MAL0979	3-oxoacyl-[acyl-carrier-protein] reductase	nadp(cpd00006)[0] c8hacp(cpd16857)[0] => h(cpd00067)[0] nadph(cpd00005)[0] c8oacp(cpd11490)[0]	N	N	Y	Y	rxn12940	(1) NADPH[0] + (1) H+[0] + (1) 3-oxooctanoyl-acp[0] <=> (1) NADP[0] + (1) 3-hydroxyoctanoyl-acp[0]
+MAL0980	fatty-acyl-CoA synthase	c8hacp(cpd16857)[0] => h2o(cpd00001)[0] c8dacp(cpd11471)[0]	N	N	Y	Y	rxn12929	(1) 3-hydroxyoctanoyl-acp[0] <=> (1) H2O[0] + (1) (2E)-Octenoyl-[acp][0]
 MAL0981	fatty-acyl-CoA synthase	nadp(cpd00006)[0] c80acp(cpd11470)[0] => h(cpd00067)[0] nadph(cpd00005)[0] c8dacp(cpd11471)[0]	N	N	Y	Y	rxn05352	(1) NADP[0] + (1) Octanoyl-ACP[0] <= (1) NADPH[0] + (1) H+[0] + (1) (2E)-Octenoyl-[acp][0]
 MAL0982	oleoyl-[ACP] hydrolase	h2o(cpd00001)[0] c80acp(cpd11470)[0] => h(cpd00067)[0] acp(cpd11493)[0] c80(cpd03846)[0]	N	N	Y	Y	rxn08438	(1) H2O[0] + (1) Octanoyl-ACP[0] => (1) H+[0] + (1) octanoate[0] + (1) ACP[0]
 MAL0983	Long-chain acyl-CoA synthetase	atp(cpd00002)[0] coa(cpd00010)[0] c80(cpd03846)[0] => amp(cpd00018)[0] ppi(cpd00012)[0] c80coa(cpd01335)[0]	N	N	Y	Y	rxn09444	(1) ATP[0] + (1) CoA[0] + (1) octanoate[0] => (1) PPi[0] + (1) AMP[0] + (1) H+[0] + (1) Octanoyl-CoA[0]
@@ -989,164 +989,164 @@ MAL0987	fatty-acyl-CoA synthase	nadp(cpd00006)[0] c100acp(cpd11474)[0] => h(cpd0
 MAL0988	oleoyl-[ACP] hydrolase	h2o(cpd00001)[0] c100acp(cpd11474)[0] => h(cpd00067)[0] acp(cpd11493)[0] c100(cpd01107)[0]	N	N	Y	Y	rxn08433	(1) H2O[0] + (1) Decanoyl-ACP[0] => (1) H+[0] + (1) Decanoate[0] + (1) ACP[0]
 MAL0989	Long-chain acyl-CoA synthetase	atp(cpd00002)[0] coa(cpd00010)[0] c100(cpd01107)[0] => amp(cpd00018)[0] ppi(cpd00012)[0] c100coa(cpd03128)[0]	N	N	Y	Y	rxn09453	(1) ATP[0] + (1) CoA[0] + (1) Decanoate[0] => (1) PPi[0] + (1) AMP[0] + (1) H+[0] + (1) Decanoyl-CoA[0]
 MAL0990	beta-ketoacyl-ACP synthase I	h(cpd00067)[0] malacp(cpd11492)[0] c100acp(cpd11474)[0] => co2(cpd00011)[0] acp(cpd11493)[0] c12oacp(cpd11489)[0]	N	N	Y	Y	rxn05348	(1) H+[0] + (1) Decanoyl-ACP[0] + (1) Malonyl-acyl-carrierprotein-[0] => (1) CO2[0] + (1) 3-oxododecanoyl-acp[0] + (1) ACP[0]
-MAL0991	3-oxoacyl-[acyl-carrier-protein] reductase	nadp(cpd00006)[0] c12hacp[0] => h(cpd00067)[0] nadph(cpd00005)[0] c12oacp(cpd11489)[0]	N	N	N	N	frxn00102	(1) NADP[0] + (1) 3-hydroxydodecanoyl-[acyl-carrier protein][0] <=> (1) NADPH[0] + (1) H+[0] + (1) 3-oxododecanoyl-acp[0]
-MAL0992	fatty-acyl-CoA synthase	c12hacp[0] => h2o(cpd00001)[0] c12dacp[0]	N	N	N	N	frxn00109	
-MAL0993	fatty-acyl-CoA synthase	nadp(cpd00006)[0] c120acp(cpd11468)[0] => h(cpd00067)[0] nadph(cpd00005)[0] c12dacp[0]	N	N	N	N	frxn00110	
+MAL0991	3-oxoacyl-[acyl-carrier-protein] reductase	nadp(cpd00006)[0] c12hacp[0] => h(cpd00067)[0] nadph(cpd00005)[0] c12oacp(cpd11489)[0]	N	N	N	N	frxn00101	(1) NADP[0] + (1) 3-hydroxydodecanoyl-[acyl-carrier protein][0] <=> (1) NADPH[0] + (1) H+[0] + (1) 3-oxododecanoyl-acp[0]
+MAL0992	fatty-acyl-CoA synthase	c12hacp[0] => h2o(cpd00001)[0] c12dacp[0]	N	N	N	N	frxn00107	
+MAL0993	fatty-acyl-CoA synthase	nadp(cpd00006)[0] c120acp(cpd11468)[0] => h(cpd00067)[0] nadph(cpd00005)[0] c12dacp[0]	N	N	N	N	frxn00108	
 MAL0994	oleoyl-[ACP] hydrolase	h2o(cpd00001)[0] c120acp(cpd11468)[0] => h(cpd00067)[0] acp(cpd11493)[0] c120(cpd01741)[0]	N	N	Y	Y	rxn06556	(1) H2O[0] + (1) Dodecanoyl-ACP[0] => (1) H+[0] + (1) ddca[0] + (1) ACP[0]
 MAL0995	Long-chain acyl-CoA synthetase	atp(cpd00002)[0] coa(cpd00010)[0] c120(cpd01741)[0] => amp(cpd00018)[0] ppi(cpd00012)[0] c120coa(cpd01260)[0]	N	N	Y	Y	rxn09452	(1) ATP[0] + (1) CoA[0] + (1) ddca[0] => (1) PPi[0] + (1) AMP[0] + (1) H+[0] + (1) Lauroyl-CoA[0]
 MAL0996	beta-ketoacyl-ACP synthase I	h(cpd00067)[0] malacp(cpd11492)[0] c120acp(cpd11468)[0] => co2(cpd00011)[0] acp(cpd11493)[0] c14oacp(cpd11491)[0]	N	N	Y	Y	rxn05345	(1) H+[0] + (1) Dodecanoyl-ACP[0] + (1) Malonyl-acyl-carrierprotein-[0] => (1) CO2[0] + (1) 3-oxotetradecanoyl-acp[0] + (1) ACP[0]
-MAL0997	3-oxoacyl-[acyl-carrier-protein] reductase	nadp(cpd00006)[0] c14hacp[0] => h(cpd00067)[0] nadph(cpd00005)[0] c14oacp(cpd11491)[0]	N	N	N	N	frxn00103	(1) NADP[0] + (1) 3-hydroxymyristoyl-[acp][0] <=> (1) NADPH[0] + (1) H+[0] + (1) 3-oxotetradecanoyl-acp[0]
-MAL0998	fatty-acyl-CoA synthase	c14hacp[0] => h2o(cpd00001)[0] c14dacp[0]	N	N	N	N	frxn00111	
-MAL0999	fatty-acyl-CoA synthase	nadp(cpd00006)[0] c140acp(cpd27551)[0] => h(cpd00067)[0] nadph(cpd00005)[0] c14dacp[0]	N	N	N	N	frxn00112	
+MAL0997	3-oxoacyl-[acyl-carrier-protein] reductase	nadp(cpd00006)[0] c14hacp[0] => h(cpd00067)[0] nadph(cpd00005)[0] c14oacp(cpd11491)[0]	N	N	N	N	frxn00102	(1) NADP[0] + (1) 3-hydroxymyristoyl-[acp][0] <=> (1) NADPH[0] + (1) H+[0] + (1) 3-oxotetradecanoyl-acp[0]
+MAL0998	fatty-acyl-CoA synthase	c14hacp[0] => h2o(cpd00001)[0] c14dacp[0]	N	N	N	N	frxn00109	
+MAL0999	fatty-acyl-CoA synthase	nadp(cpd00006)[0] c140acp(cpd27551)[0] => h(cpd00067)[0] nadph(cpd00005)[0] c14dacp[0]	N	N	N	N	frxn00110	
 MAL1000	oleoyl-[ACP] hydrolase	h2o(cpd00001)[0] c140acp(cpd27551)[0] => h(cpd00067)[0] acp(cpd11493)[0] c140(cpd03847)[0]	N	N	Y	Y	rxn21082	(1) H2O[0] + (1) Myristoyl-ACPs[0] => (1) H+[0] + (1) Myristic acid[0] + (1) ACP[0]
 MAL1001	Long-chain acyl-CoA synthetase	atp(cpd00002)[0] coa(cpd00010)[0] c140(cpd03847)[0] => amp(cpd00018)[0] ppi(cpd00012)[0] c140coa(cpd01695)[0]	N	N	Y	Y	rxn05736	(1) ATP[0] + (1) CoA[0] + (1) Myristic acid[0] => (1) PPi[0] + (1) AMP[0] + (1) H+[0] + (1) Myristoyl-CoA[0]
 MAL1002	beta-ketoacyl-ACP synthase I	h(cpd00067)[0] malacp(cpd11492)[0] c140acp(cpd27551)[0] => co2(cpd00011)[0] acp(cpd11493)[0] c16oacp(cpd11485)[0]	N	N	Y	Y	rxn25647	(1) Malonyl-acyl-carrierprotein-[0] + (1) Myristoyl-ACPs[0] => (1) CO2[0] + (1) 3-oxohexadecanoyl-acp[0] + (1) ACP[0]
 MAL1003	3-oxoacyl-[acyl-carrier-protein] reductase	nadp(cpd00006)[0] c16hacp(cpd11481)[0] => h(cpd00067)[0] nadph(cpd00005)[0] c16oacp(cpd11485)[0]	N	N	Y	Y	rxn05336	(1) NADP[0] + (1) R-3-hydroxypalmitoyl-acyl-carrierprotein-[0] <=> (1) NADPH[0] + (1) H+[0] + (1) 3-oxohexadecanoyl-acp[0]
-MAL1004	fatty-acyl-CoA synthase	c16hacp(cpd11481)[0] => h2o(cpd00001)[0] c16dacp[0]	N	N	N	N	frxn00113	
-MAL1005	fatty-acyl-CoA synthase	nadp(cpd00006)[0] c160acp(cpd11476)[0] => h(cpd00067)[0] nadph(cpd00005)[0] c16dacp[0]	N	N	N	N	frxn00114	
+MAL1004	fatty-acyl-CoA synthase	c16hacp(cpd11481)[0] => h2o(cpd00001)[0] c16dacp[0]	N	N	N	N	frxn00111	
+MAL1005	fatty-acyl-CoA synthase	nadp(cpd00006)[0] c160acp(cpd11476)[0] => h(cpd00067)[0] nadph(cpd00005)[0] c16dacp[0]	N	N	N	N	frxn00112	
 MAL1006	oleoyl-[ACP] hydrolase	h2o(cpd00001)[0] c160acp(cpd11476)[0] => h(cpd00067)[0] acp(cpd11493)[0] c160(cpd00214)[0]	N	N	Y	Y	rxn06033	(1) H2O[0] + (1) hexadecanoyl-acp[0] => (1) H+[0] + (1) Palmitate[0] + (1) ACP[0]
 MAL1007	Palmitaldehyde:NAD oxidoreductase	h2o(cpd00001)[0] nad(cpd00003)[0] c16a(cpd00405)[0] => (2) h(cpd00067)[0] nadh(cpd00004)[0] c160(cpd00214)[0]	N	N	Y	Y	rxn01247	(1) H2O[0] + (1) NAD[0] + (1) Hexadecanal[0] <=> (1) NADH[0] + (2) H+[0] + (1) Palmitate[0]
-MAL1008	Biotin carboxylase	atp(cpd00002)[0] h2o(cpd00001)[0] co2(cpd00011)[0] bccp(cpd12848)[0] mg2(cpd00254)[0] => h(cpd00067)[0] adp(cpd00008)[0] pi(cpd00009)[0] cccp(cpd12543)[0]	N	N	N	Y	frxn00115	
-MAL1009	oleoyl-[ACP] hydrolase	h2o(cpd00001)[0] c161acp[0] => h(cpd00067)[0] acp(cpd11493)[0] c161(cpd15237)[0]	N	N	N	N	frxn00116	
+MAL1008	Biotin carboxylase	atp(cpd00002)[0] h2o(cpd00001)[0] co2(cpd00011)[0] bccp(cpd12848)[0] mg2(cpd00254)[0] => h(cpd00067)[0] adp(cpd00008)[0] pi(cpd00009)[0] cccp(cpd12543)[0]	N	N	N	Y	frxn00113	
+MAL1009	oleoyl-[ACP] hydrolase	h2o(cpd00001)[0] c161acp[0] => h(cpd00067)[0] acp(cpd11493)[0] c161(cpd15237)[0]	N	N	N	N	frxn00114	
 MAL1010	palmitoyl-protein thioesterase	h2o(cpd00001)[0] c160coa(cpd00134)[0] => h(cpd00067)[0] coa(cpd00010)[0] c160(cpd00214)[0]	N	N	Y	Y	rxn00943	(1) H2O[0] + (1) Palmitoyl-CoA[0] => (1) CoA[0] + (1) H+[0] + (1) Palmitate[0]
 MAL1011	palmitoyl-protein thioesterase	h2o(cpd00001)[0] c180coa(cpd00327)[0] => h(cpd00067)[0] coa(cpd00010)[0] c180(cpd01080)[0]	N	N	Y	Y	rxn08444	(1) H2O[0] + (1) strcoa[0] => (1) CoA[0] + (1) H+[0] + (1) ocdca[0]
 MAL1012	palmitoyl-protein thioesterase	h2o(cpd00001)[0] c200coa(cpd01393)[0] => coa(cpd00010)[0] c200(cpd03848)[0]	N	N	Y	Y	rxn11710	(1) H2O[0] + (1) Icosanoyl-CoA[0] => (1) CoA[0] + (1) H+[0] + (1) Arachidic acid[0]
 MAL1013	palmitoyl-protein thioesterase	h2o(cpd00001)[0] c220coa(cpd16343)[0] => coa(cpd00010)[0] c220(cpd05196)[0]	N	N	Y	Y	rxn11719	(1) H2O[0] + (1) Behenoyl-CoA[0] => (1) CoA[0] + (1) H+[0] + (1) Docosanoate[0]
-MAL1014	palmitoyl-protein thioesterase	h2o(cpd00001)[0] c240coa(cpd15297)[0] => coa(cpd00010)[0] c240[0]	N	N	N	N	frxn00117	
-MAL1015	fatty acid elongase	h(cpd00067)[0] malcoa(cpd00070)[0] c160coa(cpd00134)[0] => coa(cpd00010)[0] co2(cpd00011)[0] c18ocoa[0]	N	N	N	N	frxn00118	
-MAL1016	very-long-chain 3-oxoacyl-CoA reductase	h(cpd00067)[0] nadph(cpd00005)[0] c18ocoa[0] => nadp(cpd00006)[0] c18hcoa[0]	N	N	N	N	frxn00119	
-MAL1017	very-long-chain (3R)-3-hydroxyacyl-[acyl-carrier protein] dehydratase	c18hcoa[0] => h2o(cpd00001)[0] c18dcoa[0]	N	N	N	N	frxn00120	
-MAL1018	very-long-chain enoyl-CoA reductase	h(cpd00067)[0] nadph(cpd00005)[0] c18dcoa[0] => nadp(cpd00006)[0] c180coa(cpd00327)[0]	N	N	N	N	frxn00121	
-MAL1019	fatty acid elongase	h(cpd00067)[0] malcoa(cpd00070)[0] c180coa(cpd00327)[0] => coa(cpd00010)[0] co2(cpd00011)[0] c20ocoa[0]	N	N	N	N	frxn00122	
-MAL1020	very-long-chain 3-oxoacyl-CoA reductase	h(cpd00067)[0] nadph(cpd00005)[0] c20ocoa[0] => nadp(cpd00006)[0] c20hcoa[0]	N	N	N	N	frxn00123	
-MAL1021	very-long-chain (3R)-3-hydroxyacyl-[acyl-carrier protein] dehydratase	c20hcoa[0] => h2o(cpd00001)[0] c20dcoa[0]	N	N	N	N	frxn00124	
-MAL1022	very-long-chain enoyl-CoA reductase	h(cpd00067)[0] nadph(cpd00005)[0] c20dcoa[0] => nadp(cpd00006)[0] c200coa(cpd01393)[0]	N	N	N	N	frxn00125	
-MAL1023	fatty acid elongase	h(cpd00067)[0] malcoa(cpd00070)[0] c200coa(cpd01393)[0] => coa(cpd00010)[0] co2(cpd00011)[0] c22ocoa[0]	N	N	N	N	frxn00126	
-MAL1024	very-long-chain 3-oxoacyl-CoA reductase	h(cpd00067)[0] nadph(cpd00005)[0] c22ocoa[0] => nadp(cpd00006)[0] c22hcoa[0]	N	N	N	N	frxn00127	
-MAL1025	very-long-chain (3R)-3-hydroxyacyl-[acyl-carrier protein] dehydratase	c22hcoa[0] => h2o(cpd00001)[0] c22dcoa[0]	N	N	N	N	frxn00128	
-MAL1026	very-long-chain enoyl-CoA reductase	h(cpd00067)[0] nadph(cpd00005)[0] c22dcoa[0] => nadp(cpd00006)[0] c220coa(cpd16343)[0]	N	N	N	N	frxn00129	
-MAL1027	fatty acid elongase	h(cpd00067)[0] malcoa(cpd00070)[0] c220coa(cpd16343)[0] => coa(cpd00010)[0] co2(cpd00011)[0] c24ocoa[0]	N	N	N	N	frxn00130	
-MAL1028	very-long-chain 3-oxoacyl-CoA reductase	h(cpd00067)[0] nadph(cpd00005)[0] c24ocoa[0] => nadp(cpd00006)[0] c24hcoa[0]	N	N	N	N	frxn00131	
-MAL1029	very-long-chain (3R)-3-hydroxyacyl-[acyl-carrier protein] dehydratase	c24hcoa[0] => h2o(cpd00001)[0] c24dcoa[0]	N	N	N	N	frxn00132	
-MAL1030	very-long-chain enoyl-CoA reductase	h(cpd00067)[0] nadph(cpd00005)[0] c24dcoa[0] => nadp(cpd00006)[0] c240coa(cpd15297)[0]	N	N	N	N	frxn00133	
+MAL1014	palmitoyl-protein thioesterase	h2o(cpd00001)[0] c240coa(cpd15297)[0] => coa(cpd00010)[0] c240[0]	N	N	N	N	frxn00115	
+MAL1015	fatty acid elongase	h(cpd00067)[0] malcoa(cpd00070)[0] c160coa(cpd00134)[0] => coa(cpd00010)[0] co2(cpd00011)[0] c18ocoa[0]	N	N	N	N	frxn00116	
+MAL1016	very-long-chain 3-oxoacyl-CoA reductase	h(cpd00067)[0] nadph(cpd00005)[0] c18ocoa[0] => nadp(cpd00006)[0] c18hcoa[0]	N	N	N	N	frxn00117	
+MAL1017	very-long-chain (3R)-3-hydroxyacyl-[acyl-carrier protein] dehydratase	c18hcoa[0] => h2o(cpd00001)[0] c18dcoa[0]	N	N	N	N	frxn00118	
+MAL1018	very-long-chain enoyl-CoA reductase	h(cpd00067)[0] nadph(cpd00005)[0] c18dcoa[0] => nadp(cpd00006)[0] c180coa(cpd00327)[0]	N	N	N	N	frxn00119	
+MAL1019	fatty acid elongase	h(cpd00067)[0] malcoa(cpd00070)[0] c180coa(cpd00327)[0] => coa(cpd00010)[0] co2(cpd00011)[0] c20ocoa[0]	N	N	N	N	frxn00120	
+MAL1020	very-long-chain 3-oxoacyl-CoA reductase	h(cpd00067)[0] nadph(cpd00005)[0] c20ocoa[0] => nadp(cpd00006)[0] c20hcoa[0]	N	N	N	N	frxn00121	
+MAL1021	very-long-chain (3R)-3-hydroxyacyl-[acyl-carrier protein] dehydratase	c20hcoa[0] => h2o(cpd00001)[0] c20dcoa[0]	N	N	N	N	frxn00122	
+MAL1022	very-long-chain enoyl-CoA reductase	h(cpd00067)[0] nadph(cpd00005)[0] c20dcoa[0] => nadp(cpd00006)[0] c200coa(cpd01393)[0]	N	N	N	N	frxn00123	
+MAL1023	fatty acid elongase	h(cpd00067)[0] malcoa(cpd00070)[0] c200coa(cpd01393)[0] => coa(cpd00010)[0] co2(cpd00011)[0] c22ocoa[0]	N	N	N	N	frxn00124	
+MAL1024	very-long-chain 3-oxoacyl-CoA reductase	h(cpd00067)[0] nadph(cpd00005)[0] c22ocoa[0] => nadp(cpd00006)[0] c22hcoa[0]	N	N	N	N	frxn00125	
+MAL1025	very-long-chain (3R)-3-hydroxyacyl-[acyl-carrier protein] dehydratase	c22hcoa[0] => h2o(cpd00001)[0] c22dcoa[0]	N	N	N	N	frxn00126	
+MAL1026	very-long-chain enoyl-CoA reductase	h(cpd00067)[0] nadph(cpd00005)[0] c22dcoa[0] => nadp(cpd00006)[0] c220coa(cpd16343)[0]	N	N	N	N	frxn00127	
+MAL1027	fatty acid elongase	h(cpd00067)[0] malcoa(cpd00070)[0] c220coa(cpd16343)[0] => coa(cpd00010)[0] co2(cpd00011)[0] c24ocoa[0]	N	N	N	N	frxn00128	
+MAL1028	very-long-chain 3-oxoacyl-CoA reductase	h(cpd00067)[0] nadph(cpd00005)[0] c24ocoa[0] => nadp(cpd00006)[0] c24hcoa[0]	N	N	N	N	frxn00129	
+MAL1029	very-long-chain (3R)-3-hydroxyacyl-[acyl-carrier protein] dehydratase	c24hcoa[0] => h2o(cpd00001)[0] c24dcoa[0]	N	N	N	N	frxn00130	
+MAL1030	very-long-chain enoyl-CoA reductase	h(cpd00067)[0] nadph(cpd00005)[0] c24dcoa[0] => nadp(cpd00006)[0] c240coa(cpd15297)[0]	N	N	N	N	frxn00131	
 MAL1031	Long-chain acyl-CoA synthetase	atp(cpd00002)[0] coa(cpd00010)[0] c160(cpd00214)[0] => amp(cpd00018)[0] ppi(cpd00012)[0] c160coa(cpd00134)[0]	N	N	Y	Y	rxn00947	(1) ATP[0] + (1) CoA[0] + (1) Palmitate[0] => (1) PPi[0] + (1) AMP[0] + (1) H+[0] + (1) Palmitoyl-CoA[0]
 MAL1032	Long-chain acyl-CoA synthetase	atp(cpd00002)[0] coa(cpd00010)[0] c180(cpd01080)[0] => amp(cpd00018)[0] ppi(cpd00012)[0] c180coa(cpd00327)[0]	N	N	Y	Y	rxn09449	(1) ATP[0] + (1) CoA[0] + (1) ocdca[0] => (1) PPi[0] + (1) AMP[0] + (1) H+[0] + (1) strcoa[0]
 MAL1033	Long-chain acyl-CoA synthetase	atp(cpd00002)[0] coa(cpd00010)[0] c200(cpd03848)[0] => h(cpd00067)[0] amp(cpd00018)[0] ppi(cpd00012)[0] c200coa(cpd01393)[0]	N	N	Y	Y	rxn37323	(1) ATP[0] + (1) CoA[0] + (1) Arachidic acid[0] => (1) PPi[0] + (1) AMP[0] + (1) H+[0] + (1) Icosanoyl-CoA[0]
-MAL1034	Carnitine O-acetyltransferase	car(cpd19003)[0] c120coa(cpd01260)[0] => coa(cpd00010)[0] c120car[0]	N	N	N	N	frxn00134	
-MAL1035	Carnitine O-acetyltransferase	car(cpd19003)[0] c140coa(cpd01695)[0] => coa(cpd00010)[0] c140car[0]	N	N	N	N	frxn00135	
-MAL1036	Carnitine O-acetyltransferase	car(cpd19003)[0] c160coa(cpd00134)[0] => coa(cpd00010)[0] c160car(cpd01915)[0]	N	N	N	Y	frxn00136	
-MAL1037	Carnitine O-acetyltransferase	car(cpd19003)[0] c161coa(cpd15238)[0] => coa(cpd00010)[0] c161car[0]	N	N	N	N	frxn00137	
-MAL1038	Carnitine O-acetyltransferase	car(cpd19003)[0] c162coa[0] => coa(cpd00010)[0] c162car[0]	N	N	N	N	frxn00138	
-MAL1039	Carnitine O-acetyltransferase	car(cpd19003)[0] c180coa(cpd00327)[0] => coa(cpd00010)[0] c180car(cpd36045)[0]	N	N	N	Y	frxn00139	
-MAL1040	Carnitine O-acetyltransferase	car(cpd19003)[0] c181coa(cpd15274)[0] => coa(cpd00010)[0] c181car[0]	N	N	N	N	frxn00140	
-MAL1041	Carnitine O-acetyltransferase	car(cpd19003)[0] c182coa(cpd01398)[0] => coa(cpd00010)[0] c182car[0]	N	N	N	N	frxn00141	
-MAL1042	Carnitine O-acetyltransferase	car(cpd19003)[0] c183(6)coa(cpd01942)[0] => coa(cpd00010)[0] c183(6)car[0]	N	N	N	N	frxn00142	
-MAL1043	Carnitine O-acetyltransferase	car(cpd19003)[0] c200coa(cpd01393)[0] => coa(cpd00010)[0] c200car[0]	N	N	N	N	frxn00143	
-MAL1044	Carnitine O-acetyltransferase	car(cpd19003)[0] c203(6)coa(cpd02263)[0] => coa(cpd00010)[0] c203(6)car[0]	N	N	N	N	frxn00144	
-MAL1045	Carnitine O-acetyltransferase	car(cpd19003)[0] c204(6)coa(cpd01519)[0] => coa(cpd00010)[0] c204(6)car[0]	N	N	N	N	frxn00145	
-MAL1046	Carnitine O-acetyltransferase	car(cpd19003)[0] c220coa(cpd16343)[0] => coa(cpd00010)[0] c220car[0]	N	N	N	N	frxn00146	
-MAL1047	Carnitine O-acetyltransferase	car(cpd19003)[0] c224(6)coa(cpd14891)[0] => (4) h(cpd00067)[0] coa(cpd00010)[0] c224(6)car[0]	N	N	N	N	frxn00147	
-MAL1048	Carnitine O-acetyltransferase	car(cpd19003)[0] c240coa(cpd15297)[0] => coa(cpd00010)[0] c240car[0]	N	N	N	N	frxn00148	
-MAL1049	Carnitine O-acetyltransferase	car(cpd19003)[0] c244(6)coa(cpd14892)[0] => coa(cpd00010)[0] c244(6)car[0]	N	N	N	N	frxn00149	
-MAL1050	Carnitine O-acetyltransferase	car(cpd19003)[0] c183(3)coa(cpd14883)[0] => coa(cpd00010)[0] c183(3)car[0]	N	N	N	N	frxn00150	
-MAL1051	Carnitine O-acetyltransferase	car(cpd19003)[0] c184(3)coa(cpd14884)[0] => coa(cpd00010)[0] c184(3)car[0]	N	N	N	N	frxn00151	
-MAL1052	Carnitine O-acetyltransferase	car(cpd19003)[0] c204(3)coa(cpd14899)[0] => (2) h(cpd00067)[0] coa(cpd00010)[0] c204(3)car[0]	N	N	N	N	frxn00152	
-MAL1053	Carnitine O-acetyltransferase	car(cpd19003)[0] c205(3)coa(cpd24122)[0] => coa(cpd00010)[0] c205(3)car[0]	N	N	N	N	frxn00153	
-MAL1054	Carnitine O-acetyltransferase	car(cpd19003)[0] c225(3)coa(cpd14887)[0] => coa(cpd00010)[0] c225(3)car[0]	N	N	N	N	frxn00154	
-MAL1055	Carnitine O-acetyltransferase	car(cpd19003)[0] c245(3)coa(cpd14888)[0] => coa(cpd00010)[0] c245(3)car[0]	N	N	N	N	frxn00155	
-MAL1056	Carnitine O-acetyltransferase	car(cpd19003)[0] c246(3)coa(cpd14889)[0] => coa(cpd00010)[0] c246(3)car[0]	N	N	N	N	frxn00156	
-MAL1057	Carnitine O-acetyltransferase	coa(cpd00010)[0] c226(3)car[0] => car(cpd19003)[0] c226(3)coa(cpd14890)[0]	N	N	N	N	frxn00157	
-MAL1058	Carnitine O-acetyltransferase	c120car[0] car(cpd19003)[1] => car(cpd19003)[0] c120car[1]	Y	N	N	N	frxn00158	
-MAL1059	Carnitine O-acetyltransferase	c140car[0] car(cpd19003)[1] => car(cpd19003)[0] c140car[1]	Y	N	N	N	frxn00159	
-MAL1060	Carnitine O-acetyltransferase	c160car(cpd01915)[0] car(cpd19003)[1] => car(cpd19003)[0] c160car(cpd01915)[1]	Y	N	N	Y	frxn00160	
-MAL1061	Carnitine O-acetyltransferase	c161car[0] car(cpd19003)[1] => car(cpd19003)[0] c161car[1]	Y	N	N	N	frxn00161	
-MAL1062	Carnitine O-acetyltransferase	c162car[0] car(cpd19003)[1] => car(cpd19003)[0] c162car[1]	Y	N	N	N	frxn00162	
-MAL1063	Carnitine O-acetyltransferase	c180car(cpd36045)[0] car(cpd19003)[1] => car(cpd19003)[0] c180car(cpd36045)[1]	Y	N	N	Y	frxn00163	
-MAL1064	Carnitine O-acetyltransferase	c181car[0] car(cpd19003)[1] => car(cpd19003)[0] c181car[1]	Y	N	N	N	frxn00164	
-MAL1065	Carnitine O-acetyltransferase	c182car[0] car(cpd19003)[1] => car(cpd19003)[0] c182car[1]	Y	N	N	N	frxn00165	
-MAL1066	Carnitine O-acetyltransferase	c183(6)car[0] car(cpd19003)[1] => car(cpd19003)[0] c183(6)car[1]	Y	N	N	N	frxn00166	
-MAL1067	Carnitine O-acetyltransferase	c200car[0] car(cpd19003)[1] => car(cpd19003)[0] c200car[1]	Y	N	N	N	frxn00167	
-MAL1068	Carnitine O-acetyltransferase	c203(6)car[0] car(cpd19003)[1] => car(cpd19003)[0] c203(6)car[1]	Y	N	N	N	frxn00168	
-MAL1069	Carnitine O-acetyltransferase	c204(6)car[0] car(cpd19003)[1] => car(cpd19003)[0] c204(6)car[1]	Y	N	N	N	frxn00169	
-MAL1070	Carnitine O-acetyltransferase	c220car[0] car(cpd19003)[1] => car(cpd19003)[0] c220car[1]	Y	N	N	N	frxn00170	
-MAL1071	Carnitine O-acetyltransferase	c224(6)car[0] car(cpd19003)[1] => car(cpd19003)[0] c224(6)car[1]	Y	N	N	N	frxn00171	
-MAL1072	Carnitine O-acetyltransferase	c240car[0] car(cpd19003)[1] => car(cpd19003)[0] c240car[1]	Y	N	N	N	frxn00172	
-MAL1073	Carnitine O-acetyltransferase	c244(6)car[0] car(cpd19003)[1] => car(cpd19003)[0] c244(6)car[1]	Y	N	N	N	frxn00173	
-MAL1074	Carnitine O-acetyltransferase	car(cpd19003)[0] c245(6)car[1] => car(cpd19003)[1] c245(6)car[0]	Y	N	N	N	frxn00174	
-MAL1075	Carnitine O-acetyltransferase	car(cpd19003)[0] c225(6)car[1] => car(cpd19003)[1] c225(6)car[0]	Y	N	N	N	frxn00175	
-MAL1076	Carnitine O-acetyltransferase	c183(3)car[0] car(cpd19003)[1] => car(cpd19003)[0] c183(3)car[1]	Y	N	N	N	frxn00176	
-MAL1077	Carnitine O-acetyltransferase	c184(3)car[0] car(cpd19003)[1] => car(cpd19003)[0] c184(3)car[1]	Y	N	N	N	frxn00177	
-MAL1078	Carnitine O-acetyltransferase	c204(3)car[0] car(cpd19003)[1] => car(cpd19003)[0] c204(3)car[1]	Y	N	N	N	frxn00178	
-MAL1079	Carnitine O-acetyltransferase	c205(3)car[0] car(cpd19003)[1] => car(cpd19003)[0] c205(3)car[1]	Y	N	N	N	frxn00179	
-MAL1080	Carnitine O-acetyltransferase	c225(3)car[0] car(cpd19003)[1] => car(cpd19003)[0] c225(3)car[1]	Y	N	N	N	frxn00180	
-MAL1081	Carnitine O-acetyltransferase	c245(3)car[0] car(cpd19003)[1] => car(cpd19003)[0] c245(3)car[1]	Y	N	N	N	frxn00181	
-MAL1082	Carnitine O-acetyltransferase	c246(3)car[0] car(cpd19003)[1] => car(cpd19003)[0] c246(3)car[1]	Y	N	N	N	frxn00182	
-MAL1083	Carnitine O-acetyltransferase	car(cpd19003)[0] c226(3)car[1] => c226(3)car[0] car(cpd19003)[1]	Y	N	N	N	frxn00183	
-MAL1084	Carnitine O-acetyltransferase	car(cpd19003)[0] c120coa(cpd01260)[0] => coa(cpd00010)[0] c120car[0]	N	N	N	N	frxn00134	(1) Lauroyl-CoA[0] + (1) Carnitine[0] <=> (1) CoA[0] + (1) Dodecanoyl-carnitine[0]
-MAL1085	Carnitine O-acetyltransferase	car(cpd19003)[0] c140coa(cpd01695)[0] => coa(cpd00010)[0] c140car[0]	N	N	N	N	frxn00135	(1) Myristoyl-CoA[0] + (1) Carnitine[0] <=> (1) CoA[0] + (1) myristoylcarnitine[0]
-MAL1086	Carnitine O-acetyltransferase	car(cpd19003)[0] c160coa(cpd00134)[0] => coa(cpd00010)[0] c160car(cpd01915)[0]	N	N	N	Y	frxn00136	(1) Palmitoyl-CoA[0] + (1) Carnitine[0] <=> (1) CoA[0] + (1) L-Palmitoylcarnitine[0]
-MAL1087	Carnitine O-acetyltransferase	car(cpd19003)[0] c161coa(cpd15238)[0] => coa(cpd00010)[0] c161car[0]	N	N	N	N	frxn00137	(1) Hexadecenoyl-CoA[0] + (1) Carnitine[0] <=> (1) CoA[0] + (1) Hexadecenoyl-carnitine[0]
-MAL1088	Carnitine O-acetyltransferase	car(cpd19003)[0] c162coa[0] => coa(cpd00010)[0] c162car[0]	N	N	N	N	frxn00138	(1) Carnitine[0] + (1) hexadecadienoyl-CoA[0] <=> (1) CoA[0] + (1) Hexadecadienoyl-carnitine[0]
-MAL1089	Carnitine O-acetyltransferase	car(cpd19003)[0] c180coa(cpd00327)[0] => coa(cpd00010)[0] c180car(cpd36045)[0]	N	N	N	Y	frxn00139	(1) strcoa[0] + (1) Carnitine[0] <=> (1) CoA[0] + (1) O-octadecanoyl-L-carnitine[0]
-MAL1090	Carnitine O-acetyltransferase	car(cpd19003)[0] c181coa(cpd15274)[0] => coa(cpd00010)[0] c181car[0]	N	N	N	N	frxn00140	(1) Octadecenoyl-CoA[0] + (1) Carnitine[0] <=> (1) CoA[0] + (1) Octadecenoyl-carnitine[0]
-MAL1091	Carnitine O-acetyltransferase	car(cpd19003)[0] c182coa(cpd01398)[0] => coa(cpd00010)[0] c182car[0]	N	N	N	N	frxn00141	(1) Linoleoyl-CoA[0] + (1) Carnitine[0] <=> (1) CoA[0] + (1) Octadecadienoyl-carnitine[0]
-MAL1092	Carnitine O-acetyltransferase	car(cpd19003)[0] c183(6)coa(cpd01942)[0] => coa(cpd00010)[0] c183(6)car[0]	N	N	N	N	frxn00142	(1) gamma-Linolenoyl-CoA[0] + (1) Carnitine[0] <=> (1) CoA[0] + (1) c183(6)car[m][0]
-MAL1093	Carnitine O-acetyltransferase	car(cpd19003)[0] c200coa(cpd01393)[0] => coa(cpd00010)[0] c200car[0]	N	N	N	N	frxn00143	(1) Icosanoyl-CoA[0] + (1) Carnitine[0] <=> (1) CoA[0] + (1) eicosanoyl-car[0]
-MAL1094	Carnitine O-acetyltransferase	car(cpd19003)[0] c203(6)coa(cpd02263)[0] => coa(cpd00010)[0] c203(6)car[0]	N	N	N	N	frxn00144	(1) 8,11,14-Icosatrienoyl-CoA[0] + (1) Carnitine[0] <=> (1) CoA[0] + (1) di-homo-gama-linolenate-car[0]
-MAL1095	Carnitine O-acetyltransferase	car(cpd19003)[0] c204(6)coa(cpd01519)[0] => coa(cpd00010)[0] c204(6)car[0]	N	N	N	N	frxn00145	(1) Arachidonyl-CoA[0] + (1) Carnitine[0] <=> (1) CoA[0] + (1) aracar[c][0]
-MAL1096	Carnitine O-acetyltransferase	car(cpd19003)[0] c220coa(cpd16343)[0] => coa(cpd00010)[0] c220car[0]	N	N	N	N	frxn00146	(1) Behenoyl-CoA[0] + (1) Carnitine[0] <=> (1) CoA[0] + (1) c220car[c][0]
-MAL1097	Carnitine O-acetyltransferase	car(cpd19003)[0] c224(6)coa(cpd14891)[0] => coa(cpd00010)[0] (4) h(cpd00067)[0] c224(6)car[0]	N	N	N	N	frxn00147	(1) (7Z,10Z,13Z,16Z)-Docosatetraenoyl-CoA[0] + (1) Carnitine[0] <=> (1) CoA[0] + (4) H+[0] + (1) c224(6)car[c][0]
-MAL1098	Carnitine O-acetyltransferase	car(cpd19003)[0] c240coa(cpd15297)[0] => coa(cpd00010)[0] c240car[0]	N	N	N	N	frxn00148	(1) Lignoceroyl-CoA[0] + (1) Carnitine[0] <=> (1) CoA[0] + (1) c240car[c][0]
-MAL1099	Carnitine O-acetyltransferase	car(cpd19003)[0] c244(6)coa(cpd14892)[0] => coa(cpd00010)[0] c244(6)car[0]	N	N	N	N	frxn00149	(1) (9Z,12Z,15Z,18Z)-Tetracosatetraenoyl-CoA[0] + (1) Carnitine[0] <=> (1) CoA[0] + (1) c244(6)car[c][0]
-MAL1100	Carnitine O-acetyltransferase	car(cpd19003)[0] c245(6)coa(cpd14893)[0] => coa(cpd00010)[0] c245(6)car[0]	N	N	N	N	frxn00184	
-MAL1101	Carnitine O-acetyltransferase	car(cpd19003)[0] c225(6)coa(cpd14894)[0] => coa(cpd00010)[0] c225(6)car[0]	N	N	N	N	frxn00185	
-MAL1102	Carnitine O-acetyltransferase	car(cpd19003)[0] c183(3)coa(cpd14883)[0] => coa(cpd00010)[0] c183(3)car[0]	N	N	N	N	frxn00150	(1) alpha-Linolenoyl-CoA[0] + (1) Carnitine[0] <=> (1) CoA[0] + (1) c183(3)car[c][0]
-MAL1103	Carnitine O-acetyltransferase	car(cpd19003)[0] c184(3)coa(cpd14884)[0] => coa(cpd00010)[0] c184(3)car[0]	N	N	N	N	frxn00151	(1) Stearidonoyl-CoA[0] + (1) Carnitine[0] <=> (1) CoA[0] + (1) c184(3)car[c][0]
-MAL1104	Carnitine O-acetyltransferase	car(cpd19003)[0] c204(3)coa(cpd14899)[0] => coa(cpd00010)[0] (2) h(cpd00067)[0] c204(3)car[0]	N	N	N	N	frxn00152	(1) (11Z,14Z,17Z)-Icosatrienoyl-CoA[0] + (1) Carnitine[0] <=> (1) CoA[0] + (2) H+[0] + (1) c204(3)car[c][0]
-MAL1105	Carnitine O-acetyltransferase	car(cpd19003)[0] c205(3)coa(cpd24122)[0] => coa(cpd00010)[0] c205(3)car[0]	N	N	N	N	frxn00153	(1) Carnitine[0] + (1) eicosapentaenoyl CoA[0] <=> (1) CoA[0] + (1) c205(3)car[c][0]
-MAL1106	Carnitine O-acetyltransferase	car(cpd19003)[0] c225(3)coa(cpd14887)[0] => coa(cpd00010)[0] c225(3)car[0]	N	N	N	N	frxn00154	(1) (7Z,10Z,13Z,16Z,19Z)-Docosapentaenoyl-CoA[0] + (1) Carnitine[0] <=> (1) CoA[0] + (1) c225(3)car[c][0]
-MAL1107	Carnitine O-acetyltransferase	car(cpd19003)[0] c245(3)coa(cpd14888)[0] => coa(cpd00010)[0] c245(3)car[0]	N	N	N	N	frxn00155	(1) (9Z,12Z,15Z,18Z,21Z)-Tetracosaheptaenoyl-CoA[0] + (1) Carnitine[0] <=> (1) CoA[0] + (1) c245(3)car[c][0]
-MAL1108	Carnitine O-acetyltransferase	car(cpd19003)[0] c246(3)coa(cpd14889)[0] => coa(cpd00010)[0] c246(3)car[0]	N	N	N	N	frxn00156	(1) (6Z,9Z,12Z,15Z,18Z,21Z)-Tetracosahexaenoyl-CoA[0] + (1) Carnitine[0] <=> (1) CoA[0] + (1) c246(3)car[c][0]
-MAL1109	Carnitine O-acetyltransferase	car(cpd19003)[0] c226(3)coa(cpd14890)[0] => coa(cpd00010)[0] c226(3)car[0]	N	N	N	N	frxn00157	(1) CoA[0] + (1) c226(3)car[c][0] <=> (1) (4Z,7Z,10Z,13Z,16Z,19Z)-Docosahexaenoyl-CoA[0] + (1) Carnitine[0]
-MAL1110	acyl-CoA oxidase	fad(cpd00015)[0] c240coa(cpd15297)[0] => fadh2(cpd00982)[0] c24dcoa[0]	N	N	N	N	frxn00186	
-MAL1111	Enoyl-CoA hydratase	h2o(cpd00001)[0] c24dcoa[0] => c24hcoa[0]	N	N	N	N	frxn00132	(1) c24hcoa[c][0] <=> (1) H2O[0] + (1) c24dcoa[c][0]
-MAL1112	3-hydroxyacyl-CoA dehydrogenase	nad(cpd00003)[0] c24hcoa[0] => nadh(cpd00004)[0] h(cpd00067)[0] c24ocoa[0]	N	N	N	N	frxn00187	
-MAL1113	acetyl-CoA C-acyltransferase	coa(cpd00010)[0] c24ocoa[0] => accoa(cpd00022)[0] c220coa(cpd16343)[0]	N	N	N	N	frxn00188	
-MAL1114	acyl-CoA oxidase	fad(cpd00015)[0] c220coa(cpd16343)[0] => fadh2(cpd00982)[0] c22dcoa[0]	N	N	N	N	frxn00189	
-MAL1115	Enoyl-CoA hydratase	h2o(cpd00001)[0] c22dcoa[0] => c22hcoa[0]	N	N	N	N	frxn00128	(1) c22hcoa[c][0] <=> (1) H2O[0] + (1) c22dcoa[c][0]
-MAL1116	3-hydroxyacyl-CoA dehydrogenase	nad(cpd00003)[0] c22hcoa[0] => nadh(cpd00004)[0] h(cpd00067)[0] c22ocoa[0]	N	N	N	N	frxn00190	
-MAL1117	acetyl-CoA C-acyltransferase	coa(cpd00010)[0] c22ocoa[0] => accoa(cpd00022)[0] c200coa(cpd01393)[0]	N	N	N	N	frxn00191	
-MAL1118	acyl-CoA oxidase	fad(cpd00015)[0] c200coa(cpd01393)[0] => fadh2(cpd00982)[0] c20dcoa[0]	N	N	N	N	frxn00192	
-MAL1119	Enoyl-CoA hydratase	h2o(cpd00001)[0] c20dcoa[0] => c20hcoa[0]	N	N	N	N	frxn00124	(1) c20hcoa[c][0] <=> (1) H2O[0] + (1) c20dcoa[c][0]
-MAL1120	3-hydroxyacyl-CoA dehydrogenase	nad(cpd00003)[0] c20hcoa[0] => nadh(cpd00004)[0] h(cpd00067)[0] c20ocoa[0]	N	N	N	N	frxn00193	
-MAL1121	acetyl-CoA C-acyltransferase	coa(cpd00010)[0] c20ocoa[0] => accoa(cpd00022)[0] c180coa(cpd00327)[0]	N	N	N	N	frxn00194	
-MAL1122	acyl-CoA oxidase	fad(cpd00015)[0] c180coa(cpd00327)[0] => fadh2(cpd00982)[0] c18dcoa[0]	N	N	N	N	frxn00195	
-MAL1123	Enoyl-CoA hydratase	h2o(cpd00001)[0] c18dcoa[0] => c18hcoa[0]	N	N	N	N	frxn00120	(1) c18hcoa[c][0] <=> (1) H2O[0] + (1) c18dcoa[c][0]
-MAL1124	3-hydroxyacyl-CoA dehydrogenase	nad(cpd00003)[0] c18hcoa[0] => nadh(cpd00004)[0] h(cpd00067)[0] c18ocoa[0]	N	N	N	N	frxn00196	
-MAL1125	acetyl-CoA C-acyltransferase	coa(cpd00010)[0] c18ocoa[0] => accoa(cpd00022)[0] c160coa(cpd00134)[0]	N	N	N	N	frxn00197	
+MAL1034	Carnitine O-acetyltransferase	car(cpd19003)[0] c120coa(cpd01260)[0] => coa(cpd00010)[0] c120car[0]	N	N	N	N	frxn00132	
+MAL1035	Carnitine O-acetyltransferase	car(cpd19003)[0] c140coa(cpd01695)[0] => coa(cpd00010)[0] c140car[0]	N	N	N	N	frxn00133	
+MAL1036	Carnitine O-acetyltransferase	car(cpd19003)[0] c160coa(cpd00134)[0] => coa(cpd00010)[0] c160car(cpd01915)[0]	N	N	N	Y	frxn00134	
+MAL1037	Carnitine O-acetyltransferase	car(cpd19003)[0] c161coa(cpd15238)[0] => coa(cpd00010)[0] c161car[0]	N	N	N	N	frxn00135	
+MAL1038	Carnitine O-acetyltransferase	car(cpd19003)[0] c162coa[0] => coa(cpd00010)[0] c162car[0]	N	N	N	N	frxn00136	
+MAL1039	Carnitine O-acetyltransferase	car(cpd19003)[0] c180coa(cpd00327)[0] => coa(cpd00010)[0] c180car(cpd36045)[0]	N	N	N	Y	frxn00137	
+MAL1040	Carnitine O-acetyltransferase	car(cpd19003)[0] c181coa(cpd15274)[0] => coa(cpd00010)[0] c181car[0]	N	N	N	N	frxn00138	
+MAL1041	Carnitine O-acetyltransferase	car(cpd19003)[0] c182coa(cpd01398)[0] => coa(cpd00010)[0] c182car[0]	N	N	N	N	frxn00139	
+MAL1042	Carnitine O-acetyltransferase	car(cpd19003)[0] c183(6)coa(cpd01942)[0] => coa(cpd00010)[0] c183(6)car[0]	N	N	N	N	frxn00140	
+MAL1043	Carnitine O-acetyltransferase	car(cpd19003)[0] c200coa(cpd01393)[0] => coa(cpd00010)[0] c200car[0]	N	N	N	N	frxn00141	
+MAL1044	Carnitine O-acetyltransferase	car(cpd19003)[0] c203(6)coa(cpd02263)[0] => coa(cpd00010)[0] c203(6)car[0]	N	N	N	N	frxn00142	
+MAL1045	Carnitine O-acetyltransferase	car(cpd19003)[0] c204(6)coa(cpd01519)[0] => coa(cpd00010)[0] c204(6)car[0]	N	N	N	N	frxn00143	
+MAL1046	Carnitine O-acetyltransferase	car(cpd19003)[0] c220coa(cpd16343)[0] => coa(cpd00010)[0] c220car[0]	N	N	N	N	frxn00144	
+MAL1047	Carnitine O-acetyltransferase	car(cpd19003)[0] c224(6)coa(cpd14891)[0] => (4) h(cpd00067)[0] coa(cpd00010)[0] c224(6)car[0]	N	N	N	N	frxn00145	
+MAL1048	Carnitine O-acetyltransferase	car(cpd19003)[0] c240coa(cpd15297)[0] => coa(cpd00010)[0] c240car[0]	N	N	N	N	frxn00146	
+MAL1049	Carnitine O-acetyltransferase	car(cpd19003)[0] c244(6)coa(cpd14892)[0] => coa(cpd00010)[0] c244(6)car[0]	N	N	N	N	frxn00147	
+MAL1050	Carnitine O-acetyltransferase	car(cpd19003)[0] c183(3)coa(cpd14883)[0] => coa(cpd00010)[0] c183(3)car[0]	N	N	N	N	frxn00148	
+MAL1051	Carnitine O-acetyltransferase	car(cpd19003)[0] c184(3)coa(cpd14884)[0] => coa(cpd00010)[0] c184(3)car[0]	N	N	N	N	frxn00149	
+MAL1052	Carnitine O-acetyltransferase	car(cpd19003)[0] c204(3)coa(cpd14899)[0] => (2) h(cpd00067)[0] coa(cpd00010)[0] c204(3)car[0]	N	N	N	N	frxn00150	
+MAL1053	Carnitine O-acetyltransferase	car(cpd19003)[0] c205(3)coa(cpd24122)[0] => coa(cpd00010)[0] c205(3)car[0]	N	N	N	N	frxn00151	
+MAL1054	Carnitine O-acetyltransferase	car(cpd19003)[0] c225(3)coa(cpd14887)[0] => coa(cpd00010)[0] c225(3)car[0]	N	N	N	N	frxn00152	
+MAL1055	Carnitine O-acetyltransferase	car(cpd19003)[0] c245(3)coa(cpd14888)[0] => coa(cpd00010)[0] c245(3)car[0]	N	N	N	N	frxn00153	
+MAL1056	Carnitine O-acetyltransferase	car(cpd19003)[0] c246(3)coa(cpd14889)[0] => coa(cpd00010)[0] c246(3)car[0]	N	N	N	N	frxn00154	
+MAL1057	Carnitine O-acetyltransferase	coa(cpd00010)[0] c226(3)car[0] => car(cpd19003)[0] c226(3)coa(cpd14890)[0]	N	N	N	N	frxn00155	
+MAL1058	Carnitine O-acetyltransferase	c120car[0] car(cpd19003)[1] => car(cpd19003)[0] c120car[1]	Y	N	N	N	frxn00156	
+MAL1059	Carnitine O-acetyltransferase	c140car[0] car(cpd19003)[1] => car(cpd19003)[0] c140car[1]	Y	N	N	N	frxn00157	
+MAL1060	Carnitine O-acetyltransferase	c160car(cpd01915)[0] car(cpd19003)[1] => car(cpd19003)[0] c160car(cpd01915)[1]	Y	N	N	Y	frxn00158	
+MAL1061	Carnitine O-acetyltransferase	c161car[0] car(cpd19003)[1] => car(cpd19003)[0] c161car[1]	Y	N	N	N	frxn00159	
+MAL1062	Carnitine O-acetyltransferase	c162car[0] car(cpd19003)[1] => car(cpd19003)[0] c162car[1]	Y	N	N	N	frxn00160	
+MAL1063	Carnitine O-acetyltransferase	c180car(cpd36045)[0] car(cpd19003)[1] => car(cpd19003)[0] c180car(cpd36045)[1]	Y	N	N	Y	frxn00161	
+MAL1064	Carnitine O-acetyltransferase	c181car[0] car(cpd19003)[1] => car(cpd19003)[0] c181car[1]	Y	N	N	N	frxn00162	
+MAL1065	Carnitine O-acetyltransferase	c182car[0] car(cpd19003)[1] => car(cpd19003)[0] c182car[1]	Y	N	N	N	frxn00163	
+MAL1066	Carnitine O-acetyltransferase	c183(6)car[0] car(cpd19003)[1] => car(cpd19003)[0] c183(6)car[1]	Y	N	N	N	frxn00164	
+MAL1067	Carnitine O-acetyltransferase	c200car[0] car(cpd19003)[1] => car(cpd19003)[0] c200car[1]	Y	N	N	N	frxn00165	
+MAL1068	Carnitine O-acetyltransferase	c203(6)car[0] car(cpd19003)[1] => car(cpd19003)[0] c203(6)car[1]	Y	N	N	N	frxn00166	
+MAL1069	Carnitine O-acetyltransferase	c204(6)car[0] car(cpd19003)[1] => car(cpd19003)[0] c204(6)car[1]	Y	N	N	N	frxn00167	
+MAL1070	Carnitine O-acetyltransferase	c220car[0] car(cpd19003)[1] => car(cpd19003)[0] c220car[1]	Y	N	N	N	frxn00168	
+MAL1071	Carnitine O-acetyltransferase	c224(6)car[0] car(cpd19003)[1] => car(cpd19003)[0] c224(6)car[1]	Y	N	N	N	frxn00169	
+MAL1072	Carnitine O-acetyltransferase	c240car[0] car(cpd19003)[1] => car(cpd19003)[0] c240car[1]	Y	N	N	N	frxn00170	
+MAL1073	Carnitine O-acetyltransferase	c244(6)car[0] car(cpd19003)[1] => car(cpd19003)[0] c244(6)car[1]	Y	N	N	N	frxn00171	
+MAL1074	Carnitine O-acetyltransferase	car(cpd19003)[0] c245(6)car[1] => car(cpd19003)[1] c245(6)car[0]	Y	N	N	N	frxn00172	
+MAL1075	Carnitine O-acetyltransferase	car(cpd19003)[0] c225(6)car[1] => car(cpd19003)[1] c225(6)car[0]	Y	N	N	N	frxn00173	
+MAL1076	Carnitine O-acetyltransferase	c183(3)car[0] car(cpd19003)[1] => car(cpd19003)[0] c183(3)car[1]	Y	N	N	N	frxn00174	
+MAL1077	Carnitine O-acetyltransferase	c184(3)car[0] car(cpd19003)[1] => car(cpd19003)[0] c184(3)car[1]	Y	N	N	N	frxn00175	
+MAL1078	Carnitine O-acetyltransferase	c204(3)car[0] car(cpd19003)[1] => car(cpd19003)[0] c204(3)car[1]	Y	N	N	N	frxn00176	
+MAL1079	Carnitine O-acetyltransferase	c205(3)car[0] car(cpd19003)[1] => car(cpd19003)[0] c205(3)car[1]	Y	N	N	N	frxn00177	
+MAL1080	Carnitine O-acetyltransferase	c225(3)car[0] car(cpd19003)[1] => car(cpd19003)[0] c225(3)car[1]	Y	N	N	N	frxn00178	
+MAL1081	Carnitine O-acetyltransferase	c245(3)car[0] car(cpd19003)[1] => car(cpd19003)[0] c245(3)car[1]	Y	N	N	N	frxn00179	
+MAL1082	Carnitine O-acetyltransferase	c246(3)car[0] car(cpd19003)[1] => car(cpd19003)[0] c246(3)car[1]	Y	N	N	N	frxn00180	
+MAL1083	Carnitine O-acetyltransferase	car(cpd19003)[0] c226(3)car[1] => c226(3)car[0] car(cpd19003)[1]	Y	N	N	N	frxn00181	
+MAL1084	Carnitine O-acetyltransferase	car(cpd19003)[0] c120coa(cpd01260)[0] => coa(cpd00010)[0] c120car[0]	N	N	N	N	frxn00132	(1) Lauroyl-CoA[0] + (1) Carnitine[0] <=> (1) CoA[0] + (1) Dodecanoyl-carnitine[0]
+MAL1085	Carnitine O-acetyltransferase	car(cpd19003)[0] c140coa(cpd01695)[0] => coa(cpd00010)[0] c140car[0]	N	N	N	N	frxn00133	(1) Myristoyl-CoA[0] + (1) Carnitine[0] <=> (1) CoA[0] + (1) myristoylcarnitine[0]
+MAL1086	Carnitine O-acetyltransferase	car(cpd19003)[0] c160coa(cpd00134)[0] => coa(cpd00010)[0] c160car(cpd01915)[0]	N	N	N	Y	frxn00134	(1) Palmitoyl-CoA[0] + (1) Carnitine[0] <=> (1) CoA[0] + (1) L-Palmitoylcarnitine[0]
+MAL1087	Carnitine O-acetyltransferase	car(cpd19003)[0] c161coa(cpd15238)[0] => coa(cpd00010)[0] c161car[0]	N	N	N	N	frxn00135	(1) Hexadecenoyl-CoA[0] + (1) Carnitine[0] <=> (1) CoA[0] + (1) Hexadecenoyl-carnitine[0]
+MAL1088	Carnitine O-acetyltransferase	car(cpd19003)[0] c162coa[0] => coa(cpd00010)[0] c162car[0]	N	N	N	N	frxn00136	(1) Carnitine[0] + (1) hexadecadienoyl-CoA[0] <=> (1) CoA[0] + (1) Hexadecadienoyl-carnitine[0]
+MAL1089	Carnitine O-acetyltransferase	car(cpd19003)[0] c180coa(cpd00327)[0] => coa(cpd00010)[0] c180car(cpd36045)[0]	N	N	N	Y	frxn00137	(1) strcoa[0] + (1) Carnitine[0] <=> (1) CoA[0] + (1) O-octadecanoyl-L-carnitine[0]
+MAL1090	Carnitine O-acetyltransferase	car(cpd19003)[0] c181coa(cpd15274)[0] => coa(cpd00010)[0] c181car[0]	N	N	N	N	frxn00138	(1) Octadecenoyl-CoA[0] + (1) Carnitine[0] <=> (1) CoA[0] + (1) Octadecenoyl-carnitine[0]
+MAL1091	Carnitine O-acetyltransferase	car(cpd19003)[0] c182coa(cpd01398)[0] => coa(cpd00010)[0] c182car[0]	N	N	N	N	frxn00139	(1) Linoleoyl-CoA[0] + (1) Carnitine[0] <=> (1) CoA[0] + (1) Octadecadienoyl-carnitine[0]
+MAL1092	Carnitine O-acetyltransferase	car(cpd19003)[0] c183(6)coa(cpd01942)[0] => coa(cpd00010)[0] c183(6)car[0]	N	N	N	N	frxn00140	(1) gamma-Linolenoyl-CoA[0] + (1) Carnitine[0] <=> (1) CoA[0] + (1) c183(6)car[m][0]
+MAL1093	Carnitine O-acetyltransferase	car(cpd19003)[0] c200coa(cpd01393)[0] => coa(cpd00010)[0] c200car[0]	N	N	N	N	frxn00141	(1) Icosanoyl-CoA[0] + (1) Carnitine[0] <=> (1) CoA[0] + (1) eicosanoyl-car[0]
+MAL1094	Carnitine O-acetyltransferase	car(cpd19003)[0] c203(6)coa(cpd02263)[0] => coa(cpd00010)[0] c203(6)car[0]	N	N	N	N	frxn00142	(1) 8,11,14-Icosatrienoyl-CoA[0] + (1) Carnitine[0] <=> (1) CoA[0] + (1) di-homo-gama-linolenate-car[0]
+MAL1095	Carnitine O-acetyltransferase	car(cpd19003)[0] c204(6)coa(cpd01519)[0] => coa(cpd00010)[0] c204(6)car[0]	N	N	N	N	frxn00143	(1) Arachidonyl-CoA[0] + (1) Carnitine[0] <=> (1) CoA[0] + (1) aracar[c][0]
+MAL1096	Carnitine O-acetyltransferase	car(cpd19003)[0] c220coa(cpd16343)[0] => coa(cpd00010)[0] c220car[0]	N	N	N	N	frxn00144	(1) Behenoyl-CoA[0] + (1) Carnitine[0] <=> (1) CoA[0] + (1) c220car[c][0]
+MAL1097	Carnitine O-acetyltransferase	car(cpd19003)[0] c224(6)coa(cpd14891)[0] => coa(cpd00010)[0] (4) h(cpd00067)[0] c224(6)car[0]	N	N	N	N	frxn00145	(1) (7Z,10Z,13Z,16Z)-Docosatetraenoyl-CoA[0] + (1) Carnitine[0] <=> (1) CoA[0] + (4) H+[0] + (1) c224(6)car[c][0]
+MAL1098	Carnitine O-acetyltransferase	car(cpd19003)[0] c240coa(cpd15297)[0] => coa(cpd00010)[0] c240car[0]	N	N	N	N	frxn00146	(1) Lignoceroyl-CoA[0] + (1) Carnitine[0] <=> (1) CoA[0] + (1) c240car[c][0]
+MAL1099	Carnitine O-acetyltransferase	car(cpd19003)[0] c244(6)coa(cpd14892)[0] => coa(cpd00010)[0] c244(6)car[0]	N	N	N	N	frxn00147	(1) (9Z,12Z,15Z,18Z)-Tetracosatetraenoyl-CoA[0] + (1) Carnitine[0] <=> (1) CoA[0] + (1) c244(6)car[c][0]
+MAL1100	Carnitine O-acetyltransferase	car(cpd19003)[0] c245(6)coa(cpd14893)[0] => coa(cpd00010)[0] c245(6)car[0]	N	N	N	N	frxn00182	
+MAL1101	Carnitine O-acetyltransferase	car(cpd19003)[0] c225(6)coa(cpd14894)[0] => coa(cpd00010)[0] c225(6)car[0]	N	N	N	N	frxn00183	
+MAL1102	Carnitine O-acetyltransferase	car(cpd19003)[0] c183(3)coa(cpd14883)[0] => coa(cpd00010)[0] c183(3)car[0]	N	N	N	N	frxn00148	(1) alpha-Linolenoyl-CoA[0] + (1) Carnitine[0] <=> (1) CoA[0] + (1) c183(3)car[c][0]
+MAL1103	Carnitine O-acetyltransferase	car(cpd19003)[0] c184(3)coa(cpd14884)[0] => coa(cpd00010)[0] c184(3)car[0]	N	N	N	N	frxn00149	(1) Stearidonoyl-CoA[0] + (1) Carnitine[0] <=> (1) CoA[0] + (1) c184(3)car[c][0]
+MAL1104	Carnitine O-acetyltransferase	car(cpd19003)[0] c204(3)coa(cpd14899)[0] => coa(cpd00010)[0] (2) h(cpd00067)[0] c204(3)car[0]	N	N	N	N	frxn00150	(1) (11Z,14Z,17Z)-Icosatrienoyl-CoA[0] + (1) Carnitine[0] <=> (1) CoA[0] + (2) H+[0] + (1) c204(3)car[c][0]
+MAL1105	Carnitine O-acetyltransferase	car(cpd19003)[0] c205(3)coa(cpd24122)[0] => coa(cpd00010)[0] c205(3)car[0]	N	N	N	N	frxn00151	(1) Carnitine[0] + (1) eicosapentaenoyl CoA[0] <=> (1) CoA[0] + (1) c205(3)car[c][0]
+MAL1106	Carnitine O-acetyltransferase	car(cpd19003)[0] c225(3)coa(cpd14887)[0] => coa(cpd00010)[0] c225(3)car[0]	N	N	N	N	frxn00152	(1) (7Z,10Z,13Z,16Z,19Z)-Docosapentaenoyl-CoA[0] + (1) Carnitine[0] <=> (1) CoA[0] + (1) c225(3)car[c][0]
+MAL1107	Carnitine O-acetyltransferase	car(cpd19003)[0] c245(3)coa(cpd14888)[0] => coa(cpd00010)[0] c245(3)car[0]	N	N	N	N	frxn00153	(1) (9Z,12Z,15Z,18Z,21Z)-Tetracosaheptaenoyl-CoA[0] + (1) Carnitine[0] <=> (1) CoA[0] + (1) c245(3)car[c][0]
+MAL1108	Carnitine O-acetyltransferase	car(cpd19003)[0] c246(3)coa(cpd14889)[0] => coa(cpd00010)[0] c246(3)car[0]	N	N	N	N	frxn00154	(1) (6Z,9Z,12Z,15Z,18Z,21Z)-Tetracosahexaenoyl-CoA[0] + (1) Carnitine[0] <=> (1) CoA[0] + (1) c246(3)car[c][0]
+MAL1109	Carnitine O-acetyltransferase	car(cpd19003)[0] c226(3)coa(cpd14890)[0] => coa(cpd00010)[0] c226(3)car[0]	N	N	N	N	frxn00155	(1) CoA[0] + (1) c226(3)car[c][0] <=> (1) (4Z,7Z,10Z,13Z,16Z,19Z)-Docosahexaenoyl-CoA[0] + (1) Carnitine[0]
+MAL1110	acyl-CoA oxidase	fad(cpd00015)[0] c240coa(cpd15297)[0] => fadh2(cpd00982)[0] c24dcoa[0]	N	N	N	N	frxn00184	
+MAL1111	Enoyl-CoA hydratase	h2o(cpd00001)[0] c24dcoa[0] => c24hcoa[0]	N	N	N	N	frxn00130	(1) c24hcoa[c][0] <=> (1) H2O[0] + (1) c24dcoa[c][0]
+MAL1112	3-hydroxyacyl-CoA dehydrogenase	nad(cpd00003)[0] c24hcoa[0] => nadh(cpd00004)[0] h(cpd00067)[0] c24ocoa[0]	N	N	N	N	frxn00185	
+MAL1113	acetyl-CoA C-acyltransferase	coa(cpd00010)[0] c24ocoa[0] => accoa(cpd00022)[0] c220coa(cpd16343)[0]	N	N	N	N	frxn00186	
+MAL1114	acyl-CoA oxidase	fad(cpd00015)[0] c220coa(cpd16343)[0] => fadh2(cpd00982)[0] c22dcoa[0]	N	N	N	N	frxn00187	
+MAL1115	Enoyl-CoA hydratase	h2o(cpd00001)[0] c22dcoa[0] => c22hcoa[0]	N	N	N	N	frxn00126	(1) c22hcoa[c][0] <=> (1) H2O[0] + (1) c22dcoa[c][0]
+MAL1116	3-hydroxyacyl-CoA dehydrogenase	nad(cpd00003)[0] c22hcoa[0] => nadh(cpd00004)[0] h(cpd00067)[0] c22ocoa[0]	N	N	N	N	frxn00188	
+MAL1117	acetyl-CoA C-acyltransferase	coa(cpd00010)[0] c22ocoa[0] => accoa(cpd00022)[0] c200coa(cpd01393)[0]	N	N	N	N	frxn00189	
+MAL1118	acyl-CoA oxidase	fad(cpd00015)[0] c200coa(cpd01393)[0] => fadh2(cpd00982)[0] c20dcoa[0]	N	N	N	N	frxn00190	
+MAL1119	Enoyl-CoA hydratase	h2o(cpd00001)[0] c20dcoa[0] => c20hcoa[0]	N	N	N	N	frxn00122	(1) c20hcoa[c][0] <=> (1) H2O[0] + (1) c20dcoa[c][0]
+MAL1120	3-hydroxyacyl-CoA dehydrogenase	nad(cpd00003)[0] c20hcoa[0] => nadh(cpd00004)[0] h(cpd00067)[0] c20ocoa[0]	N	N	N	N	frxn00191	
+MAL1121	acetyl-CoA C-acyltransferase	coa(cpd00010)[0] c20ocoa[0] => accoa(cpd00022)[0] c180coa(cpd00327)[0]	N	N	N	N	frxn00192	
+MAL1122	acyl-CoA oxidase	fad(cpd00015)[0] c180coa(cpd00327)[0] => fadh2(cpd00982)[0] c18dcoa[0]	N	N	N	N	frxn00193	
+MAL1123	Enoyl-CoA hydratase	h2o(cpd00001)[0] c18dcoa[0] => c18hcoa[0]	N	N	N	N	frxn00118	(1) c18hcoa[c][0] <=> (1) H2O[0] + (1) c18dcoa[c][0]
+MAL1124	3-hydroxyacyl-CoA dehydrogenase	nad(cpd00003)[0] c18hcoa[0] => nadh(cpd00004)[0] h(cpd00067)[0] c18ocoa[0]	N	N	N	N	frxn00194	
+MAL1125	acetyl-CoA C-acyltransferase	coa(cpd00010)[0] c18ocoa[0] => accoa(cpd00022)[0] c160coa(cpd00134)[0]	N	N	N	N	frxn00195	
 MAL1126	Long-chain acyl-CoA synthetase	coa(cpd00010)[0] atp(cpd00002)[0] c160(cpd00214)[0] => ppi(cpd00012)[0] amp(cpd00018)[0] c160coa(cpd00134)[0]	N	N	Y	Y	rxn00947	(1) ATP[0] + (1) CoA[0] + (1) Palmitate[0] => (1) PPi[0] + (1) AMP[0] + (1) H+[0] + (1) Palmitoyl-CoA[0]
 MAL1127	acyl-CoA oxidase	fad(cpd00015)[0] c160coa(cpd00134)[0] => fadh2(cpd00982)[0] c16dcoa(cpd03126)[0]	N	N	Y	Y	rxn00946	(1) FAD[0] + (1) Palmitoyl-CoA[0] <=> (1) FADH2[0] + (1) (2E)-Hexadecenoyl-CoA[0]
-MAL1128	Enoyl-CoA hydratase	h2o(cpd00001)[0] c16dcoa(cpd03126)[0] => c16hcoa[0]	N	N	N	N	frxn00198	
-MAL1129	3-hydroxyacyl-CoA dehydrogenase	nad(cpd00003)[0] c16hcoa[0] => nadh(cpd00004)[0] h(cpd00067)[0] c16ocoa(cpd03114)[0]	N	N	N	N	frxn00199	
+MAL1128	Enoyl-CoA hydratase	h2o(cpd00001)[0] c16dcoa(cpd03126)[0] => c16hcoa[0]	N	N	N	N	frxn00196	
+MAL1129	3-hydroxyacyl-CoA dehydrogenase	nad(cpd00003)[0] c16hcoa[0] => nadh(cpd00004)[0] h(cpd00067)[0] c16ocoa(cpd03114)[0]	N	N	N	N	frxn00197	
 MAL1130	acetyl-CoA C-acyltransferase	coa(cpd00010)[0] c16ocoa(cpd03114)[0] => accoa(cpd00022)[0] c140coa(cpd01695)[0]	N	N	Y	Y	rxn02804	(1) Acetyl-CoA[0] + (1) Myristoyl-CoA[0] <=> (1) CoA[0] + (1) 3-Oxopalmitoyl-CoA[0]
-MAL1131	acyl-CoA oxidase	fad(cpd00015)[0] c140coa(cpd01695)[0] => fadh2(cpd00982)[0] c14dcoa[0]	N	N	N	N	frxn00200	
-MAL1132	Enoyl-CoA hydratase	h2o(cpd00001)[0] c14dcoa[0] => c14hcoa[0]	N	N	N	N	frxn00201	
-MAL1133	3-hydroxyacyl-CoA dehydrogenase	nad(cpd00003)[0] c14hcoa[0] => nadh(cpd00004)[0] h(cpd00067)[0] c14ocoa(cpd12689)[0]	N	N	N	N	frxn00202	
+MAL1131	acyl-CoA oxidase	fad(cpd00015)[0] c140coa(cpd01695)[0] => fadh2(cpd00982)[0] c14dcoa[0]	N	N	N	N	frxn00198	
+MAL1132	Enoyl-CoA hydratase	h2o(cpd00001)[0] c14dcoa[0] => c14hcoa[0]	N	N	N	N	frxn00199	
+MAL1133	3-hydroxyacyl-CoA dehydrogenase	nad(cpd00003)[0] c14hcoa[0] => nadh(cpd00004)[0] h(cpd00067)[0] c14ocoa(cpd12689)[0]	N	N	N	N	frxn00200	
 MAL1134	acetyl-CoA C-acyltransferase	coa(cpd00010)[0] c14ocoa(cpd12689)[0] => accoa(cpd00022)[0] c120coa(cpd01260)[0]	N	N	Y	Y	rxn06510	(1) Acetyl-CoA[0] + (1) Lauroyl-CoA[0] <=> (1) CoA[0] + (1) 3-Oxotetradecanoyl-CoA[0]
 MAL1135	acyl-CoA oxidase	fad(cpd00015)[0] c120coa(cpd01260)[0] => fadh2(cpd00982)[0] c12dcoa(cpd02060)[0]	N	N	Y	Y	rxn02720	(1) FAD[0] + (1) Lauroyl-CoA[0] <=> (1) FADH2[0] + (1) (2E)-Dodecenoyl-CoA[0]
-MAL1136	Enoyl-CoA hydratase	h2o(cpd00001)[0] c12dcoa(cpd02060)[0] => c12hcoa[0]	N	N	N	N	frxn00203	
-MAL1137	3-hydroxyacyl-CoA dehydrogenase	nad(cpd00003)[0] c12hcoa[0] => nadh(cpd00004)[0] h(cpd00067)[0] c12ocoa(cpd03117)[0]	N	N	N	N	frxn00204	
+MAL1136	Enoyl-CoA hydratase	h2o(cpd00001)[0] c12dcoa(cpd02060)[0] => c12hcoa[0]	N	N	N	N	frxn00201	
+MAL1137	3-hydroxyacyl-CoA dehydrogenase	nad(cpd00003)[0] c12hcoa[0] => nadh(cpd00004)[0] h(cpd00067)[0] c12ocoa(cpd03117)[0]	N	N	N	N	frxn00202	
 MAL1138	acetyl-CoA C-acyltransferase	coa(cpd00010)[0] c12ocoa(cpd03117)[0] => accoa(cpd00022)[0] c100coa(cpd03128)[0]	N	N	Y	Y	rxn03243	(1) Acetyl-CoA[0] + (1) Decanoyl-CoA[0] <=> (1) CoA[0] + (1) 3-Oxododecanoyl-CoA[0]
 MAL1139	acyl-CoA oxidase	fad(cpd00015)[0] c100coa(cpd03128)[0] => fadh2(cpd00982)[0] c10dcoa(cpd03129)[0]	N	N	Y	Y	rxn03253	(1) FAD[0] + (1) Decanoyl-CoA[0] <=> (1) FADH2[0] + (1) (2E)-Decenoyl-CoA[0]
-MAL1140	Enoyl-CoA hydratase	h2o(cpd00001)[0] c10dcoa(cpd03129)[0] => c10hcoa(cpd16776)[0]	N	N	N	Y	frxn00205	
-MAL1141	3-hydroxyacyl-CoA dehydrogenase	nad(cpd00003)[0] c10hcoa(cpd16776)[0] => nadh(cpd00004)[0] h(cpd00067)[0] c10ocoa(cpd03119)[0]	N	N	N	Y	frxn00206	
+MAL1140	Enoyl-CoA hydratase	h2o(cpd00001)[0] c10dcoa(cpd03129)[0] => c10hcoa(cpd16776)[0]	N	N	N	Y	frxn00203	
+MAL1141	3-hydroxyacyl-CoA dehydrogenase	nad(cpd00003)[0] c10hcoa(cpd16776)[0] => nadh(cpd00004)[0] h(cpd00067)[0] c10ocoa(cpd03119)[0]	N	N	N	Y	frxn00204	
 MAL1142	acetyl-CoA C-acyltransferase	coa(cpd00010)[0] c10ocoa(cpd03119)[0] => accoa(cpd00022)[0] c80coa(cpd01335)[0]	N	N	Y	Y	rxn02680	(1) Acetyl-CoA[0] + (1) Octanoyl-CoA[0] <=> (1) CoA[0] + (1) 3-Oxodecanoyl-CoA[0]
 MAL1143	acyl-CoA oxidase	fad(cpd00015)[0] c80coa(cpd01335)[0] => fadh2(cpd00982)[0] c8dcoa(cpd03130)[0]	N	N	Y	Y	rxn02679	(1) FAD[0] + (1) Octanoyl-CoA[0] <=> (1) FADH2[0] + (1) (2E)-Octenoyl-CoA[0]
-MAL1144	Enoyl-CoA hydratase	h2o(cpd00001)[0] c8dcoa(cpd03130)[0] => c8hcoa(cpd16779)[0]	N	N	N	Y	frxn00207	
-MAL1145	3-hydroxyacyl-CoA dehydrogenase	nad(cpd00003)[0] c8hcoa(cpd16779)[0] => nadh(cpd00004)[0] h(cpd00067)[0] c8ocoa(cpd03121)[0]	N	N	N	Y	frxn00208	
+MAL1144	Enoyl-CoA hydratase	h2o(cpd00001)[0] c8dcoa(cpd03130)[0] => c8hcoa(cpd16779)[0]	N	N	N	Y	frxn00205	
+MAL1145	3-hydroxyacyl-CoA dehydrogenase	nad(cpd00003)[0] c8hcoa(cpd16779)[0] => nadh(cpd00004)[0] h(cpd00067)[0] c8ocoa(cpd03121)[0]	N	N	N	Y	frxn00206	
 MAL1146	acetyl-CoA C-acyltransferase	coa(cpd00010)[0] c8ocoa(cpd03121)[0] => accoa(cpd00022)[0] c60coa(cpd03124)[0]	N	N	Y	Y	rxn03248	(1) Acetyl-CoA[0] + (1) Hexanoyl-CoA[0] <=> (1) CoA[0] + (1) 3-Oxooctanoyl-CoA[0]
 MAL1147	medium-chain acyl-CoA dehydrogenase	fad(cpd00015)[0] c60coa(cpd03124)[0] => fadh2(cpd00982)[0] c6dcoa(cpd03125)[0]	N	N	Y	Y	rxn03251	(1) FAD[0] + (1) Hexanoyl-CoA[0] <=> (1) FADH2[0] + (1) (2E)-Hexenoyl-CoA[0]
-MAL1148	Enoyl-CoA hydratase	h2o(cpd00001)[0] c6dcoa(cpd03125)[0] => c6hcoa(cpd16777)[0]	N	N	N	Y	frxn00209	
+MAL1148	Enoyl-CoA hydratase	h2o(cpd00001)[0] c6dcoa(cpd03125)[0] => c6hcoa(cpd16777)[0]	N	N	N	Y	frxn00207	
 MAL1149	3-hydroxyacyl-CoA dehydrogenase	nad(cpd00003)[0] c6hcoa(cpd16777)[0] => nadh(cpd00004)[0] h(cpd00067)[0] c6ocoa(cpd03123)[0]	N	N	Y	Y	rxn12971	(1) NAD[0] + (1) 3-hydroxyhexanoyl-CoA[0] => (1) NADH[0] + (1) H+[0] + (1) 3-Oxohexanoyl-CoA[0]
 MAL1150	acetyl-CoA C-acyltransferase	coa(cpd00010)[0] c6ocoa(cpd03123)[0] => accoa(cpd00022)[0] c40coa(cpd00120)[0]	N	N	Y	Y	rxn00874	(1) Acetyl-CoA[0] + (1) Butyryl-CoA[0] <=> (1) CoA[0] + (1) 3-Oxohexanoyl-CoA[0]
 MAL1151	medium-chain acyl-CoA dehydrogenase	fad(cpd00015)[0] c40coa(cpd00120)[0] => fadh2(cpd00982)[0] c4dcoa(cpd00650)[0]	N	N	Y	Y	rxn00872	(1) FAD[0] + (1) Butyryl-CoA[0] <=> (1) Crotonyl-CoA[0] + (1) FADH2[0]
@@ -1155,17 +1155,17 @@ MAL1153	3-hydroxyacyl-CoA dehydrogenase	nad(cpd00003)[0] c4hcoa(cpd00842)[0] => 
 MAL1154	acetyl-CoA C-acetyltransferase	coa(cpd00010)[0] aaccoa(cpd00279)[0] => (2) accoa(cpd00022)[0]	N	N	Y	Y	rxn00178	(2) Acetyl-CoA[0] <=> (1) CoA[0] + (1) Acetoacetyl-CoA[0]
 MAL1155	glutaryl-CoA dehydrogenase	h(cpd00067)[0] fad(cpd00015)[0] gltcoa(cpd00413)[0] => co2(cpd00011)[0] fadh2(cpd00982)[0] c4dcoa(cpd00650)[0]	N	N	Y	Y	rxn01802	(1) FAD[0] + (1) H+[0] + (1) Glutaryl-CoA[0] => (1) CO2[0] + (1) Crotonyl-CoA[0] + (1) FADH2[0]
 MAL1156	NAD-dependent alcohol dehydrogenase	nad(cpd00003)[0] gl(cpd00100)[0] => h(cpd00067)[0] nadh(cpd00004)[0] glyal(cpd00448)[0]	N	N	Y	Y	rxn00763	(1) NAD[0] + (1) Glycerol[0] <=> (1) NADH[0] + (1) H+[0] + (1) D-Glyceraldehyde[0]
-MAL1157	c161 Oxidation	(6) coa(cpd00010)[0] (7) nad(cpd00003)[0] (7) h2o(cpd00001)[0] (6) fad(cpd00015)[0] c161coa(cpd15238)[0] => (8) accoa(cpd00022)[0] (7) nadp(cpd00006)[0] (7) h(cpd00067)[0] (6) fadh2(cpd00982)[0]	N	N	N	Y	frxn00210	
-MAL1158	c201 Oxidation	(8) coa(cpd00010)[0] (9) nad(cpd00003)[0] (9) h2o(cpd00001)[0] (8) fad(cpd00015)[0] c201coa(cpd16344)[0] => (10) accoa(cpd00022)[0] (9) nadp(cpd00006)[0] (9) h(cpd00067)[0] (8) fadh2(cpd00982)[0]	N	N	N	Y	frxn00211	
-MAL1159	c182 Oxidation	(8) coa(cpd00010)[0] (8) nad(cpd00003)[0] (9) h2o(cpd00001)[0] (6) fad(cpd00015)[0] c182coa(cpd01398)[0] => (10) accoa(cpd00022)[0] (8) nadp(cpd00006)[0] (9) h(cpd00067)[0] (6) fadh2(cpd00982)[0]	N	N	N	Y	frxn00212	
-MAL1160	c181 Oxidation	(7) coa(cpd00010)[0] (8) nad(cpd00003)[0] (8) h2o(cpd00001)[0] (7) fad(cpd00015)[0] c181coa(cpd15274)[0] => (9) accoa(cpd00022)[0] (8) nadp(cpd00006)[0] (9) h(cpd00067)[0] (7) fadh2(cpd00982)[0]	N	N	N	Y	frxn00213	
+MAL1157	c161 Oxidation	(6) coa(cpd00010)[0] (7) nad(cpd00003)[0] (7) h2o(cpd00001)[0] (6) fad(cpd00015)[0] c161coa(cpd15238)[0] => (8) accoa(cpd00022)[0] (7) nadp(cpd00006)[0] (7) h(cpd00067)[0] (6) fadh2(cpd00982)[0]	N	N	N	Y	frxn00208	
+MAL1158	c201 Oxidation	(8) coa(cpd00010)[0] (9) nad(cpd00003)[0] (9) h2o(cpd00001)[0] (8) fad(cpd00015)[0] c201coa(cpd16344)[0] => (10) accoa(cpd00022)[0] (9) nadp(cpd00006)[0] (9) h(cpd00067)[0] (8) fadh2(cpd00982)[0]	N	N	N	Y	frxn00209	
+MAL1159	c182 Oxidation	(8) coa(cpd00010)[0] (8) nad(cpd00003)[0] (9) h2o(cpd00001)[0] (6) fad(cpd00015)[0] c182coa(cpd01398)[0] => (10) accoa(cpd00022)[0] (8) nadp(cpd00006)[0] (9) h(cpd00067)[0] (6) fadh2(cpd00982)[0]	N	N	N	Y	frxn00210	
+MAL1160	c181 Oxidation	(7) coa(cpd00010)[0] (8) nad(cpd00003)[0] (8) h2o(cpd00001)[0] (7) fad(cpd00015)[0] c181coa(cpd15274)[0] => (9) accoa(cpd00022)[0] (8) nadp(cpd00006)[0] (9) h(cpd00067)[0] (7) fadh2(cpd00982)[0]	N	N	N	Y	frxn00211	
 MAL1161	Long-chain acyl-CoA synthetase	atp(cpd00002)[0] coa(cpd00010)[0] c161(cpd15237)[0] => amp(cpd00018)[0] ppi(cpd00012)[0] c161coa(cpd15238)[0]	N	N	Y	Y	rxn09450	(1) ATP[0] + (1) CoA[0] + (1) hexadecenoate[0] <= (1) PPi[0] + (1) AMP[0] + (1) Hexadecenoyl-CoA[0]
 MAL1162	sterol 14-demethylase	(2) h(cpd00067)[0] (3) nadph(cpd00005)[0] (3) o2(cpd00007)[0] lnst(cpd01188)[0] => (4) h2o(cpd00001)[0] (3) nadp(cpd00006)[0] for(cpd00047)[0] dctol(cpd08302)[0]	N	N	Y	Y	rxn03912	(3) NADPH[0] + (3) O2[0] + (2) H+[0] + (1) Lanosterol[0] => (4) H2O[0] + (3) NADP[0] + (1) Formate[0] + (1) 4,4-Dimethyl-5alpha-cholesta-8,14,24-trien-3beta-ol[0]
 MAL1163	lanosterol delta24-reductase	h(cpd00067)[0] nadph(cpd00005)[0] lnst(cpd01188)[0] => nadp(cpd00006)[0] dhstro(cpd03039)[0]	N	N	Y	Y	rxn02618	(1) NADPH[0] + (1) H+[0] + (1) Lanosterol[0] => (1) NADP[0] + (1) 24,25-Dihydrolanosterol[0]
 MAL1164	delta14-sterol reductase;C-14 sterol reductase (cG24)	h(cpd00067)[0] nadph(cpd00005)[0] dctol(cpd08302)[0] => nadp(cpd00006)[0] dcdol(cpd03038)[0]	N	N	Y	Y	rxn03911	(1) NADP[0] + (1) 14-Demethyllanosterol[0] <=> (1) NADPH[0] + (1) H+[0] + (1) 4,4-Dimethyl-5alpha-cholesta-8,14,24-trien-3beta-ol[0]
-MAL1165	methylsterol monooxygenase;C-4 sterol methyl oxidase (cG25)	(2) h(cpd00067)[0] (3) nadph(cpd00005)[0] (3) o2(cpd00007)[0] dcdol(cpd03038)[0] => (4) h2o(cpd00001)[0] (3) nadp(cpd00006)[0] dcda[0]	N	N	N	N	frxn00214	
-MAL1166	C-4 sterol decarboxylase (cG26);sterol-4alpha-carboxylate 3-dehydrogenase (decarboxylating)	nadp(cpd00006)[0] dcda[0] => nadph(cpd00005)[0] co2(cpd00011)[0] cdol[0]	N	N	N	N	frxn00215	
-MAL1167	3-keto-steroid reductase	h(cpd00067)[0] nadph(cpd00005)[0] cdol[0] => nadp(cpd00006)[0] mzymst(cpd03035)[0]	N	N	N	N	frxn00216	
+MAL1165	methylsterol monooxygenase;C-4 sterol methyl oxidase (cG25)	(2) h(cpd00067)[0] (3) nadph(cpd00005)[0] (3) o2(cpd00007)[0] dcdol(cpd03038)[0] => (4) h2o(cpd00001)[0] (3) nadp(cpd00006)[0] dcda[0]	N	N	N	N	frxn00212	
+MAL1166	C-4 sterol decarboxylase (cG26);sterol-4alpha-carboxylate 3-dehydrogenase (decarboxylating)	nadp(cpd00006)[0] dcda[0] => nadph(cpd00005)[0] co2(cpd00011)[0] cdol[0]	N	N	N	N	frxn00213	
+MAL1167	3-keto-steroid reductase	h(cpd00067)[0] nadph(cpd00005)[0] cdol[0] => nadp(cpd00006)[0] mzymst(cpd03035)[0]	N	N	N	N	frxn00214	
 MAL1168	none enzyme	mzymst(cpd03035)[0] => zymst(cpd03221)[0]	N	N	Y	Y	rxn07327	(1) 4-methylzymosterol[0] <=> (1) Zymosterol[0]
 MAL1169	cholestenol Delta-isomerase	zymst(cpd03221)[0] => acdbol(cpd03222)[0]	N	N	Y	Y	rxn03281	(1) Zymosterol[0] => (1) 5alpha-Cholesta-7,24-dien-3beta-ol[0]
 MAL1170	 delta24-sterol reductase	h(cpd00067)[0] nadph(cpd00005)[0] zymst(cpd03221)[0] => nadp(cpd00006)[0] ac8bol(cpd02398)[0]	N	N	Y	Y	rxn03007	(1) NADP[0] + (1) Zymostenol[0] => (1) NADPH[0] + (1) H+[0] + (1) Zymosterol[0]
@@ -1181,10 +1181,10 @@ MAL1179	Diacylglycerol - sterol O-acyltransferase	chtrol(cpd00160)[0] acylcoa(cp
 MAL1180	sterol 24-C-methyltransferase	sam(cpd00017)[0] zymst(cpd03221)[0] => h(cpd00067)[0] sah(cpd00019)[0] fest(cpd02755)[0]	N	N	Y	Y	rxn03063	(1) S-Adenosyl-L-methionine[0] + (1) Zymosterol[0] => (1) S-Adenosyl-homocysteine[0] + (1) H+[0] + (1) Fecosterol[0]
 MAL1181	sterol 24-C-methyltransferase	sam(cpd00017)[0] zymst(cpd03221)[0] => h(cpd00067)[0] sah(cpd00019)[0] fest(cpd02755)[0]	N	N	Y	Y	rxn03063	(1) S-Adenosyl-L-methionine[0] + (1) Zymosterol[0] => (1) S-Adenosyl-homocysteine[0] + (1) H+[0] + (1) Fecosterol[0]
 MAL1182	sterol 24-C-methyltransferase	sam(cpd00017)[0] zymst(cpd03221)[0] => h(cpd00067)[0] sah(cpd00019)[0] fest(cpd02755)[0]	N	N	Y	Y	rxn03063	(1) S-Adenosyl-L-methionine[0] + (1) Zymosterol[0] => (1) S-Adenosyl-homocysteine[0] + (1) H+[0] + (1) Fecosterol[0]
-MAL1183	lathosterol oxidase	nadp(cpd00006)[0] epst(cpd14514)[0] => h(cpd00067)[0] nadph(cpd00005)[0] ergod(cpd35810)[0]	N	N	N	Y	frxn00217	
+MAL1183	lathosterol oxidase	nadp(cpd00006)[0] epst(cpd14514)[0] => h(cpd00067)[0] nadph(cpd00005)[0] ergod(cpd35810)[0]	N	N	N	Y	frxn00215	
 MAL1184	sterol 24-C-methyltransferase	sam(cpd00017)[0] cycl(cpd01306)[0] => h(cpd00067)[0] sah(cpd00019)[0] mecynol(cpd05727)[0]	N	N	Y	Y	rxn07312	(1) S-Adenosyl-L-methionine[0] + (1) Cycloartenol[0] => (1) S-Adenosyl-homocysteine[0] + (1) H+[0] + (1) 24-Methylenecycloartanol[0]
 MAL1185	sterol 24-C-methyltransferase	sam(cpd00017)[0] cycl(cpd01306)[0] => h(cpd00067)[0] sah(cpd00019)[0] mecynol(cpd05727)[0]	N	N	Y	Y	rxn07312	(1) S-Adenosyl-L-methionine[0] + (1) Cycloartenol[0] => (1) S-Adenosyl-homocysteine[0] + (1) H+[0] + (1) 24-Methylenecycloartanol[0]
-MAL1186	sterol 24-C-methyltransferase	sam(cpd00017)[0] cycl(cpd01306)[0] => h(cpd00067)[1] sah(cpd00019)[0] mecynol(cpd05727)[0]	Y	N	N	Y	frxn00218	
+MAL1186	sterol 24-C-methyltransferase	sam(cpd00017)[0] cycl(cpd01306)[0] => h(cpd00067)[1] sah(cpd00019)[0] mecynol(cpd05727)[0]	Y	N	N	Y	frxn00216	
 MAL1187	sterol 14-demethylase	(2) h(cpd00067)[0] (3) nadph(cpd00005)[0] (3) o2(cpd00007)[0] obl(cpd01334)[0] => (4) h2o(cpd00001)[0] (3) nadp(cpd00006)[0] for(cpd00047)[0] amt3bol(cpd08347)[0]	N	N	Y	Y	rxn03996	(3) NADPH[0] + (3) O2[0] + (2) H+[0] + (1) Obtusifoliol[0] => (4) H2O[0] + (3) NADP[0] + (1) Formate[0] + (1) delta8,14 -Sterol[0]
 MAL1188	Delta14-sterol reductase	h(cpd00067)[0] nadph(cpd00005)[0] amt3bol(cpd08347)[0] => nadp(cpd00006)[0] mefol(cpd14513)[0]	N	N	Y	Y	rxn07314	(1) NADPH[0] + (1) H+[0] + (1) delta8,14 -Sterol[0] <=> (1) NADP[0] + (1) 4alpha-Methylfecosterol[0]
 MAL1189	cholestenol Delta-isomerase	mefol(cpd14513)[0] => menol(cpd08359)[0]	N	N	Y	Y	rxn07315	(1) 4alpha-Methylfecosterol[0] => (1) 24-Methylene lophenol[0]
@@ -1193,91 +1193,91 @@ MAL1191	7-dehydrocholesterol reductase	melol(cpd14517)[0] => (2) h(cpd00067)[0] 
 MAL1192	lathosterol oxidase	d7arol(cpd14518)[0] => (2) h(cpd00067)[0] dhrsol(cpd14519)[0]	N	N	Y	Y	rxn07317	(1) delta7-Avenasterol[0] <= (2) H+[0] + (1) 5-Dehydroavenasterol[0]
 MAL1193	7-dehydrocholesterol reductase	h(cpd00067)[0] nadph(cpd00005)[0] dhrsol(cpd14519)[0] => nadp(cpd00006)[0] isol(cpd05717)[0]	N	N	Y	Y	rxn43532	(1) NADP[0] + (1) delta5-Avenasterol[0] <=> (1) NADPH[0] + (1) H+[0] + (1) 5-Dehydroavenasterol[0]
 MAL1194	delta24(24(1))-sterol reductase	h(cpd00067)[0] nadph(cpd00005)[0] egteol(cpd03223)[0] => nadp(cpd00006)[0] egstr(cpd01170)[0]	N	N	Y	Y	rxn03913	(1) NADP[0] + (1) Ergosterol[0] <= (1) NADPH[0] + (1) H+[0] + (1) 5,7,22,24(28)-Ergostatetraenol[0]
-MAL1195	Diacylglycerol - sterol O-acyltransferase	dagly(cpd19004)[0] egstr(cpd01170)[0] => magly(cpd01297)[0] ergose(cpd16803)[0]	N	N	N	Y	frxn00219	
-MAL1196	C-5 sterol desaturase (ERG3)	nadph(cpd00005)[0] epst(cpd14514)[0] => (3) h(cpd00067)[0] nadp(cpd00006)[0] ergod(cpd35810)[0]	N	N	N	Y	frxn00220	
+MAL1195	Diacylglycerol - sterol O-acyltransferase	dagly(cpd19004)[0] egstr(cpd01170)[0] => magly(cpd01297)[0] ergose(cpd16803)[0]	N	N	N	Y	frxn00217	
+MAL1196	C-5 sterol desaturase (ERG3)	nadph(cpd00005)[0] epst(cpd14514)[0] => (3) h(cpd00067)[0] nadp(cpd00006)[0] ergod(cpd35810)[0]	N	N	N	Y	frxn00218	
 MAL1197	C-8 sterol isomerase (ERG1)	epst(cpd14514)[0] => fest(cpd02755)[0]	N	N	Y	Y	rxn07328	(1) Fecosterol[0] => (1) Episterol[0]
-MAL1198	lathosterol oxidase	nadph(cpd00005)[0] acdbol(cpd03222)[0] => (3) h(cpd00067)[0] nadp(cpd00006)[0] 7dstrol(cpd03037)[0]	N	N	N	Y	frxn00221	
+MAL1198	lathosterol oxidase	nadph(cpd00005)[0] acdbol(cpd03222)[0] => (3) h(cpd00067)[0] nadp(cpd00006)[0] 7dstrol(cpd03037)[0]	N	N	N	Y	frxn00219	
 MAL1199	7-dehydrocholesterol reductase	h(cpd00067)[0] nadph(cpd00005)[0] 7dstrol(cpd03037)[0] => nadp(cpd00006)[0] dmstrol(cpd01243)[0]	N	N	Y	Y	rxn26888	(1) NADP[0] + (1) Desmosterol[0] <=> (1) NADPH[0] + (1) H+[0] + (1) 7-Dehydrodesmosterol[0]
-MAL1200	propanoyl-CoA C-acyltransferase	ppacoa(cpd00086)[0] chcoa(cpd00782)[0] => coa(cpd00010)[0] 37oxcoa(cpd03232)[0]	N	N	N	Y	frxn00222	
+MAL1200	propanoyl-CoA C-acyltransferase	ppacoa(cpd00086)[0] chcoa(cpd00782)[0] => coa(cpd00010)[0] 37oxcoa(cpd03232)[0]	N	N	N	Y	frxn00220	
 MAL1201	propanoyl-CoA C-acyltransferase	ppacoa(cpd00086)[0] chlcoa(cpd01237)[0] => coa(cpd00010)[0] toxcoa(cpd03248)[0]	N	N	Y	Y	rxn02639	(1) Propionyl-CoA[0] + (1) Choloyl-CoA[0] <=> (1) CoA[0] + (1) 3alpha,7alpha,12alpha-Trihydroxy-5beta-24-oxocholestanoyl-CoA[0]
-MAL1202	acyl-CoA thioesterase 8	h(cpd00067)[0] coa(cpd00010)[0] chlat(cpd01663)[0] => h2o(cpd00001)[0] chcoa(cpd00782)[0]	N	N	N	Y	frxn00223	
+MAL1202	acyl-CoA thioesterase 8	h(cpd00067)[0] coa(cpd00010)[0] chlat(cpd01663)[0] => h2o(cpd00001)[0] chcoa(cpd00782)[0]	N	N	N	Y	frxn00221	
 MAL1203	acyl-CoA thioesterase 8	h2o(cpd00001)[0] chlcoa(cpd01237)[0] => coa(cpd00010)[0] tbcla(cpd00526)[0]	N	N	Y	Y	rxn05049	(1) H2O[0] + (1) Choloyl-CoA[0] => (1) CoA[0] + (1) H+[0] + (1) Cholate[0]
 MAL1204	aldehyde dehydrogenase (NAD[m] +)	nad(cpd00003)[0] h2o(cpd00001)[0] glyal(cpd00448)[0] => nadh(cpd00004)[0] (2) h(cpd00067)[0] g(cpd00223)[0]	N	N	Y	Y	rxn01286	(1) H2O[0] + (1) NAD[0] + (1) D-Glyceraldehyde[0] <=> (1) NADH[0] + (2) H+[0] + (1) Glycerate[0]
 MAL1205	aldehyde dehydrogenase (NAD[c] +)	h2o(cpd00001)[0] nad(cpd00003)[0] glyal(cpd00448)[0] => (2) h(cpd00067)[0] nadh(cpd00004)[0] g(cpd00223)[0]	N	N	Y	Y	rxn01286	(1) H2O[0] + (1) NAD[0] + (1) D-Glyceraldehyde[0] <=> (1) NADH[0] + (2) H+[0] + (1) Glycerate[0]
 MAL1206	NADP-dependent alcohol dehydrogenase/Glycerol dehydrogenase	nadp(cpd00006)[0] gl(cpd00100)[0] => h(cpd00067)[0] nadph(cpd00005)[0] glyal(cpd00448)[0]	N	N	Y	Y	rxn00765	(1) NADP[0] + (1) Glycerol[0] <=> (1) NADPH[0] + (1) H+[0] + (1) D-Glyceraldehyde[0]
 MAL1207	Glycerol kinase	atp(cpd00002)[0] gl(cpd00100)[0] => adp(cpd00008)[0] gl3p(cpd00080)[0]	N	N	Y	Y	rxn00615	(1) ATP[0] + (1) Glycerol[0] => (1) ADP[0] + (1) H+[0] + (1) Glycerol-3-phosphate[0]
 MAL1208	glycerol-1-phosphatase	h2o(cpd00001)[0] gl3p(cpd00080)[0] => pi(cpd00009)[0] gl(cpd00100)[0]	N	N	Y	Y	rxn00610	(1) H2O[0] + (1) Glycerol-3-phosphate[0] <=> (1) Phosphate[0] + (1) Glycerol[0]
-MAL1209	glycerone-phosphate O-acyltransferase	(3) h(cpd00067)[0] (0.158) c160coa(cpd00134)[0] (0.064) c180coa(cpd00327)[0] (0.0118) c200coa(cpd01393)[0] (0.034) c220coa(cpd16343)[0] (0.311) c181coa(cpd15274)[0] (0.101) c182coa(cpd01398)[0] (0.1062) c183(6)coa(cpd01942)[0] (0.202) c204(6)coa(cpd01519)[0] gl3p(cpd00080)[0] (0.006) c201coa(cpd16344)[0] (0.007) c202coa(cpd14900)[0] => coa(cpd00010)[0] agl3p(cpd00517)[0]	N	N	N	Y	frxn00224	
+MAL1209	glycerone-phosphate O-acyltransferase	(3) h(cpd00067)[0] (0.158) c160coa(cpd00134)[0] (0.064) c180coa(cpd00327)[0] (0.0118) c200coa(cpd01393)[0] (0.034) c220coa(cpd16343)[0] (0.311) c181coa(cpd15274)[0] (0.101) c182coa(cpd01398)[0] (0.1062) c183(6)coa(cpd01942)[0] (0.202) c204(6)coa(cpd01519)[0] gl3p(cpd00080)[0] (0.006) c201coa(cpd16344)[0] (0.007) c202coa(cpd14900)[0] => coa(cpd00010)[0] agl3p(cpd00517)[0]	N	N	N	Y	frxn00222	
 MAL1210	Diacylglycerol pyrophosphate phosphatase	h2o(cpd00001)[0] pa(cpd11422)[0] => (2) h(cpd00067)[0] pi(cpd00009)[0] dagly(cpd19004)[0]	N	N	Y	Y	rxn39330	(1) H2O[0] + (1) 1,2-diacyl-sn-glycerol 3-phosphate[0] <=> (1) Phosphate[0] + (1) 1,2-Diacyl-sn-glycerol[0]
-MAL1211	triacylglycerol lipase	h2o(cpd00001)[0] tagly(cpd11677)[0] => h(cpd00067)[0] dagly(cpd19004)[0] (0.237) c160(cpd00214)[0] (0.087) c180(cpd01080)[0] (0.0035) c200(cpd03848)[0] (0.058) c220(cpd05196)[0] (0.017) c240[0] (0.183) c181(cpd00536)[0] (0.085) c182(cpd01122)[0] (0.0315) c183(6)(cpd03849)[0] (0.012) c201(cpd16341)[0] (0.006) c202(cpd16340)[0] (0.28) c204(6)(cpd00188)[0]	N	N	N	N	frxn00225	
-MAL1212	triacylglycerol lipase	h(cpd00067)[0] h2o(cpd00001)[0] dagly(cpd19004)[0] => (0.266) c160(cpd00214)[0] (0.165) c180(cpd01080)[0] (0.0026) c200(cpd03848)[0] (0.045) c220(cpd05196)[0] (0.036) c240[0] magly(cpd01297)[0] (0.217) c181(cpd00536)[0] (0.054) c182(cpd01122)[0] (0.0234) c183(6)(cpd03849)[0] (0.032) c202(cpd16340)[0] (0.159) c204(6)(cpd00188)[0]	N	N	N	N	frxn00226	
-MAL1213	Phospholipid diacylglycerol acyltransferase	dagly(cpd19004)[0] pc(cpd11624)[0] => tagly(cpd11677)[0] lpc(cpd02601)[0]	N	N	N	Y	frxn00227	
-MAL1214	Phospholipid diacylglycerol acyltransferase	dagly(cpd19004)[0] paa[0] => tagly(cpd11677)[0] lpaa[0]	N	N	N	N	frxn00228	
-MAL1215	Phospholipid diacylglycerol acyltransferase	dagly(cpd19004)[0] pdme[0] => h(cpd00067)[0] tagly(cpd11677)[0] lpdme[0]	N	Y	N	N	frxn00229	
-MAL1216	Phospholipid diacylglycerol acyltransferase	dagly(cpd19004)[0] pe(cpd11456)[0] => tagly(cpd11677)[0] lpe(cpd03556)[0]	N	N	N	Y	frxn00230	
-MAL1217	Phospholipid diacylglycerol acyltransferase	dagly(cpd19004)[0] pg(cpd11652)[0] => tagly(cpd11677)[0] lpg[0]	N	N	N	N	frxn00231	
-MAL1218	Phospholipid diacylglycerol acyltransferase	dagly(cpd19004)[0] pmme[0] => h(cpd00067)[0] tagly(cpd11677)[0] lpmme[0]	N	Y	N	N	frxn00229	(1) 1,2-Diacyl-sn-glycerol[0] <=> (1) H+[0] + (1) Triglyceride[0]
-MAL1219	Phospholipid diacylglycerol acyltransferase	dagly(cpd19004)[0] ps(cpd11455)[0] => tagly(cpd11677)[0] lps[0]	N	N	N	N	frxn00232	
-MAL1220	Diacylglycerol O-acyltransferase	dagly(cpd19004)[0] (0.237) c160coa(cpd00134)[0] (0.087) c180coa(cpd00327)[0] (0.0035) c200coa(cpd01393)[0] (0.058) c220coa(cpd16343)[0] (0.017) c240coa(cpd15297)[0] (0.183) c181coa(cpd15274)[0] (0.085) c182coa(cpd01398)[0] (0.0315) c183(6)coa(cpd01942)[0] (0.28) c204(6)coa(cpd01519)[0] (0.012) c201coa(cpd16344)[0] (0.006) c202coa(cpd14900)[0] => coa(cpd00010)[0] tagly(cpd11677)[0]	N	N	N	Y	frxn00233	
+MAL1211	triacylglycerol lipase	h2o(cpd00001)[0] tagly(cpd11677)[0] => h(cpd00067)[0] dagly(cpd19004)[0] (0.237) c160(cpd00214)[0] (0.087) c180(cpd01080)[0] (0.0035) c200(cpd03848)[0] (0.058) c220(cpd05196)[0] (0.017) c240[0] (0.183) c181(cpd00536)[0] (0.085) c182(cpd01122)[0] (0.0315) c183(6)(cpd03849)[0] (0.012) c201(cpd16341)[0] (0.006) c202(cpd16340)[0] (0.28) c204(6)(cpd00188)[0]	N	N	N	N	frxn00223	
+MAL1212	triacylglycerol lipase	h(cpd00067)[0] h2o(cpd00001)[0] dagly(cpd19004)[0] => (0.266) c160(cpd00214)[0] (0.165) c180(cpd01080)[0] (0.0026) c200(cpd03848)[0] (0.045) c220(cpd05196)[0] (0.036) c240[0] magly(cpd01297)[0] (0.217) c181(cpd00536)[0] (0.054) c182(cpd01122)[0] (0.0234) c183(6)(cpd03849)[0] (0.032) c202(cpd16340)[0] (0.159) c204(6)(cpd00188)[0]	N	N	N	N	frxn00224	
+MAL1213	Phospholipid diacylglycerol acyltransferase	dagly(cpd19004)[0] pc(cpd11624)[0] => tagly(cpd11677)[0] lpc(cpd02601)[0]	N	N	N	Y	frxn00225	
+MAL1214	Phospholipid diacylglycerol acyltransferase	dagly(cpd19004)[0] paa[0] => tagly(cpd11677)[0] lpaa[0]	N	N	N	N	frxn00226	
+MAL1215	Phospholipid diacylglycerol acyltransferase	dagly(cpd19004)[0] pdme[0] => h(cpd00067)[0] tagly(cpd11677)[0] lpdme[0]	N	Y	N	N	frxn00227	
+MAL1216	Phospholipid diacylglycerol acyltransferase	dagly(cpd19004)[0] pe(cpd11456)[0] => tagly(cpd11677)[0] lpe(cpd03556)[0]	N	N	N	Y	frxn00228	
+MAL1217	Phospholipid diacylglycerol acyltransferase	dagly(cpd19004)[0] pg(cpd11652)[0] => tagly(cpd11677)[0] lpg[0]	N	N	N	N	frxn00229	
+MAL1218	Phospholipid diacylglycerol acyltransferase	dagly(cpd19004)[0] pmme[0] => h(cpd00067)[0] tagly(cpd11677)[0] lpmme[0]	N	Y	N	N	frxn00227	(1) 1,2-Diacyl-sn-glycerol[0] <=> (1) H+[0] + (1) Triglyceride[0]
+MAL1219	Phospholipid diacylglycerol acyltransferase	dagly(cpd19004)[0] ps(cpd11455)[0] => tagly(cpd11677)[0] lps[0]	N	N	N	N	frxn00230	
+MAL1220	Diacylglycerol O-acyltransferase	dagly(cpd19004)[0] (0.237) c160coa(cpd00134)[0] (0.087) c180coa(cpd00327)[0] (0.0035) c200coa(cpd01393)[0] (0.058) c220coa(cpd16343)[0] (0.017) c240coa(cpd15297)[0] (0.183) c181coa(cpd15274)[0] (0.085) c182coa(cpd01398)[0] (0.0315) c183(6)coa(cpd01942)[0] (0.28) c204(6)coa(cpd01519)[0] (0.012) c201coa(cpd16344)[0] (0.006) c202coa(cpd14900)[0] => coa(cpd00010)[0] tagly(cpd11677)[0]	N	N	N	Y	frxn00231	
 MAL1221	alpha-galactosidase?	h2o(cpd00001)[0] ddgly(cpd12633)[0] => gal(cpd00108)[0] dbggly(cpd12371)[0]	N	N	Y	Y	rxn39463	(1) H2O[0] + (1) 2,3-Di-O-acyl-1-O-(6-O-alpha-D-galactosyl-beta-D-galactosyl)-D- glycerol[0] <=> (1) Galactose[0] + (1) MGDG[0]
 MAL1222	diacylglycerol cholinephosphotransferase	h(cpd00067)[0] dagly(cpd19004)[0] cdpcln(cpd00256)[0] => cmp(cpd00046)[0] pc(cpd11624)[0]	N	N	Y	Y	rxn33407	(1) CDPcholine[0] + (1) 1,2-Diacyl-sn-glycerol[0] => (1) CMP[0] + (1) H+[0] + (1) Lecithin[0]
-MAL1223	glycerone-phosphate O-acyltransferase	h(cpd00067)[0] t3p2(cpd00095)[0] (0.158) c160coa(cpd00134)[0] (0.064) c180coa(cpd00327)[0] (0.0118) c200coa(cpd01393)[0] (0.034) c220coa(cpd16343)[0] (0.311) c181coa(cpd15274)[0] (0.101) c182coa(cpd01398)[0] (0.1062) c183(6)coa(cpd01942)[0] (0.202) c204(6)coa(cpd01519)[0] (0.006) c201coa(cpd16344)[0] (0.007) c202coa(cpd14900)[0] => coa(cpd00010)[0] at3p2[0]	N	N	N	N	frxn00234	
+MAL1223	glycerone-phosphate O-acyltransferase	h(cpd00067)[0] t3p2(cpd00095)[0] (0.158) c160coa(cpd00134)[0] (0.064) c180coa(cpd00327)[0] (0.0118) c200coa(cpd01393)[0] (0.034) c220coa(cpd16343)[0] (0.311) c181coa(cpd15274)[0] (0.101) c182coa(cpd01398)[0] (0.1062) c183(6)coa(cpd01942)[0] (0.202) c204(6)coa(cpd01519)[0] (0.006) c201coa(cpd16344)[0] (0.007) c202coa(cpd14900)[0] => coa(cpd00010)[0] at3p2[0]	N	N	N	N	frxn00232	
 MAL1224	glycerol-3-phosphate dehydrogenase (NAD[c] +)	(2) h(cpd00067)[0] t3p2(cpd00095)[0] nadh(cpd00004)[0] => nad(cpd00003)[0] gl3p(cpd00080)[0]	N	N	Y	Y	rxn00611	(1) NAD[0] + (1) Glycerol-3-phosphate[0] <=> (1) NADH[0] + (1) H+[0] + (1) Glycerone-phosphate[0]
-MAL1225	lysophosphatidic acid-acyltransferase	(0.158) c160coa(cpd00134)[0] (0.064) c180coa(cpd00327)[0] (0.0118) c200coa(cpd01393)[0] (0.034) c220coa(cpd16343)[0] (0.311) c181coa(cpd15274)[0] (0.101) c182coa(cpd01398)[0] (0.1062) c183(6)coa(cpd01942)[0] (0.202) c204(6)coa(cpd01519)[0] (0.006) c201coa(cpd16344)[0] (0.007) c202coa(cpd14900)[0] agl3p(cpd00517)[0] => coa(cpd00010)[0] pa(cpd11422)[0]	N	N	N	Y	frxn00235	
+MAL1225	lysophosphatidic acid-acyltransferase	(0.158) c160coa(cpd00134)[0] (0.064) c180coa(cpd00327)[0] (0.0118) c200coa(cpd01393)[0] (0.034) c220coa(cpd16343)[0] (0.311) c181coa(cpd15274)[0] (0.101) c182coa(cpd01398)[0] (0.1062) c183(6)coa(cpd01942)[0] (0.202) c204(6)coa(cpd01519)[0] (0.006) c201coa(cpd16344)[0] (0.007) c202coa(cpd14900)[0] agl3p(cpd00517)[0] => coa(cpd00010)[0] pa(cpd11422)[0]	N	N	N	Y	frxn00233	
 MAL1226	Glycerol dehydrogenase	nad(cpd00003)[0] gl(cpd00100)[0] => h(cpd00067)[0] nadh(cpd00004)[0] glyn(cpd00157)[0]	N	N	Y	Y	rxn00762	(1) NAD[0] + (1) Glycerol[0] <=> (1) NADH[0] + (1) H+[0] + (1) Glycerone[0]
 MAL1227	glycerol-3-phosphate dehydrogenase	fad(cpd00015)[0] gl3p(cpd00080)[0] => h(cpd00067)[0] fadh2(cpd00982)[0] t3p2(cpd00095)[0]	N	N	Y	Y	rxn00616	(1) FAD[0] + (1) Glycerol-3-phosphate[0] => (1) Glycerone-phosphate[0] + (1) FADH2[0]
 MAL1228	Phospholipase D	h2o(cpd00001)[0] pc(cpd11624)[0] => cln(cpd00098)[0] pa(cpd11422)[0]	N	N	Y	Y	rxn05963	(1) H2O[0] + (1) Lecithin[0] <=> (1) H+[0] + (1) Choline[0] + (1) 1,2-diacyl-sn-glycerol 3-phosphate[0]
 MAL1229	Phospholipase D	h2o(cpd00001)[0] pe(cpd11456)[0] => h(cpd00067)[0] pa(cpd11422)[0] ethla(cpd00162)[0]	N	N	Y	Y	rxn06086	(1) H2O[0] + (1) Phosphatidylethanolamine[0] => (1) H+[0] + (1) Aminoethanol[0] + (1) 1,2-diacyl-sn-glycerol 3-phosphate[0]
 MAL1230	phosphatidate cytidylyltransferase	ctp(cpd00052)[0] pa(cpd11422)[0] => h(cpd00067)[0] ppi(cpd00012)[0] cdpdg(cpd11427)[0]	N	N	Y	Y	rxn06043	(1) CTP[0] + (1) 1,2-diacyl-sn-glycerol 3-phosphate[0] <=> (1) PPi[0] + (1) CDP-diacylglycerol[0]
-MAL1231	elongation of very long chain fatty acids protein 2	acylcoa(cpd11611)[0] acglp[0] => (4) h(cpd00067)[0] coa(cpd00010)[0] pins(cpd11715)[0]	N	N	N	N	frxn00236	
+MAL1231	elongation of very long chain fatty acids protein 2	acylcoa(cpd11611)[0] acglp[0] => (4) h(cpd00067)[0] coa(cpd00010)[0] pins(cpd11715)[0]	N	N	N	N	frxn00234	
 MAL1232	CDP-diacylglycerol-glycerol-3-phosphate 3-phosphatidyltransferase	gl3p(cpd00080)[0] cdpdg(cpd11427)[0] => (2) h(cpd00067)[0] pgp(cpd11454)[0] cmp(cpd00046)[0]	N	N	Y	Y	rxn06045	(1) Glycerol-3-phosphate[0] + (1) CDP-diacylglycerol[0] <=> (1) CMP[0] + (1) H+[0] + (1) Phosphatidylglycerophosphate[0]
-MAL1233	cardiolipin synthase	cdpdg(cpd11427)[0] pg(cpd11652)[0] => cmp(cpd00046)[0] cl(cpd00099)[0]	N	N	N	Y	frxn00237	
-MAL1234	monolysocardiolipin acyltransferase	acylcoa(cpd11611)[0] mlcl(cpd19399)[0] => (4) h(cpd00067)[0] coa(cpd00010)[0] cl(cpd00099)[0]	N	N	N	Y	frxn00238	
-MAL1235	cardiolipin-specific phospholipase	h2o(cpd00001)[0] cl(cpd00099)[0] => carbo(cpd00049)[0] mlcl(cpd19399)[0]	N	N	N	Y	frxn00239	
+MAL1233	cardiolipin synthase	cdpdg(cpd11427)[0] pg(cpd11652)[0] => cmp(cpd00046)[0] cl(cpd00099)[0]	N	N	N	Y	frxn00235	
+MAL1234	monolysocardiolipin acyltransferase	acylcoa(cpd11611)[0] mlcl(cpd19399)[0] => (4) h(cpd00067)[0] coa(cpd00010)[0] cl(cpd00099)[0]	N	N	N	Y	frxn00236	
+MAL1235	cardiolipin-specific phospholipase	h2o(cpd00001)[0] cl(cpd00099)[0] => carbo(cpd00049)[0] mlcl(cpd19399)[0]	N	N	N	Y	frxn00237	
 MAL1236	elongation of very long chain fatty acids protein 2	acylcoa(cpd11611)[0] acglpo(cpd19396)[0] => (5) h(cpd00067)[0] coa(cpd00010)[0] pg(cpd11652)[0]	N	N	Y	Y	rxn15904	(1) Acyl-CoA[0] + (1) 1-Acyl-sn-glycero-3-phosphoglycerol[0] => (1) CoA[0] + (1) Phosphatidylglycerol[0]
 MAL1237	phosphatidylserine synthase 2	ps(cpd11455)[0] ethla(cpd00162)[0] => ser(cpd00054)[0] pe(cpd11456)[0]	N	N	Y	Y	rxn07254	(1) L-Serine[0] + (1) Phosphatidylethanolamine[0] <=> (1) Aminoethanol[0] + (1) ps_BS[0]
 MAL1238	phosphatidylserine decarboxylase	h(cpd00067)[0] ps(cpd11455)[0] => co2(cpd00011)[0] pe(cpd11456)[0]	N	N	Y	Y	rxn06090	(1) H+[0] + (1) ps_BS[0] => (1) CO2[0] + (1) Phosphatidylethanolamine[0]
 MAL1239	phosphatidylserine decarboxylase	h(cpd00067)[0] ps(cpd11455)[0] => co2(cpd00011)[0] pe(cpd11456)[0]	N	N	Y	Y	rxn06090	(1) H+[0] + (1) ps_BS[0] => (1) CO2[0] + (1) Phosphatidylethanolamine[0]
 MAL1240	phosphatidylserine decarboxylase	h(cpd00067)[0] ps(cpd11455)[0] => co2(cpd00011)[0] pe(cpd11456)[0]	N	N	Y	Y	rxn06090	(1) H+[0] + (1) ps_BS[0] => (1) CO2[0] + (1) Phosphatidylethanolamine[0]
-MAL1241	elongation of very long chain fatty acids protein 2	(2) h(cpd00067)[0] (0.342) c160coa(cpd00134)[0] (0.067) c180coa(cpd00327)[0] (0.0043) c200coa(cpd01393)[0] (0.026) c220coa(cpd16343)[0] (0.21) c181coa(cpd15274)[0] (0.175) c182coa(cpd01398)[0] (0.0387) c183(6)coa(cpd01942)[0] (0.118) c204(6)coa(cpd01519)[0] (0.004) c201coa(cpd16344)[0] (0.015) c202coa(cpd14900)[0] acglpe(cpd19395)[0] => coa(cpd00010)[0] ps(cpd11455)[0]	N	N	N	Y	frxn00240	
-MAL1242	phospholipase A2	pe(cpd11456)[0] acp(cpd11493)[0] => (2) h(cpd00067)[0] lpe(cpd03556)[0] acylacpp[0]	N	N	N	N	frxn00241	
-MAL1243	lysophosphatidylcholine acyltransferase	(0.202) c160coa(cpd00134)[0] (0.056) c180coa(cpd00327)[0] (0.0124) c200coa(cpd01393)[0] (0.016) c220coa(cpd16343)[0] (0.228) c181coa(cpd15274)[0] (0.1116) c182coa(cpd01398)[0] (0.121) c183(6)coa(cpd01942)[0] (0.225) c204(6)coa(cpd01519)[0] (0.015) c201coa(cpd16344)[0] (0.013) c202coa(cpd14900)[0] lpe(cpd03556)[0] => coa(cpd00010)[0] pe(cpd11456)[0]	N	N	N	Y	frxn00242	
-MAL1244	Lysophospholipase	h2o(cpd00001)[0] lpe(cpd03556)[0] => h(cpd00067)[0] carbo(cpd00049)[0] glypeln(cpd00908)[0]	N	N	N	Y	frxn00243	
+MAL1241	elongation of very long chain fatty acids protein 2	(2) h(cpd00067)[0] (0.342) c160coa(cpd00134)[0] (0.067) c180coa(cpd00327)[0] (0.0043) c200coa(cpd01393)[0] (0.026) c220coa(cpd16343)[0] (0.21) c181coa(cpd15274)[0] (0.175) c182coa(cpd01398)[0] (0.0387) c183(6)coa(cpd01942)[0] (0.118) c204(6)coa(cpd01519)[0] (0.004) c201coa(cpd16344)[0] (0.015) c202coa(cpd14900)[0] acglpe(cpd19395)[0] => coa(cpd00010)[0] ps(cpd11455)[0]	N	N	N	Y	frxn00238	
+MAL1242	phospholipase A2	pe(cpd11456)[0] acp(cpd11493)[0] => (2) h(cpd00067)[0] lpe(cpd03556)[0] acylacpp[0]	N	N	N	N	frxn00239	
+MAL1243	lysophosphatidylcholine acyltransferase	(0.202) c160coa(cpd00134)[0] (0.056) c180coa(cpd00327)[0] (0.0124) c200coa(cpd01393)[0] (0.016) c220coa(cpd16343)[0] (0.228) c181coa(cpd15274)[0] (0.1116) c182coa(cpd01398)[0] (0.121) c183(6)coa(cpd01942)[0] (0.225) c204(6)coa(cpd01519)[0] (0.015) c201coa(cpd16344)[0] (0.013) c202coa(cpd14900)[0] lpe(cpd03556)[0] => coa(cpd00010)[0] pe(cpd11456)[0]	N	N	N	Y	frxn00240	
+MAL1244	Lysophospholipase	h2o(cpd00001)[0] lpe(cpd03556)[0] => h(cpd00067)[0] carbo(cpd00049)[0] glypeln(cpd00908)[0]	N	N	N	Y	frxn00241	
 MAL1245	glycerophosphoryl diester phosphodiesterase	h2o(cpd00001)[0] glypeln(cpd00908)[0] => gl3p(cpd00080)[0] ethla(cpd00162)[0]	N	N	Y	Y	rxn01073	(1) H2O[0] + (1) Glycerophosphoethanolamine[0] => (1) H+[0] + (1) Glycerol-3-phosphate[0] + (1) Aminoethanol[0]
 MAL1246	ethanolamine kinase	atp(cpd00002)[0] ethla(cpd00162)[0] => h(cpd00067)[0] adp(cpd00008)[0] pen(cpd00285)[0]	N	N	Y	Y	rxn01071	(1) ATP[0] + (1) Aminoethanol[0] => (1) ADP[0] + (1) H+[0] + (1) Phosphoethanolamine[0]
-MAL1247	phosphatidylethanolamine N-methyltransferase	sam(cpd00017)[0] pe(cpd11456)[0] => h(cpd00067)[0] sah(cpd00019)[0] pcpmme[0]	N	N	N	N	frxn00244	
-MAL1248	methlene-fatty-acyl-phospholipid sythnase	sam(cpd00017)[0] pcpmme[0] => h(cpd00067)[0] sah(cpd00019)[0] pndm(cpd12514)[0]	N	N	N	N	frxn00245	
+MAL1247	phosphatidylethanolamine N-methyltransferase	sam(cpd00017)[0] pe(cpd11456)[0] => h(cpd00067)[0] sah(cpd00019)[0] pcpmme[0]	N	N	N	N	frxn00242	
+MAL1248	methlene-fatty-acyl-phospholipid sythnase	sam(cpd00017)[0] pcpmme[0] => h(cpd00067)[0] sah(cpd00019)[0] pndm(cpd12514)[0]	N	N	N	N	frxn00243	
 MAL1249	methlene-fatty-acyl-phospholipid sythnase	sam(cpd00017)[0] pndm(cpd12514)[0] => h(cpd00067)[0] sah(cpd00019)[0] pc(cpd11624)[0]	N	N	Y	Y	rxn05970	(1) S-Adenosyl-L-methionine[0] + (1) Phosphatidyl-N-dimethylethanolamine[0] <= (1) S-Adenosyl-homocysteine[0] + (1) H+[0] + (1) Lecithin[0]
 MAL1250	cholinesterase	h2o(cpd00001)[0] accln(cpd01367)[0] => h(cpd00067)[0] ac(cpd00029)[0] cln(cpd00098)[0]	N	N	Y	Y	rxn00754	(1) H2O[0] + (1) Acetylcholine[0] => (1) Acetate[0] + (1) H+[0] + (1) Choline[0]
 MAL1251	choline kinase	atp(cpd00002)[0] cln(cpd00098)[0] => h(cpd00067)[0] adp(cpd00008)[0] pcln(cpd00457)[0]	N	N	Y	Y	rxn00751	(1) ATP[0] + (1) Choline[0] => (1) ADP[0] + (1) H+[0] + (1) Phosphocholine[0]
 MAL1252	choline-phosphate cytidylyltransferase	h(cpd00067)[0] ctp(cpd00052)[0] pcln(cpd00457)[0] => ppi(cpd00012)[0] cdpcln(cpd00256)[0]	N	N	Y	Y	rxn01380	(1) CTP[0] + (1) Phosphocholine[0] <=> (1) PPi[0] + (1) CDPcholine[0]
-MAL1253	Acylglycerone-phosphate reductase	(4) h(cpd00067)[0] nadph(cpd00005)[0] at3p2[0] => nadp(cpd00006)[0] agl3p(cpd00517)[0]	N	N	N	N	frxn00246	
+MAL1253	Acylglycerone-phosphate reductase	(4) h(cpd00067)[0] nadph(cpd00005)[0] at3p2[0] => nadp(cpd00006)[0] agl3p(cpd00517)[0]	N	N	N	N	frxn00244	
 MAL1254	phosphatidylglycerophosphatase 	h(cpd00067)[0] h2o(cpd00001)[0] pgp(cpd11454)[0] => pi(cpd00009)[0] pg(cpd11652)[0]	N	N	Y	Y	rxn06080	(1) H2O[0] + (1) Phosphatidylglycerophosphate[0] => (1) Phosphate[0] + (1) Phosphatidylglycerol[0]
-MAL1255	phospholipase A2	h(cpd00067)[0] h2o(cpd00001)[0] pe(cpd11456)[0] => (0.202) c160(cpd00214)[0] (0.056) c180(cpd01080)[0] (0.0124) c200(cpd03848)[0] (0.016) c220(cpd05196)[0] (0.228) c181(cpd00536)[0] (0.1116) c182(cpd01122)[0] (0.121) c183(6)(cpd03849)[0] (0.015) c201(cpd16341)[0] (0.013) c202(cpd16340)[0] (0.225) c204(6)(cpd00188)[0] lpe(cpd03556)[0]	N	N	N	Y	frxn00247	
+MAL1255	phospholipase A2	h(cpd00067)[0] h2o(cpd00001)[0] pe(cpd11456)[0] => (0.202) c160(cpd00214)[0] (0.056) c180(cpd01080)[0] (0.0124) c200(cpd03848)[0] (0.016) c220(cpd05196)[0] (0.228) c181(cpd00536)[0] (0.1116) c182(cpd01122)[0] (0.121) c183(6)(cpd03849)[0] (0.015) c201(cpd16341)[0] (0.013) c202(cpd16340)[0] (0.225) c204(6)(cpd00188)[0] lpe(cpd03556)[0]	N	N	N	Y	frxn00245	
 MAL1256	3-Dehydrosphinganine reductase	h(cpd00067)[0] nadph(cpd00005)[0] dhsph(cpd01879)[0] => nadp(cpd00006)[0] sph(cpd00623)[0]	N	N	Y	Y	rxn02134	(1) NADP[0] + (1) Sphinganine[0] <=> (1) NADPH[0] + (1) H+[0] + (1) 3-Dehydrosphinganine[0]
 MAL1257	C4-hydroxylase	h(cpd00067)[0] nadph(cpd00005)[0] o2(cpd00007)[0] sph(cpd00623)[0] => h2o(cpd00001)[0] nadp(cpd00006)[0] psph(cpd08926)[0]	N	N	Y	Y	rxn04381	(1) NADPH[0] + (1) O2[0] + (1) H+[0] + (1) Sphinganine[0] => (1) H2O[0] + (1) NADP[0] + (1) Phytosphingosine[0]
 MAL1258	Acyl-CoA-dependent ceramide synthase	acylcoa(cpd11611)[0] sph(cpd00623)[0] => (5) h(cpd00067)[0] coa(cpd00010)[0] dcer2(cpd08908)[0]	N	N	Y	Y	rxn07108	(1) Sphinganine[0] + (1) Acyl-CoA[0] => (1) CoA[0] + (1) H+[0] + (1) Dihydroceramide[0]
-MAL1259	dihydroceramidase	h2o(cpd00001)[0] dcer2(cpd08908)[0] => co2(cpd00011)[0] acylcoa(cpd11611)[0] sph(cpd00623)[0]	N	N	N	Y	frxn00248	
-MAL1260	C4-hydroxylase	h(cpd00067)[0] nadph(cpd00005)[0] o2(cpd00007)[0] dcer2(cpd08908)[0] => h2o(cpd00001)[0] nadp(cpd00006)[0] pcer2(cpd27876)[0]	N	N	N	Y	frxn00249	
-MAL1261	neutral ceramidase	acylcoa(cpd11611)[0] sphe(cpd00267)[0] => (5) h(cpd00067)[0] coa(cpd00010)[0] cer(cpd26685)[0]	N	N	N	Y	frxn00250	
-MAL1262	alkaline ceramidase	h2o(cpd00001)[0] cer(cpd26685)[0] => carbo(cpd00049)[0] sphe(cpd00267)[0]	N	N	N	Y	frxn00251	
-MAL1263	dihydroceramidase	h2o(cpd00001)[0] pcer2(cpd27876)[0] => carbo(cpd00049)[0] psph(cpd08926)[0]	N	N	N	Y	frxn00252	
+MAL1259	dihydroceramidase	h2o(cpd00001)[0] dcer2(cpd08908)[0] => co2(cpd00011)[0] acylcoa(cpd11611)[0] sph(cpd00623)[0]	N	N	N	Y	frxn00246	
+MAL1260	C4-hydroxylase	h(cpd00067)[0] nadph(cpd00005)[0] o2(cpd00007)[0] dcer2(cpd08908)[0] => h2o(cpd00001)[0] nadp(cpd00006)[0] pcer2(cpd27876)[0]	N	N	N	Y	frxn00247	
+MAL1261	neutral ceramidase	acylcoa(cpd11611)[0] sphe(cpd00267)[0] => (5) h(cpd00067)[0] coa(cpd00010)[0] cer(cpd26685)[0]	N	N	N	Y	frxn00248	
+MAL1262	alkaline ceramidase	h2o(cpd00001)[0] cer(cpd26685)[0] => carbo(cpd00049)[0] sphe(cpd00267)[0]	N	N	N	Y	frxn00249	
+MAL1263	dihydroceramidase	h2o(cpd00001)[0] pcer2(cpd27876)[0] => carbo(cpd00049)[0] psph(cpd08926)[0]	N	N	N	Y	frxn00250	
 MAL1264	3-sn-phosphatidate phosphohydrolase	h(cpd00067)[0] h2o(cpd00001)[0] dhsp(cpd00824)[0] => pi(cpd00009)[0] sph(cpd00623)[0]	N	N	Y	Y	rxn04376	(1) H2O[0] + (1) Sphinganine 1-phosphate[0] <=> (1) Phosphate[0] + (1) Sphinganine[0]
-MAL1265	3-sn-phosphatidate phosphohydrolase	h(cpd00067)[0] h2o(cpd00001)[0] sph1p(cpd00824)[0] => pi(cpd00009)[0] sphe(cpd00267)[0]	N	N	N	Y	frxn00253	
-MAL1266	3-sn-phosphatidate phosphohydrolase	h2o(cpd00001)[0] cer1p(cpd01899)[0] => h(cpd00067)[0] pi(cpd00009)[0] cer(cpd26685)[0]	N	N	N	Y	frxn00254	
+MAL1265	3-sn-phosphatidate phosphohydrolase	h(cpd00067)[0] h2o(cpd00001)[0] sph1p(cpd00824)[0] => pi(cpd00009)[0] sphe(cpd00267)[0]	N	N	N	Y	frxn00251	
+MAL1266	3-sn-phosphatidate phosphohydrolase	h2o(cpd00001)[0] cer1p(cpd01899)[0] => h(cpd00067)[0] pi(cpd00009)[0] cer(cpd26685)[0]	N	N	N	Y	frxn00252	
 MAL1267	sphingomyelin phosphodiesterase	h2o(cpd00001)[0] spmylin(cpd00431)[0] => cln(cpd00098)[0] cer1p(cpd01899)[0]	N	N	Y	Y	rxn01845	(1) H2O[0] + (1) Sphingomyelin[0] => (1) H+[0] + (1) Choline[0] + (1) Ceramide phosphate[0]
 MAL1268	Acyl-CoA-dependent ceramide synthase	acylcoa(cpd11611)[0] sphen(cpd02284)[0] => (4) h(cpd00067)[0] coa(cpd00010)[0] spmylin(cpd00431)[0]	N	N	Y	Y	rxn06178	(1) Sphingosyl-phosphocholine[0] + (1) Acyl-CoA[0] => (1) CoA[0] + (1) H+[0] + (1) Sphingomyelin[0]
 MAL1269	serine palmitoyltransferase	h(cpd00067)[0] ser(cpd00054)[0] c160coa(cpd00134)[0] => coa(cpd00010)[0] co2(cpd00011)[0] dhsph(cpd01879)[0]	N	N	Y	Y	rxn00948	(1) L-Serine[0] + (1) H+[0] + (1) Palmitoyl-CoA[0] => (1) CoA[0] + (1) CO2[0] + (1) 3-Dehydrosphinganine[0]
 MAL1270	serine palmitoyltransferase	h(cpd00067)[0] ser(cpd00054)[0] c160coa(cpd00134)[0] => coa(cpd00010)[0] co2(cpd00011)[0] dhsph(cpd01879)[0]	N	N	Y	Y	rxn00948	(1) L-Serine[0] + (1) H+[0] + (1) Palmitoyl-CoA[0] => (1) CoA[0] + (1) CO2[0] + (1) 3-Dehydrosphinganine[0]
 MAL1271	Sphinganine kinase	atp(cpd00002)[0] sph(cpd00623)[0] => h(cpd00067)[0] adp(cpd00008)[0] dhsp(cpd00824)[0]	N	N	Y	Y	rxn02133	(1) ATP[0] + (1) Sphinganine[0] => (1) ADP[0] + (1) H+[0] + (1) Sphinganine 1-phosphate[0]
 MAL1272	Sphinganine-1-phosphate aldolase	dhsp(cpd00824)[0] => pen(cpd00285)[0] c16a(cpd00405)[0]	N	N	Y	Y	rxn01783	(1) Sphinganine 1-phosphate[0] <=> (1) Phosphoethanolamine[0] + (1) Hexadecanal[0]
-MAL1273	sphinganine-1-phosphate aldolase	sph1p(cpd00824)[0] => pen(cpd00285)[0] c16e[0]	N	N	N	N	frxn00255	
-MAL1274	hexadecanal:NADP+ delta2-oxidoreductase	h(cpd00067)[0] nadph(cpd00005)[0] c16e[0] => nadp(cpd00006)[0] c16a(cpd00405)[0]	N	N	N	N	frxn00256	
-MAL1275	sphingosine kinase	atp(cpd00002)[0] sphe(cpd00267)[0] => h(cpd00067)[0] adp(cpd00008)[0] sph1p(cpd00824)[0]	N	N	N	Y	frxn00257	
-MAL1276	sphingolipid delta-4 desaturase	h(cpd00067)[0] nadph(cpd00005)[0] o2(cpd00007)[0] dcer2(cpd08908)[0] => (2) h2o(cpd00001)[0] nadp(cpd00006)[0] cer(cpd26685)[0]	N	N	N	Y	frxn00258	
-MAL1277	shingomyelin synthase	pc(cpd11624)[0] cer(cpd26685)[0] => h(cpd00067)[0] dagly(cpd19004)[0] spmylin(cpd00431)[0]	N	N	N	Y	frxn00259	
-MAL1278	Sphingomyelin phosphodiesterase	h2o(cpd00001)[0] spmylin(cpd00431)[0] => (2) h(cpd00067)[0] pcln(cpd00457)[0] cer(cpd26685)[0]	N	N	N	Y	frxn00260	
-MAL1279	ceramide glucosyltransferase	h(cpd00067)[0] udpg(cpd00026)[0] cer(cpd26685)[0] => udp(cpd00014)[0] glucer(cpd00878)[0]	N	N	N	Y	frxn00261	
+MAL1273	sphinganine-1-phosphate aldolase	sph1p(cpd00824)[0] => pen(cpd00285)[0] c16e[0]	N	N	N	N	frxn00253	
+MAL1274	hexadecanal:NADP+ delta2-oxidoreductase	h(cpd00067)[0] nadph(cpd00005)[0] c16e[0] => nadp(cpd00006)[0] c16a(cpd00405)[0]	N	N	N	N	frxn00254	
+MAL1275	sphingosine kinase	atp(cpd00002)[0] sphe(cpd00267)[0] => h(cpd00067)[0] adp(cpd00008)[0] sph1p(cpd00824)[0]	N	N	N	Y	frxn00255	
+MAL1276	sphingolipid delta-4 desaturase	h(cpd00067)[0] nadph(cpd00005)[0] o2(cpd00007)[0] dcer2(cpd08908)[0] => (2) h2o(cpd00001)[0] nadp(cpd00006)[0] cer(cpd26685)[0]	N	N	N	Y	frxn00256	
+MAL1277	shingomyelin synthase	pc(cpd11624)[0] cer(cpd26685)[0] => h(cpd00067)[0] dagly(cpd19004)[0] spmylin(cpd00431)[0]	N	N	N	Y	frxn00257	
+MAL1278	Sphingomyelin phosphodiesterase	h2o(cpd00001)[0] spmylin(cpd00431)[0] => (2) h(cpd00067)[0] pcln(cpd00457)[0] cer(cpd26685)[0]	N	N	N	Y	frxn00258	
+MAL1279	ceramide glucosyltransferase	h(cpd00067)[0] udpg(cpd00026)[0] cer(cpd26685)[0] => udp(cpd00014)[0] glucer(cpd00878)[0]	N	N	N	Y	frxn00259	
 MAL1280	alpha-galactosidase?	h2o(cpd00001)[0] dgacer(cpd03652)[0] => gal(cpd00108)[0] glacer(cpd01743)[0]	N	N	Y	Y	rxn11587	(1) H2O[0] + (1) Digalactosylceramide[0] => (1) Galactose[0] + (1) Cerebroside[0]
 MAL1281	glutathione peroxidase	(2) gsh(cpd00042)[0] 5hpete(cpd03176)[0] => h2o(cpd00001)[0] gssg(cpd00111)[0] 5hete(cpd02918)[0]	N	N	Y	Y	rxn04840	(2) GSH[0] + (1) 5(S)-HPETE[0] => (1) H2O[0] + (1) Oxidized glutathione[0] + (1) 5-HETE[0]
 MAL1282	glutathione peroxidase	(2) gsh(cpd00042)[0] 5hpete(cpd03176)[0] => h2o(cpd00001)[0] gssg(cpd00111)[0] 5hete(cpd02918)[0]	N	N	Y	Y	rxn04840	(2) GSH[0] + (1) 5(S)-HPETE[0] => (1) H2O[0] + (1) Oxidized glutathione[0] + (1) 5-HETE[0]
@@ -1294,84 +1294,84 @@ MAL1292	Cytochrome P450	(2) h(cpd00067)[0] nadph(cpd00005)[0] o2(cpd00007)[0] c2
 MAL1293	cytosolic phospholipase A2 	h2o(cpd00001)[0] pc(cpd11624)[0] => c182(cpd01122)[0] lpc(cpd02601)[0]	N	N	Y	Y	rxn07180	(1) H2O[0] + (1) Lecithin[0] <=> (1) Linoleate[0] + (1) 2-Lysolecithin[0]
 MAL1294	beta-keto reductase	nad(cpd00003)[0] hode(cpd10459)[0] => nadh(cpd00004)[0] h(cpd00067)[0] oxode(cpd10462)[0]	N	N	Y	Y	rxn04864	(1) NAD[0] + (1) 13(S)-HODE[0] <=> (1) NADH[0] + (1) H+[0] + (1) 13-KODE[0]
 MAL1295	beta-keto reductase	nad(cpd00003)[0] hode(cpd10459)[0] => h(cpd00067)[0] nadh(cpd00004)[0] oxode(cpd10462)[0]	N	N	Y	Y	rxn04864	(1) NAD[0] + (1) 13(S)-HODE[0] <=> (1) NADH[0] + (1) H+[0] + (1) 13-KODE[0]
-MAL1296	enoyl-CoA hydratase	(2) h(cpd00067)[0] h2o(cpd00001)[0] t2eo4coa(cpd15052)[0] => 3op4coa(cpd15054)[0]	N	N	N	Y	frxn00262	
-MAL1297	enoyl-CoA hydratase	(2) h(cpd00067)[0] h2o(cpd00001)[0] t2eo4coa(cpd15052)[0] => 3op4coa(cpd15054)[0]	N	N	N	Y	frxn00262	(1) H2O[0] + (2) H+[0] + (1) trans-2-Enoyl-OPC4-CoA[0] <=> (1) 3-Oxo-OPC4-CoA[0]
-MAL1298	enoyl-CoA hydratase	(2) h(cpd00067)[0] h2o(cpd00001)[0] t2eo6coa(cpd15048)[0] => 3op6coa(cpd15050)[0]	N	N	N	Y	frxn00263	
-MAL1299	enoyl-CoA hydratase	(2) h(cpd00067)[0] h2o(cpd00001)[0] t2eo6coa(cpd15048)[0] => 3op6coa(cpd15050)[0]	N	N	N	Y	frxn00263	(1) H2O[0] + (2) H+[0] + (1) trans-2-Enoyl-OPC6-CoA[0] <=> (1) 3-Oxo-OPC6-CoA[0]
-MAL1300	enoyl-CoA hydratase	(2) h(cpd00067)[0] h2o(cpd00001)[0] t2eo8coa(cpd15044)[0] => 3op8coa(cpd15046)[0]	N	N	N	Y	frxn00264	
-MAL1301	enoyl-CoA hydratase	(2) h(cpd00067)[0] h2o(cpd00001)[0] t2eo8coa(cpd15044)[0] => 3op8oa(cpd11718)[0]	N	N	N	Y	frxn00265	
+MAL1296	enoyl-CoA hydratase	(2) h(cpd00067)[0] h2o(cpd00001)[0] t2eo4coa(cpd15052)[0] => 3op4coa(cpd15054)[0]	N	N	N	Y	frxn00260	
+MAL1297	enoyl-CoA hydratase	(2) h(cpd00067)[0] h2o(cpd00001)[0] t2eo4coa(cpd15052)[0] => 3op4coa(cpd15054)[0]	N	N	N	Y	frxn00260	(1) H2O[0] + (2) H+[0] + (1) trans-2-Enoyl-OPC4-CoA[0] <=> (1) 3-Oxo-OPC4-CoA[0]
+MAL1298	enoyl-CoA hydratase	(2) h(cpd00067)[0] h2o(cpd00001)[0] t2eo6coa(cpd15048)[0] => 3op6coa(cpd15050)[0]	N	N	N	Y	frxn00261	
+MAL1299	enoyl-CoA hydratase	(2) h(cpd00067)[0] h2o(cpd00001)[0] t2eo6coa(cpd15048)[0] => 3op6coa(cpd15050)[0]	N	N	N	Y	frxn00261	(1) H2O[0] + (2) H+[0] + (1) trans-2-Enoyl-OPC6-CoA[0] <=> (1) 3-Oxo-OPC6-CoA[0]
+MAL1300	enoyl-CoA hydratase	(2) h(cpd00067)[0] h2o(cpd00001)[0] t2eo8coa(cpd15044)[0] => 3op8coa(cpd15046)[0]	N	N	N	Y	frxn00262	
+MAL1301	enoyl-CoA hydratase	(2) h(cpd00067)[0] h2o(cpd00001)[0] t2eo8coa(cpd15044)[0] => 3op8oa(cpd11718)[0]	N	N	N	Y	frxn00263	
 MAL1302	cytosolic phospholipase A2	h2o(cpd00001)[0] pc(cpd11624)[0] => (4) h(cpd00067)[0] lpc(cpd02601)[0] alin(cpd03850)[0]	N	N	Y	Y	rxn07649	(1) H2O[0] + (1) Lecithin[0] <=> (1) 2-Lysolecithin[0] + (1) Linolenate[0]
 MAL1303	acyl-CoA oxidase	fad(cpd00015)[0] o8coa(cpd15043)[0] => fadh2(cpd00982)[0] t2eo8coa(cpd15044)[0]	N	N	Y	Y	rxn07678	(1) FAD[0] + (1) OPC8-CoA[0] <=> (1) FADH2[0] + (1) trans-2-Enoyl-OPC8-CoA[0]
 MAL1304	acyl-CoA oxidase	fad(cpd00015)[0] o8coa(cpd15043)[0] => fadh2(cpd00982)[0] t2eo8coa(cpd15044)[0]	N	N	Y	Y	rxn07678	(1) FAD[0] + (1) OPC8-CoA[0] <=> (1) FADH2[0] + (1) trans-2-Enoyl-OPC8-CoA[0]
-MAL1305	acetyl-CoA acyltransferase	coa(cpd00010)[0] 3op8coa(cpd15046)[0] => acylcoa(cpd11611)[0] o6coa(cpd15047)[0]	N	N	N	Y	frxn00266	
-MAL1306	acetyl-CoA acyltransferase	coa(cpd00010)[0] 3op8coa(cpd15046)[0] => o6coa(cpd15047)[0] acylcoa(cpd11611)[0]	N	N	N	Y	frxn00266	(1) CoA[0] + (1) 3-Oxo-OPC8-CoA[0] <=> (1) Acyl-CoA[0] + (1) OPC6-CoA[0]
+MAL1305	acetyl-CoA acyltransferase	coa(cpd00010)[0] 3op8coa(cpd15046)[0] => acylcoa(cpd11611)[0] o6coa(cpd15047)[0]	N	N	N	Y	frxn00264	
+MAL1306	acetyl-CoA acyltransferase	coa(cpd00010)[0] 3op8coa(cpd15046)[0] => o6coa(cpd15047)[0] acylcoa(cpd11611)[0]	N	N	N	Y	frxn00264	(1) CoA[0] + (1) 3-Oxo-OPC8-CoA[0] <=> (1) Acyl-CoA[0] + (1) OPC6-CoA[0]
 MAL1307	acyl-CoA oxidase	fad(cpd00015)[0] o6coa(cpd15047)[0] => fadh2(cpd00982)[0] t2eo6coa(cpd15048)[0]	N	N	Y	Y	rxn07682	(1) FAD[0] + (1) OPC6-CoA[0] <=> (1) FADH2[0] + (1) trans-2-Enoyl-OPC6-CoA[0]
 MAL1308	acyl-CoA oxidase	fad(cpd00015)[0] o6coa(cpd15047)[0] => fadh2(cpd00982)[0] t2eo6coa(cpd15048)[0]	N	N	Y	Y	rxn07682	(1) FAD[0] + (1) OPC6-CoA[0] <=> (1) FADH2[0] + (1) trans-2-Enoyl-OPC6-CoA[0]
-MAL1309	acetyl-CoA acyltransferase	coa(cpd00010)[0] 3op6coa(cpd15050)[0] => acylcoa(cpd11611)[0] o4coa(cpd15051)[0]	N	N	N	Y	frxn00267	
-MAL1310	acetyl-CoA acyltransferase	coa(cpd00010)[0] 3op6coa(cpd15050)[0] => acylcoa(cpd11611)[0] o4coa(cpd15051)[0]	N	N	N	Y	frxn00267	(1) CoA[0] + (1) 3-Oxo-OPC6-CoA[0] <=> (1) Acyl-CoA[0] + (1) OPC4-CoA[0]
+MAL1309	acetyl-CoA acyltransferase	coa(cpd00010)[0] 3op6coa(cpd15050)[0] => acylcoa(cpd11611)[0] o4coa(cpd15051)[0]	N	N	N	Y	frxn00265	
+MAL1310	acetyl-CoA acyltransferase	coa(cpd00010)[0] 3op6coa(cpd15050)[0] => acylcoa(cpd11611)[0] o4coa(cpd15051)[0]	N	N	N	Y	frxn00265	(1) CoA[0] + (1) 3-Oxo-OPC6-CoA[0] <=> (1) Acyl-CoA[0] + (1) OPC4-CoA[0]
 MAL1311	acyl-CoA oxidase	fad(cpd00015)[0] o4coa(cpd15051)[0] => fadh2(cpd00982)[0] t2eo4coa(cpd15052)[0]	N	N	Y	Y	rxn07686	(1) FAD[0] + (1) OPC4-CoA[0] <=> (1) FADH2[0] + (1) trans-2-Enoyl-OPC4-CoA[0]
 MAL1312	acyl-CoA oxidase	fad(cpd00015)[0] o4coa(cpd15051)[0] => fadh2(cpd00982)[0] t2eo4coa(cpd15052)[0]	N	N	Y	Y	rxn07686	(1) FAD[0] + (1) OPC4-CoA[0] <=> (1) FADH2[0] + (1) trans-2-Enoyl-OPC4-CoA[0]
-MAL1313	acetyl-CoA acyltransferase	coa(cpd00010)[0] 3op4coa(cpd15054)[0] => acylcoa(cpd11611)[0] o4coa(cpd15051)[0]	N	N	N	Y	frxn00268	
-MAL1314	acetyl-CoA acyltransferase	coa(cpd00010)[0] (2) h(cpd00067)[0] 3op4coa(cpd15054)[0] => acylcoa(cpd11611)[0] o4coa(cpd15051)[0]	N	N	N	Y	frxn00268	(1) CoA[0] + (1) 3-Oxo-OPC4-CoA[0] <=> (1) Acyl-CoA[0] + (1) OPC4-CoA[0]
-MAL1315	delta 9 desaturase	nadph(cpd00005)[0] (3) h(cpd00067)[0] o2(cpd00007)[0] c180acp(cpd12458)[0] => nadp(cpd00006)[0] (2) h2o(cpd00001)[0] c181acp(cpd11825)[0]	N	N	N	Y	frxn00269	
-MAL1316	Spontaneous conversion_from aory	nh4oh(cpd00985)[0] pa(cpd11422)[0] => h2o(cpd00001)[0] paa[0]	N	N	N	N	frxn00270	
+MAL1313	acetyl-CoA acyltransferase	coa(cpd00010)[0] 3op4coa(cpd15054)[0] => acylcoa(cpd11611)[0] o4coa(cpd15051)[0]	N	N	N	Y	frxn00266	
+MAL1314	acetyl-CoA acyltransferase	coa(cpd00010)[0] (2) h(cpd00067)[0] 3op4coa(cpd15054)[0] => acylcoa(cpd11611)[0] o4coa(cpd15051)[0]	N	N	N	Y	frxn00266	(1) CoA[0] + (1) 3-Oxo-OPC4-CoA[0] <=> (1) Acyl-CoA[0] + (1) OPC4-CoA[0]
+MAL1315	delta 9 desaturase	nadph(cpd00005)[0] (3) h(cpd00067)[0] o2(cpd00007)[0] c180acp(cpd12458)[0] => nadp(cpd00006)[0] (2) h2o(cpd00001)[0] c181acp(cpd11825)[0]	N	N	N	Y	frxn00267	
+MAL1316	Spontaneous conversion_from aory	nh4oh(cpd00985)[0] pa(cpd11422)[0] => h2o(cpd00001)[0] paa[0]	N	N	N	N	frxn00268	
 MAL1317	1,2-Diacyl-sn-glycerol:sterol O-acyltransferase	chlestr(cpd01664)[0] magly(cpd01297)[0] => dagly(cpd19004)[0] chtrol(cpd00160)[0]	N	N	Y	Y	rxn39356	(1) Cholesterol[0] + (1) 1,2-Diacyl-sn-glycerol[0] <=> (1) Glyceride[0] + (1) Cholesterol ester[0]
-MAL1318	Phospholipid-translocating ATPase	atp(cpd00002)[0] h2o(cpd00001)[0] pe(cpd11456)[0] => pi(cpd00009)[0] adp(cpd00008)[0] pe(cpd11456)[1]	Y	N	N	Y	frxn00271	
-MAL1319	Phospholipid-translocating ATPase	atp(cpd00002)[0] h2o(cpd00001)[0] ps(cpd11455)[0] => pi(cpd00009)[0] adp(cpd00008)[0] ps(cpd11455)[1]	Y	N	N	Y	frxn00272	
-MAL1320	Phospholipid-translocating ATPase	atp(cpd00002)[0] h2o(cpd00001)[0] pg(cpd11652)[0] => pi(cpd00009)[0] adp(cpd00008)[0] pg(cpd11652)[1]	Y	N	N	Y	frxn00273	
-MAL1321	Phospholipid-translocating ATPase	atp(cpd00002)[0] h2o(cpd00001)[0] pa(cpd11422)[0] => pi(cpd00009)[0] adp(cpd00008)[0] pa(cpd11422)[1]	Y	N	N	Y	frxn00274	
+MAL1318	Phospholipid-translocating ATPase	atp(cpd00002)[0] h2o(cpd00001)[0] pe(cpd11456)[0] => pi(cpd00009)[0] adp(cpd00008)[0] pe(cpd11456)[1]	Y	N	N	Y	frxn00269	
+MAL1319	Phospholipid-translocating ATPase	atp(cpd00002)[0] h2o(cpd00001)[0] ps(cpd11455)[0] => pi(cpd00009)[0] adp(cpd00008)[0] ps(cpd11455)[1]	Y	N	N	Y	frxn00270	
+MAL1320	Phospholipid-translocating ATPase	atp(cpd00002)[0] h2o(cpd00001)[0] pg(cpd11652)[0] => pi(cpd00009)[0] adp(cpd00008)[0] pg(cpd11652)[1]	Y	N	N	Y	frxn00271	
+MAL1321	Phospholipid-translocating ATPase	atp(cpd00002)[0] h2o(cpd00001)[0] pa(cpd11422)[0] => pi(cpd00009)[0] adp(cpd00008)[0] pa(cpd11422)[1]	Y	N	N	Y	frxn00272	
 MAL1322	Long-chain acyl-CoA synthetase	atp(cpd00002)[0] coa(cpd00010)[0] c60(cpd01113)[0] => amp(cpd00018)[0] ppi(cpd00012)[0] c60coa(cpd03124)[0]	N	N	Y	Y	rxn12288	(1) ATP[0] + (1) CoA[0] + (1) Hexanoate[0] <=> (1) PPi[0] + (1) AMP[0] + (1) H+[0] + (1) Hexanoyl-CoA[0]
-MAL1323	MIP2C synthase	pins(cpd11715)[0] mipc[0] => h2o(cpd00001)[0] mip2c(cpd16809)[0]	N	N	N	N	frxn00275	
-MAL1324	NADPH--cytochrome P450 reductase	nadph(cpd00005)[0] (2) feri(cpd00109)[1] => nadp(cpd00006)[0] h(cpd00067)[1] (2) fero(cpd00110)[1]	Y	N	N	Y	frxn00276	
+MAL1323	MIP2C synthase	pins(cpd11715)[0] mipc[0] => h2o(cpd00001)[0] mip2c(cpd16809)[0]	N	N	N	N	frxn00273	
+MAL1324	NADPH--cytochrome P450 reductase	nadph(cpd00005)[0] (2) feri(cpd00109)[1] => nadp(cpd00006)[0] h(cpd00067)[1] (2) fero(cpd00110)[1]	Y	N	N	Y	frxn00274	
 MAL1325	C4-hydroxylase	h(cpd00067)[0] nadph(cpd00005)[0] o2(cpd00007)[0] sph(cpd00623)[0] => h2o(cpd00001)[0] nadp(cpd00006)[0] psph(cpd08926)[0]	N	N	Y	Y	rxn04381	(1) NADPH[0] + (1) O2[0] + (1) H+[0] + (1) Sphinganine[0] => (1) H2O[0] + (1) NADP[0] + (1) Phytosphingosine[0]
-MAL1326	phospholipase A2	acp(cpd11493)[0] pc(cpd11624)[0] => h(cpd00067)[0] lpc(cpd02601)[0] acylacpp[0]	N	N	N	N	frxn00277	
+MAL1326	phospholipase A2	acp(cpd11493)[0] pc(cpd11624)[0] => h(cpd00067)[0] lpc(cpd02601)[0] acylacpp[0]	N	N	N	N	frxn00275	
 MAL1327	beta-ketoacyl-ACP synthase I	h(cpd00067)[0] malacp(cpd11492)[0] c160acp(cpd11476)[0] => co2(cpd00011)[0] acp(cpd11493)[0] c18oacp(cpd14938)[0]	N	N	Y	Y	rxn07576	(1) H+[0] + (1) hexadecanoyl-acp[0] + (1) Malonyl-acyl-carrierprotein-[0] => (1) CO2[0] + (1) ACP[0] + (1) 3-Oxostearoyl-[acp][0]
-MAL1328	phosphatidylserine synthase 1	h(cpd00067)[0] ser(cpd00054)[0] pc(cpd11624)[0] => ps(cpd11455)[0] cl(cpd00099)[0]	N	N	N	Y	frxn00278	
-MAL1329	lysophosphatidylcholine acyltransferase	(0.179) c160coa(cpd00134)[0] (0.025) c180coa(cpd00327)[0] (0.0054) c200coa(cpd01393)[0] (0.01) c220coa(cpd16343)[0] (0.073) c181coa(cpd15274)[0] (0.169) c182coa(cpd01398)[0] (0.0486) c183(6)coa(cpd01942)[0] (0.434) c204(6)coa(cpd01519)[0] (0.005) c201coa(cpd16344)[0] (0.052) c202coa(cpd14900)[0] lpc(cpd02601)[0] => (2) h(cpd00067)[0] coa(cpd00010)[0] pc(cpd11624)[0]	N	N	N	Y	frxn00279	
-MAL1330	Acylglycerol lipase	h2o(cpd00001)[0] magly(cpd01297)[0] => (0.266) c160(cpd00214)[0] (0.165) c180(cpd01080)[0] (0.0026) c200(cpd03848)[0] (0.045) c220(cpd05196)[0] (0.036) c240[0] gl(cpd00100)[0] (0.217) c181(cpd00536)[0] (0.054) c182(cpd01122)[0] (0.0234) c183(6)(cpd03849)[0] (0.032) c202(cpd16340)[0] (0.159) c204(6)(cpd00188)[0]	N	N	N	N	frxn00280	
+MAL1328	phosphatidylserine synthase 1	h(cpd00067)[0] ser(cpd00054)[0] pc(cpd11624)[0] => ps(cpd11455)[0] cl(cpd00099)[0]	N	N	N	Y	frxn00276	
+MAL1329	lysophosphatidylcholine acyltransferase	(0.179) c160coa(cpd00134)[0] (0.025) c180coa(cpd00327)[0] (0.0054) c200coa(cpd01393)[0] (0.01) c220coa(cpd16343)[0] (0.073) c181coa(cpd15274)[0] (0.169) c182coa(cpd01398)[0] (0.0486) c183(6)coa(cpd01942)[0] (0.434) c204(6)coa(cpd01519)[0] (0.005) c201coa(cpd16344)[0] (0.052) c202coa(cpd14900)[0] lpc(cpd02601)[0] => (2) h(cpd00067)[0] coa(cpd00010)[0] pc(cpd11624)[0]	N	N	N	Y	frxn00277	
+MAL1330	Acylglycerol lipase	h2o(cpd00001)[0] magly(cpd01297)[0] => (0.266) c160(cpd00214)[0] (0.165) c180(cpd01080)[0] (0.0026) c200(cpd03848)[0] (0.045) c220(cpd05196)[0] (0.036) c240[0] gl(cpd00100)[0] (0.217) c181(cpd00536)[0] (0.054) c182(cpd01122)[0] (0.0234) c183(6)(cpd03849)[0] (0.032) c202(cpd16340)[0] (0.159) c204(6)(cpd00188)[0]	N	N	N	N	frxn00278	
 MAL1331	Lysophospholipase	h2o(cpd00001)[0] lpc(cpd02601)[0] => h(cpd00067)[0] carbo(cpd00049)[0] glypcln(cpd00507)[0]	N	N	Y	Y	rxn01983	(1) H2O[0] + (1) 2-Lysolecithin[0] <=> (1) Carboxylic acid[0] + (1) H+[0] + (1) Glycerophosphocholine[0]
-MAL1332	Phosphatidylcholine 2-acylhydrolase	h(cpd00067)[0] h2o(cpd00001)[0] pc(cpd11624)[0] => (0.179) c160(cpd00214)[0] (0.025) c180(cpd01080)[0] (0.0054) c200(cpd03848)[0] (0.01) c220(cpd05196)[0] (0.073) c181(cpd00536)[0] (0.169) c182(cpd01122)[0] (0.0486) c183(6)(cpd03849)[0] (0.005) c201(cpd16341)[0] (0.052) c202(cpd16340)[0] (0.434) c204(6)(cpd00188)[0] lpc(cpd02601)[0]	N	N	N	Y	frxn00281	
+MAL1332	Phosphatidylcholine 2-acylhydrolase	h(cpd00067)[0] h2o(cpd00001)[0] pc(cpd11624)[0] => (0.179) c160(cpd00214)[0] (0.025) c180(cpd01080)[0] (0.0054) c200(cpd03848)[0] (0.01) c220(cpd05196)[0] (0.073) c181(cpd00536)[0] (0.169) c182(cpd01122)[0] (0.0486) c183(6)(cpd03849)[0] (0.005) c201(cpd16341)[0] (0.052) c202(cpd16340)[0] (0.434) c204(6)(cpd00188)[0] lpc(cpd02601)[0]	N	N	N	Y	frxn00279	
 MAL1333	delta 9 desaturase	h(cpd00067)[0] nadph(cpd00005)[0] o2(cpd00007)[0] c160coa(cpd00134)[0] => (2) h2o(cpd00001)[0] nadp(cpd00006)[0] c161coa(cpd15238)[0]	N	N	Y	Y	rxn09459	(1) NADPH[0] + (1) O2[0] + (2) H+[0] + (1) Palmitoyl-CoA[0] <= (2) H2O[0] + (1) NADP[0] + (1) Hexadecenoyl-CoA[0]
 MAL1334	delta 9 desaturase	h(cpd00067)[0] nadph(cpd00005)[0] o2(cpd00007)[0] c180coa(cpd00327)[0] => (2) h2o(cpd00001)[0] nadp(cpd00006)[0] c181coa(cpd15274)[0]	N	N	Y	Y	rxn09458	(1) NADPH[0] + (1) O2[0] + (2) H+[0] + (1) strcoa[0] <= (2) H2O[0] + (1) NADP[0] + (1) Octadecenoyl-CoA[0]
-MAL1335	delta 12 desaturase	h(cpd00067)[0] nadph(cpd00005)[0] o2(cpd00007)[0] c181coa(cpd15274)[0] => (2) h2o(cpd00001)[0] nadp(cpd00006)[0] c182coa(cpd01398)[0]	N	N	N	Y	frxn00282	
-MAL1336	delta 15 desaturase	h(cpd00067)[0] nadph(cpd00005)[0] o2(cpd00007)[0] c182coa(cpd01398)[0] => (2) h2o(cpd00001)[0] nadp(cpd00006)[0] c183(3)coa(cpd14883)[0]	N	N	N	Y	frxn00283	
-MAL1337	delta 6 desaturase	h(cpd00067)[0] nadph(cpd00005)[0] o2(cpd00007)[0] c182coa(cpd01398)[0] => (2) h2o(cpd00001)[0] nadp(cpd00006)[0] c183(6)coa(cpd01942)[0]	N	N	N	Y	frxn00284	
-MAL1338	delta 6 desaturase	h(cpd00067)[0] nadph(cpd00005)[0] o2(cpd00007)[0] c183(3)coa(cpd14883)[0] => (2) h2o(cpd00001)[0] nadp(cpd00006)[0] c184(3)coa(cpd14884)[0]	N	N	N	Y	frxn00285	
-MAL1339	delta 9 desaturase	h(cpd00067)[0] nadph(cpd00005)[0] o2(cpd00007)[0] c200coa(cpd01393)[0] => (2) h2o(cpd00001)[0] nadp(cpd00006)[0] c201coa(cpd16344)[0]	N	N	N	Y	frxn00286	
-MAL1340	fatty acid elongase	h(cpd00067)[0] malcoa(cpd00070)[0] c182coa(cpd01398)[0] => coa(cpd00010)[0] co2(cpd00011)[0] c202ocoa[0]	N	N	N	N	frxn00287	
-MAL1341	very-long-chain 3-oxoacyl-CoA reductase	h(cpd00067)[0] nadph(cpd00005)[0] c202ocoa[0] => nadp(cpd00006)[0] c202hcoa[0]	N	N	N	N	frxn00288	
-MAL1342	very-long-chain (3R)-3-hydroxyacyl-[acyl-carrier protein] dehydratase	c202hcoa[0] => h2o(cpd00001)[0] c202dcoa[0]	N	N	N	N	frxn00289	
-MAL1343	very-long-chain enoyl-CoA reductase	h(cpd00067)[0] nadph(cpd00005)[0] c202dcoa[0] => nadp(cpd00006)[0] c202coa(cpd14900)[0]	N	N	N	N	frxn00290	
-MAL1344	fatty acid elongase	h(cpd00067)[0] malcoa(cpd00070)[0] c183(6)coa(cpd01942)[0] => coa(cpd00010)[0] co2(cpd00011)[0] c203(6)ocoa[0]	N	N	N	N	frxn00291	
-MAL1345	very-long-chain 3-oxoacyl-CoA reductase	h(cpd00067)[0] nadph(cpd00005)[0] c203(6)ocoa[0] => nadp(cpd00006)[0] c203(6)hcoa[0]	N	N	N	N	frxn00292	
-MAL1346	very-long-chain (3R)-3-hydroxyacyl-[acyl-carrier protein] dehydratase	c203(6)hcoa[0] => h2o(cpd00001)[0] c203(6)dcoa[0]	N	N	N	N	frxn00293	
-MAL1347	very-long-chain enoyl-CoA reductase	h(cpd00067)[0] nadph(cpd00005)[0] c203(6)dcoa[0] => nadp(cpd00006)[0] c203(6)coa(cpd02263)[0]	N	N	N	N	frxn00294	
-MAL1348	fatty acid elongase	h(cpd00067)[0] malcoa(cpd00070)[0] c184(3)coa(cpd14884)[0] => coa(cpd00010)[0] co2(cpd00011)[0] c204(3)ocoa[0]	N	N	N	N	frxn00295	
-MAL1349	very-long-chain 3-oxoacyl-CoA reductase	h(cpd00067)[0] nadph(cpd00005)[0] c204(3)ocoa[0] => nadp(cpd00006)[0] c204(3)hcoa[0]	N	N	N	N	frxn00296	
-MAL1350	very-long-chain (3R)-3-hydroxyacyl-[acyl-carrier protein] dehydratase	c204(3)hcoa[0] => h2o(cpd00001)[0] c204(3)dcoa[0]	N	N	N	N	frxn00297	
-MAL1351	very-long-chain enoyl-CoA reductase	(3) h(cpd00067)[0] nadph(cpd00005)[0] c204(3)dcoa[0] => nadp(cpd00006)[0] c204(3)coa(cpd14899)[0]	N	N	N	N	frxn00298	
-MAL1352	delta 5 desaturase	h(cpd00067)[0] nadph(cpd00005)[0] o2(cpd00007)[0] c203(6)coa(cpd02263)[0] => (2) h2o(cpd00001)[0] nadp(cpd00006)[0] c204(6)coa(cpd01519)[0]	N	N	N	Y	frxn00299	
-MAL1353	delta 5 desaturase	(3) h(cpd00067)[0] nadph(cpd00005)[0] (2) o2(cpd00007)[0] c204(3)coa(cpd14899)[0] => (4) h2o(cpd00001)[0] nadp(cpd00006)[0] c205(3)coa(cpd24122)[0]	N	N	N	Y	frxn00300	
-MAL1354	delta 15 desaturase	h(cpd00067)[0] nadph(cpd00005)[0] o2(cpd00007)[0] c204(6)coa(cpd01519)[0] => (2) h2o(cpd00001)[0] nadp(cpd00006)[0] c205(3)coa(cpd24122)[0]	N	N	N	Y	frxn00301	
-MAL1355	fatty acid elongase	h(cpd00067)[0] malcoa(cpd00070)[0] c205(3)coa(cpd24122)[0] => coa(cpd00010)[0] co2(cpd00011)[0] c225(3)ocoa[0]	N	N	N	N	frxn00302	
-MAL1356	very-long-chain 3-oxoacyl-CoA reductase	h(cpd00067)[0] nadph(cpd00005)[0] c225(3)ocoa[0] => nadp(cpd00006)[0] c225(3)hcoa[0]	N	N	N	N	frxn00303	
-MAL1357	very-long-chain (3R)-3-hydroxyacyl-[acyl-carrier protein] dehydratase	c225(3)hcoa[0] => h2o(cpd00001)[0] c225(3)dcoa[0]	N	N	N	N	frxn00304	
-MAL1358	very-long-chain enoyl-CoA reductase	h(cpd00067)[0] nadph(cpd00005)[0] c225(3)dcoa[0] => nadp(cpd00006)[0] c225(3)coa(cpd14887)[0]	N	N	N	N	frxn00305	
-MAL1359	fatty acid elongase	h(cpd00067)[0] malcoa(cpd00070)[0] c225(3)coa(cpd14887)[0] => coa(cpd00010)[0] co2(cpd00011)[0] c245(3)ocoa[0]	N	N	N	N	frxn00306	
-MAL1360	very-long-chain 3-oxoacyl-CoA reductase	h(cpd00067)[0] nadph(cpd00005)[0] c245(3)ocoa[0] => nadp(cpd00006)[0] c245(3)hcoa[0]	N	N	N	N	frxn00307	
-MAL1361	very-long-chain (3R)-3-hydroxyacyl-[acyl-carrier protein] dehydratase	c245(3)hcoa[0] => h2o(cpd00001)[0] c245(3)dcoa[0]	N	N	N	N	frxn00308	
-MAL1362	very-long-chain enoyl-CoA reductase	h(cpd00067)[0] nadph(cpd00005)[0] c245(3)dcoa[0] => nadp(cpd00006)[0] c245(3)coa(cpd14888)[0]	N	N	N	N	frxn00309	
-MAL1363	delta 6 desaturase	h(cpd00067)[0] nadph(cpd00005)[0] o2(cpd00007)[0] c245(3)coa(cpd14888)[0] => (2) h2o(cpd00001)[0] nadp(cpd00006)[0] c246(3)coa(cpd14889)[0]	N	N	N	Y	frxn00310	
-MAL1364	acyl-CoA oxidase	fad(cpd00015)[0] c246(3)coa(cpd14889)[0] => fadh2(cpd00982)[0] c246(3)dcoa[0]	N	N	N	N	frxn00311	
-MAL1365	Enoyl-CoA hydratase	h2o(cpd00001)[0] c246(3)dcoa[0] => c246(3)hcoa[0]	N	N	N	N	frxn00312	
-MAL1366	3-hydroxyacyl-CoA dehydrogenase	nad(cpd00003)[0] c246(3)hcoa[0] => nadh(cpd00004)[0] h(cpd00067)[0] c246(3)ocoa[0]	N	N	N	N	frxn00313	
-MAL1367	acetyl-CoA C-acyltransferase	coa(cpd00010)[0] c246(3)ocoa[0] => accoa(cpd00022)[0] c226(3)coa(cpd14890)[0]	N	N	N	N	frxn00314	
-MAL1368	acyl-CoA oxidase	fad(cpd00015)[0] c225(3)coa(cpd14887)[0] => fadh2(cpd00982)[0] c225(3)dcoa[0]	N	N	N	N	frxn00315	
-MAL1369	Enoyl-CoA hydratase	h2o(cpd00001)[0] c225(3)dcoa[0] => c225(3)hcoa[0]	N	N	N	N	frxn00304	(1) c225(3)hcoa[c][0] <=> (1) H2O[0] + (1) c225(3)dcoa[c][0]
-MAL1370	3-hydroxyacyl-CoA dehydrogenase	nad(cpd00003)[0] c225(3)hcoa[0] => nadh(cpd00004)[0] h(cpd00067)[0] c225(3)ocoa[0]	N	N	N	N	frxn00316	
-MAL1371	acetyl-CoA C-acyltransferase	coa(cpd00010)[0] c225(3)ocoa[0] => accoa(cpd00022)[0] c205(3)coa(cpd24122)[0]	N	N	N	N	frxn00317	
-MAL1372	delta 9 desaturase	h(cpd00067)[0] nadh(cpd00004)[0] o2(cpd00007)[0] c160acp(cpd11476)[0] => (2) h2o(cpd00001)[0] nad(cpd00003)[0] c161acp[0]	N	N	N	N	frxn00318	
-MAL1373	choloyl-CoA hydrolase	h2o(cpd00001)[0] c181coa(cpd15274)[0] => h(cpd00067)[0] coa(cpd00010)[0] c181(cpd00536)[0]	N	N	N	Y	frxn00319	
+MAL1335	delta 12 desaturase	h(cpd00067)[0] nadph(cpd00005)[0] o2(cpd00007)[0] c181coa(cpd15274)[0] => (2) h2o(cpd00001)[0] nadp(cpd00006)[0] c182coa(cpd01398)[0]	N	N	N	Y	frxn00280	
+MAL1336	delta 15 desaturase	h(cpd00067)[0] nadph(cpd00005)[0] o2(cpd00007)[0] c182coa(cpd01398)[0] => (2) h2o(cpd00001)[0] nadp(cpd00006)[0] c183(3)coa(cpd14883)[0]	N	N	N	Y	frxn00281	
+MAL1337	delta 6 desaturase	h(cpd00067)[0] nadph(cpd00005)[0] o2(cpd00007)[0] c182coa(cpd01398)[0] => (2) h2o(cpd00001)[0] nadp(cpd00006)[0] c183(6)coa(cpd01942)[0]	N	N	N	Y	frxn00282	
+MAL1338	delta 6 desaturase	h(cpd00067)[0] nadph(cpd00005)[0] o2(cpd00007)[0] c183(3)coa(cpd14883)[0] => (2) h2o(cpd00001)[0] nadp(cpd00006)[0] c184(3)coa(cpd14884)[0]	N	N	N	Y	frxn00283	
+MAL1339	delta 9 desaturase	h(cpd00067)[0] nadph(cpd00005)[0] o2(cpd00007)[0] c200coa(cpd01393)[0] => (2) h2o(cpd00001)[0] nadp(cpd00006)[0] c201coa(cpd16344)[0]	N	N	N	Y	frxn00284	
+MAL1340	fatty acid elongase	h(cpd00067)[0] malcoa(cpd00070)[0] c182coa(cpd01398)[0] => coa(cpd00010)[0] co2(cpd00011)[0] c202ocoa[0]	N	N	N	N	frxn00285	
+MAL1341	very-long-chain 3-oxoacyl-CoA reductase	h(cpd00067)[0] nadph(cpd00005)[0] c202ocoa[0] => nadp(cpd00006)[0] c202hcoa[0]	N	N	N	N	frxn00286	
+MAL1342	very-long-chain (3R)-3-hydroxyacyl-[acyl-carrier protein] dehydratase	c202hcoa[0] => h2o(cpd00001)[0] c202dcoa[0]	N	N	N	N	frxn00287	
+MAL1343	very-long-chain enoyl-CoA reductase	h(cpd00067)[0] nadph(cpd00005)[0] c202dcoa[0] => nadp(cpd00006)[0] c202coa(cpd14900)[0]	N	N	N	N	frxn00288	
+MAL1344	fatty acid elongase	h(cpd00067)[0] malcoa(cpd00070)[0] c183(6)coa(cpd01942)[0] => coa(cpd00010)[0] co2(cpd00011)[0] c203(6)ocoa[0]	N	N	N	N	frxn00289	
+MAL1345	very-long-chain 3-oxoacyl-CoA reductase	h(cpd00067)[0] nadph(cpd00005)[0] c203(6)ocoa[0] => nadp(cpd00006)[0] c203(6)hcoa[0]	N	N	N	N	frxn00290	
+MAL1346	very-long-chain (3R)-3-hydroxyacyl-[acyl-carrier protein] dehydratase	c203(6)hcoa[0] => h2o(cpd00001)[0] c203(6)dcoa[0]	N	N	N	N	frxn00291	
+MAL1347	very-long-chain enoyl-CoA reductase	h(cpd00067)[0] nadph(cpd00005)[0] c203(6)dcoa[0] => nadp(cpd00006)[0] c203(6)coa(cpd02263)[0]	N	N	N	N	frxn00292	
+MAL1348	fatty acid elongase	h(cpd00067)[0] malcoa(cpd00070)[0] c184(3)coa(cpd14884)[0] => coa(cpd00010)[0] co2(cpd00011)[0] c204(3)ocoa[0]	N	N	N	N	frxn00293	
+MAL1349	very-long-chain 3-oxoacyl-CoA reductase	h(cpd00067)[0] nadph(cpd00005)[0] c204(3)ocoa[0] => nadp(cpd00006)[0] c204(3)hcoa[0]	N	N	N	N	frxn00294	
+MAL1350	very-long-chain (3R)-3-hydroxyacyl-[acyl-carrier protein] dehydratase	c204(3)hcoa[0] => h2o(cpd00001)[0] c204(3)dcoa[0]	N	N	N	N	frxn00295	
+MAL1351	very-long-chain enoyl-CoA reductase	(3) h(cpd00067)[0] nadph(cpd00005)[0] c204(3)dcoa[0] => nadp(cpd00006)[0] c204(3)coa(cpd14899)[0]	N	N	N	N	frxn00296	
+MAL1352	delta 5 desaturase	h(cpd00067)[0] nadph(cpd00005)[0] o2(cpd00007)[0] c203(6)coa(cpd02263)[0] => (2) h2o(cpd00001)[0] nadp(cpd00006)[0] c204(6)coa(cpd01519)[0]	N	N	N	Y	frxn00297	
+MAL1353	delta 5 desaturase	(3) h(cpd00067)[0] nadph(cpd00005)[0] (2) o2(cpd00007)[0] c204(3)coa(cpd14899)[0] => (4) h2o(cpd00001)[0] nadp(cpd00006)[0] c205(3)coa(cpd24122)[0]	N	N	N	Y	frxn00298	
+MAL1354	delta 15 desaturase	h(cpd00067)[0] nadph(cpd00005)[0] o2(cpd00007)[0] c204(6)coa(cpd01519)[0] => (2) h2o(cpd00001)[0] nadp(cpd00006)[0] c205(3)coa(cpd24122)[0]	N	N	N	Y	frxn00299	
+MAL1355	fatty acid elongase	h(cpd00067)[0] malcoa(cpd00070)[0] c205(3)coa(cpd24122)[0] => coa(cpd00010)[0] co2(cpd00011)[0] c225(3)ocoa[0]	N	N	N	N	frxn00300	
+MAL1356	very-long-chain 3-oxoacyl-CoA reductase	h(cpd00067)[0] nadph(cpd00005)[0] c225(3)ocoa[0] => nadp(cpd00006)[0] c225(3)hcoa[0]	N	N	N	N	frxn00301	
+MAL1357	very-long-chain (3R)-3-hydroxyacyl-[acyl-carrier protein] dehydratase	c225(3)hcoa[0] => h2o(cpd00001)[0] c225(3)dcoa[0]	N	N	N	N	frxn00302	
+MAL1358	very-long-chain enoyl-CoA reductase	h(cpd00067)[0] nadph(cpd00005)[0] c225(3)dcoa[0] => nadp(cpd00006)[0] c225(3)coa(cpd14887)[0]	N	N	N	N	frxn00303	
+MAL1359	fatty acid elongase	h(cpd00067)[0] malcoa(cpd00070)[0] c225(3)coa(cpd14887)[0] => coa(cpd00010)[0] co2(cpd00011)[0] c245(3)ocoa[0]	N	N	N	N	frxn00304	
+MAL1360	very-long-chain 3-oxoacyl-CoA reductase	h(cpd00067)[0] nadph(cpd00005)[0] c245(3)ocoa[0] => nadp(cpd00006)[0] c245(3)hcoa[0]	N	N	N	N	frxn00305	
+MAL1361	very-long-chain (3R)-3-hydroxyacyl-[acyl-carrier protein] dehydratase	c245(3)hcoa[0] => h2o(cpd00001)[0] c245(3)dcoa[0]	N	N	N	N	frxn00306	
+MAL1362	very-long-chain enoyl-CoA reductase	h(cpd00067)[0] nadph(cpd00005)[0] c245(3)dcoa[0] => nadp(cpd00006)[0] c245(3)coa(cpd14888)[0]	N	N	N	N	frxn00307	
+MAL1363	delta 6 desaturase	h(cpd00067)[0] nadph(cpd00005)[0] o2(cpd00007)[0] c245(3)coa(cpd14888)[0] => (2) h2o(cpd00001)[0] nadp(cpd00006)[0] c246(3)coa(cpd14889)[0]	N	N	N	Y	frxn00308	
+MAL1364	acyl-CoA oxidase	fad(cpd00015)[0] c246(3)coa(cpd14889)[0] => fadh2(cpd00982)[0] c246(3)dcoa[0]	N	N	N	N	frxn00309	
+MAL1365	Enoyl-CoA hydratase	h2o(cpd00001)[0] c246(3)dcoa[0] => c246(3)hcoa[0]	N	N	N	N	frxn00310	
+MAL1366	3-hydroxyacyl-CoA dehydrogenase	nad(cpd00003)[0] c246(3)hcoa[0] => nadh(cpd00004)[0] h(cpd00067)[0] c246(3)ocoa[0]	N	N	N	N	frxn00311	
+MAL1367	acetyl-CoA C-acyltransferase	coa(cpd00010)[0] c246(3)ocoa[0] => accoa(cpd00022)[0] c226(3)coa(cpd14890)[0]	N	N	N	N	frxn00312	
+MAL1368	acyl-CoA oxidase	fad(cpd00015)[0] c225(3)coa(cpd14887)[0] => fadh2(cpd00982)[0] c225(3)dcoa[0]	N	N	N	N	frxn00313	
+MAL1369	Enoyl-CoA hydratase	h2o(cpd00001)[0] c225(3)dcoa[0] => c225(3)hcoa[0]	N	N	N	N	frxn00302	(1) c225(3)hcoa[c][0] <=> (1) H2O[0] + (1) c225(3)dcoa[c][0]
+MAL1370	3-hydroxyacyl-CoA dehydrogenase	nad(cpd00003)[0] c225(3)hcoa[0] => nadh(cpd00004)[0] h(cpd00067)[0] c225(3)ocoa[0]	N	N	N	N	frxn00314	
+MAL1371	acetyl-CoA C-acyltransferase	coa(cpd00010)[0] c225(3)ocoa[0] => accoa(cpd00022)[0] c205(3)coa(cpd24122)[0]	N	N	N	N	frxn00315	
+MAL1372	delta 9 desaturase	h(cpd00067)[0] nadh(cpd00004)[0] o2(cpd00007)[0] c160acp(cpd11476)[0] => (2) h2o(cpd00001)[0] nad(cpd00003)[0] c161acp[0]	N	N	N	N	frxn00316	
+MAL1373	choloyl-CoA hydrolase	h2o(cpd00001)[0] c181coa(cpd15274)[0] => h(cpd00067)[0] coa(cpd00010)[0] c181(cpd00536)[0]	N	N	N	Y	frxn00317	
 MAL1374	choloyl-CoA hydrolase	h2o(cpd00001)[0] c182coa(cpd01398)[0] => h(cpd00067)[0] coa(cpd00010)[0] c182(cpd01122)[0]	N	N	Y	Y	rxn11712	(1) H2O[0] + (1) Linoleoyl-CoA[0] => (1) CoA[0] + (1) H+[0] + (1) Linoleate[0]
 MAL1375	choloyl-CoA hydrolase	h2o(cpd00001)[0] c201coa(cpd16344)[0] => coa(cpd00010)[0] c201(cpd16341)[0]	N	N	Y	Y	rxn11721	(1) H2O[0] + (1) Icosenoyl-CoA[0] => (1) CoA[0] + (1) H+[0] + (1) Icosenoic acid[0]
 MAL1376	choloyl-CoA hydrolase	h2o(cpd00001)[0] c202coa(cpd14900)[0] => coa(cpd00010)[0] c202(cpd16340)[0]	N	N	Y	Y	rxn11725	(1) H2O[0] + (1) (11Z,14Z)-Icosadienoyl-CoA[0] => (1) CoA[0] + (1) H+[0] + (1) Icosadienoic acid[0]
@@ -1379,22 +1379,22 @@ MAL1377	choloyl-CoA hydrolase	h2o(cpd00001)[0] c183(6)coa(cpd01942)[0] => coa(cp
 MAL1378	choloyl-CoA hydrolase	h2o(cpd00001)[0] c203(6)coa(cpd02263)[0] => coa(cpd00010)[0] c203(6)(cpd02077)[0]	N	N	Y	Y	rxn11717	(1) H2O[0] + (1) 8,11,14-Icosatrienoyl-CoA[0] => (1) CoA[0] + (1) H+[0] + (1) 8,11,14-Icosatrienoate[0]
 MAL1379	choloyl-CoA hydrolase	h2o(cpd00001)[0] c204(6)coa(cpd01519)[0] => h(cpd00067)[0] coa(cpd00010)[0] c204(6)(cpd00188)[0]	N	N	Y	Y	rxn11718	(1) H2O[0] + (1) Arachidonyl-CoA[0] => (1) CoA[0] + (1) H+[0] + (1) Arachidonate[0]
 MAL1380	choloyl-CoA hydrolase	h2o(cpd00001)[0] c183(3)coa(cpd14883)[0] => coa(cpd00010)[0] c183(3)(cpd03850)[0]	N	N	Y	Y	rxn11713	(1) H2O[0] + (1) alpha-Linolenoyl-CoA[0] => (1) CoA[0] + (1) H+[0] + (1) Linolenate[0]
-MAL1381	choloyl-CoA hydrolase	h2o(cpd00001)[0] c184(3)coa(cpd14884)[0] => coa(cpd00010)[0] c184(3)[0]	N	N	N	N	frxn00320	
-MAL1382	choloyl-CoA hydrolase	h2o(cpd00001)[0] c204(3)coa(cpd14899)[0] => (2) h(cpd00067)[0] coa(cpd00010)[0] c204(3)[0]	N	N	N	N	frxn00321	
+MAL1381	choloyl-CoA hydrolase	h2o(cpd00001)[0] c184(3)coa(cpd14884)[0] => coa(cpd00010)[0] c184(3)[0]	N	N	N	N	frxn00318	
+MAL1382	choloyl-CoA hydrolase	h2o(cpd00001)[0] c204(3)coa(cpd14899)[0] => (2) h(cpd00067)[0] coa(cpd00010)[0] c204(3)[0]	N	N	N	N	frxn00319	
 MAL1383	choloyl-CoA hydrolase	h2o(cpd00001)[0] c205(3)coa(cpd24122)[0] => coa(cpd00010)[0] c205(3)(cpd03851)[0]	N	N	Y	Y	rxn37727	(1) H2O[0] + (1) eicosapentaenoyl CoA[0] => (1) CoA[0] + (1) H+[0] + (1) Eicosapentaenoic acid[0]
 MAL1384	choloyl-CoA hydrolase	h2o(cpd00001)[0] c225(3)coa(cpd14887)[0] => coa(cpd00010)[0] c225(3)(cpd16301)[0]	N	N	Y	Y	rxn11724	(1) H2O[0] + (1) (7Z,10Z,13Z,16Z,19Z)-Docosapentaenoyl-CoA[0] => (1) CoA[0] + (1) H+[0] + (1) Docosapentaenoic acid[0]
-MAL1385	choloyl-CoA hydrolase	h2o(cpd00001)[0] c245(3)coa(cpd14888)[0] => coa(cpd00010)[0] c245(3)[0]	N	N	N	N	frxn00322	
-MAL1386	choloyl-CoA hydrolase	h2o(cpd00001)[0] c246(3)coa(cpd14889)[0] => coa(cpd00010)[0] c246(3)[0]	N	N	N	N	frxn00323	
-MAL1387	choloyl-CoA hydrolase	h2o(cpd00001)[0] c226(3)coa(cpd14890)[0] => coa(cpd00010)[0] c226(3)[0]	N	N	N	N	frxn00324	
+MAL1385	choloyl-CoA hydrolase	h2o(cpd00001)[0] c245(3)coa(cpd14888)[0] => coa(cpd00010)[0] c245(3)[0]	N	N	N	N	frxn00320	
+MAL1386	choloyl-CoA hydrolase	h2o(cpd00001)[0] c246(3)coa(cpd14889)[0] => coa(cpd00010)[0] c246(3)[0]	N	N	N	N	frxn00321	
+MAL1387	choloyl-CoA hydrolase	h2o(cpd00001)[0] c226(3)coa(cpd14890)[0] => coa(cpd00010)[0] c226(3)[0]	N	N	N	N	frxn00322	
 MAL1388	ATP maintenance requirement	atp(cpd00002)[0] h2o(cpd00001)[0] => adp(cpd00008)[0] pi(cpd00009)[0]	N	N	Y	Y	rxn00062	(1) H2O[0] + (1) ATP[0] => (1) ADP[0] + (1) Phosphate[0] + (1) H+[0]
 MAL1389	cytochrome-c peroxidase	(2) h(cpd00067)[0] h2o2(cpd00025)[0] (2) fero(cpd00110)[0] => (2) h2o(cpd00001)[0] (2) feri(cpd00109)[0]	N	N	Y	Y	rxn00014	(1) H2O2[0] + (2) H+[0] + (2) Cytochrome c2+[0] => (2) H2O[0] + (2) Cytochrome c3+[0]
 MAL1390	Transmembrane GTPase	h2o(cpd00001)[0] gtp(cpd00038)[0] => pi(cpd00009)[0] gdp(cpd00031)[0]	N	N	Y	Y	rxn00241	(1) H2O[0] + (1) GTP[0] => (1) Phosphate[0] + (1) GDP[0] + (1) H+[0]
 UNDEF	5-hydroxyisourate transporter	hiura(cpd08625)[0] => hiura(cpd08625)[1]	Y	N	Y	Y	rxn32811	(1) 5-Hydroxyisourate[0] <=> (1) 5-Hydroxyisourate[1]
-biomass	Biomass fraction	(71.4) atp(cpd00002)[0] (71.4) h2o(cpd00001)[0] (0.0137) amp(cpd00018)[0] (0.071) gdpman(cpd00083)[0] (0.342) 13glucan(cpd11791)[0] (0.0994) 14glucan(cpd11735)[0] (0.1022) chit(cpd11683)[0] (0.1616) gln(cpd00053)[0] (0.1968) glu(cpd00023)[0] (0.3034) ser(cpd00054)[0] (0.208) gly(cpd00033)[0] (0.0146) dagly(cpd19004)[0] (0.0158) cmp(cpd00046)[0] (0.1836) asp(cpd00041)[0] (0.1181) asn(cpd00132)[0] (0.2801) ala(cpd00035)[0] (0.1848) arg(cpd00051)[0] (0.1967) thr(cpd00161)[0] (0.0092) ps(cpd11455)[0] (0.038398) cln(cpd00098)[0] (0.038) cys(cpd00084)[0] (0.07908) met(cpd00060)[0] (0.2837) leu(cpd00107)[0] (0.1485) ile(cpd00322)[0] (0.0958) val(cpd00156)[0] (0.1611) lys(cpd00039)[0] (0.1868) pro(cpd00129)[0] (0.0921) his(cpd00119)[0] (0.0861) tyr(cpd00069)[0] (0.111) phe(cpd00066)[0] (0.03588) trp(cpd00065)[0] (0.083928) pnto(cpd00644)[0] (0.01626) pe(cpd11456)[0] (0.0019) dtmp(cpd00298)[0] (0.015) gmp(cpd00126)[0] (0.0118) ump(cpd00091)[0] (0.0019) damp(cpd00294)[0] (0.0021) dgmp(cpd00296)[0] (0.0021) dcmp(cpd00206)[0] (0.040761) vb2(cpd00220)[0] (0.014777) vb6(cpd00263)[0] (0.425638) nica(cpd00218)[0] (0.0034) c160(cpd00214)[0] (0.00213) c180(cpd01080)[0] (3.4e-006) c200(cpd03848)[0] (0.00058) c220(cpd05196)[0] (0.00047) c240[0] (0.3381) tagly(cpd11677)[0] (0.0028) c181(cpd00536)[0] (0.0007) c182(cpd01122)[0] (0.0003) c183(6)(cpd03849)[0] (0.00041) c202(cpd16340)[0] (0.00205) c204(6)(cpd00188)[0] (0.0254) pc(cpd11624)[0] => (71.4) h(cpd00067)[0] (71.4) adp(cpd00008)[0] (71.4) pi(cpd00009)[0]	N	N	N	N	frxn00325	
-tr_13glucanec	13glucan transporter	13glucan(cpd11791)[0] => 13glucan(cpd11791)[1]	Y	N	N	Y	frxn00326	
-tr_2oxate	2-Oxosuccinamate transporter	2oxate(cpd01577)[0] => 2oxate(cpd01577)[1]	Y	N	N	Y	frxn00327	
+biomass	Biomass fraction	(71.4) atp(cpd00002)[0] (71.4) h2o(cpd00001)[0] (0.0137) amp(cpd00018)[0] (0.071) gdpman(cpd00083)[0] (0.342) 13glucan(cpd11791)[0] (0.0994) 14glucan(cpd11735)[0] (0.1022) chit(cpd11683)[0] (0.1616) gln(cpd00053)[0] (0.1968) glu(cpd00023)[0] (0.3034) ser(cpd00054)[0] (0.208) gly(cpd00033)[0] (0.0146) dagly(cpd19004)[0] (0.0158) cmp(cpd00046)[0] (0.1836) asp(cpd00041)[0] (0.1181) asn(cpd00132)[0] (0.2801) ala(cpd00035)[0] (0.1848) arg(cpd00051)[0] (0.1967) thr(cpd00161)[0] (0.0092) ps(cpd11455)[0] (0.038398) cln(cpd00098)[0] (0.038) cys(cpd00084)[0] (0.07908) met(cpd00060)[0] (0.2837) leu(cpd00107)[0] (0.1485) ile(cpd00322)[0] (0.0958) val(cpd00156)[0] (0.1611) lys(cpd00039)[0] (0.1868) pro(cpd00129)[0] (0.0921) his(cpd00119)[0] (0.0861) tyr(cpd00069)[0] (0.111) phe(cpd00066)[0] (0.03588) trp(cpd00065)[0] (0.083928) pnto(cpd00644)[0] (0.01626) pe(cpd11456)[0] (0.0019) dtmp(cpd00298)[0] (0.015) gmp(cpd00126)[0] (0.0118) ump(cpd00091)[0] (0.0019) damp(cpd00294)[0] (0.0021) dgmp(cpd00296)[0] (0.0021) dcmp(cpd00206)[0] (0.040761) vb2(cpd00220)[0] (0.014777) vb6(cpd00263)[0] (0.425638) nica(cpd00218)[0] (0.0034) c160(cpd00214)[0] (0.00213) c180(cpd01080)[0] (3.4e-006) c200(cpd03848)[0] (0.00058) c220(cpd05196)[0] (0.00047) c240[0] (0.3381) tagly(cpd11677)[0] (0.0028) c181(cpd00536)[0] (0.0007) c182(cpd01122)[0] (0.0003) c183(6)(cpd03849)[0] (0.00041) c202(cpd16340)[0] (0.00205) c204(6)(cpd00188)[0] (0.0254) pc(cpd11624)[0] => (71.4) h(cpd00067)[0] (71.4) adp(cpd00008)[0] (71.4) pi(cpd00009)[0]	N	N	N	N	frxn00323	
+tr_13glucanec	13glucan transporter	13glucan(cpd11791)[0] => 13glucan(cpd11791)[1]	Y	N	N	Y	frxn00324	
+tr_2oxate	2-Oxosuccinamate transporter	2oxate(cpd01577)[0] => 2oxate(cpd01577)[1]	Y	N	N	Y	frxn00325	
 tr_3pgce	3-phospho-D-glycerate transporter	3pg(cpd00169)[0] => 3pg(cpd00169)[1]	Y	N	Y	Y	rxn31169	(1) 3-Phosphoglycerate[0] <=> (1) 3-Phosphoglycerate[1]
-tr_6thate[c]	6-Thiourate transporter	6thate(cpd16417)[0] => 6thate(cpd16417)[1]	Y	N	N	Y	frxn00328	
+tr_6thate[c]	6-Thiourate transporter	6thate(cpd16417)[0] => 6thate(cpd16417)[1]	Y	N	N	Y	frxn00326	
 tr_acalce	acetaldehyde transporter	acal(cpd00071)[0] => acal(cpd00071)[1]	Y	N	Y	Y	rxn08032	(1) Acetaldehyde[0] <=> (1) Acetaldehyde[1]
 tr_acalcm	acal transporter	acal(cpd00071)[0] => acal(cpd00071)[1]	Y	N	Y	Y	rxn08032	(1) Acetaldehyde[0] <=> (1) Acetaldehyde[1]
 tr_acec	Acetate plasma membrane transport	ac(cpd00029)[0] => ac(cpd00029)[1]	Y	N	Y	Y	rxn08063	(1) Acetate[0] <=> (1) Acetate[1]
@@ -1407,19 +1407,19 @@ tr_akgec	2-oxoglutarate transporter	akg(cpd00024)[0] => akg(cpd00024)[1]	Y	N	Y	Y
 tr_akgm2c	Mitochondrial 2-oxodicarboxylate carrier	akg(cpd00024)[0] => akg(cpd00024)[1]	Y	N	Y	Y	rxn08096	(1) 2-Oxoglutarate[0] <=> (1) 2-Oxoglutarate[1]
 tr_alacm	L-alanine transporter	ala(cpd00035)[0] => ala(cpd00035)[1]	Y	N	Y	Y	rxn08104	(1) L-Alanine[0] <=> (1) L-Alanine[1]
 tr_alaec	Amino acid permease (Neutral aliphatic amino acid permease)	ala(cpd00035)[0] => ala(cpd00035)[1]	Y	N	Y	Y	rxn08104	(1) L-Alanine[0] <=> (1) L-Alanine[1]
-tr_amasacm	l-2-aminoadipate 6-semialdehyde transporter	amasa(cpd01046)[0] => amasa(cpd01046)[1]	Y	N	N	Y	frxn00329	
+tr_amasacm	l-2-aminoadipate 6-semialdehyde transporter	amasa(cpd01046)[0] => amasa(cpd01046)[1]	Y	N	N	Y	frxn00327	
 tr_amievulcm	5-aminolevulinate transporter	amievul(cpd00338)[0] => amievul(cpd00338)[1]	Y	N	Y	Y	rxn09790	(1) 5-Aminolevulinate[0] <=> (1) 5-Aminolevulinate[1]
 tr_ampcm	Multidrug resistance-associated protein 5	amp(cpd00018)[0] => amp(cpd00018)[1]	Y	N	Y	Y	rxn08134	(1) AMP[0] <=> (1) AMP[1]
-tr_aobutcm	L-2-amino-3-oxobutanoate transporter	aobut(cpd02053)[0] => aobut(cpd02053)[1]	Y	N	N	Y	frxn00330	
+tr_aobutcm	L-2-amino-3-oxobutanoate transporter	aobut(cpd02053)[0] => aobut(cpd02053)[1]	Y	N	N	Y	frxn00328	
 tr_argec	Amino acid permease	arg(cpd00051)[0] => arg(cpd00051)[1]	Y	N	Y	Y	rxn08155	(1) L-Arginine[0] <=> (1) L-Arginine[1]
 tr_asnec	Amino acid permease (Dicarboxylic amino acid permease)	asn(cpd00132)[0] => asn(cpd00132)[1]	Y	N	Y	Y	rxn05220	(1) L-Asparagine[1] <=> (1) L-Asparagine[0]
 tr_aspcp	L-Aspartate transporter	asp(cpd00041)[0] => asp(cpd00041)[1]	Y	N	Y	Y	rxn08170	(1) L-Aspartate[0] <=> (1) L-Aspartate[1]
 tr_aspec	Amino acid permease (Dicarboxylic amino acid permease)	asp(cpd00041)[0] => asp(cpd00041)[1]	Y	N	Y	Y	rxn08170	(1) L-Aspartate[0] <=> (1) L-Aspartate[1]
 tr_aspmc	Amino acid permease (Dicarboxylic amino acid permease)	asp(cpd00041)[0] => asp(cpd00041)[1]	Y	N	Y	Y	rxn08170	(1) L-Aspartate[0] <=> (1) L-Aspartate[1]
 tr_atp/adpmc	ADP,ATP carrier protein	adp(cpd00008)[0] pi(cpd00009)[0] atp(cpd00002)[1] => atp(cpd00002)[0] pi(cpd00009)[1] adp(cpd00008)[1]	Y	N	Y	Y	rxn45866	(1) ATP[1] + (1) ADP[0] + (1) Phosphate[0] <=> (1) ATP[0] + (1) ADP[1] + (1) Phosphate[1]
-tr_bh2ec	dihydrobiopterin transporter	bh2(cpd00231)[0] => bh2(cpd00231)[1]	Y	N	N	Y	frxn00331	
-tr_bh4ec	dihydrobiopterin transporter	bh4(cpd00233)[0] => bh4(cpd00233)[1]	Y	N	N	Y	frxn00332	
-tr_bmteec	Bis(4-hydroxyphenyl)methane transporter	bmte(cpd09997)[0] => bmte(cpd09997)[1]	Y	N	N	Y	frxn00333	
+tr_bh2ec	dihydrobiopterin transporter	bh2(cpd00231)[0] => bh2(cpd00231)[1]	Y	N	N	Y	frxn00329	
+tr_bh4ec	dihydrobiopterin transporter	bh4(cpd00233)[0] => bh4(cpd00233)[1]	Y	N	N	Y	frxn00330	
+tr_bmteec	Bis(4-hydroxyphenyl)methane transporter	bmte(cpd09997)[0] => bmte(cpd09997)[1]	Y	N	N	Y	frxn00331	
 tr_btcm	Vitamin H:H symporter	h(cpd00067)[0] bt(cpd00104)[0] => h(cpd00067)[1] bt(cpd00104)[1]	Y	N	Y	Y	rxn09693	(1) H+[1] + (1) BIOT[1] <=> (1) H+[0] + (1) BIOT[0]
 tr_btec	Vitamin H:H symporter	h(cpd00067)[0] bt(cpd00104)[0] => h(cpd00067)[1] bt(cpd00104)[1]	Y	N	Y	Y	rxn09693	(1) H+[1] + (1) BIOT[1] <=> (1) H+[0] + (1) BIOT[0]
 tr_c100coacm	c100coa transporter	c100coa(cpd03128)[0] => c100coa(cpd03128)[1]	Y	N	Y	Y	rxn31606	(1) Decanoyl-CoA[0] <=> (1) Decanoyl-CoA[1]
@@ -1430,29 +1430,29 @@ tr_c180ce	c180 transporter	c180(cpd01080)[0] => c180(cpd01080)[1]	Y	N	Y	Y	rxn090
 tr_c181ce	c181 transporter	c181(cpd00536)[0] => c181(cpd00536)[1]	Y	N	Y	Y	rxn28606	(1) Oleate[1] <=> (1) Oleate[0]
 tr_c182ce	c182 transporter	c182(cpd01122)[0] => c182(cpd01122)[1]	Y	N	Y	Y	rxn33504	(1) Linoleate[0] <=> (1) Linoleate[1]
 tr_c183(3)ce	c183(3) transporter	c183(3)(cpd03850)[0] => c183(3)(cpd03850)[1]	Y	N	Y	Y	rxn39015	(1) Linolenate[1] <=> (1) Linolenate[0]
-tr_c183(6)ce	c183(6) transporter	c183(6)(cpd03849)[0] => c183(6)(cpd03849)[1]	Y	N	N	Y	frxn00334	
+tr_c183(6)ce	c183(6) transporter	c183(6)(cpd03849)[0] => c183(6)(cpd03849)[1]	Y	N	N	Y	frxn00332	
 tr_c200ce	c200 transporter	c200(cpd03848)[0] => c200(cpd03848)[1]	Y	N	Y	Y	rxn39012	(1) Arachidic acid[1] <=> (1) Arachidic acid[0]
-tr_c201ce	c201 transporter	c201(cpd16341)[0] => c201(cpd16341)[1]	Y	N	N	Y	frxn00335	
-tr_c203(6)ce	c203(6) transporter	c203(6)(cpd02077)[0] => c203(6)(cpd02077)[1]	Y	N	N	Y	frxn00336	
-tr_c204(3)ce	c204(6) transporter	c204(3)[0] => c204(3)[1]	Y	N	N	N	frxn00337	
+tr_c201ce	c201 transporter	c201(cpd16341)[0] => c201(cpd16341)[1]	Y	N	N	Y	frxn00333	
+tr_c203(6)ce	c203(6) transporter	c203(6)(cpd02077)[0] => c203(6)(cpd02077)[1]	Y	N	N	Y	frxn00334	
+tr_c204(3)ce	c204(6) transporter	c204(3)[0] => c204(3)[1]	Y	N	N	N	frxn00335	
 tr_c204(6)ce	c204(6) transporter	c204(6)(cpd00188)[0] => c204(6)(cpd00188)[1]	Y	N	Y	Y	rxn33309	(1) Arachidonate[0] <=> (1) Arachidonate[1]
-tr_c205(3)ce	c205(3) transporter	c205(3)(cpd03851)[0] => c205(3)(cpd03851)[1]	Y	N	N	Y	frxn00338	
-tr_c220ce	c220 transporter	c220(cpd05196)[0] => c220(cpd05196)[1]	Y	N	N	Y	frxn00339	
-tr_c225(3)ce	c225(3) transporter	c225(3)(cpd16301)[0] => c225(3)(cpd16301)[1]	Y	N	N	Y	frxn00340	
-tr_c226(3)ce	c226(3) transporter	c226(3)[0] => c226(3)[1]	Y	N	N	N	frxn00341	
-tr_c240ce	c240 transporter	c240[0] => c240[1]	Y	N	N	N	frxn00342	
-tr_c245(3)ce	c245(3) transporter	c245(3)[0] => c245(3)[1]	Y	N	N	N	frxn00343	
-tr_c246(3)ce	c245(3) transporter	c246(3)[0] => c246(3)[1]	Y	N	N	N	frxn00344	
+tr_c205(3)ce	c205(3) transporter	c205(3)(cpd03851)[0] => c205(3)(cpd03851)[1]	Y	N	N	Y	frxn00336	
+tr_c220ce	c220 transporter	c220(cpd05196)[0] => c220(cpd05196)[1]	Y	N	N	Y	frxn00337	
+tr_c225(3)ce	c225(3) transporter	c225(3)(cpd16301)[0] => c225(3)(cpd16301)[1]	Y	N	N	Y	frxn00338	
+tr_c226(3)ce	c226(3) transporter	c226(3)[0] => c226(3)[1]	Y	N	N	N	frxn00339	
+tr_c240ce	c240 transporter	c240[0] => c240[1]	Y	N	N	N	frxn00340	
+tr_c245(3)ce	c245(3) transporter	c245(3)[0] => c245(3)[1]	Y	N	N	N	frxn00341	
+tr_c246(3)ce	c245(3) transporter	c246(3)[0] => c246(3)[1]	Y	N	N	N	frxn00342	
 tr_c40coacm	c40coa transporter	c40coa(cpd00120)[0] => c40coa(cpd00120)[1]	Y	N	Y	Y	rxn31602	(1) Butyryl-CoA[0] <=> (1) Butyryl-CoA[1]
 tr_c60coacm	c60coa transporter	c60coa(cpd03124)[0] => c60coa(cpd03124)[1]	Y	N	Y	Y	rxn31605	(1) Hexanoyl-CoA[0] <=> (1) Hexanoyl-CoA[1]
 tr_c80coacm	c80coa transporter	c80coa(cpd01335)[0] => c80coa(cpd01335)[1]	Y	N	Y	Y	rxn31604	(1) Octanoyl-CoA[0] <=> (1) Octanoyl-CoA[1]
-tr_ca/atp	Ca2+?ATPase	atp(cpd00002)[0] h2o(cpd00001)[0] ca(cpd29674)[0] => adp(cpd00008)[0] pi(cpd00009)[0] ca(cpd29674)[1]	Y	N	N	Y	frxn00345	
-tr_caec	Calcium transporter	ca(cpd29674)[0] => ca(cpd29674)[1]	Y	N	N	Y	frxn00346	
+tr_ca/atp	Ca2+?ATPase	atp(cpd00002)[0] h2o(cpd00001)[0] ca(cpd29674)[0] => adp(cpd00008)[0] pi(cpd00009)[0] ca(cpd29674)[1]	Y	N	N	Y	frxn00343	
+tr_caec	Calcium transporter	ca(cpd29674)[0] => ca(cpd29674)[1]	Y	N	N	Y	frxn00344	
 tr_capcm	carbamoyl phosphate transporter	cap(cpd00146)[0] => cap(cpd00146)[1]	Y	N	Y	Y	rxn09823	(1) Carbamoylphosphate[0] <=> (1) Carbamoylphosphate[1]
-tr_carboce	carboxylate transporter	carbo(cpd00049)[0] => carbo(cpd00049)[1]	Y	N	N	Y	frxn00347	
-tr_carcm	Mitochondrial carnitine/acylcarnitine carrier protein	car(cpd19003)[0] => car(cpd19003)[1]	Y	N	N	Y	frxn00348	
-tr_chitec	Chitin plasma membrane transporter	chit(cpd11683)[0] => chit(cpd11683)[1]	Y	N	N	Y	frxn00349	
-tr_citcm	Citrate transport	cit(cpd00137)[0] mal(cpd00130)[0] => cit(cpd00137)[1] mal(cpd00130)[1]	Y	N	N	Y	frxn00350	
+tr_carboce	carboxylate transporter	carbo(cpd00049)[0] => carbo(cpd00049)[1]	Y	N	N	Y	frxn00345	
+tr_carcm	Mitochondrial carnitine/acylcarnitine carrier protein	car(cpd19003)[0] => car(cpd19003)[1]	Y	N	N	Y	frxn00346	
+tr_chitec	Chitin plasma membrane transporter	chit(cpd11683)[0] => chit(cpd11683)[1]	Y	N	N	Y	frxn00347	
+tr_citcm	Citrate transport	cit(cpd00137)[0] mal(cpd00130)[0] => cit(cpd00137)[1] mal(cpd00130)[1]	Y	N	N	Y	frxn00348	
 tr_citec	Citrate transporter	cit(cpd00137)[0] => cit(cpd00137)[1]	Y	N	Y	Y	rxn08217	(1) Citrate[0] <=> (1) Citrate[1]
 tr_citmc	Citrate transport protein	cit(cpd00137)[0] icit(cpd00260)[1] => cit(cpd00137)[1] icit(cpd00260)[0]	Y	N	Y	Y	rxn09777	(1) Citrate[0] + (1) Isocitrate[1] <=> (1) Citrate[1] + (1) Isocitrate[0]
 tr_citrcm	L-citrulline transporter	citr(cpd00274)[0] => citr(cpd00274)[1]	Y	N	Y	Y	rxn29082	(1) Citrulline[0] <=> (1) Citrulline[1]
@@ -1460,9 +1460,9 @@ tr_co2cm	CO2 transporter	co2(cpd00011)[0] => co2(cpd00011)[1]	Y	N	Y	Y	rxn05467	(
 tr_co2ec	CO2 transporter	co2(cpd00011)[0] => co2(cpd00011)[1]	Y	N	Y	Y	rxn05467	(1) CO2[1] <=> (1) CO2[0]
 tr_coamc	coa transporter	coa(cpd00010)[0] => coa(cpd00010)[1]	Y	N	Y	Y	rxn10832	(1) CoA[1] <=> (1) CoA[0]
 tr_coapc	coenzyme a peroxisomal transport	coa(cpd00010)[0] => coa(cpd00010)[1]	Y	N	Y	Y	rxn10832	(1) CoA[1] <=> (1) CoA[0]
-tr_cornce	Coumarin transporter	corn(cpd03479)[0] => corn(cpd03479)[1]	Y	N	N	Y	frxn00351	
+tr_cornce	Coumarin transporter	corn(cpd03479)[0] => corn(cpd03479)[1]	Y	N	N	Y	frxn00349	
 tr_cpgiiicm	coproporphyrinogen iii transporter	cpgiii(cpd02083)[0] => cpgiii(cpd02083)[1]	Y	N	Y	Y	rxn33815	(1) CoproporphyrinogenIII[0] <=> (1) CoproporphyrinogenIII[1]
-tr_cprice	Coproporphyrin I transporter	cpri(cpd03417)[0] => cpri(cpd03417)[1]	Y	N	N	Y	frxn00352	
+tr_cprice	Coproporphyrin I transporter	cpri(cpd03417)[0] => cpri(cpd03417)[1]	Y	N	N	Y	frxn00350	
 tr_ctpcm	ctp transporter	ctp(cpd00052)[0] => ctp(cpd00052)[1]	Y	N	Y	Y	rxn29325	(1) CTP[1] <=> (1) CTP[0]
 tr_cu/atp	Cu+-ATPase	atp(cpd00002)[0] h2o(cpd00001)[0] cu(cpd30760)[0] => adp(cpd00008)[0] pi(cpd00009)[0] cu(cpd30760)[1]	Y	N	N	Y	frxn00056	(1) H2O[0] + (1) ATP[0] + (1) Cu(I)[0] <=> (1) ADP[0] + (1) Phosphate[0] + (1) Cu(I)[1]
 tr_cyscm	L-cysteine transporter	cys(cpd00084)[0] => cys(cpd00084)[1]	Y	N	Y	Y	rxn08284	(1) L-Cysteine[0] <=> (1) L-Cysteine[1]
@@ -1470,9 +1470,9 @@ tr_cysec	Amino acid permease	cys(cpd00084)[0] => cys(cpd00084)[1]	Y	N	Y	Y	rxn082
 tr_d6pgcec	6-Phospho-D-gluconate transport in/out via proton symport	h(cpd00067)[0] d6pgc(cpd00284)[0] => h(cpd00067)[1] d6pgc(cpd00284)[1]	Y	N	Y	Y	rxn05482	(1) H+[1] + (1) 6-Phospho-D-gluconate[1] <=> (1) H+[0] + (1) 6-Phospho-D-gluconate[0]
 tr_daglyec	tagly transporter	dagly(cpd19004)[0] => dagly(cpd19004)[1]	Y	N	Y	Y	rxn32410	(1) 1,2-Diacyl-sn-glycerol[0] <=> (1) 1,2-Diacyl-sn-glycerol[1]
 tr_damc	5-Deoxyadenosine transporter	da(cpd03091)[0] => da(cpd03091)[1]	Y	N	Y	Y	rxn13822	(1) 5'-Deoxyadenosine[0] <=> (1) 5'-Deoxyadenosine[1]
-tr_dexce	Dextrin transporter	dex(cpd11594)[0] => dex(cpd11594)[1]	Y	N	N	Y	frxn00353	
+tr_dexce	Dextrin transporter	dex(cpd11594)[0] => dex(cpd11594)[1]	Y	N	N	Y	frxn00351	
 tr_dglce2c	D-glucose transporter	dglc(cpd00027)[0] => dglc(cpd00027)[1]	Y	N	Y	Y	rxn08617	(1) D-Glucose[0] <=> (1) D-Glucose[1]
-tr_dhplysmc	protein-dihydrolipoyllysine	dhplys(cpd12225)[0] => dhplys(cpd12225)[1]	Y	N	N	Y	frxn00354	
+tr_dhplysmc	protein-dihydrolipoyllysine	dhplys(cpd12225)[0] => dhplys(cpd12225)[1]	Y	N	N	Y	frxn00352	
 tr_dhspcm	sphinganine 1-phosphate transporter	dhsp(cpd00824)[0] => dhsp(cpd00824)[1]	Y	N	Y	Y	rxn13396	(1) Sphinganine 1-phosphate[0] <=> (1) Sphinganine 1-phosphate[1]
 tr_dmppcm	1,2-dihydroxy-5-(methylthio)pent-1-en-3-one transporter	dmpp(cpd00202)[0] => dmpp(cpd00202)[1]	Y	N	Y	Y	rxn34362	(1) DMAPP[1] <=> (1) DMAPP[0]
 tr_dorisce	Deoxyribose transporter	doris(cpd01242)[0] => doris(cpd01242)[1]	Y	N	Y	Y	rxn29369	(1) Thyminose[1] <=> (1) Thyminose[0]
@@ -1480,8 +1480,8 @@ tr_ethcm	Ethanol transporter	eth(cpd00363)[0] => eth(cpd00363)[1]	Y	N	Y	Y	rxn084
 tr_ethec	Alcohol transporter	eth(cpd00363)[0] => eth(cpd00363)[1]	Y	N	Y	Y	rxn08428	(1) Ethanol[0] <=> (1) Ethanol[1]
 tr_fad/fmn	FAD/FMN antiport	fad(cpd00015)[0] fmn(cpd00050)[1] => fad(cpd00015)[1] fmn(cpd00050)[0]	Y	N	Y	Y	rxn09755	(1) FAD[0] + (1) FMN[1] <=> (1) FAD[1] + (1) FMN[0]
 tr_fe2ec	Iron transport multicopper oxidase FET3	fe2(cpd10515)[0] => fe2(cpd10515)[1]	Y	N	Y	Y	rxn08475	(1) Fe+2[0] <=> (1) Fe+2[1]
-tr_fkynec	N-formylkynurenine transporter	fkyn(cpd01749)[0] => fkyn(cpd01749)[1]	Y	N	N	Y	frxn00355	
-tr_fkynmc	N-formylkynurenine transporter	fkyn(cpd01749)[0] => fkyn(cpd01749)[1]	Y	N	N	Y	frxn00355	(1) N-Formylkynurenine[0] <=> (1) N-Formylkynurenine[1]
+tr_fkynec	N-formylkynurenine transporter	fkyn(cpd01749)[0] => fkyn(cpd01749)[1]	Y	N	N	Y	frxn00353	
+tr_fkynmc	N-formylkynurenine transporter	fkyn(cpd01749)[0] => fkyn(cpd01749)[1]	Y	N	N	Y	frxn00353	(1) N-Formylkynurenine[0] <=> (1) N-Formylkynurenine[1]
 tr_forec	formate transporter	for(cpd00047)[0] => for(cpd00047)[1]	Y	N	Y	Y	rxn08525	(1) Formate[0] <=> (1) Formate[1]
 tr_frue2c	MFS monosaccharide transporter	dfru(cpd00082)[0] => dfru(cpd00082)[1]	Y	N	Y	Y	rxn08537	(1) D-Fructose[0] <=> (1) D-Fructose[1]
 tr_fu1pcm	L-Fucose 1-phosphate transporter	fu1p(cpd01912)[0] => fu1p(cpd01912)[1]	Y	N	Y	Y	rxn32115	(1) L-Fucose 1-phosphate[0] <=> (1) L-Fucose 1-phosphate[1]
@@ -1499,7 +1499,7 @@ tr_glu/aspcm	glutamate and asparate transporter	glu(cpd00023)[0] asp(cpd00041)[1
 tr_glucp	L-Aspartate peroxisomal transport	glu(cpd00023)[0] => glu(cpd00023)[1]	Y	N	Y	Y	rxn08633	(1) L-Glutamate[0] <=> (1) L-Glutamate[1]
 tr_gluec	Amino acid permease (Dicarboxylic amino acid permease)	glu(cpd00023)[0] => glu(cpd00023)[1]	Y	N	Y	Y	rxn08633	(1) L-Glutamate[0] <=> (1) L-Glutamate[1]
 tr_glum2c	glutamate uniporter	glu(cpd00023)[0] => glu(cpd00023)[1]	Y	N	Y	Y	rxn08633	(1) L-Glutamate[0] <=> (1) L-Glutamate[1]
-tr_glupmc	alpha-d-glutamyl phosphate transporter	glup(cpd02339)[0] => glup(cpd02339)[1]	Y	N	N	Y	frxn00356	
+tr_glupmc	alpha-d-glutamyl phosphate transporter	glup(cpd02339)[0] => glup(cpd02339)[1]	Y	N	N	Y	frxn00354	
 tr_glxec	glyoxylate transporter	glx(cpd00040)[0] => glx(cpd00040)[1]	Y	N	Y	Y	rxn09839	(1) Glyoxalate[0] <=> (1) Glyoxalate[1]
 tr_glycm	L-glycine transporter	gly(cpd00033)[0] => gly(cpd00033)[1]	Y	N	Y	Y	rxn05218	(1) Glycine[1] <=> (1) Glycine[0]
 tr_glycogene2c	glycogen transporter	glycogen(cpd00155)[0] => glycogen(cpd00155)[1]	Y	N	Y	Y	rxn05580	(1) Glycogen[1] <=> (1) Glycogen[0]
@@ -1511,43 +1511,43 @@ tr_gshcm	Multidrug resistance-associated protein 5	gsh(cpd00042)[0] => gsh(cpd00
 tr_gshec	Multidrug resistance-associated protein 5	gsh(cpd00042)[0] => gsh(cpd00042)[1]	Y	N	Y	Y	rxn08677	(1) GSH[0] <=> (1) GSH[1]
 tr_gsnec	guanosine transporter	h(cpd00067)[0] gsn(cpd00311)[0] => h(cpd00067)[1] gsn(cpd00311)[1]	Y	N	Y	Y	rxn05204	(1) H+[1] + (1) Guanosine[1] <=> (1) H+[0] + (1) Guanosine[0]
 tr_gsnmc	guanosine transporter	h(cpd00067)[0] gsn(cpd00311)[0] => h(cpd00067)[1] gsn(cpd00311)[1]	Y	N	Y	Y	rxn05204	(1) H+[1] + (1) Guanosine[1] <=> (1) H+[0] + (1) Guanosine[0]
-tr_gtp/gdpc2m	Mitochondrial GTP/GDP exchanger	gdp(cpd00031)[0] gtp(cpd00038)[1] => gtp(cpd00038)[0] gdp(cpd00031)[1]	Y	N	N	Y	frxn00357	
-tr_h/atp	V-type proton ATPase catalytic subunit A/H+-ATPase	atp(cpd00002)[0] h(cpd00067)[0] h2o(cpd00001)[0] => adp(cpd00008)[0] pi(cpd00009)[0] h(cpd00067)[1]	Y	N	N	Y	frxn00358	
+tr_gtp/gdpc2m	Mitochondrial GTP/GDP exchanger	gdp(cpd00031)[0] gtp(cpd00038)[1] => gtp(cpd00038)[0] gdp(cpd00031)[1]	Y	N	N	Y	frxn00355	
+tr_h/atp	V-type proton ATPase catalytic subunit A/H+-ATPase	atp(cpd00002)[0] h(cpd00067)[0] h2o(cpd00001)[0] => adp(cpd00008)[0] pi(cpd00009)[0] h(cpd00067)[1]	Y	N	N	Y	frxn00356	
 tr_h2ocm	H2O transporter	h2o(cpd00001)[0] => h2o(cpd00001)[1]	Y	N	Y	Y	rxn05319	(1) H2O[1] <=> (1) H2O[0]
 tr_h2oec	H2O transporter	h2o(cpd00001)[0] => h2o(cpd00001)[1]	Y	N	Y	Y	rxn05319	(1) H2O[1] <=> (1) H2O[0]
-tr_hcitcm	Hydrochloric acid transporter	hcit(cpd00919)[0] => hcit(cpd00919)[1]	Y	N	N	Y	frxn00359	
+tr_hcitcm	Hydrochloric acid transporter	hcit(cpd00919)[0] => hcit(cpd00919)[1]	Y	N	N	Y	frxn00357	
 tr_hco3mc	HCO3 transporter	hco3(cpd00242)[0] => hco3(cpd00242)[1]	Y	N	Y	Y	rxn10826	(1) H2CO3[1] <=> (1) H2CO3[0]
-tr_hemeace	heme a transporter	hemea(cpd11312)[0] => hemea(cpd11312)[1]	Y	N	N	Y	frxn00360	
+tr_hemeace	heme a transporter	hemea(cpd11312)[0] => hemea(cpd11312)[1]	Y	N	N	Y	frxn00358	
 tr_hemebcm	heme b transporter	hemeb(cpd00028)[0] => hemeb(cpd00028)[1]	Y	N	Y	Y	rxn09116	(1) Heme[1] <=> (1) Heme[0]
 tr_hex4hybcm	3-Hexaprenyl-4-hydroxybenzoate transporter	hex4hyb(cpd09429)[0] => hex4hyb(cpd09429)[1]	Y	N	Y	Y	rxn13205	(1) 3-Hexaprenyl-4-hydroxybenzoate[0] <=> (1) 3-Hexaprenyl-4-hydroxybenzoate[1]
 tr_hisec	Amino acid permease	his(cpd00119)[0] => his(cpd00119)[1]	Y	N	Y	Y	rxn08721	(1) L-Histidine[0] <=> (1) L-Histidine[1]
-tr_hisolec	l-histidinol transporter	hisol(cpd00641)[0] => hisol(cpd00641)[1]	Y	N	N	Y	frxn00361	
-tr_hisolpec	l-histidinol phosphate transporter	hisolp(cpd00807)[0] => hisolp(cpd00807)[1]	Y	N	N	Y	frxn00362	
-tr_hmtbmc	hydroxymethylbilane transporter	hmtb(cpd00755)[0] => hmtb(cpd00755)[1]	Y	N	N	Y	frxn00363	
+tr_hisolec	l-histidinol transporter	hisol(cpd00641)[0] => hisol(cpd00641)[1]	Y	N	N	Y	frxn00359	
+tr_hisolpec	l-histidinol phosphate transporter	hisolp(cpd00807)[0] => hisolp(cpd00807)[1]	Y	N	N	Y	frxn00360	
+tr_hmtbmc	hydroxymethylbilane transporter	hmtb(cpd00755)[0] => hmtb(cpd00755)[1]	Y	N	N	Y	frxn00361	
 tr_hno3e/c	Nitrate permease	hno3(cpd00209)[0] => hno3(cpd00209)[1]	Y	N	Y	Y	rxn09005	(1) Nitrate[0] <=> (1) Nitrate[1]
 tr_houdhicmc	5-hydroxy-2-oxo-4-ureido-2,5-dihydro-1H imidazole-5-carboxylate transporter	houdhic(cpd09027)[0] => houdhic(cpd09027)[1]	Y	N	Y	Y	rxn32610	(1) 5-Hydroxy-2-oxo-4-ureido-2,5-dihydro-1H-imidazole-5-carboxylate[0] <=> (1) 5-Hydroxy-2-oxo-4-ureido-2,5-dihydro-1H-imidazole-5-carboxylate[1]
-tr_hpsamlysmc	s-aminomethyldihydrolipoylprotein transporter	hpsamlys(cpd11830)[0] => hpsamlys(cpd11830)[1]	Y	N	N	Y	frxn00364	
+tr_hpsamlysmc	s-aminomethyldihydrolipoylprotein transporter	hpsamlys(cpd11830)[0] => hpsamlys(cpd11830)[1]	Y	N	N	Y	frxn00362	
 tr_ilecm	L-isoleucine transporter	ile(cpd00322)[0] => ile(cpd00322)[1]	Y	N	Y	Y	rxn08747	(1) L-Isoleucine[0] <=> (1) L-Isoleucine[1]
 tr_ileec	Neutral aliphatic amino acid permease	ile(cpd00322)[0] => ile(cpd00322)[1]	Y	N	Y	Y	rxn08747	(1) L-Isoleucine[0] <=> (1) L-Isoleucine[1]
 tr_insec	Myo-inositol transporter	ins(cpd00246)[0] => ins(cpd00246)[1]	Y	N	Y	Y	rxn08754	(1) Inosine[0] <=> (1) Inosine[1]
 tr_ipppcm	isopentenyl diphosphate transporter	ippp(cpd00113)[0] => ippp(cpd00113)[1]	Y	N	Y	Y	rxn13332	(1) Isopentenyldiphosphate[0] <=> (1) Isopentenyldiphosphate[1]
 tr_ipppec	isopentenyl diphosphate transporter	ippp(cpd00113)[0] => ippp(cpd00113)[1]	Y	N	Y	Y	rxn13332	(1) Isopentenyldiphosphate[0] <=> (1) Isopentenyldiphosphate[1]
-tr_ivacoacm	3-isovaleryl-coa transporter	ivacoa[0] => ivacoa[1]	Y	N	N	N	frxn00365	
+tr_ivacoacm	3-isovaleryl-coa transporter	ivacoa[0] => ivacoa[1]	Y	N	N	N	frxn00363	
 tr_k/hec	K+/H+ transporter	h(cpd00067)[0] k(cpd00205)[1] => h(cpd00067)[1] k(cpd00205)[0]	Y	N	Y	Y	rxn05596	(1) H+[1] + (1) K+[0] <=> (1) H+[0] + (1) K+[1]
 tr_k/hmc	K+/H+?antiporters	h(cpd00067)[0] k(cpd00205)[1] => h(cpd00067)[1] k(cpd00205)[0]	Y	N	Y	Y	rxn05596	(1) H+[1] + (1) K+[0] <=> (1) H+[0] + (1) K+[1]
 tr_lacte2c	Lactose permease	lact(cpd00208)[0] => lact(cpd00208)[1]	Y	N	Y	Y	rxn08780	(1) LACT[0] <=> (1) LACT[1]
-tr_ladhdece	(S)-Lactaldehyde transporter	ladhde(cpd00334)[0] => ladhde(cpd00334)[1]	Y	N	N	Y	frxn00366	
+tr_ladhdece	(S)-Lactaldehyde transporter	ladhde(cpd00334)[0] => ladhde(cpd00334)[1]	Y	N	N	Y	frxn00364	
 tr_larabec	l-arabinose transporter	larab(cpd00224)[0] => larab(cpd00224)[1]	Y	N	Y	Y	rxn08142	(1) L-Arabinose[0] <=> (1) L-Arabinose[1]
 tr_leucm	L-leucine transporter	leu(cpd00107)[0] => leu(cpd00107)[1]	Y	N	Y	Y	rxn08786	(1) L-Leucine[0] <=> (1) L-Leucine[1]
 tr_leuec	Neutral aliphatic amino acid permease	leu(cpd00107)[0] => leu(cpd00107)[1]	Y	N	Y	Y	rxn08786	(1) L-Leucine[0] <=> (1) L-Leucine[1]
 tr_llaccm	(S)-lactate transporter	llac(cpd00159)[0] => llac(cpd00159)[1]	Y	N	Y	Y	rxn08795	(1) L-Lactate[0] <=> (1) L-Lactate[1]
 tr_llacec	(S)-lactate transporter	llac(cpd00159)[0] => llac(cpd00159)[1]	Y	N	Y	Y	rxn08795	(1) L-Lactate[0] <=> (1) L-Lactate[1]
 tr_llctcm	l-cystathionine transporter	llct(cpd19019)[0] => llct(cpd19019)[1]	Y	N	Y	Y	rxn30258	(1) L-Cystathionine[0] <=> (1) L-Cystathionine[1]
-tr_lpc/atp	Lipid flippase	atp(cpd00002)[0] h2o(cpd00001)[0] lpc(cpd02601)[0] => adp(cpd00008)[0] pi(cpd00009)[0] lpc(cpd02601)[1]	Y	N	N	Y	frxn00367	
-tr_lps/atp	Lipid flippase	atp(cpd00002)[0] h2o(cpd00001)[0] lps[0] => adp(cpd00008)[0] pi(cpd00009)[0] lps[1]	Y	N	N	N	frxn00368	
+tr_lpc/atp	Lipid flippase	atp(cpd00002)[0] h2o(cpd00001)[0] lpc(cpd02601)[0] => adp(cpd00008)[0] pi(cpd00009)[0] lpc(cpd02601)[1]	Y	N	N	Y	frxn00365	
+tr_lps/atp	Lipid flippase	atp(cpd00002)[0] h2o(cpd00001)[0] lps[0] => adp(cpd00008)[0] pi(cpd00009)[0] lps[1]	Y	N	N	N	frxn00366	
 tr_lysec	Amino acid permease	lys(cpd00039)[0] => lys(cpd00039)[1]	Y	N	Y	Y	rxn08856	(1) L-Lysine[0] <=> (1) L-Lysine[1]
 tr_lysmc	L-lysine transporter	lys(cpd00039)[0] => lys(cpd00039)[1]	Y	N	Y	Y	rxn08856	(1) L-Lysine[0] <=> (1) L-Lysine[1]
-tr_maglyec	tagly transporter	magly(cpd01297)[0] => magly(cpd01297)[1]	Y	N	N	Y	frxn00369	
+tr_maglyec	tagly transporter	magly(cpd01297)[0] => magly(cpd01297)[1]	Y	N	N	Y	frxn00367	
 tr_mal/picm	Dicarboxylate carrier	pi(cpd00009)[0] mal(cpd00130)[1] => pi(cpd00009)[1] mal(cpd00130)[0]	Y	N	Y	Y	rxn09739	(1) Phosphate[1] + (1) L-Malate[0] <=> (1) Phosphate[0] + (1) L-Malate[1]
 tr_mal/piec	Dicarboxylate:Pi antiporter	mal(cpd00130)[0] pi(cpd00009)[1] => pi(cpd00009)[0] mal(cpd00130)[1]	Y	N	Y	Y	rxn09739	(1) Phosphate[1] + (1) L-Malate[0] <=> (1) Phosphate[0] + (1) L-Malate[1]
 tr_malpc	(s)-Malate peroxisomal transport	h(cpd00067)[0] mal(cpd00130)[0] => h(cpd00067)[1] mal(cpd00130)[1]	Y	N	Y	Y	rxn05605	(1) H+[1] + (1) L-Malate[1] <=> (1) H+[0] + (1) L-Malate[0]
@@ -1568,33 +1568,33 @@ tr_naorncm	n2-acetyl-l-ornithine transporter	naorn(cpd00342)[0] => naorn(cpd0034
 tr_nh3cm	ammonia transporter	nh3(cpd00013)[0] => nh3(cpd00013)[1]	Y	N	Y	Y	rxn05466	(1) NH3[1] <=> (1) NH3[0]
 tr_nh3e2c	Ammonium transporter	nh3(cpd00013)[0] => nh3(cpd00013)[1]	Y	N	Y	Y	rxn05466	(1) NH3[1] <=> (1) NH3[0]
 tr_nicdec	nicotinamide transporter	nicd(cpd00133)[0] => nicd(cpd00133)[1]	Y	N	Y	Y	rxn10867	(1) Nicotinamide[1] <=> (1) Nicotinamide[0]
-tr_nitece	nitrile transporter	nite(cpd00542)[0] => nite(cpd00542)[1]	Y	N	N	Y	frxn00370	
+tr_nitece	nitrile transporter	nite(cpd00542)[0] => nite(cpd00542)[1]	Y	N	N	Y	frxn00368	
 tr_nmnce	nicotinamide d-ribonucleotide transporter	nmn(cpd00355)[0] => nmn(cpd00355)[1]	Y	N	Y	Y	rxn08995	(1) Nicotinamide ribonucleotide[1] <=> (1) Nicotinamide ribonucleotide[0]
 tr_o2cm	o2 transporter	o2(cpd00007)[0] => o2(cpd00007)[1]	Y	N	Y	Y	rxn05468	(1) O2[1] <=> (1) O2[0]
 tr_o2ec	o2 transporter	o2(cpd00007)[0] => o2(cpd00007)[1]	Y	N	Y	Y	rxn05468	(1) O2[1] <=> (1) O2[0]
-tr_oa/picm	Dicarboxylate:Pi antiporter	oa(cpd00032)[0] pi(cpd00009)[1] => pi(cpd00009)[0] oa(cpd00032)[1]	Y	N	N	Y	frxn00371	
-tr_oa/piec	Dicarboxylate:Pi antiporter	pi(cpd00009)[0] oa(cpd00032)[1] => oa(cpd00032)[0] pi(cpd00009)[1]	Y	N	N	Y	frxn00371	(1) Phosphate[1] + (1) Oxaloacetate[0] <=> (1) Phosphate[0] + (1) Oxaloacetate[1]
+tr_oa/picm	Dicarboxylate:Pi antiporter	oa(cpd00032)[0] pi(cpd00009)[1] => pi(cpd00009)[0] oa(cpd00032)[1]	Y	N	N	Y	frxn00369	
+tr_oa/piec	Dicarboxylate:Pi antiporter	pi(cpd00009)[0] oa(cpd00032)[1] => oa(cpd00032)[0] pi(cpd00009)[1]	Y	N	N	Y	frxn00369	(1) Phosphate[1] + (1) Oxaloacetate[0] <=> (1) Phosphate[0] + (1) Oxaloacetate[1]
 tr_oasercm	o-acetyl-l-serine transporter	oaser(cpd00722)[0] => oaser(cpd00722)[1]	Y	N	Y	Y	rxn08059	(1) O-Acetyl-L-serine[0] <=> (1) O-Acetyl-L-serine[1]
 tr_obutcm	2-oxobutanoate transporter	obut(cpd00094)[0] => obut(cpd00094)[1]	Y	N	Y	Y	rxn13195	(1) 2-Oxobutyrate[0] <=> (1) 2-Oxobutyrate[1]
 tr_oivalcm	(r)-2-oxoisovalerate transporter	oival(cpd00123)[0] => oival(cpd00123)[1]	Y	N	Y	Y	rxn09799	(1) 3-Methyl-2-oxobutanoate[0] <=> (1) 3-Methyl-2-oxobutanoate[1]
-tr_omvalcm	(s)-3-nethyl-2-oxopentanoate transporter	omval[0] => omval[1]	Y	N	N	N	frxn00372	
+tr_omvalcm	(s)-3-nethyl-2-oxopentanoate transporter	omval[0] => omval[1]	Y	N	N	N	frxn00370	
 tr_ornm2c	Amino acid transporter arg-13	orn(cpd00064)[0] => orn(cpd00064)[1]	Y	N	Y	Y	rxn09048	(1) Ornithine[0] <=> (1) Ornithine[1]
 tr_oroacm	orotate transporter	oroa(cpd00247)[0] => oroa(cpd00247)[1]	Y	N	Y	Y	rxn09050	(1) Orotate[0] <=> (1) Orotate[1]
-tr_pa/atp	Lipid flippase	atp(cpd00002)[0] h2o(cpd00001)[0] pa(cpd11422)[0] => adp(cpd00008)[0] pi(cpd00009)[0] pa(cpd11422)[1]	Y	N	N	Y	frxn00274	(1) H2O[0] + (1) ATP[0] + (1) 1,2-diacyl-sn-glycerol 3-phosphate[0] <=> (1) ADP[0] + (1) Phosphate[0] + (1) 1,2-diacyl-sn-glycerol 3-phosphate[1]
-tr_paa/atp	Lipid flippase	atp(cpd00002)[0] h2o(cpd00001)[0] paa[0] => adp(cpd00008)[0] pi(cpd00009)[0] paa[1]	Y	N	N	N	frxn00373	
+tr_pa/atp	Lipid flippase	atp(cpd00002)[0] h2o(cpd00001)[0] pa(cpd11422)[0] => adp(cpd00008)[0] pi(cpd00009)[0] pa(cpd11422)[1]	Y	N	N	Y	frxn00272	(1) H2O[0] + (1) ATP[0] + (1) 1,2-diacyl-sn-glycerol 3-phosphate[0] <=> (1) ADP[0] + (1) Phosphate[0] + (1) 1,2-diacyl-sn-glycerol 3-phosphate[1]
+tr_paa/atp	Lipid flippase	atp(cpd00002)[0] h2o(cpd00001)[0] paa[0] => adp(cpd00008)[0] pi(cpd00009)[0] paa[1]	Y	N	N	N	frxn00371	
 tr_pantmc	(r)-pantoate transporter	pant(cpd00408)[0] => pant(cpd00408)[1]	Y	N	Y	Y	rxn09728	(1) Pantoate[0] <=> (1) Pantoate[1]
-tr_pc/atp	Lipid flippase	atp(cpd00002)[0] h2o(cpd00001)[0] pc(cpd11624)[0] => adp(cpd00008)[0] pi(cpd00009)[0] pc(cpd11624)[1]	Y	N	N	Y	frxn00374	
-tr_pe/atp	Lipid flippase	atp(cpd00002)[0] h2o(cpd00001)[0] pe(cpd11456)[0] => adp(cpd00008)[0] pi(cpd00009)[0] pe(cpd11456)[1]	Y	N	N	Y	frxn00271	(1) H2O[0] + (1) ATP[0] + (1) Phosphatidylethanolamine[0] <=> (1) ADP[0] + (1) Phosphate[0] + (1) Phosphatidylethanolamine[1]
+tr_pc/atp	Lipid flippase	atp(cpd00002)[0] h2o(cpd00001)[0] pc(cpd11624)[0] => adp(cpd00008)[0] pi(cpd00009)[0] pc(cpd11624)[1]	Y	N	N	Y	frxn00372	
+tr_pe/atp	Lipid flippase	atp(cpd00002)[0] h2o(cpd00001)[0] pe(cpd11456)[0] => adp(cpd00008)[0] pi(cpd00009)[0] pe(cpd11456)[1]	Y	N	N	Y	frxn00269	(1) H2O[0] + (1) ATP[0] + (1) Phosphatidylethanolamine[0] <=> (1) ADP[0] + (1) Phosphate[0] + (1) Phosphatidylethanolamine[1]
 tr_pepec	Phosphoenolpyruvate transporter	h(cpd00067)[0] pep(cpd00061)[0] => h(cpd00067)[1] pep(cpd00061)[1]	Y	N	Y	Y	rxn05630	(1) Phosphoenolpyruvate[1] + (1) H+[1] <=> (1) Phosphoenolpyruvate[0] + (1) H+[0]
 tr_pheec	Aromatic amino acid permease	phe(cpd00066)[0] => phe(cpd00066)[1]	Y	N	Y	Y	rxn09118	(1) L-Phenylalanine[0] <=> (1) L-Phenylalanine[1]
 tr_pi/hcm	pi transporter	h(cpd00067)[0] pi(cpd00009)[0] => h(cpd00067)[1] pi(cpd00009)[1]	Y	N	Y	Y	rxn05312	(1) Phosphate[1] + (1) H+[1] <=> (1) Phosphate[0] + (1) H+[0]
 tr_pi/hec	cytoplasm phosphate carrier	h(cpd00067)[0] pi(cpd00009)[0] => h(cpd00067)[1] pi(cpd00009)[1]	Y	N	Y	Y	rxn05312	(1) Phosphate[1] + (1) H+[1] <=> (1) Phosphate[0] + (1) H+[0]
 tr_pntoec	(r)-pantothenate transporter	pnto(cpd00644)[0] => pnto(cpd00644)[1]	Y	N	Y	Y	rxn09166	(1) PAN[0] <=> (1) PAN[1]
-tr_ppbgcm	porphobilinogen transporter	=> ppbg(cpd00689)[0]	N	N	N	Y	frxn00375	
-tr_ppmvlec	(r)-5-diphosphomevalonate transporter	ppmvl(cpd00841)[0] => ppmvl(cpd00841)[1]	Y	N	N	Y	frxn00376	
+tr_ppbgcm	porphobilinogen transporter	=> ppbg(cpd00689)[0]	N	N	N	Y	frxn00373	
+tr_ppmvlec	(r)-5-diphosphomevalonate transporter	ppmvl(cpd00841)[0] => ppmvl(cpd00841)[1]	Y	N	N	Y	frxn00374	
 tr_procm	L-proline transporter	pro(cpd00129)[0] => pro(cpd00129)[1]	Y	N	Y	Y	rxn09193	(1) L-Proline[0] <=> (1) L-Proline[1]
 tr_proec	Amino acid permease	pro(cpd00129)[0] => pro(cpd00129)[1]	Y	N	Y	Y	rxn09193	(1) L-Proline[0] <=> (1) L-Proline[1]
-tr_ps/atp	Lipid flippase	atp(cpd00002)[0] h2o(cpd00001)[0] ps(cpd11455)[0] => adp(cpd00008)[0] pi(cpd00009)[0] ps(cpd11455)[1]	Y	N	N	Y	frxn00272	(1) H2O[0] + (1) ATP[0] + (1) ps_BS[0] <=> (1) ADP[0] + (1) Phosphate[0] + (1) ps_BS[1]
+tr_ps/atp	Lipid flippase	atp(cpd00002)[0] h2o(cpd00001)[0] ps(cpd11455)[0] => adp(cpd00008)[0] pi(cpd00009)[0] ps(cpd11455)[1]	Y	N	N	Y	frxn00270	(1) H2O[0] + (1) ATP[0] + (1) ps_BS[0] <=> (1) ADP[0] + (1) Phosphate[0] + (1) ps_BS[1]
 tr_pyrcm	Pyruvate transporter	pyr(cpd00020)[0] => pyr(cpd00020)[1]	Y	N	Y	Y	rxn09218	(1) Pyruvate[0] <=> (1) Pyruvate[1]
 tr_rhamosece	L-Rhamnose transporter	rhmose(cpd00396)[0] => rhmose(cpd00396)[1]	Y	N	Y	Y	rxn09229	(1) L-Rhamnose[0] <=> (1) L-Rhamnose[1]
 tr_ribcm	Ribose transporter	rib(cpd00105)[0] => rib(cpd00105)[1]	Y	N	Y	Y	rxn09228	(1) D-Ribose[0] <=> (1) D-Ribose[1]
@@ -1610,12 +1610,12 @@ tr_slfe2c	Sulfate transporter	slf(cpd00048)[0] => slf(cpd00048)[1]	Y	N	Y	Y	rxn05
 tr_slficm	sulfite transporter	slfi(cpd00081)[0] => slfi(cpd00081)[1]	Y	N	Y	Y	rxn09260	(1) Sulfite[0] <=> (1) Sulfite[1]
 tr_slfiec	sulfite transporter	slfi(cpd00081)[0] => slfi(cpd00081)[1]	Y	N	Y	Y	rxn09260	(1) Sulfite[0] <=> (1) Sulfite[1]
 tr_sphepcm	sphingosine 1-phosphate transporter	sph1p(cpd00824)[0] => sph1p(cpd00824)[1]	Y	N	Y	Y	rxn13396	(1) Sphinganine 1-phosphate[0] <=> (1) Sphinganine 1-phosphate[1]
-tr_stare2c	Starch transporter	star[0] => star[1]	Y	N	N	N	frxn00377	
+tr_stare2c	Starch transporter	star[0] => star[1]	Y	N	N	N	frxn00375	
 tr_succ/picm	Dicarboxylate carrier	pi(cpd00009)[0] succ(cpd00036)[1] => pi(cpd00009)[1] succ(cpd00036)[0]	Y	N	Y	Y	rxn09713	(1) Phosphate[1] + (1) Succinate[0] <=> (1) Phosphate[0] + (1) Succinate[1]
 tr_succ/piec	Dicarboxylate:Pi antiporter	succ(cpd00036)[0] pi(cpd00009)[1] => pi(cpd00009)[0] succ(cpd00036)[1]	Y	N	Y	Y	rxn09713	(1) Phosphate[1] + (1) Succinate[0] <=> (1) Phosphate[0] + (1) Succinate[1]
 tr_succpc	succinate peroxisomal transport	succ(cpd00036)[0] => succ(cpd00036)[1]	Y	N	Y	Y	rxn09271	(1) Succinate[0] <=> (1) Succinate[1]
 tr_sucec	Sucrose transporter	suc(cpd00076)[0] => suc(cpd00076)[1]	Y	N	Y	Y	rxn09275	(1) Sucrose[0] <=> (1) Sucrose[1]
-tr_taglyec	tagly transporter	tagly(cpd11677)[0] => tagly(cpd11677)[1]	Y	N	N	Y	frxn00378	
+tr_taglyec	tagly transporter	tagly(cpd11677)[0] => tagly(cpd11677)[1]	Y	N	N	Y	frxn00376	
 tr_thmec	thiamin transporter	thm(cpd00305)[0] => thm(cpd00305)[1]	Y	N	Y	Y	rxn09300	(1) Thiamin[0] <=> (1) Thiamin[1]
 tr_thrcm	L-threonine transporter	thr(cpd00161)[0] => thr(cpd00161)[1]	Y	N	Y	Y	rxn09307	(1) L-Threonine[0] <=> (1) L-Threonine[1]
 tr_threc	Amino acid permease	thr(cpd00161)[0] => thr(cpd00161)[1]	Y	N	Y	Y	rxn09307	(1) L-Threonine[0] <=> (1) L-Threonine[1]
@@ -1623,8 +1623,8 @@ tr_trpcm	L-tryptophan transporter	trp(cpd00065)[0] => trp(cpd00065)[1]	Y	N	Y	Y	r
 tr_trpec	Aromatic amino acid permease	trp(cpd00065)[0] => trp(cpd00065)[1]	Y	N	Y	Y	rxn05222	(1) L-Tryptophan[1] <=> (1) L-Tryptophan[0]
 tr_tyrcm	L-tyrosine transporter	tyr(cpd00069)[0] => tyr(cpd00069)[1]	Y	N	Y	Y	rxn09339	(1) L-Tyrosine[0] <=> (1) L-Tyrosine[1]
 tr_tyrec	Aromatic amino acid permease	tyr(cpd00069)[0] => tyr(cpd00069)[1]	Y	N	Y	Y	rxn09339	(1) L-Tyrosine[0] <=> (1) L-Tyrosine[1]
-tr_urateec	Uric acid-xanthine permease	urate(cpd00300)[0] => urate(cpd00300)[1]	Y	N	N	Y	frxn00379	
-tr_uratepc	urate peroxisomal transport	urate(cpd00300)[0] => urate(cpd00300)[1]	Y	N	N	Y	frxn00379	(1) Urate[0] <=> (1) Urate[1]
+tr_urateec	Uric acid-xanthine permease	urate(cpd00300)[0] => urate(cpd00300)[1]	Y	N	N	Y	frxn00377	
+tr_uratepc	urate peroxisomal transport	urate(cpd00300)[0] => urate(cpd00300)[1]	Y	N	N	Y	frxn00377	(1) Urate[0] <=> (1) Urate[1]
 tr_ureacm	Urea active transporter	urea(cpd00073)[0] => urea(cpd00073)[1]	Y	N	Y	Y	rxn05667	(1) Urea[1] <=> (1) Urea[0]
 tr_ureaec	Urea active transporter	urea(cpd00073)[0] => urea(cpd00073)[1]	Y	N	Y	Y	rxn05667	(1) Urea[1] <=> (1) Urea[0]
 tr_valcm	L-valine transporter	val(cpd00156)[0] => val(cpd00156)[1]	Y	N	Y	Y	rxn05245	(1) L-Valine[1] <=> (1) L-Valine[0]
