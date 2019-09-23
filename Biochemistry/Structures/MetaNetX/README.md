@@ -1,13 +1,3 @@
-## Loading eQuilibrator cache
-
-The "latest" set of data in the eQuilibrator cache does not work with equilibrator_api version 0.2.0
-So, here is a means to make sure that you retrieve the cache from quilt that will work:
-
-```
-bash-3.2$ pip install quilt
-bash-3.2$ quilt install equilibrator/cache -x 7a100a
-```
-
 ## Dumping structures from eQuilibrator cache
 
 In `./Find_MNX_Structures_in_MS.pl` We cross-check the available mappings between
@@ -26,6 +16,27 @@ so here, we force that to happen
 bash-3.2$ pip install equilibrator_api
 bash-3.2$ python
 >>> from equilibrator_api import ccache
+```
+
+```
+$ quilt version list equilibrator/cache
+0.2.0: dddb582567ce3eec2e0c984032506c7a47eabb1e7126e19cebb0bd6bce3bd9d3
+0.2.1: 01e755c6234c968b73bdc061a0cfcbb2cc83ab7b6827132b2f57ef8ba6e66858
+0.2.3: 6fc4e3cfb0b954488937b823c4013fe613d80644479b7a9e3fd84d524bade402
+0.2.4: 43e27a997dbb7fd576b719439828d6f7402967f2530739340521574aa0b392ea
+```
+
+```
+$ pip show equilibrator_api
+Name: equilibrator-api
+Version: 0.2.5
+Summary: Standard reaction Gibbs energy estimation for biochemical reactions.
+Home-page: https://gitlab.com/elad.noor/equilibrator-api
+Author: Elad Noor
+Author-email: noor@imsb.biol.ethz.ch
+License: MIT License
+Location: /anaconda2/envs/msd_env/lib/python3.7/site-packages
+Requires: numpy, pyparsing, sbtab, component-contribution, matplotlib, pandas, nltk, scipy, equilibrator-cache, optlang
 ```
 
 ### Step 2
@@ -49,5 +60,44 @@ sqlite> .headers on
 sqlite> .mode tabs
 sqlite> .output eq_cpds.dump
 sqlite> select mnx_id,inchi_key from compounds;
+sqlite> .quit
+```
+
+```
+Download MetaNetX file:
+
+https://www.metanetx.org/cgi-bin/mnxget/mnxref/chem_prop.tsv
+(Downloaded version 2019/02/13)
+
+```
+
+
+## Latest instructions
+
+### Clear everything out
+```
+pip uninstall equilibrator_api equilibrator_cache component_contribution
+quilt rm equilibrator/cache
+```
+
+### Re-install latest code
+```
+pip install --pre equilibrator_api
+```
+
+### To find SQLite table, need to edit code to print out new location of table
+
+```
+Edit /anaconda2/envs/py3/lib/python3.6/site-packages/equilibrator_cache/api.py to print "location"
+python
+>>> from equilibrator_api import ccache
+$ sqlite3 /var/folders/fx/lnfg_9152tdg2ffl8236g0gr0000gq/T/tmp5sffp_kd/compounds.sqlite
+```
+
+```
+sqlite> .headers on
+sqlite> .mode tabs
+sqlite> .output cpds.dump
+sqlite> select ci.accession,c.inchi_key,c.smiles from compounds as c,compound_identifiers as ci where c.id==ci.compound_id and ci.registry_id==4 order by c.id,ci.accession;
 sqlite> .quit
 ```
