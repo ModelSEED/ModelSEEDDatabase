@@ -29,3 +29,8 @@ then running these six commands should not cause any changes to appear in the da
 ./Update_Reaction_eQuilibrator_Energies.py
 ./Estimate_Reaction_Reversibility.py EQ
 ```
+
+These easily run together by running:
+```
+./Rerun_Thermodynamics.sh
+```
