@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 import os
-from equilibrator_api import ComponentContribution, Q_, Reaction
+from equilibrator_api import ComponentContribution, Q_, Reaction, ccache
 
 equilibrator_calculator = ComponentContribution(p_h=Q_(7.0), ionic_strength=Q_("0.25M"), temperature=Q_("298.15K"))
 
@@ -15,13 +15,14 @@ with open(file_name) as file_handle:
         line=line.strip()
         (mnx,inchikey)=line.split('\t')
 
-        equilibrator_reaction = Reaction.parse_formula(' = ' + 'mnx:'+mnx)
+        equilibrator_reaction = Reaction.parse_formula(ccache.get_compound, ' = ' + mnx)
 
         try:
-            dG0_prime, uncertainty = equilibrator_calculator.standard_dg_prime(equilibrator_reaction)
-            dG0_prime = str(dG0_prime.to('kilocal / mole').magnitude)
-            uncertainty = str(uncertainty.to('kilocal / mole').magnitude)
+            result = equilibrator_calculator.standard_dg_prime(equilibrator_reaction)
+            dG0_prime = str(result.value.to('kilocal / mole').magnitude)
+            uncertainty = str(result.error.to('kilocal / mole').magnitude)
 
             output_handle.write("\t".join([mnx,dG0_prime,uncertainty])+"\n")
-        except:
+        except Exception as e:
             output_handle.write("\t".join([mnx,"Unable to retrieve energy"])+"\n")
+            print(e)
