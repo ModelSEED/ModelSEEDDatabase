@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 import os,sys,math
-from equilibrator_api import ComponentContribution, Reaction, Q_
+from equilibrator_api import ComponentContribution, Reaction, Q_, ccache
 from BiochemPy import Compounds,Reactions
 
 #We have to try and make sure that we use MetaNetX IDs for which an estimate of energy
@@ -151,7 +151,7 @@ for rxn in reactions_dict:
         if(rgt['compound'] not in seed_mnx_structural_map):
             OK = False
         else:
-            mnx_id = 'mnx:'+seed_mnx_structural_map[rgt['compound']]
+            mnx_id = seed_mnx_structural_map[rgt['compound']]
 
             if(rgt['coefficient'] < 0):
                 lhs[mnx_id]=math.fabs(rgt['coefficient'])
@@ -162,20 +162,22 @@ for rxn in reactions_dict:
         " = " + \
         ' + '.join([f'{value} {key}' for key, value in rhs.items()])
 
-    equilibrator_reaction = Reaction.parse_formula(equation_str)
+    equilibrator_reaction = Reaction.parse_formula(ccache.get_compound, equation_str)
 
     try:
-        dG0_prime, uncertainty = equilibrator_calculator.standard_dg_prime(equilibrator_reaction)
-        dG0_prime = str(dG0_prime.to('kilocal / mole').magnitude)
-        uncertainty = str(uncertainty.to('kilocal / mole').magnitude)
+        result = equilibrator_calculator.standard_dg_prime(equilibrator_reaction)
+        dG0_prime = str(result.value.to('kilocal / mole').magnitude)
+        uncertainty = str(result.error.to('kilocal / mole').magnitude)
+
 
         ln_RI = equilibrator_calculator.ln_reversibility_index(equilibrator_reaction)
         if not type(ln_RI) == float:
             ln_RI = str(ln_RI.magnitude)
 
         output_handle.write("\t".join([rxn,dG0_prime,uncertainty,ln_RI])+"\n")
-    except:
+    except Exception as e:
         output_handle.write("\t".join([rxn,"Unable to retrieve energy"])+"\n")
+        print(e)
 
     #These are all true, as per earlier condition
     #print(OK)
