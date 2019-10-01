@@ -5,11 +5,12 @@ import os, sys
 columns={'2010':{'cpd_id':7,'formula':6,'structure':16,'rxn_id':9,'equation':8,'status':16},
          '2014':{'cpd_id':0,'formula':3,'structure':6,'rxn_id':0,'equation':6,'status':17}}
 
+out = open('Growth_Stats.tsv','w')
 for year in ['2010','2014']:
 
     print("Statistics from "+year)
     compounds_dict=dict()
-    with open(year+'/compoundTable.txt') as fh:
+    with open('../'+year+'/compoundTable.txt') as fh:
         for line in fh.readlines():
             line=line.strip()
             array=line.split('\t')
@@ -20,7 +21,7 @@ for year in ['2010','2014']:
     fh.close()
 
     reactions_dict=dict()
-    with open(year+'/reactionTable.txt') as fh:
+    with open('../'+year+'/reactionTable.txt') as fh:
         for line in fh.readlines():
             line=line.strip()
             array=line.split('\t')
@@ -38,6 +39,7 @@ for year in ['2010','2014']:
     print(str(compound_counts['cpd'])+" compounds")
     for entry in ['Structure','Generic']:
         print(entry,compound_counts[entry],float(compound_counts[entry])/float(compound_counts['cpd']))
+    out.write('\t'.join([year,'cpd',str(compound_counts['cpd']),str(compound_counts['Structure'])])+'\n')
 
     reaction_counts={'rxn':0,'Generic':0,'Complete':0,'Balanced':0}
     for rxn in reactions_dict:
@@ -80,3 +82,5 @@ for year in ['2010','2014']:
     for entry in ['Complete','Balanced','Generic']:
         print(entry,reaction_counts[entry],float(reaction_counts[entry])/float(reaction_counts['rxn']))
     print("\n========================\n")
+    out.write('\t'.join([year,'rxn',str(reaction_counts['rxn']),str(reaction_counts['Balanced'])])+'\n')
+out.close()
