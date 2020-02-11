@@ -3,7 +3,7 @@ from BiochemPy import Reactions
 from csv import DictReader
 import sys
 
-ONTOLOGY_FILE  = 'ontology_donors.tsv'
+ONTOLOGY_FILE  = 'Ontology_Donors.tsv'
 
 # The ontology file really needs just two columns with the headers 'from' and 'to'
 # Its important to note that the 'from' column must contain the parent (and more generic) metabolite
