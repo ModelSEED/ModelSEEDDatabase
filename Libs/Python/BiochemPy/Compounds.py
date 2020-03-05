@@ -21,7 +21,7 @@ class Compounds:
         type_mapping = {"is_core": int, "is_obsolete": int, "is_cofactor": int, "charge": int,
                         "mass": float, "deltag": float, "deltagerr": float}
         lists = ["aliases","notes"]
-        dicts = ["ontology"]
+        dicts = []
 
         cpds_dict = dict()
         for line in reader:
