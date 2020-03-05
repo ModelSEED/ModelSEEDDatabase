@@ -28,7 +28,7 @@ class Reactions:
         type_mapping = {"is_transport": int, "is_obsolete": int,
                         "deltag": float, "deltagerr": float}
         lists = ["aliases","pathways","ec_numbers","notes"]
-        dicts = ["ontology"]
+        dicts = []
 
         rxns_dict = dict()
         for line in reader:
