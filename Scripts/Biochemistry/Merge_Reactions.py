@@ -23,7 +23,7 @@ for code in sorted(Reactions_Codes.keys()):
                 Update_Reactions+=1
                 Reactions_Dict[rxn]["linked_reaction"] = rxn_list
                 Reactions_Dict[rxn]["is_obsolete"]=0
-            elif(rxn != primary_rxn and Reactions_Dict[rxn]["is_obsolete"]==0):
+            elif(rxn != primary_rxn and  ( Reactions_Dict[rxn]["is_obsolete"]==0 or rxn_list != Reactions_Dict[rxn]["linked_reaction"] )):
                 print("Secondary: ",rxn,code,rxn_list,Reactions_Dict[rxn]["linked_reaction"],Reactions_Dict[rxn]["is_obsolete"])
                 Update_Reactions+=1
                 Reactions_Dict[rxn]["linked_reaction"] = rxn_list

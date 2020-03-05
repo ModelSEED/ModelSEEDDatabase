@@ -207,12 +207,12 @@ class Reactions:
         else:
             return 0
 
-    def generateCodes(self, rxns_dict):
+    def generateCodes(self, rxns_dict,check_obsolete=True):
         codes_dict=dict()
         for rxn in rxns_dict:
             if(rxns_dict[rxn]['status']=="EMPTY"):
                 continue
-            if(rxns_dict[rxn]['is_obsolete']==1):
+            if(check_obsolete is False and rxns_dict[rxn]['is_obsolete']==1):
                 continue
             rxn_cpds_array = self.parseStoich(rxns_dict[rxn]['stoichiometry'])
             code = self.generateCode(rxn_cpds_array)
