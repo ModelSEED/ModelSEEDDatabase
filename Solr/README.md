@@ -1,73 +1,36 @@
-1. Installation
+-------------------------------------------------------------------------
+1. Installation of Solr
 
 Follow the 'Solr Quick Start' link on the page:
 
-http://lucene.apache.org/solr/resources.html#solr-version-control
+http://lucene.apache.org/solr/guide/8_4/solr-tutorial.html
 
 to Download/Unpack/Launch Solr on your Solr server machine, if locally, it will be running at:
 
 http://localhost:8983/solr/#/
 
-2. create the core directories
--------------------------------------------------------------------------
-e.g., on my laptop suppose Solr is installed under my_solr_install_dir and
-my_solr_install_dir=/Users/qzhang/SOLR/solr-7.7.0
+NB: As of 02/13/20, we're running Solr 8.4.1 using JDK 11 on Ubuntu 18.04
+and we found the first three steps in this guide helpful:
 
-2.1) create one folder for each core (and subfolders of conf and data for that core)
+https://tecadmin.net/install-apache-solr-on-ubuntu/
 
-    mkdir my_solr_install_dir/server/solr/compounds
-    mkdir -p my_solr_install_dir/server/solr/compounds/conf
-    mkdir -p my_solr_install_dir/server/solr/compounds/data
-    mkdir my_solr_install_dir/server/solr/reactions
-    mkdir -p my_solr_install_dir/server/solr/reactions/conf
-    mkdir -p my_solr_install_dir/server/solr/reactions/data
+NB: Though we no longer use it, we found this guide helpful to set up basic authentication for our solr endpoint on nginx:
+https://docs.nginx.com/nginx/admin-guide/security-controls/configuring-http-basic-authentication/
 
 -------------------------------------------------------------------------
+2. Create Solr cores
 
-2.2) Inside each of the above conf folders, create/copy-paste files solrconfig.xml, schema.xml,
-managed_schema, schema_types.xml and elevate.xml from the corresponding folders
-(e.g., 'Solr/compounds/conf/' for compounds and 'Solr/reactions/conf/' for reactions) of this repo.
+sudo -u solr /opt/solr/bin/solr create_core -c compounds -d cores/compounds/
+sudo -u solr /opt/solr/bin/solr create_core -c reactions -d cores/reactions/
 
-At this point the data folders are empty.
-
-2.3) In the browser where you can see the Solr Admin UI, (i.e., http://localhost:8983/solr/#/), 
-Under 'Core Admin'-->'Add Core'. Set the instanceDir and dataDir by entering the absolute paths of the dirs created in Step 2.1):
-e.g., for compounds:
-        instanceDir= my_solr_install_dir/server/solr/compounds
-        dataDir= my_solr_install_dir/server/solr/compounds/data
-      for reactions:
-        instanceDir= my_solr_install_dir/server/solr/reactions
-        dataDir= my_solr_install_dir/server/solr/reactions/data
-
-3. Load data into Solr
 -------------------------------------------------------------------------
-Either check out the datafiles from 'Biochemistry/' of this repo, e.g., compounds.json and/or reactions.json,
-or go to where your datafiles reside on your local machine, get the full path to the datafile. Then,
-from the shell go to folder `my_solr_install_dir/bin/` and run the following commands to load data
-into the corresponding core we have just created in the browser UI. [Note: if you skipped step 2.3),
-you will get "HTTP ERROR 404" (Not Found) error.]
+3. Load data into Solr cores
 
-    localhost:my_solr_install_dir qzhang$ bin/post -c [core_name] [path-to-data/datafile.json]
-
-When data loading returns error (it happens, probably due to file format or acceptable string values, etc.), 
-fix the causes and reload until it succeeds.
+/opt/solr/bin/post -u solr -c compounds ../Biochemistry/compounds.json
+/opt/solr/bin/post -u solr -c compounds ../Biochemistry/reactions.json
 
 4. To access the local Solr instance from locally installed modelseed-ui
 -------------------------------------------------------------------------
-Inside the config.js of modelseed-ui folder, add an entry of 'local_solr_url: "http://0.0.0.0:8983/solr/"' to this.services.
+Navigate to the root of the ModelSEED-UI repository, and edit the config.js file:
 
-Then in file 'modelseed-ui/app/services/biochem.js' and module 'Biochem', find the following line and set the solr_endpoint:
-
-var solr_endpoint = config.services.local_solr_url;
-
-After that, make sure wherever module 'Biochem' is injected and a call to 'Biochem.get*' is changed to'Biochem.get*_solr'.
-
-Then you can see the biochemistry data changes in your local Solr reflected in modelseed-ui.
-
--------------------------------------------------------------------------
-5. The above procedures were tested for running Solr on my Mac laptop. They should apply to setting up Solr on the megilen server,
-where the cloud version of Solr (7) has been installed.
-
-For example, run the following command to load the data from compounds.json in the `compounds` core
-
-    megilen-cloud-server:modelseedSolrUser$ megilen_solr_installation_dir/bin/post -c compounds [path-to-biochem_data]/compounds.json
+    Change the solr_url from https://modelseed.org/solr/ to http://localhost:8983/solr
