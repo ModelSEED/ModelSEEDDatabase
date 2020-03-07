@@ -2,6 +2,7 @@ import os
 import re
 import json
 import copy
+import itertools
 from csv import DictReader
 
 class Reactions:
@@ -27,7 +28,7 @@ class Reactions:
         type_mapping = {"is_transport": int, "is_obsolete": int,
                         "deltag": float, "deltagerr": float}
         lists = ["aliases","pathways","ec_numbers","notes"]
-        dicts = ["ontology"]
+        dicts = []
 
         rxns_dict = dict()
         for line in reader:
@@ -123,7 +124,79 @@ class Reactions:
                                    "charge": self.Compounds_Dict[cpd][
                                        "charge"]})
         return rxn_cpds_array
-        
+
+    def parseStoichOnt(self, stoichiometry):
+        rxn_cpds_dict = dict()
+
+        #For empty reaction
+        if(stoichiometry == ""):
+            return rxn_cpds_array
+
+        for rgt in stoichiometry.split(";"):
+            (coeff, cpd, cpt, index, name) = rgt.split(":", 4)
+            cpd_cpt_tuple = (cpd,cpt)
+            rxn_cpds_dict[cpd_cpt_tuple]=coeff
+
+        return rxn_cpds_dict
+
+    # The basis for this code, and producing combinations of ontologically related reactions
+    # was found in Filipe's code (see commit: 92db86)
+    def generateOntologyReactionCodes(self, rxn_id, rxn_cpds, cpds_neighbors):
+
+        # returns list of reaction codes to match with biochemistry
+        new_codes = dict()
+
+        replacements = list()
+        for cpd_cpt_tuple in rxn_cpds:
+            replace_list = list()
+            cpd_id = cpd_cpt_tuple[0]
+            if cpd_id in cpds_neighbors:
+                for neighbor_id in cpds_neighbors[cpd_id]:
+                    replace_list.append((cpd_id,neighbor_id))
+
+            if len(replace_list) > 0:
+                replacements.append(replace_list)
+
+        # Iterate through different numbers of compounds to replace
+        # i.e. replace 1 compound, replace 2 compounds etc.
+        # The output is a list of all the possible combination of replacements to explore
+        replacement_product=list()
+        for n_cpds in range(1,len(replacements)+1):
+            combination = list(itertools.combinations(replacements,n_cpds))
+            for entry in combination:
+                product_list = list(itertools.product(*entry))
+                replacement_product += product_list
+
+        if(len(replacements) == 0):
+            return new_codes
+
+        for entry in replacement_product:
+
+            # Old code assumed that all "new" compounds were unique
+            # cpd_swap_dict = {x:y for x, y in entry}
+            # new_swapped_rxn_cpds = { (x if not x in cpd_swap_dict else cpd_swap_dict[x], c):y 
+            #                          for (x, c), y in rxn_cpds.items() }
+
+            # Regenerate array of cpd dicts for use with generateCode()
+            swapped_rxn_cpds_array=list()
+            for (cpd, cpt), coeff in rxn_cpds.items():
+                new_cpd = cpd
+                for old, new in entry:
+                    if(cpd == old):
+                        new_cpd = new
+                reagent = { "reagent":new_cpd+'_'+cpt+'0',
+                            "compartment":cpt,
+                            "coefficient":float(coeff) }
+
+                # Correct for redundant ".0" in floats
+                if (str(reagent["coefficient"])[-2:] == ".0"):
+                    reagent["coefficient"] = int(round(reagent["coefficient"]))
+
+                swapped_rxn_cpds_array.append(reagent)
+            new_code = self.generateCode(swapped_rxn_cpds_array)
+            new_codes[new_code]=entry
+        return new_codes
+
     @staticmethod
     def isTransport(rxn_cpds_array):
         compartments_dict=dict()
@@ -134,10 +207,12 @@ class Reactions:
         else:
             return 0
 
-    def generateCodes(self, rxns_dict):
+    def generateCodes(self, rxns_dict,check_obsolete=True):
         codes_dict=dict()
         for rxn in rxns_dict:
             if(rxns_dict[rxn]['status']=="EMPTY"):
+                continue
+            if(check_obsolete is False and rxns_dict[rxn]['is_obsolete']==1):
                 continue
             rxn_cpds_array = self.parseStoich(rxns_dict[rxn]['stoichiometry'])
             code = self.generateCode(rxn_cpds_array)
