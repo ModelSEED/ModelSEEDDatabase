@@ -1,0 +1,20 @@
+# status of plugins
+curl --user solr:<password> http://localhost:8983/solr/admin/authentication
+curl --user solr:<password> http://localhost:8983/solr/admin/authorization
+
+# set user and password in authentication, can be used to edit/change password
+curl --user solr:<password> http://localhost:8983/solr/admin/authentication -H 'Content-type:application/json' -d '{"set-user": {"modelseed":"<password>"}}'
+
+# set roles like admin in authorization
+curl --user solr:<password> http://localhost:8983/solr/admin/authorization -H 'Content-type:application/json' -d '{"set-user-role" : {"solr":["admin"]}}' 
+
+# set permissions
+curl --user solr:<password> http://localhost:8983/solr/admin/authorization -H 'Content-type:application/json' -d '{"set-permission" : {"name":"security-read","role":"admin"}}'
+curl --user solr:<password> http://localhost:8983/solr/admin/authorization -H 'Content-type:application/json' -d '{"set-permission" : {"name":"security-edit","role":"admin"}}'
+
+for i in "collection-admin-edit" "collection-admin-read" "core-admin-read" "core-admin-edit" "read" "update" "config-edit" "config-read" "schema-read" "schema-edit" "security-edit" "security-read" "metrics-read";do
+    echo $i;
+done
+
+# status of cores
+curl -u modelseed:<password> https://modelseed.mcs.anl.gov/solr/#/admin/cores?action=STATUS
