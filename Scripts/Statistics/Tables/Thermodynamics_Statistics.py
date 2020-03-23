@@ -2,7 +2,7 @@
 import os, sys
 from BiochemPy import Compounds, Reactions,InChIs
 
-with open('../Thermodynamics/Compounds_GroupFormation_eQuilibrator_Comparison.txt') as fh:
+with open('../../Thermodynamics/Compounds_GroupFormation_eQuilibrator_Comparison.txt') as fh:
     header=1
     Reported_Cpds={'GF':0,'EQ':0,'EQR':0}
     for line in fh.readlines():
@@ -22,7 +22,7 @@ with open('../Thermodynamics/Compounds_GroupFormation_eQuilibrator_Comparison.tx
 fh.close()
 print("Compounds: ",Reported_Cpds)
 
-with open('../Thermodynamics/Reactions_GroupFormation_eQuilibrator_Comparison.txt') as fh:
+with open('../../Thermodynamics/Reactions_GroupFormation_eQuilibrator_Comparison.txt') as fh:
     header=1
     Reported_Rxns={'GF':0,'EQ':0,'EQR':0,'GFEQ':0}
     for line in fh.readlines():
