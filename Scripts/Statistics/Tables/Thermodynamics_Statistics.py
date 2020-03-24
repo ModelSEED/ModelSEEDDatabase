@@ -2,6 +2,40 @@
 import os, sys
 from BiochemPy import Compounds, Reactions,InChIs
 
+print("\n================")
+print("For Section: \"Computation of thermodynamic properties of ModelSEED compounds and reaction\"\n")
+
+MS_Complete_Structures=dict()
+with open("../../../Biochemistry/Structures/Unique_ModelSEED_Structures.txt") as fh:
+    for line in fh.readlines():
+        line=line.strip()
+        array=line.split('\t')
+
+        if("InChI" in array[5]):
+            MS_Complete_Structures[array[5]]=1
+
+MNX_Complete_Structures=dict()
+with open("../../../Biochemistry/Structures/MetaNetX/chem_prop.tsv") as fh:
+    header=1
+    for line in fh.readlines():
+        if(line[0] == "#"):
+            continue
+
+        line=line.strip()
+        array=line.split('\t')
+
+        if('InChI' in array[5]):
+            MNX_Complete_Structures[array[5]]=1
+
+Shared_Structures=0
+for struct in MS_Complete_Structures:
+    if(struct in MNX_Complete_Structures):
+        Shared_Structures+=1
+
+print("InChI in ModelSEED: ",len(MS_Complete_Structures.keys()))
+print("InChI in MetaNetX: ",len(MNX_Complete_Structures.keys()))
+print("Shared InChI: ",Shared_Structures,"\n")
+
 with open('../../Thermodynamics/Compounds_GroupFormation_eQuilibrator_Comparison.txt') as fh:
     header=1
     Reported_Cpds={'GF':0,'EQ':0,'EQR':0}
@@ -20,7 +54,10 @@ with open('../../Thermodynamics/Compounds_GroupFormation_eQuilibrator_Comparison
             if(float(dge)>50):
                 Reported_Cpds['EQR']+=1
 fh.close()
-print("Compounds: ",Reported_Cpds)
+print("Compounds: ")
+print("\tGF: ",Reported_Cpds["GF"])
+print("\tEQ: ",Reported_Cpds["EQ"])
+print("\tRejected EQ: ",Reported_Cpds["EQR"],"\n")
 
 with open('../../Thermodynamics/Reactions_GroupFormation_eQuilibrator_Comparison.txt') as fh:
     header=1
@@ -43,9 +80,14 @@ with open('../../Thermodynamics/Reactions_GroupFormation_eQuilibrator_Comparison
             if(float(dge)>100):
                 Reported_Rxns['EQR']+=1
 fh.close()
-print("Reactions: ",Reported_Rxns)
-print("================\n")
+print("Reactions: ")
+print("\tGF: ",Reported_Rxns["GF"])
+print("\tEQ: ",Reported_Rxns["EQ"])
+print("\tShared GF & EQ: ",Reported_Rxns["GFEQ"])
+print("\tRejected EQ: ",Reported_Rxns["EQR"],"\n")
 
+print("================")
+print("For Table 4\n")
 compounds_helper = Compounds()
 compounds_dict = compounds_helper.loadCompounds()
 
@@ -81,8 +123,8 @@ for cpd in compounds_dict:
 total_cpds = compound_counts['Structured']
 print("Compounds Completeness")
 for key in Cpd_Types:
-    print(key,compound_counts[key],float(compound_counts[key])/float(total_cpds))
-print("================\n")
+    pct = "{0:.2f}".format(float(compound_counts[key])/float(total_cpds))
+    print(key,compound_counts[key],pct)
 
 reactions_helper = Reactions()
 reactions_dict = reactions_helper.loadReactions()
@@ -130,5 +172,6 @@ for rxn in reactions_dict:
 
 total_rxns=reaction_counts['Structured']
 for key in Rxn_Types:
-    print(key,reaction_counts[key],float(reaction_counts[key])/float(total_rxns))
-print("================\n")
+    pct = "{0:.2f}".format(float(reaction_counts[key])/float(total_rxns))
+    print(key,reaction_counts[key],pct)
+print("\n================\n")
