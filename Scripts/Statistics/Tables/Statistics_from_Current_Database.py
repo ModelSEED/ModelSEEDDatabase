@@ -19,7 +19,8 @@ for cpd in compounds_dict:
 
 print(str(len(compounds_dict.keys()))+" compounds")
 for entry in ['Structure','Generic']:
-    print(entry,compound_counts[entry],float(compound_counts[entry])/float(len(compounds_dict.keys())))
+    pct = "{0:.2f}".format(float(compound_counts[entry])/float(len(compounds_dict.keys())))
+    print(entry,compound_counts[entry],pct)
 out.write('\t'.join(['2019','cpd',str(len(compounds_dict.keys())),str(compound_counts['Structure'])])+'\n')
 
 reaction_counts={'Generic':0,'Complete':0,'Balanced':0}
@@ -52,5 +53,6 @@ for rxn in reactions_dict:
 
 print(str(len(reactions_dict.keys()))+" reactions")
 for entry in ['Complete','Balanced','Generic']:
-    print(entry,reaction_counts[entry],float(reaction_counts[entry])/float(len(reactions_dict.keys())))
+    pct = "{0:.2f}".format(float(reaction_counts[entry])/float(len(reactions_dict.keys())))
+    print(entry,reaction_counts[entry],pct)
 out.write('\t'.join(['2019','rxn',str(len(reactions_dict.keys())),str(reaction_counts['Balanced'])])+'\n')

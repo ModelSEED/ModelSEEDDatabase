@@ -38,7 +38,8 @@ for year in ['2010','2014']:
 
     print(str(compound_counts['cpd'])+" compounds")
     for entry in ['Structure','Generic']:
-        print(entry,compound_counts[entry],float(compound_counts[entry])/float(compound_counts['cpd']))
+        pct = "{0:.2f}".format(float(compound_counts[entry])/float(compound_counts['cpd']))
+        print(entry,compound_counts[entry],pct)
     out.write('\t'.join([year,'cpd',str(compound_counts['cpd']),str(compound_counts['Structure'])])+'\n')
 
     reaction_counts={'rxn':0,'Generic':0,'Complete':0,'Balanced':0}
@@ -80,7 +81,8 @@ for year in ['2010','2014']:
 
     print(str(reaction_counts['rxn'])+" reactions")
     for entry in ['Complete','Balanced','Generic']:
-        print(entry,reaction_counts[entry],float(reaction_counts[entry])/float(reaction_counts['rxn']))
+        pct = "{0:.2f}".format(float(reaction_counts[entry])/float(reaction_counts['rxn']))
+        print(entry,reaction_counts[entry],pct)
     print("\n========================\n")
     out.write('\t'.join([year,'rxn',str(reaction_counts['rxn']),str(reaction_counts['Balanced'])])+'\n')
 out.close()
