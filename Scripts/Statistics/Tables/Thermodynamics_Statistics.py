@@ -38,7 +38,7 @@ print("Shared InChI: ",Shared_Structures,"\n")
 
 with open('../../Thermodynamics/Compounds_GroupFormation_eQuilibrator_Comparison.txt') as fh:
     header=1
-    Reported_Cpds={'GF':0,'EQ':0,'EQR':0}
+    Reported_Cpds={'GF':0,'EQ':0,'EQR':0,'LoEQE':0,'HiEQE':0}
     for line in fh.readlines():
         if(header==1):
             header-=1
@@ -53,15 +53,19 @@ with open('../../Thermodynamics/Compounds_GroupFormation_eQuilibrator_Comparison
             (dg,dge)=array[2].split('|')
             if(float(dge)>50):
                 Reported_Cpds['EQR']+=1
+            if(float(dge)<5):
+                Reported_Cpds['LoEQE']+=1
+            if(float(dge)>100):
+                Reported_Cpds['HiEQE']+=1
 fh.close()
 print("Compounds: ")
 print("\tGF: ",Reported_Cpds["GF"])
 print("\tEQ: ",Reported_Cpds["EQ"])
-print("\tRejected EQ: ",Reported_Cpds["EQR"],"\n")
+print("\tRejected EQ: ",Reported_Cpds["EQR"])
 
 with open('../../Thermodynamics/Reactions_GroupFormation_eQuilibrator_Comparison.txt') as fh:
     header=1
-    Reported_Rxns={'GF':0,'EQ':0,'EQR':0,'GFEQ':0}
+    Reported_Rxns={'GF':0,'EQ':0,'EQR':0,'GFEQ':0,'LoEQE':0,'HiEQE':0}
     for line in fh.readlines():
         if(header==1):
             header-=1
@@ -79,12 +83,30 @@ with open('../../Thermodynamics/Reactions_GroupFormation_eQuilibrator_Comparison
             (dg,dge)=array[2].split('|')
             if(float(dge)>100):
                 Reported_Rxns['EQR']+=1
+            if(float(dge)<5):
+                Reported_Rxns['LoEQE']+=1
+            if(float(dge)>100):
+                Reported_Rxns['HiEQE']+=1
 fh.close()
 print("Reactions: ")
 print("\tGF: ",Reported_Rxns["GF"])
 print("\tEQ: ",Reported_Rxns["EQ"])
 print("\tShared GF & EQ: ",Reported_Rxns["GFEQ"])
 print("\tRejected EQ: ",Reported_Rxns["EQR"],"\n")
+
+print("================")
+print("For Section: \"Thermodynamics\"\n")
+
+print("Compounds:")
+pct = "{0:.2f}".format(float(Reported_Cpds["LoEQE"])/float(Reported_Cpds["EQ"]))
+print("\tLow EQ error: ",Reported_Cpds["LoEQE"],pct)
+pct = "{0:.2f}".format(float(Reported_Cpds["HiEQE"])/float(Reported_Cpds["EQ"]))
+print("\tHigh EQ error: ",Reported_Cpds["HiEQE"],pct,"\n")
+print("Reactions:")
+pct = "{0:.2f}".format(float(Reported_Rxns["LoEQE"])/float(Reported_Rxns["EQ"]))
+print("\tLow EQ error: ",Reported_Rxns["LoEQE"],pct)
+pct = "{0:.2f}".format(float(Reported_Rxns["HiEQE"])/float(Reported_Rxns["EQ"]))
+print("\tHigh EQ error: ",Reported_Rxns["HiEQE"],pct,"\n")
 
 print("================")
 print("For Table 4\n")
@@ -134,7 +156,7 @@ Rxn_Types = ['All', 'Total (GF)', 'Complete (GF)', 'Accepted (GF)', 'Total (EQ)'
 for type in Rxn_Types:
     reaction_counts[type]=0
 
-print("Reactions Completeness")
+print("\nReactions Completeness")
 for rxn in reactions_dict:
     rxn_obj = reactions_dict[rxn]
 
