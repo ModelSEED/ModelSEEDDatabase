@@ -27,7 +27,8 @@ for year in ['2010','2014']:
             line=line.strip()
             array=line.split('\t')
             reactions_dict[array[columns[year]['rxn_id']]]={'eqn':array[columns[year]['equation']],
-                                                            'stat':array[columns[year]['status']]}
+                                                            'stat':array[columns[year]['status']],
+                                                            'dir':array[columns[year]['direction']]}
 
             if(year=='2014'):
                 Old_Rxn_Rev[array[columns[year]['rxn_id']]]=array[columns[year]['reversibility']]
@@ -48,7 +49,7 @@ for year in ['2010','2014']:
         print(entry,compound_counts[entry],pct)
     out.write('\t'.join([year,'cpd',str(compound_counts['cpd']),str(compound_counts['Structure'])])+'\n')
 
-    reaction_counts={'rxn':0,'Generic':0,'Complete':0,'Balanced':0}
+    reaction_counts={'rxn':0,'Generic':0,'Complete':0,'Balanced':0,'Reversibility':0}
     for rxn in reactions_dict:
         reaction_counts['rxn']+=1
 
@@ -84,9 +85,12 @@ for year in ['2010','2014']:
 
         if('OK' in reactions_dict[rxn]['stat']):
             reaction_counts['Balanced']+=1
+            
+            if(reactions_dict[rxn]['dir'] == '=' or reactions_dict[rxn]['dir'] == '<=>'):
+                reaction_counts['Reversibility']+=1
 
     print(str(reaction_counts['rxn'])+" reactions")
-    for entry in ['Complete','Balanced','Generic']:
+    for entry in ['Complete','Balanced','Generic','Reversibility']:
         pct = "{0:.2f}".format(float(reaction_counts[entry])/float(reaction_counts['rxn']))
         print(entry,reaction_counts[entry],pct)
     print("\n========================\n")
@@ -115,7 +119,7 @@ for entry in ['Structure','Generic']:
     print(entry,compound_counts[entry],pct)
 out.write('\t'.join(['2019','cpd',str(len(compounds_dict.keys())),str(compound_counts['Structure'])])+'\n')
 
-reaction_counts={'Generic':0,'Complete':0,'Balanced':0}
+reaction_counts={'Generic':0,'Complete':0,'Balanced':0,'Reversible':0}
 New_Rxn_Rev=dict()
 for rxn in reactions_dict:
 
@@ -146,8 +150,11 @@ for rxn in reactions_dict:
     if('OK' in reactions_dict[rxn]['status']):
         reaction_counts['Balanced']+=1
 
+        if(reactions_dict[rxn]['direction']=="="):
+            reaction_counts['Reversible']+=1
+
 print(str(len(reactions_dict.keys()))+" reactions")
-for entry in ['Complete','Balanced','Generic']:
+for entry in ['Complete','Balanced','Generic','Reversible']:
     pct = "{0:.2f}".format(float(reaction_counts[entry])/float(len(reactions_dict.keys())))
     print(entry,reaction_counts[entry],pct)
 out.write('\t'.join(['2019','rxn',str(len(reactions_dict.keys())),str(reaction_counts['Balanced'])])+'\n')
