@@ -10,5 +10,5 @@ These two scripts print the numbers for Table 2
 
 Table 3?
 
-The numbers from this script are used in the "Computation of thermodynamic properties of ModelSEED compounds and reaction" text and Table 4?
+The numbers from this script are used in the "Computation of thermodynamic properties of ModelSEED compounds and reaction" section and Table 4
 ./Thermodynamics_Statistics.py
