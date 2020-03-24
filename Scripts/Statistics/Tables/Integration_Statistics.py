@@ -12,7 +12,9 @@ compound_structures = dict()
 compound_bc_identifiers = dict()
 sources = {'BioCyc':{},'Model':{}}
 
-column_keys = ['KEGG/MetaCyc (Integrated)','KEGG/MetaCyc (Integrated Structure)','KEGG/MetaCyc (Unintegrated)','KEGG/MetaCyc (Unintegrated Structure)',
+column_keys = ['KEGG','MetaCyc','KEGG Structures','MetaCyc Structures',
+               'BiGG','metanetx.chemical','metanetx.reaction','rhea',
+               'KEGG/MetaCyc (Integrated)','KEGG/MetaCyc (Integrated Structure)','KEGG/MetaCyc (Unintegrated)','KEGG/MetaCyc (Unintegrated Structure)',
                'BioCyc (Integrated)','BioCyc (Integrated Identifier)','BioCyc (Unintegrated)',
                'Model (Integrated)', 'Model (Unintegrated)',
                'Orphans']
@@ -26,6 +28,13 @@ for cpd in compounds_dict:
     if(cpd not in compound_aliases_dict and cpd not in structures_dict):
         #This is possible for a few compounds, but should not be
         continue
+
+    for source in ('KEGG','MetaCyc','BiGG','metanetx.chemical'):
+        if(source in compound_aliases_dict[cpd]):
+            compound_counts[source]+=1
+
+            if(cpd in structures_dict and (source == 'KEGG' or source == 'MetaCyc')):
+                compound_counts[source+' Structures']+=1
 
     KEGG_MetaCyc=False
     if('KEGG' in compound_aliases_dict[cpd] and 'MetaCyc' in compound_aliases_dict[cpd]):
@@ -83,17 +92,6 @@ for cpd in compounds_dict:
     if(KEGG_MetaCyc is False and BioCyc is False and Model is False):
         compound_counts['Orphans']+=1
 
-print("\n=================\n")
-for key in sources.keys():
-    print(key,len(sources[key].keys()))
-print("\n=================\n")
-
-print("Compound Integration:")
-
-for key in column_keys:
-    print(key,compound_counts[key])
-print("\n=================\n")
-
 reactions_helper = Reactions()
 reactions_dict = reactions_helper.loadReactions()
 reaction_aliases_dict =  reactions_helper.loadMSAliases()
@@ -110,6 +108,10 @@ for rxn in reactions_dict:
     if(rxn not in reaction_aliases_dict):
         #This is possible for a few reactions, but should not be
         continue
+
+    for source in ('KEGG','MetaCyc','BiGG','metanetx.reaction','rhea'):
+        if(source in reaction_aliases_dict[rxn]):
+            reaction_counts[source]+=1
 
     KEGG_MetaCyc=False
     if('KEGG' in reaction_aliases_dict[rxn] or 'MetaCyc' in reaction_aliases_dict[rxn]):
@@ -160,7 +162,21 @@ for rxn in reactions_dict:
     if(KEGG_MetaCyc is False and BioCyc is False and Model is False):
         reaction_counts['Orphans']+=1
 
-print("Reaction Integration:")
+print("\n=================")
+print("For Table 1 and Table 3\n")
+
+print("->Compound Integration:\n")
+
+print("ModelSEED",len(compounds_dict))
+print("Structures",len(structures_dict))
+for key in column_keys:
+    print(key,compound_counts[key])
+
+print("\n->Reaction Integration:\n")
+print("ModelSEED",len(reactions_dict))
 for key in column_keys:
     print(key,reaction_counts[key])
 print("\n=================\n")
+
+
+
