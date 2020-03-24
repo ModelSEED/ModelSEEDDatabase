@@ -2,10 +2,11 @@
 import os, sys
 
 
-columns={'2010':{'cpd_id':7,'formula':6,'structure':16,'rxn_id':9,'equation':8,'status':16},
-         '2014':{'cpd_id':0,'formula':3,'structure':6,'rxn_id':0,'equation':6,'status':17}}
+columns={'2010':{'cpd_id':7,'formula':6,'structure':16,'rxn_id':9,'equation':8,'status':16,'reversibility':18,'direction':14},
+         '2014':{'cpd_id':0,'formula':3,'structure':6,'rxn_id':0,'equation':6,'status':17,'reversibility':8,'direction':9}}
 
 out = open('Growth_Stats.tsv','w')
+Old_Rxn_Rev=dict()
 for year in ['2010','2014']:
 
     print("Statistics from "+year)
@@ -25,7 +26,12 @@ for year in ['2010','2014']:
         for line in fh.readlines():
             line=line.strip()
             array=line.split('\t')
-            reactions_dict[array[columns[year]['rxn_id']]]={'eqn':array[columns[year]['equation']],'stat':array[columns[year]['status']]}
+            reactions_dict[array[columns[year]['rxn_id']]]={'eqn':array[columns[year]['equation']],
+                                                            'stat':array[columns[year]['status']]}
+
+            if(year=='2014'):
+                Old_Rxn_Rev[array[columns[year]['rxn_id']]]=array[columns[year]['reversibility']]
+
     fh.close()
 
     compound_counts={'cpd':0,'Generic':0,'Structure':0}
@@ -110,6 +116,7 @@ for entry in ['Structure','Generic']:
 out.write('\t'.join(['2019','cpd',str(len(compounds_dict.keys())),str(compound_counts['Structure'])])+'\n')
 
 reaction_counts={'Generic':0,'Complete':0,'Balanced':0}
+New_Rxn_Rev=dict()
 for rxn in reactions_dict:
 
     if(reactions_dict[rxn]['status'] == "EMPTY"):
@@ -117,6 +124,8 @@ for rxn in reactions_dict:
 
     complete=True
     generic=False
+
+    New_Rxn_Rev[rxn]=reactions_dict[rxn]['reversibility']
 
     for entry in reactions_dict[rxn]['compound_ids'].split(';'):
 
@@ -143,3 +152,31 @@ for entry in ['Complete','Balanced','Generic']:
     print(entry,reaction_counts[entry],pct)
 out.write('\t'.join(['2019','rxn',str(len(reactions_dict.keys())),str(reaction_counts['Balanced'])])+'\n')
 out.close()
+
+print("\n========================")
+print("For Thermodynamics section")
+Rev_Counts={'New_Rev':0,'New_iRev':0,'ReviRev':0,'iRevRev':0}
+for rxn in New_Rxn_Rev:
+    if(New_Rxn_Rev[rxn] =='?'):
+        continue
+
+    if(rxn not in Old_Rxn_Rev):
+        if(New_Rxn_Rev[rxn]=='='):
+            Rev_Counts['New_Rev']+=1
+        else:
+            Rev_Counts['New_iRev']+=1
+    else:
+        if(Old_Rxn_Rev[rxn] == '?'):
+            if(New_Rxn_Rev[rxn]=='='):
+                Rev_Counts['New_Rev']+=1
+            else:
+                Rev_Counts['New_iRev']+=1
+        else:
+            if(Old_Rxn_Rev[rxn] == '=' and New_Rxn_Rev[rxn] != '='):
+                Rev_Counts['ReviRev']+=1
+            if(Old_Rxn_Rev[rxn] != '=' and New_Rxn_Rev[rxn] == '='):
+                Rev_Counts['iRevRev']+=1
+
+print("Reversibility for New Reactions: ",Rev_Counts['New_Rev']+Rev_Counts['New_iRev'])
+print("Reversible to irreversible: ",Rev_Counts['ReviRev'])
+print("Irreversible to reversible: ",Rev_Counts['iRevRev'])
