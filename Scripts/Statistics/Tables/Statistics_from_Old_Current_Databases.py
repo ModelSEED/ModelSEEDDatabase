@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 import os, sys
 
-
 columns={'2010':{'cpd_id':7,'formula':6,'structure':16,'rxn_id':9,'equation':8,'status':16,'reversibility':18,'direction':14},
          '2014':{'cpd_id':0,'formula':3,'structure':6,'rxn_id':0,'equation':6,'status':17,'reversibility':8,'direction':9}}
 
@@ -13,8 +12,9 @@ for year in ['2010','2014']:
     compounds_dict=dict()
     with open('../'+year+'/compoundTable.txt') as fh:
         for line in fh.readlines():
-            line=line.strip()
             array=line.split('\t')
+            array[-1]=array[-1].strip()
+
             compounds_dict[array[columns[year]['cpd_id']]]={'formula':array[columns[year]['formula']],
                                                             'structure':None}
             if(len(array)>16 and array[columns[year]['structure']].strip() != "" and array[columns[year]['structure']] != 'null'):
@@ -24,11 +24,12 @@ for year in ['2010','2014']:
     reactions_dict=dict()
     with open('../'+year+'/reactionTable.txt') as fh:
         for line in fh.readlines():
-            line=line.strip()
             array=line.split('\t')
+            array[-1]=array[-1].strip()
+
             reactions_dict[array[columns[year]['rxn_id']]]={'eqn':array[columns[year]['equation']],
                                                             'stat':array[columns[year]['status']],
-                                                            'dir':array[columns[year]['direction']]}
+                                                            'dir':array[columns[year]['reversibility']]}
 
             if(year=='2014'):
                 Old_Rxn_Rev[array[columns[year]['rxn_id']]]=array[columns[year]['reversibility']]
@@ -85,8 +86,9 @@ for year in ['2010','2014']:
 
         if('OK' in reactions_dict[rxn]['stat']):
             reaction_counts['Balanced']+=1
-            
-            if(reactions_dict[rxn]['dir'] == '=' or reactions_dict[rxn]['dir'] == '<=>'):
+
+            if(reactions_dict[rxn]['dir'] == '=' or reactions_dict[rxn]['dir'] == '<=>' or \
+                   reactions_dict[rxn]['dir'] == '' or reactions_dict[rxn]['dir'] == '?'):
                 reaction_counts['Reversibility']+=1
 
     print(str(reaction_counts['rxn'])+" reactions")
@@ -150,7 +152,7 @@ for rxn in reactions_dict:
     if('OK' in reactions_dict[rxn]['status']):
         reaction_counts['Balanced']+=1
 
-        if(reactions_dict[rxn]['direction']=="="):
+        if(reactions_dict[rxn]['reversibility']=="=" or reactions_dict[rxn]['reversibility']=='?'):
             reaction_counts['Reversible']+=1
 
 print(str(len(reactions_dict.keys()))+" reactions")
