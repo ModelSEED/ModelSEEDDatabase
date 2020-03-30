@@ -12,7 +12,7 @@ compound_structures = dict()
 compound_bc_identifiers = dict()
 sources = {'BioCyc':{},'Model':{}}
 
-column_keys = ['KEGG','MetaCyc','KEGG Structures','MetaCyc Structures',
+column_keys = ['ModelSEED','KEGG','MetaCyc','KEGG Structures','MetaCyc Structures',
                'BiGG','metanetx.chemical','metanetx.reaction','rhea',
                'KEGG/MetaCyc (Integrated)','KEGG/MetaCyc (Integrated Structure)','KEGG/MetaCyc (Unintegrated)','KEGG/MetaCyc (Unintegrated Structure)',
                'BioCyc (Integrated)','BioCyc (Integrated Identifier)','BioCyc (Unintegrated)',
@@ -25,6 +25,12 @@ for key in column_keys:
     compound_counts[key]=0
 
 for cpd in compounds_dict:
+
+    if(compounds_dict[cpd]['is_obsolete'] == 1):
+        continue
+
+    compound_counts['ModelSEED']+=1
+
     if(cpd not in compound_aliases_dict and cpd not in structures_dict):
         #This is possible for a few compounds, but should not be
         continue
@@ -105,6 +111,11 @@ for rxn in reactions_dict:
     if(reactions_dict[rxn]['status'] == 'EMPTY'):
         continue
 
+    if(reactions_dict[rxn]['is_obsolete'] == 1):
+        continue
+
+    reaction_counts['ModelSEED']+=1
+
     if(rxn not in reaction_aliases_dict):
         #This is possible for a few reactions, but should not be
         continue
@@ -167,13 +178,11 @@ print("For Table 1 and Table 3\n")
 
 print("->Compound Integration:\n")
 
-print("ModelSEED",len(compounds_dict))
 print("Structures",len(structures_dict))
 for key in column_keys:
     print(key,compound_counts[key])
 
 print("\n->Reaction Integration:\n")
-print("ModelSEED",len(reactions_dict))
 for key in column_keys:
     print(key,reaction_counts[key])
 print("\n=================\n")
