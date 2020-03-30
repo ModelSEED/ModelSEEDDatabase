@@ -2,7 +2,7 @@
 import sys
 
 data=dict()
-with open('../Tables/Growth_Stats.tsv') as fh:
+with open('../../Tables/Growth_Stats.tsv') as fh:
     for line in fh.readlines():
         line=line.strip('\r\n')
         array = line.split('\t')

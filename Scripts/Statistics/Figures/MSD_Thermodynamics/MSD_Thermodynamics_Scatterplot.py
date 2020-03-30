@@ -13,6 +13,9 @@ with open(thermo_root+"/Estimated_Reaction_Reversibility_Report_EQ.txt") as fh:
         (rxn,rule,gf_rev,eq_rev) = line.split('\t')
         type_rev = gf_rev+eq_rev
 
+        if(rxn not in reactions_dict):
+            continue
+
         if("OK" not in reactions_dict[rxn]['status']):
             continue
 
@@ -53,6 +56,12 @@ with open(thermo_root+"/Reactions_GroupFormation_eQuilibrator_Comparison.txt") a
 
         line=line.strip()
         (rxn,gf_en,eq_en)=line.split('\t')
+
+        if(rxn not in reactions_dict):
+            continue
+
+        if(reactions_dict[rxn]['is_obsolete']==1):
+            continue
 
         if(gf_en=="nan" or eq_en=="nan"):
             continue
@@ -116,7 +125,7 @@ dg_plot = figure(plot_width=500, plot_height=500,x_range=(-500,500),y_range=(-50
 
 for i, category in enumerate(sorted(data_categories, key=lambda k: len(data_categories[k]['dg']['x']), reverse=True)):
     dg_plot.circle( data_categories[category]['dg']['x'], data_categories[category]['dg']['y'],
-                    color=color_dict[category],legend=category+" ("+str(len(data_categories[category]['dg']['x']))+")")
+                    color=color_dict[category],legend_label=category+" ("+str(len(data_categories[category]['dg']['x']))+")")
 
 dg_plot.xaxis.axis_label = 'eQuilibrator dG'
 dg_plot.yaxis.axis_label = 'Group Formation dG'
@@ -143,7 +152,7 @@ dge_plot = figure(plot_width=500, plot_height=500,x_range=(0,120),y_range=(0,120
 
 for i, category in enumerate(sorted(data_categories, key=lambda k: len(data_categories[k]['dge']['x']), reverse=True)):
     dge_plot.circle( data_categories[category]['dge']['x'], data_categories[category]['dge']['y'],
-                     color=color_dict[category],legend=category+" ("+str(len(data_categories[category]['dge']['x']))+")")
+                     color=color_dict[category],legend_label=category+" ("+str(len(data_categories[category]['dge']['x']))+")")
 
 dge_plot.xaxis.axis_label = 'eQuilibrator dGe'
 dge_plot.yaxis.axis_label = 'Group Formation dGe'
@@ -179,6 +188,9 @@ with open(thermo_root+"/Compounds_GroupFormation_eQuilibrator_Comparison.txt") a
 
         line=line.strip()
         (cpd,gf_en,eq_en)=line.split('\t')
+
+        if(compounds_dict[cpd]['is_obsolete']==1):
+            continue
 
         if(gf_en=="nan" or eq_en=="nan"):
             continue
@@ -235,7 +247,7 @@ dg_plot = figure(plot_width=500, plot_height=500,x_range=(-3200,3200),y_range=(-
 
 for i, category in enumerate(sorted(data_categories, key=lambda k: len(data_categories[k]['dg']['x']), reverse=True)):
     dg_plot.circle( data_categories[category]['dg']['x'], data_categories[category]['dg']['y'],
-                    color=color_dict[category],legend=category+" ("+str(len(data_categories[category]['dg']['x']))+")")
+                    color=color_dict[category],legend_label=category+" ("+str(len(data_categories[category]['dg']['x']))+")")
 
 dg_plot.xaxis.axis_label = 'eQuilibrator dG'
 dg_plot.yaxis.axis_label = 'Group Formation dG'
@@ -262,7 +274,7 @@ dge_plot = figure(plot_width=500, plot_height=500,x_range=(0,100000),y_range=(0,
 
 for i, category in enumerate(sorted(data_categories, key=lambda k: len(data_categories[k]['dge']['x']), reverse=True)):
     dge_plot.circle( data_categories[category]['dge']['x'], data_categories[category]['dge']['y'], 
-                     color=color_dict[category],legend=category+" ("+str(len(data_categories[category]['dge']['x']))+")")
+                     color=color_dict[category],legend_label=category+" ("+str(len(data_categories[category]['dge']['x']))+")")
 
 dge_plot.xaxis.axis_label = 'eQuilibrator dGe'
 dge_plot.yaxis.axis_label = 'Group Formation dGe'
