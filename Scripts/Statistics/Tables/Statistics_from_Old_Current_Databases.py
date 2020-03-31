@@ -2,8 +2,9 @@
 import os, sys
 
 columns={'2010':{'cpd_id':7,'formula':6,'structure':16,'rxn_id':9,'equation':8,'status':16,'reversibility':18,'direction':14},
-         '2014':{'cpd_id':0,'formula':3,'structure':6,'rxn_id':0,'equation':6,'status':17,'reversibility':8,'direction':9}}
+         '2014':{'cpd_id':0,'formula':3,'structure':6,'rxn_id':0,'equation':6,'status':17,'reversibility':8,'direction':9,'is_obsolete':9}}
 
+obsolete_in_2014={'rxn':18,'cpd':9}
 out = open('Growth_Stats.tsv','w')
 Old_Rxn_Rev=dict()
 for year in ['2010','2014']:
@@ -14,6 +15,9 @@ for year in ['2010','2014']:
         for line in fh.readlines():
             array=line.split('\t')
             array[-1]=array[-1].strip()
+
+            if(year=='2014' and array[obsolete_in_2014['cpd']] == "1"):
+                continue
 
             compounds_dict[array[columns[year]['cpd_id']]]={'formula':array[columns[year]['formula']],
                                                             'structure':None}
@@ -26,6 +30,9 @@ for year in ['2010','2014']:
         for line in fh.readlines():
             array=line.split('\t')
             array[-1]=array[-1].strip()
+
+            if(year=='2014' and array[obsolete_in_2014['rxn']] == "1"):
+                continue
 
             reactions_dict[array[columns[year]['rxn_id']]]={'eqn':array[columns[year]['equation']],
                                                             'stat':array[columns[year]['status']],
@@ -106,27 +113,38 @@ compounds_dict = compounds_helper.loadCompounds()
 reactions_helper = Reactions()
 reactions_dict = reactions_helper.loadReactions()
 
-print("Statistics from 2019")
+print("Statistics from 2020")
 out = open('Growth_Stats.tsv','a')
-compound_counts={'Generic':0,'Structure':0}
+compound_counts={'ModelSEED':0,'Generic':0,'Structure':0}
 for cpd in compounds_dict:
+
+    if(compounds_dict[cpd]['is_obsolete']=="1"):
+        continue
+
+    compound_counts['ModelSEED']+=1
+
     if(compounds_dict[cpd]['smiles'] != ""):
         compound_counts['Structure']+=1
     if('R' in compounds_dict[cpd]['formula']):
         compound_counts['Generic']+=1
 
-print(str(len(compounds_dict.keys()))+" compounds")
+print(str(compound_counts['ModelSEED'])+" compounds")
 for entry in ['Structure','Generic']:
-    pct = "{0:.2f}".format(float(compound_counts[entry])/float(len(compounds_dict.keys())))
+    pct = "{0:.2f}".format(float(compound_counts[entry])/float(compound_counts['ModelSEED']))
     print(entry,compound_counts[entry],pct)
-out.write('\t'.join(['2019','cpd',str(len(compounds_dict.keys())),str(compound_counts['Structure'])])+'\n')
+out.write('\t'.join(['2020','cpd',str(len(compounds_dict.keys())),str(compound_counts['Structure'])])+'\n')
 
-reaction_counts={'Generic':0,'Complete':0,'Balanced':0,'Reversible':0}
+reaction_counts={'ModelSEED':0,'Generic':0,'Complete':0,'Balanced':0,'Reversible':0}
 New_Rxn_Rev=dict()
 for rxn in reactions_dict:
 
     if(reactions_dict[rxn]['status'] == "EMPTY"):
         continue
+
+    if(reactions_dict[rxn]['is_obsolete']==1):
+        continue
+
+    reaction_counts['ModelSEED']+=1
 
     complete=True
     generic=False
@@ -155,11 +173,11 @@ for rxn in reactions_dict:
         if(reactions_dict[rxn]['reversibility']=="=" or reactions_dict[rxn]['reversibility']=='?'):
             reaction_counts['Reversible']+=1
 
-print(str(len(reactions_dict.keys()))+" reactions")
+print(str(reaction_counts['ModelSEED'])+" reactions")
 for entry in ['Complete','Balanced','Generic','Reversible']:
-    pct = "{0:.2f}".format(float(reaction_counts[entry])/float(len(reactions_dict.keys())))
+    pct = "{0:.2f}".format(float(reaction_counts[entry])/float(reaction_counts['ModelSEED']))
     print(entry,reaction_counts[entry],pct)
-out.write('\t'.join(['2019','rxn',str(len(reactions_dict.keys())),str(reaction_counts['Balanced'])])+'\n')
+out.write('\t'.join(['2020','rxn',str(len(reactions_dict.keys())),str(reaction_counts['Balanced'])])+'\n')
 out.close()
 
 print("\n========================")

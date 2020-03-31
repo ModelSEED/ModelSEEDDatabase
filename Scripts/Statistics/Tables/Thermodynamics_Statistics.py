@@ -2,6 +2,12 @@
 import os, sys
 from BiochemPy import Compounds, Reactions,InChIs
 
+compounds_helper = Compounds()
+compounds_dict = compounds_helper.loadCompounds()
+
+reactions_helper = Reactions()
+reactions_dict = reactions_helper.loadReactions()
+
 print("\n================")
 print("For Section: \"Computation of thermodynamic properties of ModelSEED compounds and reaction\"\n")
 
@@ -45,6 +51,10 @@ with open('../../Thermodynamics/Compounds_GroupFormation_eQuilibrator_Comparison
             continue
 
         array = line.split('\t')
+
+        if(compounds_dict[array[0]]["is_obsolete"] == 1):
+            continue
+
         if('nan' not in array[1] and '1000000' not in array[1]):
             Reported_Cpds['GF']+=1
 
@@ -58,6 +68,7 @@ with open('../../Thermodynamics/Compounds_GroupFormation_eQuilibrator_Comparison
             if(float(dge)>100):
                 Reported_Cpds['HiEQE']+=1
 fh.close()
+
 print("Compounds: ")
 print("\tGF: ",Reported_Cpds["GF"])
 print("\tEQ: ",Reported_Cpds["EQ"])
@@ -72,6 +83,10 @@ with open('../../Thermodynamics/Reactions_GroupFormation_eQuilibrator_Comparison
             continue
 
         array = line.split('\t')
+
+        if(array[0] not in reactions_dict or reactions_dict[array[0]]["is_obsolete"] == 1):
+            continue
+
         if('nan' not in array[1] and '1000000' not in array[1]):
             Reported_Rxns['GF']+=1
 
@@ -110,8 +125,6 @@ print("\tHigh EQ error: ",Reported_Rxns["HiEQE"],pct,"\n")
 
 print("================")
 print("For Table 4\n")
-compounds_helper = Compounds()
-compounds_dict = compounds_helper.loadCompounds()
 
 compound_counts=dict()
 Cpd_Types = ['All', 'Total (GF)', 'Accepted (GF)', 'Total (EQ)', 'Accepted (EQ)', 'Structured', 'Final']
@@ -119,6 +132,9 @@ for type in Cpd_Types:
     compound_counts[type]=0
 
 for cpd in compounds_dict:
+    if(compounds_dict[cpd]["is_obsolete"] == 1):
+        continue
+
     cpd_obj = compounds_dict[cpd]
 
     compound_counts['All']+=1
@@ -148,9 +164,6 @@ for key in Cpd_Types:
     pct = "{0:.2f}".format(float(compound_counts[key])/float(total_cpds))
     print(key,compound_counts[key],pct)
 
-reactions_helper = Reactions()
-reactions_dict = reactions_helper.loadReactions()
-
 reaction_counts=dict()
 Rxn_Types = ['All', 'Total (GF)', 'Complete (GF)', 'Accepted (GF)', 'Total (EQ)', 'Complete (EQ)', 'Accepted (EQ)', 'Structured', 'Final']
 for type in Rxn_Types:
@@ -158,10 +171,13 @@ for type in Rxn_Types:
 
 print("\nReactions Completeness")
 for rxn in reactions_dict:
-    rxn_obj = reactions_dict[rxn]
-
     if(reactions_dict[rxn]['status'] == 'EMPTY'):
         continue
+
+    if(reactions_dict[rxn]["is_obsolete"] == 1):
+        continue
+
+    rxn_obj = reactions_dict[rxn]
 
     reaction_counts['All']+=1
 
