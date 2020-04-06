@@ -12,4 +12,10 @@
 # This script takes the output of the previous two scripts, and uses them to update the ModelSEED database
 ./Update_Compound_Structures_Formulas_Charge.py
 
-# This script is tentatively for building spreadsheets of conflicts and redundancies for reporting
+# These two scripts build tab-separated files of conflicts and redundancies for reporting
+# Their output isn't necessarily optimal, or include all possible problems, but is used as a starting point
+# for loading into spreadsheets with the goal of curating by a team
+# Redundant structures are structures that are found assigned to more than one compound, and could be merged
+# Concflicting structures are structures found assigned to a single compound and could be disambiguated
+./Report_Redundant_Structures.py
+./Report_Conflicting_Structures.py
