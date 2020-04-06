@@ -293,5 +293,6 @@ for msid in sorted(MS_Aliases_Dict.keys()):
     if(formula_conflict==1):
         for formula in Formulas[struct_type][struct_stage]:
             for external_id in Formulas[struct_type][struct_stage][formula]:
-                formula_conflicts_file.write("\t".join((msid,struct_type,struct_stage,formula,external_id,
+                formula_dict=json.loads(formula)
+                formula_conflicts_file.write("\t".join((msid,struct_type,struct_stage,formula_dict['formula'],formula_dict['charge'],external_id,
                                                           Formulas[struct_type][struct_stage][formula][external_id]))+"\n")
