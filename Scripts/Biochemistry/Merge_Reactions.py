@@ -19,17 +19,18 @@ for code in sorted(Reactions_Codes.keys()):
         for rxn in Reactions_Codes[code].keys():
             rxn_list = ";".join(sorted(x for x in Reactions_Codes[code].keys() if x != rxn))
             if(rxn == primary_rxn and ( Reactions_Dict[rxn]["is_obsolete"]==1 or rxn_list != Reactions_Dict[rxn]["linked_reaction"] )):
-                print("Primary: ",rxn,code,rxn_list,Reactions_Dict[rxn]["linked_reaction"],Reactions_Dict[rxn]["is_obsolete"])
+                print("Updating primary reaction "+rxn+" and removing any indication that its obsolete")
                 Update_Reactions+=1
                 Reactions_Dict[rxn]["linked_reaction"] = rxn_list
                 Reactions_Dict[rxn]["is_obsolete"]=0
             elif(rxn != primary_rxn and ( Reactions_Dict[rxn]["is_obsolete"]==0 or rxn_list != Reactions_Dict[rxn]["linked_reaction"] )):
-                print("Secondary: ",rxn,code,rxn_list,Reactions_Dict[rxn]["linked_reaction"],Reactions_Dict[rxn]["is_obsolete"])
+                print("Updating reaction "+rxn+" to indicate that its obsolete")
                 Update_Reactions+=1
                 Reactions_Dict[rxn]["linked_reaction"] = rxn_list
                 Reactions_Dict[rxn]["is_obsolete"]=1
 
 if(Update_Reactions>0):
+    print("Saving obsolescence updating in "+str(Update_Reactions)+" reactions")
     ReactionsHelper.saveReactions(Reactions_Dict)
     pass
 
