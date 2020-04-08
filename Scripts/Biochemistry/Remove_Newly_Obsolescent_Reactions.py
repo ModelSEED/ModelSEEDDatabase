@@ -15,8 +15,11 @@ rxns_ecs_dict = reactions_helper.loadECs()
 # We actually don't want obsolete reactions and compounds in our database
 # So we're striving to remove any 'new' ones that are obsolete
 # Any information attached to them should be associated with their linked counterpart
+# We need to retain older reactions that are now obsolete as these may be present in prior published models
 
-last_rxn_str='rxn40000'
+# The number used here is the last reaction entered before we re-integrated updates from KEGG and MetaCyc
+# In the fall of 2018, so after this point, we'll take out obsolete reactions
+last_rxn_str='rxn39250'
 last_rxn_int=int(last_rxn_str[3:])
 
 delete_rxns=list()
@@ -28,8 +31,10 @@ for rxn in reactions_dict:
 for rxn in delete_rxns:
 
     # I need to update the linked_reaction field to make sure that the removed reaction is deleted
-    for lnkd_rxn in reactions_dict[rxn]['linked_reaction']:
-        reactions_dict[lnkd_rxn]['linked_reaction'].remove(rxn)
+    for lnkd_rxn in reactions_dict[rxn]['linked_reaction'].split(';'):
+        linked_reaction_list = reactions_dict[lnkd_rxn]['linked_reaction'].split(';')
+        linked_reaction_list.remove(rxn)
+        reactions_dict[lnkd_rxn]['linked_reaction']=linked_reaction_list
 
         # I need to move the names, aliases, and ec numbers to linked reactions
         # This should already have been done when merging reactions, but doing it here to double-check
@@ -55,10 +60,17 @@ for rxn in delete_rxns:
                     print("Warning: adding "+ec+" to "+lnkd_rxn)
 
     del(reactions_dict[rxn])
-    del(rxns_aliases_dict[rxn])
-    del(rxns_ecs_dict[rxn])
-    del(rxns_names_dict[rxn])
+    if(rxn in rxns_aliases_dict):
+        del(rxns_aliases_dict[rxn])
+    if(rxn in rxns_ecs_dict):
+        del(rxns_ecs_dict[rxn])
+    if(rxn in rxns_names_dict):
+        del(rxns_names_dict[rxn])
 
 if(len(delete_rxns)>0):
     print("Removing "+str(len(delete_rxns))+" newly obsolete reactions")
     reactions_helper.saveReactions(reactions_dict)
+    reactions_helper.saveNames(rxns_names_dict)
+    reactions_helper.saveAliases(rxns_aliases_dict)
+    reactions_helper.saveECs(rxns_ecs_dict)
+
