@@ -32,5 +32,6 @@ for code in sorted(Reactions_Codes.keys()):
 if(Update_Reactions>0):
     print("Saving obsolescence updating in "+str(Update_Reactions)+" reactions")
     ReactionsHelper.saveReactions(Reactions_Dict)
-    pass
+
+print("Run ./Merge_Obsolete_Aliases.py and ./Update_Reaction_Aliases.py")
 
