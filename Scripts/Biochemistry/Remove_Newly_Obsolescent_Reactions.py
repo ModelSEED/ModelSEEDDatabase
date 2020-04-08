@@ -55,6 +55,8 @@ for rxn in delete_rxns:
 
         if(rxn in rxns_ecs_dict):
             for ec in rxns_ecs_dict[rxn]:
+                if(lnkd_rxn not in rxns_ecs_dict):
+                    rxns_ecs_dict[lnkd_rxn]=list()
                 if(ec not in rxns_ecs_dict[lnkd_rxn]):
                     rxns_ecs_dict[lnkd_rxn].append(ec)
                     print("Warning: adding "+ec+" to "+lnkd_rxn)
