@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-import os
+import os,sys
 from BiochemPy import Compounds, Reactions
 
 Overridden_Compounds=dict()
@@ -56,11 +56,17 @@ with open('Compounds_to_Merge_Spreadsheet.txt','w') as fh:
         cells=[str(structure_rxn_count[structure]),structure]
         cells.append(compounds_dict[sorted(InChIKey_Cpds[structure])[0]]['name'])
         for cpd in sorted(InChIKey_Cpds[structure]):
+
+            kegg_string=""
+            metacyc_string=""
             if(cpd in aliases_dict and 'KEGG' in aliases_dict[cpd]):
                 kegg_string="KEGG:"+"|".join(aliases_dict[cpd]['KEGG'])
+
             if(cpd in aliases_dict and 'MetaCyc' in aliases_dict[cpd]):
                 metacyc_string="MetaCyc:"+"|".join(aliases_dict[cpd]['MetaCyc'])
+
             cell_string = "; ".join([cpd,kegg_string,metacyc_string])
             cells.append(cell_string)
         fh.write("\t".join(cells)+"\n")
+
 fh.close()

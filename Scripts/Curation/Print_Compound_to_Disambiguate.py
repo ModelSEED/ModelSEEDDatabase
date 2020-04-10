@@ -10,11 +10,16 @@ import json
 arguments = list(sys.argv)
 #Pop filename
 arguments = arguments[1:]
-if(len(arguments) != 1 or re.search('^cpd\d{5}$',arguments[0]) is None):
-    print("Error: script must be initiated with a single ModelSEED compound identifier")
+if( len(arguments) < 1 or len(arguments) > 2 or \
+        re.search('^cpd\d{5}$',arguments[0]) is None or \
+        ( len(arguments) == 2 and re.search('^cpd\d{5}$',arguments[1]) is None)):
+    print("Error: script must be initiated with one or two ModelSEED compound identifier(s)")
     sys.exit()
 
-Compound=arguments[0]
+disambiguating_cpd=arguments[0]
+merging_cpd=None
+if(len(arguments)==2):
+    merging_cpd=arguments[1]
 Disambiguation_Object = {'metadata':{},'from':{},'to':{},'method':"disambiguation"}
 
 ##########################################################
@@ -55,17 +60,17 @@ from BiochemPy import Reactions, Compounds
 compounds_helper = Compounds()
 compounds_dict = compounds_helper.loadCompounds()
 
-if(Compound not in compounds_dict):
-    print("Error: compound "+Compound+" is not found in the ModelSEED database")
+if(disambiguating_cpd not in compounds_dict):
+    print("Error: compound "+disambiguating_cpd+" is not found in the ModelSEED database")
     sys.exit()
 
-if(compounds_dict[Compound]['is_obsolete']==1):
-    print("Warning: compound "+Compound+" is obsolete, consider using the non-obsolete version")
+if(compounds_dict[disambiguating_cpd]['is_obsolete']==1):
+    print("Warning: compound "+disambiguating_cpd+" is obsolete, consider using the non-obsolete version")
 
-Disambiguation_Object['from']={'id':Compound,'structures':{},'aliases':{},'names':{},
-                               'formula':compounds_dict[Compound]['formula'],
-                               'charge':compounds_dict[Compound]['charge'],
-                               'mass':compounds_dict[Compound]['mass']}
+Disambiguation_Object['from']={'id':disambiguating_cpd,'structures':{},'aliases':{},'names':{},
+                               'formula':compounds_dict[disambiguating_cpd]['formula'],
+                               'charge':compounds_dict[disambiguating_cpd]['charge'],
+                               'mass':compounds_dict[disambiguating_cpd]['mass']}
 
 Aliases_Dict = compounds_helper.loadMSAliases()
 Names_Dict = compounds_helper.loadNames()
@@ -94,13 +99,13 @@ for type in Structures_Dict:
                 reverse_structures_dict[structure][stage][alias]=1
 
 names_dict=dict()
-for name in Names_Dict[Compound]:
+for name in Names_Dict[disambiguating_cpd]:
     names_dict[name]=True
 Disambiguation_Object['from']['names']=names_dict
 
 aliases_dict=dict()
-for source in Aliases_Dict[Compound]:
-    for alias in Aliases_Dict[Compound][source]:
+for source in Aliases_Dict[disambiguating_cpd]:
+    for alias in Aliases_Dict[disambiguating_cpd][source]:
         if(alias not in aliases_dict):
             aliases_dict[alias]=dict()
         aliases_dict[alias][source]=True
@@ -108,15 +113,15 @@ Disambiguation_Object['from']['aliases']=aliases_dict
 
 #It's possible that the structure and/or alias is associated with another compound
 #Need to find and report
-Other_Compounds=list()
+other_compounds=list()
 for cpd in Aliases_Dict.keys():
-    if(cpd == Compound):
+    if(cpd == disambiguating_cpd):
         continue
 
     for source in Aliases_Dict[cpd].keys():
         for alias in Aliases_Dict[cpd][source]:
-            if(alias in aliases_dict and cpd not in Other_Compounds):
-                Other_Compounds.append(cpd)
+            if(alias in aliases_dict and cpd not in other_compounds):
+                other_compounds.append(cpd)
 
 structures_dict=dict()
 inchi=False
@@ -145,7 +150,7 @@ if(inchi is not True):
                     structures_dict[alias][structure]=True
 Disambiguation_Object['from']['structures']=structures_dict
 
-#Find Other_Compounds using structures
+#Find other_compounds using structures
 #This should work regardless of whether the structure is an InChI or a SMILE
 for current_alias in structures_dict:
     for current_structure in structures_dict[current_alias]:
@@ -154,19 +159,26 @@ for current_alias in structures_dict:
                 for other_alias in reverse_structures_dict[current_structure]['Charged']:
                     for source in reverse_aliases_dict[other_alias]:
                         for cpd in reverse_aliases_dict[other_alias][source]:
-                            if(cpd != Compound and cpd not in Other_Compounds):
-                                Other_Compounds.append(cpd)
+                            if(cpd != disambiguating_cpd and cpd not in other_compounds):
+                                other_compounds.append(cpd)
 
 #Array of possible other compounds
 Disambiguation_Object['to']=list()
-if(len(Other_Compounds)==0):
+if(len(other_compounds)==0):
     Disambiguation_Object['to'].append({'id':None,'name':None,'formula':None,'charge':"0",'mass':"0"})
 else:
-    for cpd in sorted(Other_Compounds):
-        Disambiguation_Object['to'].append({'id':cpd,'name':compounds_dict[cpd]['name'],
-                                            'formula':compounds_dict[cpd]['formula'],
-                                            'charge':compounds_dict[cpd]['charge'],
-                                            'mass':compounds_dict[cpd]['mass']})
+    #Here use specific compound listed by user
+    if(merging_cpd is not None):
+        Disambiguation_Object['to'].append({'id':merging_cpd,'name':compounds_dict[merging_cpd]['name'],
+                                            'formula':compounds_dict[merging_cpd]['formula'],
+                                            'charge':compounds_dict[merging_cpd]['charge'],
+                                            'mass':compounds_dict[merging_cpd]['mass']})
+    else:
+        for other_cpd in sorted(other_compounds):
+            Disambiguation_Object['to'].append({'id':other_cpd,'name':compounds_dict[other_cpd]['name'],
+                                                'formula':compounds_dict[other_cpd]['formula'],
+                                                'charge':compounds_dict[other_cpd]['charge'],
+                                                'mass':compounds_dict[other_cpd]['mass']})
 
 ##########################################################
 #
@@ -174,7 +186,12 @@ else:
 #
 ##########################################################
 
-with open('Objects/'+Compound+'_'+user+'_Object.json','w') as f:
+filename=disambiguating_cpd
+if(merging_cpd is not None):
+    filename+='_'+merging_cpd
+filename+='_'+user+'_Object.json'
+
+with open('Objects/'+filename,'w') as f:
     json_string = json.dumps(Disambiguation_Object,
                              indent=4, sort_keys=True,
                              separators=(',', ': '), ensure_ascii=True)
