@@ -40,6 +40,17 @@ for cpd in sorted (compounds_dict.keys()):
     if(cpd not in structures_dict):
         compounds_dict[cpd]['inchikey']=""
         compounds_dict[cpd]['smiles']=""
+
+        formula_charge_dict={'formula':'null','charge':0}
+        #Override manually
+        if(cpd in Overridden_Fields and 'formula' in Overridden_Fields[cpd]):
+            formula_charge_dict['formula']=Overridden_Fields[cpd]['formula']
+        if(cpd in Overridden_Fields and 'charge' in Overridden_Fields[cpd]):
+            formula_charge_dict['charge']=int(Overridden_Fields[cpd]['charge'])
+
+        if(formula_charge_dict['formula'] != "null"):
+            compounds_dict[cpd]['formula']=formula_charge_dict['formula']
+            compounds_dict[cpd]['charge']=int(formula_charge_dict['charge'])
     else:
         formula_charge_dict={'formula':'null','charge':'0'}
         inchikey=""
