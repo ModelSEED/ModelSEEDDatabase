@@ -10,6 +10,7 @@ CompoundsHelper = Compounds()
 Compounds_Dict = CompoundsHelper.loadCompounds()
 Structures_Dict = CompoundsHelper.loadStructures(["InChI"],["ModelSEED"])
 
+sys.exit()
 diff_file = open("Compound_Formula_Differences.txt", 'w')
 for cpd in sorted(Compounds_Dict.keys()):
     if(cpd not in Structures_Dict):
@@ -33,6 +34,7 @@ for cpd in sorted(Compounds_Dict.keys()):
 
     #Make adjustments based to protonation state of InChI structure
     (adjusted_inchi_formula, notes) = InChIs.adjust_protons(inchi_formula, inchi_layers['p'])
+
     if(notes != ""):
         diff_file.write("Notes from adjusting protons for "+cpd+": "+notes+"\n")
 
@@ -60,10 +62,8 @@ for cpd in sorted(Compounds_Dict.keys()):
 
             #Proton-specific (i.e. minor difference)
             if( (len(missing_atoms)==1 and 'H' in missing_atoms) or (len(different_atoms)==1 and "H" in different_atoms)):
-                diff_file.write("Proton difference for "+cpd+": "+str(missing_atoms)+"/"+str(different_atoms)+"\n")
-                continue
-
-            if(len(missing_atoms)>0):
-                diff_file.write("Missing atoms for "+cpd+": "+str(missing_atoms)+"\n")
+                diff_file.write("Proton difference for "+cpd+": "+str(list(missing_atoms))+"/"+str(different_atoms)+"\n")
+            elif(len(missing_atoms)>0):
+                diff_file.write("Missing atoms for "+cpd+": "+str(list(missing_atoms))+"\n")
             if(len(different_atoms.keys())>0):
                 diff_file.write("Differing atoms for "+cpd+": "+str(different_atoms)+"\n")
