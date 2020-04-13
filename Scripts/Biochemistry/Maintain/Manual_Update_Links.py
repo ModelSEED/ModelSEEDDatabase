@@ -281,6 +281,5 @@ rxns_ecs_dict[rxn].append(' 1.14.11.15')
 del(rxns_aliases_dict['rxn46683'])
 del(rxns_ecs_dict['rxn46683'])
 
-reactions_helper.saveAliases(rxns_aliases_dict)
-reactions_helper.saveECs(rxns_ecs_dict)
-
+#reactions_helper.saveAliases(rxns_aliases_dict)
+#reactions_helper.saveECs(rxns_ecs_dict)

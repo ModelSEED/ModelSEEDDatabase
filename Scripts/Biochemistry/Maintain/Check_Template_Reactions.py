@@ -10,7 +10,7 @@ from BiochemPy import Reactions
 ReactionsHelper = Reactions()
 Reactions_Dict = ReactionsHelper.loadReactions()
 
-Template_Dir='../../Templates/'
+Template_Dir='../../../Templates/'
 Unbalanced_Reactions=dict()
 for template in os.listdir(Template_Dir):
         if not os.path.isdir(os.path.join(Template_Dir, template)):

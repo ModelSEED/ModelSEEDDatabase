@@ -13,17 +13,18 @@ Structures_Dict = CompoundsHelper.loadStructures(["InChI"],["ModelSEED"])
 diff_file = open("Compound_Formula_Differences.txt", 'w')
 for cpd in sorted(Compounds_Dict.keys()):
     if(cpd not in Structures_Dict):
-        diff_file.write("Zero structures for "+cpd+"\n")
+        #diff_file.write("Zero structures for "+cpd+"\n")
         continue
 
     if('InChI' not in Structures_Dict[cpd]):
-        diff_file.write("No InChI structure for "+cpd+"\n")
+        #diff_file.write("No InChI structure for "+cpd+"\n")
         continue
 
     current_formula = Compounds_Dict[cpd]['formula']
 
     #Parse out InChI formula
-    (inchi_formula,inchi_layers) = InChIs.parse(Structures_Dict[cpd]['InChI'])
+    inchi = list(Structures_Dict[cpd]['InChI'].keys())[0]
+    (inchi_formula,inchi_layers) = InChIs.parse(inchi)
 
     #Make sure formula is merged appropriately before applying proton adjustment
     (inchi_formula, notes) = Compounds.mergeFormula(inchi_formula)
