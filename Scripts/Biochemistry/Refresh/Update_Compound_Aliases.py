@@ -13,7 +13,7 @@ Aliases_Dict = CompoundsHelper.loadMSAliases()
 Names_Dict = CompoundsHelper.loadNames()
 
 Source_Classes=dict()
-reader = DictReader(open('../../Biochemistry/Aliases/Source_Classifiers.txt'), dialect='excel-tab')
+reader = DictReader(open('../../../Biochemistry/Aliases/Source_Classifiers.txt'), dialect='excel-tab')
 for line in reader:
     if(line['Source Type'] not in Source_Classes):
         Source_Classes[line['Source Type']]=dict()
