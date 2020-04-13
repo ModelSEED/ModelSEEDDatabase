@@ -57,6 +57,12 @@ with open('Compounds_to_Merge_Spreadsheet.txt','w') as fh:
         cells.append(compounds_dict[sorted(InChIKey_Cpds[structure])[0]]['name'])
         for cpd in sorted(InChIKey_Cpds[structure]):
 
+            # Find linked compounds
+            if(compounds_dict[cpd]['linked_compound'] != 'null'):
+                for lnkd_cpd in compounds_dict[cpd]['linked_compound'].split(';'):
+                    if(lnkd_cpd in InChIKey_Cpds[structure]):
+                        print("Warning: "+cpd+" and "+lnkd_cpd+" already merged")
+
             kegg_string=""
             metacyc_string=""
             if(cpd in aliases_dict and 'KEGG' in aliases_dict[cpd]):
