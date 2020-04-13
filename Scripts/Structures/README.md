@@ -1,4 +1,7 @@
 # This script takes all the InChI and SMILE strings from the original sources and extracts the formulas and charges, including protonation states
+# You should only have to do this whenever you update the structures themselves, but, you might get changes occuring if you install updated
+# versions of RDKit and/or OpenBabel in your conda environment, so double-check. At time of submission we used RDKit 2020.03.1.0 and
+# OpenBabel 2.4.1
 ./Print_Structure_Formula_Charge.py
 
 # This script takes the list of InChI and SMILE strings from the original sources and attempts to consolidate them for the ModelSEED database
