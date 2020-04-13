@@ -24,9 +24,18 @@ for source in "KEGG","MetaCyc":
             file_name=Structures_Root+source+"/"+struct_type+"_"+struct_stage+"_Formulas_Charges.txt"
             file_handle_dict[file_string]=open(file_name,"w")
 
+resolved_structures=open('Resolved_Structures.txt','w')
 unresolved_structures=open('Unresolved_Structures.txt','w')
 for struct_type in sorted(Structures_Dict.keys()):
+
+#    if(struct_type != 'InChI'):
+#        continue
+
     for external_id in sorted(Structures_Dict[struct_type]):
+
+#        if(external_id != 'FAD'):
+#            continue
+
         source="MetaCyc"
         if(re.search("^[CR]\d{5}$",external_id)):
             source="KEGG"
@@ -38,7 +47,7 @@ for struct_type in sorted(Structures_Dict.keys()):
                 try:
                     if(struct_type == 'InChI'):
                         mol = AllChem.MolFromInchi(structure)
-                        if(mol is None):
+                        if(mol is None or external_id=='FAD'):
                             mol=pybel.readstring("inchi",structure)
                             if(mol):
                                 mol_source="OpenBabel"
@@ -85,4 +94,5 @@ for struct_type in sorted(Structures_Dict.keys()):
                 #these are hill-sorted, and merges molecular fragments
                 norm_formula = Compounds.mergeFormula(norm_formula)[0]
 
+                resolved_structures.write("\t".join([external_id,struct_stage,structure,norm_formula,str(new_charge),mol_source])+"\n")
                 file_handle_dict[file_string].write("\t".join((external_id,norm_formula,str(new_charge)))+"\n")
