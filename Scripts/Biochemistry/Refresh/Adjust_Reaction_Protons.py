@@ -50,10 +50,7 @@ for rxn in sorted(Reactions_Dict.keys()):
             ReactionsHelper.rebuildReaction(Reactions_Dict[rxn],new_stoichiometry)
             Reactions_Dict[rxn]["status"]=new_status
             if("HB" not in Reactions_Dict[rxn]["notes"]):
-                if(Reactions_Dict[rxn]["notes"]=="" or Reactions_Dict[rxn]["notes"]=="null"):
-                    Reactions_Dict[rxn]["notes"]="HB"
-                else:
-                    Reactions_Dict[rxn]["notes"]+="|HB"
+                Reactions_Dict[rxn]["notes"].append("HB")
             Update_Reactions+=1
 
 if(Update_Reactions>0):
