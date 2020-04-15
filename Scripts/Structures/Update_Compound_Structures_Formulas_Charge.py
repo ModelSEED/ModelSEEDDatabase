@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-import os
+import os,sys
 from BiochemPy import Compounds
 
 Overridden_Fields=dict()
@@ -25,32 +25,62 @@ with open(os.path.dirname(__file__)+'/ACPs_Master_Formula_Charge.txt') as fh:
 
 compounds_helper = Compounds()
 structures_dict = compounds_helper.loadStructures(["SMILE","InChI","InChIKey"],["ModelSEED"])
+ignoring_structures_dict = compounds_helper.loadStructures(["SMILE","InChIKey"],["KEGG","MetaCyc"])
+aliases_dict = compounds_helper.loadSourceAliases()
 compounds_dict = compounds_helper.loadCompounds()
+Structures_Root=os.path.dirname(__file__)+"/../../Biochemistry/Structures/"
 
 inchikey_dict = dict()
+smiles_dict = dict()
 for cpd in structures_dict:
     if('InChIKey' in structures_dict[cpd]):
         for struct in structures_dict[cpd]['InChIKey'].keys():
             if(struct not in inchikey_dict):
                 inchikey_dict[struct]=list()
             inchikey_dict[struct].append(cpd)
+    if('SMILE' in structures_dict[cpd]):
+        for struct in structures_dict[cpd]['SMILE'].keys():
+            if(struct not in smiles_dict):
+                smiles_dict[struct]=list()
+            smiles_dict[struct].append(cpd)
 
-Structures_Root=os.path.dirname(__file__)+"/../../Biochemistry/Structures/"
+Ignored_Structures=list()
+with open(Structures_Root+"Ignored_ModelSEED_Structures.txt") as fh:
+    for line in fh.readlines():
+        line=line.strip()
+        array=line.split('\t')
+        if(array[1] != "None"):
+            continue
+
+        external_id = array.pop(0)
+
+        if(external_id in ignoring_structures_dict['SMILE']):
+            if(len(aliases_dict['MetaCyc'][external_id])==1):
+                cpd = list(aliases_dict['MetaCyc'][external_id])[0]
+                if(cpd not in Ignored_Structures):
+                    Ignored_Structures.append(cpd)
+            else:
+                print("Warning, multiple MS compounds for "+external_id)
+        else:
+            print("Warning, no SMILES to ignore for "+external_id)
+
 for cpd in sorted (compounds_dict.keys()):
     if(cpd not in structures_dict):
         compounds_dict[cpd]['inchikey']=""
         compounds_dict[cpd]['smiles']=""
 
-        formula_charge_dict={'formula':'null','charge':0}
-        #Override manually
-        if(cpd in Overridden_Fields and 'formula' in Overridden_Fields[cpd]):
-            formula_charge_dict['formula']=Overridden_Fields[cpd]['formula']
-        if(cpd in Overridden_Fields and 'charge' in Overridden_Fields[cpd]):
-            formula_charge_dict['charge']=int(Overridden_Fields[cpd]['charge'])
+        if(cpd in Ignored_Structures):
+            compounds_dict[cpd]['formula']="R"
+            compounds_dict[cpd]['charge']="0"
+            continue
 
-        if(formula_charge_dict['formula'] != "null"):
-            compounds_dict[cpd]['formula']=formula_charge_dict['formula']
-            compounds_dict[cpd]['charge']=int(formula_charge_dict['charge'])
+        if(cpd in Overridden_Fields):
+            if('formula' in Overridden_Fields[cpd]):
+                compounds_dict[cpd]['formula']=Overridden_Fields[cpd]['formula']
+            if('charge' in Overridden_Fields[cpd]):
+                compounds_dict[cpd]['charge']=int(Overridden_Fields[cpd]['charge'])
+            continue
+
     else:
         formula_charge_dict={'formula':'null','charge':'0'}
         inchikey=""
