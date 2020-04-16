@@ -7,26 +7,23 @@ sys.path.append('../../Libs/Python')
 from BiochemPy import Reactions, Compounds
 
 arguments = list(sys.argv)
-#Pop script name
-#arguments = arguments[1:]
-#if(len(arguments) != 2 or 'cpd' not in arguments[0] or 'cpd' not in arguments[1]):
-#    print("Error: script must be initiated with the identifiers of the two compounds to merge")
-#    sys.exit()
+#Remove script name
+arguments = arguments[1:]
+if(len(arguments) != 2 or 'cpd' not in arguments[0] or 'cpd' not in arguments[1]):
+    print("Error: script must be initiated with the identifiers of the two compounds to merge")
+    sys.exit()
 
-#primary_cpd=arguments[0]
-#merging_cpd=arguments[1]
-#arguments=sorted(arguments)
+primary_cpd=arguments[0]
+merging_cpd=arguments[1]
+arguments=sorted(arguments)
 
-#if(primary_cpd != arguments[0]):
-#    print("Error: compound identifiers must be used in order")
-#    print("\tThe first compound identifier (in order) should be the one that is retained: "+arguments[0])
-#    sys.exit()
+if(primary_cpd != arguments[0]):
+    print("Error: compound identifiers must be used in order")
+    print("\tThe first compound identifier (in order) should be the one that is retained: "+arguments[0])
+    sys.exit()
 
 compounds_helper = Compounds()
 compounds_dict = compounds_helper.loadCompounds()
-
-primary_cpd="cpd00013"
-merging_cpd="cpd19013"
 
 if(compounds_dict[primary_cpd]['is_obsolete']==1):
     compounds_dict[primary_cpd]["is_obsolete"]=0
@@ -51,8 +48,7 @@ if(primary_cpd not in compounds_dict[merging_cpd]['linked_compound']):
 compounds_helper.saveCompounds(compounds_dict)
 
 print("You must run these commands afterwards:")
-print("\tUpdate_Obsolete_Compounds_in_Reactions.py")
-print("\t../../Biochemistry/Merge_Reactions.py")
-print("\t../../Biochemistry/Merge_Obsolete_Aliases.py")
-print("\t../../Biochemistry/Remove_Newly_Obsolescent_Reactions.py")
-print("\t../../Biochemistry/Remove_Newly_Obsolescent_Compounds.py")
+print("\t../../Biochemistry/Maintain/Update_Obsolete_Compounds_in_Reactions.py")
+print("\t../../Biochemistry/Refresh/Refresh_Database.sh")
+print("\t../../Biochemistry/Update/Remove_Newly_Obsolescent_Reactions.py")
+print("\t../../Biochemistry/Update/Remove_Newly_Obsolescent_Compounds.py")
