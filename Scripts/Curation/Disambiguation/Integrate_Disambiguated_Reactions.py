@@ -39,8 +39,12 @@ reaction_names_dict = reactions_helper.loadNames()
 reaction_ecs_dict = reactions_helper.loadECs()
 
 for object in disambiguated_reactions:
-    original_names=reaction_names_dict[object['from']['id']]
-    disambig_names=reaction_names_dict[object['to']['id']]
+    original_names=list()
+    if(object['from']['id'] in reaction_names_dict):
+        original_names=reaction_names_dict[object['from']['id']]
+    disambig_names=list()
+    if(object['to']['id'] in reaction_names_dict):
+        disambig_names=reaction_names_dict[object['to']['id']]
     for name in object['names']:
         if(object['names'][name]=="true"):
             if(name not in original_names):
@@ -60,8 +64,12 @@ for object in disambiguated_reactions:
             if(name not in disambig_names):
                 disambig_names.append(name)
 
-    original_ecs=reaction_ecs_dict[object['from']['id']]
-    disambig_ecs=reaction_ecs_dict[object['to']['id']]
+    original_ecs=list()
+    if(object['from']['id'] in reaction_ecs_dict):
+        original_ecs=reaction_ecs_dict[object['from']['id']]
+    disambig_ecs=list()
+    if(object['to']['id'] in reaction_ecs_dict):
+        disambig_ecs=reaction_ecs_dict[object['to']['id']]
     for ec in object['ecs']:
         if(object['ecs'][ec]=="true"):
             if(ec not in original_ecs):
