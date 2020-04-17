@@ -16,5 +16,7 @@ for cpd in compounds_dict:
 reactions_helper = Reactions()
 reactions_dict = reactions_helper.loadReactions()
 for rxn in reactions_dict:
-    break
-#reactions_helper.saveReactions(reactions_dict)
+    if(reactions_dict[rxn]['linked_reaction']==""):
+        reactions_dict[rxn]['linked_reaction']="null"
+#    break
+reactions_helper.saveReactions(reactions_dict)
