@@ -34,6 +34,10 @@ for rxn in delete_rxns:
     for lnkd_rxn in reactions_dict[rxn]['linked_reaction'].split(';'):
         linked_reaction_list = reactions_dict[lnkd_rxn]['linked_reaction'].split(';')
         linked_reaction_list.remove(rxn)
+        if(len(linked_reaction_list)==0):
+            linked_reaction_list="null"
+        else:
+            linked_reaction_list=";".join(linked_reaction_list)
         reactions_dict[lnkd_rxn]['linked_reaction']=linked_reaction_list
 
         # I need to move the names, aliases, and ec numbers to linked reactions
@@ -75,4 +79,3 @@ if(len(delete_rxns)>0):
     reactions_helper.saveNames(rxns_names_dict)
     reactions_helper.saveAliases(rxns_aliases_dict)
     reactions_helper.saveECs(rxns_ecs_dict)
-
