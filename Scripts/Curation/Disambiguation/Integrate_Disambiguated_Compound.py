@@ -189,7 +189,7 @@ if(Dry_Run==0):
 
 #Reactions
 #Read all Provenance
-Provenance_Root=os.path.dirname(__file__)+"/../../Biochemistry/Aliases/Provenance/"
+Provenance_Root=os.path.dirname(__file__)+"/../../../Biochemistry/Aliases/Provenance/"
 Prov_Rxns=dict()
 with open(Provenance_Root+"Original_Reaction_Compound_Links.tsv") as pfh:
     for line in pfh.readlines():
