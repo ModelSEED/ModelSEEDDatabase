@@ -1,12 +1,20 @@
 #!/usr/bin/env bash
 date
-./Rebuild_Reactions.py
-./Merge_Reactions.py
-./Rebalance_Reactions.py
-./Adjust_Reaction_Protons.py
-./Adjust_Reaction_Water.py
-./Merge_Obsolete_Aliases.py
-./Update_Compound_Aliases_in_DB.py
-./Update_Reaction_Aliases_in_DB.py
+DIR=`dirname $0`
+echo "Rebuild"
+${DIR}/Rebuild_Reactions.py
+echo "Merge reactions"
+${DIR}/Merge_Reactions.py
+echo "Rebalance"
+${DIR}/Rebalance_Reactions.py
+echo "Adjust protons"
+${DIR}/Adjust_Reaction_Protons.py
+echo "Adjust water"
+${DIR}/Adjust_Reaction_Water.py
+echo "Merge obsolete aliases"
+${DIR}/Merge_Obsolete_Aliases.py
+echo "Update aliases"
+${DIR}/Update_Compound_Aliases_in_DB.py
+${DIR}/Update_Reaction_Aliases_in_DB.py
 echo "Refresh complete: use git diff to observe changes"
 date
