@@ -39,16 +39,52 @@ reaction_names_dict = reactions_helper.loadNames()
 reaction_ecs_dict = reactions_helper.loadECs()
 
 for object in disambiguated_reactions:
-    original_names=list()
-    disambig_names=list()
+    original_names=reaction_names_dict[object['from']['id']]
+    disambig_names=reaction_names_dict[object['to']['id']]
     for name in object['names']:
-        if(object['names'][name]=="true" or object['names'][name]=="both"):
-            original_names.append(name)
-        if(object['names'][name]=="false" or object['names'][name]=="both"):
-            disambig_names.append(name)
+        if(object['names'][name]=="true"):
+            if(name not in original_names):
+                original_names.append(name)
+            if(name in disambig_names):
+                disambig_names.remove(name)
+
+        if(object['names'][name]=="false"):
+            if(name in original_names):
+                original_names.remove(name)
+            if(name not in disambig_names):
+                disambig_names.append(name)
+        
+        if(object['names'][name]=="both"):
+            if(name not in original_names):
+                original_names.append(name)
+            if(name not in disambig_names):
+                disambig_names.append(name)
+
+    original_ecs=reaction_ecs_dict[object['from']['id']]
+    disambig_ecs=reaction_ecs_dict[object['to']['id']]
+    for ec in object['ecs']:
+        if(object['ecs'][ec]=="true"):
+            if(ec not in original_ecs):
+                original_ecs.append(ec)
+            if(ec in disambig_ecs):
+                disambig_ecs.remove(ec)
+
+        if(object['ecs'][ec]=="false"):
+            if(ec in original_ecs):
+                original_ecs.remove(ec)
+            if(ec not in disambig_ecs):
+                disambig_ecs.append(ec)
+        
+        if(object['ecs'][ec]=="both"):
+            if(ec not in original_ecs):
+                original_ecs.append(ec)
+            if(ec not in disambig_ecs):
+                disambig_ecs.append(ec)
 
     reaction_names_dict[object['from']['id']]=original_names
     reaction_names_dict[object['to']['id']]=disambig_names
+    reaction_ecs_dict[object['from']['id']]=original_ecs
+    reaction_ecs_dict[object['to']['id']]=disambig_ecs
 
 reactions_helper.saveNames(reaction_names_dict)
 reactions_helper.saveECs(reaction_ecs_dict)
