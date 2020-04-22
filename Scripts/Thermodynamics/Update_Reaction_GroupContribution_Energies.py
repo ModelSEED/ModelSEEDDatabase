@@ -7,12 +7,12 @@ compounds_dict = compounds_helper.loadCompounds()
 
 mol_cpds_dict=dict()
 for cpd in compounds_dict:
-    if('GF' in compounds_dict[cpd]['notes'] and compounds_dict[cpd]['deltag'] != 10000000):
+    if('GC' in compounds_dict[cpd]['notes'] and compounds_dict[cpd]['deltag'] != 10000000):
         mol_cpds_dict[cpd]=1
 
         if(compounds_dict[cpd]['is_obsolete']):
             for link in compounds_dict[cpd]['linked_compound'].split(';'):
-                if('GF' in compounds_dict[link]['notes'] and compounds_dict[cpd]['deltag'] != 10000000):
+                if('GC' in compounds_dict[link]['notes'] and compounds_dict[cpd]['deltag'] != 10000000):
                     mol_cpds_dict[link]=1
 
 reactions_helper = Reactions()
@@ -46,13 +46,13 @@ for rxn in reactions_dict:
 
     if(rxn not in complete_mol_rxns_dict):
 
-        #'GF' means group formation approach to calculating energies
+        #'GC' means group contribution approach to calculating energies
         #'P' means partial, as in some of the reagents have energies calculated thus
         if(rxn in incomplete_mol_rxns_dict):
-            if('GFC' in notes_list):
-                notes_list.remove('GFC')
-            if('GFP' not in notes_list):
-                notes_list.append('GFP')
+            if('GCC' in notes_list):
+                notes_list.remove('GCC')
+            if('GCP' not in notes_list):
+                notes_list.append('GCP')
 
         reactions_dict[rxn]['deltag']=10000000.0
         reactions_dict[rxn]['deltagerr']=10000000.0
@@ -63,12 +63,12 @@ for rxn in reactions_dict:
             reactions_dict[rxn]['notes']=notes_list
         continue
 
-    #'GF' means group formation approach to calculating energies
+    #'GC' means group contribution approach to calculating energies
     #'C' means complete, as in all of the reagents have energies calculated thus
-    if('GFP' in notes_list):
-        notes_list.remove('GFP')
-    if('GFC' not in notes_list):
-        notes_list.append('GFC')
+    if('GCP' in notes_list):
+        notes_list.remove('GCP')
+    if('GCC' not in notes_list):
+        notes_list.append('GCC')
 
     rxn_cpds_array=reactions_helper.parseStoich(reactions_dict[rxn]["stoichiometry"])
 

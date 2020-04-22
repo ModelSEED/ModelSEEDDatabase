@@ -72,14 +72,14 @@ for cpd in structures_dict:
 # print(len(seed_mnx_map))
 # 17,863 ModelSEED compounds assigned eQuilibrator energies
 
-file_handle = open('Compounds_GroupFormation_eQuilibrator_Comparison.txt', 'w')
-file_handle.write('ID\tGF\tEQ\n')
+file_handle = open('Compounds_GroupContribution_eQuilibrator_Comparison.txt', 'w')
+file_handle.write('ID\tGC\tEQ\n')
 for cpd in sorted (compounds_dict.keys()):
 
     cpd_gf='nan'
     cpd_eq='nan'
 
-    if("GF" in compounds_dict[cpd]['notes']):
+    if("GC" in compounds_dict[cpd]['notes']):
         cpd_gf='|'.join([str(compounds_dict[cpd]['deltag']),str(compounds_dict[cpd]['deltagerr'])])
 
     if(cpd in seed_mnx_map):

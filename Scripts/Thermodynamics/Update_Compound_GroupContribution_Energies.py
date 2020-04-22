@@ -8,7 +8,7 @@ structures_dict = compounds_helper.loadStructures(["SMILE","InChIKey"],["ModelSE
 
 ############################################################################
 ##
-## First we apply Group Formation Energies
+## First we apply Group Contribution Energies
 ##
 ############################################################################
 #In the case where there was originally conflicting structures, we only want
@@ -94,7 +94,7 @@ for cpd in sorted (compounds_dict.keys()):
 
         compounds_dict[cpd]['deltag']=lowest_dg
         compounds_dict[cpd]['deltagerr']=lowest_dge
-        compounds_dict[cpd]['notes']=['GF'] #Meaning group formation approach
+        compounds_dict[cpd]['notes']=['GC'] #Meaning group contribution approach
 
 print("Saving compounds")
 compounds_helper.saveCompounds(compounds_dict)
