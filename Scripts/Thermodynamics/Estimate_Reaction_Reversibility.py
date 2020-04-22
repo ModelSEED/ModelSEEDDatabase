@@ -6,7 +6,7 @@ reactions_helper = Reactions()
 reactions_dict = reactions_helper.loadReactions()
 
 DB_Level = ''
-if(len(sys.argv)>1 and (sys.argv[1] == 'EQ' or sys.argv[1] == 'GF')):
+if(len(sys.argv)>1 and (sys.argv[1] == 'EQ' or sys.argv[1] == 'GC')):
     DB_Level = sys.argv[1]
 
 #Constants
@@ -53,15 +53,15 @@ for rxn in sorted(reactions_dict.keys()):
     rxn_dg = reactions_dict[rxn]['deltag']
     rxn_dge = reactions_dict[rxn]['deltagerr']
 
-    # Here, if I'm specifying either GF or EQ,
+    # Here, if I'm specifying either GC or EQ,
     # Then I want to check that I should estimate for this reaction
-    # (I.e. either "GFC" or "EQC")
+    # (I.e. either "GCC" or "EQC")
     # Otherwise its labeled as incomplete
     DB_Rxn=True
     if(len(DB_Level)>0):
         DB_Rxn=False
         for entry in reactions_dict[rxn]["notes"]:
-            if(DB_Level in entry and (entry == "GFC" or entry == "EQU")):
+            if(DB_Level in entry and (entry == "GCC" or entry == "EQU")):
                 DB_Rxn=True
 
     if(rxn_dg == 10000000 or rxn_dg is None or DB_Rxn is False):
@@ -70,11 +70,11 @@ for rxn in sorted(reactions_dict.keys()):
         status="Incomplete"
 
         #Here, if using EQ, but incomplete/not-updated reaction
-        #Can still fall back onto GF if complete by GF standards
+        #Can still fall back onto GC if complete by GC standards
 
-        if(DB_Level == "EQ" and "GFC" in reactions_dict[rxn]['notes']):
+        if(DB_Level == "EQ" and "GCC" in reactions_dict[rxn]['notes']):
             thermoreversibility=reactions_dict[rxn]["reversibility"]
-            status+=" (GFC)"
+            status+=" (GCC)"
 
         reversibility_report[rxn]=[status,reactions_dict[rxn]["reversibility"],thermoreversibility]
         reactions_dict[rxn]['reversibility']=thermoreversibility
@@ -269,7 +269,7 @@ file_name+=".txt"
 with open(file_name,"w") as fh:
     for rxn in sorted(reversibility_report):
         report_array=list(reversibility_report[rxn])
-        if(DB_Level == "GF"):
+        if(DB_Level == "GC"):
             del(report_array[1])
         fh.write(rxn+"\t"+"\t".join(report_array)+"\n")
 fh.close()
