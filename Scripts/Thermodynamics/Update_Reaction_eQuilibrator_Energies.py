@@ -29,14 +29,14 @@ file_handle.close()
 # print(len(eq_reactions))
 # 13, 874 ModelSEED Reactions
 
-file_handle = open('Reactions_GroupFormation_eQuilibrator_Comparison.txt', 'w')
-file_handle.write('ID\tGF\tEQ\n')
+file_handle = open('Reactions_GroupContribution_eQuilibrator_Comparison.txt', 'w')
+file_handle.write('ID\tGC\tEQ\n')
 for rxn in sorted (reactions_dict.keys()):
 
     rxn_gf='nan'
     rxn_eq='nan'
 
-    if("GFC" in reactions_dict[rxn]['notes']):
+    if("GCC" in reactions_dict[rxn]['notes']):
         rxn_gf='|'.join([str(reactions_dict[rxn]['deltag']),str(reactions_dict[rxn]['deltagerr'])])
 
     if(rxn in eq_reactions):
