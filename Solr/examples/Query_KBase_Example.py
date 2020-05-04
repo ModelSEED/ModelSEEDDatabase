@@ -1,6 +1,8 @@
 #!/usr/bin/env python
-# pip install --extra-index-url https://pypi.anaconda.org/kbase/simple releng-client
-# RE search spec: https://github.com/kbase/relation_engine_spec/blob/master/stored_queries/
+## To install the KBase python client run:
+## pip install --extra-index-url https://pypi.anaconda.org/kbase/simple releng-client
+## The specification (DB schema) for the compounds and reactions are found here:
+## https://github.com/kbase/relation_engine_spec/blob/master/stored_queries/
 from relation_engine_client import REClient
 re_client = REClient("https://kbase.us/services/relation_engine_api")
 
