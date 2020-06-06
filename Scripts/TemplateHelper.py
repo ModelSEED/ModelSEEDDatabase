@@ -612,7 +612,7 @@ class TemplateHelper(BaseHelper):
                 compound['name'] = masterCompound['name']
                 compound['abbreviation'] = masterCompound['abbreviation']
                 compound['isCofactor'] = masterCompound['is_cofactor']
-                compound['aliases'] = masterCompound['aliases']
+                compound['aliases'] = masterCompound['aliases'].split(';')
                 compound['defaultCharge'] = masterCompound['charge']
                 compound['mass'] = masterCompound['mass']
                 compound['deltaG'] = masterCompound['deltag']
