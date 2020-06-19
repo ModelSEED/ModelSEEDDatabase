@@ -38,14 +38,15 @@ dictionaries for manipulation, can be found in
 We have collected and grouped data that underlies our construction of
 the ModelSEED Biochemistry Database into these folders
 
-### Aliases
+# [Aliases](Aliases/README.md)
 
 All of the ModelSEED Biochemistry came from external sources, the
-majority of which comes from [KEGG](url) and [MetaCyc](url). Here, in
-the [Aliases](Aliases) directory, we link every compound and reaction
-to their sources.
+majority of which comes from <a href="https://www.kegg.jp/">KEGG</a>
+and <a href="https://metacyc.org/">MetaCyc</a>. Here, in the
+[Aliases](Aliases) directory, we link every compound and reaction to
+their sources.
 
-### Structures
+# [Structures](Structures/README.md)
 
 We attempt to link and consolidate our compounds around biochemical
 structures, and in turn match reactions based on these structures. We
@@ -55,12 +56,12 @@ biochemistry on actual physical chemistry. The structures we use are
 downloaded from KEGG and MetaCyc and their derivatives are stored in
 this directory.
 
-### Thermodynamics
+# [Thermodynamics](Thermodynamics)
 
 The results from our two different approaches to computing the
 compound and reaction energies are stored in this directory.
 
-### Pathways
+# [Pathways](Pathways)
 
 We aim to keep a list of subsystems from the ModelSEED environment as
 well as external sources in this directory, but we have not yet begun
