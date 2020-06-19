@@ -41,9 +41,10 @@ the ModelSEED Biochemistry Database into these folders
 # [Aliases](Aliases/README.md)
 
 All of the ModelSEED Biochemistry came from external sources, the
-majority of which comes from [KEGG](url) and [MetaCyc](url). Here, in
-the [Aliases](Aliases) directory, we link every compound and reaction
-to their sources.
+majority of which comes from <a href="https://www.kegg.jp/">KEGG</a>
+and <a href="https://metacyc.org/">MetaCyc</a>. Here, in the
+[Aliases](Aliases) directory, we link every compound and reaction to
+their sources.
 
 # [Structures](Structures/README.md)
 
