@@ -22,13 +22,13 @@ def check_dups(_compounds, verbose, unique_fields=('id', 'abbreviation',
     # build a nested dict for uniqueness checking
     # {field: {value: [ids_with_this_value]}}
     unique_values = dict([(x, defaultdict(list)) for x in unique_fields])
-    for id, comp in _compounds.items():
+    for comp in _compounds:
         if comp['is_obsolete']:
             continue
         for key in unique_values:
             if not comp.get(key) or comp[key] == 'null':
                 continue
-            unique_values[key][comp[key]].append(id)
+            unique_values[key][comp[key]].append(comp['id'])
 
     # if the unique_values dict for a field has more than one id, it's not unique
     duplicated = defaultdict(int)
