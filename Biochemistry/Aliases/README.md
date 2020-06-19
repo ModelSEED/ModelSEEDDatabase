@@ -1,3 +1,9 @@
+# ModelSEED Biochemistry Database Aliases
+
+Here we keep all the external links for the ModelSEED Biochemistry
+Database, the synonyms of the compounds and reactions, and other
+collated data.
+
 In Source_Classifiers.txt we classify the sources of our biochemistry in three tiers:
 
 1) Primary Database: This is only KEGG and MetaCyc, the two sources of the structural data we used to perform our initial merger
