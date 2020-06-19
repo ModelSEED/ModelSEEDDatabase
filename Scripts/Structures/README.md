@@ -48,3 +48,15 @@ Redundant structures are structures that are found assigned to more
 than one compound, and could be merged. Concflicting structures are
 multiple but different structures found assigned to a single compound
 and could be disambiguated.
+
+# Addendum
+
+Acyl-carrier proteins are frequently found in metabolic
+reconstructions and are a key component of some pathways such as fatty
+acid biosynthesis. As the protein chains vary from species to species
+there's no determined structure to use, and frequently the formula and
+the charge of the phosphopantetheine prosthetic group as well as the
+attached fatty acyl chain can be overlooked and leads to reaction
+imbalance. Here we attempt to manually curate the formula and charge
+that would maintain the mass-balance of the fatty acid biosynthetic
+pathways, and others, in the `ACPs_Master_Formula_Charge.txt` file.
