@@ -42,7 +42,7 @@ print("InChI in ModelSEED: ",len(MS_Complete_Structures.keys()))
 print("InChI in MetaNetX: ",len(MNX_Complete_Structures.keys()))
 print("Shared InChI: ",Shared_Structures,"\n")
 
-with open('../../Thermodynamics/Compounds_GroupFormation_eQuilibrator_Comparison.txt') as fh:
+with open('../../Thermodynamics/Compounds_GroupContribution_eQuilibrator_Comparison.txt') as fh:
     header=1
     Reported_Cpds={'GF':0,'EQ':0,'EQR':0,'LoEQE':0,'HiEQE':0}
     for line in fh.readlines():
@@ -74,7 +74,7 @@ print("\tGF: ",Reported_Cpds["GF"])
 print("\tEQ: ",Reported_Cpds["EQ"])
 print("\tRejected EQ: ",Reported_Cpds["EQR"])
 
-with open('../../Thermodynamics/Reactions_GroupFormation_eQuilibrator_Comparison.txt') as fh:
+with open('../../Thermodynamics/Reactions_GroupContribution_eQuilibrator_Comparison.txt') as fh:
     header=1
     Reported_Rxns={'GF':0,'EQ':0,'EQR':0,'GFEQ':0,'LoEQE':0,'HiEQE':0}
     for line in fh.readlines():
