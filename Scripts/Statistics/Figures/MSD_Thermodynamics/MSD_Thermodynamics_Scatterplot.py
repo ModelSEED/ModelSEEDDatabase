@@ -58,6 +58,9 @@ min_max_dict={'gc_dg':{'max':-sys.maxsize-1,'min':sys.maxsize},
               'gc_dge_pct':{'max':-sys.maxsize-1,'min':sys.maxsize},
               'eq_dge_pct':{'max':-sys.maxsize-1,'min':sys.maxsize}}
 
+total_count=0
+included_count=0
+
 diff_dict={'small':[],'medium':[],'large':[]}
 high_pct={'gc':[],'eq':[]}
 with open(thermo_root+"/Reactions_GroupContribution_eQuilibrator_Comparison.txt") as fh:
@@ -114,6 +117,10 @@ with open(thermo_root+"/Reactions_GroupContribution_eQuilibrator_Comparison.txt"
         else:
             eq_dge_pct = ( float(eq_dge) / 0.001 ) * 100.0
 
+        total_count+=1
+        if(eq_dge_pct < 10000 and gc_dge_pct < 10000):
+            included_count+=1
+
         data_categories[rev_type]['dge']['x'].append(float(eq_dge_pct))
         data_categories[rev_type]['dge']['y'].append(float(gc_dge_pct))
 
@@ -158,6 +165,7 @@ with open(thermo_root+"/Reactions_GroupContribution_eQuilibrator_Comparison.txt"
 
 fh.close()
 
+print("Fraction in dGe panel: "+str(float(included_count)/float(total_count)))
 print(str(len(accepted_rxns)))
 for size_diff in diff_dict:
     print(size_diff,str(len(diff_dict[size_diff])))
@@ -213,17 +221,17 @@ dg_plot.output_backend="svg"
 export_svgs(dg_plot,filename=file_name+".svg")
 
 #Rxn dGe
-dge_plot = figure(plot_width=500, plot_height=500,x_range=(0,200),y_range=(0,200))
+dge_plot = figure(plot_width=500, plot_height=500,x_range=(-100,10000),y_range=(-100,10000))
 
 for i, category in enumerate(sorted(data_categories, key=lambda k: len(data_categories[k]['dge']['x']), reverse=True)):
     dge_plot.circle( data_categories[category]['dge']['x'], data_categories[category]['dge']['y'],
-                     color=color_dict[category],legend_label=category+" ("+str(len(data_categories[category]['dge']['x']))+")")
+                     color=color_dict[category] ) #,legend_label=category+" ("+str(len(data_categories[category]['dge']['x']))+")")
 
 dge_plot.xaxis.axis_label = deltag_string+' % uncertainty (eQuilibrator)'
 dge_plot.yaxis.axis_label = deltag_string+' % uncertainty (Group Contribution)'
 
-dge_plot.legend.location = "top_right"
-dge_plot.legend.click_policy="hide"
+#dge_plot.legend.location = "top_right"
+#dge_plot.legend.click_policy="hide"
 
 file_name=output_file_root+"_Rxn_dGe"
 output_file(file_name+".html")

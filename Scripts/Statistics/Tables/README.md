@@ -1,5 +1,5 @@
 The scripts here were used for the paper for the release of the ModelSEED Biochemistry Database (2020)
-commit #cd906d4ba1be977a0304f8096071b7817f7cc593
+commit #5d1bbb6d231b91a9a632ad2180a592adf626806f
 
 The numbers from this script are used to fill Table 1, Table 3, and Table 5
 ./Integration_Statistics.py

@@ -167,6 +167,7 @@ for rxn in reactions_dict:
     if(generic is True):
         reaction_counts['Generic']+=1
 
+    print("2020 Status: "+reactions_dict[rxn]['status'])
     if('OK' in reactions_dict[rxn]['status']):
         reaction_counts['Balanced']+=1
 
