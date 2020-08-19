@@ -21,6 +21,11 @@ compounds_dict = compounds_helper.loadCompounds()
 structures_dict = compounds_helper.loadStructures(["SMILE","InChI","InChIKey"],["ModelSEED"])
 aliases_dict = compounds_helper.loadMSAliases()
 
+# We're removing all pKa and pKb before loading new ones
+for cpd in compounds_dict:
+    compounds_dict[cpd]['pka']=""
+    compounds_dict[cpd]['pkb']=""
+
 # We're only loading pKa/pKb for compounds that have an accepted unique structure in ModelSEED
 for cpd in structures_dict:
     found=False
