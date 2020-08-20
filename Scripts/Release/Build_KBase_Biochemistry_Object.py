@@ -110,7 +110,7 @@ if __name__ == "__main__":
         aliases = parse_aliases('../../Biochemistry/Aliases/'+file)
         for msid in aliases:
             for source in aliases[msid]:
-                biochem_obj['compound_aliases'][msid][source].append(aliases[msid][source])
+                biochem_obj['compound_aliases'][msid][source]=aliases[msid][source]
                 
     biochem_obj['reaction_aliases'] = parse_aliases('../../Biochemistry/Aliases/Unique_ModelSEED_Reaction_Aliases.txt')
     biochem_obj['description'] = \
