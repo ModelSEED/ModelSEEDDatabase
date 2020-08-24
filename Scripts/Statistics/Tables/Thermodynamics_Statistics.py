@@ -42,9 +42,9 @@ print("InChI in ModelSEED: ",len(MS_Complete_Structures.keys()))
 print("InChI in MetaNetX: ",len(MNX_Complete_Structures.keys()))
 print("Shared InChI: ",Shared_Structures,"\n")
 
-with open('../../Thermodynamics/Compounds_GroupFormation_eQuilibrator_Comparison.txt') as fh:
+with open('../../Thermodynamics/Compounds_GroupContribution_eQuilibrator_Comparison.txt') as fh:
     header=1
-    Reported_Cpds={'GF':0,'EQ':0,'EQR':0,'LoEQE':0,'HiEQE':0}
+    Reported_Cpds={'GC':0,'EQ':0,'EQR':0,'LoEQE':0,'HiEQE':0}
     for line in fh.readlines():
         if(header==1):
             header-=1
@@ -56,7 +56,7 @@ with open('../../Thermodynamics/Compounds_GroupFormation_eQuilibrator_Comparison
             continue
 
         if('nan' not in array[1] and '1000000' not in array[1]):
-            Reported_Cpds['GF']+=1
+            Reported_Cpds['GC']+=1
 
         if('nan' not in array[2]):
             Reported_Cpds['EQ']+=1
@@ -70,13 +70,13 @@ with open('../../Thermodynamics/Compounds_GroupFormation_eQuilibrator_Comparison
 fh.close()
 
 print("Compounds: ")
-print("\tGF: ",Reported_Cpds["GF"])
+print("\tGC: ",Reported_Cpds["GC"])
 print("\tEQ: ",Reported_Cpds["EQ"])
 print("\tRejected EQ: ",Reported_Cpds["EQR"])
 
-with open('../../Thermodynamics/Reactions_GroupFormation_eQuilibrator_Comparison.txt') as fh:
+with open('../../Thermodynamics/Reactions_GroupContribution_eQuilibrator_Comparison.txt') as fh:
     header=1
-    Reported_Rxns={'GF':0,'EQ':0,'EQR':0,'GFEQ':0,'LoEQE':0,'HiEQE':0}
+    Reported_Rxns={'GC':0,'EQ':0,'EQR':0,'GCEQ':0,'LoEQE':0,'HiEQE':0}
     for line in fh.readlines():
         if(header==1):
             header-=1
@@ -88,12 +88,12 @@ with open('../../Thermodynamics/Reactions_GroupFormation_eQuilibrator_Comparison
             continue
 
         if('nan' not in array[1] and '1000000' not in array[1]):
-            Reported_Rxns['GF']+=1
+            Reported_Rxns['GC']+=1
 
         if('nan' not in array[2]):
             Reported_Rxns['EQ']+=1
             if('nan' not in array[1] and '1000000' not in array[1]):
-                Reported_Rxns['GFEQ']+=1
+                Reported_Rxns['GCEQ']+=1
 
             (dg,dge)=array[2].split('|')
             if(float(dge)>100):
@@ -104,9 +104,9 @@ with open('../../Thermodynamics/Reactions_GroupFormation_eQuilibrator_Comparison
                 Reported_Rxns['HiEQE']+=1
 fh.close()
 print("Reactions: ")
-print("\tGF: ",Reported_Rxns["GF"])
+print("\tGC: ",Reported_Rxns["GC"])
 print("\tEQ: ",Reported_Rxns["EQ"])
-print("\tShared GF & EQ: ",Reported_Rxns["GFEQ"])
+print("\tShared GC & EQ: ",Reported_Rxns["GCEQ"])
 print("\tRejected EQ: ",Reported_Rxns["EQR"],"\n")
 
 print("================")
@@ -127,7 +127,7 @@ print("================")
 print("For Table 4\n")
 
 compound_counts=dict()
-Cpd_Types = ['All', 'Total (GF)', 'Accepted (GF)', 'Total (EQ)', 'Accepted (EQ)', 'Structured', 'Final']
+Cpd_Types = ['All', 'Total (GC)', 'Accepted (GC)', 'Total (EQ)', 'Accepted (EQ)', 'Structured', 'Final']
 for type in Cpd_Types:
     compound_counts[type]=0
 
@@ -139,20 +139,20 @@ for cpd in compounds_dict:
 
     compound_counts['All']+=1
 
-    if('GF' in cpd_obj['notes']):
-        compound_counts['Total (GF)']+=1
+    if('GC' in cpd_obj['notes']):
+        compound_counts['Total (GC)']+=1
 
     if('EQ' in cpd_obj['notes']):
         compound_counts['Total (EQ)']+=1
 
-    if('GF' in cpd_obj['notes'] or 'EQ' in cpd_obj['notes']):
+    if('GC' in cpd_obj['notes'] or 'EQ' in cpd_obj['notes']):
         compound_counts['Structured']+=1
 
     if(cpd_obj['deltag'] == 10000000):
         continue
 
-    if('GF' in cpd_obj['notes'] and 'EQU' not in cpd_obj['notes']):
-        compound_counts['Accepted (GF)']+=1
+    if('GC' in cpd_obj['notes'] and 'EQU' not in cpd_obj['notes']):
+        compound_counts['Accepted (GC)']+=1
         compound_counts['Final']+=1
     elif('EQU' in cpd_obj['notes']):
         compound_counts['Accepted (EQ)']+=1
@@ -165,7 +165,7 @@ for key in Cpd_Types:
     print(key,compound_counts[key],pct)
 
 reaction_counts=dict()
-Rxn_Types = ['All', 'Total (GF)', 'Complete (GF)', 'Accepted (GF)', 'Total (EQ)', 'Complete (EQ)', 'Accepted (EQ)', 'Structured', 'Final']
+Rxn_Types = ['All', 'Total (GC)', 'Complete (GC)', 'Accepted (GC)', 'Total (EQ)', 'Complete (EQ)', 'Accepted (EQ)', 'Structured', 'Final']
 for type in Rxn_Types:
     reaction_counts[type]=0
 
@@ -181,18 +181,18 @@ for rxn in reactions_dict:
 
     reaction_counts['All']+=1
 
-    if('GFP' in rxn_obj['notes'] or 'GFC' in rxn_obj['notes']):
-        reaction_counts['Total (GF)']+=1
+    if('GCP' in rxn_obj['notes'] or 'GCC' in rxn_obj['notes']):
+        reaction_counts['Total (GC)']+=1
 
     if('EQP' in rxn_obj['notes'] or 'EQC' in rxn_obj['notes'] or 'Accepted (EQ)' in rxn_obj['notes']):
         reaction_counts['Total (EQ)']+=1
 
-    if('GFP' in rxn_obj['notes'] or 'GFC' in rxn_obj['notes'] or \
+    if('GCP' in rxn_obj['notes'] or 'GCC' in rxn_obj['notes'] or \
            'EQP' in rxn_obj['notes'] or 'EQC' in rxn_obj['notes'] or 'Accepted (EQ)' in rxn_obj['notes']):
         reaction_counts['Structured']+=1
 
-    if('GFC' in rxn_obj['notes']):
-        reaction_counts['Complete (GF)']+=1
+    if('GCC' in rxn_obj['notes']):
+        reaction_counts['Complete (GC)']+=1
 
     if('EQC' in rxn_obj['notes']):
         reaction_counts['Complete (EQ)']+=1
@@ -204,8 +204,8 @@ for rxn in reactions_dict:
         reaction_counts['Accepted (EQ)']+=1
         reaction_counts['Final']+=1
 
-    if('GFC' in rxn_obj['notes'] and 'EQU' not in rxn_obj['notes']):
-        reaction_counts['Accepted (GF)']+=1
+    if('GCC' in rxn_obj['notes'] and 'EQU' not in rxn_obj['notes']):
+        reaction_counts['Accepted (GC)']+=1
         reaction_counts['Final']+=1
 
 total_rxns=reaction_counts['Structured']
