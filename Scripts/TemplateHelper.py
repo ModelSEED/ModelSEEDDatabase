@@ -69,11 +69,16 @@ class TemplateHelper(BaseHelper):
         self.biochem = BiochemHelper()
         if not os.path.exists(compoundsPath):
             raise ValueError("Invalid path to compounds: {}".format(compoundsPath))
-        self.masterCompounds = json.load(open(compoundsPath))
+        compounds = json.load(open(compoundsPath))
+        self.masterCompounds = dict()
+        for cpdobj in compounds:
+        	self.masterCompounds[cpdobj["id"]] = cpdobj
         if not os.path.exists(reactionsPath):
             raise ValueError("Invalid path to reactions: {}".format(reactionsPath))
-        self.masterReactions = json.load(open(reactionsPath))
-        
+        reactions = json.load(open(reactionsPath))
+        self.masterReactions = dict()
+        for rxnobj in reactions:
+        	self.masterReactions[rxnobj["id"]] = rxnobj
         # Create empty dictionaries for keeping track of items to add to Model Template.
         self.compartments = dict()
         self.biomasses = dict()
@@ -515,15 +520,15 @@ class TemplateHelper(BaseHelper):
                         reaction['deltaGErr'] = 10000000
                     if reaction['name'] == 'null':
                         reaction['name'] = reaction['id']
-                    if not isinstance(reaction['base_cost'], (int, long, float, complex)):
+                    if not isinstance(reaction['base_cost'], (int, float, complex)):
                         reaction['base_cost'] = float(reaction['base_cost'])
-                    if not isinstance(reaction['maxforflux'], (int, long, float, complex)):
+                    if not isinstance(reaction['maxforflux'], (int, float, complex)):
                         reaction['maxforflux'] = float(reaction['maxforflux'])
-                    if not isinstance(reaction['maxrevflux'], (int, long, float, complex)):
+                    if not isinstance(reaction['maxrevflux'], (int, float, complex)):
                         reaction['maxrevflux'] = float(reaction['maxrevflux'])
-                    if not isinstance(reaction['deltaG'], (int, long, float, complex)):
+                    if not isinstance(reaction['deltaG'], (int, float, complex)):
                         reaction['deltaG'] = float(reaction['deltaG'])
-                    if not isinstance(reaction['deltaGErr'], (int, long, float, complex)):
+                    if not isinstance(reaction['deltaGErr'], (int, float, complex)):
                         reaction['deltaGErr'] = float(reaction['deltaGErr'])
                     # Stoichiometry format is n:cpdid:c:i:"cpdname"
                     if len(masterReaction['stoichiometry']) > 0:
@@ -625,13 +630,13 @@ class TemplateHelper(BaseHelper):
                     compound['deltaG'] = 10000000
                 if compound['deltaGErr'] == 'null':
                     compound['deltaGErr'] = 10000000
-                if not isinstance(compound['mass'], (int, long, float, complex)):
+                if not isinstance(compound['mass'], (int, float, complex)) and compound['mass'] != None:
                     compound['mass'] = float(compound['mass'])
-                if not isinstance(compound['defaultCharge'], (int, long, float, complex)):
+                if not isinstance(compound['defaultCharge'], (int, float, complex)):
                     compound['defaultCharge'] = float(compound['defaultCharge'])
-                if not isinstance(compound['deltaG'], (int, long, float, complex)):
+                if not isinstance(compound['deltaG'], (int, float, complex)):
                     compound['deltaG'] = float(compound['deltaG'])
-                if not isinstance(compound['deltaGErr'], (int, long, float, complex)):
+                if not isinstance(compound['deltaGErr'], (int, float, complex)):
                     compound['deltaGErr'] = float(compound['deltaGErr'])
                 compound['formula'] = masterCompound['formula']
                 self.compounds[compound['id']] = compound
@@ -653,7 +658,7 @@ class TemplateHelper(BaseHelper):
             compCompound['id'] = id
             compCompound['templatecompound_ref'] = '~/compounds/id/'+compoundId
             compCompound['charge'] = compound['defaultCharge'] # @todo Not sure how charge could be different
-            if not isinstance(compCompound['charge'], (int, long, float, complex)):
+            if not isinstance(compCompound['charge'], (int, float, complex)):
                 compCompound['charge'] = float(compCompound['charge'])
             if compartment['id'] == 'e':
                 compCompound['maxuptake'] = 100.0 # Set a maximum for the extracellular compartment
