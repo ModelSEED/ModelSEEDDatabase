@@ -624,7 +624,7 @@ class TemplateHelper(BaseHelper):
                 compound['deltaGErr'] = masterCompound['deltagerr']
                 if compound['mass'] == 'null':
                     compound['mass'] = 0
-                if compound['aliases'] == 'null':
+                if compound['aliases'] == 'null' or compound['aliases'] == None:
                     compound['aliases'] = []
                 if compound['deltaG'] == 'null':
                     compound['deltaG'] = 10000000
