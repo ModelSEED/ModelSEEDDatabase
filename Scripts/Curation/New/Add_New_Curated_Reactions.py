@@ -77,6 +77,11 @@ with open(reactions_file) as fh:
         for i in range(len(Headers)):
             rxn[Headers[i].upper()]=array[i]
 
+        if(rxn['ID'] != 'jrxn14442'):
+            continue
+
+        print(rxn['ID'])
+
         #Retrieve identifiers from within equation
         #Split based on whitespace, and remove compartment index
         original_cpd_array=rxn['EQUATION'].split(' ')
@@ -120,12 +125,13 @@ with open(reactions_file) as fh:
             print("Warning: missing "+curation_source+" identifiers for reaction "+rxn['ID']+": "+rxn['EQUATION'])
             continue
         
+        print(rxn['EQUATION'])
         rxn_cpds_array = reactions_helper.parseEquation(rxn['EQUATION'])
         adjusted=False
         new_rxn_cpds_array = reactions_helper.removeCpdRedundancy(rxn_cpds_array)
         if(len(new_rxn_cpds_array)!=len(rxn_cpds_array)):
             adjusted=True
-
+        print(adjusted)
         rxn_code = reactions_helper.generateCode(new_rxn_cpds_array)
         matched_rxn=None        
         if(len(new_rxn_cpds_array)==0):
@@ -239,7 +245,9 @@ with open(reactions_file) as fh:
             New_Rxn_Count[new_rxn['id']]=1
 
             #Rebuild key fields for reaction using parsed equation
+            print(new_rxn_cpds_array)
             stoichiometry=reactions_helper.buildStoich(new_rxn_cpds_array)
+            print(stoichiometry)
             reactions_helper.rebuildReaction(reactions_dict[new_rxn['id']],stoichiometry)
 
             #Finally, because several new reactions may share equations

@@ -98,9 +98,12 @@ identifier_count = int(re.sub('^cpd','',last_identifier))
 
 Biochem_Root="../../Biochemistry/Aliases/Provenance/Primary_Databases/";
 
+
+type_mapping = {"charge": int, "mass": float, "deltag": float, "deltagerr": float}
+
 Default_Cpd = OrderedDict({ "id":"cpd00000","name":"null","abbreviation":"null","aliases":"null",
-                             "formula":"null","mass":"10000000","charge":"0",
-                             "deltag":"10000000","deltagerr":"10000000","pka":"","pkb":"",
+                             "formula":"null","mass":10000000,"charge":0,
+                             "deltag":10000000,"deltagerr":10000000,"pka":"","pkb":"",
                              "inchikey":"","smiles":"",
                              "is_cofactor":0,"is_core":0,"is_obsolete":0,
                              "abstract_compound":"null","comprised_of":"null","linked_compound":"null",
@@ -224,8 +227,8 @@ with open(Biochem_Root+Biochem+"_Compounds.tbl") as fh:
 
             new_cpd = copy.deepcopy(Default_Cpd)
             new_cpd['id']=new_identifier
-            new_cpd['mass']=cpd['MASS']
-            new_cpd['charge']=cpd['CHARGE']
+            new_cpd['mass']=float(cpd['MASS'])
+            new_cpd['charge']=int(cpd['CHARGE'])
             new_cpd['formula']=cpd['FORMULA']
 
             #Add new identifier with original ID as alias
