@@ -125,7 +125,7 @@ with open(reactions_file) as fh:
         new_rxn_cpds_array = reactions_helper.removeCpdRedundancy(rxn_cpds_array)
         if(len(new_rxn_cpds_array)!=len(rxn_cpds_array)):
             adjusted=True
-
+        
         rxn_code = reactions_helper.generateCode(new_rxn_cpds_array)
         matched_rxn=None        
         if(len(new_rxn_cpds_array)==0):
