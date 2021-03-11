@@ -17,6 +17,9 @@ time_str = time.strftime('%Y-%m-%d', time.gmtime(time.time()))
 compounds_helper = Compounds()
 compounds_dict = compounds_helper.loadCompounds()
 
+type_mapping = {"is_core": int, "is_obsolete": int, "is_cofactor": int, "charge": int,
+                "mass": float, "deltag": float, "deltagerr": float}
+
 Headers=list()
 updated_cpds=list()
 with open(attributes_file) as fh:
@@ -29,7 +32,12 @@ with open(attributes_file) as fh:
         cpd_attributes=dict()
         array=line.split('\t',len(Headers))
         for i in range(len(Headers)):
-            cpd_attributes[Headers[i].lower()]=array[i]
+            header = Headers[i].lower()
+            cpd_attributes[header]=array[i]
+
+            if(header in type_mapping):
+                target_type = type_mapping[header]
+                cpd_attributes[header] = target_type(array[i])
 
         #Check for compound
         if('id' not in cpd_attributes): 
