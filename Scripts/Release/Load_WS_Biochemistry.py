@@ -6,7 +6,11 @@ Workspace_URL = 'https://appdev.kbase.us/services/ws'
 WSClient = Workspace(url = Workspace_URL, token = Token)
 print(WSClient.ver())
 
-with open('MSD_v1.0_Biochem.json', "r") as read_file:
+if(len(sys.argv)<2 or os.path.isfile(sys.argv[1]) is False):
+    print("Takes one argument, the path to and including biochemistry object json")
+    sys.exit()
+
+with open(sys.argv[1], "r") as read_file:
     data = json.load(read_file)
 
 results = WSClient.save_objects({'workspace':'kbase',
