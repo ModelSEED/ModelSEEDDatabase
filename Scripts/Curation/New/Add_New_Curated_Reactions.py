@@ -273,4 +273,3 @@ if(len(New_Rxn_Count)>0):
 #../../Biochemistry/Refresh/Adjust_Reaction_Protons.py
 #../../Biochemistry/Refresh/Adjust_Reaction_Water.py
 #../../Biochemistry/Refresh/Merge_Reactions.py (merges may happen because of water)
-#../../Biochemistry/Refresh/Update_Reaction_Aliases.py
