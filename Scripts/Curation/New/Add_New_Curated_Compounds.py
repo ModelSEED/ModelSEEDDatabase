@@ -107,7 +107,7 @@ identifier_count = int(re.sub('^cpd','',last_identifier))
 
 Default_Cpd = OrderedDict({ "id":"cpd00000","name":"null","abbreviation":"null","aliases":"null",
                              "formula":"null","mass":10000000,"charge":0,
-                             "deltag":10000000,"deltagerr":10000000,"pka":"","pkb":"",
+                             "deltag":10000000.0,"deltagerr":10000000.0,"pka":"","pkb":"",
                              "inchikey":"","smiles":"",
                              "is_cofactor":0,"is_core":0,"is_obsolete":0,
                              "abstract_compound":"null","comprised_of":"null","linked_compound":"null",
