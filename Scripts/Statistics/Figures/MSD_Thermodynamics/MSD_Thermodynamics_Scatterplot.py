@@ -183,7 +183,7 @@ for i, category in enumerate(sorted(data_categories, key=lambda k: len(data_cate
     print(category,str(len(data_categories[category]['dg']['x'])))
 
 from bokeh.plotting import figure, output_file, show, save
-from bokeh.io import export_svgs, export_png
+from bokeh.io import export_svgs
 from bokeh.palettes import Colorblind
 
 color_dict={'no-change':Colorblind[4][0],
@@ -216,7 +216,6 @@ dg_plot.toolbar_location = None
 dg_plot.background_fill_color = None
 dg_plot.border_fill_color = None
 
-export_png(dg_plot,filename=file_name+".png")
 dg_plot.output_backend="svg"
 export_svgs(dg_plot,filename=file_name+".svg")
 
@@ -227,8 +226,12 @@ for i, category in enumerate(sorted(data_categories, key=lambda k: len(data_cate
     dge_plot.circle( data_categories[category]['dge']['x'], data_categories[category]['dge']['y'],
                      color=color_dict[category] ) #,legend_label=category+" ("+str(len(data_categories[category]['dge']['x']))+")")
 
-dge_plot.xaxis.axis_label = deltag_string+' % uncertainty (eQuilibrator)'
-dge_plot.yaxis.axis_label = deltag_string+' % uncertainty (Group Contribution)'
+#dge_plot.xaxis.axis_label = deltag_string+' % uncertainty (eQuilibrator)'
+#dge_plot.yaxis.axis_label = deltag_string+' % uncertainty (Group Contribution)'
+dge_plot.xaxis.axis_label = '% Uncertainty (eQuilibrator)'
+dge_plot.yaxis.axis_label = '% Uncertainty (Group Contribution)'
+dge_plot.xaxis.axis_label_text_font_size = "14pt"
+dge_plot.yaxis.axis_label_text_font_size = "14pt"
 
 #dge_plot.legend.location = "top_right"
 #dge_plot.legend.click_policy="hide"
@@ -243,7 +246,6 @@ dge_plot.toolbar_location = None
 dge_plot.background_fill_color = None
 dge_plot.border_fill_color = None
 
-export_png(dge_plot,filename=file_name+".png")
 dge_plot.output_backend="svg"
 export_svgs(dge_plot,filename=file_name+".svg")
 
