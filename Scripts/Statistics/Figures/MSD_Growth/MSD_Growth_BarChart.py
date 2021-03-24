@@ -14,7 +14,7 @@ with open('../../Tables/Growth_Stats.tsv') as fh:
 categories = ['Compounds','Compounds with structure','Reactions','Mass-balanced reactions']
 years = sorted(data.keys())
 
-from bokeh.io import show, output_file, save, export_png, export_svgs
+from bokeh.io import show, output_file, save, export_svgs
 from bokeh.models import ColumnDataSource, FactorRange
 from bokeh.plotting import figure
 from bokeh.transform import factor_cmap
@@ -47,6 +47,5 @@ p.toolbar_location = None
 p.background_fill_color = None
 p.border_fill_color = None
 
-export_png(p,filename=file_name+".png")
 p.output_backend="svg"
 export_svgs(p,filename=file_name+".svg")
