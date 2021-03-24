@@ -27,7 +27,10 @@ class Compounds:
         for line in reader:
             for list_type in lists:
                 if(line[list_type] != "null"):
-                    line[list_type]=line[list_type].split("|")
+                    if(line[list_type] == ""):
+                        line[list_type]=[]
+                    else:
+                        line[list_type]=line[list_type].split("|")
             for dict_type in dicts:
                 if(line[dict_type] != "null"):
                     entries = line[dict_type].split('|')
