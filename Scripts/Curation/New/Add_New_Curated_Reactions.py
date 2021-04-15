@@ -1,13 +1,18 @@
 #!/usr/bin/env python
 import os, sys, re, copy
+import argparse
 
-if(len(sys.argv)!=2 or os.path.isfile(sys.argv[1]) is False):
-    print("Takes one argument, the path to and including reactions file")
+parser = argparse.ArgumentParser()
+parser.add_argument('reactions_file')
+parser.add_argument("--source", dest='compound_source', default='ModelSEED')
+parser.add_argument("-s", dest='save_file', action='store_true')
+args = parser.parse_args()
+
+if(os.path.isfile(args.reactions_file) is False):
+    print("Cannot find file: "+reactions_file)
     sys.exit()
 
-reactions_file=sys.argv[1]
-curation_source = reactions_file.split('/')[-2]
-compound_source = "ModelSEED"
+curation_source = args.reactions_file.split('/')[-2]
 
 sys.path.append('../../Libs/Python')
 from BiochemPy import Reactions, Compounds, InChIs
@@ -65,7 +70,7 @@ New_Rxn_Count=dict()
 Headers=list()
 rxns=list()
 missing_cpds=dict()
-with open(reactions_file) as fh:
+with open(args.reactions_file) as fh:
     for line in fh.readlines():
         line=line.strip()
         if(len(Headers)==0):
@@ -83,8 +88,13 @@ with open(reactions_file) as fh:
 
         new_cpd_array=list()
         for i in range(len(original_cpd_array)):
-            #Assumes MS IDs
-            if('cpd' not in original_cpd_array[i]):
+            if(re.search('^\([\d\.]+\)$',original_cpd_array[i])):
+                continue
+
+            if(original_cpd_array[i] == '+' ):
+                continue
+
+            if(re.search('^<?[-=]+>?$',original_cpd_array[i])):
                 continue
 
             if(re.search('\[[01]\]$',original_cpd_array[i])):
@@ -93,13 +103,17 @@ with open(reactions_file) as fh:
                 new_cpd_array.append(original_cpd_array[i])
 
         all_matched=True
+        eqn_missing_cpds=list()
         for new_cpd in new_cpd_array:
-            #Assume MS identifiers for time being
-            if(new_cpd in compounds_dict):
+            
+            #if source is ModelSEED
+            msid = ""
+            if(args.compound_source == 'ModelSEED' and new_cpd in compounds_dict):
                 msid = new_cpd
+            elif(args.compound_source in Source_Alias_Dict and new_cpd in Source_Alias_Dict[args.compound_source]):
+                msid = sorted(Source_Alias_Dict[args.compound_source][new_cpd])[0]
 
-#            if(compound_source in Source_Alias_Dict and new_cpd in Source_Alias_Dict[compound_source]):
-#                msid = sorted(Source_Alias_Dict[compound_source][new_cpd])[0]
+            if(msid != ""):
 
                 #set boundary
                 bound_msid=msid+"["
@@ -114,10 +128,11 @@ with open(reactions_file) as fh:
                 rxn['EQUATION'] = " ".join(new_eqn_array)
             else:
                 missing_cpds[new_cpd]=1
+                eqn_missing_cpds.append(new_cpd)
                 all_matched=False
 
         if(all_matched is False):
-            print("Warning: missing "+curation_source+" identifiers for reaction "+rxn['ID']+": "+rxn['EQUATION'])
+            print("Warning: missing "+curation_source+" identifiers for reaction "+rxn['ID']+": "+"|".join(eqn_missing_cpds))
             continue
         
         rxn_cpds_array = reactions_helper.parseEquation(rxn['EQUATION'])
@@ -152,18 +167,20 @@ with open(reactions_file) as fh:
                     matched_rxn = sorted(list(reactions_codes[rxn_code]))[0]
 
         if(matched_rxn is not None):
+            print("Matched reaction:\t"+rxn['ID']+"\t"+matched_rxn)
             #Add Names, EC and Alias
             #Regardless of match-type, add new names
             #NB at this point, names shouldn't match _anything_ already in the database
             #Names are saved separately as part of the aliases at the end of the script
-            for name in rxn['NAMES'].split('|'):
-                if(name not in All_Names):
-                    #Possible for there to be no names in biochemistry?
-                    if(matched_rxn not in Names_Dict):
-                        Names_Dict[matched_rxn]=list()
-                    Names_Dict[matched_rxn].append(name)
-                    All_Names[name]=1
-                    New_Name_Count[matched_rxn]=1
+            if('NAMES' in rxn):
+                for name in rxn['NAMES'].split('|'):
+                    if(name not in All_Names):
+                        #Possible for there to be no names in biochemistry?
+                        if(matched_rxn not in Names_Dict):
+                            Names_Dict[matched_rxn]=list()
+                        Names_Dict[matched_rxn].append(name)
+                        All_Names[name]=1
+                        New_Name_Count[matched_rxn]=1
 
             if('ECS' in rxn):
                 for ec in rxn['ECS'].split('|'):
@@ -203,18 +220,19 @@ with open(reactions_file) as fh:
 
             #Add new names
             #Names are saved separately as part of the aliases at the end of the script
-            for name in rxn['NAMES'].split('|'):
-                if(new_rxn['name']=='null'):
-                    new_rxn['name']=name
-                    new_rxn['abbreviation']=name
+            if('NAMES' in rxn):
+                for name in rxn['NAMES'].split('|'):
+                    if(new_rxn['name']=='null'):
+                        new_rxn['name']=name
+                        new_rxn['abbreviation']=name
 
-                if(name not in All_Names):
-                    #Possible for there to be no names in biochemistry?
-                    if(new_rxn['id'] not in Names_Dict):
-                        Names_Dict[new_rxn['id']]=list()
-                    Names_Dict[new_rxn['id']].append(name)
-                    All_Names[name]=1
-                    New_Name_Count[new_rxn['id']]=1
+                    if(name not in All_Names):
+                        #Possible for there to be no names in biochemistry?
+                        if(new_rxn['id'] not in Names_Dict):
+                            Names_Dict[new_rxn['id']]=list()
+                        Names_Dict[new_rxn['id']].append(name)
+                        All_Names[name]=1
+                        New_Name_Count[new_rxn['id']]=1
 
             #If no names at all
             if(new_rxn['name']=='null'):
@@ -254,19 +272,23 @@ if(len(missing_cpds)>0):
 #Here, for matches, re-write names, ecs and aliases
 if(len(New_EC_Count)>0):
     print("Saving additional ECs for "+str(len(New_EC_Count))+" reactions")
-    reactions_helper.saveECs(ECs_Dict)
+    if(args.save_file is True):
+        reactions_helper.saveECs(ECs_Dict)
 
 if(len(New_Name_Count)>0):
     print("Saving additional names for "+str(len(New_Name_Count))+" reactions")
-    reactions_helper.saveNames(Names_Dict)
+    if(args.save_file is True):
+        reactions_helper.saveNames(Names_Dict)
 
 if(len(New_Alias_Count)>0):
     print("Saving additional "+curation_source+" aliases for "+str(len(New_Alias_Count))+" reactions")
-    reactions_helper.saveAliases(original_rxn_alias_dict)
+    if(args.save_file is True):
+        reactions_helper.saveAliases(original_rxn_alias_dict)
 
 if(len(New_Rxn_Count)>0):
     print("Saving "+str(len(New_Rxn_Count))+" new reactions from "+curation_source)
-    reactions_helper.saveReactions(reactions_dict)
+    if(args.save_file is True):
+        reactions_helper.saveReactions(reactions_dict)
 
 #Scripts to run afterwards
 #../../Biochemistry/Refresh/Rebalance_Reactions.py (very important)

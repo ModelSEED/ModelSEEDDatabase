@@ -1,20 +1,19 @@
 #!/usr/bin/env python
 import os, sys, re, copy
+import argparse
 from csv import DictReader
 from collections import OrderedDict
-temp=list();
-header=True;
 
-dry_run = True
-if("save" in sys.argv):
-    dry_run = False
+parser = argparse.ArgumentParser()
+parser.add_argument('compounds_file')
+parser.add_argument("-s", dest='save_file', action='store_true')
+args = parser.parse_args()
 
-if(len(sys.argv)<2 or os.path.isfile(sys.argv[1]) is False):
-    print("Takes one argument, the path to and including reactions file")
+if(os.path.isfile(args.compounds_file) is False):
+    print("Cannot find file: "+args.compounds_file)
     sys.exit()
 
-compounds_file=sys.argv[1]
-curation_source = compounds_file.split('/')[-2]
+curation_source = args.compounds_file.split('/')[-2]
 
 sys.path.append('../../Libs/Python')
 from BiochemPy import Reactions, Compounds, InChIs
@@ -115,7 +114,7 @@ Default_Cpd = OrderedDict({ "id":"cpd00000","name":"null","abbreviation":"null",
 New_Cpd_Count=dict()
 Matched_Cpd_Count=dict()
 Headers=list()
-with open(compounds_file) as fh:
+with open(args.compounds_file) as fh:
     for line in fh.readlines():
         line=line.strip()
         if(len(Headers)==0):
@@ -130,7 +129,7 @@ with open(compounds_file) as fh:
         (matched_cpd,matched_src)=(None,None)
 
         #Check that the Structure doesn't already exist, first as InChI, then as SMILE
-        if(matched_cpd is None and cpd['inchi'] and cpd['inchi'] in all_inchis):
+        if(matched_cpd is None and 'inchi' in cpd and cpd['inchi'] in all_inchis):
 
             msids = dict()
             for alias in all_inchis[cpd['inchi']]:
@@ -147,7 +146,7 @@ with open(compounds_file) as fh:
                 matched_cpd=msids[0]
                 matched_src='InChI'
 
-        elif(matched_cpd is None and cpd['smile'] and cpd['smile'] in all_smiles):
+        elif(matched_cpd is None and 'smile' in cpd and cpd['smile'] in all_smiles):
 
             msids = dict()
             for alias in all_smiles[cpd['smile']]:
@@ -176,10 +175,10 @@ with open(compounds_file) as fh:
                 matched_src='NAMES'
 
         if(matched_cpd is not None):
-            
+            print("Matched compound:\t"+cpd['id']+"\t"+matched_cpd)
             if(matched_src not in Matched_Cpd_Count):
-                Matched_Cpd_Count[matched_src]=list()
-            Matched_Cpd_Count[matched_src].append(matched_cpd)
+                Matched_Cpd_Count[matched_src]=dict()
+            Matched_Cpd_Count[matched_src][matched_cpd]=cpd['id']
 
             #Regardless of match-type, add new names
             #NB at this point, names shouldn't match _anything_ already in the database
@@ -194,12 +193,12 @@ with open(compounds_file) as fh:
                     new_name_count[matched_cpd]=1
 
             #print warning if multiple structures
-            if(cpd['inchi'] in all_inchis):
+            if('inchi' in cpd and cpd['inchi'] in all_inchis):
                 if(cpd['id'] not in all_aliases_InChIs or cpd['id'] not in all_inchis[cpd['inchi']]):
                     print("Warning: InChI structure for "+cpd['id']+" assigned to different compounds: "+",".join(all_inchis[cpd['inchi']]))
 
             #print warning if multiple structures
-            if(cpd['smile'] in all_smiles):
+            if('smile' in cpd and cpd['smile'] in all_smiles):
                 if(cpd['ID'] not in all_aliases_SMILEs or cpd['id'] not in all_smiles[cpd['smile']]):
                     print("Warning: SMILE structure for "+cpd['id']+" assigned to different compounds: "+",".join(all_smiles[cpd['smile']]))
                 
@@ -224,9 +223,12 @@ with open(compounds_file) as fh:
 
             new_cpd = copy.deepcopy(Default_Cpd)
             new_cpd['id']=new_identifier
-            new_cpd['mass']=float(cpd['mass'])
-            new_cpd['charge']=int(cpd['charge'])
-            new_cpd['formula']=cpd['formula']
+            if('mass' in cpd):
+                new_cpd['mass']=float(cpd['mass'])
+            if('charge' in cpd):
+                new_cpd['charge']=int(cpd['charge'])
+            if('formula' in cpd):
+                new_cpd['formula']=cpd['formula']
 
             #Add new identifier with original ID as alias
             original_alias_dict[new_cpd['id']]={curation_source:[cpd['id']]}
@@ -261,14 +263,16 @@ with open(compounds_file) as fh:
 print("Compounds matched via:")
 for src in sorted(Matched_Cpd_Count):
     print("\t"+src+": "+str(len(Matched_Cpd_Count[src])))
+    for match in Matched_Cpd_Count[src]:
+        print(src+"\t"+match+"\t"+Matched_Cpd_Count[src][match])
 print("Saving additional names for "+str(len(new_name_count))+" compounds")
-if(dry_run is False):
+if(args.save_file is True):
     compounds_helper.saveNames(names_dict)
 print("Saving additional "+curation_source+" aliases for "+str(len(new_alias_count))+" compounds")
-if(dry_run is False):
+if(args.save_file is True):
     compounds_helper.saveAliases(original_alias_dict)
 print("Saving "+str(len(New_Cpd_Count))+" new compounds from "+curation_source)
-if(dry_run is False):
+if(args.save_file is True):
     compounds_helper.saveCompounds(compounds_dict)
 
 #Scripts to run afterwards
