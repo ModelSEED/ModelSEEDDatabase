@@ -60,7 +60,7 @@ class Reactions:
             if(text == "+"):
                 continue
 
-            match=re.search('^<?=>?$',text)
+            match=re.search('^<?[=-]+>?$',text)
             if(match is not None):
                 reagent=1
 
