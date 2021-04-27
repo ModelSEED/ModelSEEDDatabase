@@ -3,21 +3,37 @@ import os, sys, re, copy
 import argparse
 
 parser = argparse.ArgumentParser()
-parser.add_argument('reactions_file')
-parser.add_argument("--source", dest='compound_source', default='ModelSEED')
+parser.add_argument('reactions_file', help="Reactions File")
+parser.add_argument('compound_source', help="ModelSEED alias or GitHub username")
 parser.add_argument("-s", dest='save_file', action='store_true')
 args = parser.parse_args()
+
+
 
 if(os.path.isfile(args.reactions_file) is False):
     print("Cannot find file: "+reactions_file)
     sys.exit()
 
-curation_source = args.reactions_file.split('/')[-2]
-
 sys.path.append('../../Libs/Python')
 from BiochemPy import Reactions, Compounds, InChIs
 
 compounds_helper = Compounds()
+Compounds_Alias_Dict=compounds_helper.loadMSAliases()
+Source_Alias_Dict = dict()
+for msid in Compounds_Alias_Dict:
+    for source in Compounds_Alias_Dict[msid]:
+        if(source not in Source_Alias_Dict):
+            Source_Alias_Dict[source]=dict()
+        for alias in Compounds_Alias_Dict[msid][source]:
+            if(alias not in Source_Alias_Dict[source]):
+                Source_Alias_Dict[source][alias]=list()
+            Source_Alias_Dict[source][alias].append(msid)
+
+#Check compound source
+if(args.compound_source != "ModelSEED" and args.compound_source not in Source_Alias_Dict):
+    print("Alias for source of compounds is not recognized")
+    sys.exit()
+
 compounds_dict = compounds_helper.loadCompounds()
 reactions_helper = Reactions()
 reactions_dict = reactions_helper.loadReactions()
@@ -29,17 +45,6 @@ Default_Rxn = {"id":"cpd00001","name":"null","abbreviation":"null","aliases":[],
                "status":"NB","is_obsolete":0,"is_transport":0,
                "abstract_reaction":"null","pathways":"null","ec_numbers":"null",
                "compound_ids":"null","linked_reaction":"null","notes":[],"source":""}
-
-Compounds_Alias_Dict=compounds_helper.loadMSAliases()
-Source_Alias_Dict = dict()
-for msid in Compounds_Alias_Dict:
-    for source in Compounds_Alias_Dict[msid]:
-        if(source not in Source_Alias_Dict):
-            Source_Alias_Dict[source]=dict()
-        for alias in Compounds_Alias_Dict[msid][source]:
-            if(alias not in Source_Alias_Dict[source]):
-                Source_Alias_Dict[source][alias]=list()
-            Source_Alias_Dict[source][alias].append(msid)
 
 original_rxn_alias_dict=reactions_helper.loadMSAliases()
 New_Alias_Count=dict()
@@ -132,7 +137,7 @@ with open(args.reactions_file) as fh:
                 all_matched=False
 
         if(all_matched is False):
-            print("Warning: missing "+curation_source+" identifiers for reaction "+rxn['ID']+": "+"|".join(eqn_missing_cpds))
+            print("Warning: missing "+args.compound_source+" identifiers for reaction "+rxn['ID']+": "+"|".join(eqn_missing_cpds))
             continue
         
         rxn_cpds_array = reactions_helper.parseEquation(rxn['EQUATION'])
@@ -195,14 +200,14 @@ with open(args.reactions_file) as fh:
             #Add ID to aliases if the match is with a different reaction
             if(matched_rxn not in original_rxn_alias_dict):
                 original_rxn_alias_dict[matched_rxn]=dict()
-            if(matched_rxn in original_rxn_alias_dict and curation_source not in original_rxn_alias_dict[matched_rxn]):
-                original_rxn_alias_dict[matched_rxn][curation_source]=list()
-            if(rxn['ID'] not in original_rxn_alias_dict[matched_rxn][curation_source]):
-                original_rxn_alias_dict[matched_rxn][curation_source].append(rxn['ID'])
+            if(matched_rxn in original_rxn_alias_dict and args.compound_source not in original_rxn_alias_dict[matched_rxn]):
+                original_rxn_alias_dict[matched_rxn][args.compound_source]=list()
+            if(rxn['ID'] not in original_rxn_alias_dict[matched_rxn][args.compound_source]):
+                original_rxn_alias_dict[matched_rxn][args.compound_source].append(rxn['ID'])
                 New_Alias_Count[matched_rxn]=1
 
             #Update source type
-            reactions_dict[matched_rxn]['source']=curation_source
+            reactions_dict[matched_rxn]['source']=args.compound_source
 
         else:
             
@@ -214,8 +219,8 @@ with open(args.reactions_file) as fh:
             new_rxn = copy.deepcopy(Default_Rxn)
             new_rxn['id']=new_identifier
 
-            #Add new identifier with curation source as alias
-            original_rxn_alias_dict[new_rxn['id']]={curation_source:[rxn['ID']]}
+            #Add new identifier with compound source as alias
+            original_rxn_alias_dict[new_rxn['id']]={args.compound_source:[rxn['ID']]}
             New_Alias_Count[new_rxn['id']]=1
 
             #Add new names
@@ -251,7 +256,7 @@ with open(args.reactions_file) as fh:
                         New_EC_Count[new_rxn['id']]=1
 
             #Add source type
-            new_rxn['source']=curation_source
+            new_rxn['source']=args.compound_source
 
             reactions_dict[new_rxn['id']]=new_rxn
             New_Rxn_Count[new_rxn['id']]=1
@@ -281,12 +286,12 @@ if(len(New_Name_Count)>0):
         reactions_helper.saveNames(Names_Dict)
 
 if(len(New_Alias_Count)>0):
-    print("Saving additional "+curation_source+" aliases for "+str(len(New_Alias_Count))+" reactions")
+    print("Saving additional "+args.compound_source+" aliases for "+str(len(New_Alias_Count))+" reactions")
     if(args.save_file is True):
         reactions_helper.saveAliases(original_rxn_alias_dict)
 
 if(len(New_Rxn_Count)>0):
-    print("Saving "+str(len(New_Rxn_Count))+" new reactions from "+curation_source)
+    print("Saving "+str(len(New_Rxn_Count))+" new reactions from "+args.compound_source)
     if(args.save_file is True):
         reactions_helper.saveReactions(reactions_dict)
 
