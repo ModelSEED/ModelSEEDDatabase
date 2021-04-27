@@ -1,11 +1,12 @@
 #!/usr/bin/env python
 import os, sys, re, copy
-import argparse
+import argparse, requests
 from csv import DictReader
 from collections import OrderedDict
 
 parser = argparse.ArgumentParser()
-parser.add_argument('compounds_file')
+parser.add_argument('compounds_file', help="Compounds File")
+parser.add_argument('github_user', help="GitHub username")
 parser.add_argument("-s", dest='save_file', action='store_true')
 args = parser.parse_args()
 
@@ -13,7 +14,15 @@ if(os.path.isfile(args.compounds_file) is False):
     print("Cannot find file: "+args.compounds_file)
     sys.exit()
 
-curation_source = args.compounds_file.split('/')[-2]
+curation_source = args.github_user
+
+url = f"https://api.github.com/users/{curation_source}"
+r = requests.get(url.format(curation_source)).json()
+if("login" in r and r["login"] == curation_source):
+    print("Github user "+curation_source+" found")
+if("message" in r and r["message"] == "Not Found"):
+    print ("Github user "+curation_source+" does not exist.")
+    sys.exit()
 
 sys.path.append('../../Libs/Python')
 from BiochemPy import Reactions, Compounds, InChIs
