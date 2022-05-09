@@ -28,7 +28,7 @@ class Compounds:
             for list_type in lists:
                 if(line[list_type] != "null"):
                     if(line[list_type] == ""):
-                        line[list_type]=[]
+                        line[list_type]="null"
                     else:
                         line[list_type]=line[list_type].split("|")
             for dict_type in dicts:
