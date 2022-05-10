@@ -301,6 +301,8 @@ class Compounds:
             values_list=list()
             for header in self.Headers:
                 value=compounds_dict[cpd][header]
+                if(value is None):
+                    value="null"
                 if(isinstance(value,list)):
                     value = "|".join(value)
                 if(isinstance(value,dict)):
