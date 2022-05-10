@@ -24,6 +24,30 @@ class Reactions:
         self.Compounds_Dict = self.CompoundsHelper.loadCompounds()
 
     def loadReactions(self):
+        rxns_file = self.BiochemRoot+'reactions.json'
+        with open(rxns_file) as json_file_handle:
+            rxns_list = json.load(json_file_handle)
+
+        rxns_dict = dict()
+        for rxn_obj in rxns_list:
+            rxns_dict[rxn_obj['id']]=rxn_obj
+            for key in rxn_obj:
+                if(isinstance(rxn_obj[key],list)):
+                    for i in range(len(rxn_obj[key])):
+                        if(rxn_obj[key][i] is None):
+                            rxn_obj[key][i]="null"
+                            
+                if(isinstance(rxn_obj[key],dict)):
+                    for entry in rxn_obj[key]:
+                        if(rxn_obj[key][entry] is None):
+                            rxn_obj[key][entry]="null"
+                            
+                if(rxn_obj[key] is None):
+                    rxn_obj[key]="null"
+
+        return rxns_dict
+
+    def loadReactions_tsv(self):
         reader = DictReader(open(self.RxnsFile), dialect='excel-tab')
         type_mapping = {"is_transport": int, "is_obsolete": int,
                         "deltag": float, "deltagerr": float}

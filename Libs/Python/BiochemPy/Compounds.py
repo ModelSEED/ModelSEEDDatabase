@@ -17,6 +17,30 @@ class Compounds:
         self.Headers = reader.fieldnames
 
     def loadCompounds(self):
+        cpds_file = self.BiochemRoot+'compounds.json'
+        with open(cpds_file) as json_file_handle:
+            cpds_list = json.load(json_file_handle)
+
+        cpds_dict = dict()
+        for cpd_obj in cpds_list:
+            cpds_dict[cpd_obj['id']]=cpd_obj
+            for key in cpd_obj:
+                if(isinstance(cpd_obj[key],list)):
+                    for i in range(len(cpd_obj[key])):
+                        if(cpd_obj[key][i] is None):
+                            cpd_obj[key][i]="null"
+                            
+                if(isinstance(cpd_obj[key],dict)):
+                    for entry in cpd_obj[key]:
+                        if(cpd_obj[key][entry] is None):
+                            cpd_obj[key][entry]="null"
+                            
+                if(cpd_obj[key] is None):
+                    cpd_obj[key]="null"
+
+        return cpds_dict
+    
+    def loadCompounds_tsv(self):
         reader = DictReader(open(self.CpdsFile), dialect='excel-tab')
         type_mapping = {"is_core": int, "is_obsolete": int, "is_cofactor": int, "charge": int,
                         "mass": float, "deltag": float, "deltagerr": float}
