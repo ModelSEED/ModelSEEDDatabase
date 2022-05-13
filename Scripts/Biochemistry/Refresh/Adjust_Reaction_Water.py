@@ -1,4 +1,6 @@
 #!/usr/bin/env python
+import sys
+sys.path.append('../../../Libs/Python')
 from BiochemPy import Reactions
 
 ReactionsHelper = Reactions()
@@ -13,11 +15,11 @@ for rxn in sorted(Reactions_Dict.keys()):
         continue
 
     #Parse old stoichiometry into array
-    old_stoichiometry=Reactions_Dict[rxn]["stoichiometry"]
-    Rxn_Cpds_Array=ReactionsHelper.parseStoich(old_stoichiometry)
+    rxn_cpds_array=Reactions_Dict[rxn]["stoichiometry"]
+    old_stoichiometry = ReactionsHelper.buildStoich(rxn_cpds_array)
 
     #Don't adjust reactions that only have water
-    if(len(Rxn_Cpds_Array)==1):
+    if(len(rxn_cpds_array)==1):
         continue
 
     Water_Adjustment = 1
@@ -25,11 +27,11 @@ for rxn in sorted(Reactions_Dict.keys()):
         Water_Adjustment = -1
 
     #Adjust for water
-    ReactionsHelper.adjustCompound(Rxn_Cpds_Array,"cpd00001",float(Water_Adjustment))
+    ReactionsHelper.adjustCompound(rxn_cpds_array,"cpd00001",float(Water_Adjustment))
 
     #Recompute new status and stoichiometry
-    new_status = ReactionsHelper.balanceReaction(Rxn_Cpds_Array)
-    new_stoichiometry = ReactionsHelper.buildStoich(Rxn_Cpds_Array)
+    new_status = ReactionsHelper.balanceReaction(rxn_cpds_array)
+    new_stoichiometry = ReactionsHelper.buildStoich(rxn_cpds_array)
 
     if(new_status != Reactions_Dict[rxn]['status']):
         status_file.write(rxn+"\t"+Reactions_Dict[rxn]['status']+"\t"+new_status+"\n")

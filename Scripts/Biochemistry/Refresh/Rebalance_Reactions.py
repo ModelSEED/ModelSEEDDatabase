@@ -11,7 +11,7 @@ print_charges = False
 if("print" in sys.argv):
     print_charges = True
 
-sys.path.append('../../Libs/Python')
+sys.path.append('../../../Libs/Python')
 from BiochemPy import Reactions
 
 ReactionsHelper = Reactions()
@@ -23,7 +23,7 @@ for rxn in sorted(Reactions_Dict.keys()):
     if(Reactions_Dict[rxn]["status"] == "EMPTY"):
         continue
 
-    Rxn_Cpds_Array=ReactionsHelper.parseStoich(Reactions_Dict[rxn]["stoichiometry"])
+    Rxn_Cpds_Array=Reactions_Dict[rxn]["stoichiometry"]
     new_status = ReactionsHelper.balanceReaction(Rxn_Cpds_Array)
     old_status=Reactions_Dict[rxn]["status"]
 

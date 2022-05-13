@@ -1,5 +1,6 @@
 #!/usr/bin/env python
-import re
+import re, sys
+sys.path.append('../../../Libs/Python/')
 from BiochemPy import Reactions
 from csv import DictReader
 

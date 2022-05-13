@@ -1,4 +1,6 @@
 #!/usr/bin/env python
+import sys
+sys.path.append('../../../Libs/Python')
 from BiochemPy import Reactions
 
 ReactionsHelper = Reactions()

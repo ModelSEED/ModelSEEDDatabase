@@ -242,7 +242,7 @@ class Reactions:
                 continue
             if(check_obsolete is False and rxns_dict[rxn]['is_obsolete']==1):
                 continue
-            rxn_cpds_array = self.parseStoich(rxns_dict[rxn]['stoichiometry'])
+            rxn_cpds_array = rxns_dict[rxn]['stoichiometry']
             code = self.generateCode(rxn_cpds_array)
             if(code not in codes_dict):
                 codes_dict[code]=dict()
@@ -518,7 +518,7 @@ class Reactions:
             reaction_dict["stoichiometry"] = stoichiometry
 
         # Build list of "reagents" and "products"
-        rxn_cpds_array = self.parseStoich(stoichiometry)
+        rxn_cpds_array = stoichiometry
         reagents_array = list()
         products_array = list()
         compound_ids_dict = dict()

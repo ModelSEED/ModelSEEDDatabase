@@ -1,4 +1,6 @@
 #!/usr/bin/env python
+import sys
+sys.path.append('../../../Libs/Python/')
 from BiochemPy import Reactions
 
 ReactionsHelper = Reactions()
@@ -9,12 +11,15 @@ for rxn in sorted(Reactions_Dict.keys()):
     if(Reactions_Dict[rxn]["status"] == "EMPTY"):
         continue
 
-    Rxn_Cpds_Array = ReactionsHelper.parseStoich(Reactions_Dict[rxn]["stoichiometry"])
+    Rxn_Cpds_Array = Reactions_Dict[rxn]["stoichiometry"]
+    Stoichiometry=ReactionsHelper.buildStoich(Rxn_Cpds_Array)
+
     New_Rxn_Cpds_Array = ReactionsHelper.removeCpdRedundancy(Rxn_Cpds_Array)
-    Stoichiometry=ReactionsHelper.buildStoich(New_Rxn_Cpds_Array)
-    if(Stoichiometry != Reactions_Dict[rxn]["stoichiometry"]):
+    New_Stoichiometry=ReactionsHelper.buildStoich(New_Rxn_Cpds_Array)
+
+    if(Stoichiometry != New_Stoichiometry):
         print("Rebuilding "+rxn)
-        ReactionsHelper.rebuildReaction(Reactions_Dict[rxn],Stoichiometry)
+        ReactionsHelper.rebuildReaction(Reactions_Dict[rxn], New_Rxn_Cpds_Array)
         Update_Reactions+=1
 
 if(Update_Reactions>0):
