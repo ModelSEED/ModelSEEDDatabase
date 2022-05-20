@@ -6,7 +6,7 @@ from csv import DictReader
 
 class Compounds:
     def __init__(self, biochem_root='../../../Biochemistry/',
-                 cpds_file='compounds.tsv'):
+                 cpds_file='compound_00.tsv'):
 
         self.BiochemRoot = os.path.dirname(__file__)+'/'+biochem_root
         self.CpdsFile = self.BiochemRoot + cpds_file
@@ -44,6 +44,7 @@ class Compounds:
         return cpds_dict
 
     def loadCompounds_tsv(self):
+        print("WARNING: This function is currently redundant and will only load one file!")
         reader = DictReader(open(self.CpdsFile), dialect='excel-tab')
         type_mapping = {"is_core": int, "is_obsolete": int, "is_cofactor": int, "charge": int,
                         "mass": float, "deltag": float, "deltagerr": float}
@@ -326,11 +327,12 @@ class Compounds:
         cpds_count_thousands=0
         cpds_count_string=f"{cpds_count_thousands:02}"
 
-        # Initiate file handles
+        # Initiate TSV file handle
         cpds_tsv_file_handle = open(cpds_root + cpds_count_string+".tsv", 'w')
-        cpds_json_file_handle = open(cpds_root + cpds_count_string+".json", 'w')
+        cpds_tsv_file_handle.write("\t".join(self.Headers) + "\n")
 
-        # Initiate JSON list
+        # Initiate JSON file handle
+        cpds_json_file_handle = open(cpds_root + cpds_count_string+".json", 'w')
         cpds_json_list = list()
 
         # Initiate counting

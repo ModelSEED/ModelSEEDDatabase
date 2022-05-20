@@ -8,7 +8,7 @@ from csv import DictReader
 
 class Reactions:
     def __init__(self, biochem_root='../../../Biochemistry/',
-                 rxns_file='reactions.tsv'):
+                 rxns_file='reaction_00.tsv'):
 
         self.BiochemRoot = os.path.dirname(__file__)+'/'+biochem_root
         self.RxnsFile = self.BiochemRoot + rxns_file
@@ -51,6 +51,7 @@ class Reactions:
         return rxns_dict
 
     def loadReactions_tsv(self):
+        print("WARNING: This function is currently redundant and will only load one file!")
         reader = DictReader(open(self.RxnsFile), dialect='excel-tab')
         type_mapping = {"is_transport": int, "is_obsolete": int,
                         "deltag": float, "deltagerr": float}
@@ -623,11 +624,12 @@ class Reactions:
         rxns_count_thousands=0
         rxns_count_string=f"{rxns_count_thousands:02}"
 
-        # Initiate file handles
+        # Initiate TSV file handle
         rxns_tsv_file_handle = open(rxns_root + rxns_count_string+".tsv", 'w')
-        rxns_json_file_handle = open(rxns_root + rxns_count_string+".json", 'w')
+        rxns_tsv_file_handle.write("\t".join(self.Headers) + "\n")
 
-        # Initiate JSON list
+        # Initiate JSON file handle
+        rxns_json_file_handle = open(rxns_root + rxns_count_string+".json", 'w')
         rxns_json_list = list()
 
         # Initiate counting
