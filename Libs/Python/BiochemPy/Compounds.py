@@ -1,6 +1,7 @@
 import re
 import os
 import json
+import glob
 from csv import DictReader
 
 class Compounds:
@@ -17,29 +18,31 @@ class Compounds:
         self.Headers = reader.fieldnames
 
     def loadCompounds(self):
-        cpds_file = self.BiochemRoot+'compounds.json'
-        with open(cpds_file) as json_file_handle:
-            cpds_list = json.load(json_file_handle)
 
+        search_path = os.path.join(self.BiochemRoot,"compound_*.json")
         cpds_dict = dict()
-        for cpd_obj in cpds_list:
-            cpds_dict[cpd_obj['id']]=cpd_obj
-            for key in cpd_obj:
-                if(isinstance(cpd_obj[key],list)):
-                    for i in range(len(cpd_obj[key])):
-                        if(cpd_obj[key][i] is None):
-                            cpd_obj[key][i]="null"
+        for compounds_file in sorted(glob.glob(search_path)):
+            with open(compounds_file) as json_file_handle:
+                cpds_list = json.load(json_file_handle)
+                for cpd_obj in cpds_list:
+                    for key in cpd_obj:
+                        if(isinstance(cpd_obj[key],list)):
+                            for i in range(len(cpd_obj[key])):
+                                if(cpd_obj[key][i] is None):
+                                    cpd_obj[key][i]="null"
                             
-                if(isinstance(cpd_obj[key],dict)):
-                    for entry in cpd_obj[key]:
-                        if(cpd_obj[key][entry] is None):
-                            cpd_obj[key][entry]="null"
+                        if(isinstance(cpd_obj[key],dict)):
+                            for entry in cpd_obj[key]:
+                                if(cpd_obj[key][entry] is None):
+                                    cpd_obj[key][entry]="null"
                             
-                if(cpd_obj[key] is None):
-                    cpd_obj[key]="null"
-
+                        if(cpd_obj[key] is None):
+                            cpd_obj[key]="null"
+                        
+                    cpds_dict[cpd_obj['id']]=cpd_obj
+                    
         return cpds_dict
-    
+
     def loadCompounds_tsv(self):
         reader = DictReader(open(self.CpdsFile), dialect='excel-tab')
         type_mapping = {"is_core": int, "is_obsolete": int, "is_cofactor": int, "charge": int,
@@ -316,15 +319,64 @@ class Compounds:
         alias_file.close()
 
     def saveCompounds(self, compounds_dict):
-        cpds_root = os.path.splitext(self.CpdsFile)[0]
 
-        # Print to TSV
-        cpds_file = open(cpds_root + ".tsv", 'w')
-        cpds_file.write("\t".join(self.Headers) + "\n")
-        for cpd in sorted(compounds_dict.keys()):
+        cpds_root = self.BiochemRoot + 'compound_'
+
+        # Initiate count
+        cpds_count_thousands=0
+        cpds_count_string=f"{cpds_count_thousands:02}"
+
+        # Initiate file handles
+        cpds_tsv_file_handle = open(cpds_root + cpds_count_string+".tsv", 'w')
+        cpds_json_file_handle = open(cpds_root + cpds_count_string+".json", 'w')
+
+        # Initiate JSON list
+        cpds_json_list = list()
+
+        # Initiate counting
+        prev_rounded_count = 0
+        
+        # Iterate through compounds
+        for cpd_id in sorted(compounds_dict.keys()):
+
+            # Reset for every 1000
+            # NB: we want a direct link between the filename and the compound id
+            # and for legacy reasons, there may not be a compound id that falls on
+            # a multiple of 1000, so, here we find the compound id that "crosses"
+            # a multiple of 1000 in order to keep count
+            #
+            # for the same legacy reasons, this means there won't be
+            # 1000 compounds in every file
+            cpd_count = int(cpd_id[3:])
+            cur_rounded_count = cpd_count - cpd_count % 1000
+            if(cur_rounded_count > prev_rounded_count):
+
+                prev_rounded_count = cur_rounded_count
+
+                # Write JSON list
+                cpds_json_file_handle.write(json.dumps(cpds_json_list, indent=4, sort_keys=True))
+
+                # Reset JSON list
+                cpds_json_list = list()
+
+                # Increment count
+                cpds_count_thousands+=1
+                cpds_count_string=f"{cpds_count_thousands:02}"
+
+                # Reset tsv file handle
+                cpds_tsv_file_handle.close()
+                cpds_tsv_file_handle = open(cpds_root + cpds_count_string+".tsv", 'w')
+                cpds_tsv_file_handle.write("\t".join(self.Headers) + "\n")
+
+                # Reset json file handle
+                cpds_json_file_handle.close()
+                cpds_json_file_handle = open(cpds_root + cpds_count_string+".json", 'w')
+                pass
+
+            # Write TSV
             values_list=list()
             for header in self.Headers:
-                value=compounds_dict[cpd][header]
+                value=compounds_dict[cpd_id][header]
                 if(value is None):
                     value="null"
                 if(isinstance(value,list)):
@@ -335,12 +387,9 @@ class Compounds:
                         entries.append(entry+':'+value[entry])
                     value = "|".join(entries)
                 values_list.append(str(value))
-            cpds_file.write("\t".join(values_list)+"\n")
-        cpds_file.close()
+            cpds_tsv_file_handle.write("\t".join(values_list)+"\n")
 
-        #Re-configure JSON
-        new_compounds_dict = list()
-        for cpd_id in sorted(compounds_dict):
+            # Collect list for JSON
             cpd_obj = compounds_dict[cpd_id]
             for key in cpd_obj:
                 if(isinstance(cpd_obj[key],dict)):
@@ -349,9 +398,12 @@ class Compounds:
                             cpd_obj[key][entry]=None
                 if(cpd_obj[key]=="null"):
                     cpd_obj[key]=None
-            new_compounds_dict.append(cpd_obj)
 
-        # Print to JSON
-        cpds_file = open(cpds_root + ".json", 'w', newline='\n')
-        cpds_file.write(json.dumps(new_compounds_dict, indent=4, sort_keys=True))
-        cpds_file.close()
+            cpds_json_list.append(cpd_obj)
+
+        # Close TSV file handle
+        cpds_tsv_file_handle.close()
+
+        # Write last JSON list and close file handle
+        cpds_json_file_handle.write(json.dumps(cpds_json_list, indent=4, sort_keys=True))
+        cpds_json_file_handle.close()

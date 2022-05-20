@@ -2,6 +2,7 @@ import os
 import re
 import json
 import copy
+import glob
 import itertools
 from csv import DictReader
 
@@ -22,29 +23,31 @@ class Reactions:
         from BiochemPy import Compounds
         self.CompoundsHelper = Compounds()
         self.Compounds_Dict = self.CompoundsHelper.loadCompounds()
-
+            
     def loadReactions(self):
-        rxns_file = self.BiochemRoot+'reactions.json'
-        with open(rxns_file) as json_file_handle:
-            rxns_list = json.load(json_file_handle)
 
+        search_path = os.path.join(self.BiochemRoot,"reaction_*.json")
         rxns_dict = dict()
-        for rxn_obj in rxns_list:
-            rxns_dict[rxn_obj['id']]=rxn_obj
-            for key in rxn_obj:
-                if(isinstance(rxn_obj[key],list)):
-                    for i in range(len(rxn_obj[key])):
-                        if(rxn_obj[key][i] is None):
-                            rxn_obj[key][i]="null"
+        for reactions_file in sorted(glob.glob(search_path)):
+            with open(reactions_file) as json_file_handle:
+                rxns_list = json.load(json_file_handle)
+                for rxn_obj in rxns_list:
+                    for key in rxn_obj:
+                        if(isinstance(rxn_obj[key],list)):
+                            for i in range(len(rxn_obj[key])):
+                                if(rxn_obj[key][i] is None):
+                                    rxn_obj[key][i]="null"
                             
-                if(isinstance(rxn_obj[key],dict)):
-                    for entry in rxn_obj[key]:
-                        if(rxn_obj[key][entry] is None):
-                            rxn_obj[key][entry]="null"
+                        if(isinstance(rxn_obj[key],dict)):
+                            for entry in rxn_obj[key]:
+                                if(rxn_obj[key][entry] is None):
+                                    rxn_obj[key][entry]="null"
                             
-                if(rxn_obj[key] is None):
-                    rxn_obj[key]="null"
-
+                        if(rxn_obj[key] is None):
+                            rxn_obj[key]="null"
+                        
+                    rxns_dict[rxn_obj['id']]=rxn_obj
+                    
         return rxns_dict
 
     def loadReactions_tsv(self):
@@ -614,15 +617,63 @@ class Reactions:
         alias_file.close()
 
     def saveReactions(self, reactions_dict):
-        rxns_root = os.path.splitext(self.RxnsFile)[0]
+        rxns_root = self.BiochemRoot + 'reaction_'
 
-        # Print to TSV
-        rxns_file = open(rxns_root + ".tsv", 'w')
-        rxns_file.write("\t".join(self.Headers) + "\n")
-        for rxn in sorted(reactions_dict.keys()):
+        # Initiate count
+        rxns_count_thousands=0
+        rxns_count_string=f"{rxns_count_thousands:02}"
+
+        # Initiate file handles
+        rxns_tsv_file_handle = open(rxns_root + rxns_count_string+".tsv", 'w')
+        rxns_json_file_handle = open(rxns_root + rxns_count_string+".json", 'w')
+
+        # Initiate JSON list
+        rxns_json_list = list()
+
+        # Initiate counting
+        prev_rounded_count = 0
+        
+        # Iterate through reactions
+        for rxn_id in sorted(reactions_dict.keys()):
+
+            # Reset for every 1000
+            # NB: we want a direct link between the filename and the reaction id
+            # and for legacy reasons, there may not be a reaction id that falls on
+            # a multiple of 1000, so, here we find the reaction id that "crosses"
+            # a multiple of 1000 in order to keep count
+            #
+            # for the same legacy reasons, this means there won't be
+            # 1000 reactions in every file
+            rxn_count = int(rxn_id[3:])
+            cur_rounded_count = rxn_count - rxn_count % 1000
+            if(cur_rounded_count > prev_rounded_count):
+
+                prev_rounded_count = cur_rounded_count
+
+                # Write JSON list
+                rxns_json_file_handle.write(json.dumps(rxns_json_list, indent=4, sort_keys=True))
+
+                # Reset JSON list
+                rxns_json_list = list()
+
+                # Increment count
+                rxns_count_thousands+=1
+                rxns_count_string=f"{rxns_count_thousands:02}"
+
+                # Reset tsv file handle
+                rxns_tsv_file_handle.close()
+                rxns_tsv_file_handle = open(rxns_root + rxns_count_string+".tsv", 'w')
+                rxns_tsv_file_handle.write("\t".join(self.Headers) + "\n")
+
+                # Reset json file handle
+                rxns_json_file_handle.close()
+                rxns_json_file_handle = open(rxns_root + rxns_count_string+".json", 'w')
+                pass
+
+            # Write TSV
             values_list=list()
             for header in self.Headers:
-                value=reactions_dict[rxn][header]
+                value=reactions_dict[rxn_id][header]
                 if(isinstance(value,list)):
                     value = "|".join(value)
                 if(isinstance(value,dict)):
@@ -631,12 +682,9 @@ class Reactions:
                         entries.append(entry+':'+value[entry])
                     value = "|".join(entries)
                 values_list.append(str(value))
-            rxns_file.write("\t".join(values_list)+"\n")
-        rxns_file.close()
+            rxns_tsv_file_handle.write("\t".join(values_list)+"\n")
 
-        #Re-configure JSON
-        new_reactions_dict = list()
-        for rxn_id in sorted(reactions_dict):
+            # Collect list for JSON
             rxn_obj = reactions_dict[rxn_id]
             for key in rxn_obj:
                 if(isinstance(rxn_obj[key],dict)):
@@ -645,12 +693,15 @@ class Reactions:
                             rxn_obj[key][entry]=None
                 if(rxn_obj[key]=="null"):
                     rxn_obj[key]=None
-            new_reactions_dict.append(rxn_obj)
 
-        # Print to JSON
-        rxns_file = open(rxns_root + ".json", 'w')
-        rxns_file.write(json.dumps(new_reactions_dict, indent=4, sort_keys=True))
-        rxns_file.close()
+            rxns_json_list.append(rxn_obj)
+
+        # Close TSV file handle
+        rxns_tsv_file_handle.close()
+
+        # Write last JSON list and close file handle
+        rxns_json_file_handle.write(json.dumps(rxns_json_list, indent=4, sort_keys=True))
+        rxns_json_file_handle.close()
 
     def loadMSAliases(self,sources_array=[]):
         if(len(sources_array)==0):
