@@ -283,13 +283,13 @@ class Reactions:
             if (str(rgt["coefficient"])[-2:] == ".0"):
                 rgt["coefficient"] = int(round(rgt["coefficient"]))
 
-            rgt["coefficient"] = str(rgt["coefficient"])
-            rgt["compartment"] = str(rgt["compartment"])
-            rgt["index"] = str(rgt["index"])
+            coeff = str(rgt["coefficient"])
+            cpt = str(rgt["compartment"])
+            idx = str(rgt["index"])
 
             rgt_string = ":".join(
-                [rgt["coefficient"], rgt["compound"], rgt["compartment"],
-                 rgt["index"], rgt["name"]])
+                [coeff, rgt["compound"], cpt,
+                 idx, '"'+rgt["name"]+'"'])
             stoichiometry_array.append(rgt_string)
         stoichiometry_string = ";".join(stoichiometry_array)
         return stoichiometry_string
@@ -676,9 +676,11 @@ class Reactions:
             values_list=list()
             for header in self.Headers:
                 value=reactions_dict[rxn_id][header]
-                if(isinstance(value,list)):
+                if(header=="stoichiometry"):
+                    value = self.buildStoich(reactions_dict[rxn_id][header])
+                elif(isinstance(value,list)):
                     value = "|".join(value)
-                if(isinstance(value,dict)):
+                elif(isinstance(value,dict)):
                     entries = list()
                     for entry in value:
                         entries.append(entry+':'+value[entry])
