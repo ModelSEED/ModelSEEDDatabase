@@ -539,15 +539,15 @@ class Reactions:
             " + ".join(x for x in rgts_str__array if "cpd00067" not in x))
 
         code_array.append("<=>")
-        if (reaction_dict["direction"] == "="):
-            equation_array.append("<=>")
-            definition_array.append("<=>")
-        elif (reaction_dict["direction"] == "<"):
+        if (reaction_dict["reversibility"] == "<"):
             equation_array.append("<=")
             definition_array.append("<=")
-        else:
+        elif (reaction_dict["reversibility"] == ">"):
             equation_array.append("=>")
             definition_array.append("=>")
+        else:
+            equation_array.append("<=>")
+            definition_array.append("<=>")
 
         pdts_str_array = list()
         for rgt in products_array:
