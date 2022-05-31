@@ -250,15 +250,16 @@ class Reactions:
         #It matters which side of the equation, so build reagents and products arrays
         reagents=list()
         products=list()
-        for rgt in sorted(rxn_cpds_array, key=lambda x: ( x["reagent"], x["coefficient"] )):
+        for rgt in sorted(rxn_cpds_array, key=lambda x: ( x["compound"], x["compartment"], x["coefficient"] )):
             #skip protons
-            if("cpd00067" in rgt["reagent"] and is_transport == 0):
+            if(rgt["compound"] == "cpd00067" and is_transport == 0):
                 continue
 
+            rgt_str = rgt["compound"]+"_"+str(rgt["compartment"])
             if(rgt["coefficient"]<0):
-                reagents.append(rgt["reagent"]+":"+str(abs(rgt["coefficient"])))
+                reagents.append(rgt_str+":"+str(abs(rgt["coefficient"])))
             if(rgt["coefficient"]>0):
-                products.append(rgt["reagent"]+":"+str(abs(rgt["coefficient"])))
+                products.append(rgt_str+":"+str(abs(rgt["coefficient"])))
 
         rgt_string = "|".join(reagents)
         pdt_string = "|".join(products)
@@ -290,16 +291,18 @@ class Reactions:
 
         rgts_dict = dict()
         for rgt in rgts_array:
-            if (rgt["reagent"] not in rgts_dict):
-                rgts_dict[rgt["reagent"]] = 0
-            rgts_dict[rgt["reagent"]] += float(rgt["coefficient"])
+            rgt_str = rgt["compound"]+"_"+str(rgt["compartment"])
+            if (rgt_str not in rgts_dict):
+                rgts_dict[rgt_str] = 0
+            rgts_dict[rgt_str] += float(rgt["coefficient"])
 
         new_rgts_array=list()
         for rgt in rgts_array:
-            if (rgts_dict[rgt["reagent"]] == 0):
+            rgt_str = rgt["compound"]+"_"+str(rgt["compartment"])
+            if (rgts_dict[rgt_str] == 0):
                 continue
 
-            rgt["coefficient"]=rgts_dict[rgt["reagent"]]
+            rgt["coefficient"]=rgts_dict[rgt_str]
 
             # Correct for redundant ".0" in floats
             if (str(rgt["coefficient"])[-2:] == ".0"):
@@ -308,8 +311,7 @@ class Reactions:
             new_rgts_array.append(rgt)
             
             #Trick to exclude reagent if it appears in array more than once
-            rgts_dict[rgt["reagent"]]=0
-            
+            rgts_dict[rgt_str]=0
 
         return new_rgts_array
 
@@ -324,9 +326,11 @@ class Reactions:
         ########################################
         rgts_dict = dict()
         for rgt in rgts_array:
-            if (rgt["reagent"] not in rgts_dict):
-                rgts_dict[rgt["reagent"]] = 0
-            rgts_dict[rgt["reagent"]] += 1
+            rgt_str = rgt["compound"]+"_"+str(rgt["compartment"])
+
+            if (rgt_str not in rgts_dict):
+                rgts_dict[rgt_str] = 0
+            rgts_dict[rgt_str] += 1
 
         for rgt in rgts_dict.keys():
             if (rgts_dict[rgt] > 1):
