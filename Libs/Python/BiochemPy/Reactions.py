@@ -83,7 +83,6 @@ class Reactions:
         rxn_cpds_array = list()
         reagent=-1
         coeff=1
-        index=0
         for text in equation_string.split(" "):
             if(text == "+"):
                 continue
@@ -108,15 +107,13 @@ class Reactions:
                 coeff=coeff*reagent
 
                 (cpd,cpt)=(match.group(1),match.group(2))
-                rgt_id = cpd + "_" + cpt + str(index)
                 cpt = int(cpt)
                 name = self.Compounds_Dict[cpd]["name"]
                 formula = self.Compounds_Dict[cpd]["formula"]
                 charge = self.Compounds_Dict[cpd]["charge"]
 
-                rxn_cpds_array.append({"reagent": rgt_id, "coefficient": coeff,
-                                       "compound": cpd, "compartment": cpt,
-                                       "index": index, "name": name,
+                rxn_cpds_array.append({"compound": cpd, "compartment": cpt,
+                                       "coefficient": coeff, "name": name,
                                        "formula": formula, "charge": charge})
 
                 #Need to reset coeff for next compound
@@ -132,9 +129,7 @@ class Reactions:
             return rxn_cpds_array
 
         for rgt in stoichiometry.split(";"):
-            (coeff, cpd, cpt, index, name) = rgt.split(":", 4)
-            rgt_id = cpd + "_" + cpt + index
-
+            (coeff, cpd, cpt, name) = rgt.split(":", 3)
             coeff = float(coeff)
 
             # Correct for redundant ".0" in floats
@@ -142,11 +137,9 @@ class Reactions:
                 coeff = int(round(coeff))
 
             cpt = int(cpt)
-            index = int(index)
 
-            rxn_cpds_array.append({"reagent": rgt_id, "coefficient": coeff,
-                                   "compound": cpd, "compartment": cpt,
-                                   "index": index, "name": name,
+            rxn_cpds_array.append({"compound": cpd, "compartment": cpt,
+                                   "name": name, "coefficient": coeff,
                                    "formula": self.Compounds_Dict[cpd][
                                        "formula"],
                                    "charge": self.Compounds_Dict[cpd][
@@ -161,7 +154,7 @@ class Reactions:
             return rxn_cpds_array
 
         for rgt in stoichiometry.split(";"):
-            (coeff, cpd, cpt, index, name) = rgt.split(":", 4)
+            (coeff, cpd, cpt, name) = rgt.split(":", 3)
             cpd_cpt_tuple = (cpd,cpt)
             rxn_cpds_dict[cpd_cpt_tuple]=coeff
 
@@ -212,7 +205,7 @@ class Reactions:
                 for old, new in entry:
                     if(cpd == old):
                         new_cpd = new
-                reagent = { "reagent":new_cpd+'_'+cpt+'0',
+                reagent = { "reagent":new_cpd+'_'+cpt,
                             "compartment":cpt,
                             "coefficient":float(coeff) }
 
@@ -277,7 +270,7 @@ class Reactions:
     def buildStoich(rxn_cpds_array):
         stoichiometry_array = list()
         for rgt in sorted(rxn_cpds_array, key=lambda x: (
-                int(x["coefficient"] > 0), x["reagent"])):
+                int(x["coefficient"] > 0), x["compound"], x["compartment"])):
 
             # Correct for redundant ".0" in floats
             if (str(rgt["coefficient"])[-2:] == ".0"):
@@ -285,11 +278,9 @@ class Reactions:
 
             coeff = str(rgt["coefficient"])
             cpt = str(rgt["compartment"])
-            idx = str(rgt["index"])
 
             rgt_string = ":".join(
-                [coeff, rgt["compound"], cpt,
-                 idx, '"'+rgt["name"]+'"'])
+                [coeff, rgt["compound"], cpt, '"'+rgt["name"]+'"'])
             stoichiometry_array.append(rgt_string)
         stoichiometry_string = ";".join(stoichiometry_array)
         return stoichiometry_string
@@ -475,8 +466,8 @@ class Reactions:
             rgt_id = compound + "_" + str(compartment) + "0"
 
             rxn_cpds_array.append(
-                {"reagent": rgt_id, "coefficient": 0-adjustment,
-                 "compound": compound, "compartment": compartment, "index": 0,
+                {"compound": compound, "compartment": compartment,
+                 "coefficient": 0-adjustment,
                  "name": self.Compounds_Dict[compound]["name"],
                  "formula": self.Compounds_Dict[compound]["formula"],
                  "charge": self.Compounds_Dict[compound]["charge"]})
@@ -505,7 +496,6 @@ class Reactions:
             if (rgt["compound"] == old_compound):
                 found_cpd=True
                 rgt["compound"]=new_compound
-                rgt["reagent"]=new_compound + "_" + str(rgt["compartment"]) + "0"
                 rgt["name"]=self.Compounds_Dict[new_compound]['name']
 
         return found_cpd
