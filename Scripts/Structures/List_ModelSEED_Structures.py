@@ -2,6 +2,8 @@
 import os
 import sys
 import json
+
+sys.path.append('../../Libs/Python')
 from BiochemPy import Compounds
 
 #Load Compounds
@@ -10,7 +12,7 @@ Compounds_Dict = CompoundsHelper.loadCompounds()
 
 Structures_Root=os.path.dirname(__file__)+"/../../Biochemistry/Structures/"
 Formulas_Dict=dict()
-for source in "KEGG","MetaCyc":
+for source in "KEGG","MetaCyc","Rhea":
     if(source not in Formulas_Dict):
         Formulas_Dict[source]=dict()
 
@@ -38,8 +40,8 @@ with open(Structures_Root+"Ignored_ModelSEED_Structures.txt") as ignore_file:
 ignore_file.close()
 
 #Load Structures and Aliases
-Structures_Dict = CompoundsHelper.loadStructures(["SMILE","InChIKey","InChI"],["KEGG","MetaCyc"])
-MS_Aliases_Dict =  CompoundsHelper.loadMSAliases(["KEGG","MetaCyc"])
+Structures_Dict = CompoundsHelper.loadStructures(["SMILE","InChIKey","InChI"],["KEGG","MetaCyc","Rhea"])
+MS_Aliases_Dict =  CompoundsHelper.loadMSAliases(["KEGG","MetaCyc","Rhea"])
 
 master_structs_file = open(Structures_Root+"All_ModelSEED_Structures.txt",'w')
 unique_structs_file = open(Structures_Root+"Unique_ModelSEED_Structures.txt",'w')
@@ -51,7 +53,7 @@ for msid in sorted(MS_Aliases_Dict.keys()):
     #Build collection of all structures for the ModelSEED ID
     Structs = dict()
     Formulas=dict()
-    for source in 'KEGG','MetaCyc':
+    for source in 'KEGG','MetaCyc','Rhea':
         if(source not in MS_Aliases_Dict[msid].keys()):
             continue
 
@@ -215,6 +217,9 @@ for msid in sorted(MS_Aliases_Dict.keys()):
                         chosen_structure = sorted(sources_structures['MetaCyc'])[0]
                     elif('KEGG' in sources_structures):
                         chosen_structure = sorted(sources_structures['KEGG'])[0]
+                    elif('Rhea' in sources_structures):
+                        chosen_structure = sorted(sources_structures['Rhea'])[0]
+
                 else:
                     #So now we break down the InChIKey and find structures with the same connectivity
                     connected_structures = dict()
@@ -243,6 +248,8 @@ for msid in sorted(MS_Aliases_Dict.keys()):
                                 chosen_structure = sorted(sources_structures['MetaCyc'])[0]
                             elif('KEGG' in sources_structures):
                                 chosen_structure = sorted(sources_structures['KEGG'])[0]
+                            elif('Rhea' in sources_structures):
+                                chosen_structure = sorted(sources_structures['Rhea'])[0]
 
                     if(chosen_structure is None):
                         #Here we have structures with the same formula, but different connectivity
@@ -251,6 +258,8 @@ for msid in sorted(MS_Aliases_Dict.keys()):
                             chosen_structure = sorted(sources_structures['MetaCyc'])[0]
                         elif('KEGG' in sources_structures):
                             chosen_structure = sorted(sources_structures['KEGG'])[0]
+                        elif('Rhea' in sources_structures):
+                            chosen_structure = sorted(sources_structures['Rhea'])[0]
 
             #Now we have the chosen structure, we collect aliases of chosen structure
             #And use them to make sure we consistently use the right structure of each type

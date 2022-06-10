@@ -3,9 +3,10 @@ import os, sys, re
 temp=list();
 header=1;
 
+sys.path.append('../../Libs/Python')
 from BiochemPy import Compounds
 
-import pybel
+from openbabel import pybel
 from rdkit.Chem import AllChem
 from rdkit import RDLogger
 lg = RDLogger.logger()
@@ -17,7 +18,7 @@ Structures_Dict = CompoundsHelper.loadStructures(["SMILE","InChI"],["KEGG","Meta
 
 Structures_Root=os.path.dirname(__file__)+"/../../Biochemistry/Structures/"
 file_handle_dict=dict()
-for source in "KEGG","MetaCyc":
+for source in "KEGG","MetaCyc", "Rhea":
     for struct_type in "InChI","SMILE":
         for struct_stage in "Charged","Original":
             file_string="_".join((source,struct_type,struct_stage))
