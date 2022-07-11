@@ -24,7 +24,7 @@ if("message" in r and r["message"] == "Not Found"):
     print ("Github user "+curation_source+" does not exist.")
     sys.exit()
 
-sys.path.append('../../Libs/Python')
+sys.path.append('../../../Libs/Python')
 from BiochemPy import Reactions, Compounds, InChIs
 
 compounds_helper = Compounds()
@@ -64,50 +64,29 @@ for msid in original_alias_dict:
 for alias in all_aliases:
     all_aliases[alias]=sorted(all_aliases[alias])
 
-Structures_Dict = compounds_helper.loadStructures(["InChI","SMILE"],["KEGG","MetaCyc"])
-all_inchis=dict()
-all_aliases_InChIs=dict()
-for alias in Structures_Dict['InChI']:
-    if('Charged' in Structures_Dict['InChI'][alias]):
-        for struct in Structures_Dict['InChI'][alias]['Charged']:
-            if(struct not in all_inchis):
-                all_inchis[struct]=list()
-            all_inchis[struct].append(alias)
+Structures_Dict = compounds_helper.loadStructures(["InChI","InChIKey","SMILE"],["KEGG","MetaCyc"])
+all_structures=dict()
+all_aliases_structures=dict()
+for structure_type in ["InChI","InChIKey","SMILE"]:
+    for alias in Structures_Dict[structure_type]:
+        if('Charged' in Structures_Dict[structure_type][alias]):
+            for struct in Structures_Dict[structure_type][alias]['Charged']:
+                if(struct not in all_structures):
+                    all_structures[struct]=list()
+                all_structures[struct].append(alias)
 
-            if(alias not in all_aliases_InChIs):
-                all_aliases_InChIs[alias]=list()
-            all_aliases_InChIs[alias].append(struct)
-    elif('Original' in Structures_Dict['InChI'][alias]):
-        for struct in Structures_Dict['InChI'][alias]['Original']:
-            if(struct not in all_inchis):
-                all_inchis[struct]=list()
-            all_inchis[struct].append(alias)
+                if(alias not in all_aliases_structures):
+                    all_aliases_structures[alias]=list()
+                all_aliases_structures[alias].append(struct)
+        elif('Original' in Structures_Dict[structure_type][alias]):
+            for struct in Structures_Dict[structure_type][alias]['Original']:
+                if(struct not in all_structures):
+                    all_structures[struct]=list()
+                all_structures[struct].append(alias)
 
-            if(alias not in all_aliases_InChIs):
-                all_aliases_InChIs[alias]=list()
-            all_aliases_InChIs[alias].append(struct)
-
-all_smiles=dict()
-all_aliases_SMILEs=dict()
-for alias in Structures_Dict['SMILE']:
-    if('Charged' in Structures_Dict['SMILE'][alias]):
-        for struct in Structures_Dict['SMILE'][alias]['Charged']:
-            if(struct not in all_smiles):
-                all_smiles[struct]=list()
-            all_smiles[struct].append(alias)
-
-            if(alias not in all_aliases_SMILEs):
-                all_aliases_SMILEs[alias]=list()
-            all_aliases_SMILEs[alias].append(struct)
-    elif('Original' in Structures_Dict['SMILE'][alias]):
-        for struct in Structures_Dict['SMILE'][alias]['Original']:
-            if(struct not in all_smiles):
-                all_smiles[struct]=list()
-            all_smiles[struct].append(alias)
-
-            if(alias not in all_aliases_SMILEs):
-                all_aliases_SMILEs[alias]=list()
-            all_aliases_SMILEs[alias].append(struct)
+                if(alias not in all_aliases_structures):
+                    all_aliases_structures[alias]=list()
+                all_aliases_structures[alias].append(struct)
 
 #Find last identifier and increment
 last_identifier = list(sorted(compounds_dict))[-1]
@@ -125,7 +104,7 @@ Matched_Cpd_Count=dict()
 Headers=list()
 with open(args.compounds_file) as fh:
     for line in fh.readlines():
-        line=line.strip()
+        line=line.strip('\r\n')
         if(len(Headers)==0):
             Headers=line.split('\t')
             continue
@@ -137,39 +116,29 @@ with open(args.compounds_file) as fh:
 
         (matched_cpd,matched_src)=(None,None)
 
-        #Check that the Structure doesn't already exist, first as InChI, then as SMILE
-        if(matched_cpd is None and 'inchi' in cpd and cpd['inchi'] in all_inchis):
+        #Check that the Structure doesn't already exist, first as InChI, then as InChiKey, then as SMILES
+        if(matched_cpd is None):
+            for structure_type in ['inchi','inchikey','smile','smiles']:
+                if(matched_cpd is not None):
+                    break
+                
+                if(structure_type in cpd and cpd[structure_type] in all_structures):
+                    
+                    msids = list()
+                    for alias in all_structures[cpd[structure_type]]:
 
-            msids = dict()
-            for alias in all_inchis[cpd['inchi']]:
+                        #The structures are taken from their sources and the corresponding alias may not yet be registered
+                        if(alias not in all_aliases):
+                            continue
 
-                #The structures are taken from their sources and the corresponding alias may not yet be registered
-                if(alias not in all_aliases):
-                    continue
+                        for msid in all_aliases[alias]:
+                            if(msid not in msids):
+                                msids.append(msid)
 
-                for msid in all_aliases[alias]:
-                    msids[msid]=1
-
-            msids=list(sorted(msids))
-            if(len(msids)>0):
-                matched_cpd=msids[0]
-                matched_src='InChI'
-
-        elif(matched_cpd is None and 'smile' in cpd and cpd['smile'] in all_smiles):
-
-            msids = dict()
-            for alias in all_smiles[cpd['smile']]:
-                #The structures are taken from their sources and the corresponding alias may not yet be registered
-                if(alias not in all_aliases):
-                    continue
-
-                for msid in all_aliases[alias]:
-                    msids[msid]=1
-
-            msids=list(sorted(msids))
-            if(len(msids)>0):
-                matched_cpd=msids[0]
-                matched_src='SMILE'
+                    msids=list(sorted(msids))        
+                    if(len(msids)>0):
+                        matched_cpd=msids[0]
+                        matched_src=structure_type
 
         #Then check that the Name doesn't already exist
         elif(matched_cpd is None):
@@ -184,7 +153,6 @@ with open(args.compounds_file) as fh:
                 matched_src='NAMES'
 
         if(matched_cpd is not None):
-            print("Matched compound:\t"+cpd['id']+"\t"+matched_cpd)
             if(matched_src not in Matched_Cpd_Count):
                 Matched_Cpd_Count[matched_src]=dict()
             Matched_Cpd_Count[matched_src][matched_cpd]=cpd['id']
@@ -202,14 +170,14 @@ with open(args.compounds_file) as fh:
                     new_name_count[matched_cpd]=1
 
             #print warning if multiple structures
-            if('inchi' in cpd and cpd['inchi'] in all_inchis):
-                if(cpd['id'] not in all_aliases_InChIs or cpd['id'] not in all_inchis[cpd['inchi']]):
-                    print("Warning: InChI structure for "+cpd['id']+" assigned to different compounds: "+",".join(all_inchis[cpd['inchi']]))
+            if('inchi' in cpd and cpd['inchi'] in all_structures):
+                if(cpd['id'] not in all_aliases_structures or cpd['id'] not in all_structures[cpd['inchi']]):
+                    print("Warning: InChI structure for "+cpd['id']+" assigned to different compounds: "+",".join(all_structures[cpd['inchi']]))
 
             #print warning if multiple structures
-            if('smile' in cpd and cpd['smile'] in all_smiles):
-                if(cpd['ID'] not in all_aliases_SMILEs or cpd['id'] not in all_smiles[cpd['smile']]):
-                    print("Warning: SMILE structure for "+cpd['id']+" assigned to different compounds: "+",".join(all_smiles[cpd['smile']]))
+            if('smile' in cpd and cpd['smile'] in all_structures):
+                if(cpd['ID'] not in all_aliases_structures or cpd['id'] not in all_structures[cpd['smile']]):
+                    print("Warning: SMILE structure for "+cpd['id']+" assigned to different compounds: "+",".join(all_structures[cpd['smile']]))
                 
             #if matching structure or name, add ID to aliases
             if(matched_src != 'ID'):
@@ -272,8 +240,8 @@ with open(args.compounds_file) as fh:
 print("Compounds matched via:")
 for src in sorted(Matched_Cpd_Count):
     print("\t"+src+": "+str(len(Matched_Cpd_Count[src])))
-    for match in Matched_Cpd_Count[src]:
-        print(src+"\t"+match+"\t"+Matched_Cpd_Count[src][match])
+    #for match in Matched_Cpd_Count[src]:
+    #    print(src+"\t"+match+"\t"+Matched_Cpd_Count[src][match])
 print("Saving additional names for "+str(len(new_name_count))+" compounds")
 if(args.save_file is True):
     compounds_helper.saveNames(names_dict)

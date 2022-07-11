@@ -7,7 +7,7 @@ header=True;
 
 Biochem="MetaCyc"
 
-sys.path.append('../../Libs/Python')
+sys.path.append('../../../Libs/Python')
 from BiochemPy import Reactions, Compounds, InChIs
 
 compounds_helper = Compounds()
