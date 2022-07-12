@@ -125,40 +125,39 @@ with open(args.compounds_file) as fh:
         (matched_cpd,matched_str,matched_src)=(None,None,None)
 
         #Check that the Structure doesn't already exist, first as InChI, then as InChiKey, then as SMILES
-        if(matched_cpd is None):
-            for structure_type in ['inchi','inchikey','smile','smiles']:
-                if(structure_type in cpd):
-                    structure_list = [cpd[structure_type]]
-                    if(structure_type == 'inchikey'):
-                        structure_list.append('-'.join(cpd[structure_type].split('-')[0:2]))
-                        structure_list.append('-'.join(cpd[structure_type].split('-')[0:1]))
+        for structure_type in ['inchi','inchikey','smile','smiles']:
+            if(structure_type in cpd):
+                structure_list = [cpd[structure_type]]
+                if(structure_type == 'inchikey'):
+                    structure_list.append('-'.join(cpd[structure_type].split('-')[0:2]))
+                    structure_list.append('-'.join(cpd[structure_type].split('-')[0:1]))
 
-                    for structure in structure_list:
+                for structure in structure_list:
                         
-                        if(matched_cpd is not None):
-                            break
+                    if(matched_cpd is not None):
+                        break
 
-                        if(structure in all_structures):
+                    if(structure in all_structures):
                     
-                            msids = list()
-                            for alias in all_structures[structure]:
+                        msids = list()
+                        for alias in all_structures[structure]:
 
-                                #The structures are taken from their sources and the corresponding alias may not yet be registered
-                                if(alias not in all_aliases):
-                                    continue
+                            #The structures are taken from their sources and the corresponding alias may not yet be registered
+                            if(alias not in all_aliases):
+                                continue
 
-                                for msid in all_aliases[alias]:
-                                    if(msid not in msids):
-                                        msids.append(msid)
+                            for msid in all_aliases[alias]:
+                                if(msid not in msids):
+                                    msids.append(msid)
 
-                            msids=list(sorted(msids))
-                            if(len(msids)>0):
-                                matched_cpd=msids[0]
-                                matched_src=structure_type
-                                matched_str=structure
+                        msids=list(sorted(msids))
+                        if(len(msids)>0):
+                            matched_cpd=msids[0]
+                            matched_src=structure_type
+                            matched_str=structure
 
         #Then check that the Name doesn't already exist
-        elif(matched_cpd is None):
+        if(matched_cpd is None):
             msids=dict()
             for name in cpd['names'].split('|'):
                 searchname = compounds_helper.searchname(name)
