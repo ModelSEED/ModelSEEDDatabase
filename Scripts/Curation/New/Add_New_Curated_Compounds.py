@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 import os, sys, re, copy
 import argparse, requests
-from csv import DictReader
 from collections import OrderedDict
 
 parser = argparse.ArgumentParser()
@@ -19,9 +18,9 @@ curation_source = args.github_user
 
 url = f"https://api.github.com/users/{curation_source}"
 r = requests.get(url.format(curation_source)).json()
-if("login" in r and r["login"] == curation_source):
+if("login" in r and r["login"].lower() == curation_source.lower()):
     print("Github user "+curation_source+" found")
-if("message" in r and r["message"] == "Not Found"):
+else:
     print ("Github user "+curation_source+" does not exist.")
     sys.exit()
 
