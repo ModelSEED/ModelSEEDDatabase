@@ -163,7 +163,8 @@ class Compounds:
                     structures_dict[line['ID']][line['Source']][line['Structure']]={'formula':line['Formula'],
                                                                                     'charge':line['Charge'],
                                                                                     'alias':line['Alias'].split(';')}
-
+                    if('Type' in line):
+                        structures_dict[line['ID']][line['Source']][line['Structure']]['type']=line['Type']
             return structures_dict
 
         for struct_type in sources_array:
