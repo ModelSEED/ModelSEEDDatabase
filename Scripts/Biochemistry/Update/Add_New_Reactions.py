@@ -4,7 +4,7 @@ import argparse
 
 parser = argparse.ArgumentParser()
 parser.add_argument('reactions_file', help="Reactions File")
-parser.add_argument('cpd_database', help="Biochemistry database of origin for compounds")
+parser.add_argument('cpd_databases', help="Biochemistry databases of origin for compounds")
 parser.add_argument('rxn_database', help="Biochemistry database of origin for reactions")
 parser.add_argument("-r", dest='report_file', action='store_true')
 parser.add_argument("-s", dest='save_file', action='store_true')
@@ -30,9 +30,11 @@ for msid in compounds_alias_dict:
             source_alias_dict[source][alias].append(msid)
 
 #Check compound source
-if(args.cpd_database != "ModelSEED" and args.cpd_database not in source_alias_dict):
-    print("Alias for source of compounds is not recognized")
-    sys.exit()
+if(args.cpd_databases != "ModelSEED"):
+    for cpd_db in args.cpd_databases.split(','):
+        if(cpd_db not in source_alias_dict):
+            print("Alias for source of compounds is not recognized")
+            sys.exit()
 
 compounds_dict = compounds_helper.loadCompounds()
 reactions_helper = Reactions()
@@ -113,13 +115,15 @@ with open(args.reactions_file) as fh:
             
             #if source is ModelSEED
             msid = ""
-            if(args.cpd_database == 'ModelSEED' and new_cpd in compounds_dict):
-                msid = new_cpd
-            elif(args.cpd_database in source_alias_dict and new_cpd in source_alias_dict[args.cpd_database]):
-                msid = sorted(source_alias_dict[args.cpd_database][new_cpd])[0]
-
+            for cpd_db in args.cpd_databases.split(','):
+                if(cpd_db == 'ModelSEED' and new_cpd in compounds_dict):
+                    msid = new_cpd
+                    break
+                elif(cpd_db in source_alias_dict and new_cpd in source_alias_dict[cpd_db]):
+                    msid = sorted(source_alias_dict[cpd_db][new_cpd])[0]
+                    break
+                
             if(msid != ""):
-
                 #set boundary
                 bound_msid=msid+"["
                 bound_cpd=new_cpd+"["
@@ -137,7 +141,7 @@ with open(args.reactions_file) as fh:
                 all_matched=False
 
         if(all_matched is False):
-            print("Warning: missing "+args.cpd_database+" identifiers for reaction "+rxn['id']+": "+"|".join(eqn_missing_cpds))
+            print("Warning: missing "+args.cpd_databases+" identifiers for reaction "+rxn['id']+": "+"|".join(eqn_missing_cpds))
             continue
         
         rxn_cpds_array = reactions_helper.parseEquation(rxn['equation'])

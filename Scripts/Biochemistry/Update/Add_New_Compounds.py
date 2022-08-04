@@ -57,7 +57,7 @@ for msid in unique_structures_dict:
                 struct_list = [structure]
                 if(structure_format == 'InChIKey'):
                     struct_list.append('-'.join(structure.split('-')[0:2]))
-                    struct_list.append('-'.join(structure.split('-')[0:1]))
+                    #struct_list.append('-'.join(structure.split('-')[0:1]))
 
                 for struct in struct_list:
                     if(struct not in compiled_structures_dict):
@@ -75,7 +75,7 @@ for msid in all_structures_dict:
 
                 if(structure_format == 'InChIKey'):
                     struct_list.append('-'.join(structure.split('-')[0:2]))
-                    struct_list.append('-'.join(structure.split('-')[0:1]))
+                    #struct_list.append('-'.join(structure.split('-')[0:1]))
 
                 for struct in struct_list:
                     if(struct not in compiled_structures_dict):
