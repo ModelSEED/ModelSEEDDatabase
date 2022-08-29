@@ -3,7 +3,7 @@ import os, sys
 temp=list();
 header=1;
 
-sys.path.append('../../Libs/Python')
+sys.path.append('../../../Libs/Python')
 from BiochemPy import Reactions, Compounds, InChIs
 
 reactions_helper = Reactions()
@@ -75,6 +75,8 @@ for rxn in delete_rxns:
 
 if(len(delete_rxns)>0):
     print("Removing "+str(len(delete_rxns))+" newly obsolete reactions")
+    for rxn in delete_rxns:
+        print("\t"+rxn)
     reactions_helper.saveReactions(reactions_dict)
     reactions_helper.saveNames(rxns_names_dict)
     reactions_helper.saveAliases(rxns_aliases_dict)

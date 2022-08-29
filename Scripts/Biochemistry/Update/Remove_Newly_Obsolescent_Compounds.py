@@ -3,7 +3,7 @@ import os, sys
 temp=list();
 header=1;
 
-sys.path.append('../../Libs/Python')
+sys.path.append('../../../Libs/Python')
 from BiochemPy import Reactions, Compounds, InChIs
 
 compounds_helper = Compounds()
@@ -60,6 +60,8 @@ for cpd in delete_cpds:
 
 if(len(delete_cpds)>0):
     print("Removing "+str(len(delete_cpds))+" newly obsolete compounds")
+    for cpd in delete_cpds:
+        print("\t"+cpd)
     compounds_helper.saveCompounds(compounds_dict)
     compounds_helper.saveNames(cpds_names_dict)
     compounds_helper.saveAliases(cpds_aliases_dict)

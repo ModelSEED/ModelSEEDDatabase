@@ -7,8 +7,9 @@ import copy
 import re
 import json
 from collections import OrderedDict
-from BiochemPy import Reactions, Compounds
 
+sys.path.append('../../../Libs/Python')
+from BiochemPy import Reactions, Compounds
 compounds_helper = Compounds()
 compounds_dict = compounds_helper.loadCompounds()
 
@@ -31,14 +32,11 @@ for rxn in reactions_dict:
             # Replace cpd with lnkd_cpd in reaction fields:
             # code, compound_ids, equation, stoichiometry
 
-            old_stoichiometry = reactions_dict[rxn]["stoichiometry"]
-            rxn_cpds_array = reactions_helper.parseStoich(old_stoichiometry)
+            rxn_cpds_array = reactions_dict[rxn]["stoichiometry"]
             reactions_helper.replaceCompound(rxn_cpds_array,cpd,lnkd_cpd)
-            new_stoichiometry = reactions_helper.buildStoich(rxn_cpds_array)
-            reactions_helper.rebuildReaction(reactions_dict[rxn],new_stoichiometry)
-
+            
             print("Replacting obsolete "+cpd+" with "+lnkd_cpd+" in "+rxn)
-
+            
             Update_Reactions+=1
 
 #    if(Update_Reactions>0):
