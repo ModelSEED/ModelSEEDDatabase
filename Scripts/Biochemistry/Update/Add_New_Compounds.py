@@ -29,10 +29,11 @@ for msid in sorted(original_name_dict):
     for name in original_name_dict[msid]:
         all_names_dict[name]=1
 
-        searchname = compounds_helper.searchname(name)
-        #Avoid redundancy where possible
-        if(searchname not in searchnames_dict):
-            searchnames_dict[searchname]=msid
+        searchnames = compounds_helper.searchname(name)
+        for searchname in searchnames:
+            #Avoid redundancy where possible
+            if(searchname not in searchnames_dict):
+                searchnames_dict[searchname]=msid
 
 original_alias_dict=compounds_helper.loadMSAliases()
 new_alias_count = dict()
@@ -152,10 +153,13 @@ with open(args.compounds_file) as fh:
         if(matched_cpd['msid'] is None):
             msids=dict()
             for name in cpd['names'].split('|'):
-                searchname = compounds_helper.searchname(name)
-                if(searchname in searchnames_dict):
-                    if(searchnames_dict[searchname] not in msids):
-                        msids[searchnames_dict[searchname]]=name
+                searchnames = compounds_helper.searchname(name)
+                for searchname in searchnames:
+                    if(searchname in searchnames_dict):
+                        if(searchnames_dict[searchname] not in msids):
+                            msids[searchnames_dict[searchname]]=name
+                            break
+                        
             msids_list=list(sorted(msids))
             if(len(msids_list)>0):
                 matched_cpd['msid']=msids_list[0]
@@ -193,7 +197,7 @@ with open(args.compounds_file) as fh:
             #Update source type
             compounds_dict[matched_cpd['msid']]['source']='Primary Database'
 
-        else:
+        elif(args.save_file is True):
 
             #New Compound!
             #Generate new identifier

@@ -223,7 +223,7 @@ with open(args.reactions_file) as fh:
             #Update source type
             reactions_dict[matched_rxn]['source']='User'
 
-        else:
+        elif(args.save_file is True):
             
             #New Reaction!
             #Generate new identifier
