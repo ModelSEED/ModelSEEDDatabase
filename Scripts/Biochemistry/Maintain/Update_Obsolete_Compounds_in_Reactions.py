@@ -16,7 +16,7 @@ compounds_dict = compounds_helper.loadCompounds()
 reactions_helper = Reactions()
 reactions_dict = reactions_helper.loadReactions()
 
-Update_Reactions=0
+updated_reactions=list()
 for rxn in reactions_dict:
     if(reactions_dict[rxn]['status']=='EMPTY'):
         continue
@@ -33,17 +33,20 @@ for rxn in reactions_dict:
             # code, compound_ids, equation, stoichiometry
 
             rxn_cpds_array = reactions_dict[rxn]["stoichiometry"]
+            stoichiometry=reactions_helper.buildStoich(rxn_cpds_array)
+            
             reactions_helper.replaceCompound(rxn_cpds_array,cpd,lnkd_cpd)
-            
-            print("Replacting obsolete "+cpd+" with "+lnkd_cpd+" in "+rxn)
-            
-            Update_Reactions+=1
+            new_stoichiometry=reactions_helper.buildStoich(rxn_cpds_array)
+
+            if(stoichiometry != new_stoichiometry):
+                print("Replacting obsolete "+cpd+" with "+lnkd_cpd+" in "+rxn)
+                updated_reactions.append(rxn)
 
 #    if(Update_Reactions>0):
 #        break
 
-if(Update_Reactions>0):
-    print("Saving replacement of "+str(Update_Reactions)+" obsolete compounds in reactions")
+if(len(updated_reactions)>0):
+    print("Saving replacement of "+str(len(updated_reactions))+" obsolete compounds in reactions")
     reactions_helper.saveReactions(reactions_dict)
 
 # Should probably test for reaction balance, but the merged compounds should have the same structure/formula
