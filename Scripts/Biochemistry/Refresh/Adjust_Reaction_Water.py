@@ -7,7 +7,7 @@ ReactionsHelper = Reactions()
 Reactions_Dict = ReactionsHelper.loadReactions()
 
 Update_Reactions=0
-status_file = open("Status_Changes_After_Water_Adjustment.txt",'w')
+status_lines = list()
 for rxn in sorted(Reactions_Dict.keys()):
     #Find statuses that only have water imbalance
     if("MI:H:2/O:1" != Reactions_Dict[rxn]["status"] and
@@ -34,7 +34,7 @@ for rxn in sorted(Reactions_Dict.keys()):
     new_stoichiometry = ReactionsHelper.buildStoich(rxn_cpds_array)
 
     if(new_status != Reactions_Dict[rxn]['status']):
-        status_file.write(rxn+"\t"+Reactions_Dict[rxn]['status']+"\t"+new_status+"\n")
+        status_lines.append(rxn+"\t"+Reactions_Dict[rxn]['status']+"\t"+new_status+"\n")
 
     if(new_stoichiometry != old_stoichiometry):
         print("Rebuilding reaction :",rxn)
@@ -46,6 +46,13 @@ for rxn in sorted(Reactions_Dict.keys()):
             else:
                 Reactions_Dict[rxn]["notes"]+="|WB"
         Update_Reactions+=1
+
+if(len(status_lines)>0):
+    print("Updating status for "+str(len(status_lines))+" reactions")
+    status_file = open("Status_Changes_After_Water_Adjustment.txt",'w')
+    for line in status_lines:
+        status_file.write(line)
+    status_file.close()
 
 if(Update_Reactions>0):
     print("Saving adjusted water for "+str(Update_Reactions)+" reactions")

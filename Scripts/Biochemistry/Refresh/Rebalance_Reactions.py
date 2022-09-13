@@ -18,7 +18,7 @@ ReactionsHelper = Reactions()
 Reactions_Dict = ReactionsHelper.loadReactions()
 
 Update_Reactions=0
-status_file = open("Status_Changes.txt",'w')
+status_lines = list()
 for rxn in sorted(Reactions_Dict.keys()):
     if(Reactions_Dict[rxn]["status"] == "EMPTY"):
         continue
@@ -34,7 +34,7 @@ for rxn in sorted(Reactions_Dict.keys()):
 
     if(new_status != old_status and "CK" not in old_status):
         print("Changing Status for "+rxn+" from "+old_status+" to "+new_status)
-        status_file.write(rxn+"\t"+old_status+"\t"+new_status+"\n")
+        status_lines.append(rxn+"\t"+old_status+"\t"+new_status+"\n")
         Reactions_Dict[rxn]["status"]=new_status
         Update_Reactions+=1
         if(print_charges is True):
@@ -42,8 +42,14 @@ for rxn in sorted(Reactions_Dict.keys()):
                 print("\t".join(["\t",entry['compound'],str(entry['coefficient']), \
                                      str(entry['charge']),entry['name']]))
 
+if(len(status_lines)>0):
+    print("Updating status for "+str(len(status_lines))+" reactions")
+    status_file = open("Status_Changes.txt",'w')
+    for line in status_lines:
+        status_file.write(line)
+    status_file.close()
+
 if(Update_Reactions>0):
     print("Updating statuses for "+str(Update_Reactions)+" reactions")
     if(dry_run is False):
         ReactionsHelper.saveReactions(Reactions_Dict)
-status_file.close()
