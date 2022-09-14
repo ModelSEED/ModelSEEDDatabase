@@ -7,6 +7,8 @@ import copy
 import re
 import json
 
+print("Warning: Need to include disambiguation of ECs")
+
 arguments = list(sys.argv)
 #Pop filename
 arguments = arguments[1:]
