@@ -164,21 +164,20 @@ for current_alias in structures_dict:
 
 #Array of possible other compounds
 Disambiguation_Object['to']=list()
-if(len(other_compounds)==0):
+#Here use specific compound listed by user
+if(merging_cpd is not None):
+    Disambiguation_Object['to'].append({'id':merging_cpd,'name':compounds_dict[merging_cpd]['name'],
+                                        'formula':compounds_dict[merging_cpd]['formula'],
+                                        'charge':compounds_dict[merging_cpd]['charge'],
+                                        'mass':compounds_dict[merging_cpd]['mass']})
+elif(len(other_compounds)==0):
     Disambiguation_Object['to'].append({'id':None,'name':None,'formula':None,'charge':"0",'mass':"0"})
 else:
-    #Here use specific compound listed by user
-    if(merging_cpd is not None):
-        Disambiguation_Object['to'].append({'id':merging_cpd,'name':compounds_dict[merging_cpd]['name'],
-                                            'formula':compounds_dict[merging_cpd]['formula'],
-                                            'charge':compounds_dict[merging_cpd]['charge'],
-                                            'mass':compounds_dict[merging_cpd]['mass']})
-    else:
-        for other_cpd in sorted(other_compounds):
-            Disambiguation_Object['to'].append({'id':other_cpd,'name':compounds_dict[other_cpd]['name'],
-                                                'formula':compounds_dict[other_cpd]['formula'],
-                                                'charge':compounds_dict[other_cpd]['charge'],
-                                                'mass':compounds_dict[other_cpd]['mass']})
+    for other_cpd in sorted(other_compounds):
+        Disambiguation_Object['to'].append({'id':other_cpd,'name':compounds_dict[other_cpd]['name'],
+                                            'formula':compounds_dict[other_cpd]['formula'],
+                                            'charge':compounds_dict[other_cpd]['charge'],
+                                            'mass':compounds_dict[other_cpd]['mass']})
 
 ##########################################################
 #
