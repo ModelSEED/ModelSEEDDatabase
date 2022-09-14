@@ -438,10 +438,11 @@ if(len(disambiguation_object['reactions'])>0):
         f.write(json_string)
 
 #Scripts to run afterwards
-#../Structures/List_ModelSEED_Structures.py
-#../Structures/Update_Structure_Formula_Charge.py
-#../Biochemistry/Update_Compound_Aliases.py
-#../Biochemistry/Rebalance_Reactions.py (very important)
-#../Biochemistry/Adjust_Reaction_Protons.py
-#../Biochemistry/Adjust_Reaction_Water.py
-#../Biochemistry/Merge_Reactions.py (merges may happen because of water)
+print("Run these scripts to complete the disambiguation:")
+print("\t../Structures/List_ModelSEED_Structures.py")
+print("\t../Structures/Update_Structure_Formula_Charge.py")
+print("\t../Biochemistry/Update_Compound_Aliases.py")
+print("\t../Biochemistry/Rebalance_Reactions.py (very important)")
+print("\t../Biochemistry/Adjust_Reaction_Protons.py")
+print("\t../Biochemistry/Adjust_Reaction_Water.py")
+print("\t../Biochemistry/Merge_Reactions.py (merges may happen because of water)")
