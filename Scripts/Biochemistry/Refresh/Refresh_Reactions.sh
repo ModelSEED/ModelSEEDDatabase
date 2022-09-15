@@ -6,7 +6,7 @@ ${DIR}/Rebuild_Reactions.py
 echo "Merge reactions"
 ${DIR}/Merge_Reactions.py
 echo "Rebalance"
-${DIR}/Rebalance_Reactions.py
+${DIR}/Rebalance_Reactions.py save
 echo "Adjust protons"
 ${DIR}/Adjust_Reaction_Protons.py
 echo "Adjust water"
