@@ -12,7 +12,7 @@ Compounds_Dict = CompoundsHelper.loadCompounds()
 
 Structures_Root=os.path.dirname(__file__)+"/../../Biochemistry/Structures/"
 Formulas_Dict=dict()
-for source in "KEGG","MetaCyc","Rhea":
+for source in "KEGG","MetaCyc","ChEBI","Rhea":
     if(source not in Formulas_Dict):
         Formulas_Dict[source]=dict()
 
@@ -40,8 +40,8 @@ with open(Structures_Root+"Ignored_ModelSEED_Structures.txt") as ignore_file:
 ignore_file.close()
 
 #Load Structures and Aliases
-Structures_Dict = CompoundsHelper.loadStructures(["SMILE","InChIKey","InChI"],["KEGG","MetaCyc","Rhea"])
-MS_Aliases_Dict =  CompoundsHelper.loadMSAliases(["KEGG","MetaCyc","Rhea"])
+Structures_Dict = CompoundsHelper.loadStructures(["SMILE","InChIKey","InChI"],["KEGG","MetaCyc","ChEBI","Rhea"])
+MS_Aliases_Dict =  CompoundsHelper.loadMSAliases(["KEGG","MetaCyc","ChEBI","Rhea"])
 
 master_structs_file = open(Structures_Root+"All_ModelSEED_Structures.txt",'w')
 unique_structs_file = open(Structures_Root+"Unique_ModelSEED_Structures.txt",'w')
@@ -53,7 +53,7 @@ for msid in sorted(MS_Aliases_Dict.keys()):
     #Build collection of all structures for the ModelSEED ID
     Structs = dict()
     Formulas=dict()
-    for source in 'KEGG','MetaCyc','Rhea':
+    for source in 'KEGG','MetaCyc','ChEBI','Rhea':
         if(source not in MS_Aliases_Dict[msid].keys()):
             continue
 
@@ -217,6 +217,8 @@ for msid in sorted(MS_Aliases_Dict.keys()):
                         chosen_structure = sorted(sources_structures['MetaCyc'])[0]
                     elif('KEGG' in sources_structures):
                         chosen_structure = sorted(sources_structures['KEGG'])[0]
+                    elif('ChEBI' in sources_structures):
+                        chosen_structure = sorted(sources_structures['ChEBI'])[0]
                     elif('Rhea' in sources_structures):
                         chosen_structure = sorted(sources_structures['Rhea'])[0]
 
@@ -248,6 +250,8 @@ for msid in sorted(MS_Aliases_Dict.keys()):
                                 chosen_structure = sorted(sources_structures['MetaCyc'])[0]
                             elif('KEGG' in sources_structures):
                                 chosen_structure = sorted(sources_structures['KEGG'])[0]
+                            elif('ChEBI' in sources_structures):
+                                chosen_structure = sorted(sources_structures['ChEBI'])[0]
                             elif('Rhea' in sources_structures):
                                 chosen_structure = sorted(sources_structures['Rhea'])[0]
 
@@ -258,6 +262,8 @@ for msid in sorted(MS_Aliases_Dict.keys()):
                             chosen_structure = sorted(sources_structures['MetaCyc'])[0]
                         elif('KEGG' in sources_structures):
                             chosen_structure = sorted(sources_structures['KEGG'])[0]
+                        elif('ChEBI' in sources_structures):
+                            chosen_structure = sorted(sources_structures['ChEBI'])[0]
                         elif('Rhea' in sources_structures):
                             chosen_structure = sorted(sources_structures['Rhea'])[0]
 

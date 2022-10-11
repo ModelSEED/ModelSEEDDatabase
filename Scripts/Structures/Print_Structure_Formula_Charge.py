@@ -16,7 +16,7 @@ Structures_Root=os.path.dirname(__file__)+"/../../Biochemistry/Structures/"
 resolved_structures=open('Resolved_Structures.txt','w')
 unresolved_structures=open('Unresolved_Structures.txt','w')
 file_handle_dict=dict()
-for source in "KEGG","MetaCyc","Rhea":
+for source in "KEGG","MetaCyc","ChEBI","Rhea":
     for struct_type in "InChI","SMILE":
         for struct_stage in "Charged","Original":
             file_string="_".join((source,struct_type,struct_stage))
