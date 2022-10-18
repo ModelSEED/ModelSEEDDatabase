@@ -5,14 +5,12 @@ import chemaxon.formats.MolImporter;
 import chemaxon.formats.MolExporter;
 import chemaxon.formats.MolFormatException;
 
-import chemaxon.marvin.calculations.MajorMicrospeciesPlugin;
 import chemaxon.marvin.calculations.TautomerizationPlugin;
 import chemaxon.marvin.plugin.PluginException;
 
-public final class ChargeMol {
+public final class ListTautomers {
 
     public static void main(String[] args){
-
 	Molecule OriginalMol = new Molecule();
 	double pH = 7.0;
 
@@ -38,42 +36,42 @@ public final class ChargeMol {
 	    pH = Double.parseDouble(args[1]);
 	}
 
-	//Ready Plugin
-	MajorMicrospeciesPlugin mmsPlugin = new MajorMicrospeciesPlugin();
-	mmsPlugin.setpH(pH);
-
-	//Molecule for fusing all fragments
-	Molecule FusedMol = new Molecule();
+	//Ready Tautomer plugin
+	//Set it so that we retrieve the dominant normal canonical tautomer at pH of 7
+	//Precise calculations may take time so set to five seconds
+	TautomerizationPlugin tPlugin = new TautomerizationPlugin();
+	tPlugin.setpH(pH);
+	tPlugin.setDominantTautomerDistributionCalculation(true);
 
 	//Fragment Molecule and iterate
 	Molecule frags[] = OriginalMol.convertToFrags();
 	for(int i = 0; i < frags.length; i++){
 	    
-	    try {
+	    try{
+		
+		//Run Tautomer Plugin
+		tPlugin.setMolecule(frags[i]);
+		tPlugin.run();
 
-		//Run MMS Plugin
-		mmsPlugin.setMolecule(frags[i]);
-		mmsPlugin.run();
+		System.out.println("---------Tautomers---------");
+		int count = tPlugin.getStructureCount();
+		for (int j=0; j < count; ++j) {
+		    Molecule tautomer = tPlugin.getStructure(j);
+		    double distribution = tPlugin.getDominantTautomerDistribution(j);
 
-		//Get Major microspecies as molecule
-		Molecule MMSmol = mmsPlugin.getMajorMicrospecies();
+		    try{
+			
+			String InChIKey= MolExporter.exportToFormat(tautomer, "inchikey:SAbs");
+			System.out.println(InChIKey+"\t"+distribution);
 
-		//Fuse fragment
-		FusedMol.fuse(MMSmol,false);
-
-	    } catch (PluginException PIE){
+		    }catch(IOException IOE) {
+			System.out.println("Error: "+IOE.getMessage());
+		    }
+		}
+		
+	    }catch(PluginException PIE){
 		System.out.println("Error: "+PIE.getMessage());
 	    }
-		
-	}
-	
-	//Print to string
-	try{
-	    String FusedString = MolExporter.exportToFormat(FusedMol, "mol");
-	    System.out.print(FusedString);
-
-	}catch(IOException IOE) {
-	    System.out.println("Error: "+IOE.getMessage());
 	}
     }
 }
