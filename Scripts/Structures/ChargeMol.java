@@ -4,15 +4,14 @@ import chemaxon.struc.Molecule;
 import chemaxon.formats.MolImporter;
 import chemaxon.formats.MolExporter;
 import chemaxon.formats.MolFormatException;
-
 import chemaxon.marvin.calculations.MajorMicrospeciesPlugin;
 import chemaxon.marvin.calculations.TautomerizationPlugin;
+import chemaxon.calculations.hydrogenize.Hydrogenize;
 import chemaxon.marvin.plugin.PluginException;
 
 public final class ChargeMol {
 
     public static void main(String[] args){
-
 	Molecule OriginalMol = new Molecule();
 	double pH = 7.0;
 
@@ -38,33 +37,63 @@ public final class ChargeMol {
 	    pH = Double.parseDouble(args[1]);
 	}
 
-	//Ready Plugin
+	// Hydrogenize plugin
+	Hydrogenize hydro = new Hydrogenize();
+
+	// MMS Plugin
 	MajorMicrospeciesPlugin mmsPlugin = new MajorMicrospeciesPlugin();
 	mmsPlugin.setpH(pH);
 
-	//Molecule for fusing all fragments
+	// Tautomer plugin
+	// Set it so that we retrieve the dominant tautomer at pH of 7
+	// Precise calculations may take time so set to five seconds
+	TautomerizationPlugin tPlugin = new TautomerizationPlugin();
+	tPlugin.setpH(pH);
+	tPlugin.setDominantTautomerDistributionCalculation(true);
+
+	// Molecule for fusing all fragments
 	Molecule FusedMol = new Molecule();
 
-	//Fragment Molecule and iterate
+	// Fragment Molecule and iterate
+	// For each fragment we:
+	// i)   convert to implicit hydrogens
+	// ii)  aromatize
+	// iii) find dominant tautomer at pH7
+	// iv)  find major microspecies at pH7
+	// v)   convert to explicit hydrogens
 	Molecule frags[] = OriginalMol.convertToFrags();
 	for(int i = 0; i < frags.length; i++){
-	    
-	    try {
 
-		//Run MMS Plugin
-		mmsPlugin.setMolecule(frags[i]);
-		mmsPlugin.run();
+		//Retrieve molecule, set implicit hydrogens and aromatize
+		Molecule fragment = frags[i];
+		hydro.convertExplicitHToImplicit(fragment);
+		fragment.aromatize();
 
-		//Get Major microspecies as molecule
-		Molecule MMSmol = mmsPlugin.getMajorMicrospecies();
+		try{
+		    
+		    // Run Tautomer Plugin
+		    tPlugin.setMolecule(fragment);
+		    tPlugin.run();
 
-		//Fuse fragment
-		FusedMol.fuse(MMSmol,false);
+		    // Dominant tautomer is the first one
+		    Molecule tautomer = tPlugin.getStructure(0);
 
-	    } catch (PluginException PIE){
-		System.out.println("Error: "+PIE.getMessage());
-	    }
+		    // Run MMS Plugin
+		    mmsPlugin.setMolecule(tautomer);
+		    mmsPlugin.run();
+
+		    //Get Major microspecies as molecule
+		    Molecule microspecies = mmsPlugin.getMajorMicrospecies();
+
+		    // Convert to explicit hydrogens
+		    hydro.convertImplicitHToExplicit(microspecies);
+		    
+		    //Fuse fragment
+		    FusedMol.fuse(microspecies,false);
 		
+		}catch(PluginException PIE){
+		    System.out.println("Error: "+PIE.getMessage());
+		}
 	}
 	
 	//Print to string
