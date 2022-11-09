@@ -22,11 +22,15 @@ with open('../../Biochemistry/Structures/Unique_ModelSEED_Structures.txt') as fh
 		ids_list = tmp_list[2].split(';')
 		new_ids_list = list()
 		for id in ids_list:
+			if(id == ''):
+				continue
+
 			if(id not in IDs_to_remove):
 				new_ids_list.append(id)
 		tmp_list[2] = ";".join(new_ids_list)
 		line = "\t".join(tmp_list)
-		All_lines.append(line)
+		if(len(new_ids_list)>0):
+			All_lines.append(line)
 
 with open('../../Biochemistry/Structures/Unique_ModelSEED_Structures.txt', 'w') as fh:
 	fh.write('\n'.join(All_lines)+'\n')
