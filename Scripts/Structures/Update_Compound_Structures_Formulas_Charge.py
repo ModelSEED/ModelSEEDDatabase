@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 import os,sys
+sys.path.append('../../Libs/Python')
 from BiochemPy import Compounds
 
 Overridden_Fields=dict()
@@ -45,7 +46,7 @@ for cpd in structures_dict:
             smiles_dict[struct].append(cpd)
 
 Ignored_Structures=list()
-with open(Structures_Root+"Ignored_ModelSEED_Structures.txt") as fh:
+with open(Structures_Root+"Curation/Ignored_Structures_Publication2020.txt") as fh:
     for line in fh.readlines():
         line=line.strip()
         array=line.split('\t')
