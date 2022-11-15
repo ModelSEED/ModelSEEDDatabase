@@ -2,6 +2,7 @@
 import os
 import sys
 import json
+import glob
 
 sys.path.append('../../Libs/Python')
 from BiochemPy import Compounds
@@ -12,7 +13,7 @@ Compounds_Dict = CompoundsHelper.loadCompounds()
 
 Structures_Root=os.path.dirname(__file__)+"/../../Biochemistry/Structures/"
 Formulas_Dict=dict()
-for source in "KEGG","MetaCyc","ChEBI","Rhea":
+for source in "KEGG","MetaCyc": #,"ChEBI","Rhea":
     if(source not in Formulas_Dict):
         Formulas_Dict[source]=dict()
 
@@ -33,15 +34,15 @@ for source in "KEGG","MetaCyc","ChEBI","Rhea":
 
 #Load Curated Structures
 Ignored_Structures=dict()
-with open(Structures_Root+"Ignored_ModelSEED_Structures.txt") as ignore_file:
-    for line in ignore_file.readlines():
-        array=line.split('\t')
-        Ignored_Structures[array[0]]=1
-ignore_file.close()
+for file in glob.glob(Structures_Root+"Curation/*.txt"):
+    with open(file) as ignore_file:
+        for line in ignore_file.readlines():
+            array=line.split('\t')
+            Ignored_Structures[array[0]]=1
 
 #Load Structures and Aliases
-Structures_Dict = CompoundsHelper.loadStructures(["SMILE","InChIKey","InChI"],["KEGG","MetaCyc","ChEBI","Rhea"])
-MS_Aliases_Dict =  CompoundsHelper.loadMSAliases(["KEGG","MetaCyc","ChEBI","Rhea"])
+Structures_Dict = CompoundsHelper.loadStructures(["SMILE","InChIKey","InChI"],["KEGG","MetaCyc"]) #,"ChEBI","Rhea"])
+MS_Aliases_Dict =  CompoundsHelper.loadMSAliases(["KEGG","MetaCyc"]) #,"ChEBI","Rhea"])
 
 master_structs_file = open(Structures_Root+"All_ModelSEED_Structures.txt",'w')
 unique_structs_file = open(Structures_Root+"Unique_ModelSEED_Structures.txt",'w')
@@ -53,7 +54,7 @@ for msid in sorted(MS_Aliases_Dict.keys()):
     #Build collection of all structures for the ModelSEED ID
     Structs = dict()
     Formulas=dict()
-    for source in 'KEGG','MetaCyc','ChEBI','Rhea':
+    for source in 'KEGG','MetaCyc': #,'ChEBI','Rhea':
         if(source not in MS_Aliases_Dict[msid].keys()):
             continue
 
@@ -139,6 +140,7 @@ for msid in sorted(MS_Aliases_Dict.keys()):
         pass
 
     if(struct_pass):
+            
         #Only one formula/charge combination possible here
         formula_charge_dict=json.loads(list(Formulas[struct_type][struct_stage].keys())[0])
 
@@ -152,9 +154,13 @@ for msid in sorted(MS_Aliases_Dict.keys()):
                     continue
 
                 aliases=dict()
-                structure = list(Structs[structure_type][struct_stage].keys())[0]
-                for alias in Structs[structure_type][struct_stage][structure]:
-                    aliases[alias]=1
+                
+                # Even though there is one standardized InChI structure, there's a chance of multiple SMILES
+                # So we "choose" a structure, but collect all aliases in case
+                structure = sorted(Structs[structure_type][struct_stage].keys())[0]
+                for struct in Structs[structure_type][struct_stage].keys():
+                    for alias in Structs[structure_type][struct_stage][struct]:
+                        aliases[alias]=1
 
                 unique_structs_file.write("\t".join((msid,\
                                                          structure_type,\
