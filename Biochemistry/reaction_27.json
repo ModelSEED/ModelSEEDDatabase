@@ -11022,21 +11022,24 @@
         "aliases": [
             "AraCyc: SULFUR-DIOXYGENASE-RXN",
             "CornCyc: SULFUR-DIOXYGENASE-RXN",
-            "MetaCyc: SULFUR-DIOXYGENASE-RXN",
+            "KEGG: R08677",
+            "MetaCyc: RXN-8174; SULFUR-DIOXYGENASE-RXN",
             "PlantCyc: SULFUR-DIOXYGENASE-RXN",
             "Name: Sulfur dioxygenase"
         ],
-        "code": "(1) cpd00042[0] + (1) cpd27013[0] <=> (1) cpd17456[0]",
-        "compound_ids": "cpd00042;cpd17456;cpd27013",
-        "definition": "(1) GSH[0] + (1) Elemental-Sulfur[0] <=> (1) S-Sulfanylglutathione[0]",
+        "code": "(1) cpd00042[0] + (1) cpd00074[0] <=> (1) cpd17456[0]",
+        "compound_ids": "cpd00042;cpd00074;cpd17456",
+        "definition": "(1) GSH[0] + (1) S[0] <=> (1) S-Sulfanylglutathione[0]",
         "deltag": 10000000.0,
         "deltagerr": 10000000.0,
-        "ec_numbers": null,
-        "equation": "(1) cpd00042[0] + (1) cpd27013[0] <=> (1) cpd17456[0]",
+        "ec_numbers": [
+            "1.13.11.18"
+        ],
+        "equation": "(1) cpd00042[0] + (1) cpd00074[0] <=> (1) cpd17456[0]",
         "id": "rxn27268",
-        "is_obsolete": 0,
+        "is_obsolete": 1,
         "is_transport": 0,
-        "linked_reaction": null,
+        "linked_reaction": "rxn15776;rxn24663",
         "name": "Sulfur dioxygenase",
         "notes": [
             "GCP",
@@ -11061,9 +11064,9 @@
                 "charge": 0,
                 "coefficient": -1,
                 "compartment": 0,
-                "compound": "cpd27013",
+                "compound": "cpd00074",
                 "formula": "null",
-                "name": "Elemental-Sulfur"
+                "name": "S"
             },
             {
                 "charge": -1,
@@ -27650,15 +27653,15 @@
             "ChlamyCyc: 2.8.1.8-RXN",
             "Name: Lipoyl synthase"
         ],
-        "code": "(2) cpd00017[0] + (2) cpd00074[0] + (1) cpd27013[0] + (1) cpd29546[0] <=> (2) cpd00060[0] + (2) cpd03091[0] + (1) cpd29545[0]",
-        "compound_ids": "cpd00017;cpd00060;cpd00074;cpd03091;cpd27013;cpd29545;cpd29546",
-        "definition": "(2) S-Adenosyl-L-methionine[0] + (2) S[0] + (1) Elemental-Sulfur[0] + (1) Protein-6-N-octanoyl-lysine[0] <=> (2) L-Methionine[0] + (2) 5'-Deoxyadenosine[0] + (1) Protein-6-N-lipoyl-lysine[0]",
+        "code": "(2) cpd00017[0] + (3) cpd00074[0] + (1) cpd29546[0] <=> (2) cpd00060[0] + (2) cpd03091[0] + (1) cpd29545[0]",
+        "compound_ids": "cpd00017;cpd00060;cpd00074;cpd03091;cpd29545;cpd29546",
+        "definition": "(2) S-Adenosyl-L-methionine[0] + (3) S[0] + (1) Protein-6-N-octanoyl-lysine[0] <=> (2) L-Methionine[0] + (2) 5'-Deoxyadenosine[0] + (1) Protein-6-N-lipoyl-lysine[0]",
         "deltag": 10000000.0,
         "deltagerr": 10000000.0,
         "ec_numbers": [
             "2.8.1.8"
         ],
-        "equation": "(2) cpd00017[0] + (2) cpd00074[0] + (1) cpd27013[0] + (1) cpd29546[0] <=> (2) cpd00060[0] + (2) cpd03091[0] + (1) cpd29545[0]",
+        "equation": "(2) cpd00017[0] + (3) cpd00074[0] + (1) cpd29546[0] <=> (2) cpd00060[0] + (2) cpd03091[0] + (1) cpd29545[0]",
         "id": "rxn27532",
         "is_obsolete": 0,
         "is_transport": 0,
@@ -27683,19 +27686,11 @@
             },
             {
                 "charge": 0,
-                "coefficient": -2,
+                "coefficient": -3,
                 "compartment": 0,
                 "compound": "cpd00074",
                 "formula": "S",
                 "name": "S"
-            },
-            {
-                "charge": 0,
-                "coefficient": -1,
-                "compartment": 0,
-                "compound": "cpd27013",
-                "formula": "null",
-                "name": "Elemental-Sulfur"
             },
             {
                 "charge": 0,
