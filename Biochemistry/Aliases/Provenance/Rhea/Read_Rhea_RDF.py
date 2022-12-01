@@ -69,12 +69,17 @@ for subject, predicate, object in graph.triples((None, None, None)):
     if("chebi" in predicate):
         chebi_ids[str(subject)]=object.split('_')[-1]
 
-with open('Rhea_Generic_Polymer_Names.tsv','w') as rn_fh:
-    rn_fh.write('ID\tNAMES\n')
+with open('ChEBI_rdf_names.tsv','w') as cpd_fh:
+    cpd_fh.write('ID\tNAMES\n')
+    for cpd in sorted(chebi_ids.keys()):
+        cpd_fh.write(chebi_ids[cpd]+"\t"+"|".join(compound_names[cpd])+"\n")
+
+with open('Rhea_rdf_names.tsv','w') as gp_fh:
+    gp_fh.write('ID\tNAMES\n')
     for cpd in sorted(generic_ids.keys()):
-        rn_fh.write(generic_ids[cpd]+"\t"+"|".join(compound_names[cpd])+"\n")
+        gp_fh.write(generic_ids[cpd]+"\t"+"|".join(compound_names[cpd])+"\n")
     for cpd in sorted(polymer_ids.keys()):
-        rn_fh.write(polymer_ids[cpd]+"\t"+"|".join(compound_names[cpd])+"\n")
+        gp_fh.write(polymer_ids[cpd]+"\t"+"|".join(compound_names[cpd])+"\n")
 
 ofh = open("Rhea_reactions.tsv",'w')
 efh = open("missing_rhea_entities.tsv",'w')

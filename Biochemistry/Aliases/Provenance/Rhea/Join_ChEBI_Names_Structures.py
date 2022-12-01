@@ -3,11 +3,11 @@
 # Load names
 ChEBI_names_dict = dict()
 
-with open('chebiId_name.tsv') as fh:
+with open('ChEBI_rdf_names.tsv') as fh:
 	for line in fh.readlines():
 		line = line.strip('\r\n')
 		tmp_list = line.split('\t')
-		chebi_id = tmp_list[0].split(':')[1]
+		chebi_id = tmp_list[0]
 		if(chebi_id not in ChEBI_names_dict):
 			ChEBI_names_dict[chebi_id]=list()
 		ChEBI_names_dict[chebi_id].append(tmp_list[1])
@@ -17,7 +17,7 @@ with open('names.tsv') as fh:
 		line = line.strip('\r\n')
 		tmp_list = line.split('\t')
 		if(tmp_list[1] not in ChEBI_names_dict):
-			ChEBI_names_dict[tmp_list[1]]=list()
+			continue
 		if(tmp_list[4] not in ChEBI_names_dict[tmp_list[1]]):
 			ChEBI_names_dict[tmp_list[1]].append(tmp_list[4])
 

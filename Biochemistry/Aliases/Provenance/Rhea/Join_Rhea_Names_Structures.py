@@ -3,7 +3,7 @@
 # Load names
 Rhea_names_dict = dict()
 
-with open('Rhea_Generic_Polymer_Names.tsv') as fh:
+with open('Rhea_rdf_names.tsv') as fh:
 	for line in fh.readlines():
 		line = line.strip('\r\n')
 		tmp_list = line.split('\t')
