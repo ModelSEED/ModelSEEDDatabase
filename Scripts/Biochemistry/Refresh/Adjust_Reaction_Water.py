@@ -15,11 +15,11 @@ for rxn in sorted(Reactions_Dict.keys()):
         continue
 
     #Parse old stoichiometry into array
-    rxn_cpds_array=Reactions_Dict[rxn]["stoichiometry"]
-    old_stoichiometry = ReactionsHelper.buildStoich(rxn_cpds_array)
+    rgts_array=Reactions_Dict[rxn]["stoichiometry"]
+    old_stoichiometry=ReactionsHelper.buildStoich(rgts_array)
 
     #Don't adjust reactions that only have water
-    if(len(rxn_cpds_array)==1):
+    if(len(rgts_array)==1):
         continue
 
     Water_Adjustment = 1
@@ -27,18 +27,18 @@ for rxn in sorted(Reactions_Dict.keys()):
         Water_Adjustment = -1
 
     #Adjust for water
-    ReactionsHelper.adjustCompound(rxn_cpds_array,"cpd00001",float(Water_Adjustment))
+    ReactionsHelper.adjustCompound(rgts_array,"cpd00001",float(Water_Adjustment))
 
     #Recompute new status and stoichiometry
-    new_status = ReactionsHelper.balanceReaction(rxn_cpds_array)
-    new_stoichiometry = ReactionsHelper.buildStoich(rxn_cpds_array)
+    new_status = ReactionsHelper.balanceReaction(rgts_array)
+    new_stoichiometry = ReactionsHelper.buildStoich(rgts_array)
 
     if(new_status != Reactions_Dict[rxn]['status']):
         status_lines.append(rxn+"\t"+Reactions_Dict[rxn]['status']+"\t"+new_status+"\n")
 
     if(new_stoichiometry != old_stoichiometry):
         print("Rebuilding reaction :",rxn)
-        ReactionsHelper.rebuildReaction(Reactions_Dict[rxn],new_stoichiometry)
+        ReactionsHelper.rebuildReaction(Reactions_Dict[rxn],rgts_array)
         Reactions_Dict[rxn]["status"]=new_status
         if("WB" not in Reactions_Dict[rxn]["notes"]):
             if(Reactions_Dict[rxn]["notes"]=="" or Reactions_Dict[rxn]["notes"]=="null"):

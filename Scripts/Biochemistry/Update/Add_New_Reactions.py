@@ -41,7 +41,7 @@ reactions_helper = Reactions()
 reactions_dict = reactions_helper.loadReactions()
 reactions_codes = reactions_helper.generateCodes(reactions_dict)
 
-Default_Rxn = {"id":"cpd00001","name":"null","abbreviation":"null","aliases":[],
+Default_Rxn = {"id":"cpd00001","name":"null","abbreviation":"null","aliases":null,
                "code":"null","stoichiometry":"null","equation":"null","definition":"null",
                "reversibility":"=","direction":"=","deltag":"10000000","deltagerr":"10000000",
                "status":"NB","is_obsolete":0,"is_transport":0,

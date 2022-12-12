@@ -35,22 +35,22 @@ for rxn in sorted(Reactions_Dict.keys()):
         #print("Adjusting: "+rxn,element,number)
 
         #Parse old stoichiometry into array
-        old_stoichiometry=Reactions_Dict[rxn]["stoichiometry"]
-        Rxn_Cpds_Array=ReactionsHelper.parseStoich(old_stoichiometry)
+        rgts_array=Reactions_Dict[rxn]["stoichiometry"]
+        old_stoichiometry=ReactionsHelper.buildStoich(rgts_array)
 
         #Adjust for protons
-        ReactionsHelper.adjustCompound(Rxn_Cpds_Array,"cpd00067",float(number))
+        ReactionsHelper.adjustCompound(rgts_array,"cpd00067",float(number))
 
         #Recompute new status and stoichiometry
-        new_status = ReactionsHelper.balanceReaction(Rxn_Cpds_Array)
-        new_stoichiometry = ReactionsHelper.buildStoich(Rxn_Cpds_Array)
+        new_status = ReactionsHelper.balanceReaction(rgts_array)
+        new_stoichiometry = ReactionsHelper.buildStoich(rgts_array)
 
         if(new_status != Reactions_Dict[rxn]['status']):
             status_lines.append(rxn+"\t"+Reactions_Dict[rxn]['status']+"\t"+new_status+"\n")
 
         if(new_stoichiometry != old_stoichiometry):
             print("Rebuilding reaction :",rxn)
-            ReactionsHelper.rebuildReaction(Reactions_Dict[rxn],new_stoichiometry)
+            ReactionsHelper.rebuildReaction(Reactions_Dict[rxn],rgts_array)
             Reactions_Dict[rxn]["status"]=new_status
             if("HB" not in Reactions_Dict[rxn]["notes"]):
                 Reactions_Dict[rxn]["notes"].append("HB")
