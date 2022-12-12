@@ -55,6 +55,7 @@ Disambiguation_Object['metadata']['date_time']=time_str
 # Collect compound data
 #
 ##########################################################
+sys.path.append('../../../Libs/Python')
 from BiochemPy import Reactions, Compounds
 
 compounds_helper = Compounds()
