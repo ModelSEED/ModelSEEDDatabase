@@ -13,7 +13,7 @@ Compounds_Dict = CompoundsHelper.loadCompounds()
 
 Structures_Root=os.path.dirname(__file__)+"/../../Biochemistry/Structures/"
 Formulas_Dict=dict()
-for source in "KEGG","MetaCyc": #,"ChEBI","Rhea":
+for source in "KEGG","MetaCyc","ChEBI","Rhea":
     if(source not in Formulas_Dict):
         Formulas_Dict[source]=dict()
 
@@ -41,8 +41,8 @@ for file in glob.glob(Structures_Root+"Curation/*.txt"):
             Ignored_Structures[array[0]]=1
 
 #Load Structures and Aliases
-Structures_Dict = CompoundsHelper.loadStructures(["SMILE","InChIKey","InChI"],["KEGG","MetaCyc"]) #,"ChEBI","Rhea"])
-MS_Aliases_Dict =  CompoundsHelper.loadMSAliases(["KEGG","MetaCyc"]) #,"ChEBI","Rhea"])
+Structures_Dict = CompoundsHelper.loadStructures(["SMILE","InChIKey","InChI"],["KEGG","MetaCyc","ChEBI","Rhea"])
+MS_Aliases_Dict =  CompoundsHelper.loadMSAliases(["KEGG","MetaCyc","ChEBI","Rhea"])
 
 master_structs_file = open(Structures_Root+"All_ModelSEED_Structures.txt",'w')
 unique_structs_file = open(Structures_Root+"Unique_ModelSEED_Structures.txt",'w')
@@ -54,7 +54,7 @@ for msid in sorted(MS_Aliases_Dict.keys()):
     #Build collection of all structures for the ModelSEED ID
     Structs = dict()
     Formulas=dict()
-    for source in 'KEGG','MetaCyc': #,'ChEBI','Rhea':
+    for source in 'KEGG','MetaCyc','ChEBI','Rhea':
         if(source not in MS_Aliases_Dict[msid].keys()):
             continue
 
