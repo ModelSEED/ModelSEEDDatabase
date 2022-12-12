@@ -2,11 +2,14 @@
 ##########################################
 # Load names
 ChEBI_names_dict = dict()
-
+header=1
 with open('ChEBI_rdf_names.tsv') as fh:
 	for line in fh.readlines():
 		line = line.strip('\r\n')
 		tmp_list = line.split('\t')
+		if(header==1):
+			header=0
+			continue
 		chebi_id = tmp_list[0]
 		if(chebi_id not in ChEBI_names_dict):
 			ChEBI_names_dict[chebi_id]=list()

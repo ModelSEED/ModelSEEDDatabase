@@ -2,11 +2,14 @@
 ##########################################
 # Load names
 Rhea_names_dict = dict()
-
+header=1
 with open('Rhea_rdf_names.tsv') as fh:
 	for line in fh.readlines():
 		line = line.strip('\r\n')
 		tmp_list = line.split('\t')
+		if(header==1):
+			header=0
+			continue
 		if(tmp_list[0] not in Rhea_names_dict):
 			Rhea_names_dict[tmp_list[0]]=list()
 		Rhea_names_dict[tmp_list[0]].append(tmp_list[1])
