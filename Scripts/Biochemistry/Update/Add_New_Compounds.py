@@ -9,6 +9,7 @@ parser.add_argument('compounds_file', help="Compounds File")
 parser.add_argument('database', help="Biochemistry database of origin")
 parser.add_argument("-s", dest='save_file', action='store_true')
 parser.add_argument("-r", dest='report_file', action='store_true')
+parser.add_argument("-no", dest='names_only', action='store_true')
 args = parser.parse_args()
 
 if(os.path.isfile(args.compounds_file) is False):
@@ -110,6 +111,7 @@ with open(args.compounds_file) as fh:
             cpd[Headers[i].lower()]=array[i]
 
         matched_cpd = {'msid':None,'string':None,'format':None,'stage':None}
+        cpd_has_structure=False
 
         #First check that the Alias doesn't already exist
         if(args.database in source_alias_dict and cpd['id'] in source_alias_dict[args.database]):
@@ -121,10 +123,11 @@ with open(args.compounds_file) as fh:
                 matched_cpd['stage']='na'
 
         #Then check that the Structure doesn't already exist, first as InChI, then as InChiKey, then as SMILES
-        if(matched_cpd['msid'] is None):
+        if(matched_cpd['msid'] is None and args.names_only is False):
 
             for struct_format in ['inchi','inchikey','smile','smiles']:
                 if(struct_format in cpd):
+                    cpd_has_structure=True
                     structure_list = [cpd[struct_format]]
                     if(struct_format == 'inchikey'):
                         structure_list.append('-'.join(cpd[struct_format].split('-')[0:2]))
@@ -156,6 +159,13 @@ with open(args.compounds_file) as fh:
                 searchnames = compounds_helper.searchname(name)
                 for searchname in searchnames:
                     if(searchname in searchnames_dict):
+                        # If we're searching names, that means the structures didn't match
+                        # But, if the new cpd has a structure, it can't match any compound
+                        # that already has a structure, hence this condition
+                        if(cpd_has_structure is True and \
+                            searchnames_dict[searchname] in all_structures_dict):  
+                            continue
+
                         if(searchnames_dict[searchname] not in msids):
                             msids[searchnames_dict[searchname]]=name
                             break
