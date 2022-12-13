@@ -163,7 +163,8 @@ class Compounds:
                     structures_dict[line['ID']][line['Source']][line['Structure']]={'formula':line['Formula'],
                                                                                     'charge':line['Charge'],
                                                                                     'alias':line['Alias'].split(';')}
-
+                    if('Type' in line):
+                        structures_dict[line['ID']][line['Source']][line['Structure']]['type']=line['Type']
             return structures_dict
 
         for struct_type in sources_array:
@@ -190,8 +191,10 @@ class Compounds:
 
     @staticmethod
     def searchname(name):
+        searchnames_list = [name]
         searchname = name.lower()
-
+        searchnames_list.append(searchname)
+        
         #try to keep/maintain charges
         ending = ""
         if(searchname.endswith("-")):
@@ -201,17 +204,22 @@ class Compounds:
             ending="+"
 
         searchname = ''.join(char for char in searchname if char.isalnum())
-
+        searchnames_list.append(searchname+ending)
+        
         #attempting to match fatty acids
-        searchname = re.sub('icacid','ate',searchname)
-
+        if(re.search('icacid$',searchname)):
+            searchname = re.sub('icacid','ate',searchname)
+            searchnames_list.append(searchname+ending)
+        elif(re.search('ate$',searchname)):
+            searchname = re.sub('ate','icacid',searchname)
+            searchnames_list.append(searchname+ending)
+            
         #remove redundant articles
-        if(re.search('^an?\s',name)):
+        if(re.search('^an?\s',searchname)):
             searchname = re.sub('^an?','',searchname)
+            searchnames_list.append(searchname+ending)
 
-        searchname+=ending
-
-        return searchname
+        return searchnames_list
 
     @staticmethod
     def parseFormula(formula):

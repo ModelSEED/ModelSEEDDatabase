@@ -433,22 +433,23 @@
         "abbreviation": "1.13.11.55-RXN.c",
         "abstract_reaction": null,
         "aliases": [
+            "KEGG: R07365",
             "MetaCyc: 1.13.11.55-RXN",
             "Name: SOR; sulfur oxygenase; sulfur oxygenase reductase; sulfur oxygenase/reductase; sulfur:oxygen oxidoreductase (hydrogen-sulfide- and sulfite-forming)"
         ],
-        "code": "(4) cpd00001[0] + (1) cpd00007[0] + (4) cpd27013[0] <=> (2) cpd00081[0] + (2) cpd00239[0]",
-        "compound_ids": "cpd00001;cpd00007;cpd00067;cpd00081;cpd00239;cpd27013",
-        "definition": "(4) H2O[0] + (1) O2[0] + (4) Elemental-Sulfur[0] <=> (4) H+[0] + (2) Sulfite[0] + (2) H2S[0]",
+        "code": "(4) cpd00001[0] + (1) cpd00007[0] + (4) cpd00074[0] <=> (2) cpd00081[0] + (2) cpd00239[0]",
+        "compound_ids": "cpd00001;cpd00007;cpd00067;cpd00074;cpd00081;cpd00239",
+        "definition": "(4) H2O[0] + (1) O2[0] + (4) S[0] <=> (4) H+[0] + (2) Sulfite[0] + (2) H2S[0]",
         "deltag": 10000000.0,
         "deltagerr": 10000000.0,
         "ec_numbers": [
             "1.13.11.55"
         ],
-        "equation": "(4) cpd00001[0] + (1) cpd00007[0] + (4) cpd27013[0] <=> (4) cpd00067[0] + (2) cpd00081[0] + (2) cpd00239[0]",
+        "equation": "(4) cpd00001[0] + (1) cpd00007[0] + (4) cpd00074[0] <=> (4) cpd00067[0] + (2) cpd00081[0] + (2) cpd00239[0]",
         "id": "rxn17061",
-        "is_obsolete": 0,
+        "is_obsolete": 1,
         "is_transport": 0,
-        "linked_reaction": null,
+        "linked_reaction": "rxn05093",
         "name": "sulfur oxygenase reductase",
         "notes": [
             "GCP",
@@ -481,9 +482,9 @@
                 "charge": 0,
                 "coefficient": -4,
                 "compartment": 0,
-                "compound": "cpd27013",
+                "compound": "cpd00074",
                 "formula": "null",
-                "name": "Elemental-Sulfur"
+                "name": "S"
             },
             {
                 "charge": 1,
@@ -10678,10 +10679,12 @@
         "abbreviation": "1.5.1.9-RXN.m",
         "abstract_reaction": null,
         "aliases": [
+            "AraCyc: 1.5.1.9-RXN",
+            "BrachyCyc: 1.5.1.9-RXN",
             "ChlamyCyc: 1.5.1.9-RXN",
             "KEGG: R02313",
             "MetaCyc: 1.5.1.9-RXN",
-            "Name: 6-N-(L-1,3-dicarboxypropyl)-L-lysine:NAD+ oxidoreductase (L-glutamate-forming); N6-(L-1,3-dicarboxypropyl)-L-lysine:NAD+ oxidoreductase (L-glutamate-forming); NAD+ oxidoreductase (L-2-aminoadipic-delta-semialdehyde and glutamate forming); aminoadipic semialdehyde synthase; dehydrogenase, saccharopine (nicotinamide adenine dinucleotide, glutamate-forming); saccharopin dehydrogenase; saccharopine dehydrogenase (NAD+, L-glutamate-forming)"
+            "Name: (L-glutamate-forming); 6-N-(L-1,3-dicarboxypropyl)-L-lysine:NAD+ oxidoreductase (L-glutamate-forming); N6-(L-1,3-Dicarboxypropyl)-L-lysine:NAD+ oxidoreductase; N6-(L-1,3-Dicarboxypropyl)-L-lysine:NAD+ oxidoreductase (L-glutamate-forming); N6-(L-1,3-dicarboxypropyl)-L-lysine:NAD+ oxidoreductase (L-glutamate-forming); NAD+ oxidoreductase (L-2-aminoadipic-delta-semialdehyde and glutamate forming); aminoadipic semialdehyde synthase; dehydrogenase, saccharopine (nicotinamide adenine dinucleotide, glutamate-forming); saccharopin dehydrogenase; saccharopine dehydrogenase (NAD+, L-glutamate-forming)"
         ],
         "code": "(1) cpd00001[0] + (1) cpd00003[0] + (1) cpd00351[0] <=> (1) cpd00004[0] + (1) cpd00023[0] + (1) cpd01046[0]",
         "compound_ids": "cpd00001;cpd00003;cpd00004;cpd00023;cpd00067;cpd00351;cpd01046",
@@ -10693,9 +10696,9 @@
         ],
         "equation": "(1) cpd00001[0] + (1) cpd00003[0] + (1) cpd00351[0] <=> (1) cpd00004[0] + (1) cpd00023[0] + (1) cpd00067[0] + (1) cpd01046[0]",
         "id": "rxn17247",
-        "is_obsolete": 0,
+        "is_obsolete": 1,
         "is_transport": 0,
-        "linked_reaction": null,
+        "linked_reaction": "rxn01662",
         "name": "saccharopine dehydrogenase (NAD+, L-glutamate-forming)",
         "notes": [
             "GCC",
@@ -13448,15 +13451,15 @@
             "MetaCyc: 1.97.1.3-RXN",
             "Name: (donor):sulfur oxidoreductase; sulfur reductase"
         ],
-        "code": "(1) cpd26978[0] + (1) cpd27013[0] <=> (1) cpd00239[0] + (1) cpd22290[0]",
-        "compound_ids": "cpd00239;cpd22290;cpd26978;cpd27013",
-        "definition": "(1) Donor-H2[0] + (1) Elemental-Sulfur[0] <=> (1) H2S[0] + (1) Acceptor[0]",
+        "code": "(1) cpd26978[0] + (1) cpd00074[0] <=> (1) cpd00239[0] + (1) cpd22290[0]",
+        "compound_ids": "cpd00074;cpd00239;cpd22290;cpd26978",
+        "definition": "(1) Donor-H2[0] + (1) S[0] <=> (1) H2S[0] + (1) Acceptor[0]",
         "deltag": 10000000.0,
         "deltagerr": 10000000.0,
         "ec_numbers": [
             "1.97.1.3"
         ],
-        "equation": "(1) cpd26978[0] + (1) cpd27013[0] <=> (1) cpd00239[0] + (1) cpd22290[0]",
+        "equation": "(1) cpd26978[0] + (1) cpd00074[0] <=> (1) cpd00239[0] + (1) cpd22290[0]",
         "id": "rxn17373",
         "is_obsolete": 0,
         "is_transport": 0,
@@ -13483,9 +13486,9 @@
                 "charge": 0,
                 "coefficient": -1,
                 "compartment": 0,
-                "compound": "cpd27013",
+                "compound": "cpd00074",
                 "formula": "null",
-                "name": "Elemental-Sulfur"
+                "name": "S"
             },
             {
                 "charge": -1,
@@ -14164,15 +14167,15 @@
             "MetaCyc: 2-ACYLGLYCEROL-O-ACYLTRANSFERASE-RXN",
             "Name: 2-acylglycerol O-acyltransferase; acyl coenzyme A-monoglyceride acyltransferase; acyl-CoA:2-acylglycerol O-acyltransferase; acylglycerol palmitoyltransferase; monoacylglycerol acyltransferase; monoglyceride acyltransferase"
         ],
-        "code": "(1) cpd22234[0] + (1) cpd24466[0] <=> (1) cpd00010[0] + (1) cpd26855[0]",
-        "compound_ids": "cpd00010;cpd22234;cpd24466;cpd26855",
-        "definition": "(1) ACYL-COA[0] + (1) CPD-409[0] <=> (1) CoA[0] + (1) DIACYLGLYCEROL[0]",
+        "code": "(1) cpd22234[0] + (1) cpd24466[0] <=> (1) cpd00010[0] + (1) cpd11423[0]",
+        "compound_ids": "cpd00010;cpd11423;cpd22234;cpd24466",
+        "definition": "(1) ACYL-COA[0] + (1) CPD-409[0] <=> (1) CoA[0] + (1) 1,2-Diacyl-sn-glycerol[0]",
         "deltag": 10000000.0,
         "deltagerr": 10000000.0,
         "ec_numbers": [
             "2.3.1.22"
         ],
-        "equation": "(1) cpd22234[0] + (1) cpd24466[0] <=> (1) cpd00010[0] + (1) cpd26855[0]",
+        "equation": "(1) cpd22234[0] + (1) cpd24466[0] <=> (1) cpd00010[0] + (1) cpd11423[0]",
         "id": "rxn17383",
         "is_obsolete": 0,
         "is_transport": 0,
@@ -14215,9 +14218,9 @@
                 "charge": 0,
                 "coefficient": 1,
                 "compartment": 0,
-                "compound": "cpd26855",
+                "compound": "cpd11423",
                 "formula": "C5H6O5R2",
-                "name": "DIACYLGLYCEROL"
+                "name": "1,2-Diacyl-sn-glycerol"
             }
         ]
     },
@@ -19645,15 +19648,15 @@
             "MetaCyc: 2.3.1.158-RXN",
             "Name: PDAT; phospholipid:1,2-diacyl-sn-glycerol O-acyltransferase; phospholipid:diacylglycerol acyltransferase"
         ],
-        "code": "(1) cpd26855[0] + (1) cpd27865[0] <=> (1) cpd27430[0] + (1) cpd28278[0]",
-        "compound_ids": "cpd26855;cpd27430;cpd27865;cpd28278",
-        "definition": "(1) DIACYLGLYCEROL[0] + (1) Phospholipids[0] <=> (1) Lysophospholipids[0] + (1) Triacylglycerols[0]",
+        "code": "(1) cpd11423[0] + (1) cpd27865[0] <=> (1) cpd27430[0] + (1) cpd28278[0]",
+        "compound_ids": "cpd11423;cpd27430;cpd27865;cpd28278",
+        "definition": "(1) 1,2-Diacyl-sn-glycerol[0] + (1) Phospholipids[0] <=> (1) Lysophospholipids[0] + (1) Triacylglycerols[0]",
         "deltag": 10000000.0,
         "deltagerr": 10000000.0,
         "ec_numbers": [
             "2.3.1.158"
         ],
-        "equation": "(1) cpd26855[0] + (1) cpd27865[0] <=> (1) cpd27430[0] + (1) cpd28278[0]",
+        "equation": "(1) cpd11423[0] + (1) cpd27865[0] <=> (1) cpd27430[0] + (1) cpd28278[0]",
         "id": "rxn17462",
         "is_obsolete": 0,
         "is_transport": 0,
@@ -19673,9 +19676,9 @@
                 "charge": 0,
                 "coefficient": -1,
                 "compartment": 0,
-                "compound": "cpd26855",
+                "compound": "cpd11423",
                 "formula": "C5H6O5R2",
-                "name": "DIACYLGLYCEROL"
+                "name": "1,2-Diacyl-sn-glycerol"
             },
             {
                 "charge": -1,
@@ -20880,15 +20883,15 @@
             "MetaCyc: 2.3.1.73-RXN",
             "Name: 1,2-diacyl-sn-glycerol:sterol O-acyltransferase; 1,2-diacyl-sn-glycerol:sterol acyl transferase; diacylglycerol-sterol O-acyltransferase"
         ],
-        "code": "(1) cpd26855[0] + (1) cpd28196[0] <=> (1) cpd24552[0] + (1) cpd28197[0]",
-        "compound_ids": "cpd24552;cpd26855;cpd28196;cpd28197",
-        "definition": "(1) DIACYLGLYCEROL[0] + (1) Sterols[0] <=> (1) CPD-504[0] + (1) Steryl-Esters[0]",
+        "code": "(1) cpd11423[0] + (1) cpd28196[0] <=> (1) cpd24552[0] + (1) cpd28197[0]",
+        "compound_ids": "cpd11423;cpd24552;cpd28196;cpd28197",
+        "definition": "(1) 1,2-Diacyl-sn-glycerol[0] + (1) Sterols[0] <=> (1) CPD-504[0] + (1) Steryl-Esters[0]",
         "deltag": 10000000.0,
         "deltagerr": 10000000.0,
         "ec_numbers": [
             "2.3.1.73"
         ],
-        "equation": "(1) cpd26855[0] + (1) cpd28196[0] <=> (1) cpd24552[0] + (1) cpd28197[0]",
+        "equation": "(1) cpd11423[0] + (1) cpd28196[0] <=> (1) cpd24552[0] + (1) cpd28197[0]",
         "id": "rxn17480",
         "is_obsolete": 0,
         "is_transport": 0,
@@ -20907,9 +20910,9 @@
                 "charge": 0,
                 "coefficient": -1,
                 "compartment": 0,
-                "compound": "cpd26855",
+                "compound": "cpd11423",
                 "formula": "C5H6O5R2",
-                "name": "DIACYLGLYCEROL"
+                "name": "1,2-Diacyl-sn-glycerol"
             },
             {
                 "charge": 0,
@@ -21014,15 +21017,15 @@
             "MetaCyc: 2.3.1.77-RXN",
             "Name: triacylglycerol-sterol O-acyltransferase; triacylglycerol:3beta-hydroxysterol O-acyltransferase; triacylglycerol:sterol acyltransferase"
         ],
-        "code": "(1) cpd22003[0] + (1) cpd28278[0] <=> (1) cpd22002[0] + (1) cpd26855[0]",
-        "compound_ids": "cpd22002;cpd22003;cpd26855;cpd28278",
-        "definition": "(1) 3-Beta-Hydroxysterols[0] + (1) Triacylglycerols[0] <=> (1) 3-Beta-Hydroxysterol-Esters[0] + (1) DIACYLGLYCEROL[0]",
+        "code": "(1) cpd22003[0] + (1) cpd28278[0] <=> (1) cpd22002[0] + (1) cpd11423[0]",
+        "compound_ids": "cpd11423;cpd22002;cpd22003;cpd28278",
+        "definition": "(1) 3-Beta-Hydroxysterols[0] + (1) Triacylglycerols[0] <=> (1) 3-Beta-Hydroxysterol-Esters[0] + (1) 1,2-Diacyl-sn-glycerol[0]",
         "deltag": 10000000.0,
         "deltagerr": 10000000.0,
         "ec_numbers": [
             "2.3.1.77"
         ],
-        "equation": "(1) cpd22003[0] + (1) cpd28278[0] <=> (1) cpd22002[0] + (1) cpd26855[0]",
+        "equation": "(1) cpd22003[0] + (1) cpd28278[0] <=> (1) cpd22002[0] + (1) cpd11423[0]",
         "id": "rxn17482",
         "is_obsolete": 0,
         "is_transport": 0,
@@ -21065,9 +21068,9 @@
                 "charge": 0,
                 "coefficient": 1,
                 "compartment": 0,
-                "compound": "cpd26855",
+                "compound": "cpd11423",
                 "formula": "C5H6O5R2",
-                "name": "DIACYLGLYCEROL"
+                "name": "1,2-Diacyl-sn-glycerol"
             }
         ]
     },
@@ -22765,22 +22768,25 @@
         "abbreviation": "AMYLOSUCRASE-RXN.c",
         "abstract_reaction": null,
         "aliases": [
+            "KEGG: R01823; R02120",
             "MetaCyc: 2.4.1.125-RXN; AMYLOSUCRASE-RXN; DEXTRANSUCRASE-RXN",
-            "Name: amylosucrase; sucrose-1,4-alpha-glucan glucosyltransferase; sucrose-glucan glucosyltransferase; sucrose:(1->4)-alpha-D-glucan 4-alpha-D-glucosyltransferase; sucrose:1,4-alpha-D-glucan 4-alpha-D-glucosyltransferase"
+            "Name: Sucrose:1,4-alpha-D-glucan 4-alpha-D-glucosyltransferase; Sucrose:1,6-alpha-D-glucan 6-alpha-D-glucosyltransferase; amylosucrase; sucrose-1,4-alpha-glucan glucosyltransferase; sucrose-glucan glucosyltransferase; sucrose:(1->4)-alpha-D-glucan 4-alpha-D-glucosyltransferase; sucrose:1,4-alpha-D-glucan 4-alpha-D-glucosyltransferase"
         ],
-        "code": "(1) cpd00076[0] <=> (1) cpd19102[0]",
-        "compound_ids": "cpd00076;cpd19102",
-        "definition": "(1) Sucrose[0] <= (1) C10906[0]",
+        "code": "(1) cpd00076[0] <=> (1) cpd00082[0]",
+        "compound_ids": "cpd00076;cpd00082",
+        "definition": "(1) Sucrose[0] <= (1) D-Fructose[0]",
         "deltag": 59.57,
         "deltagerr": 0.45,
         "ec_numbers": [
-            "2.4.1.4"
+            "2.4.1.125",
+            "2.4.1.4",
+            "2.4.1.5"
         ],
-        "equation": "(1) cpd00076[0] <= (1) cpd19102[0]",
+        "equation": "(1) cpd00076[0] <= (1) cpd00082[0]",
         "id": "rxn17507",
-        "is_obsolete": 0,
+        "is_obsolete": 1,
         "is_transport": 0,
-        "linked_reaction": null,
+        "linked_reaction": "rxn06050",
         "name": "sucrose-1,4-alpha-glucan glucosyltransferase",
         "notes": [
             "GCC",
@@ -22804,9 +22810,9 @@
                 "charge": 0,
                 "coefficient": 1,
                 "compartment": 0,
-                "compound": "cpd19102",
+                "compound": "cpd00082",
                 "formula": "C6H12O6",
-                "name": "C10906"
+                "name": "D-Fructose"
             }
         ]
     },
@@ -24591,15 +24597,15 @@
             "MetaCyc: 2.4.1.157-RXN",
             "Name: 1,2-diacylglycerol 3-glucosyltransferase; UDP-glucose-diacylglycerol glucosyltransferase; UDP-glucose:1,2-diacyl-sn-glycerol 3-D-glucosyltransferase; UDP-glucose:1,2-diacylglycerol 3-D-glucosyltransferase; UDP-glucose:1,2-diacylglycerol glucosyltransferase; UDP-glucose:diacylglycerol glucosyltransferase; uridine diphosphoglucose-diacylglycerol glucosyltransferase"
         ],
-        "code": "(1) cpd26855[0] + (1) cpd28293[0] <=> (1) cpd00014[0] + (1) cpd24352[0]",
-        "compound_ids": "cpd00014;cpd24352;cpd26855;cpd28293",
-        "definition": "(1) DIACYLGLYCEROL[0] + (1) UDP-GLUCOSE[0] <=> (1) UDP[0] + (1) CPD-168[0]",
+        "code": "(1) cpd11423[0] + (1) cpd28293[0] <=> (1) cpd00014[0] + (1) cpd24352[0]",
+        "compound_ids": "cpd00014;cpd11423;cpd24352;cpd28293",
+        "definition": "(1) 1,2-Diacyl-sn-glycerol[0] + (1) UDP-GLUCOSE[0] <=> (1) UDP[0] + (1) CPD-168[0]",
         "deltag": 10000000.0,
         "deltagerr": 10000000.0,
         "ec_numbers": [
             "2.4.1.157"
         ],
-        "equation": "(1) cpd26855[0] + (1) cpd28293[0] <=> (1) cpd00014[0] + (1) cpd24352[0]",
+        "equation": "(1) cpd11423[0] + (1) cpd28293[0] <=> (1) cpd00014[0] + (1) cpd24352[0]",
         "id": "rxn17534",
         "is_obsolete": 0,
         "is_transport": 0,
@@ -24621,9 +24627,9 @@
                 "charge": 0,
                 "coefficient": -1,
                 "compartment": 0,
-                "compound": "cpd26855",
+                "compound": "cpd11423",
                 "formula": "C5H6O5R2",
-                "name": "DIACYLGLYCEROL"
+                "name": "1,2-Diacyl-sn-glycerol"
             },
             {
                 "charge": -2,
@@ -28765,15 +28771,15 @@
             "MetaCyc: 2.4.1.46-RXN",
             "Name: 1,2-diacylglycerol 3-beta-galactosyltransferase; 1beta-MGDG; MGDG synthase; UDP galactose-1,2-diacylglycerol galactosyltransferase; UDP-galactose-diacylglyceride galactosyltransferase; UDP-galactose:1,2-diacyl-sn-glycerol 3-beta-D-galactosyltransferase; UDP-galactose:1,2-diacylglycerol 3-beta-D-galactosyltransferase; UDP-galactose:diacylglycerol galactosyltransferase; monogalactosyldiacylglycerol synthase; uridine diphosphogalactose-1,2-diacylglycerol galactosyltransferase"
         ],
-        "code": "(1) cpd00043[0] + (1) cpd26855[0] <=> (1) cpd00014[0] + (1) cpd26819[0]",
-        "compound_ids": "cpd00014;cpd00043;cpd26819;cpd26855",
-        "definition": "(1) UDP-galactose[0] + (1) DIACYLGLYCEROL[0] <=> (1) UDP[0] + (1) D-Galactosyl-12-diacyl-glycerols[0]",
+        "code": "(1) cpd00043[0] + (1) cpd11423[0] <=> (1) cpd00014[0] + (1) cpd26819[0]",
+        "compound_ids": "cpd00014;cpd00043;cpd11423;cpd26819",
+        "definition": "(1) UDP-galactose[0] + (1) 1,2-Diacyl-sn-glycerol[0] <=> (1) UDP[0] + (1) D-Galactosyl-12-diacyl-glycerols[0]",
         "deltag": 10000000.0,
         "deltagerr": 10000000.0,
         "ec_numbers": [
             "2.4.1.46"
         ],
-        "equation": "(1) cpd00043[0] + (1) cpd26855[0] <=> (1) cpd00014[0] + (1) cpd26819[0]",
+        "equation": "(1) cpd00043[0] + (1) cpd11423[0] <=> (1) cpd00014[0] + (1) cpd26819[0]",
         "id": "rxn17600",
         "is_obsolete": 0,
         "is_transport": 0,
@@ -28803,9 +28809,9 @@
                 "charge": 0,
                 "coefficient": -1,
                 "compartment": 0,
-                "compound": "cpd26855",
+                "compound": "cpd11423",
                 "formula": "C5H6O5R2",
-                "name": "DIACYLGLYCEROL"
+                "name": "1,2-Diacyl-sn-glycerol"
             },
             {
                 "charge": -2,
@@ -28836,15 +28842,15 @@
             "MetaCyc: 2.4.1.46-RXN",
             "Name: 1,2-diacylglycerol 3-beta-galactosyltransferase; 1beta-MGDG; MGDG synthase; UDP galactose-1,2-diacylglycerol galactosyltransferase; UDP-galactose-diacylglyceride galactosyltransferase; UDP-galactose:1,2-diacyl-sn-glycerol 3-beta-D-galactosyltransferase; UDP-galactose:1,2-diacylglycerol 3-beta-D-galactosyltransferase; UDP-galactose:diacylglycerol galactosyltransferase; monogalactosyldiacylglycerol synthase; uridine diphosphogalactose-1,2-diacylglycerol galactosyltransferase"
         ],
-        "code": "(1) cpd00043[0] + (1) cpd26855[0] <=> (1) cpd00014[0] + (1) cpd26819[0]",
-        "compound_ids": "cpd00014;cpd00043;cpd26819;cpd26855",
-        "definition": "(1) UDP-galactose[0] + (1) DIACYLGLYCEROL[0] <=> (1) UDP[0] + (1) D-Galactosyl-12-diacyl-glycerols[0]",
+        "code": "(1) cpd00043[0] + (1) cpd11423[0] <=> (1) cpd00014[0] + (1) cpd26819[0]",
+        "compound_ids": "cpd00014;cpd00043;cpd11423;cpd26819",
+        "definition": "(1) UDP-galactose[0] + (1) 1,2-Diacyl-sn-glycerol[0] <=> (1) UDP[0] + (1) D-Galactosyl-12-diacyl-glycerols[0]",
         "deltag": 10000000.0,
         "deltagerr": 10000000.0,
         "ec_numbers": [
             "2.4.1.46"
         ],
-        "equation": "(1) cpd00043[0] + (1) cpd26855[0] <=> (1) cpd00014[0] + (1) cpd26819[0]",
+        "equation": "(1) cpd00043[0] + (1) cpd11423[0] <=> (1) cpd00014[0] + (1) cpd26819[0]",
         "id": "rxn17601",
         "is_obsolete": 1,
         "is_transport": 0,
@@ -28874,9 +28880,9 @@
                 "charge": 0,
                 "coefficient": -1,
                 "compartment": 0,
-                "compound": "cpd26855",
+                "compound": "cpd11423",
                 "formula": "C5H6O5R2",
-                "name": "DIACYLGLYCEROL"
+                "name": "1,2-Diacyl-sn-glycerol"
             },
             {
                 "charge": -2,
@@ -37553,15 +37559,15 @@
             "MetaCyc: 2.7.8.27-RXN",
             "Name: SM synthase; SMS1; SMS2; ceramide:phosphatidylcholine cholinephosphotransferase; sphingomyelin synthase"
         ],
-        "code": "(1) cpd11624[0] + (1) cpd26685[0] <=> (1) cpd26855[0] + (1) cpd28189[0]",
-        "compound_ids": "cpd11624;cpd26685;cpd26855;cpd28189",
-        "definition": "(1) Lecithin[0] + (1) Ceramides[0] <=> (1) DIACYLGLYCEROL[0] + (1) Sphingomyelins[0]",
+        "code": "(1) cpd11624[0] + (1) cpd26685[0] <=> (1) cpd11423[0] + (1) cpd28189[0]",
+        "compound_ids": "cpd11423;cpd11624;cpd26685;cpd28189",
+        "definition": "(1) Lecithin[0] + (1) Ceramides[0] <=> (1) 1,2-Diacyl-sn-glycerol[0] + (1) Sphingomyelins[0]",
         "deltag": 10000000.0,
         "deltagerr": 10000000.0,
         "ec_numbers": [
             "2.7.8.27"
         ],
-        "equation": "(1) cpd11624[0] + (1) cpd26685[0] <=> (1) cpd26855[0] + (1) cpd28189[0]",
+        "equation": "(1) cpd11624[0] + (1) cpd26685[0] <=> (1) cpd11423[0] + (1) cpd28189[0]",
         "id": "rxn17724",
         "is_obsolete": 0,
         "is_transport": 0,
@@ -37596,9 +37602,9 @@
                 "charge": 0,
                 "coefficient": 1,
                 "compartment": 0,
-                "compound": "cpd26855",
+                "compound": "cpd11423",
                 "formula": "C5H6O5R2",
-                "name": "DIACYLGLYCEROL"
+                "name": "1,2-Diacyl-sn-glycerol"
             },
             {
                 "charge": 0,
@@ -40249,15 +40255,15 @@
             "MetaCyc: 3-KETOGLUCOSIDASE-RXN",
             "Name: "
         ],
-        "code": "(1) cpd00001[0] + (1) cpd03412[0] <=> (1) cpd19102[0] + (1) cpd22007[0]",
-        "compound_ids": "cpd00001;cpd03412;cpd19102;cpd22007",
-        "definition": "(1) H2O[0] + (1) 3-Ketosucrose[0] <=> (1) C10906[0] + (1) 3-dehydro-alpha-D-glucose[0]",
+        "code": "(1) cpd00001[0] + (1) cpd03412[0] <=> (1) cpd00082[0] + (1) cpd22007[0]",
+        "compound_ids": "cpd00001;cpd00082;cpd03412;cpd22007",
+        "definition": "(1) H2O[0] + (1) 3-Ketosucrose[0] <=> (1) D-Fructose[0] + (1) 3-dehydro-alpha-D-glucose[0]",
         "deltag": -5.2,
         "deltagerr": 0.55,
         "ec_numbers": [
             "3.2.1.-"
         ],
-        "equation": "(1) cpd00001[0] + (1) cpd03412[0] <=> (1) cpd19102[0] + (1) cpd22007[0]",
+        "equation": "(1) cpd00001[0] + (1) cpd03412[0] <=> (1) cpd00082[0] + (1) cpd22007[0]",
         "id": "rxn17760",
         "is_obsolete": 0,
         "is_transport": 0,
@@ -40295,9 +40301,9 @@
                 "charge": 0,
                 "coefficient": 1,
                 "compartment": 0,
-                "compound": "cpd19102",
+                "compound": "cpd00082",
                 "formula": "C6H12O6",
-                "name": "C10906"
+                "name": "D-Fructose"
             },
             {
                 "charge": 0,
@@ -41080,13 +41086,13 @@
             "MetaCyc: 3.1.1.--RXN",
             "Name: "
         ],
-        "code": "(1) cpd00001[0] + (1) cpd26855[0] <=> (1) cpd24552[0] + (1) cpd27058[0]",
-        "compound_ids": "cpd00001;cpd00067;cpd24552;cpd26855;cpd27058",
-        "definition": "(1) H2O[0] + (1) DIACYLGLYCEROL[0] <=> (1) H+[0] + (1) CPD-504[0] + (1) Fatty-Acids[0]",
+        "code": "(1) cpd00001[0] + (1) cpd11423[0] <=> (1) cpd24552[0] + (1) cpd27058[0]",
+        "compound_ids": "cpd00001;cpd00067;cpd11423;cpd24552;cpd27058",
+        "definition": "(1) H2O[0] + (1) 1,2-Diacyl-sn-glycerol[0] <=> (1) H+[0] + (1) CPD-504[0] + (1) Fatty-Acids[0]",
         "deltag": 10000000.0,
         "deltagerr": 10000000.0,
         "ec_numbers": null,
-        "equation": "(1) cpd00001[0] + (1) cpd26855[0] <=> (1) cpd00067[0] + (1) cpd24552[0] + (1) cpd27058[0]",
+        "equation": "(1) cpd00001[0] + (1) cpd11423[0] <=> (1) cpd00067[0] + (1) cpd24552[0] + (1) cpd27058[0]",
         "id": "rxn17773",
         "is_obsolete": 0,
         "is_transport": 0,
@@ -41114,9 +41120,9 @@
                 "charge": 0,
                 "coefficient": -1,
                 "compartment": 0,
-                "compound": "cpd26855",
+                "compound": "cpd11423",
                 "formula": "C5H6O5R2",
-                "name": "DIACYLGLYCEROL"
+                "name": "1,2-Diacyl-sn-glycerol"
             },
             {
                 "charge": 1,
@@ -46481,15 +46487,15 @@
             "MetaCyc: 3.1.4.10-RXN",
             "Name: 1-phosphatidyl-1D-myo-inositol 1,2-diacyl-sn-glycerol-lyase (1D-myo-inositol-1,2-cyclic-phosphate-forming); 1-phosphatidyl-1D-myo-inositol diacylglycerol-lyase (1,2-cyclic-phosphate-forming); 1-phosphatidyl-D-myo-inositol inositolphosphohydrolase (cyclic-phosphate-forming); 1-phosphatidylinositol phosphodiesterase; monophosphatidylinositol phosphodiesterase; phosphatidylinositol diacylglycerol-lyase; phosphatidylinositol phospholipase C"
         ],
-        "code": "(1) cpd27343[0] <=> (1) cpd02639[0] + (1) cpd26855[0]",
-        "compound_ids": "cpd02639;cpd26855;cpd27343",
-        "definition": "(1) L-1-phosphatidyl-inositols[0] <=> (1) D-myo-Inositol 1,2-cyclic phosphate[0] + (1) DIACYLGLYCEROL[0]",
+        "code": "(1) cpd27343[0] <=> (1) cpd02639[0] + (1) cpd11423[0]",
+        "compound_ids": "cpd02639;cpd11423;cpd27343",
+        "definition": "(1) L-1-phosphatidyl-inositols[0] <=> (1) D-myo-Inositol 1,2-cyclic phosphate[0] + (1) 1,2-Diacyl-sn-glycerol[0]",
         "deltag": 10000000.0,
         "deltagerr": 10000000.0,
         "ec_numbers": [
             "4.6.1.13"
         ],
-        "equation": "(1) cpd27343[0] <=> (1) cpd02639[0] + (1) cpd26855[0]",
+        "equation": "(1) cpd27343[0] <=> (1) cpd02639[0] + (1) cpd11423[0]",
         "id": "rxn17859",
         "is_obsolete": 0,
         "is_transport": 0,
@@ -46524,9 +46530,9 @@
                 "charge": 0,
                 "coefficient": 1,
                 "compartment": 0,
-                "compound": "cpd26855",
+                "compound": "cpd11423",
                 "formula": "C5H6O5R2",
-                "name": "DIACYLGLYCEROL"
+                "name": "1,2-Diacyl-sn-glycerol"
             }
         ]
     },
@@ -46541,15 +46547,15 @@
             "MetaCyc: 3.1.4.11-RXN; RXN-13333",
             "Name: 1-phosphatidyl-1D-myo-inositol-4,5-bisphosphate inositoltrisphosphohydrolase; 1-phosphatidyl-D-myo-inositol-4,5-bisphosphate inositoltrisphosphohydrolase; 1-phosphatidylinositol-4,5-bisphosphate phosphodiesterase; PI-PLC; monophosphatidylinositol phosphodiesterase; phosphatidylinositol phospholipase C; phosphoinositidase C; phosphoinositide phospholipase C; triphosphoinositide phosphodiesterase"
         ],
-        "code": "(1) cpd00001[0] + (1) cpd27788[0] <=> (1) cpd00916[0] + (1) cpd26855[0]",
-        "compound_ids": "cpd00001;cpd00067;cpd00916;cpd26855;cpd27788",
-        "definition": "(1) H2O[0] + (1) PHOSPHATIDYL-MYO-INOSITOL-45-BISPHOSPHA[0] <=> (1) H+[0] + (1) Ins(1,4,5)P3[0] + (1) DIACYLGLYCEROL[0]",
+        "code": "(1) cpd00001[0] + (1) cpd27788[0] <=> (1) cpd00916[0] + (1) cpd11423[0]",
+        "compound_ids": "cpd00001;cpd00067;cpd00916;cpd11423;cpd27788",
+        "definition": "(1) H2O[0] + (1) PHOSPHATIDYL-MYO-INOSITOL-45-BISPHOSPHA[0] <=> (1) H+[0] + (1) Ins(1,4,5)P3[0] + (1) 1,2-Diacyl-sn-glycerol[0]",
         "deltag": 10000000.0,
         "deltagerr": 10000000.0,
         "ec_numbers": [
             "3.1.4.11"
         ],
-        "equation": "(1) cpd00001[0] + (1) cpd27788[0] <=> (1) cpd00067[0] + (1) cpd00916[0] + (1) cpd26855[0]",
+        "equation": "(1) cpd00001[0] + (1) cpd27788[0] <=> (1) cpd00067[0] + (1) cpd00916[0] + (1) cpd11423[0]",
         "id": "rxn17860",
         "is_obsolete": 0,
         "is_transport": 0,
@@ -46602,9 +46608,9 @@
                 "charge": 0,
                 "coefficient": 1,
                 "compartment": 0,
-                "compound": "cpd26855",
+                "compound": "cpd11423",
                 "formula": "C5H6O5R2",
-                "name": "DIACYLGLYCEROL"
+                "name": "1,2-Diacyl-sn-glycerol"
             }
         ]
     },
@@ -46619,15 +46625,15 @@
             "MetaCyc: 3.1.4.11-RXN; RXN-13333",
             "Name: 1-phosphatidyl-1D-myo-inositol-4,5-bisphosphate inositoltrisphosphohydrolase; 1-phosphatidyl-D-myo-inositol-4,5-bisphosphate inositoltrisphosphohydrolase; 1-phosphatidylinositol-4,5-bisphosphate phosphodiesterase; PI-PLC; monophosphatidylinositol phosphodiesterase; phosphatidylinositol phospholipase C; phosphoinositidase C; phosphoinositide phospholipase C; triphosphoinositide phosphodiesterase"
         ],
-        "code": "(1) cpd00001[0] + (1) cpd27788[0] <=> (1) cpd00916[0] + (1) cpd26855[0]",
-        "compound_ids": "cpd00001;cpd00067;cpd00916;cpd26855;cpd27788",
-        "definition": "(1) H2O[0] + (1) PHOSPHATIDYL-MYO-INOSITOL-45-BISPHOSPHA[0] <=> (1) H+[0] + (1) Ins(1,4,5)P3[0] + (1) DIACYLGLYCEROL[0]",
+        "code": "(1) cpd00001[0] + (1) cpd27788[0] <=> (1) cpd00916[0] + (1) cpd11423[0]",
+        "compound_ids": "cpd00001;cpd00067;cpd00916;cpd11423;cpd27788",
+        "definition": "(1) H2O[0] + (1) PHOSPHATIDYL-MYO-INOSITOL-45-BISPHOSPHA[0] <=> (1) H+[0] + (1) Ins(1,4,5)P3[0] + (1) 1,2-Diacyl-sn-glycerol[0]",
         "deltag": 10000000.0,
         "deltagerr": 10000000.0,
         "ec_numbers": [
             "3.1.4.11"
         ],
-        "equation": "(1) cpd00001[0] + (1) cpd27788[0] <=> (1) cpd00067[0] + (1) cpd00916[0] + (1) cpd26855[0]",
+        "equation": "(1) cpd00001[0] + (1) cpd27788[0] <=> (1) cpd00067[0] + (1) cpd00916[0] + (1) cpd11423[0]",
         "id": "rxn17861",
         "is_obsolete": 1,
         "is_transport": 0,
@@ -46680,9 +46686,9 @@
                 "charge": 0,
                 "coefficient": 1,
                 "compartment": 0,
-                "compound": "cpd26855",
+                "compound": "cpd11423",
                 "formula": "C5H6O5R2",
-                "name": "DIACYLGLYCEROL"
+                "name": "1,2-Diacyl-sn-glycerol"
             }
         ]
     },
@@ -47370,22 +47376,23 @@
         "abbreviation": "3.1.4.47-RXN.c",
         "abstract_reaction": null,
         "aliases": [
+            "KEGG: R07635",
             "MetaCyc: 3.1.4.47-RXN",
-            "Name: (glycosyl)phosphatidylinositol-specific phospholipase C; 6-(alpha-D-glucosaminyl)-1-phosphatidyl-1D-myo-inositol 1,2-diacyl-sn-glycerol-lyase [6-(alpha-D-glucosaminyl)-1D-myo-inositol 1,2-cyclic phosphate-forming]; 6-(alpha-D-glucosaminyl)-1-phosphatidyl-1D-myo-inositol diacylglycerol-lyase (1,2-cyclic-phosphate-forming); GPI-PLC; GPI-specific phospholipase C; VSG-lipase; glycosyl inositol phospholipid anchor-hydrolyzing enzyme; glycosylphosphatidylinositol diacylglycerol-lyase; glycosylphosphatidylinositol-phospholipase C; glycosylphosphatidylinositol-specific phospholipase C; variant-surface-glycoprotein phospholipase C"
+            "Name: (glycosyl)phosphatidylinositol-specific phospholipase C; 6-(alpha-D-glucosaminyl)-1-phosphatidyl-1D-myo-inositol; 6-(alpha-D-glucosaminyl)-1-phosphatidyl-1D-myo-inositol 1,2-diacyl-sn-glycerol-lyase [6-(alpha-D-glucosaminyl)-1D-myo-inositol 1,2-cyclic phosphate-forming]; 6-(alpha-D-glucosaminyl)-1-phosphatidyl-1D-myo-inositol diacylglycerol-lyase (1,2-cyclic-phosphate-forming); GPI-PLC; GPI-specific phospholipase C; VSG-lipase; diacylglycerol-lyase (1,2-cyclic-phosphate-forming); glycosyl inositol phospholipid anchor-hydrolyzing enzyme; glycosylphosphatidylinositol diacylglycerol-lyase; glycosylphosphatidylinositol-phospholipase C; glycosylphosphatidylinositol-specific phospholipase C; variant-surface-glycoprotein phospholipase C"
         ],
-        "code": "(1) cpd12500[0] <=> (1) cpd14791[0] + (1) cpd26855[0]",
-        "compound_ids": "cpd12500;cpd14791;cpd26855",
-        "definition": "(1) D-Glucosaminylphosphatidylinositol[0] <=> (1) 6-(alpha-D-Glucosaminyl)-1D-myo-inositol 1,2-cyclic phosphate[0] + (1) DIACYLGLYCEROL[0]",
+        "code": "(1) cpd12500[0] <=> (1) cpd14791[0] + (1) cpd11423[0]",
+        "compound_ids": "cpd11423;cpd12500;cpd14791",
+        "definition": "(1) D-Glucosaminylphosphatidylinositol[0] <=> (1) 6-(alpha-D-Glucosaminyl)-1D-myo-inositol 1,2-cyclic phosphate[0] + (1) 1,2-Diacyl-sn-glycerol[0]",
         "deltag": 10000000.0,
         "deltagerr": 10000000.0,
         "ec_numbers": [
             "4.6.1.14"
         ],
-        "equation": "(1) cpd12500[0] <=> (1) cpd14791[0] + (1) cpd26855[0]",
+        "equation": "(1) cpd12500[0] <=> (1) cpd14791[0] + (1) cpd11423[0]",
         "id": "rxn17876",
-        "is_obsolete": 0,
+        "is_obsolete": 1,
         "is_transport": 0,
-        "linked_reaction": null,
+        "linked_reaction": "rxn07451",
         "name": "glycosylphosphatidylinositol diacylglycerol-lyase",
         "notes": [
             "HB",
@@ -47417,9 +47424,9 @@
                 "charge": 0,
                 "coefficient": 1,
                 "compartment": 0,
-                "compound": "cpd26855",
+                "compound": "cpd11423",
                 "formula": "C5H6O5R2",
-                "name": "DIACYLGLYCEROL"
+                "name": "1,2-Diacyl-sn-glycerol"
             }
         ]
     },
@@ -50909,15 +50916,15 @@
             "MetaCyc: 3.2.1.153-RXN",
             "Name: 1-FEH II; 1-FEH w1; 1-FEH w2; 1-fructan exohydrolase; beta-(2,1)-D-fructan fructohydrolase; beta-(2-1)-D-fructan fructohydrolase; beta-(2-1)-linkage-specific fructan-beta-fructosidase; beta-(2-1)fructan exohydrolase; beta-(2->1)-D-fructan fructohydrolase; fructan beta-(2,1)-fructosidase; inulinase"
         ],
-        "code": " <=> (1) cpd19102[0]",
-        "compound_ids": "cpd19102",
-        "definition": " => (1) C10906[0]",
+        "code": " <=> (1) cpd00082[0]",
+        "compound_ids": "cpd00082",
+        "definition": " => (1) D-Fructose[0]",
         "deltag": -101.22,
         "deltagerr": 0.27,
         "ec_numbers": [
             "3.2.1.153"
         ],
-        "equation": " => (1) cpd19102[0]",
+        "equation": " => (1) cpd00082[0]",
         "id": "rxn17932",
         "is_obsolete": 0,
         "is_transport": 0,
@@ -50937,9 +50944,9 @@
                 "charge": 0,
                 "coefficient": 1,
                 "compartment": 0,
-                "compound": "cpd19102",
+                "compound": "cpd00082",
                 "formula": "C6H12O6",
-                "name": "C10906"
+                "name": "D-Fructose"
             }
         ]
     },
@@ -50950,22 +50957,24 @@
             "AraCyc: 3.2.1.154-RXN",
             "BrachyCyc: 3.2.1.154-RXN",
             "CornCyc: 3.2.1.154-RXN",
-            "MetaCyc: 3.2.1.154-RXN",
-            "Name: (2->6)-beta-D-fructan fructohydrolase; 6-FEH; beta-(2,6)-D-fructan fructohydrolase; beta-(2-6)-fructan exohydrolase; fructan beta-(2,6)-fructosidase; levanase"
+            "MetaCyc: 3.2.1.153-RXN; 3.2.1.154-RXN",
+            "Name: (2->6)-beta-D-fructan fructohydrolase; 6-FEH; beta-(2,6)-D-fructan fructohydrolase; beta-(2-6)-fructan exohydrolase; beta-D-Fructan fructohydrolase; fructan beta-(2,6)-fructosidase; levanase"
         ],
-        "code": "(1) cpd00001[0] <=> (1) cpd19102[0]",
-        "compound_ids": "cpd00001;cpd19102",
-        "definition": "(1) H2O[0] => (1) C10906[0]",
+        "code": "(1) cpd00001[0] <=> (1) cpd00082[0]",
+        "compound_ids": "cpd00001;cpd00082",
+        "definition": "(1) H2O[0] => (1) D-Fructose[0]",
         "deltag": -63.68,
         "deltagerr": 0.33,
         "ec_numbers": [
-            "3.2.1.154"
+            "3.2.1.154",
+            "3.2.1.26",
+            "3.2.1.80"
         ],
-        "equation": "(1) cpd00001[0] => (1) cpd19102[0]",
+        "equation": "(1) cpd00001[0] => (1) cpd00082[0]",
         "id": "rxn17933",
-        "is_obsolete": 0,
+        "is_obsolete": 1,
         "is_transport": 0,
-        "linked_reaction": null,
+        "linked_reaction": "rxn05906",
         "name": "fructan beta-(2,6)-fructosidase",
         "notes": [
             "GCC",
@@ -50989,9 +50998,9 @@
                 "charge": 0,
                 "coefficient": 1,
                 "compartment": 0,
-                "compound": "cpd19102",
+                "compound": "cpd00082",
                 "formula": "C6H12O6",
-                "name": "C10906"
+                "name": "D-Fructose"
             }
         ]
     },
@@ -54035,15 +54044,15 @@
             "SoyCyc: 3.2.1.7-RXN",
             "Name: 1-beta-D-fructan fructanohydrolase; 2,1-beta-D-fructan fructanohydrolase; endo-inulinase; exoinulinase; indoinulinase; inulase; inulinase"
         ],
-        "code": "(1) cpd27312[0] <=> (1) cpd19102[0] + (1) cpd27092[0]",
-        "compound_ids": "cpd19102;cpd27092;cpd27312",
-        "definition": "(1) Inulin[0] <=> (1) C10906[0] + (1) Fructooligosaccharides[0]",
+        "code": "(1) cpd27312[0] <=> (1) cpd00082[0] + (1) cpd27092[0]",
+        "compound_ids": "cpd00082;cpd27092;cpd27312",
+        "definition": "(1) Inulin[0] <=> (1) D-Fructose[0] + (1) Fructooligosaccharides[0]",
         "deltag": 10000000.0,
         "deltagerr": 10000000.0,
         "ec_numbers": [
             "3.2.1.7"
         ],
-        "equation": "(1) cpd27312[0] <=> (1) cpd19102[0] + (1) cpd27092[0]",
+        "equation": "(1) cpd27312[0] <=> (1) cpd00082[0] + (1) cpd27092[0]",
         "id": "rxn17984",
         "is_obsolete": 0,
         "is_transport": 0,
@@ -54070,9 +54079,9 @@
                 "charge": 0,
                 "coefficient": 1,
                 "compartment": 0,
-                "compound": "cpd19102",
+                "compound": "cpd00082",
                 "formula": "C6H12O6",
-                "name": "C10906"
+                "name": "D-Fructose"
             },
             {
                 "charge": 0,

@@ -3,7 +3,7 @@ import os, sys
 temp=list();
 header=1;
 
-sys.path.append('../../Libs/Python')
+sys.path.append('../../../Libs/Python')
 from BiochemPy import Reactions, Compounds, InChIs
 
 compounds_helper = Compounds()
@@ -33,7 +33,10 @@ for cpd in delete_cpds:
     for lnkd_cpd in compounds_dict[cpd]['linked_compound'].split(';'):
         linked_compound_list = compounds_dict[lnkd_cpd]['linked_compound'].split(';')
         linked_compound_list.remove(cpd)
-        compounds_dict[lnkd_cpd]['linked_compound']=linked_compound_list
+        if(len(linked_compound_list)>0):
+            compounds_dict[lnkd_cpd]['linked_compound']=";".join(linked_compound_list)
+        else:
+            compounds_dict[lnkd_cpd]['linked_compound']='null'
 
         # I need to move the names, aliases, and ec numbers to linked compounds
         # This should already have been done when merging compounds, but doing it here to double-check
@@ -60,6 +63,8 @@ for cpd in delete_cpds:
 
 if(len(delete_cpds)>0):
     print("Removing "+str(len(delete_cpds))+" newly obsolete compounds")
+    for cpd in delete_cpds:
+        print("\t"+cpd)
     compounds_helper.saveCompounds(compounds_dict)
     compounds_helper.saveNames(cpds_names_dict)
     compounds_helper.saveAliases(cpds_aliases_dict)

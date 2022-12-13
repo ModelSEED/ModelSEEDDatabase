@@ -3218,8 +3218,8 @@
         "abstract_reaction": null,
         "aliases": [
             "KEGG: R01823; R02120",
-            "MetaCyc: 2.4.1.125-RXN; AMYLOSUCRASE-RXN",
-            "Name: Sucrose:1,4-alpha-D-glucan 4-alpha-D-glucosyltransferase; Sucrose:1,6-alpha-D-glucan 6-alpha-D-glucosyltransferase"
+            "MetaCyc: 2.4.1.125-RXN; AMYLOSUCRASE-RXN; DEXTRANSUCRASE-RXN",
+            "Name: Sucrose:1,4-alpha-D-glucan 4-alpha-D-glucosyltransferase; Sucrose:1,6-alpha-D-glucan 6-alpha-D-glucosyltransferase; amylosucrase; sucrose-1,4-alpha-glucan glucosyltransferase; sucrose-glucan glucosyltransferase; sucrose:(1->4)-alpha-D-glucan 4-alpha-D-glucosyltransferase; sucrose:1,4-alpha-D-glucan 4-alpha-D-glucosyltransferase"
         ],
         "code": "(1) cpd00076[0] <=> (1) cpd00082[0]",
         "compound_ids": "cpd00076;cpd00082",
@@ -3235,7 +3235,7 @@
         "id": "rxn06050",
         "is_obsolete": 0,
         "is_transport": 0,
-        "linked_reaction": null,
+        "linked_reaction": "rxn17507",
         "name": "Sucrose:1,4-alpha-D-glucan 4-alpha-D-glucosyltransferase",
         "notes": [
             "GCC",
@@ -14416,6 +14416,7 @@
         "abstract_reaction": null,
         "aliases": [
             "KEGG: R02689",
+            "MetaCyc: RXN-16648",
             "iAO358: rll_607",
             "Name: UDP-glucose diacylglycerol glucosyltransferase; UDPglucose:1,2-diacylglycerol 3-D-glucosyltransferase"
         ],
@@ -14425,7 +14426,8 @@
         "deltag": 10000000.0,
         "deltagerr": 10000000.0,
         "ec_numbers": [
-            "2.4.1.157"
+            "2.4.1.157",
+            "2.4.1.336"
         ],
         "equation": "(1) cpd00026[0] + (1) cpd11423[0] <=> (1) cpd00014[0] + (1) cpd12452[0]",
         "id": "rxn06219",
@@ -45283,15 +45285,15 @@
             "KEGG: R04375",
             "Name: "
         ],
-        "code": "(1) cpd00003[0] + (1) cpd02386[0] <=> (1) cpd00004[0] + (1) cpd12723[0]",
-        "compound_ids": "cpd00003;cpd00004;cpd00067;cpd02386;cpd12723",
-        "definition": "(1) NAD[0] + (1) 2-Dehydro-3-deoxy-D-xylonate[0] <=> (1) NADH[0] + (1) H+[0] + (1) (4S)-5-Hydroxy-2,4-dioxopentanoate[0]",
+        "code": "(1) cpd00003[0] + (1) cpd00520[0] <=> (1) cpd00004[0] + (1) cpd12723[0]",
+        "compound_ids": "cpd00003;cpd00004;cpd00067;cpd00520;cpd12723",
+        "definition": "(1) NAD[0] + (1) 2-Dehydro-3-deoxy-D-pentonate[0] <=> (1) NADH[0] + (1) H+[0] + (1) (4S)-5-Hydroxy-2,4-dioxopentanoate[0]",
         "deltag": 4.41,
         "deltagerr": 0.24,
         "ec_numbers": [
             "1.1.1.-"
         ],
-        "equation": "(1) cpd00003[0] + (1) cpd02386[0] <=> (1) cpd00004[0] + (1) cpd00067[0] + (1) cpd12723[0]",
+        "equation": "(1) cpd00003[0] + (1) cpd00520[0] <=> (1) cpd00004[0] + (1) cpd00067[0] + (1) cpd12723[0]",
         "id": "rxn06670",
         "is_obsolete": 0,
         "is_transport": 0,
@@ -45322,9 +45324,9 @@
                 "charge": -1,
                 "coefficient": -1,
                 "compartment": 0,
-                "compound": "cpd02386",
+                "compound": "cpd00520",
                 "formula": "C5H7O5",
-                "name": "2-Dehydro-3-deoxy-D-xylonate"
+                "name": "2-Dehydro-3-deoxy-D-pentonate"
             },
             {
                 "charge": -2,
@@ -45639,15 +45641,15 @@
             "KEGG: R04390",
             "Name: L-2-Aminoadipate-6-semialdehyde:NAD(P)+ 6-oxidoreductase"
         ],
-        "code": "(1) cpd00005[0] + (1) cpd12734[0] <=> (1) cpd00006[0] + (1) cpd02522[0] + (1) cpd13373[0]",
-        "compound_ids": "cpd00005;cpd00006;cpd00067;cpd02522;cpd12734;cpd13373",
-        "definition": "(1) NADPH[0] + (1) H+[0] + (1) Aminoadip.-S[0] <=> (1) NADP[0] + (1) 2-Aminoadipate 6-semialdehyde[0] + (1) Holo-Lys2[0]",
+        "code": "(1) cpd00005[0] + (1) cpd12734[0] <=> (1) cpd00006[0] + (1) cpd01046[0] + (1) cpd13373[0]",
+        "compound_ids": "cpd00005;cpd00006;cpd00067;cpd01046;cpd12734;cpd13373",
+        "definition": "(1) NADPH[0] + (1) H+[0] + (1) Aminoadip.-S[0] <=> (1) NADP[0] + (1) Allysine[0] + (1) Holo-Lys2[0]",
         "deltag": 10000000.0,
         "deltagerr": 10000000.0,
         "ec_numbers": [
             "1.2.1.31"
         ],
-        "equation": "(1) cpd00005[0] + (1) cpd00067[0] + (1) cpd12734[0] <=> (1) cpd00006[0] + (1) cpd02522[0] + (1) cpd13373[0]",
+        "equation": "(1) cpd00005[0] + (1) cpd00067[0] + (1) cpd12734[0] <=> (1) cpd00006[0] + (1) cpd01046[0] + (1) cpd13373[0]",
         "id": "rxn06675",
         "is_obsolete": 0,
         "is_transport": 0,
@@ -45701,9 +45703,9 @@
                 "charge": 0,
                 "coefficient": 1,
                 "compartment": 0,
-                "compound": "cpd02522",
+                "compound": "cpd01046",
                 "formula": "C6H11NO3",
-                "name": "2-Aminoadipate 6-semialdehyde"
+                "name": "Allysine"
             },
             {
                 "charge": 0,

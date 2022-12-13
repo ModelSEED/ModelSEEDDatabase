@@ -3,7 +3,7 @@ import os, sys
 temp=list();
 header=1;
 
-sys.path.append('../../Libs/Python')
+sys.path.append('../../../Libs/Python')
 from BiochemPy import Reactions, Compounds, InChIs
 
 reactions_helper = Reactions()
@@ -34,11 +34,10 @@ for rxn in delete_rxns:
     for lnkd_rxn in reactions_dict[rxn]['linked_reaction'].split(';'):
         linked_reaction_list = reactions_dict[lnkd_rxn]['linked_reaction'].split(';')
         linked_reaction_list.remove(rxn)
-        if(len(linked_reaction_list)==0):
-            linked_reaction_list="null"
+        if(len(linked_reaction_list)>0):
+            reactions_dict[lnkd_rxn]['linked_reaction']=";".join(linked_reaction_list)
         else:
-            linked_reaction_list=";".join(linked_reaction_list)
-        reactions_dict[lnkd_rxn]['linked_reaction']=linked_reaction_list
+            reactions_dict[lnkd_rxn]['linked_reaction']='null'
 
         # I need to move the names, aliases, and ec numbers to linked reactions
         # This should already have been done when merging reactions, but doing it here to double-check
@@ -75,6 +74,8 @@ for rxn in delete_rxns:
 
 if(len(delete_rxns)>0):
     print("Removing "+str(len(delete_rxns))+" newly obsolete reactions")
+    for rxn in delete_rxns:
+        print("\t"+rxn)
     reactions_helper.saveReactions(reactions_dict)
     reactions_helper.saveNames(rxns_names_dict)
     reactions_helper.saveAliases(rxns_aliases_dict)
