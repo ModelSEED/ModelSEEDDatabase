@@ -166,7 +166,6 @@ with open(args.reactions_file) as fh:
             #Find statuses that only have water or hydroxyl imbalance
             new_status = reactions_helper.balanceReaction(new_rxn_cpds_array)
 
-            print(rxn,new_status)
             if(new_status == "MI:H:2/O:1" or new_status == "MI:H:-2/O:-1" or \
                 new_status == "MI:H:1/O:1|CI:-1" or new_status == "MI:H:-1/O:-1|CI:1"):
                 Water_Adjustment = 1
