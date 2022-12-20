@@ -41,7 +41,7 @@ reactions_helper = Reactions()
 reactions_dict = reactions_helper.loadReactions()
 reactions_codes = reactions_helper.generateCodes(reactions_dict)
 
-Default_Rxn = {"id":"cpd00001","name":"null","abbreviation":"null","aliases":null,
+Default_Rxn = {"id":"cpd00001","name":"null","abbreviation":"null","aliases":"null",
                "code":"null","stoichiometry":"null","equation":"null","definition":"null",
                "reversibility":"=","direction":"=","deltag":"10000000","deltagerr":"10000000",
                "status":"NB","is_obsolete":0,"is_transport":0,
@@ -79,13 +79,14 @@ missing_cpds=dict()
 matched_rxns_dict=dict()
 with open(args.reactions_file) as fh:
     for line in fh.readlines():
-        line=line.strip()
+        line=line.strip('\r\n')
         if(len(Headers)==0):
             Headers=line.split('\t')
             continue
 
         rxn=dict()
         array=line.split('\t',len(Headers))
+
         for i in range(len(Headers)):
             rxn[Headers[i].lower()]=array[i]
 
@@ -162,11 +163,14 @@ with open(args.reactions_file) as fh:
         #We need to include water when matching codes, in case
         if(matched_rxn is None):
 
-            #Find statuses that only have water imbalance
+            #Find statuses that only have water or hydroxyl imbalance
             new_status = reactions_helper.balanceReaction(new_rxn_cpds_array)
-            if(new_status == "MI:H:2/O:1" or new_status == "MI:H:-2/O:-1"):
+
+            print(rxn,new_status)
+            if(new_status == "MI:H:2/O:1" or new_status == "MI:H:-2/O:-1" or \
+                new_status == "MI:H:1/O:1|CI:-1" or new_status == "MI:H:-1/O:-1|CI:1"):
                 Water_Adjustment = 1
-                if("-1" in new_status):
+                if("O:-1" in new_status):
                     Water_Adjustment = -1
 
                 #Adjust for water
