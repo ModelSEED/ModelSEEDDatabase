@@ -2,14 +2,14 @@
 # database, then these scripts will then not change anything, which you can check
 # using git diff
 
+There are two shell scripts that run these in the appropriate order:
+./Refresh_Reactions.py
+./Refresh_Aliases.py
+
 # 1) This one attempts to balance "out" compounds, and is key for
 # identifying reactions wherein the updated stoichiometry should be
 # adjusted for the purposes of FBA.
 ./Rebuild_Reactions.py
-
-# 2) This one matches reaction stoichiometry and indicates which reactions
-# are now obsolete
-./Merge_Reactions.py
 
 # 3) This one calculates the new status of the reaction based on how the mass
 # and charge balances out in the reactants and products. Its different from
@@ -22,6 +22,18 @@
 # in an output file
 ./Adjust_Reaction_Protons.py
 ./Adjust_Reaction_Water.py
+
+# 4) This one matches reaction stoichiometry and indicates which reactions
+# are now obsolete.
+./Merge_Reactions.py
+
+NB: if it is reported that compounds and reactions are now obsolete, and the 
+new entities have been added since 2018, they may have to be removed.
+The scripts for this should likely be run separately:
+./Remove_Newly_Obsolescent_Compounds.py
+./Remove_Newly_Obsolescent_Reactions.py
+
+(compounds are only merged manually via curation, see ../../Curation/Redundancies)
 
 # 5) This script takes the output of Merge_Reactions.py and makes sure that all the
 # aliases are consistently applied to linked reactions and compounds
