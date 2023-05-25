@@ -43,7 +43,7 @@ reactions_codes = reactions_helper.generateCodes(reactions_dict)
 
 Default_Rxn = {"id":"cpd00001","name":"null","abbreviation":"null","aliases":"null",
                "code":"null","stoichiometry":"null","equation":"null","definition":"null",
-               "reversibility":"=","direction":"=","deltag":"10000000","deltagerr":"10000000",
+               "reversibility":"=","deltag":"10000000","deltagerr":"10000000",
                "status":"NB","is_obsolete":0,"is_transport":0,
                "abstract_reaction":"null","pathways":"null","ec_numbers":"null",
                "compound_ids":"null","linked_reaction":"null","notes":[],"source":""}
