@@ -1,10 +1,13 @@
 #!/usr/bin/env python
 import sys
 sys.path.append('../../../Libs/Python')
-from BiochemPy import Reactions
+from BiochemPy import Reactions, Compounds
 
 ReactionsHelper = Reactions()
 Reactions_Dict = ReactionsHelper.loadReactions()
+
+compounds_helper = Compounds()
+compounds_dict = compounds_helper.loadCompounds()
 
 Update_Reactions=0
 status_lines = list()
@@ -29,8 +32,15 @@ for rxn in sorted(Reactions_Dict.keys()):
     #Adjust for water
     ReactionsHelper.adjustCompound(rgts_array,"cpd00001",float(Water_Adjustment))
 
+    # Check that all reagents have structures
+    all_structures=True
+    for rgt in rgts_array:
+        if(compounds_dict[rgt['compound']]['smiles'] == '' and \
+            compounds_dict[rgt['compound']]['inchikey'] == ''):
+            all_structures=False
+
     #Recompute new status and stoichiometry
-    new_status = ReactionsHelper.balanceReaction(rgts_array)
+    new_status = ReactionsHelper.balanceReaction(rgts_array, all_structures)
     new_stoichiometry = ReactionsHelper.buildStoich(rgts_array)
 
     if(new_status != Reactions_Dict[rxn]['status']):
