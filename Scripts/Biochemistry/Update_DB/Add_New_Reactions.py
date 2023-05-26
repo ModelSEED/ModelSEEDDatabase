@@ -2,6 +2,9 @@
 import os, sys, re, copy
 import argparse
 
+print("Warning: need to check for structures in redundant compounds")
+sys.exit()
+
 parser = argparse.ArgumentParser()
 parser.add_argument('reactions_file', help="Reactions File")
 parser.add_argument('cpd_databases', help="Biochemistry databases of origin for compounds")
