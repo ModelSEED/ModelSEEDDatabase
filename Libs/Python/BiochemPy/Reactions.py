@@ -315,7 +315,7 @@ class Reactions:
 
         return new_rgts_array
 
-    def balanceReaction(self, rgts_array):
+    def balanceReaction(self, rgts_array, all_structures=False):
         if (len(rgts_array) == 0):
             return "EMPTY"
 
@@ -333,7 +333,7 @@ class Reactions:
             rgts_dict[rgt_str] += 1
 
         for rgt in rgts_dict.keys():
-            if (rgts_dict[rgt] > 1):
+            if (rgts_dict[rgt] > 1 and all_structures is False):
                 return "Duplicate reagents"
 
         ########################################
