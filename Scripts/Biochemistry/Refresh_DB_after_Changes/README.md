@@ -3,8 +3,8 @@
 # using git diff
 
 There are two shell scripts that run these in the appropriate order:
-./Refresh_Reactions.py
-./Refresh_Aliases.py
+./Refresh_Reactions.sh
+./Refresh_Aliases.sh
 
 # 1) This one attempts to balance "out" compounds, and is key for
 # identifying reactions wherein the updated stoichiometry should be
