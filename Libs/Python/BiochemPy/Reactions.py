@@ -413,18 +413,18 @@ class Reactions:
             if (rxn_net_mass[atom] == 0):
                 continue
 
-            rxn_net_mass[atom] = "{0:.2f}".format(rxn_net_mass[atom])
+            rxn_net_mass[atom] = "{0:.3f}".format(rxn_net_mass[atom])
 
-            # Correct for redundant ".00" in floats
-            if (rxn_net_mass[atom][-3:] == ".00"):
+            # Correct for redundant ".000" in floats
+            if (rxn_net_mass[atom][-4:] == ".000"):
                 rxn_net_mass[atom] = str(int(float(rxn_net_mass[atom])))
     
             imbalanced_atoms_array.append(atom + ":" + rxn_net_mass[atom])
 
-        rxn_net_charge = "{0:.2f}".format(rxn_net_charge)
+        rxn_net_charge = "{0:.3f}".format(rxn_net_charge)
 
-        # Correct for redundant ".00" in floats
-        if (rxn_net_charge[-3:] == ".00"):
+        # Correct for redundant ".000" in floats
+        if (rxn_net_charge[-4:] == ".000"):
             rxn_net_charge = str(int(float(rxn_net_charge)))
 
         status = ""

@@ -4,6 +4,10 @@ import sys
 sys.path.append('../../../Libs/Python')
 from BiochemPy import Reactions, Compounds
 
+be_verbose=False
+if("verbose" in sys.argv):
+    be_verbose=True
+
 ReactionsHelper = Reactions()
 Reactions_Dict = ReactionsHelper.loadReactions()
 
@@ -35,7 +39,8 @@ for rxn in sorted(Reactions_Dict.keys()):
             continue
         
         (element,number)=elements[0].split(":")
-        #print("Adjusting: "+rxn,element,number)
+        if(be_verbose is True):
+            print("Adjusting: "+rxn,element,number)
 
         #Parse old stoichiometry into array
         rgts_array=Reactions_Dict[rxn]["stoichiometry"]
@@ -59,8 +64,11 @@ for rxn in sorted(Reactions_Dict.keys()):
             status_lines.append(rxn+"\t"+Reactions_Dict[rxn]['status']+"\t"+new_status+"\n")
 
         if(new_stoichiometry != old_stoichiometry):
-            print("Rebuilding reaction :",rxn)
+            if(be_verbose is True):
+                print("Rebuilding reaction :",rxn)
             ReactionsHelper.rebuildReaction(Reactions_Dict[rxn],rgts_array)
+            if(be_verbose is True):
+                print("Saving new status for reaction :",rxn,new_status)
             Reactions_Dict[rxn]["status"]=new_status
             if("HB" not in Reactions_Dict[rxn]["notes"]):
                 Reactions_Dict[rxn]["notes"].append("HB")
