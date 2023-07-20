@@ -3,6 +3,7 @@ import os, sys, re, copy
 import argparse
 
 print("Warning: need to check for structures in redundant compounds")
+print("Warning: need to check formulas in reaction stoichiometries")
 sys.exit()
 
 parser = argparse.ArgumentParser()

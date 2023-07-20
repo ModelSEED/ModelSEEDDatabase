@@ -27,7 +27,7 @@ for rxn in sorted(reactions_dict.keys()):
         continue
 
     rxn_cpds_array=reactions_dict[rxn]["stoichiometry"]
-    
+ 
     # Check that all reagents have structures
     all_structures=True
     for rgt in rxn_cpds_array:

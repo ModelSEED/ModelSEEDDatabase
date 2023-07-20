@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 date
 DIR=`dirname $0`
+echo "Refresh stoichiometries"
+${DIR}/Rebuild_Stoichiometry.py
 echo "Rebuild"
 ${DIR}/Rebuild_Reactions.py
 echo "Rebalance"

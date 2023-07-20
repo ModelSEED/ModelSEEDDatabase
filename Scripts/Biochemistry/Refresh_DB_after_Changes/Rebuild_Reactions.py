@@ -10,7 +10,7 @@ compounds_helper = Compounds()
 compounds_dict = compounds_helper.loadCompounds()
 
 updated_reactions=list()
-for rxn in sorted(reactions_dict.keys()):
+for rxn in reactions_dict:
     if(reactions_dict[rxn]["status"] == "EMPTY"):
         continue
 

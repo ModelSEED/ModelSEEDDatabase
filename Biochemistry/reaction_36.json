@@ -50610,14 +50610,14 @@
             "Name: chalcone isomerase; chalcone-flavanone isomerase; flavanone lyase (decyclizing)"
         ],
         "code": "(1) cpd03969[0] <=> (1) cpd24140[0]",
-        "compound_ids": "cpd00067;cpd03969;cpd24140",
-        "definition": "(1) H+[0] + (1) Isosalipurpol[0] <=> (1) (2R)-4',5,7-trihydroxyflavan-4-one[0]",
+        "compound_ids": "cpd03969;cpd24140",
+        "definition": "(1) Isosalipurpol[0] <=> (1) (2R)-4',5,7-trihydroxyflavan-4-one[0]",
         "deltag": -7.54,
         "deltagerr": 3.31,
         "ec_numbers": [
             "5.5.1.6"
         ],
-        "equation": "(1) cpd00067[0] + (1) cpd03969[0] <=> (1) cpd24140[0]",
+        "equation": "(1) cpd03969[0] <=> (1) cpd24140[0]",
         "id": "rxn36668",
         "is_obsolete": 0,
         "is_transport": 0,
@@ -50631,22 +50631,14 @@
         "pathways": null,
         "reversibility": "=",
         "source": "Primary Database",
-        "status": "OK",
+        "status": "CI:1",
         "stoichiometry": [
-            {
-                "charge": 1,
-                "coefficient": -1,
-                "compartment": 0,
-                "compound": "cpd00067",
-                "formula": "H",
-                "name": "H+"
-            },
             {
                 "charge": -1,
                 "coefficient": -1,
                 "compartment": 0,
                 "compound": "cpd03969",
-                "formula": "C15H11O5",
+                "formula": "C15H12O5",
                 "name": "Isosalipurpol"
             },
             {
@@ -51997,7 +51989,7 @@
                 "coefficient": -1,
                 "compartment": 0,
                 "compound": "cpd00358",
-                "formula": "C9H12N2O14P3",
+                "formula": "C9H11N2O14P3",
                 "name": "dUTP"
             },
             {
@@ -52029,7 +52021,7 @@
                 "coefficient": 1,
                 "compartment": 0,
                 "compound": "cpd00978",
-                "formula": "C9H12N2O11P2",
+                "formula": "C9H11N2O11P2",
                 "name": "dUDP"
             }
         ]
@@ -52231,7 +52223,7 @@
                 "coefficient": -1,
                 "compartment": 0,
                 "compound": "cpd00357",
-                "formula": "C10H14N2O14P3",
+                "formula": "C10H13N2O14P3",
                 "name": "TTP"
             },
             {
@@ -52263,7 +52255,7 @@
                 "coefficient": 1,
                 "compartment": 0,
                 "compound": "cpd00297",
-                "formula": "C10H14N2O11P2",
+                "formula": "C10H13N2O11P2",
                 "name": "dTDP"
             }
         ]
@@ -52310,7 +52302,7 @@
                 "coefficient": -1,
                 "compartment": 0,
                 "compound": "cpd00062",
-                "formula": "C9H12N2O15P3",
+                "formula": "C9H11N2O15P3",
                 "name": "UTP"
             },
             {
@@ -52326,7 +52318,7 @@
                 "coefficient": 1,
                 "compartment": 0,
                 "compound": "cpd00014",
-                "formula": "C9H12N2O12P2",
+                "formula": "C9H11N2O12P2",
                 "name": "UDP"
             },
             {
@@ -54300,7 +54292,7 @@
                 "coefficient": 1,
                 "compartment": 0,
                 "compound": "cpd00014",
-                "formula": "C9H12N2O12P2",
+                "formula": "C9H11N2O12P2",
                 "name": "UDP"
             },
             {
@@ -54316,7 +54308,7 @@
                 "coefficient": 1,
                 "compartment": 0,
                 "compound": "cpd26557",
-                "formula": "C21H19O12",
+                "formula": "C21H20O12",
                 "name": "glucosyl 3-quercetin"
             }
         ]
@@ -54333,14 +54325,14 @@
             "Name: GTI; UDP-glucose:flavonol 3-O-D-glucosyltransferase; UDP-glucose:flavonol 3-O-glucosyltransferase; UDPG:flavonoid-3-O-glucosyltransferase; flavonol 3-O-glucosyltransferase; uridine diphosphoglucose-flavonol 3-O-glucosyltransferase"
         ],
         "code": "(1) cpd00026[0] + (1) cpd00313[0] <=> (1) cpd00014[0] + (1) cpd26557[0]",
-        "compound_ids": "cpd00014;cpd00026;cpd00313;cpd26557",
-        "definition": "(1) UDP-glucose[0] + (1) Quercetin[0] <=> (1) UDP[0] + (1) glucosyl 3-quercetin[0]",
+        "compound_ids": "cpd00014;cpd00026;cpd00067;cpd00313;cpd26557",
+        "definition": "(1) UDP-glucose[0] + (1) Quercetin[0] <=> (1) UDP[0] + (1) glucosyl 3-quercetin[0] + (1) H+[0]",
         "deltag": -1.7,
         "deltagerr": 5.69,
         "ec_numbers": [
             "2.4.1.91"
         ],
-        "equation": "(1) cpd00026[0] + (1) cpd00313[0] <=> (1) cpd00014[0] + (1) cpd26557[0]",
+        "equation": "(1) cpd00026[0] + (1) cpd00313[0] <=> (1) cpd00014[0] + (1) cpd26557[0] + (1) cpd00067[0]",
         "id": "rxn36718",
         "is_obsolete": 0,
         "is_transport": 0,
@@ -54348,14 +54340,15 @@
         "name": "flavonol 3-O-glucosyltransferase",
         "notes": [
             "GCC",
-            "EQC"
+            "EQC",
+            "HB"
         ],
         "pathways": [
             "MetaCyc: FLAVONOID-SYN (Flavonoid Biosynthesis); FLAVONOL-SYN (Flavonol Biosynthesis); PHENYLPROPANOID-SYN (Phenylpropanoid Derivative Biosynthesis); PWY-5321 (quercetin glycoside biosynthesis (Arabidopsis)); PWY-5390 (rutin biosynthesis); PWY-6266 (superpathway of flavones and derivatives biosynthesis); PWY-7129 (quercetin glucoside biosynthesis (<i>Allium</i>)); PWY-7137 (quercetin gentiotetraside biosynthesis); PWY-7172 (flavonol acylglucoside biosynthesis III-quercetin derivatives); PWY-7173 (quercetin triglucoside biosynthesis); SECONDARY-METABOLITE-BIOSYNTHESIS (Secondary Metabolite Biosynthesis)"
         ],
         "reversibility": "=",
         "source": "Primary Database",
-        "status": "OK",
+        "status": "CI:1",
         "stoichiometry": [
             {
                 "charge": -2,
@@ -54370,7 +54363,7 @@
                 "coefficient": -1,
                 "compartment": 0,
                 "compound": "cpd00313",
-                "formula": "C15H9O7",
+                "formula": "C15H10O7",
                 "name": "Quercetin"
             },
             {
@@ -54378,7 +54371,7 @@
                 "coefficient": 1,
                 "compartment": 0,
                 "compound": "cpd00014",
-                "formula": "C9H12N2O12P2",
+                "formula": "C9H11N2O12P2",
                 "name": "UDP"
             },
             {
@@ -54386,8 +54379,16 @@
                 "coefficient": 1,
                 "compartment": 0,
                 "compound": "cpd26557",
-                "formula": "C21H19O12",
+                "formula": "C21H20O12",
                 "name": "glucosyl 3-quercetin"
+            },
+            {
+                "charge": 1,
+                "coefficient": 1,
+                "compartment": 0,
+                "compound": "cpd00067",
+                "formula": "H",
+                "name": "H+"
             }
         ]
     },
@@ -55489,14 +55490,14 @@
             "Name: 13-beta-D-GLUCOSYLOXYDOCOSANOATE-TRANS-GLUCOSE"
         ],
         "code": "(1) cpd00026[0] + (1) cpd02534[0] <=> (1) cpd00014[0] + (1) cpd19461[0]",
-        "compound_ids": "cpd00014;cpd00026;cpd02534;cpd19461",
-        "definition": "(1) UDP-glucose[0] + (1) 13-beta-D-Glucosyloxydocosanoate[0] <=> (1) UDP[0] + (1) 13-Sophorosyloxydocosanoic acid[0]",
+        "compound_ids": "cpd00014;cpd00026;cpd00067;cpd02534;cpd19461",
+        "definition": "(1) UDP-glucose[0] + (1) 13-beta-D-Glucosyloxydocosanoate[0] <=> (1) UDP[0] + (1) 13-Sophorosyloxydocosanoic acid[0] + (1) H+[0]",
         "deltag": -3.88,
         "deltagerr": 0.56,
         "ec_numbers": [
             "2.4.1.158"
         ],
-        "equation": "(1) cpd00026[0] + (1) cpd02534[0] <=> (1) cpd00014[0] + (1) cpd19461[0]",
+        "equation": "(1) cpd00026[0] + (1) cpd02534[0] <=> (1) cpd00014[0] + (1) cpd19461[0] + (1) cpd00067[0]",
         "id": "rxn36733",
         "is_obsolete": 0,
         "is_transport": 0,
@@ -55505,12 +55506,13 @@
         "notes": [
             "GCC",
             "EQC",
-            "EQU"
+            "EQU",
+            "HB"
         ],
         "pathways": null,
         "reversibility": "=",
         "source": "Primary Database",
-        "status": "OK",
+        "status": "CI:1",
         "stoichiometry": [
             {
                 "charge": -2,
@@ -55533,7 +55535,7 @@
                 "coefficient": 1,
                 "compartment": 0,
                 "compound": "cpd00014",
-                "formula": "C9H12N2O12P2",
+                "formula": "C9H11N2O12P2",
                 "name": "UDP"
             },
             {
@@ -55543,6 +55545,14 @@
                 "compound": "cpd19461",
                 "formula": "C34H63O13",
                 "name": "13-Sophorosyloxydocosanoic acid"
+            },
+            {
+                "charge": 1,
+                "coefficient": 1,
+                "compartment": 0,
+                "compound": "cpd00067",
+                "formula": "H",
+                "name": "H+"
             }
         ]
     },
@@ -56621,13 +56631,13 @@
         ],
         "code": "(1) cpd00006[0] + (1) cpd03300[0] <=> (1) cpd00005[0] + (1) cpd02091[0]",
         "compound_ids": "cpd00005;cpd00006;cpd00067;cpd02091;cpd03300",
-        "definition": "(1) NADP[0] + (1) Imidazole lactate[0] <=> (1) NADPH[0] + (2) H+[0] + (1) Imidazole pyruvate[0]",
+        "definition": "(1) NADP[0] + (1) Imidazole lactate[0] <=> (1) NADPH[0] + (1) H+[0] + (1) Imidazole pyruvate[0]",
         "deltag": 4.46,
         "deltagerr": 0.24,
         "ec_numbers": [
             "1.1.1.111"
         ],
-        "equation": "(1) cpd00006[0] + (1) cpd03300[0] <=> (1) cpd00005[0] + (2) cpd00067[0] + (1) cpd02091[0]",
+        "equation": "(1) cpd00006[0] + (1) cpd03300[0] <=> (1) cpd00005[0] + (1) cpd00067[0] + (1) cpd02091[0]",
         "id": "rxn36748",
         "is_obsolete": 0,
         "is_transport": 0,
@@ -56644,7 +56654,7 @@
         ],
         "reversibility": "=",
         "source": "Primary Database",
-        "status": "OK",
+        "status": "CI:-1",
         "stoichiometry": [
             {
                 "charge": -3,
@@ -56659,7 +56669,7 @@
                 "coefficient": -1,
                 "compartment": 0,
                 "compound": "cpd03300",
-                "formula": "C6H8N2O3",
+                "formula": "C6H7N2O3",
                 "name": "Imidazole lactate"
             },
             {
@@ -56672,7 +56682,7 @@
             },
             {
                 "charge": 1,
-                "coefficient": 2,
+                "coefficient": 1,
                 "compartment": 0,
                 "compound": "cpd00067",
                 "formula": "H",
@@ -56697,13 +56707,13 @@
         ],
         "code": "(1) cpd00006[0] + (1) cpd03300[0] <=> (1) cpd00005[0] + (1) cpd02091[0]",
         "compound_ids": "cpd00005;cpd00006;cpd00067;cpd02091;cpd03300",
-        "definition": "(1) NADP[0] + (1) Imidazole lactate[0] <=> (1) NADPH[0] + (2) H+[0] + (1) Imidazole pyruvate[0]",
+        "definition": "(1) NADP[0] + (1) Imidazole lactate[0] <=> (1) NADPH[0] + (1) H+[0] + (1) Imidazole pyruvate[0]",
         "deltag": 4.46,
         "deltagerr": 0.24,
         "ec_numbers": [
             "1.1.1.111"
         ],
-        "equation": "(1) cpd00006[0] + (1) cpd03300[0] <=> (1) cpd00005[0] + (2) cpd00067[0] + (1) cpd02091[0]",
+        "equation": "(1) cpd00006[0] + (1) cpd03300[0] <=> (1) cpd00005[0] + (1) cpd00067[0] + (1) cpd02091[0]",
         "id": "rxn36749",
         "is_obsolete": 1,
         "is_transport": 0,
@@ -56720,7 +56730,7 @@
         ],
         "reversibility": "=",
         "source": "Primary Database",
-        "status": "OK",
+        "status": "CI:-1",
         "stoichiometry": [
             {
                 "charge": -3,
@@ -56735,7 +56745,7 @@
                 "coefficient": -1,
                 "compartment": 0,
                 "compound": "cpd03300",
-                "formula": "C6H8N2O3",
+                "formula": "C6H7N2O3",
                 "name": "Imidazole lactate"
             },
             {
@@ -56748,7 +56758,7 @@
             },
             {
                 "charge": 1,
-                "coefficient": 2,
+                "coefficient": 1,
                 "compartment": 0,
                 "compound": "cpd00067",
                 "formula": "H",
@@ -56774,13 +56784,13 @@
         ],
         "code": "(1) cpd00003[0] + (1) cpd03300[0] <=> (1) cpd00004[0] + (1) cpd02091[0]",
         "compound_ids": "cpd00003;cpd00004;cpd00067;cpd02091;cpd03300",
-        "definition": "(1) NAD[0] + (1) Imidazole lactate[0] <=> (1) NADH[0] + (2) H+[0] + (1) Imidazole pyruvate[0]",
+        "definition": "(1) NAD[0] + (1) Imidazole lactate[0] <=> (1) NADH[0] + (1) H+[0] + (1) Imidazole pyruvate[0]",
         "deltag": 4.45,
         "deltagerr": 0.24,
         "ec_numbers": [
             "1.1.1.111"
         ],
-        "equation": "(1) cpd00003[0] + (1) cpd03300[0] <=> (1) cpd00004[0] + (2) cpd00067[0] + (1) cpd02091[0]",
+        "equation": "(1) cpd00003[0] + (1) cpd03300[0] <=> (1) cpd00004[0] + (1) cpd00067[0] + (1) cpd02091[0]",
         "id": "rxn36750",
         "is_obsolete": 1,
         "is_transport": 0,
@@ -56798,7 +56808,7 @@
         ],
         "reversibility": "=",
         "source": "Primary Database",
-        "status": "OK",
+        "status": "CI:-1",
         "stoichiometry": [
             {
                 "charge": -1,
@@ -56813,7 +56823,7 @@
                 "coefficient": -1,
                 "compartment": 0,
                 "compound": "cpd03300",
-                "formula": "C6H8N2O3",
+                "formula": "C6H7N2O3",
                 "name": "Imidazole lactate"
             },
             {
@@ -56826,7 +56836,7 @@
             },
             {
                 "charge": 1,
-                "coefficient": 2,
+                "coefficient": 1,
                 "compartment": 0,
                 "compound": "cpd00067",
                 "formula": "H",
@@ -70378,13 +70388,13 @@
         ],
         "code": "(1) cpd00001[0] + (1) cpd00978[0] <=> (1) cpd00009[0] + (1) cpd00299[0]",
         "compound_ids": "cpd00001;cpd00009;cpd00067;cpd00299;cpd00978",
-        "definition": "(1) H2O[0] + (1) dUDP[0] => (1) Phosphate[0] + (2) H+[0] + (1) dUMP[0]",
+        "definition": "(1) H2O[0] + (1) dUDP[0] => (1) Phosphate[0] + (1) H+[0] + (1) dUMP[0]",
         "deltag": -6.12,
         "deltagerr": 0.31,
         "ec_numbers": [
             "3.6.1.6"
         ],
-        "equation": "(1) cpd00001[0] + (1) cpd00978[0] => (1) cpd00009[0] + (2) cpd00067[0] + (1) cpd00299[0]",
+        "equation": "(1) cpd00001[0] + (1) cpd00978[0] => (1) cpd00009[0] + (1) cpd00067[0] + (1) cpd00299[0]",
         "id": "rxn36935",
         "is_obsolete": 0,
         "is_transport": 0,
@@ -70393,12 +70403,13 @@
         "notes": [
             "GCC",
             "EQC",
-            "EQU"
+            "EQU",
+            "HB"
         ],
         "pathways": null,
         "reversibility": ">",
         "source": "Primary Database",
-        "status": "OK",
+        "status": "CI:-1",
         "stoichiometry": [
             {
                 "charge": 0,
@@ -70413,7 +70424,7 @@
                 "coefficient": -1,
                 "compartment": 0,
                 "compound": "cpd00978",
-                "formula": "C9H12N2O11P2",
+                "formula": "C9H11N2O11P2",
                 "name": "dUDP"
             },
             {
@@ -70426,7 +70437,7 @@
             },
             {
                 "charge": 1,
-                "coefficient": 2,
+                "coefficient": 1,
                 "compartment": 0,
                 "compound": "cpd00067",
                 "formula": "H",
