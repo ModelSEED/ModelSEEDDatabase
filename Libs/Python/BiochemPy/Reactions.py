@@ -231,8 +231,6 @@ class Reactions:
     def generateCodes(self, rxns_dict,check_obsolete=True):
         codes_dict=dict()
         for rxn in rxns_dict:
-            if(rxns_dict[rxn]['status']=="EMPTY"):
-                continue
             if(check_obsolete is False and rxns_dict[rxn]['is_obsolete']==1):
                 continue
             rxn_cpds_array = rxns_dict[rxn]['stoichiometry']
