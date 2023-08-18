@@ -1567,14 +1567,14 @@
             "Name: UDP-glucose:cis-zeatin O-beta-D-glucosyltransferase; cis-zeatin O-beta-D-glucosyltransferase"
         ],
         "code": "(1) cpd00026[0] + (1) cpd11215[0] <=> (1) cpd00014[0] + (1) cpd11216[0]",
-        "compound_ids": "cpd00014;cpd00026;cpd00067;cpd11215;cpd11216",
-        "definition": "(1) UDP-glucose[0] + (1) cis-Zeatin[0] <=> (1) UDP[0] + (1) cis-Zeatin-O-glucoside[0] + (1) H+[0]",
+        "compound_ids": "cpd00014;cpd00026;cpd11215;cpd11216",
+        "definition": "(1) UDP-glucose[0] + (1) cis-Zeatin[0] <=> (1) UDP[0] + (1) cis-Zeatin-O-glucoside[0]",
         "deltag": -6.02,
         "deltagerr": 0.56,
         "ec_numbers": [
             "2.4.1.215"
         ],
-        "equation": "(1) cpd00026[0] + (1) cpd11215[0] <=> (1) cpd00014[0] + (1) cpd11216[0] + (1) cpd00067[0]",
+        "equation": "(1) cpd00026[0] + (1) cpd11215[0] <=> (1) cpd00014[0] + (1) cpd11216[0]",
         "id": "rxn05022",
         "is_obsolete": 0,
         "is_transport": 0,
@@ -1592,7 +1592,7 @@
         ],
         "reversibility": "=",
         "source": "Primary Database",
-        "status": "CI:1",
+        "status": "OK",
         "stoichiometry": [
             {
                 "charge": -2,
@@ -1615,7 +1615,7 @@
                 "coefficient": 1,
                 "compartment": 0,
                 "compound": "cpd00014",
-                "formula": "C9H11N2O12P2",
+                "formula": "C9H12N2O12P2",
                 "name": "UDP"
             },
             {
@@ -1625,14 +1625,6 @@
                 "compound": "cpd11216",
                 "formula": "C16H23N5O6",
                 "name": "cis-Zeatin-O-glucoside"
-            },
-            {
-                "charge": 1,
-                "coefficient": 1,
-                "compartment": 0,
-                "compound": "cpd00067",
-                "formula": "H",
-                "name": "H+"
             }
         ]
     },
@@ -1958,7 +1950,7 @@
         "pathways": null,
         "reversibility": "?",
         "source": "Primary Database",
-        "status": "MI:H:-1/O:1",
+        "status": "MI:O:1",
         "stoichiometry": [
             {
                 "charge": -2,
@@ -1981,7 +1973,7 @@
                 "coefficient": 1,
                 "compartment": 0,
                 "compound": "cpd00014",
-                "formula": "C9H11N2O12P2",
+                "formula": "C9H12N2O12P2",
                 "name": "UDP"
             },
             {
@@ -2086,14 +2078,14 @@
             "Name: ATP:cob(I)alamin Cobeta-adenosyltransferase; ATP:cob(I)yrinic acid-a,c-diamide Cobeta-adenosyltransferase; ATP:cobinamide Cobeta-adenosyltransferase; ATP:corrinoid adenosyltransferase; CobA; CobO; Cobinamide adenyltransferase; aquacob(I)alamin adenosyltransferase; aquocob(I)alamin vitamin B12s adenosyltransferase; cob(I)alamin adenosyltransferase; cob(I)yrinic acid a,c-diamide adenosyltransferase"
         ],
         "code": "(1) cpd00002[0] + (1) cpd03422[0] <=> (1) cpd00421[0] + (1) cpd03918[0]",
-        "compound_ids": "cpd00002;cpd00421;cpd03422;cpd03918",
-        "definition": "(1) ATP[0] + (1) Cobinamide[0] <=> (1) Triphosphate[0] + (1) Adenosyl cobinamide[0]",
+        "compound_ids": "cpd00002;cpd00067;cpd00421;cpd03422;cpd03918",
+        "definition": "(1) ATP[0] + (1) Cobinamide[0] + (1) H+[0] <=> (1) Triphosphate[0] + (1) Adenosyl cobinamide[0]",
         "deltag": 10000000.0,
         "deltagerr": 10000000.0,
         "ec_numbers": [
             "2.5.1.17"
         ],
-        "equation": "(1) cpd00002[0] + (1) cpd03422[0] <=> (1) cpd00421[0] + (1) cpd03918[0]",
+        "equation": "(1) cpd00002[0] + (1) cpd03422[0] + (1) cpd00067[0] <=> (1) cpd00421[0] + (1) cpd03918[0]",
         "id": "rxn05029",
         "is_obsolete": 0,
         "is_transport": 0,
@@ -2109,7 +2101,7 @@
         ],
         "reversibility": "?",
         "source": "Primary Database",
-        "status": "OK",
+        "status": "CI:-1",
         "stoichiometry": [
             {
                 "charge": -3,
@@ -2124,7 +2116,7 @@
                 "coefficient": -1,
                 "compartment": 0,
                 "compound": "cpd03422",
-                "formula": "C48H73CoN11O8",
+                "formula": "C48H71CoN11O8",
                 "name": "Cobinamide"
             },
             {
@@ -2140,8 +2132,16 @@
                 "coefficient": 1,
                 "compartment": 0,
                 "compound": "cpd03918",
-                "formula": "C58H85CoN16O11",
+                "formula": "C58H84CoN16O11",
                 "name": "Adenosyl cobinamide"
+            },
+            {
+                "charge": 1,
+                "coefficient": -1,
+                "compartment": 0,
+                "compound": "cpd00067",
+                "formula": "H",
+                "name": "H+"
             }
         ]
     },
@@ -2695,14 +2695,14 @@
             "Name: NAAT; NAAT-I; NAAT-II; NAAT-III; nicotianamine; nicotianamine aminotransferase; nicotianamine transaminase; nicotianamine:2-oxoglutarate aminotransferase; nicotianamine:2-oxoglutarate aminotransferase; nicotianamine transaminase; transaminase"
         ],
         "code": "(1) cpd00024[0] + (1) cpd03158[0] <=> (1) cpd00023[0] + (1) cpd11173[0]",
-        "compound_ids": "cpd00023;cpd00024;cpd03158;cpd11173",
-        "definition": "(1) 2-Oxoglutarate[0] + (1) Nicotianamine[0] <=> (1) L-Glutamate[0] + (1) 3''-Deamino-3''-oxonicotianamine[0]",
+        "compound_ids": "cpd00023;cpd00024;cpd00067;cpd03158;cpd11173",
+        "definition": "(1) 2-Oxoglutarate[0] + (1) Nicotianamine[0] <=> (1) L-Glutamate[0] + (1) 3''-Deamino-3''-oxonicotianamine[0] + (1) H+[0]",
         "deltag": -2.08,
         "deltagerr": 0.46,
         "ec_numbers": [
             "2.6.1.80"
         ],
-        "equation": "(1) cpd00024[0] + (1) cpd03158[0] <=> (1) cpd00023[0] + (1) cpd11173[0]",
+        "equation": "(1) cpd00024[0] + (1) cpd03158[0] <=> (1) cpd00023[0] + (1) cpd11173[0] + (1) cpd00067[0]",
         "id": "rxn05037",
         "is_obsolete": 0,
         "is_transport": 0,
@@ -2711,14 +2711,15 @@
         "notes": [
             "GCC",
             "EQC",
-            "EQU"
+            "EQU",
+            "HB"
         ],
         "pathways": [
             "MetaCyc: PWY-5912 (2'-deoxymugineic acid phytosiderophore biosynthesis); SECONDARY-METABOLITE-BIOSYNTHESIS (Secondary Metabolite Biosynthesis); Siderophores-Biosynthesis (Siderophore Biosynthesis)"
         ],
         "reversibility": "=",
         "source": "Primary Database",
-        "status": "OK",
+        "status": "CI:1",
         "stoichiometry": [
             {
                 "charge": -2,
@@ -2733,7 +2734,7 @@
                 "coefficient": -1,
                 "compartment": 0,
                 "compound": "cpd03158",
-                "formula": "C12H20N3O6",
+                "formula": "C12H21N3O6",
                 "name": "Nicotianamine"
             },
             {
@@ -2751,6 +2752,14 @@
                 "compound": "cpd11173",
                 "formula": "C12H16N2O7",
                 "name": "3''-Deamino-3''-oxonicotianamine"
+            },
+            {
+                "charge": 1,
+                "coefficient": 1,
+                "compartment": 0,
+                "compound": "cpd00067",
+                "formula": "H",
+                "name": "H+"
             }
         ]
     },
@@ -2887,7 +2896,7 @@
                 "coefficient": -1,
                 "compartment": 0,
                 "compound": "cpd02720",
-                "formula": "C9H14N4O9P",
+                "formula": "C9H15N4O9P",
                 "name": "5-Amino-6--5-phosphoribitylaminouracil"
             },
             {
@@ -2903,7 +2912,7 @@
                 "coefficient": 1,
                 "compartment": 0,
                 "compound": "cpd02882",
-                "formula": "C9H15N4O6",
+                "formula": "C9H16N4O6",
                 "name": "4--1-D-Ribitylamino-5-aminouracil"
             }
         ]
@@ -3697,7 +3706,7 @@
                 "coefficient": -1,
                 "compartment": 0,
                 "compound": "cpd03917",
-                "formula": "C55H77CoN15O11",
+                "formula": "C55H76CoN15O11",
                 "name": "Adenosylcobyric acid"
             },
             {
@@ -3729,7 +3738,7 @@
                 "coefficient": 1,
                 "compartment": 0,
                 "compound": "cpd03918",
-                "formula": "C58H85CoN16O11",
+                "formula": "C58H84CoN16O11",
                 "name": "Adenosyl cobinamide"
             }
         ]
@@ -4391,14 +4400,14 @@
             "Name: 2,7,4'-trihydroxyisoflavanone hydro-lyase; 2,7,4'-trihydroxyisoflavanone hydro-lyase (daidzein-forming); 2-hydroxyisoflavanone dehydratase"
         ],
         "code": "(1) cpd11233[0] <=> (1) cpd00001[0] + (1) cpd07097[0]",
-        "compound_ids": "cpd00001;cpd07097;cpd11233",
-        "definition": "(1) 2,7,4'-Trihydroxyisoflavanone[0] => (1) H2O[0] + (1) Daidzein[0]",
+        "compound_ids": "cpd00001;cpd00067;cpd07097;cpd11233",
+        "definition": "(1) 2,7,4'-Trihydroxyisoflavanone[0] => (1) H2O[0] + (1) Daidzein[0] + (1) H+[0]",
         "deltag": -11.91,
         "deltagerr": 3.26,
         "ec_numbers": [
             "4.2.1.105"
         ],
-        "equation": "(1) cpd11233[0] => (1) cpd00001[0] + (1) cpd07097[0]",
+        "equation": "(1) cpd11233[0] => (1) cpd00001[0] + (1) cpd07097[0] + (1) cpd00067[0]",
         "id": "rxn05065",
         "is_obsolete": 0,
         "is_transport": 0,
@@ -4415,7 +4424,7 @@
         ],
         "reversibility": ">",
         "source": "Primary Database",
-        "status": "CI:-1",
+        "status": "OK",
         "stoichiometry": [
             {
                 "charge": 0,
@@ -4438,8 +4447,16 @@
                 "coefficient": 1,
                 "compartment": 0,
                 "compound": "cpd07097",
-                "formula": "C15H10O4",
+                "formula": "C15H9O4",
                 "name": "Daidzein"
+            },
+            {
+                "charge": 1,
+                "coefficient": 1,
+                "compartment": 0,
+                "compound": "cpd00067",
+                "formula": "H",
+                "name": "H+"
             }
         ]
     },
@@ -5017,7 +5034,7 @@
         "pathways": null,
         "reversibility": ">",
         "source": "Primary Database",
-        "status": "MI:H:-1/O:1",
+        "status": "MI:O:1",
         "stoichiometry": [
             {
                 "charge": -2,
@@ -5040,7 +5057,7 @@
                 "coefficient": 1,
                 "compartment": 0,
                 "compound": "cpd00014",
-                "formula": "C9H11N2O12P2",
+                "formula": "C9H12N2O12P2",
                 "name": "UDP"
             },
             {
@@ -5083,7 +5100,7 @@
         "pathways": null,
         "reversibility": ">",
         "source": "Primary Database",
-        "status": "MI:H:-1/O:1",
+        "status": "MI:O:1",
         "stoichiometry": [
             {
                 "charge": -2,
@@ -5106,7 +5123,7 @@
                 "coefficient": 1,
                 "compartment": 0,
                 "compound": "cpd00014",
-                "formula": "C9H11N2O12P2",
+                "formula": "C9H12N2O12P2",
                 "name": "UDP"
             },
             {
@@ -5129,14 +5146,14 @@
             "Name: 2''-O-beta-L-rhamnosyltransferase; UDP-L-rhamnose:flavanone-7-O-glucoside; UDP-L-rhamnose:flavanone-7-O-glucoside 2''-O-beta-L-rhamnosyltransferase"
         ],
         "code": "(1) cpd01481[0] + (1) cpd02485[0] <=> (1) cpd00014[0] + (1) cpd11239[0]",
-        "compound_ids": "cpd00014;cpd00067;cpd01481;cpd02485;cpd11239",
-        "definition": "(1) UDP-L-rhamnose[0] + (1) Flavanone 7-O-glucoside[0] <=> (1) UDP[0] + (1) Flavanone 7-O-[beta-L-rhamnosyl-(1->2)-beta-D-glucoside][0] + (1) H+[0]",
+        "compound_ids": "cpd00014;cpd01481;cpd02485;cpd11239",
+        "definition": "(1) UDP-L-rhamnose[0] + (1) Flavanone 7-O-glucoside[0] <=> (1) UDP[0] + (1) Flavanone 7-O-[beta-L-rhamnosyl-(1->2)-beta-D-glucoside][0]",
         "deltag": -3.83,
         "deltagerr": 0.39,
         "ec_numbers": [
             "2.4.1.236"
         ],
-        "equation": "(1) cpd01481[0] + (1) cpd02485[0] <=> (1) cpd00014[0] + (1) cpd11239[0] + (1) cpd00067[0]",
+        "equation": "(1) cpd01481[0] + (1) cpd02485[0] <=> (1) cpd00014[0] + (1) cpd11239[0]",
         "id": "rxn05078",
         "is_obsolete": 0,
         "is_transport": 0,
@@ -5151,7 +5168,7 @@
         "pathways": null,
         "reversibility": "=",
         "source": "Primary Database",
-        "status": "CI:1",
+        "status": "OK",
         "stoichiometry": [
             {
                 "charge": -2,
@@ -5174,7 +5191,7 @@
                 "coefficient": 1,
                 "compartment": 0,
                 "compound": "cpd00014",
-                "formula": "C9H11N2O12P2",
+                "formula": "C9H12N2O12P2",
                 "name": "UDP"
             },
             {
@@ -5184,14 +5201,6 @@
                 "compound": "cpd11239",
                 "formula": "C27H32O12",
                 "name": "Flavanone 7-O-[beta-L-rhamnosyl-(1->2)-beta-D-glucoside]"
-            },
-            {
-                "charge": 1,
-                "coefficient": 1,
-                "compartment": 0,
-                "compound": "cpd00067",
-                "formula": "H",
-                "name": "H+"
             }
         ]
     },
@@ -5224,7 +5233,7 @@
         "pathways": null,
         "reversibility": ">",
         "source": "Primary Database",
-        "status": "MI:H:-1/O:1",
+        "status": "MI:O:1",
         "stoichiometry": [
             {
                 "charge": -2,
@@ -5247,7 +5256,7 @@
                 "coefficient": 1,
                 "compartment": 0,
                 "compound": "cpd00014",
-                "formula": "C9H11N2O12P2",
+                "formula": "C9H12N2O12P2",
                 "name": "UDP"
             },
             {
@@ -5269,14 +5278,14 @@
             "Name: UDP-glucose:flavonol-3-O-glucoside 2''-O-beta-D-glucosyltransferase"
         ],
         "code": "(1) cpd00026[0] + (1) cpd02450[0] <=> (1) cpd00014[0] + (1) cpd11241[0]",
-        "compound_ids": "cpd00014;cpd00026;cpd00067;cpd02450;cpd11241",
-        "definition": "(1) UDP-glucose[0] + (1) Flavonol 3-O-D-glucoside[0] <=> (1) UDP[0] + (1) Flavonol 3-O-beta-D-glucosyl-(1->2)-beta-D-glucoside[0] + (1) H+[0]",
+        "compound_ids": "cpd00014;cpd00026;cpd02450;cpd11241",
+        "definition": "(1) UDP-glucose[0] + (1) Flavonol 3-O-D-glucoside[0] <=> (1) UDP[0] + (1) Flavonol 3-O-beta-D-glucosyl-(1->2)-beta-D-glucoside[0]",
         "deltag": -1.7,
         "deltagerr": 6.33,
         "ec_numbers": [
             "2.4.1.239"
         ],
-        "equation": "(1) cpd00026[0] + (1) cpd02450[0] <=> (1) cpd00014[0] + (1) cpd11241[0] + (1) cpd00067[0]",
+        "equation": "(1) cpd00026[0] + (1) cpd02450[0] <=> (1) cpd00014[0] + (1) cpd11241[0]",
         "id": "rxn05080",
         "is_obsolete": 0,
         "is_transport": 0,
@@ -5290,7 +5299,7 @@
         "pathways": null,
         "reversibility": "=",
         "source": "Primary Database",
-        "status": "CI:1",
+        "status": "OK",
         "stoichiometry": [
             {
                 "charge": -2,
@@ -5313,7 +5322,7 @@
                 "coefficient": 1,
                 "compartment": 0,
                 "compound": "cpd00014",
-                "formula": "C9H11N2O12P2",
+                "formula": "C9H12N2O12P2",
                 "name": "UDP"
             },
             {
@@ -5323,14 +5332,6 @@
                 "compound": "cpd11241",
                 "formula": "C27H30O13",
                 "name": "Flavonol 3-O-beta-D-glucosyl-(1->2)-beta-D-glucoside"
-            },
-            {
-                "charge": 1,
-                "coefficient": 1,
-                "compartment": 0,
-                "compound": "cpd00067",
-                "formula": "H",
-                "name": "H+"
             }
         ]
     },
@@ -5343,14 +5344,14 @@
             "Name: 2'''-O-beta-D-glucosyltransferase; UDP-glucose:flavonol-3-O-beta-D-glucosyl-(1->2)-beta-D-glucoside; UDP-glucose:flavonol-3-O-beta-D-glucosyl-(1->2)-beta-D-glucoside 2'''-O-beta-D-glucosyltransferase"
         ],
         "code": "(1) cpd00026[0] + (1) cpd11241[0] <=> (1) cpd00014[0] + (1) cpd11242[0]",
-        "compound_ids": "cpd00014;cpd00026;cpd00067;cpd11241;cpd11242",
-        "definition": "(1) UDP-glucose[0] + (1) Flavonol 3-O-beta-D-glucosyl-(1->2)-beta-D-glucoside[0] <=> (1) UDP[0] + (1) Flavonol 3-O-beta-D-glucosyl-(1->2)-beta-D-glucosyl-(1->2)-beta-D-glucoside[0] + (1) H+[0]",
+        "compound_ids": "cpd00014;cpd00026;cpd11241;cpd11242",
+        "definition": "(1) UDP-glucose[0] + (1) Flavonol 3-O-beta-D-glucosyl-(1->2)-beta-D-glucoside[0] <=> (1) UDP[0] + (1) Flavonol 3-O-beta-D-glucosyl-(1->2)-beta-D-glucosyl-(1->2)-beta-D-glucoside[0]",
         "deltag": -1.7,
         "deltagerr": 7.87,
         "ec_numbers": [
             "2.4.1.240"
         ],
-        "equation": "(1) cpd00026[0] + (1) cpd11241[0] <=> (1) cpd00014[0] + (1) cpd11242[0] + (1) cpd00067[0]",
+        "equation": "(1) cpd00026[0] + (1) cpd11241[0] <=> (1) cpd00014[0] + (1) cpd11242[0]",
         "id": "rxn05081",
         "is_obsolete": 0,
         "is_transport": 0,
@@ -5364,7 +5365,7 @@
         "pathways": null,
         "reversibility": "=",
         "source": "Primary Database",
-        "status": "CI:1",
+        "status": "OK",
         "stoichiometry": [
             {
                 "charge": -2,
@@ -5387,7 +5388,7 @@
                 "coefficient": 1,
                 "compartment": 0,
                 "compound": "cpd00014",
-                "formula": "C9H11N2O12P2",
+                "formula": "C9H12N2O12P2",
                 "name": "UDP"
             },
             {
@@ -5397,14 +5398,6 @@
                 "compound": "cpd11242",
                 "formula": "C33H40O18",
                 "name": "Flavonol 3-O-beta-D-glucosyl-(1->2)-beta-D-glucosyl-(1->2)-beta-D-glucoside"
-            },
-            {
-                "charge": 1,
-                "coefficient": 1,
-                "compartment": 0,
-                "compound": "cpd00067",
-                "formula": "H",
-                "name": "H+"
             }
         ]
     },
@@ -6893,14 +6886,14 @@
             "Name: S-adenosyl-L-methionine:hydroxyisoflavone 7-O-methyltransferase"
         ],
         "code": "(1) cpd00017[0] + (1) cpd11264[0] <=> (1) cpd00019[0] + (1) cpd11265[0]",
-        "compound_ids": "cpd00017;cpd00019;cpd00067;cpd11264;cpd11265",
-        "definition": "(1) S-Adenosyl-L-methionine[0] + (1) 7-Hydroxyisoflavone[0] <=> (1) S-Adenosyl-homocysteine[0] + (1) 7-Methoxyisoflavone[0] + (1) H+[0]",
+        "compound_ids": "cpd00017;cpd00019;cpd11264;cpd11265",
+        "definition": "(1) S-Adenosyl-L-methionine[0] + (1) 7-Hydroxyisoflavone[0] <=> (1) S-Adenosyl-homocysteine[0] + (1) 7-Methoxyisoflavone[0]",
         "deltag": -3.53,
         "deltagerr": 5.81,
         "ec_numbers": [
             "2.1.1.150"
         ],
-        "equation": "(1) cpd00017[0] + (1) cpd11264[0] <=> (1) cpd00019[0] + (1) cpd11265[0] + (1) cpd00067[0]",
+        "equation": "(1) cpd00017[0] + (1) cpd11264[0] <=> (1) cpd00019[0] + (1) cpd11265[0]",
         "id": "rxn05102",
         "is_obsolete": 0,
         "is_transport": 0,
@@ -6914,7 +6907,7 @@
         "pathways": null,
         "reversibility": "=",
         "source": "Primary Database",
-        "status": "CI:1",
+        "status": "OK",
         "stoichiometry": [
             {
                 "charge": 1,
@@ -6929,7 +6922,7 @@
                 "coefficient": -1,
                 "compartment": 0,
                 "compound": "cpd11264",
-                "formula": "C15H10O3",
+                "formula": "C15H9O3",
                 "name": "7-Hydroxyisoflavone"
             },
             {
@@ -6947,14 +6940,6 @@
                 "compound": "cpd11265",
                 "formula": "C16H12O3",
                 "name": "7-Methoxyisoflavone"
-            },
-            {
-                "charge": 1,
-                "coefficient": 1,
-                "compartment": 0,
-                "compound": "cpd00067",
-                "formula": "H",
-                "name": "H+"
             }
         ]
     },
@@ -8032,14 +8017,14 @@
             "Name: "
         ],
         "code": "(1) cpd00434[0] <=> (1) cpd00001[0] + (1) cpd11311[0]",
-        "compound_ids": "cpd00001;cpd00434;cpd11311",
-        "definition": "(1) 4-Aminobutanal[0] => (1) H2O[0] + (1) 1-Pyrroline[0]",
+        "compound_ids": "cpd00001;cpd00067;cpd00434;cpd11311",
+        "definition": "(1) 4-Aminobutanal[0] => (1) H2O[0] + (1) 1-Pyrroline[0] + (1) H+[0]",
         "deltag": -7.12,
         "deltagerr": 2.59,
         "ec_numbers": [
             "2.6.1.82"
         ],
-        "equation": "(1) cpd00434[0] => (1) cpd00001[0] + (1) cpd11311[0]",
+        "equation": "(1) cpd00434[0] => (1) cpd00001[0] + (1) cpd11311[0] + (1) cpd00067[0]",
         "id": "rxn05118",
         "is_obsolete": 0,
         "is_transport": 0,
@@ -8048,14 +8033,15 @@
         "notes": [
             "GCC",
             "EQC",
-            "EQU"
+            "EQU",
+            "HB"
         ],
         "pathways": [
             "MetaCyc: AMINE-DEG (Amine and Polyamine Degradation); ARGININE-DEG (L-arginine Degradation); Amino-Acid-Degradation (Amino Acid Degradation); Degradation (Degradation/Utilization/Assimilation); ORNARGDEG-PWY (superpathway of L-arginine and L-ornithine degradation); ORNDEG-PWY (superpathway of ornithine degradation); PWY-2 (putrescine degradation IV); PWY-6440 (spermine and spermidine degradation II); Proteinogenic-Amino-Acids-Degradation (Proteinogenic Amino Acid Degradation); Putrescine-Degradation (Putrescine Degradation); SPERMINE-SPERMIDINE-DEG (Spermine and Spermidine Degradation)"
         ],
         "reversibility": ">",
         "source": "Primary Database",
-        "status": "OK",
+        "status": "CI:1",
         "stoichiometry": [
             {
                 "charge": 1,
@@ -8078,8 +8064,16 @@
                 "coefficient": 1,
                 "compartment": 0,
                 "compound": "cpd11311",
-                "formula": "C4H8N",
+                "formula": "C4H7N",
                 "name": "1-Pyrroline"
+            },
+            {
+                "charge": 1,
+                "coefficient": 1,
+                "compartment": 0,
+                "compound": "cpd00067",
+                "formula": "H",
+                "name": "H+"
             }
         ]
     },
@@ -9343,14 +9337,14 @@
             "Name: UDP-glucose:DIBOA 2-D-glucosyltransferase"
         ],
         "code": "(1) cpd00026[0] + (1) cpd11411[0] <=> (1) cpd00014[0] + (1) cpd11413[0]",
-        "compound_ids": "cpd00014;cpd00026;cpd00067;cpd11411;cpd11413",
-        "definition": "(1) UDP-glucose[0] + (1) DIBOA[0] <=> (1) UDP[0] + (1) DIBOA-glucoside[0] + (1) H+[0]",
+        "compound_ids": "cpd00014;cpd00026;cpd11411;cpd11413",
+        "definition": "(1) UDP-glucose[0] + (1) DIBOA[0] <=> (1) UDP[0] + (1) DIBOA-glucoside[0]",
         "deltag": -3.87,
         "deltagerr": 0.56,
         "ec_numbers": [
             "2.4.1.202"
         ],
-        "equation": "(1) cpd00026[0] + (1) cpd11411[0] <=> (1) cpd00014[0] + (1) cpd11413[0] + (1) cpd00067[0]",
+        "equation": "(1) cpd00026[0] + (1) cpd11411[0] <=> (1) cpd00014[0] + (1) cpd11413[0]",
         "id": "rxn05135",
         "is_obsolete": 0,
         "is_transport": 0,
@@ -9367,7 +9361,7 @@
         ],
         "reversibility": "=",
         "source": "Primary Database",
-        "status": "CI:1",
+        "status": "OK",
         "stoichiometry": [
             {
                 "charge": -2,
@@ -9390,7 +9384,7 @@
                 "coefficient": 1,
                 "compartment": 0,
                 "compound": "cpd00014",
-                "formula": "C9H11N2O12P2",
+                "formula": "C9H12N2O12P2",
                 "name": "UDP"
             },
             {
@@ -9400,14 +9394,6 @@
                 "compound": "cpd11413",
                 "formula": "C14H17NO9",
                 "name": "DIBOA-glucoside"
-            },
-            {
-                "charge": 1,
-                "coefficient": 1,
-                "compartment": 0,
-                "compound": "cpd00067",
-                "formula": "H",
-                "name": "H+"
             }
         ]
     },
@@ -16397,7 +16383,7 @@
                 "coefficient": -1,
                 "compartment": 1,
                 "compound": "cpd00220",
-                "formula": "C17H19N4O6",
+                "formula": "C17H20N4O6",
                 "name": "Riboflavin"
             },
             {
@@ -16405,7 +16391,7 @@
                 "coefficient": 1,
                 "compartment": 0,
                 "compound": "cpd00220",
-                "formula": "C17H19N4O6",
+                "formula": "C17H20N4O6",
                 "name": "Riboflavin"
             }
         ]
@@ -16719,13 +16705,13 @@
         ],
         "code": "(1) cpd00008[0] + (1) cpd11421[0] <=> (1) cpd00001[0] + (1) cpd00177[0] + (1) cpd11420[0]",
         "compound_ids": "cpd00001;cpd00008;cpd00067;cpd00177;cpd11420;cpd11421",
-        "definition": "(1) ADP[0] + (1) trdrd[0] + (2) H+[0] <=> (1) H2O[0] + (1) dADP[0] + (1) trdox[0]",
+        "definition": "(1) ADP[0] + (1) trdrd[0] + (1) H+[0] <=> (1) H2O[0] + (1) dADP[0] + (1) trdox[0]",
         "deltag": 10000000.0,
         "deltagerr": 10000000.0,
         "ec_numbers": [
             "1.17.4.1"
         ],
-        "equation": "(1) cpd00008[0] + (1) cpd11421[0] + (2) cpd00067[0] <=> (1) cpd00001[0] + (1) cpd00177[0] + (1) cpd11420[0]",
+        "equation": "(1) cpd00008[0] + (1) cpd11421[0] + (1) cpd00067[0] <=> (1) cpd00001[0] + (1) cpd00177[0] + (1) cpd11420[0]",
         "id": "rxn05231",
         "is_obsolete": 0,
         "is_transport": 0,
@@ -16741,7 +16727,7 @@
         ],
         "reversibility": "?",
         "source": "Primary Database",
-        "status": "CI:-2",
+        "status": "CI:-1",
         "stoichiometry": [
             {
                 "charge": -2,
@@ -16756,7 +16742,7 @@
                 "coefficient": -1,
                 "compartment": 0,
                 "compound": "cpd11421",
-                "formula": "C10H13N4O4R4S2",
+                "formula": "C10H14N4O4R4S2",
                 "name": "trdrd"
             },
             {
@@ -16785,7 +16771,7 @@
             },
             {
                 "charge": 1,
-                "coefficient": -2,
+                "coefficient": -1,
                 "compartment": 0,
                 "compound": "cpd00067",
                 "formula": "H",
@@ -16806,13 +16792,13 @@
         ],
         "code": "(1) cpd00002[0] + (1) cpd11421[0] <=> (1) cpd00001[0] + (1) cpd00115[0] + (1) cpd11420[0]",
         "compound_ids": "cpd00001;cpd00002;cpd00067;cpd00115;cpd11420;cpd11421",
-        "definition": "(1) ATP[0] + (1) trdrd[0] + (2) H+[0] <=> (1) H2O[0] + (1) dATP[0] + (1) trdox[0]",
+        "definition": "(1) ATP[0] + (1) trdrd[0] + (1) H+[0] <=> (1) H2O[0] + (1) dATP[0] + (1) trdox[0]",
         "deltag": 10000000.0,
         "deltagerr": 10000000.0,
         "ec_numbers": [
             "1.17.4.2"
         ],
-        "equation": "(1) cpd00002[0] + (1) cpd11421[0] + (2) cpd00067[0] <=> (1) cpd00001[0] + (1) cpd00115[0] + (1) cpd11420[0]",
+        "equation": "(1) cpd00002[0] + (1) cpd11421[0] + (1) cpd00067[0] <=> (1) cpd00001[0] + (1) cpd00115[0] + (1) cpd11420[0]",
         "id": "rxn05232",
         "is_obsolete": 0,
         "is_transport": 0,
@@ -16828,7 +16814,7 @@
         ],
         "reversibility": "?",
         "source": "Primary Database",
-        "status": "CI:-2",
+        "status": "CI:-1",
         "stoichiometry": [
             {
                 "charge": -3,
@@ -16843,7 +16829,7 @@
                 "coefficient": -1,
                 "compartment": 0,
                 "compound": "cpd11421",
-                "formula": "C10H13N4O4R4S2",
+                "formula": "C10H14N4O4R4S2",
                 "name": "trdrd"
             },
             {
@@ -16872,7 +16858,7 @@
             },
             {
                 "charge": 1,
-                "coefficient": -2,
+                "coefficient": -1,
                 "compartment": 0,
                 "compound": "cpd00067",
                 "formula": "H",
@@ -16893,13 +16879,13 @@
         ],
         "code": "(1) cpd00031[0] + (1) cpd11421[0] <=> (1) cpd00001[0] + (1) cpd00295[0] + (1) cpd11420[0]",
         "compound_ids": "cpd00001;cpd00031;cpd00067;cpd00295;cpd11420;cpd11421",
-        "definition": "(1) GDP[0] + (1) trdrd[0] + (2) H+[0] <=> (1) H2O[0] + (1) dGDP[0] + (1) trdox[0]",
+        "definition": "(1) GDP[0] + (1) trdrd[0] + (1) H+[0] <=> (1) H2O[0] + (1) dGDP[0] + (1) trdox[0]",
         "deltag": 10000000.0,
         "deltagerr": 10000000.0,
         "ec_numbers": [
             "1.17.4.1"
         ],
-        "equation": "(1) cpd00031[0] + (1) cpd11421[0] + (2) cpd00067[0] <=> (1) cpd00001[0] + (1) cpd00295[0] + (1) cpd11420[0]",
+        "equation": "(1) cpd00031[0] + (1) cpd11421[0] + (1) cpd00067[0] <=> (1) cpd00001[0] + (1) cpd00295[0] + (1) cpd11420[0]",
         "id": "rxn05233",
         "is_obsolete": 0,
         "is_transport": 0,
@@ -16915,7 +16901,7 @@
         ],
         "reversibility": "?",
         "source": "Primary Database",
-        "status": "CI:-2",
+        "status": "CI:-1",
         "stoichiometry": [
             {
                 "charge": -2,
@@ -16930,7 +16916,7 @@
                 "coefficient": -1,
                 "compartment": 0,
                 "compound": "cpd11421",
-                "formula": "C10H13N4O4R4S2",
+                "formula": "C10H14N4O4R4S2",
                 "name": "trdrd"
             },
             {
@@ -16959,7 +16945,7 @@
             },
             {
                 "charge": 1,
-                "coefficient": -2,
+                "coefficient": -1,
                 "compartment": 0,
                 "compound": "cpd00067",
                 "formula": "H",
@@ -16980,13 +16966,13 @@
         ],
         "code": "(1) cpd00038[0] + (1) cpd11421[0] <=> (1) cpd00001[0] + (1) cpd00241[0] + (1) cpd11420[0]",
         "compound_ids": "cpd00001;cpd00038;cpd00067;cpd00241;cpd11420;cpd11421",
-        "definition": "(1) GTP[0] + (1) trdrd[0] + (2) H+[0] <=> (1) H2O[0] + (1) dGTP[0] + (1) trdox[0]",
+        "definition": "(1) GTP[0] + (1) trdrd[0] + (1) H+[0] <=> (1) H2O[0] + (1) dGTP[0] + (1) trdox[0]",
         "deltag": 10000000.0,
         "deltagerr": 10000000.0,
         "ec_numbers": [
             "1.17.4.2"
         ],
-        "equation": "(1) cpd00038[0] + (1) cpd11421[0] + (2) cpd00067[0] <=> (1) cpd00001[0] + (1) cpd00241[0] + (1) cpd11420[0]",
+        "equation": "(1) cpd00038[0] + (1) cpd11421[0] + (1) cpd00067[0] <=> (1) cpd00001[0] + (1) cpd00241[0] + (1) cpd11420[0]",
         "id": "rxn05234",
         "is_obsolete": 0,
         "is_transport": 0,
@@ -17002,7 +16988,7 @@
         ],
         "reversibility": "?",
         "source": "Primary Database",
-        "status": "CI:-2",
+        "status": "CI:-1",
         "stoichiometry": [
             {
                 "charge": -3,
@@ -17017,7 +17003,7 @@
                 "coefficient": -1,
                 "compartment": 0,
                 "compound": "cpd11421",
-                "formula": "C10H13N4O4R4S2",
+                "formula": "C10H14N4O4R4S2",
                 "name": "trdrd"
             },
             {
@@ -17046,7 +17032,7 @@
             },
             {
                 "charge": 1,
-                "coefficient": -2,
+                "coefficient": -1,
                 "compartment": 0,
                 "compound": "cpd00067",
                 "formula": "H",
@@ -17067,13 +17053,13 @@
         ],
         "code": "(1) cpd00052[0] + (1) cpd11421[0] <=> (1) cpd00001[0] + (1) cpd00356[0] + (1) cpd11420[0]",
         "compound_ids": "cpd00001;cpd00052;cpd00067;cpd00356;cpd11420;cpd11421",
-        "definition": "(1) CTP[0] + (1) trdrd[0] + (2) H+[0] <=> (1) H2O[0] + (1) dCTP[0] + (1) trdox[0]",
+        "definition": "(1) CTP[0] + (1) trdrd[0] + (1) H+[0] <=> (1) H2O[0] + (1) dCTP[0] + (1) trdox[0]",
         "deltag": 10000000.0,
         "deltagerr": 10000000.0,
         "ec_numbers": [
             "1.17.4.2"
         ],
-        "equation": "(1) cpd00052[0] + (1) cpd11421[0] + (2) cpd00067[0] <=> (1) cpd00001[0] + (1) cpd00356[0] + (1) cpd11420[0]",
+        "equation": "(1) cpd00052[0] + (1) cpd11421[0] + (1) cpd00067[0] <=> (1) cpd00001[0] + (1) cpd00356[0] + (1) cpd11420[0]",
         "id": "rxn05235",
         "is_obsolete": 0,
         "is_transport": 0,
@@ -17089,7 +17075,7 @@
         ],
         "reversibility": "?",
         "source": "Primary Database",
-        "status": "CI:-2",
+        "status": "CI:-1",
         "stoichiometry": [
             {
                 "charge": -3,
@@ -17104,7 +17090,7 @@
                 "coefficient": -1,
                 "compartment": 0,
                 "compound": "cpd11421",
-                "formula": "C10H13N4O4R4S2",
+                "formula": "C10H14N4O4R4S2",
                 "name": "trdrd"
             },
             {
@@ -17133,7 +17119,7 @@
             },
             {
                 "charge": 1,
-                "coefficient": -2,
+                "coefficient": -1,
                 "compartment": 0,
                 "compound": "cpd00067",
                 "formula": "H",
@@ -17154,13 +17140,13 @@
         ],
         "code": "(1) cpd00062[0] + (1) cpd11421[0] <=> (1) cpd00001[0] + (1) cpd00358[0] + (1) cpd11420[0]",
         "compound_ids": "cpd00001;cpd00062;cpd00067;cpd00358;cpd11420;cpd11421",
-        "definition": "(1) UTP[0] + (1) trdrd[0] + (2) H+[0] <=> (1) H2O[0] + (1) dUTP[0] + (1) trdox[0]",
+        "definition": "(1) UTP[0] + (1) trdrd[0] + (1) H+[0] <=> (1) H2O[0] + (1) dUTP[0] + (1) trdox[0]",
         "deltag": 10000000.0,
         "deltagerr": 10000000.0,
         "ec_numbers": [
             "1.17.4.2"
         ],
-        "equation": "(1) cpd00062[0] + (1) cpd11421[0] + (2) cpd00067[0] <=> (1) cpd00001[0] + (1) cpd00358[0] + (1) cpd11420[0]",
+        "equation": "(1) cpd00062[0] + (1) cpd11421[0] + (1) cpd00067[0] <=> (1) cpd00001[0] + (1) cpd00358[0] + (1) cpd11420[0]",
         "id": "rxn05236",
         "is_obsolete": 0,
         "is_transport": 0,
@@ -17176,14 +17162,14 @@
         ],
         "reversibility": "?",
         "source": "Primary Database",
-        "status": "CI:-2",
+        "status": "CI:-1",
         "stoichiometry": [
             {
                 "charge": -3,
                 "coefficient": -1,
                 "compartment": 0,
                 "compound": "cpd00062",
-                "formula": "C9H11N2O15P3",
+                "formula": "C9H12N2O15P3",
                 "name": "UTP"
             },
             {
@@ -17191,7 +17177,7 @@
                 "coefficient": -1,
                 "compartment": 0,
                 "compound": "cpd11421",
-                "formula": "C10H13N4O4R4S2",
+                "formula": "C10H14N4O4R4S2",
                 "name": "trdrd"
             },
             {
@@ -17207,7 +17193,7 @@
                 "coefficient": 1,
                 "compartment": 0,
                 "compound": "cpd00358",
-                "formula": "C9H11N2O14P3",
+                "formula": "C9H12N2O14P3",
                 "name": "dUTP"
             },
             {
@@ -17220,7 +17206,7 @@
             },
             {
                 "charge": 1,
-                "coefficient": -2,
+                "coefficient": -1,
                 "compartment": 0,
                 "compound": "cpd00067",
                 "formula": "H",
@@ -17383,14 +17369,14 @@
             "Name: Phosphoadenylyl-sulfate reductase (thioredoxin); adenosine 3',5'-bisphosphate,sulfite:oxidized-thioredoxin; adenosine 3',5'-bisphosphate,sulfite:oxidized-thioredoxin oxidoreductase; adenosine 3',5'-bisphosphate,sulfite:oxidized-thioredoxin oxidoreductase (3'-phosphoadenosine-5'-phosphosulfate -forming); oxidoreductase (3'-phosphoadenosine-5'-phosphosulfate -forming); phosphoadenylyl-sulfate reductase (thioredoxin); phosphoadenylyl-sulfatereductase-thioredoxin"
         ],
         "code": "(1) cpd00044[0] + (1) cpd11421[0] <=> (1) cpd00045[0] + (1) cpd00081[0] + (1) cpd11420[0]",
-        "compound_ids": "cpd00044;cpd00045;cpd00067;cpd00081;cpd11420;cpd11421",
-        "definition": "(1) 3-phosphoadenylylsulfate[0] + (1) trdrd[0] + (1) H+[0] <=> (1) Adenosine 3-5-bisphosphate[0] + (1) Sulfite[0] + (1) trdox[0]",
+        "compound_ids": "cpd00044;cpd00045;cpd00081;cpd11420;cpd11421",
+        "definition": "(1) 3-phosphoadenylylsulfate[0] + (1) trdrd[0] <=> (1) Adenosine 3-5-bisphosphate[0] + (1) Sulfite[0] + (1) trdox[0]",
         "deltag": 10000000.0,
         "deltagerr": 10000000.0,
         "ec_numbers": [
             "1.8.4.8"
         ],
-        "equation": "(1) cpd00044[0] + (1) cpd11421[0] + (1) cpd00067[0] <=> (1) cpd00045[0] + (1) cpd00081[0] + (1) cpd11420[0]",
+        "equation": "(1) cpd00044[0] + (1) cpd11421[0] <=> (1) cpd00045[0] + (1) cpd00081[0] + (1) cpd11420[0]",
         "id": "rxn05239",
         "is_obsolete": 0,
         "is_transport": 0,
@@ -17406,7 +17392,7 @@
         ],
         "reversibility": "?",
         "source": "Primary Database",
-        "status": "CI:-2",
+        "status": "CI:-1",
         "stoichiometry": [
             {
                 "charge": -4,
@@ -17421,7 +17407,7 @@
                 "coefficient": -1,
                 "compartment": 0,
                 "compound": "cpd11421",
-                "formula": "C10H13N4O4R4S2",
+                "formula": "C10H14N4O4R4S2",
                 "name": "trdrd"
             },
             {
@@ -17431,14 +17417,6 @@
                 "compound": "cpd00045",
                 "formula": "C10H11N5O10P2",
                 "name": "Adenosine 3-5-bisphosphate"
-            },
-            {
-                "charge": 1,
-                "coefficient": -1,
-                "compartment": 0,
-                "compound": "cpd00067",
-                "formula": "H",
-                "name": "H+"
             },
             {
                 "charge": -1,
@@ -18530,14 +18508,14 @@
             "Name: AMP,sulfite:thioredoxin-disulfide; AMP,sulfite:thioredoxin-disulfide oxidoreductase(adenosine-5'-phosphosulfate-forming); Adenylylsulfate (APS)reductase (aerobic); adenylylsulfate reductase; oxidoreductase(adenosine-5'-phosphosulfate-forming)"
         ],
         "code": "(1) cpd00193[0] + (1) cpd11421[0] <=> (1) cpd00018[0] + (1) cpd00081[0] + (1) cpd11420[0]",
-        "compound_ids": "cpd00018;cpd00067;cpd00081;cpd00193;cpd11420;cpd11421",
-        "definition": "(1) APS[0] + (1) trdrd[0] + (1) H+[0] <=> (1) AMP[0] + (1) Sulfite[0] + (1) trdox[0]",
+        "compound_ids": "cpd00018;cpd00081;cpd00193;cpd11420;cpd11421",
+        "definition": "(1) APS[0] + (1) trdrd[0] <=> (1) AMP[0] + (1) Sulfite[0] + (1) trdox[0]",
         "deltag": 10000000.0,
         "deltagerr": 10000000.0,
         "ec_numbers": [
             "1.8.4.10"
         ],
-        "equation": "(1) cpd00193[0] + (1) cpd11421[0] + (1) cpd00067[0] <=> (1) cpd00018[0] + (1) cpd00081[0] + (1) cpd11420[0]",
+        "equation": "(1) cpd00193[0] + (1) cpd11421[0] <=> (1) cpd00018[0] + (1) cpd00081[0] + (1) cpd11420[0]",
         "id": "rxn05256",
         "is_obsolete": 0,
         "is_transport": 0,
@@ -18551,7 +18529,7 @@
         "pathways": null,
         "reversibility": "?",
         "source": "Primary Database",
-        "status": "CI:-2",
+        "status": "CI:-1",
         "stoichiometry": [
             {
                 "charge": -2,
@@ -18566,7 +18544,7 @@
                 "coefficient": -1,
                 "compartment": 0,
                 "compound": "cpd11421",
-                "formula": "C10H13N4O4R4S2",
+                "formula": "C10H14N4O4R4S2",
                 "name": "trdrd"
             },
             {
@@ -18576,14 +18554,6 @@
                 "compound": "cpd00018",
                 "formula": "C10H12N5O7P",
                 "name": "AMP"
-            },
-            {
-                "charge": 1,
-                "coefficient": -1,
-                "compartment": 0,
-                "compound": "cpd00067",
-                "formula": "H",
-                "name": "H+"
             },
             {
                 "charge": -1,
@@ -18684,11 +18654,11 @@
         ],
         "code": "(2400) cpd00026[0] + (2400) cpd00402[0] + (1) cpd11428[0] <=> (2400) cpd00014[0] + (2400) cpd00046[0] + (1) cpd11445[0]",
         "compound_ids": "cpd00014;cpd00026;cpd00046;cpd00067;cpd00402;cpd11428;cpd11445",
-        "definition": "(2400) UDP-glucose[0] + (2400) CDPglycerol[0] + (1) d12dg_BS[0] <=> (2400) UDP[0] + (2400) CMP[0] + (4800) H+[0] + (1) lipo1-24_BS[0]",
+        "definition": "(2400) UDP-glucose[0] + (2400) CDPglycerol[0] + (1) d12dg_BS[0] <=> (2400) UDP[0] + (2400) CMP[0] + (2400) H+[0] + (1) lipo1-24_BS[0]",
         "deltag": 10000000.0,
         "deltagerr": 10000000.0,
         "ec_numbers": null,
-        "equation": "(2400) cpd00026[0] + (2400) cpd00402[0] + (1) cpd11428[0] <=> (2400) cpd00014[0] + (2400) cpd00046[0] + (4800) cpd00067[0] + (1) cpd11445[0]",
+        "equation": "(2400) cpd00026[0] + (2400) cpd00402[0] + (1) cpd11428[0] <=> (2400) cpd00014[0] + (2400) cpd00046[0] + (2400) cpd00067[0] + (1) cpd11445[0]",
         "id": "rxn05258",
         "is_obsolete": 0,
         "is_transport": 0,
@@ -18702,7 +18672,7 @@
         "pathways": null,
         "reversibility": "?",
         "source": "Secondary Database",
-        "status": "CI:2400",
+        "status": "OK",
         "stoichiometry": [
             {
                 "charge": -2,
@@ -18733,7 +18703,7 @@
                 "coefficient": 2400,
                 "compartment": 0,
                 "compound": "cpd00014",
-                "formula": "C9H11N2O12P2",
+                "formula": "C9H12N2O12P2",
                 "name": "UDP"
             },
             {
@@ -18746,7 +18716,7 @@
             },
             {
                 "charge": 1,
-                "coefficient": 4800,
+                "coefficient": 2400,
                 "compartment": 0,
                 "compound": "cpd00067",
                 "formula": "H",
@@ -18772,11 +18742,11 @@
         ],
         "code": "(2400) cpd00037[0] + (2400) cpd00402[0] + (1) cpd11428[0] <=> (2400) cpd00014[0] + (2400) cpd00046[0] + (1) cpd11446[0]",
         "compound_ids": "cpd00014;cpd00037;cpd00046;cpd00067;cpd00402;cpd11428;cpd11446",
-        "definition": "(2400) UDP-N-acetylglucosamine[0] + (2400) CDPglycerol[0] + (1) d12dg_BS[0] <=> (2400) UDP[0] + (2400) CMP[0] + (4800) H+[0] + (1) lipo2-24_BS[0]",
+        "definition": "(2400) UDP-N-acetylglucosamine[0] + (2400) CDPglycerol[0] + (1) d12dg_BS[0] <=> (2400) UDP[0] + (2400) CMP[0] + (2400) H+[0] + (1) lipo2-24_BS[0]",
         "deltag": 10000000.0,
         "deltagerr": 10000000.0,
         "ec_numbers": null,
-        "equation": "(2400) cpd00037[0] + (2400) cpd00402[0] + (1) cpd11428[0] <=> (2400) cpd00014[0] + (2400) cpd00046[0] + (4800) cpd00067[0] + (1) cpd11446[0]",
+        "equation": "(2400) cpd00037[0] + (2400) cpd00402[0] + (1) cpd11428[0] <=> (2400) cpd00014[0] + (2400) cpd00046[0] + (2400) cpd00067[0] + (1) cpd11446[0]",
         "id": "rxn05259",
         "is_obsolete": 0,
         "is_transport": 0,
@@ -18790,7 +18760,7 @@
         "pathways": null,
         "reversibility": "?",
         "source": "Secondary Database",
-        "status": "CI:2400",
+        "status": "OK",
         "stoichiometry": [
             {
                 "charge": -2,
@@ -18821,7 +18791,7 @@
                 "coefficient": 2400,
                 "compartment": 0,
                 "compound": "cpd00014",
-                "formula": "C9H11N2O12P2",
+                "formula": "C9H12N2O12P2",
                 "name": "UDP"
             },
             {
@@ -18834,7 +18804,7 @@
             },
             {
                 "charge": 1,
-                "coefficient": 4800,
+                "coefficient": 2400,
                 "compartment": 0,
                 "compound": "cpd00067",
                 "formula": "H",
@@ -18877,7 +18847,7 @@
         "pathways": null,
         "reversibility": "?",
         "source": "Secondary Database",
-        "status": "MI:H:3/O:2",
+        "status": "MI:H:4/O:2",
         "stoichiometry": [
             {
                 "charge": -2,
@@ -18908,7 +18878,7 @@
                 "coefficient": 1,
                 "compartment": 0,
                 "compound": "cpd00014",
-                "formula": "C9H11N2O12P2",
+                "formula": "C9H12N2O12P2",
                 "name": "UDP"
             },
             {
@@ -18955,11 +18925,11 @@
         ],
         "code": "(1) cpd00001[0] + (45) cpd00026[0] + (1) cpd00037[0] + (45) cpd00402[0] + (1) cpd00861[0] <=> (46) cpd00014[0] + (45) cpd00046[0] + (1) cpd00091[0] + (1) cpd11444[0]",
         "compound_ids": "cpd00001;cpd00014;cpd00026;cpd00037;cpd00046;cpd00067;cpd00091;cpd00402;cpd00861;cpd11444",
-        "definition": "(1) H2O[0] + (45) UDP-glucose[0] + (1) UDP-N-acetylglucosamine[0] + (45) CDPglycerol[0] + (1) UDP-N-acetyl-D-mannosamine[0] <=> (46) UDP[0] + (45) CMP[0] + (92) H+[0] + (1) UMP[0] + (1) gtca3-45_BS[0]",
+        "definition": "(1) H2O[0] + (45) UDP-glucose[0] + (1) UDP-N-acetylglucosamine[0] + (45) CDPglycerol[0] + (1) UDP-N-acetyl-D-mannosamine[0] <=> (46) UDP[0] + (45) CMP[0] + (46) H+[0] + (1) UMP[0] + (1) gtca3-45_BS[0]",
         "deltag": 10000000.0,
         "deltagerr": 10000000.0,
         "ec_numbers": null,
-        "equation": "(1) cpd00001[0] + (45) cpd00026[0] + (1) cpd00037[0] + (45) cpd00402[0] + (1) cpd00861[0] <=> (46) cpd00014[0] + (45) cpd00046[0] + (92) cpd00067[0] + (1) cpd00091[0] + (1) cpd11444[0]",
+        "equation": "(1) cpd00001[0] + (45) cpd00026[0] + (1) cpd00037[0] + (45) cpd00402[0] + (1) cpd00861[0] <=> (46) cpd00014[0] + (45) cpd00046[0] + (46) cpd00067[0] + (1) cpd00091[0] + (1) cpd11444[0]",
         "id": "rxn05261",
         "is_obsolete": 0,
         "is_transport": 0,
@@ -18973,7 +18943,7 @@
         "pathways": null,
         "reversibility": "?",
         "source": "Secondary Database",
-        "status": "CI:46",
+        "status": "OK",
         "stoichiometry": [
             {
                 "charge": 0,
@@ -19020,7 +18990,7 @@
                 "coefficient": 46,
                 "compartment": 0,
                 "compound": "cpd00014",
-                "formula": "C9H11N2O12P2",
+                "formula": "C9H12N2O12P2",
                 "name": "UDP"
             },
             {
@@ -19033,7 +19003,7 @@
             },
             {
                 "charge": 1,
-                "coefficient": 92,
+                "coefficient": 46,
                 "compartment": 0,
                 "compound": "cpd00067",
                 "formula": "H",
@@ -19084,7 +19054,7 @@
         "pathways": null,
         "reversibility": "?",
         "source": "Secondary Database",
-        "status": "MI:H:-134/O:-44|CI:-45",
+        "status": "MI:H:-133/O:-44|CI:-45",
         "stoichiometry": [
             {
                 "charge": 0,
@@ -19147,7 +19117,7 @@
                 "coefficient": 1,
                 "compartment": 0,
                 "compound": "cpd00014",
-                "formula": "C9H11N2O12P2",
+                "formula": "C9H12N2O12P2",
                 "name": "UDP"
             },
             {
@@ -19222,7 +19192,7 @@
         "pathways": null,
         "reversibility": "?",
         "source": "Secondary Database",
-        "status": "MI:H:-58/O:-29|CI:30",
+        "status": "MI:H:-28/O:-29|CI:30",
         "stoichiometry": [
             {
                 "charge": 0,
@@ -19253,7 +19223,7 @@
                 "coefficient": 30,
                 "compartment": 0,
                 "compound": "cpd00014",
-                "formula": "C9H11N2O12P2",
+                "formula": "C9H12N2O12P2",
                 "name": "UDP"
             },
             {
@@ -20838,7 +20808,7 @@
         "pathways": null,
         "reversibility": "?",
         "source": "Secondary Database",
-        "status": "MI:C:34.310/H:66.660/O:4.950/R:-0.020|CI:2",
+        "status": "MI:C:34.310/H:68.660/O:4.950/R:-0.020|CI:2",
         "stoichiometry": [
             {
                 "charge": -2,
@@ -20861,7 +20831,7 @@
                 "coefficient": 2,
                 "compartment": 0,
                 "compound": "cpd00014",
-                "formula": "C9H11N2O12P2",
+                "formula": "C9H12N2O12P2",
                 "name": "UDP"
             },
             {
@@ -20909,7 +20879,7 @@
         "pathways": null,
         "reversibility": "?",
         "source": "Secondary Database",
-        "status": "MI:C:34.310/H:66.660/O:4.950/R:-0.020|CI:1",
+        "status": "MI:C:34.310/H:67.660/O:4.950/R:-0.020|CI:1",
         "stoichiometry": [
             {
                 "charge": -2,
@@ -20932,7 +20902,7 @@
                 "coefficient": 1,
                 "compartment": 0,
                 "compound": "cpd00014",
-                "formula": "C9H11N2O12P2",
+                "formula": "C9H12N2O12P2",
                 "name": "UDP"
             },
             {
@@ -20980,7 +20950,7 @@
         "pathways": null,
         "reversibility": "?",
         "source": "Secondary Database",
-        "status": "MI:C:34.310/H:66.660/O:4.950/R:-0.020|CI:3",
+        "status": "MI:C:34.310/H:69.660/O:4.950/R:-0.020|CI:3",
         "stoichiometry": [
             {
                 "charge": -2,
@@ -21003,7 +20973,7 @@
                 "coefficient": 3,
                 "compartment": 0,
                 "compound": "cpd00014",
-                "formula": "C9H11N2O12P2",
+                "formula": "C9H12N2O12P2",
                 "name": "UDP"
             },
             {
@@ -21259,15 +21229,15 @@
             "Name: NADPH:oxidized-thioredoxin oxidoreductase; Thioredoxin reductase (NADPH); thioredoxin reductase; thioredoxin reductase (NADPH); thioredoxinreductase-NADPH"
         ],
         "code": "(1) cpd00005[0] + (1) cpd11420[0] <=> (1) cpd00006[0] + (1) cpd11421[0]",
-        "compound_ids": "cpd00005;cpd00006;cpd00067;cpd11420;cpd11421",
-        "definition": "(1) NADPH[0] + (1) trdox[0] <=> (1) H+[0] + (1) NADP[0] + (1) trdrd[0]",
+        "compound_ids": "cpd00005;cpd00006;cpd11420;cpd11421",
+        "definition": "(1) NADPH[0] + (1) trdox[0] <=> (1) NADP[0] + (1) trdrd[0]",
         "deltag": 10000000.0,
         "deltagerr": 10000000.0,
         "ec_numbers": [
             "1.6.4.5",
             "1.8.1.9"
         ],
-        "equation": "(1) cpd00005[0] + (1) cpd11420[0] <=> (1) cpd00067[0] + (1) cpd00006[0] + (1) cpd11421[0]",
+        "equation": "(1) cpd00005[0] + (1) cpd11420[0] <=> (1) cpd00006[0] + (1) cpd11421[0]",
         "id": "rxn05289",
         "is_obsolete": 0,
         "is_transport": 0,
@@ -21283,7 +21253,7 @@
         ],
         "reversibility": "?",
         "source": "Primary Database",
-        "status": "CI:2",
+        "status": "CI:1",
         "stoichiometry": [
             {
                 "charge": -4,
@@ -21292,14 +21262,6 @@
                 "compound": "cpd00005",
                 "formula": "C21H26N7O17P3",
                 "name": "NADPH"
-            },
-            {
-                "charge": 1,
-                "coefficient": 1,
-                "compartment": 0,
-                "compound": "cpd00067",
-                "formula": "H",
-                "name": "H+"
             },
             {
                 "charge": 1,
@@ -21322,7 +21284,7 @@
                 "coefficient": 1,
                 "compartment": 0,
                 "compound": "cpd11421",
-                "formula": "C10H13N4O4R4S2",
+                "formula": "C10H14N4O4R4S2",
                 "name": "trdrd"
             }
         ]
@@ -21590,7 +21552,7 @@
         "pathways": null,
         "reversibility": "?",
         "source": "Secondary Database",
-        "status": "MI:C:-15.355/H:-14.228/N:-11.533/O:-5.610/P:-1.102/R:3|CI:-2",
+        "status": "MI:C:-15.355/H:-15.108/N:-11.533/O:-5.610/P:-1.102/R:3|CI:-2",
         "stoichiometry": [
             {
                 "charge": -3,
@@ -21621,7 +21583,7 @@
                 "coefficient": -0.8807,
                 "compartment": 0,
                 "compound": "cpd00357",
-                "formula": "C10H13N2O14P3",
+                "formula": "C10H14N2O14P3",
                 "name": "TTP"
             },
             {
@@ -21699,7 +21661,7 @@
                 "coefficient": -0.6331,
                 "compartment": 0,
                 "compound": "cpd00062",
-                "formula": "C9H11N2O15P3",
+                "formula": "C9H12N2O15P3",
                 "name": "UTP"
             },
             {
@@ -36608,7 +36570,7 @@
                 "coefficient": -1,
                 "compartment": 1,
                 "compound": "cpd00423",
-                "formula": "C62H88CoN13O14P",
+                "formula": "C62H87CoN13O14P",
                 "name": "Vitamin B12r"
             },
             {
@@ -36640,7 +36602,7 @@
                 "coefficient": 1,
                 "compartment": 0,
                 "compound": "cpd00423",
-                "formula": "C62H88CoN13O14P",
+                "formula": "C62H87CoN13O14P",
                 "name": "Vitamin B12r"
             }
         ]
@@ -45092,7 +45054,7 @@
                 "coefficient": -1,
                 "compartment": 1,
                 "compound": "cpd00220",
-                "formula": "C17H19N4O6",
+                "formula": "C17H20N4O6",
                 "name": "Riboflavin"
             },
             {
@@ -45108,7 +45070,7 @@
                 "coefficient": 1,
                 "compartment": 0,
                 "compound": "cpd00220",
-                "formula": "C17H19N4O6",
+                "formula": "C17H20N4O6",
                 "name": "Riboflavin"
             }
         ]
@@ -49750,15 +49712,15 @@
             "Name: O3-Acetyl-L-serine acetate-lyase (adding hydrogen sulfide); O3-acetyl-L-serine acetate-lyase (thiosulfate-reducing, L-cysteine-forming); O3-acetyl-L-serine:thiosulfate 2-amino-2-carboxyethyltransferase (reducing, L-cysteine-forming); cysteine synthase (Thiosulfate)"
         ],
         "code": "(1) cpd00268[0] + (1) cpd00722[0] + (1) cpd11421[0] <=> (1) cpd00029[0] + (1) cpd00081[0] + (1) cpd00084[0] + (1) cpd11420[0]",
-        "compound_ids": "cpd00029;cpd00081;cpd00084;cpd00268;cpd00722;cpd11420;cpd11421",
-        "definition": "(1) H2S2O3[0] + (1) O-Acetyl-L-serine[0] + (1) trdrd[0] <=> (1) Acetate[0] + (1) Sulfite[0] + (1) L-Cysteine[0] + (1) trdox[0]",
+        "compound_ids": "cpd00029;cpd00067;cpd00081;cpd00084;cpd00268;cpd00722;cpd11420;cpd11421",
+        "definition": "(1) H2S2O3[0] + (1) O-Acetyl-L-serine[0] + (1) trdrd[0] <=> (1) Acetate[0] + (1) Sulfite[0] + (1) L-Cysteine[0] + (1) trdox[0] + (1) H+[0]",
         "deltag": 10000000.0,
         "deltagerr": 10000000.0,
         "ec_numbers": [
             "2.5.1.47",
             "2.5.1.49"
         ],
-        "equation": "(1) cpd00268[0] + (1) cpd00722[0] + (1) cpd11421[0] <=> (1) cpd00029[0] + (1) cpd00081[0] + (1) cpd00084[0] + (1) cpd11420[0]",
+        "equation": "(1) cpd00268[0] + (1) cpd00722[0] + (1) cpd11421[0] <=> (1) cpd00029[0] + (1) cpd00081[0] + (1) cpd00084[0] + (1) cpd11420[0] + (1) cpd00067[0]",
         "id": "rxn05733",
         "is_obsolete": 0,
         "is_transport": 0,
@@ -49772,7 +49734,7 @@
         "pathways": null,
         "reversibility": "?",
         "source": "Primary Database",
-        "status": "CI:-1",
+        "status": "OK",
         "stoichiometry": [
             {
                 "charge": -1,
@@ -49795,7 +49757,7 @@
                 "coefficient": -1,
                 "compartment": 0,
                 "compound": "cpd11421",
-                "formula": "C10H13N4O4R4S2",
+                "formula": "C10H14N4O4R4S2",
                 "name": "trdrd"
             },
             {
@@ -49829,6 +49791,14 @@
                 "compound": "cpd11420",
                 "formula": "C10H13N4O4R4S2",
                 "name": "trdox"
+            },
+            {
+                "charge": 1,
+                "coefficient": 1,
+                "compartment": 0,
+                "compound": "cpd00067",
+                "formula": "H",
+                "name": "H+"
             }
         ]
     },
@@ -51212,14 +51182,14 @@
             "Name: Chloride:hydrogen-peroxide oxidoreductase"
         ],
         "code": "(1) cpd00025[0] + (2) cpd00099[0] + (2) cpd11855[0] <=> (2) cpd00001[0] + (2) cpd11847[0]",
-        "compound_ids": "cpd00001;cpd00025;cpd00099;cpd11847;cpd11855",
-        "definition": "(1) H2O2[0] + (2) Cl-[0] + (2) RH[0] <=> (2) H2O[0] + (2) RCl[0]",
+        "compound_ids": "cpd00001;cpd00025;cpd00067;cpd00099;cpd11847;cpd11855",
+        "definition": "(1) H2O2[0] + (2) Cl-[0] + (2) RH[0] + (2) H+[0] <=> (2) H2O[0] + (2) RCl[0]",
         "deltag": 10000000.0,
         "deltagerr": 10000000.0,
         "ec_numbers": [
             "1.11.1.10"
         ],
-        "equation": "(1) cpd00025[0] + (2) cpd00099[0] + (2) cpd11855[0] <=> (2) cpd00001[0] + (2) cpd11847[0]",
+        "equation": "(1) cpd00025[0] + (2) cpd00099[0] + (2) cpd11855[0] + (2) cpd00067[0] <=> (2) cpd00001[0] + (2) cpd11847[0]",
         "id": "rxn05762",
         "is_obsolete": 0,
         "is_transport": 0,
@@ -51227,12 +51197,13 @@
         "name": "Chloride:hydrogen-peroxide oxidoreductase",
         "notes": [
             "GCP",
-            "EQP"
+            "EQP",
+            "HB"
         ],
         "pathways": null,
         "reversibility": "?",
         "source": "Secondary Database",
-        "status": "CI:2",
+        "status": "OK",
         "stoichiometry": [
             {
                 "charge": 0,
@@ -51255,7 +51226,7 @@
                 "coefficient": -2,
                 "compartment": 0,
                 "compound": "cpd11855",
-                "formula": "HR",
+                "formula": "R",
                 "name": "RH"
             },
             {
@@ -51273,6 +51244,14 @@
                 "compound": "cpd11847",
                 "formula": "ClR",
                 "name": "RCl"
+            },
+            {
+                "charge": 1,
+                "coefficient": -2,
+                "compartment": 0,
+                "compound": "cpd00067",
+                "formula": "H",
+                "name": "H+"
             }
         ]
     },
@@ -53712,7 +53691,7 @@
         ],
         "reversibility": "<",
         "source": "Primary Database",
-        "status": "MI:C:-6/H:-11/O:-5",
+        "status": "MI:C:-6/H:-10/O:-5",
         "stoichiometry": [
             {
                 "charge": -2,
@@ -53727,7 +53706,7 @@
                 "coefficient": 1,
                 "compartment": 0,
                 "compound": "cpd00014",
-                "formula": "C9H11N2O12P2",
+                "formula": "C9H12N2O12P2",
                 "name": "UDP"
             }
         ]
@@ -54920,14 +54899,14 @@
         ],
         "reversibility": "<",
         "source": "Primary Database",
-        "status": "MI:C:-10/H:-12/N:-2/O:-7/P:-1",
+        "status": "MI:C:-10/H:-13/N:-2/O:-7/P:-1",
         "stoichiometry": [
             {
                 "charge": -3,
                 "coefficient": -1,
                 "compartment": 0,
                 "compound": "cpd00357",
-                "formula": "C10H13N2O14P3",
+                "formula": "C10H14N2O14P3",
                 "name": "TTP"
             },
             {
@@ -56150,7 +56129,7 @@
         "pathways": null,
         "reversibility": "?",
         "source": "Secondary Database",
-        "status": "MI:C:1/N:1",
+        "status": "MI:C:1/H:1/N:1",
         "stoichiometry": [
             {
                 "charge": -2,
@@ -56173,7 +56152,7 @@
                 "coefficient": 1,
                 "compartment": 0,
                 "compound": "cpd00014",
-                "formula": "C9H11N2O12P2",
+                "formula": "C9H12N2O12P2",
                 "name": "UDP"
             },
             {
@@ -56503,7 +56482,7 @@
         ],
         "reversibility": ">",
         "source": "Primary Database",
-        "status": "MI:C:9/H:10/N:2/O:8/P:1",
+        "status": "MI:C:9/H:11/N:2/O:8/P:1",
         "stoichiometry": [
             {
                 "charge": -2,
@@ -56518,7 +56497,7 @@
                 "coefficient": 1,
                 "compartment": 0,
                 "compound": "cpd00014",
-                "formula": "C9H11N2O12P2",
+                "formula": "C9H12N2O12P2",
                 "name": "UDP"
             }
         ]
@@ -56768,14 +56747,14 @@
         ],
         "reversibility": "<",
         "source": "Primary Database",
-        "status": "MI:C:-9/H:-10/N:-2/O:-8/P:-1",
+        "status": "MI:C:-9/H:-11/N:-2/O:-8/P:-1",
         "stoichiometry": [
             {
                 "charge": -3,
                 "coefficient": -1,
                 "compartment": 0,
                 "compound": "cpd00062",
-                "formula": "C9H11N2O15P3",
+                "formula": "C9H12N2O15P3",
                 "name": "UTP"
             },
             {
@@ -56989,7 +56968,7 @@
         ],
         "reversibility": "<",
         "source": "Primary Database",
-        "status": "MI:C:-6/H:-11/O:-5",
+        "status": "MI:C:-6/H:-10/O:-5",
         "stoichiometry": [
             {
                 "charge": -2,
@@ -57004,7 +56983,7 @@
                 "coefficient": 1,
                 "compartment": 0,
                 "compound": "cpd00014",
-                "formula": "C9H11N2O12P2",
+                "formula": "C9H12N2O12P2",
                 "name": "UDP"
             }
         ]
@@ -61207,14 +61186,14 @@
             "Name: Dolichyl-phosphate beta-glucosyltransferase; UDPglucose:dolichyl-phosphate beta-D-glucosyltransferase"
         ],
         "code": "(1) cpd00026[0] + (1) cpd11619[0] <=> (1) cpd00014[0] + (1) cpd11831[0]",
-        "compound_ids": "cpd00014;cpd00026;cpd11619;cpd11831",
-        "definition": "(1) UDP-glucose[0] + (1) Dolichyl phosphate[0] <=> (1) UDP[0] + (1) Dolichyl beta-D-glucosyl phosphate[0]",
+        "compound_ids": "cpd00014;cpd00026;cpd00067;cpd11619;cpd11831",
+        "definition": "(1) UDP-glucose[0] + (1) Dolichyl phosphate[0] + (1) H+[0] <=> (1) UDP[0] + (1) Dolichyl beta-D-glucosyl phosphate[0]",
         "deltag": 10000000.0,
         "deltagerr": 10000000.0,
         "ec_numbers": [
             "2.4.1.117"
         ],
-        "equation": "(1) cpd00026[0] + (1) cpd11619[0] <=> (1) cpd00014[0] + (1) cpd11831[0]",
+        "equation": "(1) cpd00026[0] + (1) cpd11619[0] + (1) cpd00067[0] <=> (1) cpd00014[0] + (1) cpd11831[0]",
         "id": "rxn05914",
         "is_obsolete": 0,
         "is_transport": 0,
@@ -61230,7 +61209,7 @@
         ],
         "reversibility": "?",
         "source": "Primary Database",
-        "status": "CI:1",
+        "status": "OK",
         "stoichiometry": [
             {
                 "charge": -2,
@@ -61253,7 +61232,7 @@
                 "coefficient": 1,
                 "compartment": 0,
                 "compound": "cpd00014",
-                "formula": "C9H11N2O12P2",
+                "formula": "C9H12N2O12P2",
                 "name": "UDP"
             },
             {
@@ -61263,6 +61242,14 @@
                 "compound": "cpd11831",
                 "formula": "C31H54O9P",
                 "name": "Dolichyl beta-D-glucosyl phosphate"
+            },
+            {
+                "charge": 1,
+                "coefficient": -1,
+                "compartment": 0,
+                "compound": "cpd00067",
+                "formula": "H",
+                "name": "H+"
             }
         ]
     },
@@ -61425,14 +61412,14 @@
             "Name: UDP-N-acetyl-D-glucosamine:dolichyl-phosphate; UDP-N-acetyl-D-glucosamine:dolichyl-phosphate alpha-N-acetyl-D-glucosaminyltransferase; alpha-N-acetyl-D-glucosaminyltransferase"
         ],
         "code": "(1) cpd00037[0] + (1) cpd11619[0] <=> (1) cpd00014[0] + (1) cpd12587[0]",
-        "compound_ids": "cpd00014;cpd00037;cpd11619;cpd12587",
-        "definition": "(1) UDP-N-acetylglucosamine[0] + (1) Dolichyl phosphate[0] <=> (1) UDP[0] + (1) Dolichyl N-acetyl-alpha-D-glucosaminyl phosphate[0]",
+        "compound_ids": "cpd00014;cpd00037;cpd00067;cpd11619;cpd12587",
+        "definition": "(1) UDP-N-acetylglucosamine[0] + (1) Dolichyl phosphate[0] + (1) H+[0] <=> (1) UDP[0] + (1) Dolichyl N-acetyl-alpha-D-glucosaminyl phosphate[0]",
         "deltag": 10000000.0,
         "deltagerr": 10000000.0,
         "ec_numbers": [
             "2.4.1.153"
         ],
-        "equation": "(1) cpd00037[0] + (1) cpd11619[0] <=> (1) cpd00014[0] + (1) cpd12587[0]",
+        "equation": "(1) cpd00037[0] + (1) cpd11619[0] + (1) cpd00067[0] <=> (1) cpd00014[0] + (1) cpd12587[0]",
         "id": "rxn05917",
         "is_obsolete": 0,
         "is_transport": 0,
@@ -61446,7 +61433,7 @@
         "pathways": null,
         "reversibility": "?",
         "source": "Primary Database",
-        "status": "CI:1",
+        "status": "OK",
         "stoichiometry": [
             {
                 "charge": -2,
@@ -61469,7 +61456,7 @@
                 "coefficient": 1,
                 "compartment": 0,
                 "compound": "cpd00014",
-                "formula": "C9H11N2O12P2",
+                "formula": "C9H12N2O12P2",
                 "name": "UDP"
             },
             {
@@ -61479,6 +61466,14 @@
                 "compound": "cpd12587",
                 "formula": "C33H57NO9P",
                 "name": "Dolichyl N-acetyl-alpha-D-glucosaminyl phosphate"
+            },
+            {
+                "charge": 1,
+                "coefficient": -1,
+                "compartment": 0,
+                "compound": "cpd00067",
+                "formula": "H",
+                "name": "H+"
             }
         ]
     },
@@ -66875,7 +66870,7 @@
         "pathways": null,
         "reversibility": "?",
         "source": "Secondary Database",
-        "status": "MI:H:-2/N:-1/O:1",
+        "status": "MI:H:-1/N:-1/O:1",
         "stoichiometry": [
             {
                 "charge": -3,
@@ -66898,7 +66893,7 @@
                 "coefficient": 1,
                 "compartment": 0,
                 "compound": "cpd00014",
-                "formula": "C9H11N2O12P2",
+                "formula": "C9H12N2O12P2",
                 "name": "UDP"
             },
             {
