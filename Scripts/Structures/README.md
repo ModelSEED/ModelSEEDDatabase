@@ -33,7 +33,7 @@ it via curation of the conflicts and integration of more structures.
 This script takes the output of the previous two scripts, and uses
 them to update the ModelSEED database.
 
-* `Update_Compound_Structures_Formulas_Charge.py`
+* `Update_Compound_pKas.py`
 
 This script takes the pKa files found in
 `../../Biochemistry/Structures`, and uses them to update the ModelSEED
