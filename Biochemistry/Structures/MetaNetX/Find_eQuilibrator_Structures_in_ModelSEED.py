@@ -15,7 +15,7 @@ with open('../All_ModelSEED_Structures.txt') as ms_fh:
 #Contrived from equilibrator's cache, see README.md
 #08/31/23
 ofh = open('Structures_in_ModelSEED_and_eQuilibrator.txt','w')
-with open('eq_cpds.dump') as eq_fh:
+with open('eq_cpds.tsv') as eq_fh:
     for line in eq_fh.readlines():
         line=line.strip('\r\n')
         tmp_list = line.split('\t')

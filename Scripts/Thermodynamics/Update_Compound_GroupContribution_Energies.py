@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 import os,sys
+sys.path.append('../../Libs/Python/')
 from BiochemPy import Compounds
 
 compounds_helper = Compounds()

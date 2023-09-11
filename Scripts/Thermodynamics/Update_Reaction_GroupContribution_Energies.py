@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 import os,sys
+sys.path.append('../../Libs/Python/')
 from BiochemPy import Compounds, Reactions
 
 compounds_helper = Compounds()
@@ -24,7 +25,7 @@ for rxn in reactions_dict:
     if(reactions_dict[rxn]['status']=='EMPTY'):
         continue
 
-    rxn_cpds_array=reactions_helper.parseStoich(reactions_dict[rxn]["stoichiometry"])
+    rxn_cpds_array=reactions_dict[rxn]["stoichiometry"]
 
     All_Mol=True
     Some_Mol=False
@@ -70,7 +71,7 @@ for rxn in reactions_dict:
     if('GCC' not in notes_list):
         notes_list.append('GCC')
 
-    rxn_cpds_array=reactions_helper.parseStoich(reactions_dict[rxn]["stoichiometry"])
+    rxn_cpds_array=reactions_dict[rxn]["stoichiometry"]
 
     #thermodynamics
     dg_sum=0.0
