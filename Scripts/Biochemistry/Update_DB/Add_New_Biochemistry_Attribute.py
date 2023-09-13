@@ -14,5 +14,6 @@ reactions_helper = Reactions()
 reactions_dict = reactions_helper.loadReactions()
 for rxn in reactions_dict:
     # consistently add or alter attribute
+    reactions_dict[rxn]['thermodynamics']="null"
     pass
 reactions_helper.saveReactions(reactions_dict)

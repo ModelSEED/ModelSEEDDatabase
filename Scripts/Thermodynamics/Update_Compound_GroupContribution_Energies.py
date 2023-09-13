@@ -96,7 +96,7 @@ for cpd in sorted (compounds_dict.keys()):
                 lowest_dge=energies_dict[energy]
 
     # values always saved as list of energy and error
-    if(compounds_dict[cpd]['thermodynamics'] == "null"):
+    if(not isinstance(compounds_dict[cpd]['thermodynamics'],dict)):
         compounds_dict[cpd]['thermodynamics'] = dict()
     if('Group contribution' not in compounds_dict[cpd]['thermodynamics']):
         compounds_dict[cpd]['thermodynamics']['Group contribution']=list()

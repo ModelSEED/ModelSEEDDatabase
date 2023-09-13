@@ -90,7 +90,7 @@ for cpd in sorted (compounds_dict.keys()):
         
     #Here we indicate that we use the equilibrator value
     # values always saved as list of energy and error
-    if(compounds_dict[cpd]['thermodynamics'] == "null"):
+    if(not isinstance(compounds_dict[cpd]['thermodynamics'],dict)):
         compounds_dict[cpd]['thermodynamics'] = dict()
     if('eQuilibrator' not in compounds_dict[cpd]['thermodynamics']):
         compounds_dict[cpd]['thermodynamics']['eQuilibrator']=list()

@@ -3,92 +3,83 @@ import os,sys
 sys.path.append('../../Libs/Python/')
 from BiochemPy import Compounds, Reactions
 
+label = 'Group contribution'
+
 compounds_helper = Compounds()
 compounds_dict = compounds_helper.loadCompounds()
 
-mol_cpds_dict=dict()
+gc_cpds_dict=dict()
 for cpd in compounds_dict:
-    if('GC' in compounds_dict[cpd]['notes'] and compounds_dict[cpd]['deltag'] != 10000000):
-        mol_cpds_dict[cpd]=1
+    cpd_obj = compounds_dict[cpd]
+    if(label in cpd_obj['thermodynamics'] and cpd_obj['thermodynamics'][label][0] != 10000000):
+        gc_cpds_dict[cpd]=1
 
-        if(compounds_dict[cpd]['is_obsolete']):
-            for link in compounds_dict[cpd]['linked_compound'].split(';'):
-                if('GC' in compounds_dict[link]['notes'] and compounds_dict[cpd]['deltag'] != 10000000):
-                    mol_cpds_dict[link]=1
+        if(cpd_obj['is_obsolete']):
+            for link in cpd_obj['linked_compound'].split(';'):
+                if(link in gc_cpds_dict):
+                    continue
+
+                link_obj = compounds_dict[link]
+                if(label in link_obj['thermodynamics'] and link_obj['thermodynamics'][label][0] != 10000000):
+                    gc_cpds_dict[link]=1
 
 reactions_helper = Reactions()
 reactions_dict = reactions_helper.loadReactions()
 
-complete_mol_rxns_dict=dict()
-incomplete_mol_rxns_dict=dict()
+complete_gc_rxns_dict=dict()
+incomplete_gc_rxns_dict=dict()
 for rxn in reactions_dict:
     if(reactions_dict[rxn]['status']=='EMPTY'):
         continue
 
     rxn_cpds_array=reactions_dict[rxn]["stoichiometry"]
 
-    All_Mol=True
-    Some_Mol=False
+    all_gc=True
+    some_gc=False
     for rgt in rxn_cpds_array:
-        if(rgt['compound'] not in mol_cpds_dict):
-            All_Mol=False
-            Some_Mol=True
+        if(rgt['compound'] not in gc_cpds_dict):
+            all_gc=False
+            some_gc=True
 
-    if(All_Mol is True):
-        complete_mol_rxns_dict[rxn]=1
-    elif(Some_Mol is True):
-        incomplete_mol_rxns_dict[rxn]=1
+    if(all_gc is True):
+        complete_gc_rxns_dict[rxn]=1
+    elif(some_gc is True):
+        incomplete_gc_rxns_dict[rxn]=1
 
 for rxn in reactions_dict:
 
-    notes_list=reactions_dict[rxn]['notes']
-    if(not isinstance(notes_list,list)):
-        notes_list=list()
-
-    if(rxn not in complete_mol_rxns_dict):
-
-        #'GC' means group contribution approach to calculating energies
-        #'P' means partial, as in some of the reagents have energies calculated thus
-        if(rxn in incomplete_mol_rxns_dict):
-            if('GCC' in notes_list):
-                notes_list.remove('GCC')
-            if('GCP' not in notes_list):
-                notes_list.append('GCP')
-
-        reactions_dict[rxn]['deltag']=10000000.0
-        reactions_dict[rxn]['deltagerr']=10000000.0
-
-        if(len(notes_list)==0):
-            reactions_dict[rxn]['notes']="null"
-        else:
-            reactions_dict[rxn]['notes']=notes_list
+    if(rxn not in complete_gc_rxns_dict and rxn not in incomplete_gc_rxns_dict):
         continue
 
-    #'GC' means group contribution approach to calculating energies
-    #'C' means complete, as in all of the reagents have energies calculated thus
-    if('GCP' in notes_list):
-        notes_list.remove('GCP')
-    if('GCC' not in notes_list):
-        notes_list.append('GCC')
+    dg_dge_list = [10000000.0,10000000.0]
 
-    rxn_cpds_array=reactions_dict[rxn]["stoichiometry"]
+    if(rxn in complete_gc_rxns_dict):
 
-    #thermodynamics
-    dg_sum=0.0
-    dge_sum=0.0
-    for rgt in rxn_cpds_array:
-        if(rgt['compound'] not in mol_cpds_dict):
-            print("Warning: wrong reaction: "+rxn)
+        # build deltaG of reaction
+        rxn_cpds_array=reactions_dict[rxn]["stoichiometry"]
 
-        dg_sum+= ( compounds_dict[rgt['compound']]['deltag'] * rgt['coefficient'] )
-        dge_sum+= ( compounds_dict[rgt['compound']]['deltagerr'] * rgt['coefficient'] )**2
+        dg_sum=0.0
+        dge_sum=0.0
+        for rgt in rxn_cpds_array:
+            if(rgt['compound'] not in gc_cpds_dict):
+                print("Warning: wrong reaction: "+rxn)
 
-    dg_sum="{0:.2f}".format(dg_sum)
-    dge_sum = "{0:.2f}".format(dge_sum**0.5)
+            (dg,dge) = compounds_dict[rgt['compound']]['thermodynamics'][label]
 
-    reactions_dict[rxn]['deltag']=float(dg_sum)
-    reactions_dict[rxn]['deltagerr']=float(dge_sum)
-    reactions_dict[rxn]['notes']=notes_list
+            dg_sum += ( dg * rgt['coefficient'] )
+            dge_sum+= ( dge * rgt['coefficient'] )**2
 
+        dg_sum  =float("{0:.2f}".format(dg_sum))
+        dge_sum =float("{0:.2f}".format(dge_sum**0.5))
+        dg_dge_list = (dg_sum,dge_sum)
+
+    # values always saved as list of energy and error
+    if(not isinstance(reactions_dict[rxn]['thermodynamics'],dict)):
+        reactions_dict[rxn]['thermodynamics'] = dict()
+    if(label not in reactions_dict[rxn]['thermodynamics']):
+        reactions_dict[rxn]['thermodynamics'][label]=list()
+    reactions_dict[rxn]['thermodynamics'][label]=dg_dge_list
+
+    print(rxn,reactions_dict[rxn]['deltag'],reactions_dict[rxn]['thermodynamics'][label][0])
 print("Saving reactions")
 reactions_helper.saveReactions(reactions_dict)
