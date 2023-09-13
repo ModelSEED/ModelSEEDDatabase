@@ -80,6 +80,5 @@ for rxn in reactions_dict:
         reactions_dict[rxn]['thermodynamics'][label]=list()
     reactions_dict[rxn]['thermodynamics'][label]=dg_dge_list
 
-    print(rxn,reactions_dict[rxn]['deltag'],reactions_dict[rxn]['thermodynamics'][label][0])
 print("Saving reactions")
 reactions_helper.saveReactions(reactions_dict)
