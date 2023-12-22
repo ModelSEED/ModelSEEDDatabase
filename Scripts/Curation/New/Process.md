@@ -33,7 +33,6 @@ improve your matches and then save to the biochemistry
 An example:
 ./Add_New_Curated_Reactions.py ../../../Biochemistry/Aliases/Provenance/Rhea_reactions.tsv ChEBI samseaver -r -s
 
-=====================================================================
 After running Add_New_Curated_Compounds.py, you should run these scripts to update the database:
 
 ../../Biochemistry/Update/Merge_Formulas.py
@@ -47,4 +46,5 @@ After running Add_New_Curated_Reactions.py, you should run these scripts to upda
 ../../Biochemistry/Refresh/Adjust_Reaction_Protons.py
 ../../Biochemistry/Refresh/Adjust_Reaction_Water.py
 ../../Biochemistry/Refresh/Merge_Reactions.py (merges may happen because of water, so need to double-check the results)
+../../Biochemistry/Refresh/Update_Reaction_Aliases.py
 ../../Biochemistry/Refresh/Update_Reaction_Aliases_in_DB.py

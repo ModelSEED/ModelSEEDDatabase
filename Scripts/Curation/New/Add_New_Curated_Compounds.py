@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 import os, sys, re, copy
 import argparse, requests
+from csv import DictReader
 from collections import OrderedDict
 
 parser = argparse.ArgumentParser()
@@ -46,6 +47,7 @@ for msid in sorted(original_name_dict):
 
 original_alias_dict=compounds_helper.loadMSAliases()
 source_alias_dict = dict()
+>>>>>>> upstream/dev
 new_alias_count = dict()
 for msid in original_alias_dict:
     for source in original_alias_dict[msid]:
