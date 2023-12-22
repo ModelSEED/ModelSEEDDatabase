@@ -7,17 +7,21 @@ import copy
 import re
 import json
 from collections import OrderedDict
+import argparse
+sys.path.append('../../../Libs/Python/')
 from BiochemPy import Reactions, Compounds
 
-arguments = list(sys.argv)
-#Pop filename
-arguments = arguments[1:]
-if(len(arguments) != 1 or os.path.isfile(arguments[0]) is False):
-    print("Error: script must be initiated with the path to the edited json file from Print_Compound_to_Disambiguate.py")
+parser = argparse.ArgumentParser()
+parser.add_argument('object_file', help="Object file for compound")
+parser.add_argument("-c", dest='save_compound', action='store_true')
+parser.add_argument("-r", dest='save_reaction', action='store_true')
+args = parser.parse_args()
+
+if(os.path.isfile(args.object_file) is False):
+    print("Cannot find file: "+args.object_file)
     sys.exit()
 
-File=arguments[0]
-Dry_Run=0
+File=args.object_file
 
 ##########################################################
 #
@@ -65,7 +69,7 @@ if(len(Disambiguated_Compound['to'])==0 or Disambiguated_Compound['to'][0]['id']
                             "inchikey":"","smiles":"",
                             "is_cofactor":0,"is_core":0,"is_obsolete":0,
                             "abstract_compound":"null","comprised_of":"null","linked_compound":"null",
-                            "source":"","ontology":"class:null|context:null"})
+                            "source":"","notes":""})
 
     New_Cpd['formula']=Disambiguated_Compound['to'][0]['formula']
     New_Cpd['charge']=Disambiguated_Compound['to'][0]['charge']
@@ -168,16 +172,16 @@ if(len(New_Names)>0):
         New_Cpd['name']=New_Names[0]
         New_Cpd['abbreviation']=New_Names[0]
     Names_Dict[New_Cpd['id']]=New_Names
-    if(Dry_Run==0):
+    if(args.save_compound is True):
         print("Saving update to names")
         compounds_helper.saveNames(Names_Dict)
 
 if(len(New_Aliases)>0):
-    if(Dry_Run==0):
+    if(args.save_compound is True):
         print("Saving update to aliases")
         compounds_helper.saveAliases(Aliases_Dict)
 
-if(Dry_Run==0):
+if(args.save_compound is True):
     print("Saving disambiguation of "+Old_Cpd_ID+" as "+New_Cpd['id'])
     compounds_helper.saveCompounds(compounds_dict)
 
@@ -245,7 +249,12 @@ for rxn in reaction_aliases_dict:
             #It's entirely possible that:
             #    (1) the reaction alias is associated with multiple distinct ModelSEED reactions
             #    (2) the compound alias, for a given source, was not associated with the compound in question
-            if(Old_Cpd_ID not in reactions_dict[rxn]['stoichiometry']):
+            is_rgt = False
+            for rgt in reactions_dict[rxn]['stoichiometry']:
+                if(Old_Cpd_ID == rgt['compound']):
+                    is_rgt = True
+
+            if(is_rgt is False):
                 continue
 
             Is_Old_Dict[Prov_Rxns[source][alias]]=1
@@ -271,20 +280,18 @@ if(len(update_reactions)==0 and len(disambiguate_reactions)==0):
 # Handle reactions to update
 #
 ##########################################################
-
+#import copy
 print("Updating "+str(len(update_reactions))+" reactions")
 for rxn in sorted(update_reactions):
 
-    #Parse old stoichiometry into array
-    old_stoichiometry=reactions_dict[rxn]["stoichiometry"]
-    rxn_cpds_array=reactions_helper.parseStoich(old_stoichiometry)
+    #Load old reagents
+    rgts_array = reactions_dict[rxn]["stoichiometry"]
 
-    #Adjust for new compound
-    reactions_helper.replaceCompound(rxn_cpds_array,Old_Cpd_ID,New_Cpd['id'])
-
-    #Rebuild with old compound
-    new_stoichiometry = reactions_helper.buildStoich(rxn_cpds_array)
-    reactions_helper.rebuildReaction(reactions_dict[rxn],new_stoichiometry)
+    #Adjust for new compound            
+    reactions_helper.replaceCompound(rgts_array,Old_Cpd_ID,New_Cpd['id'])
+    
+    #Rebuild reaction
+    reactions_helper.rebuildReaction(reactions_dict[rxn],rgts_array)
 
 ##########################################################
 #
@@ -423,7 +430,7 @@ for original_rxn in sorted(disambiguate_reactions):
 
     disambiguation_object['reactions'].append(ecname_disambig_dict)
 
-if(Dry_Run==0):
+if(args.save_reaction is True):
     print("Saving update to aliases")
     reactions_helper.saveAliases(reaction_aliases_dict)
     print("Saving disambiguated reactions")
@@ -438,10 +445,9 @@ if(len(disambiguation_object['reactions'])>0):
         f.write(json_string)
 
 #Scripts to run afterwards
-#../Structures/List_ModelSEED_Structures.py
-#../Structures/Update_Structure_Formula_Charge.py
-#../Biochemistry/Update_Compound_Aliases.py
-#../Biochemistry/Rebalance_Reactions.py (very important)
-#../Biochemistry/Adjust_Reaction_Protons.py
-#../Biochemistry/Adjust_Reaction_Water.py
-#../Biochemistry/Merge_Reactions.py (merges may happen because of water)
+print("Run these scripts to complete the disambiguation:")
+print("\t../Structures/List_ModelSEED_Structures.py")
+print("\t../Structures/Update_Structure_Formula_Charge.py")
+print("\t../Biochemistry/Refresh/Refresh_Aliases.sh")
+print("\t../Biochemistry/Refresh/Refresh_Reactions.sh")
+

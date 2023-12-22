@@ -1,8 +1,17 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!-- Schema for Metabolic Modeling: Compounds -->
-<!-- Attributes: id	abbreviation	name	formula	mass	source	structure	charge	is_core	is_obselete	linked_compound	is_cofactor	deltag	deltagerr	pka	pkb	abstract_compound	comprised_of	aliases -->
+<!-- Attributes: id abbreviation name formula mass source smiles inchikey charge is_core is_obsolete -->
+<!-- linked_compound is_cofactor deltag deltagerr pka pkb abstract_compound comprised_of aliases notes -->
 
-<schema name="compounds" version="1.5">
+
+<!-- {'abbreviation': 'h2o', 'abstract_compound': None, -->
+<!-- 'aliases': ['Name: BOUND WATER; H2O; H3O+; 'KEGG: C00001; C01328', 'MetaCyc: OH; OXONIUM; WATER'], -->
+<!-- 'charge': 0, 'comprised_of': None, 'deltag': -37.54, 'deltagerr': 0.18, 'formula': 'H2O', -->
+<!-- 'id': 'cpd00001', 'inchikey': 'XLYOFNOQVPJJNP-UHFFFAOYSA-N', 'is_cofactor': 0, 'is_core': 1, -->
+<!-- 'is_obsolete': 0, 'linked_compound': None, 'mass': 18.0, 'name': 'H2O', 'notes': ['GC', 'EQ', 'EQU'], -->
+<!-- 'pka': '1:1:15.70', 'pkb': '1:1:-1.80', 'smiles': 'O', 'source': 'Primary Database'} -->
+
+<schema name="compounds" version="1.6">
 	<fields>
 
 		<field name="id"		type="string"		indexed="true"	stored="true"/>
@@ -26,7 +35,6 @@
 		<field name="comprised_of"		type="string"		indexed="true"	stored="true"/>
 		<field name="aliases"		type="string_ci"		indexed="true"	stored="true"	docValues="true" multiValued="true"/>
 		<field name="notes"		type="string"		indexed="true"	stored="true" multiValued="true"/>
-		<field name="ontology"		type="string"		indexed="true"	stored="true"/>
 		
 		<field name="text"		type="text_custom"	indexed="true"	stored="false"	multiValued="true"/>
 		<field name="_version_"		type="long"		indexed="true"	stored="true"/>
@@ -42,7 +50,6 @@
 	<copyField source="formula"		dest="text"/>
 	<copyField source="aliases"		dest="text"/>
 	<copyField source="notes"		dest="text"/>
-	<copyField source="ontology"		dest="text"/>
 	
 	<xi:include href="schema_types.xml" xmlns:xi="http://www.w3.org/2001/XInclude">
 		<xi:fallback></xi:fallback>

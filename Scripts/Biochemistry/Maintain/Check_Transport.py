@@ -1,4 +1,6 @@
 #!/usr/bin/env python
+import sys
+sys.path.append('../../../Libs/Python/')
 from BiochemPy import Reactions
 
 ReactionsHelper = Reactions()
@@ -11,9 +13,7 @@ for rxn in sorted(Reactions_Dict.keys()):
         continue
 
     old_stoichiometry=Reactions_Dict[rxn]["stoichiometry"]
-    Rxn_Cpds_Array=ReactionsHelper.parseStoich(old_stoichiometry)
-
-    is_transport = ReactionsHelper.isTransport(Rxn_Cpds_Array)
+    is_transport = ReactionsHelper.isTransport(old_stoichiometry)
 
     if(is_transport != Reactions_Dict[rxn]["is_transport"]):
         print("Updating: ",rxn,is_transport)

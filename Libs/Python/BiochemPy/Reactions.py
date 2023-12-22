@@ -2,12 +2,13 @@ import os
 import re
 import json
 import copy
+import glob
 import itertools
 from csv import DictReader
 
 class Reactions:
     def __init__(self, biochem_root='../../../Biochemistry/',
-                 rxns_file='reactions.tsv'):
+                 rxns_file='reaction_00.tsv'):
 
         self.BiochemRoot = os.path.dirname(__file__)+'/'+biochem_root
         self.RxnsFile = self.BiochemRoot + rxns_file
@@ -22,8 +23,35 @@ class Reactions:
         from BiochemPy import Compounds
         self.CompoundsHelper = Compounds()
         self.Compounds_Dict = self.CompoundsHelper.loadCompounds()
-
+            
     def loadReactions(self):
+
+        search_path = os.path.join(self.BiochemRoot,"reaction_*.json")
+        rxns_dict = dict()
+        for reactions_file in sorted(glob.glob(search_path)):
+            with open(reactions_file) as json_file_handle:
+                rxns_list = json.load(json_file_handle)
+                for rxn_obj in rxns_list:
+                    for key in rxn_obj:
+                        if(isinstance(rxn_obj[key],list)):
+                            for i in range(len(rxn_obj[key])):
+                                if(rxn_obj[key][i] is None):
+                                    rxn_obj[key][i]="null"
+                            
+                        if(isinstance(rxn_obj[key],dict)):
+                            for entry in rxn_obj[key]:
+                                if(rxn_obj[key][entry] is None):
+                                    rxn_obj[key][entry]="null"
+                            
+                        if(rxn_obj[key] is None):
+                            rxn_obj[key]="null"
+                        
+                    rxns_dict[rxn_obj['id']]=rxn_obj
+                    
+        return rxns_dict
+
+    def loadReactions_tsv(self):
+        print("WARNING: This function is currently redundant and will only load one file!")
         reader = DictReader(open(self.RxnsFile), dialect='excel-tab')
         type_mapping = {"is_transport": int, "is_obsolete": int,
                         "deltag": float, "deltagerr": float}
@@ -55,12 +83,11 @@ class Reactions:
         rxn_cpds_array = list()
         reagent=-1
         coeff=1
-        index=0
         for text in equation_string.split(" "):
             if(text == "+"):
                 continue
 
-            match=re.search('^<?=>?$',text)
+            match=re.search('^<?[=-]+>?$',text)
             if(match is not None):
                 reagent=1
 
@@ -80,15 +107,13 @@ class Reactions:
                 coeff=coeff*reagent
 
                 (cpd,cpt)=(match.group(1),match.group(2))
-                rgt_id = cpd + "_" + cpt + str(index)
                 cpt = int(cpt)
                 name = self.Compounds_Dict[cpd]["name"]
                 formula = self.Compounds_Dict[cpd]["formula"]
                 charge = self.Compounds_Dict[cpd]["charge"]
 
-                rxn_cpds_array.append({"reagent": rgt_id, "coefficient": coeff,
-                                       "compound": cpd, "compartment": cpt,
-                                       "index": index, "name": name,
+                rxn_cpds_array.append({"compound": cpd, "compartment": cpt,
+                                       "coefficient": coeff, "name": name,
                                        "formula": formula, "charge": charge})
 
                 #Need to reset coeff for next compound
@@ -104,9 +129,7 @@ class Reactions:
             return rxn_cpds_array
 
         for rgt in stoichiometry.split(";"):
-            (coeff, cpd, cpt, index, name) = rgt.split(":", 4)
-            rgt_id = cpd + "_" + cpt + index
-
+            (coeff, cpd, cpt, name) = rgt.split(":", 3)
             coeff = float(coeff)
 
             # Correct for redundant ".0" in floats
@@ -114,11 +137,9 @@ class Reactions:
                 coeff = int(round(coeff))
 
             cpt = int(cpt)
-            index = int(index)
 
-            rxn_cpds_array.append({"reagent": rgt_id, "coefficient": coeff,
-                                   "compound": cpd, "compartment": cpt,
-                                   "index": index, "name": name,
+            rxn_cpds_array.append({"compound": cpd, "compartment": cpt,
+                                   "name": name, "coefficient": coeff,
                                    "formula": self.Compounds_Dict[cpd][
                                        "formula"],
                                    "charge": self.Compounds_Dict[cpd][
@@ -133,7 +154,7 @@ class Reactions:
             return rxn_cpds_array
 
         for rgt in stoichiometry.split(";"):
-            (coeff, cpd, cpt, index, name) = rgt.split(":", 4)
+            (coeff, cpd, cpt, name) = rgt.split(":", 3)
             cpd_cpt_tuple = (cpd,cpt)
             rxn_cpds_dict[cpd_cpt_tuple]=coeff
 
@@ -184,7 +205,7 @@ class Reactions:
                 for old, new in entry:
                     if(cpd == old):
                         new_cpd = new
-                reagent = { "reagent":new_cpd+'_'+cpt+'0',
+                reagent = { "reagent":new_cpd+'_'+cpt,
                             "compartment":cpt,
                             "coefficient":float(coeff) }
 
@@ -210,11 +231,9 @@ class Reactions:
     def generateCodes(self, rxns_dict,check_obsolete=True):
         codes_dict=dict()
         for rxn in rxns_dict:
-            if(rxns_dict[rxn]['status']=="EMPTY"):
-                continue
             if(check_obsolete is False and rxns_dict[rxn]['is_obsolete']==1):
                 continue
-            rxn_cpds_array = self.parseStoich(rxns_dict[rxn]['stoichiometry'])
+            rxn_cpds_array = rxns_dict[rxn]['stoichiometry']
             code = self.generateCode(rxn_cpds_array)
             if(code not in codes_dict):
                 codes_dict[code]=dict()
@@ -229,15 +248,16 @@ class Reactions:
         #It matters which side of the equation, so build reagents and products arrays
         reagents=list()
         products=list()
-        for rgt in sorted(rxn_cpds_array, key=lambda x: ( x["reagent"], x["coefficient"] )):
+        for rgt in sorted(rxn_cpds_array, key=lambda x: ( x["compound"], x["compartment"], x["coefficient"] )):
             #skip protons
-            if("cpd00067" in rgt["reagent"] and is_transport == 0):
+            if(rgt["compound"] == "cpd00067" and is_transport == 0):
                 continue
 
+            rgt_str = rgt["compound"]+"_"+str(rgt["compartment"])
             if(rgt["coefficient"]<0):
-                reagents.append(rgt["reagent"]+":"+str(abs(rgt["coefficient"])))
+                reagents.append(rgt_str+":"+str(abs(rgt["coefficient"])))
             if(rgt["coefficient"]>0):
-                products.append(rgt["reagent"]+":"+str(abs(rgt["coefficient"])))
+                products.append(rgt_str+":"+str(abs(rgt["coefficient"])))
 
         rgt_string = "|".join(reagents)
         pdt_string = "|".join(products)
@@ -249,19 +269,17 @@ class Reactions:
     def buildStoich(rxn_cpds_array):
         stoichiometry_array = list()
         for rgt in sorted(rxn_cpds_array, key=lambda x: (
-                int(x["coefficient"] > 0), x["reagent"])):
+                int(x["coefficient"] > 0), x["compound"], x["compartment"])):
 
             # Correct for redundant ".0" in floats
             if (str(rgt["coefficient"])[-2:] == ".0"):
                 rgt["coefficient"] = int(round(rgt["coefficient"]))
 
-            rgt["coefficient"] = str(rgt["coefficient"])
-            rgt["compartment"] = str(rgt["compartment"])
-            rgt["index"] = str(rgt["index"])
+            coeff = str(rgt["coefficient"])
+            cpt = str(rgt["compartment"])
 
             rgt_string = ":".join(
-                [rgt["coefficient"], rgt["compound"], rgt["compartment"],
-                 rgt["index"], rgt["name"]])
+                [coeff, rgt["compound"], cpt, '"'+rgt["name"]+'"'])
             stoichiometry_array.append(rgt_string)
         stoichiometry_string = ";".join(stoichiometry_array)
         return stoichiometry_string
@@ -271,16 +289,18 @@ class Reactions:
 
         rgts_dict = dict()
         for rgt in rgts_array:
-            if (rgt["reagent"] not in rgts_dict):
-                rgts_dict[rgt["reagent"]] = 0
-            rgts_dict[rgt["reagent"]] += float(rgt["coefficient"])
+            rgt_str = rgt["compound"]+"_"+str(rgt["compartment"])
+            if (rgt_str not in rgts_dict):
+                rgts_dict[rgt_str] = 0
+            rgts_dict[rgt_str] += float(rgt["coefficient"])
 
         new_rgts_array=list()
         for rgt in rgts_array:
-            if (rgts_dict[rgt["reagent"]] == 0):
+            rgt_str = rgt["compound"]+"_"+str(rgt["compartment"])
+            if (rgts_dict[rgt_str] == 0):
                 continue
 
-            rgt["coefficient"]=rgts_dict[rgt["reagent"]]
+            rgt["coefficient"]=rgts_dict[rgt_str]
 
             # Correct for redundant ".0" in floats
             if (str(rgt["coefficient"])[-2:] == ".0"):
@@ -289,12 +309,11 @@ class Reactions:
             new_rgts_array.append(rgt)
             
             #Trick to exclude reagent if it appears in array more than once
-            rgts_dict[rgt["reagent"]]=0
-            
+            rgts_dict[rgt_str]=0
 
         return new_rgts_array
 
-    def balanceReaction(self, rgts_array):
+    def balanceReaction(self, rgts_array, all_structures=False):
         if (len(rgts_array) == 0):
             return "EMPTY"
 
@@ -305,12 +324,14 @@ class Reactions:
         ########################################
         rgts_dict = dict()
         for rgt in rgts_array:
-            if (rgt["reagent"] not in rgts_dict):
-                rgts_dict[rgt["reagent"]] = 0
-            rgts_dict[rgt["reagent"]] += 1
+            rgt_str = rgt["compound"]+"_"+str(rgt["compartment"])
+
+            if (rgt_str not in rgts_dict):
+                rgts_dict[rgt_str] = 0
+            rgts_dict[rgt_str] += 1
 
         for rgt in rgts_dict.keys():
-            if (rgts_dict[rgt] > 1):
+            if (rgts_dict[rgt] > 1 and all_structures is False):
                 return "Duplicate reagents"
 
         ########################################
@@ -390,18 +411,18 @@ class Reactions:
             if (rxn_net_mass[atom] == 0):
                 continue
 
-            rxn_net_mass[atom] = "{0:.2f}".format(rxn_net_mass[atom])
+            rxn_net_mass[atom] = "{0:.3f}".format(rxn_net_mass[atom])
 
-            # Correct for redundant ".00" in floats
-            if (rxn_net_mass[atom][-3:] == ".00"):
+            # Correct for redundant ".000" in floats
+            if (rxn_net_mass[atom][-4:] == ".000"):
                 rxn_net_mass[atom] = str(int(float(rxn_net_mass[atom])))
     
             imbalanced_atoms_array.append(atom + ":" + rxn_net_mass[atom])
 
-        rxn_net_charge = "{0:.2f}".format(rxn_net_charge)
+        rxn_net_charge = "{0:.3f}".format(rxn_net_charge)
 
-        # Correct for redundant ".00" in floats
-        if (rxn_net_charge[-3:] == ".00"):
+        # Correct for redundant ".000" in floats
+        if (rxn_net_charge[-4:] == ".000"):
             rxn_net_charge = str(int(float(rxn_net_charge)))
 
         status = ""
@@ -447,8 +468,8 @@ class Reactions:
             rgt_id = compound + "_" + str(compartment) + "0"
 
             rxn_cpds_array.append(
-                {"reagent": rgt_id, "coefficient": 0-adjustment,
-                 "compound": compound, "compartment": compartment, "index": 0,
+                {"compound": compound, "compartment": compartment,
+                 "coefficient": 0-adjustment,
                  "name": self.Compounds_Dict[compound]["name"],
                  "formula": self.Compounds_Dict[compound]["formula"],
                  "charge": self.Compounds_Dict[compound]["charge"]})
@@ -477,7 +498,6 @@ class Reactions:
             if (rgt["compound"] == old_compound):
                 found_cpd=True
                 rgt["compound"]=new_compound
-                rgt["reagent"]=new_compound + "_" + str(rgt["compartment"]) + "0"
                 rgt["name"]=self.Compounds_Dict[new_compound]['name']
 
         return found_cpd
@@ -490,7 +510,7 @@ class Reactions:
             reaction_dict["stoichiometry"] = stoichiometry
 
         # Build list of "reagents" and "products"
-        rxn_cpds_array = self.parseStoich(stoichiometry)
+        rxn_cpds_array = stoichiometry
         reagents_array = list()
         products_array = list()
         compound_ids_dict = dict()
@@ -517,15 +537,15 @@ class Reactions:
             " + ".join(x for x in rgts_str__array if "cpd00067" not in x))
 
         code_array.append("<=>")
-        if (reaction_dict["direction"] == "="):
-            equation_array.append("<=>")
-            definition_array.append("<=>")
-        elif (reaction_dict["direction"] == "<"):
+        if (reaction_dict["reversibility"] == "<"):
             equation_array.append("<=")
             definition_array.append("<=")
-        else:
+        elif (reaction_dict["reversibility"] == ">"):
             equation_array.append("=>")
             definition_array.append("=>")
+        else:
+            equation_array.append("<=>")
+            definition_array.append("<=>")
 
         pdts_str_array = list()
         for rgt in products_array:
@@ -590,29 +610,77 @@ class Reactions:
         alias_file.close()
 
     def saveReactions(self, reactions_dict):
-        rxns_root = os.path.splitext(self.RxnsFile)[0]
+        rxns_root = self.BiochemRoot + 'reaction_'
 
-        # Print to TSV
-        rxns_file = open(rxns_root + ".tsv", 'w')
-        rxns_file.write("\t".join(self.Headers) + "\n")
-        for rxn in sorted(reactions_dict.keys()):
+        # Initiate count
+        rxns_count_thousands=0
+        rxns_count_string=f"{rxns_count_thousands:02}"
+
+        # Initiate TSV file handle
+        rxns_tsv_file_handle = open(rxns_root + rxns_count_string+".tsv", 'w')
+        rxns_tsv_file_handle.write("\t".join(self.Headers) + "\n")
+
+        # Initiate JSON file handle
+        rxns_json_file_handle = open(rxns_root + rxns_count_string+".json", 'w')
+        rxns_json_list = list()
+
+        # Initiate counting
+        prev_rounded_count = 0
+        
+        # Iterate through reactions
+        for rxn_id in sorted(reactions_dict.keys()):
+
+            # Reset for every 1000
+            # NB: we want a direct link between the filename and the reaction id
+            # and for legacy reasons, there may not be a reaction id that falls on
+            # a multiple of 1000, so, here we find the reaction id that "crosses"
+            # a multiple of 1000 in order to keep count
+            #
+            # for the same legacy reasons, this means there won't be
+            # 1000 reactions in every file
+            rxn_count = int(rxn_id[3:])
+            cur_rounded_count = rxn_count - rxn_count % 1000
+            if(cur_rounded_count > prev_rounded_count):
+
+                prev_rounded_count = cur_rounded_count
+
+                # Write JSON list
+                rxns_json_file_handle.write(json.dumps(rxns_json_list, indent=4, sort_keys=True))
+
+                # Reset JSON list
+                rxns_json_list = list()
+
+                # Increment count
+                rxns_count_thousands+=1
+                rxns_count_string=f"{rxns_count_thousands:02}"
+
+                # Reset tsv file handle
+                rxns_tsv_file_handle.close()
+                rxns_tsv_file_handle = open(rxns_root + rxns_count_string+".tsv", 'w')
+                rxns_tsv_file_handle.write("\t".join(self.Headers) + "\n")
+
+                # Reset json file handle
+                rxns_json_file_handle.close()
+                rxns_json_file_handle = open(rxns_root + rxns_count_string+".json", 'w')
+                pass
+
+            # Write TSV
             values_list=list()
             for header in self.Headers:
-                value=reactions_dict[rxn][header]
-                if(isinstance(value,list)):
+                value=reactions_dict[rxn_id][header]
+                if(header=="stoichiometry"):
+                    value = self.buildStoich(reactions_dict[rxn_id][header])
+                elif(isinstance(value,list)):
                     value = "|".join(value)
-                if(isinstance(value,dict)):
+                elif(isinstance(value,dict)):
                     entries = list()
                     for entry in value:
                         entries.append(entry+':'+value[entry])
                     value = "|".join(entries)
                 values_list.append(str(value))
-            rxns_file.write("\t".join(values_list)+"\n")
-        rxns_file.close()
+            rxns_tsv_file_handle.write("\t".join(values_list)+"\n")
 
-        #Re-configure JSON
-        new_reactions_dict = list()
-        for rxn_id in sorted(reactions_dict):
+            # Collect list for JSON
             rxn_obj = reactions_dict[rxn_id]
             for key in rxn_obj:
                 if(isinstance(rxn_obj[key],dict)):
@@ -621,12 +689,15 @@ class Reactions:
                             rxn_obj[key][entry]=None
                 if(rxn_obj[key]=="null"):
                     rxn_obj[key]=None
-            new_reactions_dict.append(rxn_obj)
 
-        # Print to JSON
-        rxns_file = open(rxns_root + ".json", 'w')
-        rxns_file.write(json.dumps(new_reactions_dict, indent=4, sort_keys=True))
-        rxns_file.close()
+            rxns_json_list.append(rxn_obj)
+
+        # Close TSV file handle
+        rxns_tsv_file_handle.close()
+
+        # Write last JSON list and close file handle
+        rxns_json_file_handle.write(json.dumps(rxns_json_list, indent=4, sort_keys=True))
+        rxns_json_file_handle.close()
 
     def loadMSAliases(self,sources_array=[]):
         if(len(sources_array)==0):
