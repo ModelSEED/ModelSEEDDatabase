@@ -9,11 +9,11 @@
         ],
         "code": "(1) cpd00028[0] + (2) cpd00084[0] <=> (1) cpd14553[0]",
         "compound_ids": "cpd00028;cpd00067;cpd00084;cpd14553",
-        "definition": "(1) Heme[0] + (2) L-Cysteine[0] + (2) H+[0] <=> (1) C15817[0]",
+        "definition": "(1) Heme[0] + (2) H+[0] + (2) L-Cysteine[0] <=> (1) C15817[0]",
         "deltag": 10000000.0,
         "deltagerr": 10000000.0,
         "ec_numbers": null,
-        "equation": "(1) cpd00028[0] + (2) cpd00084[0] + (2) cpd00067[0] <=> (1) cpd14553[0]",
+        "equation": "(1) cpd00028[0] + (2) cpd00067[0] + (2) cpd00084[0] <=> (1) cpd14553[0]",
         "id": "rxn10001",
         "is_obsolete": 0,
         "is_transport": 0,
@@ -38,6 +38,14 @@
                 "name": "Heme"
             },
             {
+                "charge": 1,
+                "coefficient": -2,
+                "compartment": 0,
+                "compound": "cpd00067",
+                "formula": "H",
+                "name": "H+"
+            },
+            {
                 "charge": 0,
                 "coefficient": -2,
                 "compartment": 0,
@@ -52,14 +60,6 @@
                 "compound": "cpd14553",
                 "formula": "C40H44FeN6O8S2",
                 "name": "Heme C"
-            },
-            {
-                "charge": 1,
-                "coefficient": -2,
-                "compartment": 0,
-                "compound": "cpd00067",
-                "formula": "H",
-                "name": "H+"
             }
         ],
         "thermodynamics": {
@@ -32525,11 +32525,11 @@
         ],
         "code": "(1) cpd02920[0] + (1) cpd15830[0] <=> (1) cpd00012[0] + (1) cpd15851[0]",
         "compound_ids": "cpd00012;cpd00067;cpd02920;cpd15830;cpd15851",
-        "definition": "(1) 2-Amino-4-hydroxy-6-hydroxymethyl-7-8-dihydropteridinediphosphate[0] + (1) 4-(B-D-ribofuranosyl)aminobenzene 5'-phosphate[0] <=> (1) PPi[0] + (1) 7,8-dihydropterin-6-ylmethyl-4-(B-D-ribofuranosyl) aminobenzene 5'-phosphate[0] + (1) H+[0]",
+        "definition": "(1) 2-Amino-4-hydroxy-6-hydroxymethyl-7-8-dihydropteridinediphosphate[0] + (1) 4-(B-D-ribofuranosyl)aminobenzene 5'-phosphate[0] <=> (1) PPi[0] + (1) H+[0] + (1) 7,8-dihydropterin-6-ylmethyl-4-(B-D-ribofuranosyl) aminobenzene 5'-phosphate[0]",
         "deltag": 10000000.0,
         "deltagerr": 10000000.0,
         "ec_numbers": null,
-        "equation": "(1) cpd02920[0] + (1) cpd15830[0] <=> (1) cpd00012[0] + (1) cpd15851[0] + (1) cpd00067[0]",
+        "equation": "(1) cpd02920[0] + (1) cpd15830[0] <=> (1) cpd00012[0] + (1) cpd00067[0] + (1) cpd15851[0]",
         "id": "rxn10491",
         "is_obsolete": 0,
         "is_transport": 0,
@@ -32570,20 +32570,20 @@
                 "name": "PPi"
             },
             {
-                "charge": -2,
-                "coefficient": 1,
-                "compartment": 0,
-                "compound": "cpd15851",
-                "formula": "C18H21N6O8P",
-                "name": "7,8-dihydropterin-6-ylmethyl-4-(B-D-ribofuranosyl) aminobenzene 5'-phosphate"
-            },
-            {
                 "charge": 1,
                 "coefficient": 1,
                 "compartment": 0,
                 "compound": "cpd00067",
                 "formula": "H",
                 "name": "H+"
+            },
+            {
+                "charge": -2,
+                "coefficient": 1,
+                "compartment": 0,
+                "compound": "cpd15851",
+                "formula": "C18H21N6O8P",
+                "name": "7,8-dihydropterin-6-ylmethyl-4-(B-D-ribofuranosyl) aminobenzene 5'-phosphate"
             }
         ],
         "thermodynamics": {
@@ -33614,13 +33614,13 @@
         ],
         "code": "(1) cpd00001[0] + (1) cpd15807[0] <=> (1) cpd00013[0] + (1) cpd02720[0]",
         "compound_ids": "cpd00001;cpd00013;cpd00067;cpd02720;cpd15807",
-        "definition": "(1) H2O[0] + (1) 2,5-diamino-6-ribitylamino-4(3H)-pyrimidinone 5'-phosphate[0] + (1) H+[0] => (1) NH3[0] + (1) 5-Amino-6--5-phosphoribitylaminouracil[0]",
+        "definition": "(1) H2O[0] + (1) H+[0] + (1) 2,5-diamino-6-ribitylamino-4(3H)-pyrimidinone 5'-phosphate[0] => (1) NH3[0] + (1) 5-Amino-6--5-phosphoribitylaminouracil[0]",
         "deltag": -8.88,
         "deltagerr": 2.64,
         "ec_numbers": [
             "3.5.4.-"
         ],
-        "equation": "(1) cpd00001[0] + (1) cpd15807[0] + (1) cpd00067[0] => (1) cpd00013[0] + (1) cpd02720[0]",
+        "equation": "(1) cpd00001[0] + (1) cpd00067[0] + (1) cpd15807[0] => (1) cpd00013[0] + (1) cpd02720[0]",
         "id": "rxn10506",
         "is_obsolete": 0,
         "is_transport": 0,
@@ -33648,6 +33648,14 @@
                 "name": "H2O"
             },
             {
+                "charge": 1,
+                "coefficient": -1,
+                "compartment": 0,
+                "compound": "cpd00067",
+                "formula": "H",
+                "name": "H+"
+            },
+            {
                 "charge": -2,
                 "coefficient": -1,
                 "compartment": 0,
@@ -33670,14 +33678,6 @@
                 "compound": "cpd02720",
                 "formula": "C9H15N4O9P",
                 "name": "5-Amino-6--5-phosphoribitylaminouracil"
-            },
-            {
-                "charge": 1,
-                "coefficient": -1,
-                "compartment": 0,
-                "compound": "cpd00067",
-                "formula": "H",
-                "name": "H+"
             }
         ],
         "thermodynamics": {
@@ -38488,11 +38488,11 @@
         ],
         "code": "(1) cpd15839[0] + (1) cpd15889[0] <=> (1) cpd00126[0] + (1) cpd15864[0]",
         "compound_ids": "cpd00067;cpd00126;cpd15839;cpd15864;cpd15889",
-        "definition": "(1) 7,8-didemethyl-8-hydroxy-5-deazariboflavin[0] + (1) lactyl-(2)-diphospho-(5')-guanosine[0] <=> (1) GMP[0] + (1) coenzyme ferredoxin 420-0[0] + (1) H+[0]",
+        "definition": "(1) 7,8-didemethyl-8-hydroxy-5-deazariboflavin[0] + (1) lactyl-(2)-diphospho-(5')-guanosine[0] <=> (1) H+[0] + (1) GMP[0] + (1) coenzyme ferredoxin 420-0[0]",
         "deltag": 10000000.0,
         "deltagerr": 10000000.0,
         "ec_numbers": null,
-        "equation": "(1) cpd15839[0] + (1) cpd15889[0] <=> (1) cpd00126[0] + (1) cpd15864[0] + (1) cpd00067[0]",
+        "equation": "(1) cpd15839[0] + (1) cpd15889[0] <=> (1) cpd00067[0] + (1) cpd00126[0] + (1) cpd15864[0]",
         "id": "rxn10566",
         "is_obsolete": 0,
         "is_transport": 0,
@@ -38525,6 +38525,14 @@
                 "name": "lactyl-(2)-diphospho-(5')-guanosine"
             },
             {
+                "charge": 1,
+                "coefficient": 1,
+                "compartment": 0,
+                "compound": "cpd00067",
+                "formula": "H",
+                "name": "H+"
+            },
+            {
                 "charge": -2,
                 "coefficient": 1,
                 "compartment": 0,
@@ -38539,14 +38547,6 @@
                 "compound": "cpd15864",
                 "formula": "C19H20N3O12P",
                 "name": "coenzyme ferredoxin 420-0"
-            },
-            {
-                "charge": 1,
-                "coefficient": 1,
-                "compartment": 0,
-                "compound": "cpd00067",
-                "formula": "H",
-                "name": "H+"
             }
         ],
         "thermodynamics": {
@@ -57345,11 +57345,11 @@
         ],
         "code": "(1) cpd00418[0] + (1) cpd00532[0] <=> (1) cpd00209[0]",
         "compound_ids": "cpd00067;cpd00209;cpd00418;cpd00532",
-        "definition": "(1) NO[0] + (1) O2-[0] <=> (1) Nitrate[0] + (1) H+[0]",
+        "definition": "(1) NO[0] + (1) O2-[0] <=> (1) H+[0] + (1) Nitrate[0]",
         "deltag": 10000000.0,
         "deltagerr": 10000000.0,
         "ec_numbers": null,
-        "equation": "(1) cpd00418[0] + (1) cpd00532[0] <=> (1) cpd00209[0] + (1) cpd00067[0]",
+        "equation": "(1) cpd00418[0] + (1) cpd00532[0] <=> (1) cpd00067[0] + (1) cpd00209[0]",
         "id": "rxn10795",
         "is_obsolete": 0,
         "is_transport": 0,
@@ -57382,20 +57382,20 @@
                 "name": "O2-"
             },
             {
-                "charge": -1,
-                "coefficient": 1,
-                "compartment": 0,
-                "compound": "cpd00209",
-                "formula": "NO3",
-                "name": "Nitrate"
-            },
-            {
                 "charge": 1,
                 "coefficient": 1,
                 "compartment": 0,
                 "compound": "cpd00067",
                 "formula": "H",
                 "name": "H+"
+            },
+            {
+                "charge": -1,
+                "coefficient": 1,
+                "compartment": 0,
+                "compound": "cpd00209",
+                "formula": "NO3",
+                "name": "Nitrate"
             }
         ],
         "thermodynamics": {

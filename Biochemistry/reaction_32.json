@@ -1089,20 +1089,20 @@
                 "name": "Formaldehyde"
             },
             {
-                "charge": -1,
-                "coefficient": 1,
-                "compartment": 0,
-                "compound": "cpd09879",
-                "formula": "C11H18N3O7S",
-                "name": "S-(Hydroxymethyl)glutathione"
-            },
-            {
                 "charge": 1,
                 "coefficient": -1,
                 "compartment": 0,
                 "compound": "cpd00067",
                 "formula": "H",
                 "name": "H+"
+            },
+            {
+                "charge": -1,
+                "coefficient": 1,
+                "compartment": 0,
+                "compound": "cpd09879",
+                "formula": "C11H18N3O7S",
+                "name": "S-(Hydroxymethyl)glutathione"
             }
         ],
         "thermodynamics": {
@@ -6696,7 +6696,7 @@
         ],
         "code": "(1) cpd00002[0] + (1) cpd00091[0] <=> (1) cpd00008[0] + (1) cpd00014[0]",
         "compound_ids": "cpd00002;cpd00008;cpd00014;cpd00067;cpd00091",
-        "definition": "(1) ATP[0] + (1) UMP[0] + (1) H+[0] <=> (1) ADP[0] + (1) UDP[0]",
+        "definition": "(1) ATP[0] + (1) H+[0] + (1) UMP[0] <=> (1) ADP[0] + (1) UDP[0]",
         "deltag": -1.13,
         "deltagerr": 0.78,
         "ec_numbers": [
@@ -6704,7 +6704,7 @@
             "2.7.4.22",
             "2.7.4.4"
         ],
-        "equation": "(1) cpd00002[0] + (1) cpd00091[0] + (1) cpd00067[0] <=> (1) cpd00008[0] + (1) cpd00014[0]",
+        "equation": "(1) cpd00002[0] + (1) cpd00067[0] + (1) cpd00091[0] <=> (1) cpd00008[0] + (1) cpd00014[0]",
         "id": "rxn32095",
         "is_obsolete": 1,
         "is_transport": 0,
@@ -6733,6 +6733,14 @@
                 "name": "ATP"
             },
             {
+                "charge": 1,
+                "coefficient": -1,
+                "compartment": 0,
+                "compound": "cpd00067",
+                "formula": "H",
+                "name": "H+"
+            },
+            {
                 "charge": -2,
                 "coefficient": -1,
                 "compartment": 0,
@@ -6755,14 +6763,6 @@
                 "compound": "cpd00014",
                 "formula": "C9H12N2O12P2",
                 "name": "UDP"
-            },
-            {
-                "charge": 1,
-                "coefficient": -1,
-                "compartment": 0,
-                "compound": "cpd00067",
-                "formula": "H",
-                "name": "H+"
             }
         ],
         "thermodynamics": {
@@ -7318,13 +7318,13 @@
         ],
         "code": "(1) cpd00001[0] + (1) cpd00305[0] <=> (1) cpd00939[0] + (1) cpd02636[0]",
         "compound_ids": "cpd00001;cpd00067;cpd00305;cpd00939;cpd02636",
-        "definition": "(1) H2O[0] + (1) Thiamin[0] <= (1) Toxopyrimidine[0] + (1) 4-Methyl-5--2-hydroxyethyl-thiazole[0] + (1) H+[0]",
+        "definition": "(1) H2O[0] + (1) Thiamin[0] <= (1) H+[0] + (1) Toxopyrimidine[0] + (1) 4-Methyl-5--2-hydroxyethyl-thiazole[0]",
         "deltag": 11.86,
         "deltagerr": 1.31,
         "ec_numbers": [
             "3.5.99.2"
         ],
-        "equation": "(1) cpd00001[0] + (1) cpd00305[0] <= (1) cpd00939[0] + (1) cpd02636[0] + (1) cpd00067[0]",
+        "equation": "(1) cpd00001[0] + (1) cpd00305[0] <= (1) cpd00067[0] + (1) cpd00939[0] + (1) cpd02636[0]",
         "id": "rxn32104",
         "is_obsolete": 1,
         "is_transport": 0,
@@ -7364,6 +7364,14 @@
                 "charge": 1,
                 "coefficient": 1,
                 "compartment": 0,
+                "compound": "cpd00067",
+                "formula": "H",
+                "name": "H+"
+            },
+            {
+                "charge": 1,
+                "coefficient": 1,
+                "compartment": 0,
                 "compound": "cpd00939",
                 "formula": "C6H9N3O",
                 "name": "Toxopyrimidine"
@@ -7375,14 +7383,6 @@
                 "compound": "cpd02636",
                 "formula": "C6H9NOS",
                 "name": "4-Methyl-5--2-hydroxyethyl-thiazole"
-            },
-            {
-                "charge": 1,
-                "coefficient": 1,
-                "compartment": 0,
-                "compound": "cpd00067",
-                "formula": "H",
-                "name": "H+"
             }
         ],
         "thermodynamics": {
@@ -7932,13 +7932,13 @@
         ],
         "code": "(1) cpd00024[0] + (1) cpd00084[0] <=> (1) cpd00706[0] + (1) cpd19002[0]",
         "compound_ids": "cpd00024;cpd00067;cpd00084;cpd00706;cpd19002",
-        "definition": "(1) 2-Oxoglutarate[0] + (1) L-Cysteine[0] + (1) H+[0] <=> (1) Mercaptopyruvate[0] + (1) DL-Glutamate[0]",
+        "definition": "(1) 2-Oxoglutarate[0] + (1) H+[0] + (1) L-Cysteine[0] <=> (1) Mercaptopyruvate[0] + (1) DL-Glutamate[0]",
         "deltag": -3.87,
         "deltagerr": 1.24,
         "ec_numbers": [
             "2.6.1.1"
         ],
-        "equation": "(1) cpd00024[0] + (1) cpd00084[0] + (1) cpd00067[0] <=> (1) cpd00706[0] + (1) cpd19002[0]",
+        "equation": "(1) cpd00024[0] + (1) cpd00067[0] + (1) cpd00084[0] <=> (1) cpd00706[0] + (1) cpd19002[0]",
         "id": "rxn32112",
         "is_obsolete": 1,
         "is_transport": 0,
@@ -7966,6 +7966,14 @@
                 "name": "2-Oxoglutarate"
             },
             {
+                "charge": 1,
+                "coefficient": -1,
+                "compartment": 0,
+                "compound": "cpd00067",
+                "formula": "H",
+                "name": "H+"
+            },
+            {
                 "charge": 0,
                 "coefficient": -1,
                 "compartment": 0,
@@ -7988,14 +7996,6 @@
                 "compound": "cpd19002",
                 "formula": "C5H8NO4",
                 "name": "DL-Glutamate"
-            },
-            {
-                "charge": 1,
-                "coefficient": -1,
-                "compartment": 0,
-                "compound": "cpd00067",
-                "formula": "H",
-                "name": "H+"
             }
         ],
         "thermodynamics": {
@@ -8258,13 +8258,13 @@
         ],
         "code": "(1) cpd00024[0] + (1) cpd00084[0] <=> (1) cpd00706[0] + (1) cpd19002[0]",
         "compound_ids": "cpd00024;cpd00067;cpd00084;cpd00706;cpd19002",
-        "definition": "(1) 2-Oxoglutarate[0] + (1) L-Cysteine[0] + (1) H+[0] <=> (1) Mercaptopyruvate[0] + (1) DL-Glutamate[0]",
+        "definition": "(1) 2-Oxoglutarate[0] + (1) H+[0] + (1) L-Cysteine[0] <=> (1) Mercaptopyruvate[0] + (1) DL-Glutamate[0]",
         "deltag": -3.87,
         "deltagerr": 1.24,
         "ec_numbers": [
             "2.6.1.1"
         ],
-        "equation": "(1) cpd00024[0] + (1) cpd00084[0] + (1) cpd00067[0] <=> (1) cpd00706[0] + (1) cpd19002[0]",
+        "equation": "(1) cpd00024[0] + (1) cpd00067[0] + (1) cpd00084[0] <=> (1) cpd00706[0] + (1) cpd19002[0]",
         "id": "rxn32116",
         "is_obsolete": 1,
         "is_transport": 0,
@@ -8292,6 +8292,14 @@
                 "name": "2-Oxoglutarate"
             },
             {
+                "charge": 1,
+                "coefficient": -1,
+                "compartment": 0,
+                "compound": "cpd00067",
+                "formula": "H",
+                "name": "H+"
+            },
+            {
                 "charge": 0,
                 "coefficient": -1,
                 "compartment": 0,
@@ -8314,14 +8322,6 @@
                 "compound": "cpd19002",
                 "formula": "C5H8NO4",
                 "name": "DL-Glutamate"
-            },
-            {
-                "charge": 1,
-                "coefficient": -1,
-                "compartment": 0,
-                "compound": "cpd00067",
-                "formula": "H",
-                "name": "H+"
             }
         ],
         "thermodynamics": {
@@ -8441,13 +8441,13 @@
         ],
         "code": "(1) cpd00024[0] + (1) cpd00084[0] <=> (1) cpd00706[0] + (1) cpd19002[0]",
         "compound_ids": "cpd00024;cpd00067;cpd00084;cpd00706;cpd19002",
-        "definition": "(1) 2-Oxoglutarate[0] + (1) L-Cysteine[0] + (1) H+[0] <=> (1) Mercaptopyruvate[0] + (1) DL-Glutamate[0]",
+        "definition": "(1) 2-Oxoglutarate[0] + (1) H+[0] + (1) L-Cysteine[0] <=> (1) Mercaptopyruvate[0] + (1) DL-Glutamate[0]",
         "deltag": -3.87,
         "deltagerr": 1.24,
         "ec_numbers": [
             "2.6.1.1"
         ],
-        "equation": "(1) cpd00024[0] + (1) cpd00084[0] + (1) cpd00067[0] <=> (1) cpd00706[0] + (1) cpd19002[0]",
+        "equation": "(1) cpd00024[0] + (1) cpd00067[0] + (1) cpd00084[0] <=> (1) cpd00706[0] + (1) cpd19002[0]",
         "id": "rxn32118",
         "is_obsolete": 1,
         "is_transport": 0,
@@ -8475,6 +8475,14 @@
                 "name": "2-Oxoglutarate"
             },
             {
+                "charge": 1,
+                "coefficient": -1,
+                "compartment": 0,
+                "compound": "cpd00067",
+                "formula": "H",
+                "name": "H+"
+            },
+            {
                 "charge": 0,
                 "coefficient": -1,
                 "compartment": 0,
@@ -8497,14 +8505,6 @@
                 "compound": "cpd19002",
                 "formula": "C5H8NO4",
                 "name": "DL-Glutamate"
-            },
-            {
-                "charge": 1,
-                "coefficient": -1,
-                "compartment": 0,
-                "compound": "cpd00067",
-                "formula": "H",
-                "name": "H+"
             }
         ],
         "thermodynamics": {
@@ -9701,14 +9701,14 @@
         ],
         "code": "(1) cpd00005[0] + (1) cpd00111[0] <=> (1) cpd00006[0] + (2) cpd00042[0]",
         "compound_ids": "cpd00005;cpd00006;cpd00042;cpd00067;cpd00111",
-        "definition": "(1) NADPH[0] + (1) Oxidized glutathione[0] <=> (1) H+[0] + (1) NADP[0] + (2) GSH[0]",
+        "definition": "(1) NADPH[0] + (1) Oxidized glutathione[0] <=> (1) NADP[0] + (2) GSH[0] + (1) H+[0]",
         "deltag": -3.7,
         "deltagerr": 0.19,
         "ec_numbers": [
             "1.6.4.2",
             "1.8.1.7"
         ],
-        "equation": "(1) cpd00005[0] + (1) cpd00111[0] <=> (1) cpd00067[0] + (1) cpd00006[0] + (2) cpd00042[0]",
+        "equation": "(1) cpd00005[0] + (1) cpd00111[0] <=> (1) cpd00006[0] + (2) cpd00042[0] + (1) cpd00067[0]",
         "id": "rxn32133",
         "is_obsolete": 1,
         "is_transport": 0,
@@ -9737,14 +9737,6 @@
                 "name": "NADPH"
             },
             {
-                "charge": 1,
-                "coefficient": 1,
-                "compartment": 0,
-                "compound": "cpd00067",
-                "formula": "H",
-                "name": "H+"
-            },
-            {
                 "charge": -2,
                 "coefficient": -1,
                 "compartment": 0,
@@ -9767,6 +9759,14 @@
                 "compound": "cpd00042",
                 "formula": "C10H15N3O6S",
                 "name": "GSH"
+            },
+            {
+                "charge": 1,
+                "coefficient": 1,
+                "compartment": 0,
+                "compound": "cpd00067",
+                "formula": "H",
+                "name": "H+"
             }
         ],
         "thermodynamics": {
@@ -21035,13 +21035,13 @@
         ],
         "code": "(1) cpd00001[0] + (1) cpd00007[0] + (1) cpd00309[0] <=> (1) cpd00025[0] + (1) cpd00300[0]",
         "compound_ids": "cpd00001;cpd00007;cpd00025;cpd00067;cpd00300;cpd00309",
-        "definition": "(1) H2O[0] + (1) O2[0] + (1) XAN[0] => (1) H2O2[0] + (1) Urate[0] + (1) H+[0]",
+        "definition": "(1) H2O[0] + (1) O2[0] + (1) XAN[0] => (1) H2O2[0] + (1) H+[0] + (1) Urate[0]",
         "deltag": -37.03,
         "deltagerr": 1.52,
         "ec_numbers": [
             "1.17.3.2"
         ],
-        "equation": "(1) cpd00001[0] + (1) cpd00007[0] + (1) cpd00309[0] => (1) cpd00025[0] + (1) cpd00300[0] + (1) cpd00067[0]",
+        "equation": "(1) cpd00001[0] + (1) cpd00007[0] + (1) cpd00309[0] => (1) cpd00025[0] + (1) cpd00067[0] + (1) cpd00300[0]",
         "id": "rxn32289",
         "is_obsolete": 1,
         "is_transport": 0,
@@ -21094,20 +21094,20 @@
                 "name": "H2O2"
             },
             {
-                "charge": 0,
-                "coefficient": 1,
-                "compartment": 0,
-                "compound": "cpd00300",
-                "formula": "C5H3N4O3",
-                "name": "Urate"
-            },
-            {
                 "charge": 1,
                 "coefficient": 1,
                 "compartment": 0,
                 "compound": "cpd00067",
                 "formula": "H",
                 "name": "H+"
+            },
+            {
+                "charge": 0,
+                "coefficient": 1,
+                "compartment": 0,
+                "compound": "cpd00300",
+                "formula": "C5H3N4O3",
+                "name": "Urate"
             }
         ],
         "thermodynamics": {
@@ -21134,13 +21134,13 @@
         ],
         "code": "(1) cpd00001[0] + (1) cpd00007[0] + (1) cpd00309[0] <=> (1) cpd00025[0] + (1) cpd00300[0]",
         "compound_ids": "cpd00001;cpd00007;cpd00025;cpd00067;cpd00300;cpd00309",
-        "definition": "(1) H2O[0] + (1) O2[0] + (1) XAN[0] => (1) H2O2[0] + (1) Urate[0] + (1) H+[0]",
+        "definition": "(1) H2O[0] + (1) O2[0] + (1) XAN[0] => (1) H2O2[0] + (1) H+[0] + (1) Urate[0]",
         "deltag": -37.03,
         "deltagerr": 1.52,
         "ec_numbers": [
             "1.17.3.2"
         ],
-        "equation": "(1) cpd00001[0] + (1) cpd00007[0] + (1) cpd00309[0] => (1) cpd00025[0] + (1) cpd00300[0] + (1) cpd00067[0]",
+        "equation": "(1) cpd00001[0] + (1) cpd00007[0] + (1) cpd00309[0] => (1) cpd00025[0] + (1) cpd00067[0] + (1) cpd00300[0]",
         "id": "rxn32290",
         "is_obsolete": 1,
         "is_transport": 0,
@@ -21193,20 +21193,20 @@
                 "name": "H2O2"
             },
             {
-                "charge": 0,
-                "coefficient": 1,
-                "compartment": 0,
-                "compound": "cpd00300",
-                "formula": "C5H3N4O3",
-                "name": "Urate"
-            },
-            {
                 "charge": 1,
                 "coefficient": 1,
                 "compartment": 0,
                 "compound": "cpd00067",
                 "formula": "H",
                 "name": "H+"
+            },
+            {
+                "charge": 0,
+                "coefficient": 1,
+                "compartment": 0,
+                "compound": "cpd00300",
+                "formula": "C5H3N4O3",
+                "name": "Urate"
             }
         ],
         "thermodynamics": {
@@ -25136,14 +25136,14 @@
         ],
         "code": "(1) cpd00239[0] + (1) cpd00722[0] <=> (1) cpd00029[0] + (1) cpd00084[0]",
         "compound_ids": "cpd00029;cpd00067;cpd00084;cpd00239;cpd00722",
-        "definition": "(1) H2S[0] + (1) O-Acetyl-L-serine[0] => (1) Acetate[0] + (1) L-Cysteine[0] + (1) H+[0]",
+        "definition": "(1) H2S[0] + (1) O-Acetyl-L-serine[0] => (1) Acetate[0] + (1) H+[0] + (1) L-Cysteine[0]",
         "deltag": -11.8,
         "deltagerr": 1.28,
         "ec_numbers": [
             "2.5.1.47",
             "2.5.1.65"
         ],
-        "equation": "(1) cpd00239[0] + (1) cpd00722[0] => (1) cpd00029[0] + (1) cpd00084[0] + (1) cpd00067[0]",
+        "equation": "(1) cpd00239[0] + (1) cpd00722[0] => (1) cpd00029[0] + (1) cpd00067[0] + (1) cpd00084[0]",
         "id": "rxn32343",
         "is_obsolete": 1,
         "is_transport": 0,
@@ -25188,20 +25188,20 @@
                 "name": "Acetate"
             },
             {
-                "charge": 0,
-                "coefficient": 1,
-                "compartment": 0,
-                "compound": "cpd00084",
-                "formula": "C3H6NO2S",
-                "name": "L-Cysteine"
-            },
-            {
                 "charge": 1,
                 "coefficient": 1,
                 "compartment": 0,
                 "compound": "cpd00067",
                 "formula": "H",
                 "name": "H+"
+            },
+            {
+                "charge": 0,
+                "coefficient": 1,
+                "compartment": 0,
+                "compound": "cpd00084",
+                "formula": "C3H6NO2S",
+                "name": "L-Cysteine"
             }
         ],
         "thermodynamics": {
@@ -35017,13 +35017,13 @@
         ],
         "code": "(1) cpd00001[0] + (1) cpd00356[0] <=> (1) cpd00013[0] + (1) cpd00358[0]",
         "compound_ids": "cpd00001;cpd00013;cpd00067;cpd00356;cpd00358",
-        "definition": "(1) H2O[0] + (1) dCTP[0] + (1) H+[0] <=> (1) NH3[0] + (1) dUTP[0]",
+        "definition": "(1) H2O[0] + (1) H+[0] + (1) dCTP[0] <=> (1) NH3[0] + (1) dUTP[0]",
         "deltag": -6.06,
         "deltagerr": 0.47,
         "ec_numbers": [
             "3.5.4.13"
         ],
-        "equation": "(1) cpd00001[0] + (1) cpd00356[0] + (1) cpd00067[0] <=> (1) cpd00013[0] + (1) cpd00358[0]",
+        "equation": "(1) cpd00001[0] + (1) cpd00067[0] + (1) cpd00356[0] <=> (1) cpd00013[0] + (1) cpd00358[0]",
         "id": "rxn32477",
         "is_obsolete": 1,
         "is_transport": 0,
@@ -35052,6 +35052,14 @@
                 "name": "H2O"
             },
             {
+                "charge": 1,
+                "coefficient": -1,
+                "compartment": 0,
+                "compound": "cpd00067",
+                "formula": "H",
+                "name": "H+"
+            },
+            {
                 "charge": -3,
                 "coefficient": -1,
                 "compartment": 0,
@@ -35074,14 +35082,6 @@
                 "compound": "cpd00358",
                 "formula": "C9H12N2O14P3",
                 "name": "dUTP"
-            },
-            {
-                "charge": 1,
-                "coefficient": -1,
-                "compartment": 0,
-                "compound": "cpd00067",
-                "formula": "H",
-                "name": "H+"
             }
         ],
         "thermodynamics": {
@@ -35108,13 +35108,13 @@
         ],
         "code": "(1) cpd00001[0] + (1) cpd00356[0] <=> (1) cpd00013[0] + (1) cpd00358[0]",
         "compound_ids": "cpd00001;cpd00013;cpd00067;cpd00356;cpd00358",
-        "definition": "(1) H2O[0] + (1) dCTP[0] + (1) H+[0] <=> (1) NH3[0] + (1) dUTP[0]",
+        "definition": "(1) H2O[0] + (1) H+[0] + (1) dCTP[0] <=> (1) NH3[0] + (1) dUTP[0]",
         "deltag": -6.06,
         "deltagerr": 0.47,
         "ec_numbers": [
             "3.5.4.13"
         ],
-        "equation": "(1) cpd00001[0] + (1) cpd00356[0] + (1) cpd00067[0] <=> (1) cpd00013[0] + (1) cpd00358[0]",
+        "equation": "(1) cpd00001[0] + (1) cpd00067[0] + (1) cpd00356[0] <=> (1) cpd00013[0] + (1) cpd00358[0]",
         "id": "rxn32478",
         "is_obsolete": 1,
         "is_transport": 0,
@@ -35143,6 +35143,14 @@
                 "name": "H2O"
             },
             {
+                "charge": 1,
+                "coefficient": -1,
+                "compartment": 0,
+                "compound": "cpd00067",
+                "formula": "H",
+                "name": "H+"
+            },
+            {
                 "charge": -3,
                 "coefficient": -1,
                 "compartment": 0,
@@ -35165,14 +35173,6 @@
                 "compound": "cpd00358",
                 "formula": "C9H12N2O14P3",
                 "name": "dUTP"
-            },
-            {
-                "charge": 1,
-                "coefficient": -1,
-                "compartment": 0,
-                "compound": "cpd00067",
-                "formula": "H",
-                "name": "H+"
             }
         ],
         "thermodynamics": {
@@ -35353,13 +35353,13 @@
         ],
         "code": "(1) cpd00001[0] + (1) cpd00356[0] <=> (1) cpd00013[0] + (1) cpd00358[0]",
         "compound_ids": "cpd00001;cpd00013;cpd00067;cpd00356;cpd00358",
-        "definition": "(1) H2O[0] + (1) dCTP[0] + (1) H+[0] <=> (1) NH3[0] + (1) dUTP[0]",
+        "definition": "(1) H2O[0] + (1) H+[0] + (1) dCTP[0] <=> (1) NH3[0] + (1) dUTP[0]",
         "deltag": -6.06,
         "deltagerr": 0.47,
         "ec_numbers": [
             "3.5.4.13"
         ],
-        "equation": "(1) cpd00001[0] + (1) cpd00356[0] + (1) cpd00067[0] <=> (1) cpd00013[0] + (1) cpd00358[0]",
+        "equation": "(1) cpd00001[0] + (1) cpd00067[0] + (1) cpd00356[0] <=> (1) cpd00013[0] + (1) cpd00358[0]",
         "id": "rxn32481",
         "is_obsolete": 1,
         "is_transport": 0,
@@ -35388,6 +35388,14 @@
                 "name": "H2O"
             },
             {
+                "charge": 1,
+                "coefficient": -1,
+                "compartment": 0,
+                "compound": "cpd00067",
+                "formula": "H",
+                "name": "H+"
+            },
+            {
                 "charge": -3,
                 "coefficient": -1,
                 "compartment": 0,
@@ -35410,14 +35418,6 @@
                 "compound": "cpd00358",
                 "formula": "C9H12N2O14P3",
                 "name": "dUTP"
-            },
-            {
-                "charge": 1,
-                "coefficient": -1,
-                "compartment": 0,
-                "compound": "cpd00067",
-                "formula": "H",
-                "name": "H+"
             }
         ],
         "thermodynamics": {
@@ -39707,13 +39707,13 @@
         ],
         "code": "(1) cpd00007[0] + (1) cpd00024[0] + (1) cpd01980[0] <=> (1) cpd00001[0] + (1) cpd00011[0] + (1) cpd00036[0] + (1) cpd17397[0]",
         "compound_ids": "cpd00001;cpd00007;cpd00011;cpd00024;cpd00036;cpd00067;cpd01980;cpd17397",
-        "definition": "(1) O2[0] + (1) 2-Oxoglutarate[0] + (1) 5-Hydroxymethyluracil[0] => (1) H2O[0] + (1) CO2[0] + (1) Succinate[0] + (1) 5-Formyluracil[0] + (1) H+[0]",
+        "definition": "(1) O2[0] + (1) 2-Oxoglutarate[0] + (1) 5-Hydroxymethyluracil[0] => (1) H2O[0] + (1) CO2[0] + (1) Succinate[0] + (1) H+[0] + (1) 5-Formyluracil[0]",
         "deltag": -117.23,
         "deltagerr": 1.16,
         "ec_numbers": [
             "1.14.11.6"
         ],
-        "equation": "(1) cpd00007[0] + (1) cpd00024[0] + (1) cpd01980[0] => (1) cpd00001[0] + (1) cpd00011[0] + (1) cpd00036[0] + (1) cpd17397[0] + (1) cpd00067[0]",
+        "equation": "(1) cpd00007[0] + (1) cpd00024[0] + (1) cpd01980[0] => (1) cpd00001[0] + (1) cpd00011[0] + (1) cpd00036[0] + (1) cpd00067[0] + (1) cpd17397[0]",
         "id": "rxn32543",
         "is_obsolete": 1,
         "is_transport": 0,
@@ -39779,20 +39779,20 @@
                 "name": "Succinate"
             },
             {
-                "charge": 0,
-                "coefficient": 1,
-                "compartment": 0,
-                "compound": "cpd17397",
-                "formula": "C5H3N2O3",
-                "name": "5-Formyluracil"
-            },
-            {
                 "charge": 1,
                 "coefficient": 1,
                 "compartment": 0,
                 "compound": "cpd00067",
                 "formula": "H",
                 "name": "H+"
+            },
+            {
+                "charge": 0,
+                "coefficient": 1,
+                "compartment": 0,
+                "compound": "cpd17397",
+                "formula": "C5H3N2O3",
+                "name": "5-Formyluracil"
             }
         ],
         "thermodynamics": {
@@ -41477,13 +41477,13 @@
         ],
         "code": "(1) cpd00001[0] + (1) cpd00356[0] <=> (1) cpd00013[0] + (1) cpd00358[0]",
         "compound_ids": "cpd00001;cpd00013;cpd00067;cpd00356;cpd00358",
-        "definition": "(1) H2O[0] + (1) dCTP[0] + (1) H+[0] <=> (1) NH3[0] + (1) dUTP[0]",
+        "definition": "(1) H2O[0] + (1) H+[0] + (1) dCTP[0] <=> (1) NH3[0] + (1) dUTP[0]",
         "deltag": -6.06,
         "deltagerr": 0.47,
         "ec_numbers": [
             "3.5.4.13"
         ],
-        "equation": "(1) cpd00001[0] + (1) cpd00356[0] + (1) cpd00067[0] <=> (1) cpd00013[0] + (1) cpd00358[0]",
+        "equation": "(1) cpd00001[0] + (1) cpd00067[0] + (1) cpd00356[0] <=> (1) cpd00013[0] + (1) cpd00358[0]",
         "id": "rxn32567",
         "is_obsolete": 1,
         "is_transport": 0,
@@ -41512,6 +41512,14 @@
                 "name": "H2O"
             },
             {
+                "charge": 1,
+                "coefficient": -1,
+                "compartment": 0,
+                "compound": "cpd00067",
+                "formula": "H",
+                "name": "H+"
+            },
+            {
                 "charge": -3,
                 "coefficient": -1,
                 "compartment": 0,
@@ -41534,14 +41542,6 @@
                 "compound": "cpd00358",
                 "formula": "C9H12N2O14P3",
                 "name": "dUTP"
-            },
-            {
-                "charge": 1,
-                "coefficient": -1,
-                "compartment": 0,
-                "compound": "cpd00067",
-                "formula": "H",
-                "name": "H+"
             }
         ],
         "thermodynamics": {
@@ -41916,13 +41916,13 @@
         ],
         "code": "(1) cpd00007[0] + (1) cpd00024[0] + (1) cpd01980[0] <=> (1) cpd00001[0] + (1) cpd00011[0] + (1) cpd00036[0] + (1) cpd17397[0]",
         "compound_ids": "cpd00001;cpd00007;cpd00011;cpd00024;cpd00036;cpd00067;cpd01980;cpd17397",
-        "definition": "(1) O2[0] + (1) 2-Oxoglutarate[0] + (1) 5-Hydroxymethyluracil[0] => (1) H2O[0] + (1) CO2[0] + (1) Succinate[0] + (1) 5-Formyluracil[0] + (1) H+[0]",
+        "definition": "(1) O2[0] + (1) 2-Oxoglutarate[0] + (1) 5-Hydroxymethyluracil[0] => (1) H2O[0] + (1) CO2[0] + (1) Succinate[0] + (1) H+[0] + (1) 5-Formyluracil[0]",
         "deltag": -117.23,
         "deltagerr": 1.16,
         "ec_numbers": [
             "1.14.11.6"
         ],
-        "equation": "(1) cpd00007[0] + (1) cpd00024[0] + (1) cpd01980[0] => (1) cpd00001[0] + (1) cpd00011[0] + (1) cpd00036[0] + (1) cpd17397[0] + (1) cpd00067[0]",
+        "equation": "(1) cpd00007[0] + (1) cpd00024[0] + (1) cpd01980[0] => (1) cpd00001[0] + (1) cpd00011[0] + (1) cpd00036[0] + (1) cpd00067[0] + (1) cpd17397[0]",
         "id": "rxn32573",
         "is_obsolete": 1,
         "is_transport": 0,
@@ -41988,20 +41988,20 @@
                 "name": "Succinate"
             },
             {
-                "charge": 0,
-                "coefficient": 1,
-                "compartment": 0,
-                "compound": "cpd17397",
-                "formula": "C5H3N2O3",
-                "name": "5-Formyluracil"
-            },
-            {
                 "charge": 1,
                 "coefficient": 1,
                 "compartment": 0,
                 "compound": "cpd00067",
                 "formula": "H",
                 "name": "H+"
+            },
+            {
+                "charge": 0,
+                "coefficient": 1,
+                "compartment": 0,
+                "compound": "cpd17397",
+                "formula": "C5H3N2O3",
+                "name": "5-Formyluracil"
             }
         ],
         "thermodynamics": {
@@ -57785,11 +57785,11 @@
         ],
         "code": "(1) cpd00013[0] + (1) cpd00150[0] + (1) cpd00199[0] <=> (1) cpd00001[0] + (1) cpd03409[0]",
         "compound_ids": "cpd00001;cpd00013;cpd00067;cpd00150;cpd00199;cpd03409",
-        "definition": "(1) NH3[0] + (1) HCN[0] + (1) 4-Oxobutanoate[0] <=> (1) H2O[0] + (1) 4-Amino-4-cyanobutanoic acid[0] + (1) H+[0]",
+        "definition": "(1) NH3[0] + (1) HCN[0] + (1) 4-Oxobutanoate[0] <=> (1) H2O[0] + (1) H+[0] + (1) 4-Amino-4-cyanobutanoic acid[0]",
         "deltag": 10000000.0,
         "deltagerr": 10000000.0,
         "ec_numbers": null,
-        "equation": "(1) cpd00013[0] + (1) cpd00150[0] + (1) cpd00199[0] <=> (1) cpd00001[0] + (1) cpd03409[0] + (1) cpd00067[0]",
+        "equation": "(1) cpd00013[0] + (1) cpd00150[0] + (1) cpd00199[0] <=> (1) cpd00001[0] + (1) cpd00067[0] + (1) cpd03409[0]",
         "id": "rxn32792",
         "is_obsolete": 1,
         "is_transport": 0,
@@ -57840,20 +57840,20 @@
                 "name": "H2O"
             },
             {
-                "charge": 0,
-                "coefficient": 1,
-                "compartment": 0,
-                "compound": "cpd03409",
-                "formula": "C5H7N2O2",
-                "name": "4-Amino-4-cyanobutanoic acid"
-            },
-            {
                 "charge": 1,
                 "coefficient": 1,
                 "compartment": 0,
                 "compound": "cpd00067",
                 "formula": "H",
                 "name": "H+"
+            },
+            {
+                "charge": 0,
+                "coefficient": 1,
+                "compartment": 0,
+                "compound": "cpd03409",
+                "formula": "C5H7N2O2",
+                "name": "4-Amino-4-cyanobutanoic acid"
             }
         ],
         "thermodynamics": {
@@ -66359,13 +66359,13 @@
         ],
         "code": "(1) cpd00025[0] + (1) cpd11421[0] <=> (2) cpd00001[0] + (1) cpd11420[0]",
         "compound_ids": "cpd00001;cpd00025;cpd00067;cpd11420;cpd11421",
-        "definition": "(1) H2O2[0] + (1) trdrd[0] + (1) H+[0] <=> (2) H2O[0] + (1) trdox[0]",
+        "definition": "(1) H2O2[0] + (1) H+[0] + (1) trdrd[0] <=> (2) H2O[0] + (1) trdox[0]",
         "deltag": 10000000.0,
         "deltagerr": 10000000.0,
         "ec_numbers": [
             "1.11.1.-"
         ],
-        "equation": "(1) cpd00025[0] + (1) cpd11421[0] + (1) cpd00067[0] <=> (2) cpd00001[0] + (1) cpd11420[0]",
+        "equation": "(1) cpd00025[0] + (1) cpd00067[0] + (1) cpd11421[0] <=> (2) cpd00001[0] + (1) cpd11420[0]",
         "id": "rxn32910",
         "is_obsolete": 1,
         "is_transport": 0,
@@ -66393,6 +66393,14 @@
                 "charge": 1,
                 "coefficient": -1,
                 "compartment": 0,
+                "compound": "cpd00067",
+                "formula": "H",
+                "name": "H+"
+            },
+            {
+                "charge": 1,
+                "coefficient": -1,
+                "compartment": 0,
                 "compound": "cpd11421",
                 "formula": "C10H14N4O4R4S2",
                 "name": "trdrd"
@@ -66412,14 +66420,6 @@
                 "compound": "cpd11420",
                 "formula": "C10H13N4O4R4S2",
                 "name": "trdox"
-            },
-            {
-                "charge": 1,
-                "coefficient": -1,
-                "compartment": 0,
-                "compound": "cpd00067",
-                "formula": "H",
-                "name": "H+"
             }
         ],
         "thermodynamics": {
@@ -66572,13 +66572,13 @@
         ],
         "code": "(1) cpd00025[0] + (1) cpd11421[0] <=> (2) cpd00001[0] + (1) cpd11420[0]",
         "compound_ids": "cpd00001;cpd00025;cpd00067;cpd11420;cpd11421",
-        "definition": "(1) H2O2[0] + (1) trdrd[0] + (1) H+[0] <=> (2) H2O[0] + (1) trdox[0]",
+        "definition": "(1) H2O2[0] + (1) H+[0] + (1) trdrd[0] <=> (2) H2O[0] + (1) trdox[0]",
         "deltag": 10000000.0,
         "deltagerr": 10000000.0,
         "ec_numbers": [
             "1.11.1.-"
         ],
-        "equation": "(1) cpd00025[0] + (1) cpd11421[0] + (1) cpd00067[0] <=> (2) cpd00001[0] + (1) cpd11420[0]",
+        "equation": "(1) cpd00025[0] + (1) cpd00067[0] + (1) cpd11421[0] <=> (2) cpd00001[0] + (1) cpd11420[0]",
         "id": "rxn32913",
         "is_obsolete": 1,
         "is_transport": 0,
@@ -66606,6 +66606,14 @@
                 "charge": 1,
                 "coefficient": -1,
                 "compartment": 0,
+                "compound": "cpd00067",
+                "formula": "H",
+                "name": "H+"
+            },
+            {
+                "charge": 1,
+                "coefficient": -1,
+                "compartment": 0,
                 "compound": "cpd11421",
                 "formula": "C10H14N4O4R4S2",
                 "name": "trdrd"
@@ -66625,14 +66633,6 @@
                 "compound": "cpd11420",
                 "formula": "C10H13N4O4R4S2",
                 "name": "trdox"
-            },
-            {
-                "charge": 1,
-                "coefficient": -1,
-                "compartment": 0,
-                "compound": "cpd00067",
-                "formula": "H",
-                "name": "H+"
             }
         ],
         "thermodynamics": {
@@ -67921,13 +67921,13 @@
         ],
         "code": "(1) cpd00001[0] + (1) cpd00957[0] <=> (1) cpd00013[0] + (1) cpd00931[0]",
         "compound_ids": "cpd00001;cpd00013;cpd00067;cpd00931;cpd00957",
-        "definition": "(1) H2O[0] + (1) 2,5-Diamino-6-(5'-phosphoribosylamino)-4-pyrimidineone[0] + (1) H+[0] => (1) NH3[0] + (1) 5-Amino-6--5-phosphoribosylaminouracil[0]",
+        "definition": "(1) H2O[0] + (1) H+[0] + (1) 2,5-Diamino-6-(5'-phosphoribosylamino)-4-pyrimidineone[0] => (1) NH3[0] + (1) 5-Amino-6--5-phosphoribosylaminouracil[0]",
         "deltag": -8.88,
         "deltagerr": 3.08,
         "ec_numbers": [
             "3.5.4.26"
         ],
-        "equation": "(1) cpd00001[0] + (1) cpd00957[0] + (1) cpd00067[0] => (1) cpd00013[0] + (1) cpd00931[0]",
+        "equation": "(1) cpd00001[0] + (1) cpd00067[0] + (1) cpd00957[0] => (1) cpd00013[0] + (1) cpd00931[0]",
         "id": "rxn32932",
         "is_obsolete": 1,
         "is_transport": 0,
@@ -67955,6 +67955,14 @@
                 "name": "H2O"
             },
             {
+                "charge": 1,
+                "coefficient": -1,
+                "compartment": 0,
+                "compound": "cpd00067",
+                "formula": "H",
+                "name": "H+"
+            },
+            {
                 "charge": -2,
                 "coefficient": -1,
                 "compartment": 0,
@@ -67977,14 +67985,6 @@
                 "compound": "cpd00931",
                 "formula": "C9H13N4O9P",
                 "name": "5-Amino-6--5-phosphoribosylaminouracil"
-            },
-            {
-                "charge": 1,
-                "coefficient": -1,
-                "compartment": 0,
-                "compound": "cpd00067",
-                "formula": "H",
-                "name": "H+"
             }
         ],
         "thermodynamics": {
@@ -68101,13 +68101,13 @@
         ],
         "code": "(1) cpd00025[0] + (1) cpd11421[0] <=> (2) cpd00001[0] + (1) cpd11420[0]",
         "compound_ids": "cpd00001;cpd00025;cpd00067;cpd11420;cpd11421",
-        "definition": "(1) H2O2[0] + (1) trdrd[0] + (1) H+[0] <=> (2) H2O[0] + (1) trdox[0]",
+        "definition": "(1) H2O2[0] + (1) H+[0] + (1) trdrd[0] <=> (2) H2O[0] + (1) trdox[0]",
         "deltag": 10000000.0,
         "deltagerr": 10000000.0,
         "ec_numbers": [
             "1.11.1.-"
         ],
-        "equation": "(1) cpd00025[0] + (1) cpd11421[0] + (1) cpd00067[0] <=> (2) cpd00001[0] + (1) cpd11420[0]",
+        "equation": "(1) cpd00025[0] + (1) cpd00067[0] + (1) cpd11421[0] <=> (2) cpd00001[0] + (1) cpd11420[0]",
         "id": "rxn32934",
         "is_obsolete": 1,
         "is_transport": 0,
@@ -68135,6 +68135,14 @@
                 "charge": 1,
                 "coefficient": -1,
                 "compartment": 0,
+                "compound": "cpd00067",
+                "formula": "H",
+                "name": "H+"
+            },
+            {
+                "charge": 1,
+                "coefficient": -1,
+                "compartment": 0,
                 "compound": "cpd11421",
                 "formula": "C10H14N4O4R4S2",
                 "name": "trdrd"
@@ -68154,14 +68162,6 @@
                 "compound": "cpd11420",
                 "formula": "C10H13N4O4R4S2",
                 "name": "trdox"
-            },
-            {
-                "charge": 1,
-                "coefficient": -1,
-                "compartment": 0,
-                "compound": "cpd00067",
-                "formula": "H",
-                "name": "H+"
             }
         ],
         "thermodynamics": {

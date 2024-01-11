@@ -24440,11 +24440,11 @@
         ],
         "code": "(1) cpd11421[0] + (1) cpd15450[0] <=> (1) cpd11420[0] + (1) cpd15451[0]",
         "compound_ids": "cpd00067;cpd11420;cpd11421;cpd15450;cpd15451",
-        "definition": "(1) trdrd[0] + (1) fused thiol:disulfide interchange protein (oxidized)[0] <=> (1) trdox[0] + (1) fused thiol:disulfide interchange protein (reduced)[0] + (1) H+[0]",
+        "definition": "(1) trdrd[0] + (1) fused thiol:disulfide interchange protein (oxidized)[0] <=> (1) H+[0] + (1) trdox[0] + (1) fused thiol:disulfide interchange protein (reduced)[0]",
         "deltag": 10000000.0,
         "deltagerr": 10000000.0,
         "ec_numbers": null,
-        "equation": "(1) cpd11421[0] + (1) cpd15450[0] <=> (1) cpd11420[0] + (1) cpd15451[0] + (1) cpd00067[0]",
+        "equation": "(1) cpd11421[0] + (1) cpd15450[0] <=> (1) cpd00067[0] + (1) cpd11420[0] + (1) cpd15451[0]",
         "id": "rxn08369",
         "is_obsolete": 0,
         "is_transport": 0,
@@ -24480,6 +24480,14 @@
                 "charge": 1,
                 "coefficient": 1,
                 "compartment": 0,
+                "compound": "cpd00067",
+                "formula": "H",
+                "name": "H+"
+            },
+            {
+                "charge": 1,
+                "coefficient": 1,
+                "compartment": 0,
                 "compound": "cpd11420",
                 "formula": "C10H13N4O4R4S2",
                 "name": "trdox"
@@ -24491,14 +24499,6 @@
                 "compound": "cpd15451",
                 "formula": "X",
                 "name": "fused thiol:disulfide interchange protein (reduced)"
-            },
-            {
-                "charge": 1,
-                "coefficient": 1,
-                "compartment": 0,
-                "compound": "cpd00067",
-                "formula": "H",
-                "name": "H+"
             }
         ],
         "thermodynamics": {
@@ -30379,20 +30379,20 @@
                 "name": "Formaldehyde"
             },
             {
-                "charge": -1,
-                "coefficient": 1,
-                "compartment": 0,
-                "compound": "cpd15487",
-                "formula": "C11H18N3O7S",
-                "name": "hydroxymethylglutathione"
-            },
-            {
                 "charge": 1,
                 "coefficient": -1,
                 "compartment": 0,
                 "compound": "cpd00067",
                 "formula": "H",
                 "name": "H+"
+            },
+            {
+                "charge": -1,
+                "coefficient": 1,
+                "compartment": 0,
+                "compound": "cpd15487",
+                "formula": "C11H18N3O7S",
+                "name": "hydroxymethylglutathione"
             }
         ],
         "thermodynamics": {
@@ -44060,13 +44060,13 @@
         ],
         "code": "(2) cpd00042[0] + (1) cpd15480[0] <=> (1) cpd00111[0] + (1) cpd15481[0]",
         "compound_ids": "cpd00042;cpd00067;cpd00111;cpd15480;cpd15481",
-        "definition": "(2) GSH[0] + (1) glutaredoxin (oxidized)[0] + (2) H+[0] <=> (1) Oxidized glutathione[0] + (1) glutaredoxin (reduced)[0]",
+        "definition": "(2) GSH[0] + (2) H+[0] + (1) glutaredoxin (oxidized)[0] <=> (1) Oxidized glutathione[0] + (1) glutaredoxin (reduced)[0]",
         "deltag": 10000000.0,
         "deltagerr": 10000000.0,
         "ec_numbers": [
             "1.8.4.2"
         ],
-        "equation": "(2) cpd00042[0] + (1) cpd15480[0] + (2) cpd00067[0] <=> (1) cpd00111[0] + (1) cpd15481[0]",
+        "equation": "(2) cpd00042[0] + (2) cpd00067[0] + (1) cpd15480[0] <=> (1) cpd00111[0] + (1) cpd15481[0]",
         "id": "rxn08670",
         "is_obsolete": 0,
         "is_transport": 0,
@@ -44091,6 +44091,14 @@
                 "name": "GSH"
             },
             {
+                "charge": 1,
+                "coefficient": -2,
+                "compartment": 0,
+                "compound": "cpd00067",
+                "formula": "H",
+                "name": "H+"
+            },
+            {
                 "charge": 0,
                 "coefficient": -1,
                 "compartment": 0,
@@ -44113,14 +44121,6 @@
                 "compound": "cpd15481",
                 "formula": "C6H9NO2R2S2",
                 "name": "glutaredoxin (reduced)"
-            },
-            {
-                "charge": 1,
-                "coefficient": -2,
-                "compartment": 0,
-                "compound": "cpd00067",
-                "formula": "H",
-                "name": "H+"
             }
         ],
         "thermodynamics": {
@@ -44627,6 +44627,14 @@
             },
             {
                 "charge": 1,
+                "coefficient": -1,
+                "compartment": 0,
+                "compound": "cpd00067",
+                "formula": "H",
+                "name": "H+"
+            },
+            {
+                "charge": 1,
                 "coefficient": 1,
                 "compartment": 0,
                 "compound": "cpd00013",
@@ -44640,14 +44648,6 @@
                 "compound": "cpd00530",
                 "formula": "C10H12N4O15P3",
                 "name": "XTP"
-            },
-            {
-                "charge": 1,
-                "coefficient": -1,
-                "compartment": 0,
-                "compound": "cpd00067",
-                "formula": "H",
-                "name": "H+"
             }
         ],
         "thermodynamics": {
@@ -57740,13 +57740,13 @@
             "metanetx.reaction: MNXR101426",
             "Name: murein crosslinking transpeptidase 1A:(A2pm->D-ala)"
         ],
-        "code": "(1) cpd15511[0] <=> (1) cpd00117[0] + (1) cpd15514[0] + (1) cpd00001[0]",
+        "code": "(1) cpd15511[0] <=> (1) cpd00001[0] + (1) cpd00117[0] + (1) cpd15514[0]",
         "compound_ids": "cpd00001;cpd00117;cpd15511;cpd15514",
-        "definition": "(1) two linked disacharide pentapeptide murein units (uncrosslinked, middle of chain)[0] <=> (1) D-Alanine[0] + (1) two disacharide linked murein units, pentapeptide crosslinked tetrapeptide (A2pm->D-ala) (middle of chain)[0] + (1) H2O[0]",
+        "definition": "(1) two linked disacharide pentapeptide murein units (uncrosslinked, middle of chain)[0] <=> (1) H2O[0] + (1) D-Alanine[0] + (1) two disacharide linked murein units, pentapeptide crosslinked tetrapeptide (A2pm->D-ala) (middle of chain)[0]",
         "deltag": 10000000.0,
         "deltagerr": 10000000.0,
         "ec_numbers": null,
-        "equation": "(1) cpd15511[0] <=> (1) cpd00117[0] + (1) cpd15514[0] + (1) cpd00001[0]",
+        "equation": "(1) cpd15511[0] <=> (1) cpd00001[0] + (1) cpd00117[0] + (1) cpd15514[0]",
         "id": "rxn08887",
         "is_obsolete": 0,
         "is_transport": 0,
@@ -57776,6 +57776,14 @@
                 "charge": 0,
                 "coefficient": 1,
                 "compartment": 0,
+                "compound": "cpd00001",
+                "formula": "H2O",
+                "name": "H2O"
+            },
+            {
+                "charge": 0,
+                "coefficient": 1,
+                "compartment": 0,
                 "compound": "cpd00117",
                 "formula": "C3H7NO2",
                 "name": "D-Alanine"
@@ -57787,14 +57795,6 @@
                 "compound": "cpd15514",
                 "formula": "C77H117N15O40",
                 "name": "two disacharide linked murein units, pentapeptide crosslinked tetrapeptide (A2pm->D-ala) (middle of chain)"
-            },
-            {
-                "charge": 0,
-                "coefficient": 1,
-                "compartment": 0,
-                "compound": "cpd00001",
-                "formula": "H2O",
-                "name": "H2O"
             }
         ],
         "thermodynamics": {
@@ -57813,13 +57813,13 @@
             "metanetx.reaction: MNXR101427",
             "Name: murein crosslinking transpeptidase 1B:(A2pm->A2pm)"
         ],
-        "code": "(1) cpd15511[0] <=> (1) cpd00731[0] + (1) cpd15513[0] + (1) cpd00001[0]",
+        "code": "(1) cpd15511[0] <=> (1) cpd00001[0] + (1) cpd00731[0] + (1) cpd15513[0]",
         "compound_ids": "cpd00001;cpd00731;cpd15511;cpd15513",
-        "definition": "(1) two linked disacharide pentapeptide murein units (uncrosslinked, middle of chain)[0] <=> (1) Ala-Ala[0] + (1) two disacharide linked murein units, pentapeptide corsslinked tripeptide (A2pm->A2pm) (middle of chain)[0] + (1) H2O[0]",
+        "definition": "(1) two linked disacharide pentapeptide murein units (uncrosslinked, middle of chain)[0] <=> (1) H2O[0] + (1) Ala-Ala[0] + (1) two disacharide linked murein units, pentapeptide corsslinked tripeptide (A2pm->A2pm) (middle of chain)[0]",
         "deltag": 10000000.0,
         "deltagerr": 10000000.0,
         "ec_numbers": null,
-        "equation": "(1) cpd15511[0] <=> (1) cpd00731[0] + (1) cpd15513[0] + (1) cpd00001[0]",
+        "equation": "(1) cpd15511[0] <=> (1) cpd00001[0] + (1) cpd00731[0] + (1) cpd15513[0]",
         "id": "rxn08888",
         "is_obsolete": 0,
         "is_transport": 0,
@@ -57849,6 +57849,14 @@
                 "charge": 0,
                 "coefficient": 1,
                 "compartment": 0,
+                "compound": "cpd00001",
+                "formula": "H2O",
+                "name": "H2O"
+            },
+            {
+                "charge": 0,
+                "coefficient": 1,
+                "compartment": 0,
                 "compound": "cpd00731",
                 "formula": "C6H12N2O3",
                 "name": "Ala-Ala"
@@ -57860,14 +57868,6 @@
                 "compound": "cpd15513",
                 "formula": "C74H112N14O39",
                 "name": "two disacharide linked murein units, pentapeptide corsslinked tripeptide (A2pm->A2pm) (middle of chain)"
-            },
-            {
-                "charge": 0,
-                "coefficient": 1,
-                "compartment": 0,
-                "compound": "cpd00001",
-                "formula": "H2O",
-                "name": "H2O"
             }
         ],
         "thermodynamics": {
@@ -59642,13 +59642,13 @@
         ],
         "code": "(1) cpd11421[0] + (1) cpd15498[0] <=> (1) cpd00001[0] + (1) cpd00060[0] + (1) cpd11420[0]",
         "compound_ids": "cpd00001;cpd00060;cpd00067;cpd11420;cpd11421;cpd15498",
-        "definition": "(1) trdrd[0] + (1) L-Methionine Sulfoxide[0] + (1) H+[0] <=> (1) H2O[0] + (1) L-Methionine[0] + (1) trdox[0]",
+        "definition": "(1) H+[0] + (1) trdrd[0] + (1) L-Methionine Sulfoxide[0] <=> (1) H2O[0] + (1) L-Methionine[0] + (1) trdox[0]",
         "deltag": 10000000.0,
         "deltagerr": 10000000.0,
         "ec_numbers": [
             "1.8.4.5"
         ],
-        "equation": "(1) cpd11421[0] + (1) cpd15498[0] + (1) cpd00067[0] <=> (1) cpd00001[0] + (1) cpd00060[0] + (1) cpd11420[0]",
+        "equation": "(1) cpd00067[0] + (1) cpd11421[0] + (1) cpd15498[0] <=> (1) cpd00001[0] + (1) cpd00060[0] + (1) cpd11420[0]",
         "id": "rxn08918",
         "is_obsolete": 0,
         "is_transport": 0,
@@ -59664,6 +59664,14 @@
         "source": "Secondary Database",
         "status": "CI:-1",
         "stoichiometry": [
+            {
+                "charge": 1,
+                "coefficient": -1,
+                "compartment": 0,
+                "compound": "cpd00067",
+                "formula": "H",
+                "name": "H+"
+            },
             {
                 "charge": 1,
                 "coefficient": -1,
@@ -59703,14 +59711,6 @@
                 "compound": "cpd11420",
                 "formula": "C10H13N4O4R4S2",
                 "name": "trdox"
-            },
-            {
-                "charge": 1,
-                "coefficient": -1,
-                "compartment": 0,
-                "compound": "cpd00067",
-                "formula": "H",
-                "name": "H+"
             }
         ],
         "thermodynamics": {
@@ -59726,11 +59726,11 @@
         "aliases": null,
         "code": "(1) cpd11421[0] + (1) cpd15497[0] <=> (1) cpd00001[0] + (1) cpd00060[0] + (1) cpd11420[0]",
         "compound_ids": "cpd00001;cpd00060;cpd00067;cpd11420;cpd11421;cpd15497",
-        "definition": "(1) trdrd[0] + (1) L-methionine-R-sulfoxide[0] + (1) H+[0] <=> (1) H2O[0] + (1) L-Methionine[0] + (1) trdox[0]",
+        "definition": "(1) H+[0] + (1) trdrd[0] + (1) L-methionine-R-sulfoxide[0] <=> (1) H2O[0] + (1) L-Methionine[0] + (1) trdox[0]",
         "deltag": 10000000.0,
         "deltagerr": 10000000.0,
         "ec_numbers": null,
-        "equation": "(1) cpd11421[0] + (1) cpd15497[0] + (1) cpd00067[0] <=> (1) cpd00001[0] + (1) cpd00060[0] + (1) cpd11420[0]",
+        "equation": "(1) cpd00067[0] + (1) cpd11421[0] + (1) cpd15497[0] <=> (1) cpd00001[0] + (1) cpd00060[0] + (1) cpd11420[0]",
         "id": "rxn08919",
         "is_obsolete": 0,
         "is_transport": 0,
@@ -59746,6 +59746,14 @@
         "source": "Orphan",
         "status": "CI:-1",
         "stoichiometry": [
+            {
+                "charge": 1,
+                "coefficient": -1,
+                "compartment": 0,
+                "compound": "cpd00067",
+                "formula": "H",
+                "name": "H+"
+            },
             {
                 "charge": 1,
                 "coefficient": -1,
@@ -59785,14 +59793,6 @@
                 "compound": "cpd11420",
                 "formula": "C10H13N4O4R4S2",
                 "name": "trdox"
-            },
-            {
-                "charge": 1,
-                "coefficient": -1,
-                "compartment": 0,
-                "compound": "cpd00067",
-                "formula": "H",
-                "name": "H+"
             }
         ],
         "thermodynamics": {
@@ -61129,13 +61129,13 @@
             "metanetx.reaction: MNXR101628",
             "Name: murein lytic transglycosylase (murein3p3p)"
         ],
-        "code": "(1) cpd15501[0] <=> (2) cpd15397[0] + (1) cpd00001[0]",
+        "code": "(1) cpd15501[0] <=> (1) cpd00001[0] + (2) cpd15397[0]",
         "compound_ids": "cpd00001;cpd15397;cpd15501",
-        "definition": "(1) two linked disacharide tripeptide murein units (uncrosslinked, middle of chain)[0] <=> (2) N-Acetyl-D-glucosamine(anhydrous)N-Acetylmuramyl-tripeptide[0] + (1) H2O[0]",
+        "definition": "(1) two linked disacharide tripeptide murein units (uncrosslinked, middle of chain)[0] <=> (1) H2O[0] + (2) N-Acetyl-D-glucosamine(anhydrous)N-Acetylmuramyl-tripeptide[0]",
         "deltag": 10000000.0,
         "deltagerr": 10000000.0,
         "ec_numbers": null,
-        "equation": "(1) cpd15501[0] <=> (2) cpd15397[0] + (1) cpd00001[0]",
+        "equation": "(1) cpd15501[0] <=> (1) cpd00001[0] + (2) cpd15397[0]",
         "id": "rxn08939",
         "is_obsolete": 0,
         "is_transport": 0,
@@ -61162,20 +61162,20 @@
                 "name": "two linked disacharide tripeptide murein units (uncrosslinked, middle of chain)"
             },
             {
-                "charge": -2,
-                "coefficient": 2,
-                "compartment": 0,
-                "compound": "cpd15397",
-                "formula": "C34H52N6O19",
-                "name": "N-Acetyl-D-glucosamine(anhydrous)N-Acetylmuramyl-tripeptide"
-            },
-            {
                 "charge": 0,
                 "coefficient": 1,
                 "compartment": 0,
                 "compound": "cpd00001",
                 "formula": "H2O",
                 "name": "H2O"
+            },
+            {
+                "charge": -2,
+                "coefficient": 2,
+                "compartment": 0,
+                "compound": "cpd15397",
+                "formula": "C34H52N6O19",
+                "name": "N-Acetyl-D-glucosamine(anhydrous)N-Acetylmuramyl-tripeptide"
             }
         ],
         "thermodynamics": {
@@ -62400,13 +62400,13 @@
             "metanetx.reaction: MNXR135895",
             "Name: murein polymerizing transglycosylase"
         ],
-        "code": "(2) cpd03495[0] + (1) cpd00001[0] <=> (2) cpd02229[0] + (1) cpd15511[1]",
+        "code": "(1) cpd00001[0] + (2) cpd03495[0] <=> (2) cpd02229[0] + (1) cpd15511[1]",
         "compound_ids": "cpd00001;cpd02229;cpd03495;cpd15511",
-        "definition": "(2) Undecaprenyl-diphospho-N-acetylmuramoyl--N-acetylglucosamine-L-ala-D-glu-meso-2-6-diaminopimeloyl-D-ala-D-ala[0] + (1) H2O[0] <=> (2) Bactoprenyl diphosphate[0] + (1) two linked disacharide pentapeptide murein units (uncrosslinked, middle of chain)[1]",
+        "definition": "(1) H2O[0] + (2) Undecaprenyl-diphospho-N-acetylmuramoyl--N-acetylglucosamine-L-ala-D-glu-meso-2-6-diaminopimeloyl-D-ala-D-ala[0] <=> (2) Bactoprenyl diphosphate[0] + (1) two linked disacharide pentapeptide murein units (uncrosslinked, middle of chain)[1]",
         "deltag": 10000000.0,
         "deltagerr": 10000000.0,
         "ec_numbers": null,
-        "equation": "(2) cpd03495[0] + (1) cpd00001[0] <=> (2) cpd02229[0] + (1) cpd15511[1]",
+        "equation": "(1) cpd00001[0] + (2) cpd03495[0] <=> (2) cpd02229[0] + (1) cpd15511[1]",
         "id": "rxn08957",
         "is_obsolete": 0,
         "is_transport": 1,
@@ -62424,6 +62424,14 @@
         "source": "Secondary Database",
         "status": "OK",
         "stoichiometry": [
+            {
+                "charge": 0,
+                "coefficient": -1,
+                "compartment": 0,
+                "compound": "cpd00001",
+                "formula": "H2O",
+                "name": "H2O"
+            },
             {
                 "charge": -4,
                 "coefficient": -2,
@@ -62447,14 +62455,6 @@
                 "compound": "cpd15511",
                 "formula": "C80H126N16O43",
                 "name": "two linked disacharide pentapeptide murein units (uncrosslinked, middle of chain)"
-            },
-            {
-                "charge": 0,
-                "coefficient": -1,
-                "compartment": 0,
-                "compound": "cpd00001",
-                "formula": "H2O",
-                "name": "H2O"
             }
         ],
         "thermodynamics": {
@@ -62474,13 +62474,13 @@
             "metanetx.reaction: MNXR135896",
             "Name: murein polymerizing transglycosylase 2 (three linked units)"
         ],
-        "code": "(1) cpd03495[0] + (1) cpd15511[1] <=> (1) cpd02229[0] + (1) cpd15512[1] + (1) cpd00001[0]",
+        "code": "(1) cpd03495[0] + (1) cpd15511[1] <=> (1) cpd00001[0] + (1) cpd02229[0] + (1) cpd15512[1]",
         "compound_ids": "cpd00001;cpd02229;cpd03495;cpd15511;cpd15512",
-        "definition": "(1) Undecaprenyl-diphospho-N-acetylmuramoyl--N-acetylglucosamine-L-ala-D-glu-meso-2-6-diaminopimeloyl-D-ala-D-ala[0] + (1) two linked disacharide pentapeptide murein units (uncrosslinked, middle of chain)[1] <=> (1) Bactoprenyl diphosphate[0] + (1) three linked disacharide pentapeptide murein units (uncrosslinked, middle of chain)[1] + (1) H2O[0]",
+        "definition": "(1) Undecaprenyl-diphospho-N-acetylmuramoyl--N-acetylglucosamine-L-ala-D-glu-meso-2-6-diaminopimeloyl-D-ala-D-ala[0] + (1) two linked disacharide pentapeptide murein units (uncrosslinked, middle of chain)[1] <=> (1) H2O[0] + (1) Bactoprenyl diphosphate[0] + (1) three linked disacharide pentapeptide murein units (uncrosslinked, middle of chain)[1]",
         "deltag": 10000000.0,
         "deltagerr": 10000000.0,
         "ec_numbers": null,
-        "equation": "(1) cpd03495[0] + (1) cpd15511[1] <=> (1) cpd02229[0] + (1) cpd15512[1] + (1) cpd00001[0]",
+        "equation": "(1) cpd03495[0] + (1) cpd15511[1] <=> (1) cpd00001[0] + (1) cpd02229[0] + (1) cpd15512[1]",
         "id": "rxn08958",
         "is_obsolete": 0,
         "is_transport": 1,
@@ -62516,6 +62516,14 @@
                 "name": "two linked disacharide pentapeptide murein units (uncrosslinked, middle of chain)"
             },
             {
+                "charge": 0,
+                "coefficient": 1,
+                "compartment": 0,
+                "compound": "cpd00001",
+                "formula": "H2O",
+                "name": "H2O"
+            },
+            {
                 "charge": -2,
                 "coefficient": 1,
                 "compartment": 0,
@@ -62530,14 +62538,6 @@
                 "compound": "cpd15512",
                 "formula": "C120H186N24O63",
                 "name": "three linked disacharide pentapeptide murein units (uncrosslinked, middle of chain)"
-            },
-            {
-                "charge": 0,
-                "coefficient": 1,
-                "compartment": 0,
-                "compound": "cpd00001",
-                "formula": "H2O",
-                "name": "H2O"
             }
         ],
         "thermodynamics": {

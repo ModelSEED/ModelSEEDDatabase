@@ -26282,11 +26282,11 @@
         ],
         "code": "(2) cpd00017[0] + (1) cpd00084[0] + (1) cpd01311[0] <=> (1) cpd00035[0] + (2) cpd00060[0] + (1) cpd00104[0] + (2) cpd00438[0]",
         "compound_ids": "cpd00017;cpd00035;cpd00060;cpd00067;cpd00084;cpd00104;cpd00438;cpd01311",
-        "definition": "(2) S-Adenosyl-L-methionine[0] + (1) L-Cysteine[0] + (1) Dethiobiotin[0] + (1) H+[0] => (1) L-Alanine[0] + (2) L-Methionine[0] + (1) BIOT[0] + (2) Deoxyadenosine[0]",
+        "definition": "(2) S-Adenosyl-L-methionine[0] + (1) H+[0] + (1) L-Cysteine[0] + (1) Dethiobiotin[0] => (1) L-Alanine[0] + (2) L-Methionine[0] + (1) BIOT[0] + (2) Deoxyadenosine[0]",
         "deltag": -27.82,
         "deltagerr": 10.01,
         "ec_numbers": null,
-        "equation": "(2) cpd00017[0] + (1) cpd00084[0] + (1) cpd01311[0] + (1) cpd00067[0] => (1) cpd00035[0] + (2) cpd00060[0] + (1) cpd00104[0] + (2) cpd00438[0]",
+        "equation": "(2) cpd00017[0] + (1) cpd00067[0] + (1) cpd00084[0] + (1) cpd01311[0] => (1) cpd00035[0] + (2) cpd00060[0] + (1) cpd00104[0] + (2) cpd00438[0]",
         "id": "rxn13428",
         "is_obsolete": 0,
         "is_transport": 0,
@@ -26309,6 +26309,14 @@
                 "compound": "cpd00017",
                 "formula": "C15H23N6O5S",
                 "name": "S-Adenosyl-L-methionine"
+            },
+            {
+                "charge": 1,
+                "coefficient": -1,
+                "compartment": 0,
+                "compound": "cpd00067",
+                "formula": "H",
+                "name": "H+"
             },
             {
                 "charge": 0,
@@ -26357,14 +26365,6 @@
                 "compound": "cpd00438",
                 "formula": "C10H13N5O3",
                 "name": "Deoxyadenosine"
-            },
-            {
-                "charge": 1,
-                "coefficient": -1,
-                "compartment": 0,
-                "compound": "cpd00067",
-                "formula": "H",
-                "name": "H+"
             }
         ],
         "thermodynamics": {
@@ -38160,13 +38160,13 @@
             "metanetx.reaction: MNXR137604",
             "Name: murein polymerizing transglycosylase"
         ],
-        "code": "(2) cpd03495[0] + (1) cpd00001[0] <=> (2) cpd02229[1] + (1) cpd15511[1]",
+        "code": "(1) cpd00001[0] + (2) cpd03495[0] <=> (2) cpd02229[1] + (1) cpd15511[1]",
         "compound_ids": "cpd00001;cpd02229;cpd03495;cpd15511",
-        "definition": "(2) Undecaprenyl-diphospho-N-acetylmuramoyl--N-acetylglucosamine-L-ala-D-glu-meso-2-6-diaminopimeloyl-D-ala-D-ala[0] + (1) H2O[0] <=> (2) Bactoprenyl diphosphate[1] + (1) two linked disacharide pentapeptide murein units (uncrosslinked, middle of chain)[1]",
+        "definition": "(1) H2O[0] + (2) Undecaprenyl-diphospho-N-acetylmuramoyl--N-acetylglucosamine-L-ala-D-glu-meso-2-6-diaminopimeloyl-D-ala-D-ala[0] <=> (2) Bactoprenyl diphosphate[1] + (1) two linked disacharide pentapeptide murein units (uncrosslinked, middle of chain)[1]",
         "deltag": 10000000.0,
         "deltagerr": 10000000.0,
         "ec_numbers": null,
-        "equation": "(2) cpd03495[0] + (1) cpd00001[0] <=> (2) cpd02229[1] + (1) cpd15511[1]",
+        "equation": "(1) cpd00001[0] + (2) cpd03495[0] <=> (2) cpd02229[1] + (1) cpd15511[1]",
         "id": "rxn13645",
         "is_obsolete": 0,
         "is_transport": 1,
@@ -38185,6 +38185,14 @@
         "source": "Secondary Database",
         "status": "OK",
         "stoichiometry": [
+            {
+                "charge": 0,
+                "coefficient": -1,
+                "compartment": 0,
+                "compound": "cpd00001",
+                "formula": "H2O",
+                "name": "H2O"
+            },
             {
                 "charge": -4,
                 "coefficient": -2,
@@ -38208,14 +38216,6 @@
                 "compound": "cpd15511",
                 "formula": "C80H126N16O43",
                 "name": "two linked disacharide pentapeptide murein units (uncrosslinked, middle of chain)"
-            },
-            {
-                "charge": 0,
-                "coefficient": -1,
-                "compartment": 0,
-                "compound": "cpd00001",
-                "formula": "H2O",
-                "name": "H2O"
             }
         ],
         "thermodynamics": {
@@ -41612,11 +41612,11 @@
         ],
         "code": "(1) cpd11595[0] + (1.5) cpd17026[1] <=> (1) cpd00001[0] + (1) cpd17003[0] + (1.5) cpd17027[1]",
         "compound_ids": "cpd00001;cpd00067;cpd11595;cpd17003;cpd17026;cpd17027",
-        "definition": "(1) chromate[0] + (1.5) methymenaquinol 7[1] + (2) H+[0] <=> (1) H2O[0] + (1) Cr(OH)3[0] + (1.5) methylmenaquinone 7[1]",
+        "definition": "(2) H+[0] + (1) chromate[0] + (1.5) methymenaquinol 7[1] <=> (1) H2O[0] + (1) Cr(OH)3[0] + (1.5) methylmenaquinone 7[1]",
         "deltag": 10000000.0,
         "deltagerr": 10000000.0,
         "ec_numbers": null,
-        "equation": "(1) cpd11595[0] + (1.5) cpd17026[1] + (2) cpd00067[0] <=> (1) cpd00001[0] + (1) cpd17003[0] + (1.5) cpd17027[1]",
+        "equation": "(2) cpd00067[0] + (1) cpd11595[0] + (1.5) cpd17026[1] <=> (1) cpd00001[0] + (1) cpd17003[0] + (1.5) cpd17027[1]",
         "id": "rxn13684",
         "is_obsolete": 0,
         "is_transport": 1,
@@ -41632,6 +41632,14 @@
         "source": "Secondary Database",
         "status": "CI:-2",
         "stoichiometry": [
+            {
+                "charge": 1,
+                "coefficient": -2,
+                "compartment": 0,
+                "compound": "cpd00067",
+                "formula": "H",
+                "name": "H+"
+            },
             {
                 "charge": 0,
                 "coefficient": -1,
@@ -41671,14 +41679,6 @@
                 "compound": "cpd17027",
                 "formula": "C47H66O2",
                 "name": "methylmenaquinone 7"
-            },
-            {
-                "charge": 1,
-                "coefficient": -2,
-                "compartment": 0,
-                "compound": "cpd00067",
-                "formula": "H",
-                "name": "H+"
             }
         ],
         "thermodynamics": {
@@ -48720,20 +48720,20 @@
                 "name": "O2"
             },
             {
-                "charge": -1,
-                "coefficient": 1,
-                "compartment": 0,
-                "compound": "cpd00003",
-                "formula": "C21H26N7O14P2",
-                "name": "NAD"
-            },
-            {
                 "charge": 1,
                 "coefficient": -1,
                 "compartment": 0,
                 "compound": "cpd00067",
                 "formula": "H",
                 "name": "H+"
+            },
+            {
+                "charge": -1,
+                "coefficient": 1,
+                "compartment": 0,
+                "compound": "cpd00003",
+                "formula": "C21H26N7O14P2",
+                "name": "NAD"
             },
             {
                 "charge": -1,
@@ -55857,11 +55857,11 @@
         ],
         "code": "(1) cpd00043[0] + (1) cpd17059[0] <=> (1) cpd00014[0] + (1) cpd17060[0]",
         "compound_ids": "cpd00014;cpd00043;cpd00067;cpd17059;cpd17060",
-        "definition": "(1) UDP-galactose[0] + (1) Pseudomonas aeruginosa LPS core precursor 2+KDO2-lipidA[0] + (1) H+[0] <=> (1) UDP[0] + (1) Pseudomonas aeruginosa LPS core precursor 3+KDO2-lipidA[0]",
+        "definition": "(1) UDP-galactose[0] + (1) H+[0] + (1) Pseudomonas aeruginosa LPS core precursor 2+KDO2-lipidA[0] <=> (1) UDP[0] + (1) Pseudomonas aeruginosa LPS core precursor 3+KDO2-lipidA[0]",
         "deltag": 10000000.0,
         "deltagerr": 10000000.0,
         "ec_numbers": null,
-        "equation": "(1) cpd00043[0] + (1) cpd17059[0] + (1) cpd00067[0] <=> (1) cpd00014[0] + (1) cpd17060[0]",
+        "equation": "(1) cpd00043[0] + (1) cpd00067[0] + (1) cpd17059[0] <=> (1) cpd00014[0] + (1) cpd17060[0]",
         "id": "rxn13866",
         "is_obsolete": 0,
         "is_transport": 0,
@@ -55886,6 +55886,14 @@
                 "name": "UDP-galactose"
             },
             {
+                "charge": 1,
+                "coefficient": -1,
+                "compartment": 0,
+                "compound": "cpd00067",
+                "formula": "H",
+                "name": "H+"
+            },
+            {
                 "charge": 0,
                 "coefficient": -1,
                 "compartment": 0,
@@ -55908,14 +55916,6 @@
                 "compound": "cpd17060",
                 "formula": "C116H205N2O56P2",
                 "name": "Pseudomonas aeruginosa LPS core precursor 3+KDO2-lipidA"
-            },
-            {
-                "charge": 1,
-                "coefficient": -1,
-                "compartment": 0,
-                "compound": "cpd00067",
-                "formula": "H",
-                "name": "H+"
             }
         ],
         "thermodynamics": {
@@ -55935,11 +55935,11 @@
         ],
         "code": "(3) cpd00026[0] + (1) cpd17060[0] <=> (3) cpd00014[0] + (1) cpd17061[0]",
         "compound_ids": "cpd00014;cpd00026;cpd00067;cpd17060;cpd17061",
-        "definition": "(3) UDP-glucose[0] + (1) Pseudomonas aeruginosa LPS core precursor 3+KDO2-lipidA[0] + (3) H+[0] <=> (3) UDP[0] + (1) Pseudomonas aeruginosa LPS core precursor 4+KDO2-lipidA[0]",
+        "definition": "(3) UDP-glucose[0] + (3) H+[0] + (1) Pseudomonas aeruginosa LPS core precursor 3+KDO2-lipidA[0] <=> (3) UDP[0] + (1) Pseudomonas aeruginosa LPS core precursor 4+KDO2-lipidA[0]",
         "deltag": 10000000.0,
         "deltagerr": 10000000.0,
         "ec_numbers": null,
-        "equation": "(3) cpd00026[0] + (1) cpd17060[0] + (3) cpd00067[0] <=> (3) cpd00014[0] + (1) cpd17061[0]",
+        "equation": "(3) cpd00026[0] + (3) cpd00067[0] + (1) cpd17060[0] <=> (3) cpd00014[0] + (1) cpd17061[0]",
         "id": "rxn13867",
         "is_obsolete": 0,
         "is_transport": 0,
@@ -55964,6 +55964,14 @@
                 "name": "UDP-glucose"
             },
             {
+                "charge": 1,
+                "coefficient": -3,
+                "compartment": 0,
+                "compound": "cpd00067",
+                "formula": "H",
+                "name": "H+"
+            },
+            {
                 "charge": 0,
                 "coefficient": -1,
                 "compartment": 0,
@@ -55986,14 +55994,6 @@
                 "compound": "cpd17061",
                 "formula": "C134H238N2O71P2",
                 "name": "Pseudomonas aeruginosa LPS core precursor 4+KDO2-lipidA"
-            },
-            {
-                "charge": 1,
-                "coefficient": -3,
-                "compartment": 0,
-                "compound": "cpd00067",
-                "formula": "H",
-                "name": "H+"
             }
         ],
         "thermodynamics": {
@@ -56013,11 +56013,11 @@
         ],
         "code": "(2) cpd02113[0] + (1) cpd17061[0] <=> (2) cpd00297[0] + (1) cpd17062[0]",
         "compound_ids": "cpd00067;cpd00297;cpd02113;cpd17061;cpd17062",
-        "definition": "(2) dTDP-rhamnose[0] + (1) Pseudomonas aeruginosa LPS core precursor 4+KDO2-lipidA[0] + (2) H+[0] <=> (2) dTDP[0] + (1) Pseudomonas aeruginosa LPS core precursor 5+KDO2-lipidA[0]",
+        "definition": "(2) H+[0] + (2) dTDP-rhamnose[0] + (1) Pseudomonas aeruginosa LPS core precursor 4+KDO2-lipidA[0] <=> (2) dTDP[0] + (1) Pseudomonas aeruginosa LPS core precursor 5+KDO2-lipidA[0]",
         "deltag": 10000000.0,
         "deltagerr": 10000000.0,
         "ec_numbers": null,
-        "equation": "(2) cpd02113[0] + (1) cpd17061[0] + (2) cpd00067[0] <=> (2) cpd00297[0] + (1) cpd17062[0]",
+        "equation": "(2) cpd00067[0] + (2) cpd02113[0] + (1) cpd17061[0] <=> (2) cpd00297[0] + (1) cpd17062[0]",
         "id": "rxn13868",
         "is_obsolete": 0,
         "is_transport": 0,
@@ -56033,6 +56033,14 @@
         "source": "Secondary Database",
         "status": "CI:-2",
         "stoichiometry": [
+            {
+                "charge": 1,
+                "coefficient": -2,
+                "compartment": 0,
+                "compound": "cpd00067",
+                "formula": "H",
+                "name": "H+"
+            },
             {
                 "charge": -2,
                 "coefficient": -2,
@@ -56064,14 +56072,6 @@
                 "compound": "cpd17062",
                 "formula": "C146H260N2O79P2",
                 "name": "Pseudomonas aeruginosa LPS core precursor 5+KDO2-lipidA"
-            },
-            {
-                "charge": 1,
-                "coefficient": -2,
-                "compartment": 0,
-                "compound": "cpd00067",
-                "formula": "H",
-                "name": "H+"
             }
         ],
         "thermodynamics": {
@@ -56091,11 +56091,11 @@
         ],
         "code": "(1) cpd00026[0] + (1) cpd17062[0] <=> (1) cpd00014[0] + (1) cpd17063[0]",
         "compound_ids": "cpd00014;cpd00026;cpd00067;cpd17062;cpd17063",
-        "definition": "(1) UDP-glucose[0] + (1) Pseudomonas aeruginosa LPS core precursor 5+KDO2-lipidA[0] + (1) H+[0] <=> (1) UDP[0] + (1) Pseudomonas aeruginosa LPS core precursor 6+KDO2-lipidA[0]",
+        "definition": "(1) UDP-glucose[0] + (1) H+[0] + (1) Pseudomonas aeruginosa LPS core precursor 5+KDO2-lipidA[0] <=> (1) UDP[0] + (1) Pseudomonas aeruginosa LPS core precursor 6+KDO2-lipidA[0]",
         "deltag": 10000000.0,
         "deltagerr": 10000000.0,
         "ec_numbers": null,
-        "equation": "(1) cpd00026[0] + (1) cpd17062[0] + (1) cpd00067[0] <=> (1) cpd00014[0] + (1) cpd17063[0]",
+        "equation": "(1) cpd00026[0] + (1) cpd00067[0] + (1) cpd17062[0] <=> (1) cpd00014[0] + (1) cpd17063[0]",
         "id": "rxn13869",
         "is_obsolete": 0,
         "is_transport": 0,
@@ -56120,6 +56120,14 @@
                 "name": "UDP-glucose"
             },
             {
+                "charge": 1,
+                "coefficient": -1,
+                "compartment": 0,
+                "compound": "cpd00067",
+                "formula": "H",
+                "name": "H+"
+            },
+            {
                 "charge": 0,
                 "coefficient": -1,
                 "compartment": 0,
@@ -56142,14 +56150,6 @@
                 "compound": "cpd17063",
                 "formula": "C152H271N2O84P2",
                 "name": "Pseudomonas aeruginosa LPS core precursor 6+KDO2-lipidA"
-            },
-            {
-                "charge": 1,
-                "coefficient": -1,
-                "compartment": 0,
-                "compound": "cpd00067",
-                "formula": "H",
-                "name": "H+"
             }
         ],
         "thermodynamics": {
@@ -61258,13 +61258,13 @@
             "metanetx.reaction: MNXR135895",
             "Name: murein polymerizing transglycosylase"
         ],
-        "code": "(2) cpd03495[0] + (1) cpd00001[0] <=> (2) cpd02229[0] + (1) cpd15511[1]",
+        "code": "(1) cpd00001[0] + (2) cpd03495[0] <=> (2) cpd02229[0] + (1) cpd15511[1]",
         "compound_ids": "cpd00001;cpd02229;cpd03495;cpd15511",
-        "definition": "(2) Undecaprenyl-diphospho-N-acetylmuramoyl--N-acetylglucosamine-L-ala-D-glu-meso-2-6-diaminopimeloyl-D-ala-D-ala[0] + (1) H2O[0] <=> (2) Bactoprenyl diphosphate[0] + (1) two linked disacharide pentapeptide murein units (uncrosslinked, middle of chain)[1]",
+        "definition": "(1) H2O[0] + (2) Undecaprenyl-diphospho-N-acetylmuramoyl--N-acetylglucosamine-L-ala-D-glu-meso-2-6-diaminopimeloyl-D-ala-D-ala[0] <=> (2) Bactoprenyl diphosphate[0] + (1) two linked disacharide pentapeptide murein units (uncrosslinked, middle of chain)[1]",
         "deltag": 10000000.0,
         "deltagerr": 10000000.0,
         "ec_numbers": null,
-        "equation": "(2) cpd03495[0] + (1) cpd00001[0] <=> (2) cpd02229[0] + (1) cpd15511[1]",
+        "equation": "(1) cpd00001[0] + (2) cpd03495[0] <=> (2) cpd02229[0] + (1) cpd15511[1]",
         "id": "rxn13936",
         "is_obsolete": 1,
         "is_transport": 1,
@@ -61283,6 +61283,14 @@
         "source": "Secondary Database",
         "status": "OK",
         "stoichiometry": [
+            {
+                "charge": 0,
+                "coefficient": -1,
+                "compartment": 0,
+                "compound": "cpd00001",
+                "formula": "H2O",
+                "name": "H2O"
+            },
             {
                 "charge": -4,
                 "coefficient": -2,
@@ -61306,14 +61314,6 @@
                 "compound": "cpd15511",
                 "formula": "C80H126N16O43",
                 "name": "two linked disacharide pentapeptide murein units (uncrosslinked, middle of chain)"
-            },
-            {
-                "charge": 0,
-                "coefficient": -1,
-                "compartment": 0,
-                "compound": "cpd00001",
-                "formula": "H2O",
-                "name": "H2O"
             }
         ],
         "thermodynamics": {
@@ -62067,13 +62067,13 @@
             "metanetx.reaction: MNXR135895",
             "Name: murein polymerizing transglycosylase"
         ],
-        "code": "(2) cpd03495[0] + (1) cpd00001[0] <=> (2) cpd02229[0] + (1) cpd15511[1]",
+        "code": "(1) cpd00001[0] + (2) cpd03495[0] <=> (2) cpd02229[0] + (1) cpd15511[1]",
         "compound_ids": "cpd00001;cpd02229;cpd03495;cpd15511",
-        "definition": "(2) Undecaprenyl-diphospho-N-acetylmuramoyl--N-acetylglucosamine-L-ala-D-glu-meso-2-6-diaminopimeloyl-D-ala-D-ala[0] + (1) H2O[0] <=> (2) Bactoprenyl diphosphate[0] + (1) two linked disacharide pentapeptide murein units (uncrosslinked, middle of chain)[1]",
+        "definition": "(1) H2O[0] + (2) Undecaprenyl-diphospho-N-acetylmuramoyl--N-acetylglucosamine-L-ala-D-glu-meso-2-6-diaminopimeloyl-D-ala-D-ala[0] <=> (2) Bactoprenyl diphosphate[0] + (1) two linked disacharide pentapeptide murein units (uncrosslinked, middle of chain)[1]",
         "deltag": 10000000.0,
         "deltagerr": 10000000.0,
         "ec_numbers": null,
-        "equation": "(2) cpd03495[0] + (1) cpd00001[0] <=> (2) cpd02229[0] + (1) cpd15511[1]",
+        "equation": "(1) cpd00001[0] + (2) cpd03495[0] <=> (2) cpd02229[0] + (1) cpd15511[1]",
         "id": "rxn13946",
         "is_obsolete": 1,
         "is_transport": 1,
@@ -62092,6 +62092,14 @@
         "source": "Secondary Database",
         "status": "OK",
         "stoichiometry": [
+            {
+                "charge": 0,
+                "coefficient": -1,
+                "compartment": 0,
+                "compound": "cpd00001",
+                "formula": "H2O",
+                "name": "H2O"
+            },
             {
                 "charge": -4,
                 "coefficient": -2,
@@ -62115,14 +62123,6 @@
                 "compound": "cpd15511",
                 "formula": "C80H126N16O43",
                 "name": "two linked disacharide pentapeptide murein units (uncrosslinked, middle of chain)"
-            },
-            {
-                "charge": 0,
-                "coefficient": -1,
-                "compartment": 0,
-                "compound": "cpd00001",
-                "formula": "H2O",
-                "name": "H2O"
             }
         ],
         "thermodynamics": {
@@ -66307,11 +66307,11 @@
         ],
         "code": "(1) cpd17156[0] <=> (1) cpd16529[0]",
         "compound_ids": "cpd00067;cpd16529;cpd17156",
-        "definition": "(1) Cinchonidinone[0] <=> (1) Cinchoninone[0] + (1) H+[0]",
+        "definition": "(1) Cinchonidinone[0] <=> (1) H+[0] + (1) Cinchoninone[0]",
         "deltag": 0.0,
         "deltagerr": 0.0,
         "ec_numbers": null,
-        "equation": "(1) cpd17156[0] <=> (1) cpd16529[0] + (1) cpd00067[0]",
+        "equation": "(1) cpd17156[0] <=> (1) cpd00067[0] + (1) cpd16529[0]",
         "id": "rxn13997",
         "is_obsolete": 0,
         "is_transport": 0,
@@ -66340,17 +66340,17 @@
                 "charge": 1,
                 "coefficient": 1,
                 "compartment": 0,
-                "compound": "cpd16529",
-                "formula": "C19H20N2O",
-                "name": "Cinchoninone"
+                "compound": "cpd00067",
+                "formula": "H",
+                "name": "H+"
             },
             {
                 "charge": 1,
                 "coefficient": 1,
                 "compartment": 0,
-                "compound": "cpd00067",
-                "formula": "H",
-                "name": "H+"
+                "compound": "cpd16529",
+                "formula": "C19H20N2O",
+                "name": "Cinchoninone"
             }
         ],
         "thermodynamics": {
