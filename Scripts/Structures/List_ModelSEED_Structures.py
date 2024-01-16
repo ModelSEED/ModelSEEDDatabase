@@ -4,6 +4,9 @@ import sys
 import json
 import glob
 
+#################################################################
+## Load Compound Objects into memory
+#################################################################
 sys.path.append('../../Libs/Python')
 from BiochemPy import Compounds
 
@@ -11,331 +14,511 @@ from BiochemPy import Compounds
 CompoundsHelper = Compounds()
 Compounds_Dict = CompoundsHelper.loadCompounds()
 
+#################################################################
+## Load Formula Strings from file
+#################################################################
+
 Structures_Root=os.path.dirname(__file__)+"/../../Biochemistry/Structures/"
 Formulas_Dict=dict()
 for source in "KEGG","MetaCyc","ChEBI","Rhea":
-	if(source not in Formulas_Dict):
-		Formulas_Dict[source]=dict()
+    if(source not in Formulas_Dict):
+        Formulas_Dict[source]=dict()
 
-	for struct_type in "InChI","SMILE":
-		if(struct_type not in Formulas_Dict[source]):
-			Formulas_Dict[source][struct_type]=dict()
+    for struct_type in "InChI","SMILE":
+        if(struct_type not in Formulas_Dict[source]):
+            Formulas_Dict[source][struct_type]=dict()
 
-		for struct_stage in "Charged","Original":
-			if(struct_stage not in Formulas_Dict[source][struct_type]):
-				Formulas_Dict[source][struct_type][struct_stage]=dict()
+        for struct_stage in "Charged","Original":
+            if(struct_stage not in Formulas_Dict[source][struct_type]):
+                Formulas_Dict[source][struct_type][struct_stage]=dict()
 
-			file_name=Structures_Root+source+"/"+struct_type+"_"+struct_stage+"_Formulas_Charges.txt"
-			with open(file_name) as file_handle:
-				for line in file_handle.readlines():
-					line=line.strip()
-					array=line.split('\t')
-					Formulas_Dict[source][struct_type][struct_stage][array[0]]={'formula':array[1],'charge':array[2]}
+            file_name=Structures_Root+source+"/"+struct_type+"_"+struct_stage+"_Formulas_Charges.txt"
+            with open(file_name) as file_handle:
+                for line in file_handle.readlines():
+                    line=line.strip()
+                    array=line.split('\t')
+                    Formulas_Dict[source][struct_type][struct_stage][array[0]]={'formula':array[1],'charge':array[2]}
+
+#################################################################
+## Load Curated Picks for Structures
+#################################################################
 
 #Load Curated Structures
-ignored_structures=list()
+Ignored_Structures=dict()
 for file in glob.glob(Structures_Root+"Curation/*.txt"):
-	with open(file) as ignore_file:
-		for line in ignore_file.readlines():
-			line=line.strip('\r\n')
-			tmp_list=line.split('\t')
-			ignored_structures.append(tmp_list[0])
+    with open(file) as ignore_file:
+        for line in ignore_file.readlines():
+            array=line.split('\t')
+            Ignored_Structures[array[0]]=1
 
-#Load Previous Unique Structures
-previous_structures=dict()
-file = Structures_Root+"Unique_ModelSEED_Structures.txt"
-with open(file) as us_fh:
-	for line in us_fh.readlines():
-		line=line.strip('\r\n')
-		tmp_list = line.split('\t')
-		if(tmp_list[0] not in previous_structures):
-			previous_structures[tmp_list[0]]={'formula':tmp_list[3],'charge':tmp_list[4]}
+#################################################################
+## Load Structures and Aliases
+#################################################################
 
 #Load Structures and Aliases
 Structures_Dict = CompoundsHelper.loadStructures(["SMILE","InChIKey","InChI"],["KEGG","MetaCyc","ChEBI","Rhea"])
 MS_Aliases_Dict =  CompoundsHelper.loadMSAliases(["KEGG","MetaCyc","ChEBI","Rhea"])
+
+#################################################################
+## Open filehandles for writing
+#################################################################
 
 master_structs_file = open(Structures_Root+"All_ModelSEED_Structures.txt",'w')
 unique_structs_file = open(Structures_Root+"Unique_ModelSEED_Structures.txt",'w')
 unique_structs_file.write("ID\tType\tAliases\tFormula\tCharge\tStructure\n")
 structure_conflicts_file = open("Structure_Conflicts.txt",'w')
 formula_conflicts_file = open("Formula_Conflicts.txt",'w')
+
+#################################################################
+## Iterate through ModelSEED identifiers
+#################################################################
+
 for msid in sorted(MS_Aliases_Dict.keys()):
 
-	#Build collection of all structures for the ModelSEED ID
-	Structs = dict()
-	Formulas=dict()
-	for source in 'KEGG','MetaCyc','ChEBI','Rhea':
-		if(source not in MS_Aliases_Dict[msid].keys()):
-			continue
+    #################################################################
+    ## For the ModelSEED compound build dict of all structures
+    #################################################################
 
-		for struct_type in sorted(Structures_Dict.keys()):
-			for external_id in sorted(MS_Aliases_Dict[msid][source]):
-				if(external_id not in Structures_Dict[struct_type]):
-					continue
+    Structs = dict()
+    Formulas=dict()
+    for source in 'KEGG','MetaCyc','ChEBI','Rhea':
+        if(source not in MS_Aliases_Dict[msid].keys()):
+            continue
 
-				for struct_stage in sorted(Structures_Dict[struct_type][external_id].keys()):
-					if(struct_type not in Structs):
-						Structs[struct_type]=dict()
-						Formulas[struct_type]=dict()
+        #################################################################
+        ## Iterate through types, sources, ids
+        #################################################################
 
-					if(struct_stage not in Structs[struct_type]):
-						Structs[struct_type][struct_stage]=dict()
-						Formulas[struct_type][struct_stage]=dict()
+        for struct_type in sorted(Structures_Dict.keys()):
+            for external_id in sorted(MS_Aliases_Dict[msid][source]):
+                if(external_id not in Structures_Dict[struct_type]):
+                    continue
 
-					for structure in sorted(Structures_Dict[struct_type][external_id][struct_stage].keys()):
+                for struct_stage in sorted(Structures_Dict[struct_type][external_id].keys()):
+                    if(struct_type not in Structs):
+                        Structs[struct_type]=dict()
+                        Formulas[struct_type]=dict()
 
-						formula_charge_dict={'formula':"null",'charge':"null"}
+                    if(struct_stage not in Structs[struct_type]):
+                        Structs[struct_type][struct_stage]=dict()
+                        Formulas[struct_type][struct_stage]=dict()
 
-						if(struct_type in Formulas_Dict[source] and external_id in Formulas_Dict[source][struct_type][struct_stage]):
-							formula_charge_dict = Formulas_Dict[source][struct_type][struct_stage][external_id]
+                    for structure in sorted(Structures_Dict[struct_type][external_id][struct_stage].keys()):
 
-						#Write to master
-						master_structs_file.write("\t".join([msid,struct_type,struct_stage,external_id,source,\
-																 formula_charge_dict['formula'],\
-																 formula_charge_dict['charge'],\
-																 structure])+"\n")
+                        formula_charge_dict={'formula':"null",'charge':"null"}
 
-						if(external_id in ignored_structures):
-							continue
+                        if(struct_type in Formulas_Dict[source] and external_id in Formulas_Dict[source][struct_type][struct_stage]):
+                            formula_charge_dict = Formulas_Dict[source][struct_type][struct_stage][external_id]
 
-						if(structure not in Structs[struct_type][struct_stage]):
-							Structs[struct_type][struct_stage][structure]=dict()
-						Structs[struct_type][struct_stage][structure][external_id]=source
+                        #################################################################
+                        ## Write all structures to master 'All_ModelSEED_Strutures.txt'
+                        #################################################################
 
-						formula_charge_json = json.dumps(formula_charge_dict)
-						if(formula_charge_json not in Formulas[struct_type][struct_stage]):
-							Formulas[struct_type][struct_stage][formula_charge_json]=dict()
-						Formulas[struct_type][struct_stage][formula_charge_json][external_id]=source
+                        master_structs_file.write("\t".join([msid,struct_type,struct_stage,external_id,source,\
+                                                                 formula_charge_dict['formula'],\
+                                                                 formula_charge_dict['charge'],\
+                                                                 structure])+"\n")
+                        
+                        #################################################################
+                        ## Skip if curated structure designated to be ignored
+                        #################################################################
 
-	if(len(Structs.keys())==0):
-		continue
+                        if(external_id in Ignored_Structures):
+                            continue
 
-	#Priority is:
-	#Charged InChI
-	#Original InChI
-	#Charged SMILE
-	#Original SMILE
+                        #################################################################
+                        ## Populate structures dictionary
+                        #################################################################
 
-	struct_type=None
-	struct_stage=None
-	if("InChI" in Structs):
-		struct_type="InChI"
-		if("Charged" in Structs[struct_type]):
-			struct_stage="Charged"
-		elif("Original" in Structs[struct_type]):
-			struct_stage="Original"
-	elif("SMILE" in Structs):
-		struct_type="SMILE"
-		if("Charged" in Structs[struct_type]):
-			struct_stage="Charged"
-		elif("Original" in Structs[struct_type]):
-			struct_stage="Original"
+                        if(structure not in Structs[struct_type][struct_stage]):
+                            Structs[struct_type][struct_stage][structure]=dict()
+                        Structs[struct_type][struct_stage][structure][external_id]=source
 
-	if(struct_type is None or struct_stage is None):
-		#At time of writing, this doesn't happen
-		print("Warning: no structures used for "+msid)
-		continue
+                        formula_charge_json = json.dumps(formula_charge_dict)
+                        if(formula_charge_json not in Formulas[struct_type][struct_stage]):
+                            Formulas[struct_type][struct_stage][formula_charge_json]=dict()
+                        Formulas[struct_type][struct_stage][formula_charge_json][external_id]=source
+                        
+    #################################################################
+    ## Skip if no structures were collected
+    #################################################################
 
-	struct_pass=0
-	struct_conflict=0
-	formula_conflict=0
-	if(len(Structs[struct_type][struct_stage].keys())==1):
-		struct_pass=1
-	elif(len(Formulas[struct_type][struct_stage].keys())==1):
-		struct_conflict=1
-		struct_pass=1
-	else:
-		struct_conflict=1
-		formula_conflict=1
-		pass
+    if(len(Structs.keys())==0):
+        continue
+    
+    #################################################################
+    ## Prioritized which type and stage for the structure for comparison
+    ## Priority Order is:
+    ## 1) Charged InChI
+    ## 2) Original InChI
+    ## 3) Charged SMILE
+    ## 4) Original SMILE
+    #################################################################
 
-	prev_struct=0
-	if(msid in previous_structures and struct_pass==0):
-		print("Warning: prior accepted structure now has new variants: "+msid+" ("+struct_type+"/"+struct_stage+")")
-		print(previous_structures[msid])
-		struct_pass=1
-		prev_struct=1
+    struct_type=None
+    struct_stage=None
+    if("InChI" in Structs):
+        struct_type="InChI"
+        if("Charged" in Structs[struct_type]):
+            struct_stage="Charged"
+        elif("Original" in Structs[struct_type]):
+            struct_stage="Original"
+    elif("SMILE" in Structs):
+        struct_type="SMILE"
+        if("Charged" in Structs[struct_type]):
+            struct_stage="Charged"
+        elif("Original" in Structs[struct_type]):
+            struct_stage="Original"
 
-	if(struct_pass):
-		
-		formula_charge_dict = dict()
-		#Only one formula/charge combination possible here
-		if(prev_struct==1):
-			formula_charge_dict=previous_structures[msid]
-		else:
-			formula_charge_dict=json.loads(list(Formulas[struct_type][struct_stage].keys())[0])
+    if(struct_type is None or struct_stage is None):
+        #At time of writing, this doesn't happen
+        print("Warning: no structures used for "+msid)
+        continue
+                            
+    #################################################################
+    ## Now the prioritized type and stage has been established
+    ## We look to see whether or not they have the same structure
+    ## from different sources
+    ##
+    ## If there's only one structure string, or there's multiple
+    ## structure strings that have the same formula, the structure
+    ## Is considered a 'pass' NB: This will be re-written
+    ## To accomodate for differing protonation states being depicted
+    ## as charges
+    #################################################################
 
-		#If there are structural conflicts we will collect the ids and strings and establish rules
-		#But if there isn't a structural conflict, we will use the one
-		if(struct_conflict == 0):
+    struct_pass=0
+    struct_conflict=0
+    formula_conflict=0
+    if(len(Structs[struct_type][struct_stage].keys())==1):
+        struct_pass=1
+    elif(len(Formulas[struct_type][struct_stage].keys())==1):
+        struct_conflict=1
+        struct_pass=1
+    else:
+        struct_conflict=1
+        formula_conflict=1
+        pass
+                            
+    #################################################################
+    ## Here on, we consider the structure(s) in general for a
+    ## ModelSEED compound to be unique to that compound though
+    ## they may vary if there's still a conflict.
+    ## The code in this section describes how we
+    ## might 'pick' a structure.
+    #################################################################
 
-			#In order to replicate, print SMILE, InChIKey, InChI in order
-			for structure_type in "SMILE","InChIKey","InChI":
-				if(structure_type not in Structs):
-					continue
+    if(struct_pass):
 
-				aliases=dict()
-				
-				# Even though there is one standardized InChI structure, there's a chance of multiple SMILES
-				# So we "choose" a structure, but collect all aliases in case
-				structure = sorted(Structs[structure_type][struct_stage].keys())[0]
-				for struct in Structs[structure_type][struct_stage].keys():
-					for alias in Structs[structure_type][struct_stage][struct]:
-						aliases[alias]=1
+        #################################################################
+        ## The formula is considered to be identical across structures
+        ## But we've recently found this isn't always the case with some
+        ## protonated alcohol groups
+        #################################################################
 
-				unique_structs_file.write("\t".join((msid,\
-														 structure_type,\
-														 ";".join(sorted(aliases)),\
-														 formula_charge_dict['formula'],\
-														 formula_charge_dict['charge'],\
-														 structure))+"\n")
+        #Only one formula/charge combination possible here
+        formula_charge_dict=json.loads(list(Formulas[struct_type][struct_stage].keys())[0])
+        
+        #################################################################
+        ## If there are no structural conflicts then all the structures
+        ## are identical and we pick one
+        #################################################################
 
-		else:
-			struct_conflicts = dict()
-			sources_structures=dict()
-			#First decide on source and alias before printing, decision made with either InChI or SMILE alone
-			for structure_type in "InChIKey","SMILE":
-				if(structure_type not in Structs):
-					continue
+        if(struct_conflict == 0):
 
-				for structure in Structs[structure_type][struct_stage]:
-					for alias in Structs[structure_type][struct_stage][structure]:
-						source = Structs[structure_type][struct_stage][structure][alias]
-						if(structure not in struct_conflicts):
-							struct_conflicts[structure]=dict()
-						if(source not in struct_conflicts):
-							struct_conflicts[structure][source]=dict()
-						struct_conflicts[structure][source][alias]=1
-						if(source not in sources_structures):
-							sources_structures[source]=dict()
-						sources_structures[source][structure]=1
+            #################################################################
+            ## Iterate through the types for writing to file
+            ## Keeping order consistent but it doesn't matter which
+            #################################################################
 
-				if(len(struct_conflicts)>0):
-					break
-			
-			chosen_structure = None
+            for structure_type in "SMILE","InChIKey","InChI":
+                if(structure_type not in Structs):
+                    continue
 
-			#Choose structure that is entirely identical from multiple sources
-			#(indicates incorrect merger of additional id from same source)
-			#At time of writing, there's two modelseed compounds that have more than
-			#one structure with multiple sources, attempt to choose the ones that have
-			#stereochemistry
-			chosen_structures=dict()
-			for structure in struct_conflicts:
-				if(len(struct_conflicts[structure])>1):
-					chosen_structures[structure]=1
+                #################################################################
+                ## Even though there is one standardized InChI structure
+                ## There can be more than one SMILE so here we choose one 
+                #################################################################
 
-			if(len(chosen_structures)>0):
-				if(len(chosen_structures)==1):
-					chosen_structure = list(chosen_structures.keys())[0]
-				else:
-					for structure in chosen_structures:
-						#Avoid lack of stereochemistry, at time of writing, never happens
-						#For SMILE string
-						if('UHFFFAOYSA' not in structure):
-							chosen_structure = structure
-							break
-				
-			if(chosen_structure is None):	
-				#Here, each different structure has a single source
-				#Now, here, we can do no more for SMILE string, so pick MetaCyc if possible
-				if(structure_type == "SMILE"):
-					if('MetaCyc' in sources_structures):
-						chosen_structure = sorted(sources_structures['MetaCyc'])[0]
-					elif('KEGG' in sources_structures):
-						chosen_structure = sorted(sources_structures['KEGG'])[0]
-					elif('ChEBI' in sources_structures):
-						chosen_structure = sorted(sources_structures['ChEBI'])[0]
-					elif('Rhea' in sources_structures):
-						chosen_structure = sorted(sources_structures['Rhea'])[0]
+                structure = sorted(Structs[structure_type][struct_stage].keys())[0]
 
-				else:
-					#So now we break down the InChIKey and find structures with the same connectivity
-					connected_structures = dict()
-					for structure in struct_conflicts:
-						connectivity = structure.split('-')[0]
-						if(connectivity not in connected_structures):
-							connected_structures[connectivity] = dict()
-						connected_structures[connectivity][structure]=1
-					
-					chosen_connectivity = None
-					for connectivity in connected_structures:
-						if(len(connected_structures[connectivity])>1):
-							#At time of writing, only happens once per compound
-							chosen_connectivity = connectivity
-					
-					if(chosen_connectivity is not None):						
-						#First pick structure that has stereo
-						stereo_structures = dict()
-						for structure in connected_structures[chosen_connectivity]:
-							if('UHFFFAOYSA' not in structure):
-								stereo_structures[structure]=1
-						if(len(stereo_structures)==1):
-							chosen_structure=list(stereo_structures.keys())[0]
-						else:
-							if('MetaCyc' in sources_structures):
-								chosen_structure = sorted(sources_structures['MetaCyc'])[0]
-							elif('KEGG' in sources_structures):
-								chosen_structure = sorted(sources_structures['KEGG'])[0]
-							elif('ChEBI' in sources_structures):
-								chosen_structure = sorted(sources_structures['ChEBI'])[0]
-							elif('Rhea' in sources_structures):
-								chosen_structure = sorted(sources_structures['Rhea'])[0]
+                #################################################################
+                ## But we collect all aliases for that type and stage
+                ## This means that the aliases for different SMILE strings
+                ## will be grouped together under a single SMILE string
+                #################################################################
+                
+                aliases=dict()
+                for struct in Structs[structure_type][struct_stage].keys():
+                    for alias in Structs[structure_type][struct_stage][struct]:
+                        aliases[alias]=1
 
-					if(chosen_structure is None):
-						#Here we have structures with the same formula, but different connectivity
-						#For now, we pick MetaCyc
-						if('MetaCyc' in sources_structures):
-							chosen_structure = sorted(sources_structures['MetaCyc'])[0]
-						elif('KEGG' in sources_structures):
-							chosen_structure = sorted(sources_structures['KEGG'])[0]
-						elif('ChEBI' in sources_structures):
-							chosen_structure = sorted(sources_structures['ChEBI'])[0]
-						elif('Rhea' in sources_structures):
-							chosen_structure = sorted(sources_structures['Rhea'])[0]
+                #################################################################
+                ## We write them to file
+                #################################################################
 
-			#Now we have the chosen structure, we collect aliases of chosen structure
-			#And use them to make sure we consistently use the right structure of each type
-			chosen_aliases=dict()
-			for source in struct_conflicts[chosen_structure]:
-				for alias in struct_conflicts[chosen_structure][source]:
-					chosen_aliases[alias]=1
+                unique_structs_file.write("\t".join((msid,\
+                                                     structure_type,\
+                                                     ";".join(sorted(aliases)),\
+                                                     formula_charge_dict['formula'],\
+                                                     formula_charge_dict['charge'],\
+                                                     structure))+"\n")
 
-			structure_to_use = None
-			for structure_type in "SMILE","InChIKey","InChI":
-				if(structure_type not in Structs):
-					continue
+        else:
 
-				for alias in chosen_aliases:
-					for structure in Structs[structure_type][struct_stage]:
-						if(alias in Structs[structure_type][struct_stage][structure]):
-							structure_to_use=structure
+            #################################################################
+            ## Now here we have similar structures that are identical in
+            ## formula but differ in connectivity somehow. The code in
+            ## this section is about 'selecting' the primary structure from
+            ## a database and an alias that represents the compound
+            #################################################################
+            
+            struct_conflicts = dict()
+            sources_structures=dict()
 
-				#Now that we've determined the structure to use for that type
-				#We collect all aliases regardless of structure
-				aliases=dict()
-				for structure in Structs[structure_type][struct_stage]:
-					for alias in Structs[structure_type][struct_stage][structure]:
-						aliases[alias]=1
+            #################################################################
+            ## First we pick InChIKey over SMILE as the primary structure, if
+            ## we can. Then we collect that type of structure
+            #################################################################
 
-				#Finally, write to file
-				unique_structs_file.write("\t".join((msid,\
-														 structure_type,\
-														 ";".join(sorted(aliases)),\
-														 formula_charge_dict['formula'],\
-														 formula_charge_dict['charge'],\
-														 structure_to_use))+"\n")
+            for structure_type in "InChIKey","SMILE":
+                if(structure_type not in Structs):
+                    continue
 
-	if(struct_conflict==1):
-		for structure in Structs[struct_type][struct_stage]:
-			for external_id in Structs[struct_type][struct_stage][structure]:
-				structure_conflicts_file.write("\t".join((msid,struct_type,struct_stage,structure,external_id,
-														  Structs[struct_type][struct_stage][structure][external_id]))+"\n")
+                for structure in Structs[structure_type][struct_stage]:
+                    for alias in Structs[structure_type][struct_stage][structure]:
+                        source = Structs[structure_type][struct_stage][structure][alias]
+                        if(structure not in struct_conflicts):
+                            struct_conflicts[structure]=dict()
+                        if(source not in struct_conflicts):
+                            struct_conflicts[structure][source]=dict()
+                        struct_conflicts[structure][source][alias]=1
+                        if(source not in sources_structures):
+                            sources_structures[source]=dict()
+                        sources_structures[source][structure]=1
 
-	if(formula_conflict==1):
-		for formula in Formulas[struct_type][struct_stage]:
-			for external_id in Formulas[struct_type][struct_stage][formula]:
-				formula_dict=json.loads(formula)
-				formula_conflicts_file.write("\t".join((msid,struct_type,struct_stage,formula_dict['formula'],formula_dict['charge'],external_id,
-														  Formulas[struct_type][struct_stage][formula][external_id]))+"\n")
+
+                #################################################################
+                ## Break if collected InChIKey structures
+                #################################################################
+                        
+                if(len(struct_conflicts)>0):
+                    break
+
+            #################################################################
+            ## Here we go through the structures and determine if any come
+            ## from more than database to prioritize, and then if not, we
+            ## break them down to see how their connectivity matches and then
+            ## we prioritize certain databases.
+            #################################################################
+
+            chosen_structure = None
+
+            #################################################################
+            ## Find structures that are identical in more than one database
+            #################################################################
+
+            chosen_structures = dict()
+            for structure in struct_conflicts:
+                if(len(struct_conflicts[structure])>1):
+                    chosen_structures[structure]=1
+
+            if(len(chosen_structures)>0):
+                if(len(chosen_structures)==1):
+
+                        #################################################################
+                        ## If there is one structure that is identical in more than one
+                        ## database we pick that structure to be the primary one
+                        #################################################################
+
+                        chosen_structure = list(chosen_structures.keys())[0]
+                    
+                else:
+                    for structure in chosen_structures:
+                        
+                        #################################################################
+                        ## If more than one identical structures are found in more than
+                        ## one database then we have to arbitrarily pick one
+                        ## There's not many at all
+                        #################################################################
+
+                        #Avoid lack of stereochemistry, at time of writing, never happens
+                        #For SMILE string
+                        if('UHFFFAOYSA' not in structure):
+                            chosen_structure = structure
+                            break
+
+                    if(chosen_structure is None):
+                        
+                        print(msid,chosen_structures)
+
+                        chosen_structure = list(chosen_structures.keys())[0]
+                        
+            else:
+
+                #################################################################
+                ## Here, each different structure comes from one database so
+                ## we have to pick one arbitrarily
+                #################################################################
+
+                #################################################################
+                ## First, if it's a SMILE string and not InChI, it's difficult
+                ## to parse, so just prioritize which database it came from
+                ## and pick one
+                #################################################################
+
+                if(structure_type == "SMILE"):
+                    if('MetaCyc' in sources_structures):
+                        chosen_structure = sorted(sources_structures['MetaCyc'])[0]
+                    elif('KEGG' in sources_structures):
+                        chosen_structure = sorted(sources_structures['KEGG'])[0]
+                    elif('ChEBI' in sources_structures):
+                        chosen_structure = sorted(sources_structures['ChEBI'])[0]
+                    elif('Rhea' in sources_structures):
+                        chosen_structure = sorted(sources_structures['Rhea'])[0]
+
+                else:
+
+                    #################################################################
+                    ## Secondly, if it's not a SMILE, then as InChI, we can break
+                    ## the structure down and compare its connectivity which is
+                    ## the first InChIKey 'layer'. But, we need to re-configure
+                    ## this to use InChI
+                    #################################################################
+
+                    connected_structures = dict()
+                    for structure in struct_conflicts:
+                        connectivity = structure.split('-')[0]
+                        if(connectivity not in connected_structures):
+                            connected_structures[connectivity] = dict()
+                        connected_structures[connectivity][structure]=1
+                        
+                    #################################################################
+                    ## Having split the InChiKey into its connectivity layers and
+                    ## grouping them, we take the connectivity that has more than
+                    ## one structure (i.e. identical connectivity) but we're assuming
+                    ## that there are not more than one different connectivities
+                    ## that have multiple structures
+                    #################################################################
+
+                    chosen_connectivity = None
+                    for connectivity in connected_structures:
+                        if(len(connected_structures[connectivity])>1):
+                            #At time of writing, only happens once per compound
+                            chosen_connectivity = connectivity
+
+                    #################################################################
+                    ## Here, we have a connectivity that is the same for multiple
+                    ## structures, so we take those structures and try to pick one
+                    ## to use as the primary structure. First we try to see if there 
+                    ## is one (and one only) that has stereochemistry. If not,
+                    ## again, we prioritize by database
+                    #################################################################
+
+                    if(chosen_connectivity is not None):
+                        
+                        stereo_structures = dict()
+                        for structure in connected_structures[chosen_connectivity]:
+                            if('UHFFFAOYSA' not in structure):
+                                stereo_structures[structure]=1
+
+                        if(len(stereo_structures)==1):
+                            chosen_structure=list(stereo_structures.keys())[0]
+                        else:
+                            if('MetaCyc' in sources_structures):
+                                chosen_structure = sorted(sources_structures['MetaCyc'])[0]
+                            elif('KEGG' in sources_structures):
+                                chosen_structure = sorted(sources_structures['KEGG'])[0]
+                            elif('ChEBI' in sources_structures):
+                                chosen_structure = sorted(sources_structures['ChEBI'])[0]
+                            elif('Rhea' in sources_structures):
+                                chosen_structure = sorted(sources_structures['Rhea'])[0]
+
+                    #################################################################
+                    ## Finally if we get to the point where there are multiple
+                    ## connectivities that only have one structure, we prioritize
+                    ## by database. There's some redundancy here that can be
+                    ## eliminated
+                    #################################################################
+
+                    if(chosen_structure is None):
+                        #Here we have structures with the same formula, but different connectivity
+                        #For now, we pick MetaCyc
+                        if('MetaCyc' in sources_structures):
+                            chosen_structure = sorted(sources_structures['MetaCyc'])[0]
+                        elif('KEGG' in sources_structures):
+                            chosen_structure = sorted(sources_structures['KEGG'])[0]
+                        elif('ChEBI' in sources_structures):
+                            chosen_structure = sorted(sources_structures['ChEBI'])[0]
+                        elif('Rhea' in sources_structures):
+                            chosen_structure = sorted(sources_structures['Rhea'])[0]
+
+            #################################################################
+            ## We have a chosen structure and we collect the aliases for that
+            ## structure, so that we can then collect all the structure of
+            ## different types for the same aliases
+            #################################################################
+
+            chosen_aliases=dict()
+            for source in struct_conflicts[chosen_structure]:
+                for alias in struct_conflicts[chosen_structure][source]:
+                    chosen_aliases[alias]=1
+
+            #################################################################
+            ## Having collected aliases for the same structure we iterate
+            ## through the types, and the aliases, to find the right structure
+            ## to print with the alias
+            #################################################################
+
+            for structure_type in "SMILE","InChIKey","InChI":
+                if(structure_type not in Structs):
+                    continue
+
+                structure_to_use = None
+                for alias in chosen_aliases:
+                    for structure in Structs[structure_type][struct_stage]:
+                        if(alias in Structs[structure_type][struct_stage][structure]):
+                            structure_to_use=structure
+
+                #################################################################
+                ## Now we collect *all* aliases that are associated with different
+                ## structures for the same compound, to associate with the
+                ## primary structure
+                #################################################################
+
+                aliases=dict()
+                for structure in Structs[structure_type][struct_stage]:
+                    for alias in Structs[structure_type][struct_stage][structure]:
+                        aliases[alias]=1
+
+                #################################################################
+                ## Finally, write to file
+                #################################################################
+
+                unique_structs_file.write("\t".join((msid,\
+                                                     structure_type,\
+                                                     ";".join(sorted(aliases)),\
+                                                     formula_charge_dict['formula'],\
+                                                     formula_charge_dict['charge'],\
+                                                     structure_to_use))+"\n")
+                                        
+    #################################################################
+    ## Here we report the structural conflicts
+    #################################################################
+
+    if(struct_conflict==1):
+        for structure in Structs[struct_type][struct_stage]:
+            for external_id in Structs[struct_type][struct_stage][structure]:
+                structure_conflicts_file.write("\t".join((msid,struct_type,struct_stage,structure,external_id,
+                                                          Structs[struct_type][struct_stage][structure][external_id]))+"\n")
+                                        
+    #################################################################
+    ## Here we report the formula conflicts
+    #################################################################
+
+    if(formula_conflict==1):
+        for formula in Formulas[struct_type][struct_stage]:
+            for external_id in Formulas[struct_type][struct_stage][formula]:
+                formula_dict=json.loads(formula)
+                formula_conflicts_file.write("\t".join((msid,struct_type,struct_stage,formula_dict['formula'],formula_dict['charge'],external_id,
+                                                        Formulas[struct_type][struct_stage][formula][external_id]))+"\n")
