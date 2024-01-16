@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 import os,sys
+sys.path.append('../../Libs/Python')
 from BiochemPy import Compounds
 
 Structures_Root=os.path.dirname(__file__)+"/../../Biochemistry/Structures/"
