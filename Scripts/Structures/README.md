@@ -14,6 +14,7 @@ environment, so double-check. At time of submission we used RDKit
 do to get these working on a new mac below.
 
 EDIT: As of 09/15/22 we used RDKit 2022.03.5 and OpenBabel 3.1.1
+EDIT: This the same as of 01/23/24
 
 * `List_ModelSEED_Structures.py` 
 
