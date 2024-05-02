@@ -506,11 +506,10 @@ class Reactions:
         # Retrieve/Assign stoich
         if(stoichiometry is None):
             stoichiometry = reaction_dict['stoichiometry']
-        else:
-            reaction_dict["stoichiometry"] = stoichiometry
-
+        
         # Build list of "reagents" and "products"
         rxn_cpds_array = stoichiometry
+        sorted_stoichiometry = list()
         reagents_array = list()
         products_array = list()
         compound_ids_dict = dict()
@@ -521,20 +520,22 @@ class Reactions:
             else:
                 reagents_array.append(rgt)
 
-        rgts_str__array = list()
-        for rgt in reagents_array:
+        rgts_str_array = list()
+        for rgt in sorted(reagents_array, key=lambda x: (
+                int(x["coefficient"] > 0), x["compound"], x["compartment"])):
             id_string = "(" + str(abs(rgt["coefficient"])) + ") " + rgt[
                 "compound"] + "[" + str(rgt["compartment"]) + "]"
-            rgts_str__array.append(id_string)
+            rgts_str_array.append(id_string)
+            sorted_stoichiometry.append(rgt)
 
         equation_array = list()
         code_array = list()
         definition_array = list()
 
-        equation_array.append(" + ".join(rgts_str__array))
-        definition_array.append(" + ".join(rgts_str__array))
+        equation_array.append(" + ".join(rgts_str_array))
+        definition_array.append(" + ".join(rgts_str_array))
         code_array.append(
-            " + ".join(x for x in rgts_str__array if "cpd00067" not in x))
+            " + ".join(x for x in rgts_str_array if "cpd00067" not in x))
 
         code_array.append("<=>")
         if (reaction_dict["reversibility"] == "<"):
@@ -548,11 +549,13 @@ class Reactions:
             definition_array.append("<=>")
 
         pdts_str_array = list()
-        for rgt in products_array:
-            id_string = "(" + str(abs(rgt["coefficient"])) + ") " + rgt[
-                "compound"] + "[" + str(rgt["compartment"]) + "]"
+        for pdt in sorted(products_array, key=lambda x: (
+                int(x["coefficient"] > 0), x["compound"], x["compartment"])):
+            id_string = "(" + str(abs(pdt["coefficient"])) + ") " + pdt[
+                "compound"] + "[" + str(pdt["compartment"]) + "]"
             pdts_str_array.append(id_string)
-
+            sorted_stoichiometry.append(pdt)
+            
         equation_array.append(" + ".join(pdts_str_array))
         definition_array.append(" + ".join(pdts_str_array))
         code_array.append(
@@ -573,6 +576,8 @@ class Reactions:
 
         # Define if transport?
 
+        reaction_dict['stoichiometry']=sorted_stoichiometry
+        
         return
 
     def saveECs(self, ecs_dict):

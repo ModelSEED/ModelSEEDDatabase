@@ -14,6 +14,7 @@ environment, so double-check. At time of submission we used RDKit
 do to get these working on a new mac below.
 
 EDIT: As of 09/15/22 we used RDKit 2022.03.5 and OpenBabel 3.1.1
+EDIT: This the same as of 01/23/24
 
 * `List_ModelSEED_Structures.py` 
 
@@ -33,7 +34,7 @@ it via curation of the conflicts and integration of more structures.
 This script takes the output of the previous two scripts, and uses
 them to update the ModelSEED database.
 
-* `Update_Compound_Structures_Formulas_Charge.py`
+* `Update_Compound_pKas.py`
 
 This script takes the pKa files found in
 `../../Biochemistry/Structures`, and uses them to update the ModelSEED

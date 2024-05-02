@@ -3,22 +3,17 @@ import sys
 sys.path.append('../../../Libs/Python')
 from BiochemPy import Reactions, Compounds
 
-##########################################
-# Reprinting compounds, aliases and names
-##########################################
-# reactions_helper = Reactions()
-# reactions_dict = reactions_helper.loadReactions()
-# reactions_helper.Headers.append('ontology')
-# for rxn in reactions_dict:
-#    reactions_dict[rxn]['ontology']='class:null|context:null|step:null'
-#    reactions_dict[rxn]['ontology']="null"
-#    if('None' in reactions_dict[rxn]['notes']):
-#        reactions_dict[rxn]['notes']="null"
-# reactions_helper.saveReactions(reactions_dict)
-
 compounds_helper = Compounds()
 compounds_dict = compounds_helper.loadCompounds()
-compounds_helper.Headers.append('class')
 for cpd in compounds_dict:
-    compounds_dict[cpd]['class']="null"
+    # consistently add or alter attribute
+    pass
 compounds_helper.saveCompounds(compounds_dict)
+
+reactions_helper = Reactions()
+reactions_dict = reactions_helper.loadReactions()
+for rxn in reactions_dict:
+    # consistently add or alter attribute
+    reactions_dict[rxn]['thermodynamics']="null"
+    pass
+reactions_helper.saveReactions(reactions_dict)
