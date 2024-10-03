@@ -3,9 +3,7 @@
 erDiagram
     compound {
         VARCHAR compound_id PK
-        ARRAYTYPE structures
-        ARRAYTYPE aliases
-        ARRAYTYPE reagents
+        VARCHAR structure_id FK
         DOUBLE mass
         VARCHAR formula
         DOUBLE charge
@@ -14,46 +12,59 @@ erDiagram
     }
 
     molecular_structure {
-        VARCHAR structure_id
-        ARRAYTYPE compound_ids FK
+        VARCHAR id
+        VARCHAR compound_id FK
         TEXT inchi
         TEXT inchikey
         TEXT smiles
         BINARY molecule
     }
 
+    entity_as_alias {
+        VARCHAR alias_id FK
+        VARCHAR compound_id FK
+        VARCHAR reaction_id FK
+        VARCHAR pathway_id FK
+        VARCHAR molecular_structure_id FK
+    }
+
     alias {
-        VARCHAR alias_id
-        ARRAYTYPE compound_ids
+        VARCHAR id
         VARCHAR database
         VARCHAR identifier
     }
     
     reagent {
-        VARCHAR reagent_id
-        TEXT compound_id
-        INTEGER compartment_index
+        VARCHAR reaction_id PK,FK
+        VARCHAR compound_id PK,FK
+        INTEGER compartment_index PK
         DOUBLE stoichiometry
     }
 
     reaction {
-        VARCHAR reaction_id
+        VARCHAR id
         TEXT name
-        ARRAYTYPE reagents
-        ARRAYTYPE aliases
-        ARRAYTYPE pathways
         BOOLEAN is_transport
     }
 
-    pathway {
-        VARCHAR pathway_id
-        TEXT name
-        ARRAYTYPE aliases
-        ARRAYTYPE reactions
+    reaction_in_pathway {
+        VARCHAR reaction_id FK
+        VARCHAR pathway_id FK
     }
 
-    pathway ||--|{ reaction : "contains"
+    pathway {
+        VARCHAR id
+        TEXT name
+        TEXT description
+    }
+
+    pathway ||--o{ reaction_in_pathway : "contains"
+    reaction ||--o{ reaction_in_pathway : "contains"
     reaction ||--o{ reagent : "catalyzes"
     reagent ||--|| compound : "involves"
-    compound ||--|{ molecular_structure : "defined by"
-    compound |{--|{ alias : "represented as"
+    compound ||--|| molecular_structure : "defined by"
+    compound ||--o{ entity_as_alias : "represented as"
+    reaction ||--o{ entity_as_alias : "represented as"
+    pathway ||--o{ entity_as_alias : "represented as"
+    molecular_structure ||--o{ entity_as_alias : "represented as"
+    alias ||--o{ entity_as_alias : "represented as"
