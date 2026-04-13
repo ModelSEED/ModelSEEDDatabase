@@ -1,82 +1,64 @@
-# ModelSEED Biochemistry Database Scripts (Structures)
+# ModelSEED Structure Cleanup
+## `cleanup.py`
 
-There are several scripts that we use to organize and collate the structures that we wish to use as part of the biochemistry:
+Generates a clean, deduplicated structure file (`Unique_ModelSEED_Structures_new.txt`) from the raw multi-source ModelSEED compound database (`All_ModelSEED_Structures.txt`).
 
-* `Print_Structure_Formula_Charge.py`
+### Pipeline (3 stages)
 
-This script takes all the InChI and SMILE strings from the original
-sources and extracts the formulas and charges, including protonation
-states You should only have to do this whenever you update the
-structures themselves, but, you might get changes occuring if you
-install updated versions of RDKit and/or OpenBabel in your conda
-environment, so double-check. At time of submission we used RDKit
-2020.03.1.0 and OpenBabel 2.4.1. I have an outline of what I need to 
-do to get these working on a new mac below.
+1. **Parse & Filter** — Reads the raw `All_ModelSEED_Structures.txt` (~281K rows), keeps only `Charged` status rows (~141K), and groups them by compound ID. For each compound, it collects all external IDs as aliases and all structure values (SMILE/InChI/InChIKey) across sources (KEGG, MetaCyc, ChEBI, etc.).
 
-EDIT: As of 09/15/22 we used RDKit 2022.03.5 and OpenBabel 3.1.1
-EDIT: This the same as of 01/23/24
+2. **Validate & Resolve** (parallelized across 64 workers) — For each of the ~37K compounds:
+   - **Conflict resolution:** When multiple sources disagree on a structure, picks the majority-vote winner.
+   - **Cross-validation:** Independently computes InChIKey from both SMILES and InChI via RDKit. If they agree, structures are consistent. If they disagree, **InChI is trusted** as the canonical standard and SMILES/InChIKey are recomputed from it. Stereochemistry is explicitly assigned (`AssignStereochemistry`) before SMILES generation, and the recomputed SMILES is verified via round-trip (SMILES→InChIKey must match InChI-derived key).
+   - **Gap filling:** Derives missing structure types from what's available (e.g., generates InChI from SMILES if InChI is absent).
+   - **Invalid removal:** Structures that fail RDKit parsing are dropped with a warning.
 
-* `List_ModelSEED_Structures.py` 
+3. **Write Output** — Produces a 6-column `Unique_ModelSEED_Structures_new.txt` with header (`ID, Type, Aliases, Formula, Charge, Structure`), writing up to 3 rows per compound in order: SMILE, InChIKey, InChI (matching the format of `Unique_ModelSEED_Structures.txt`).
 
-This script takes the list of InChI and SMILE strings from the
-original sources and attempts to consolidate them for the ModelSEED
-database.  As it checks for formula conflicts, it needs the output of
-the previous script and it reports structure and formula conflicts in
-files in the same directory.  Its two key output files are
-`../../Biochemistry/Structures/All_ModelSEED_Structures.txt` and
-`../../Biochemistry/Structures/Unique_ModelSEED_Structures.txt`.
+### Usage
 
-The latter file is the structural heart, and our goal is to expand on
-it via curation of the conflicts and integration of more structures.
+```bash
+python cleanup.py
+```
 
-* `Update_Compound_Structures_Formulas_Charge.py`
+**Input:** `All_ModelSEED_Structures.txt` (8-column TSV, no header)
+**Output:** `Unique_ModelSEED_Structures_new.txt` (6-column TSV with header)
 
-This script takes the output of the previous two scripts, and uses
-them to update the ModelSEED database.
+## `diff_structures.py`
 
-* `Update_Compound_pKas.py`
+Compares `Unique_ModelSEED_Structures.txt` (old) against `Unique_ModelSEED_Structures_new.txt` (new) and produces `diff_report.csv` detailing every difference.
 
-This script takes the pKa files found in
-`../../Biochemistry/Structures`, and uses them to update the ModelSEED
-database.
+### Usage
 
-* `Report_Redundant_Structures.py`
-* `Report_Conflicting_Structures.py`
+```bash
+python diff_structures.py
+```
 
-These two scripts build tab-separated files of conflicts and
-redundancies for reporting. Their output isn't necessarily optimal, or
-include all possible problems, but is used as a starting point for
-loading into spreadsheets with the goal of curating by a team.
+**Output:** `diff_report.csv` with columns: `ID, Type, Change, Field, Old_Value, New_Value`
 
-Redundant structures are structures that are found assigned to more
-than one compound, and could be merged. Concflicting structures are
-multiple but different structures found assigned to a single compound
-and could be disambiguated.
+Change types:
+- **added** — row exists only in new
+- **removed** — row exists only in old
+- **modified** — row exists in both but a field differs (one row per changed field)
 
-# Addendum
+Prints both row-level and compound-level summaries.
 
-Acyl-carrier proteins are frequently found in metabolic
-reconstructions and are a key component of some pathways such as fatty
-acid biosynthesis. As the protein chains vary from species to species
-there's no determined structure to use, and frequently the formula and
-the charge of the phosphopantetheine prosthetic group as well as the
-attached fatty acyl chain can be overlooked and leads to reaction
-imbalance. Here we attempt to manually curate the formula and charge
-that would maintain the mass-balance of the fatty acid biosynthetic
-pathways, and others, in the `ACPs_Master_Formula_Charge.txt` file.
+## `validation.py`
 
-# Installing RDKit and OpenBabel
+Post-cleanup chemical validation of the output file. For each compound, it checks:
 
-You might need swig and its python bindings but the conda packages may 
-install fine:
+1. **Parsability** — SMILES and InChI both parse successfully in RDKit.
+2. **InChIKey consistency** — Recomputes InChIKey from InChI and verifies it matches the stored value.
+3. **SMILES↔InChI cross-validation** — Converts both to InChIKey and checks they agree.
 
-`port install swig`
-`port install swig-python`
+Issues are categorized into:
+- **Stereochemistry mismatch** — Same connectivity (first InChIKey block matches), different stereo layer. These are RDKit round-trip limitations where InChI encodes stereo that cannot be recovered in SMILES.
+- **Different compounds** — First InChIKey block differs, meaning SMILES and InChI represent entirely different molecules. Requires manual curation.
+- **InChI/SMILES parse failures** — Structures that RDKit cannot parse (truncated InChI, salts, unusual valence).
 
-You'll want to install anaconda and follow this process for creating
-a specific environment for the chemoinformatics packages. This was
-the approach with the least pain:
+### Usage
 
-`conda create -c conda-forge -n msd-env rdkit`
-`conda activate msd-env`
-`conda install openbabel -c conda-forge`
+```bash
+python validation.py                                # defaults to Unique_ModelSEED_Structures_new.txt
+python validation.py Unique_ModelSEED_Structures.txt # validate any file
+```

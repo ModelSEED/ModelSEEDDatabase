@@ -1,0 +1,312 @@
+\documentclass[aspectratio=169,11pt]{beamer}
+\usetheme{Madrid}
+\usecolortheme{seahorse}
+
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{xcolor}
+\usepackage{tikz}
+\usetikzlibrary{shapes.geometric, arrows.meta, positioning}
+\usepackage{graphicx}
+\graphicspath{{struct_imgs/}}
+
+\definecolor{acceptgreen}{RGB}{34,139,34}
+\definecolor{rejectred}{RGB}{178,34,34}
+
+\setbeamertemplate{navigation symbols}{}
+\setbeamerfont{frametitle}{size=\normalsize}
+\setbeamerfont{title}{size=\large}
+
+\title{ModelSEED Structure Cleanup}
+\subtitle{PubChem Cross-Validation Results}
+\author{Ray Zhu}
+\date{\today}
+
+\begin{document}
+
+% =====================================================================
+\begin{frame}
+\titlepage
+\end{frame}
+
+% =====================================================================
+\begin{frame}{Goal \& Approach}
+
+\textbf{Goal}: Validate and correct the 30,321 compound structures in
+ModelSEED against PubChem.
+
+\bigskip
+\textbf{Approach}:
+\begin{enumerate}\setlength\itemsep{4pt}
+  \item \textbf{Look up} each compound in PubChem via cross-references
+        (ChEBI, KEGG), compound names, and direct structure lookups
+        (InChIKey, InChI)
+  \item \textbf{Classify} discrepancies by comparing InChIKey blocks:\\
+        {\small Block\,1 (connectivity) -- Block\,2 (stereo) -- Block\,3 (protonation)}
+  \item \textbf{Correct} when validation criteria are met: stereochemistry
+        from PubChem (stereo count + inversion check), protonation to pH\,7
+        (OpenBabel + $\text{p}K_\text{a}$ check)
+  \item \textbf{Preserve} existing ionization states --- do not
+        replace with PubChem's neutral forms
+\end{enumerate}
+
+\end{frame}
+
+% =====================================================================
+\begin{frame}{Validation Results (30,321 compounds)}
+
+\begin{columns}[T]
+\begin{column}{0.40\textwidth}
+\small
+\begin{table}[h]
+\centering
+\small
+\begin{tabular}{lrr}
+\toprule
+\textbf{Category} & \textbf{Count} & \textbf{\%} \\
+\midrule
+MATCH             & 19,984 & 65.9 \\
+PROT.\ DIFF       &  4,365 & 14.4 \\
+XREF\_CONFLICT    &  2,919 &  9.6 \\
+MISMATCH          &  1,331 &  4.4 \\
+NOT\_FOUND        &    832 &  2.7 \\
+STEREO\_DIFF      &    683 &  2.3 \\
+Other             &    207 &  0.7 \\
+\midrule
+\textbf{Total}    & \textbf{30,321} & \\
+\bottomrule
+\end{tabular}
+\end{table}
+\end{column}
+
+\begin{column}{0.56\textwidth}
+\begin{itemize}\setlength\itemsep{6pt}
+  \item \textbf{80.3\%} share the same connectivity
+        and stereochemistry with PubChem
+  \item \textbf{2.3\%} STEREO\_DIFF --- same molecule,
+        missing stereocenters $\to$ correctable
+  \item \textbf{4.4\%} MISMATCH --- different molecular
+        graph $\to$ manual review
+  \item \textbf{9.6\%} xref conflicts ---
+        ChEBI $\neq$ KEGG mapping
+\end{itemize}
+\end{column}
+\end{columns}
+
+\end{frame}
+
+% =====================================================================
+\begin{frame}{Corrections Applied (201 compounds)}
+
+\begin{table}[h]
+\centering
+\small
+\begin{tabular}{lrrrl}
+\toprule
+\textbf{Type} & \textbf{Candidates} & \textbf{Accepted} & \textbf{Rejected} & \textbf{Criteria} \\
+\midrule
+Stereochemistry  & 683 & 188 & 495 & PubChem $\geq$ stored stereocenters, \\
+                 &     &     &     & no inversions, pH\,7 normalized \\[4pt]
+pH\,7 protonation & 30,321 & 13 & 1 & OpenBabel + $\text{p}K_\text{a}$ validation \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\bigskip
+\textbf{Stereo corrections} (188):
+\begin{itemize}\setlength\itemsep{1pt}
+  \item PubChem structure must define $\geq$ stereocenters than stored
+  \item Shared stereocenters verified via InChI layer comparison (no inversions)
+  \item Each correction pH\,7-normalized before application
+        (prevents PubChem's neutral protonation from overwriting curated charges)
+\end{itemize}
+
+\medskip
+\textbf{pH\,7 corrections} (13): terminal phosphate/sulfate deprotonation.
+Free pyrophosphate excluded ($\text{p}K_{\text{a}4}{=}9.4 > \text{pH}\;7$).
+
+\end{frame}
+
+% =====================================================================
+\begin{frame}{pH\,7 Protonation Corrections (13 accepted, 1 rejected)}
+
+\vspace{-4pt}
+\begin{columns}[T]
+\begin{column}{0.48\textwidth}
+\scriptsize
+\begin{table}[h]
+\centering
+\scriptsize
+\begin{tabular}{llrr}
+\toprule
+\textbf{Compound} & \textbf{Name} & \textbf{Old} & \textbf{New} \\
+\midrule
+cpd00002 & ATP   & $-3$ & $-4$ \\
+cpd00038 & GTP   & $-3$ & $-4$ \\
+cpd00052 & CTP   & $-3$ & $-4$ \\
+cpd00062 & UTP   & $-3$ & $-4$ \\
+cpd00068 & ITP   & $-3$ & $-4$ \\
+cpd00008 & ADP   & $-2$ & $-3$ \\
+cpd00031 & GDP   & $-2$ & $-3$ \\
+cpd00090 & IDP   & $-2$ & $-3$ \\
+cpd00096 & CDP   & $-2$ & $-3$ \\
+cpd00014 & UDP   & $-2$ & $-3$ \\
+cpd00056 & ThDP  & $-1$ & $-2$ \\
+cpd00103 & PRPP  & $-4$ & $-5$ \\
+cpd00081 & Sulfite & $-1$ & $-2$ \\
+\midrule
+\multicolumn{4}{l}{\textit{Rejected:}} \\
+cpd00012 & PPi   & $-3$ & ---  \\
+\bottomrule
+\end{tabular}
+\end{table}
+\end{column}
+
+\begin{column}{0.48\textwidth}
+\small
+\textbf{Accepted} (13): each deprotonates one terminal
+\textbf{ester-linked} phosphate or sulfate group
+($\text{p}K_\text{a} \approx 6.5$, below pH\,7).
+
+\medskip
+\textbf{Rejected} (1): free pyrophosphate (PPi).
+Its 4th $\text{p}K_\text{a}$ is 9.4 --- well above pH\,7, so
+the proton remains. The pipeline detects this via a
+SMARTS-based check: if \textbf{no} phosphorus in the
+molecule has a C--O--P ester bond, the terminal
+$\text{p}K_\text{a}$ is ${\sim}9$ rather than ${\sim}6.5$.
+\end{column}
+\end{columns}
+
+\end{frame}
+
+% =====================================================================
+\begin{frame}{\textcolor{acceptgreen}{Stereochemistry Correction Examples}}
+
+\begin{columns}[T]
+\begin{column}{0.48\textwidth}
+\begin{center}
+\textbf{cpd02877 --- Glycodeoxycholate}\\[3pt]
+\includegraphics[width=\textwidth]{stereo_accepted_cpd02877.png}
+\end{center}
+\scriptsize
+\textbf{cpd02877} (Glycodeoxycholate, name lookup).
+PubChem defines all stereocenters for the bile acid scaffold.
+\textcolor{acceptgreen}{Accepted} --- no existing stereocenters inverted.
+\end{column}
+\begin{column}{0.48\textwidth}
+\begin{center}
+\textbf{cpd04236 --- Cefotetan}\\[3pt]
+\includegraphics[width=\textwidth]{stereo_accepted_cpd04236.png}
+\end{center}
+\scriptsize
+\textbf{cpd04236} (Cefotetan, KEGG xref).
+PubChem defines additional stereocenters on the cephalosporin ring.
+\textcolor{acceptgreen}{Accepted} --- adds missing stereochemistry.
+\end{column}
+\end{columns}
+
+\end{frame}
+
+% =====================================================================
+\begin{frame}{\textcolor{acceptgreen}{Stereochemistry Correction Examples} (cont.)}
+
+\begin{columns}[T]
+\begin{column}{0.48\textwidth}
+\begin{center}
+\textbf{cpd03042 --- Porphyrin}\\[3pt]
+\includegraphics[width=\textwidth]{stereo_accepted_cpd03042.png}
+\end{center}
+\scriptsize
+\textbf{cpd03042} (Porphyrin, KEGG xref).
+PubChem replaces the \texttt{UHFFFAOYSA} achiral placeholder with
+a defined stereo block.
+\textcolor{acceptgreen}{Accepted}.
+\end{column}
+\begin{column}{0.48\textwidth}
+\begin{center}
+\textbf{cpd05038 --- Rifapentine}\\[3pt]
+\includegraphics[width=\textwidth]{stereo_accepted_cpd05038.png}
+\end{center}
+\scriptsize
+\textbf{cpd05038} (Rifapentine, KEGG xref).
+Macrolide antibiotic; PubChem record defines additional stereocenters.
+\textcolor{acceptgreen}{Accepted}.
+\end{column}
+\end{columns}
+
+\end{frame}
+
+% =====================================================================
+\begin{frame}{Key Finding: InChIKey Recovery}
+
+\textbf{2,228 compounds} were initially classified as mismatches or
+not-found via cross-references and name lookups.
+
+\bigskip
+Direct InChIKey lookup in PubChem recovered them ---
+\textbf{97\% returned exact InChIKey matches}.
+
+\bigskip
+\textbf{Interpretation}: for these compounds, the initial discrepancies
+were due to \textbf{incorrect cross-reference mappings or name ambiguity},
+not incorrect stored structures.
+
+\bigskip
+\begin{table}[h]
+\centering
+\small
+\begin{tabular}{lr}
+\toprule
+\textbf{Recovery result} & \textbf{Count} \\
+\midrule
+Exact match (MATCH)   & 2,161 (97.0\%) \\
+Stereo difference     &    51 (2.3\%) \\
+Still mismatched      &     2 (0.1\%) \\
+Other                 &    14 (0.6\%) \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\end{frame}
+
+% =====================================================================
+\begin{frame}{Remaining Work}
+
+\begin{enumerate}\setlength\itemsep{8pt}
+  \item \textbf{XREF conflicts} (2,919) --- ChEBI and KEGG map to
+        different PubChem CIDs; need resolution strategy
+  \item \textbf{MISMATCH review} (1,331) --- sub-classified into
+        tautomers, wrong mappings, and structurally distinct compounds
+        to prioritize manual review
+  \item \textbf{NOT\_FOUND} (832) --- compounds without PubChem
+        records; mostly rare metabolites or generic class names
+  \item \textbf{AMBIGUOUS} (152) --- compound names map to multiple
+        PubChem CIDs
+\end{enumerate}
+
+\end{frame}
+
+% =====================================================================
+\begin{frame}{Limitations}
+
+\begin{itemize}\setlength\itemsep{6pt}
+  \item \textbf{Single reference database} --- validation relies on
+        PubChem only; cross-checking against ChEBI, HMDB, or MetaCyc
+        would provide independent corroboration
+  \item \textbf{OpenBabel pH model} --- empirical $\text{p}K_\text{a}$
+        estimation; caught the free pyrophosphate error
+        ($\text{p}K_{\text{a}4}{=}9.4$), but other edge cases may exist
+  \item \textbf{Name-based lookups} --- inherently noisy; multi-tier
+        disambiguation (InChIKey $>$ fingerprint similarity) mitigates
+        but does not eliminate errors
+  \item \textbf{No confidence scores} --- binary accept/reject
+        decisions without uncertainty quantification for borderline
+        cases
+\end{itemize}
+
+\end{frame}
+
+\end{document}
