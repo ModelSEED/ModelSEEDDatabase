@@ -4,7 +4,7 @@ from BiochemPy import Compounds, Reactions
 
 Overridden_Compounds=dict()
 header=list()
-with open(os.path.dirname(__file__)+'/ACPs_Master_Formula_Charge.txt') as fh:
+with open(os.path.dirname(__file__)+'/../../Biochemistry/Curation/overrides/acps_formula_charge.tsv') as fh:
     for line in fh.readlines():
         line=line.strip()
         array=line.split('\t')

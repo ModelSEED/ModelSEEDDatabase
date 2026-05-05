@@ -1,6 +1,6 @@
 ## Dumping structures from eQuilibrator cache
 
-In `./Find_eQuilibrator_Structures_in_ModelSEED.py` We cross-check the available mappings between
+In `Scripts/Thermodynamics/Find_eQuilibrator_Structures_in_ModelSEED.py` we cross-check the available mappings between
 InChIKeys in eQuilibrator and ModelSEED, but to do so, we dump the structures from the eQuilibrator cache.
 
 NB: previously we also checked with the latest version of MetaNetX, but the versioning of the MetaNetX
@@ -43,9 +43,11 @@ sqlite> .quit
 
 ### Step 4
 
-We run the script to compare the two set of structures:
+We run the script to compare the two set of structures (it reads
+`eq_cpds.tsv` from the current working directory and writes the
+output to `Biochemistry/Structures/MetaNetX/Structures_in_ModelSEED_and_eQuilibrator.txt`):
 ```
-% ./Find_eQuilibrator_Structures_in_ModelSEED.py
+% ../../../Scripts/Thermodynamics/Find_eQuilibrator_Structures_in_ModelSEED.py
 ```
 
 You can then compare how the set of available structures has changed:

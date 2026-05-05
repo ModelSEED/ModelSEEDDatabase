@@ -63,7 +63,8 @@ the charge of the phosphopantetheine prosthetic group as well as the
 attached fatty acyl chain can be overlooked and leads to reaction
 imbalance. Here we attempt to manually curate the formula and charge
 that would maintain the mass-balance of the fatty acid biosynthetic
-pathways, and others, in the `ACPs_Master_Formula_Charge.txt` file.
+pathways, and others, in the
+`Biochemistry/Curation/overrides/acps_formula_charge.tsv` file.
 
 # Installing RDKit and OpenBabel
 

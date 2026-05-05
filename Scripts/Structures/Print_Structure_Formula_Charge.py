@@ -13,8 +13,8 @@ lg = RDLogger.logger()
 lg.setLevel(RDLogger.ERROR)
 
 Structures_Root=os.path.dirname(__file__)+"/../../Biochemistry/Structures/"
-resolved_structures=open('Resolved_Structures.txt','w')
-unresolved_structures=open('Unresolved_Structures.txt','w')
+resolved_structures=open(os.path.dirname(__file__)+'/../../Biochemistry/Structures/_reports/Resolved_Structures.txt','w')
+unresolved_structures=open(os.path.dirname(__file__)+'/../../Biochemistry/Structures/_reports/Unresolved_Structures.txt','w')
 file_handle_dict=dict()
 for source in "KEGG","MetaCyc","ChEBI","Rhea":
     for struct_type in "InChI","SMILE":

@@ -45,7 +45,7 @@ for source in "KEGG","MetaCyc","ChEBI","Rhea":
 
 #Load Curated Structures
 Ignored_Structures=dict()
-for file in glob.glob(Structures_Root+"Curation/*.txt"):
+for file in glob.glob(os.path.dirname(__file__)+"/../../Biochemistry/Curation/ignores/*.txt"):
     with open(file) as ignore_file:
         for line in ignore_file.readlines():
             array=line.split('\t')
@@ -66,8 +66,8 @@ MS_Aliases_Dict =  CompoundsHelper.loadMSAliases(["KEGG","MetaCyc","ChEBI","Rhea
 master_structs_file = open(Structures_Root+"All_ModelSEED_Structures.txt",'w')
 unique_structs_file = open(Structures_Root+"Unique_ModelSEED_Structures.txt",'w')
 unique_structs_file.write("ID\tType\tAliases\tFormula\tCharge\tStructure\n")
-structure_conflicts_file = open("Structure_Conflicts.txt",'w')
-formula_conflicts_file = open("Formula_Conflicts.txt",'w')
+structure_conflicts_file = open(os.path.dirname(__file__)+"/../../Biochemistry/Structures/_reports/Structure_Conflicts.txt",'w')
+formula_conflicts_file = open(os.path.dirname(__file__)+"/../../Biochemistry/Structures/_reports/Formula_Conflicts.txt",'w')
 pick_reasons_file = open(Structures_Root+"Pick_Reasons.txt",'w')
 pick_reasons_file.write("ID\tType\tStage\tReason\tChosen_Structure\tChosen_Aliases\n")
 

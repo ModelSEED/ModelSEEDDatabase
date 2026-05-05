@@ -5,7 +5,7 @@ from BiochemPy import Compounds
 
 Overridden_Fields=dict()
 header=list()
-with open(os.path.dirname(__file__)+'/ACPs_Master_Formula_Charge.txt') as fh:
+with open(os.path.dirname(__file__)+'/../../Biochemistry/Curation/overrides/acps_formula_charge.tsv') as fh:
     for line in fh.readlines():
         line=line.strip()
         array=line.split('\t')
@@ -46,7 +46,7 @@ for cpd in structures_dict:
             smiles_dict[struct].append(cpd)
 
 Ignored_Structures=list()
-with open(Structures_Root+"Curation/Ignored_Structures_Publication2020.txt") as fh:
+with open(os.path.dirname(__file__)+"/../../Biochemistry/Curation/ignores/Ignored_Structures_Publication2020.txt") as fh:
     for line in fh.readlines():
         line=line.strip()
         array=line.split('\t')

@@ -41,7 +41,8 @@ from BiochemPy import Compounds  # noqa: E402
 BIOCHEM_ROOT = os.path.normpath(os.path.join(SCRIPT_DIR, '..', '..', 'Biochemistry'))
 STRUCT_ROOT  = os.path.join(BIOCHEM_ROOT, 'Structures')
 THERMO_ROOT  = os.path.join(BIOCHEM_ROOT, 'Thermodynamics')
-ACPS_FILE    = os.path.normpath(os.path.join(SCRIPT_DIR, '..', 'Structures', 'ACPs_Master_Formula_Charge.txt'))
+ACPS_FILE    = os.path.normpath(os.path.join(BIOCHEM_ROOT, 'Curation', 'overrides', 'acps_formula_charge.tsv'))
+IGNORES_DIR  = os.path.normpath(os.path.join(BIOCHEM_ROOT, 'Curation', 'ignores'))
 
 STRUCTURE_SOURCES   = ['KEGG', 'MetaCyc', 'ChEBI', 'Rhea']
 PRIORITY_ORDER      = ['MetaCyc', 'KEGG', 'ChEBI', 'Rhea']
@@ -203,13 +204,13 @@ def load_acp_overrides(path):
     return overrides
 
 
-def load_ignored_cpds(struct_root, helper):
+def load_ignored_cpds(ignores_dir, helper):
     """Cpds whose missing-structure rows get the R/0 override.
     Replays Update_Compound_Structures_Formulas_Charge.py: only
     Ignored_Structures_Publication2020.txt with Accepted=='None', mapped via
     MetaCyc aliases."""
     ignored = set()
-    path = os.path.join(struct_root, 'Curation', 'Ignored_Structures_Publication2020.txt')
+    path = os.path.join(ignores_dir, 'Ignored_Structures_Publication2020.txt')
     if not os.path.isfile(path):
         return ignored
     smile_dict = helper.loadStructures(['SMILE', 'InChIKey'], ['KEGG', 'MetaCyc']).get('SMILE', {})
@@ -256,7 +257,7 @@ def main():
 
     print('Loading curation overrides...')
     acp_overrides = load_acp_overrides(ACPS_FILE)
-    ignored_cpds  = load_ignored_cpds(STRUCT_ROOT, helper)
+    ignored_cpds  = load_ignored_cpds(IGNORES_DIR, helper)
 
     print('Loading pKa data...')
     pka_data, pka_sources_seen = load_pka_data(STRUCT_ROOT, STRUCTURE_SOURCES)
@@ -340,7 +341,7 @@ def main():
                 gc_struct_type = 'SMILE'
         if gc_struct_type:
             struct = list(structures[cpd][gc_struct_type].keys())[0]
-            valid_aliases = {ext for _src, _stg, ext in all_evidence.get(cpd, {}).get(gc_struct_type, {}).get(struct, [])}
+            valid_aliases = sorted({ext for _src, _stg, ext in all_evidence.get(cpd, {}).get(gc_struct_type, {}).get(struct, [])})
             lowest_dg  = None
             lowest_src = None
             for ext_id in valid_aliases:

@@ -47,8 +47,8 @@ MS_Aliases_Dict =  CompoundsHelper.loadMSAliases(["KEGG","MetaCyc","ChEBI","Rhea
 master_structs_file = open(Structures_Root+"All_ModelSEED_Structures.txt",'w')
 unique_structs_file = open(Structures_Root+"Unique_ModelSEED_Structures.txt",'w')
 unique_structs_file.write("ID\tType\tAliases\tFormula\tCharge\tStructure\n")
-structure_conflicts_file = open("Structure_Conflicts.txt",'w')
-formula_conflicts_file = open("Formula_Conflicts.txt",'w')
+structure_conflicts_file = open(os.path.dirname(__file__)+"/../../Biochemistry/Structures/_reports/Structure_Conflicts.txt",'w')
+formula_conflicts_file = open(os.path.dirname(__file__)+"/../../Biochemistry/Structures/_reports/Formula_Conflicts.txt",'w')
 for msid in sorted(MS_Aliases_Dict.keys()):
 
     #Build collection of all structures for the ModelSEED ID
