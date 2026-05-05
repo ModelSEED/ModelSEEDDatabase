@@ -68,6 +68,8 @@ unique_structs_file = open(Structures_Root+"Unique_ModelSEED_Structures.txt",'w'
 unique_structs_file.write("ID\tType\tAliases\tFormula\tCharge\tStructure\n")
 structure_conflicts_file = open("Structure_Conflicts.txt",'w')
 formula_conflicts_file = open("Formula_Conflicts.txt",'w')
+pick_reasons_file = open(Structures_Root+"Pick_Reasons.txt",'w')
+pick_reasons_file.write("ID\tType\tStage\tReason\tChosen_Structure\tChosen_Aliases\n")
 
 #################################################################
 ## Iterate through ModelSEED identifiers
@@ -190,8 +192,10 @@ for msid in sorted(MS_Aliases_Dict.keys()):
     struct_pass=0
     struct_conflict=0
     formula_conflict=0
+    pick_reason=None
     if(len(Structs[struct_type][struct_stage].keys())==1):
         struct_pass=1
+        pick_reason="single_structure"
     elif(len(Formulas[struct_type][struct_stage].keys())==1):
         struct_conflict=1
         struct_pass=1
@@ -332,10 +336,11 @@ for msid in sorted(MS_Aliases_Dict.keys()):
                         #################################################################
 
                         chosen_structure = list(chosen_structures.keys())[0]
-                    
+                        pick_reason="multi_source_agreement"
+
                 else:
                     for structure in chosen_structures:
-                        
+
                         #################################################################
                         ## If more than one identical structures are found in more than
                         ## one database then we have to arbitrarily pick one
@@ -346,13 +351,15 @@ for msid in sorted(MS_Aliases_Dict.keys()):
                         #For SMILE string
                         if('UHFFFAOYSA' not in structure):
                             chosen_structure = structure
+                            pick_reason="multi_source_stereochemistry"
                             break
 
                     if(chosen_structure is None):
-                        
+
                         print(msid,chosen_structures)
 
                         chosen_structure = list(chosen_structures.keys())[0]
+                        pick_reason="multi_source_arbitrary"
                         
             else:
 
@@ -370,12 +377,16 @@ for msid in sorted(MS_Aliases_Dict.keys()):
                 if(structure_type == "SMILE"):
                     if('MetaCyc' in sources_structures):
                         chosen_structure = sorted(sources_structures['MetaCyc'])[0]
+                        pick_reason="smile_db_priority:MetaCyc"
                     elif('KEGG' in sources_structures):
                         chosen_structure = sorted(sources_structures['KEGG'])[0]
+                        pick_reason="smile_db_priority:KEGG"
                     elif('ChEBI' in sources_structures):
                         chosen_structure = sorted(sources_structures['ChEBI'])[0]
+                        pick_reason="smile_db_priority:ChEBI"
                     elif('Rhea' in sources_structures):
                         chosen_structure = sorted(sources_structures['Rhea'])[0]
+                        pick_reason="smile_db_priority:Rhea"
 
                 else:
 
@@ -424,15 +435,20 @@ for msid in sorted(MS_Aliases_Dict.keys()):
 
                         if(len(stereo_structures)==1):
                             chosen_structure=list(stereo_structures.keys())[0]
+                            pick_reason="connectivity_stereochemistry"
                         else:
                             if('MetaCyc' in sources_structures):
                                 chosen_structure = sorted(sources_structures['MetaCyc'])[0]
+                                pick_reason="connectivity_db_priority:MetaCyc"
                             elif('KEGG' in sources_structures):
                                 chosen_structure = sorted(sources_structures['KEGG'])[0]
+                                pick_reason="connectivity_db_priority:KEGG"
                             elif('ChEBI' in sources_structures):
                                 chosen_structure = sorted(sources_structures['ChEBI'])[0]
+                                pick_reason="connectivity_db_priority:ChEBI"
                             elif('Rhea' in sources_structures):
                                 chosen_structure = sorted(sources_structures['Rhea'])[0]
+                                pick_reason="connectivity_db_priority:Rhea"
 
                     #################################################################
                     ## Finally if we get to the point where there are multiple
@@ -446,12 +462,16 @@ for msid in sorted(MS_Aliases_Dict.keys()):
                         #For now, we pick MetaCyc
                         if('MetaCyc' in sources_structures):
                             chosen_structure = sorted(sources_structures['MetaCyc'])[0]
+                            pick_reason="multi_connectivity_db_priority:MetaCyc"
                         elif('KEGG' in sources_structures):
                             chosen_structure = sorted(sources_structures['KEGG'])[0]
+                            pick_reason="multi_connectivity_db_priority:KEGG"
                         elif('ChEBI' in sources_structures):
                             chosen_structure = sorted(sources_structures['ChEBI'])[0]
+                            pick_reason="multi_connectivity_db_priority:ChEBI"
                         elif('Rhea' in sources_structures):
                             chosen_structure = sorted(sources_structures['Rhea'])[0]
+                            pick_reason="multi_connectivity_db_priority:Rhea"
 
             #################################################################
             ## We have a chosen structure and we collect the aliases for that
@@ -522,3 +542,43 @@ for msid in sorted(MS_Aliases_Dict.keys()):
                 formula_dict=json.loads(formula)
                 formula_conflicts_file.write("\t".join((msid,struct_type,struct_stage,formula_dict['formula'],formula_dict['charge'],external_id,
                                                         Formulas[struct_type][struct_stage][formula][external_id]))+"\n")
+
+    #################################################################
+    ## Record which branch of the picker fired for this compound.
+    ## "single_structure" means no choice was needed; the *_db_priority
+    ## reasons are fallbacks when no source agreement existed; the
+    ## stereochemistry reasons are picks made to prefer stereo-specified
+    ## structures over UHFFFAOYSA.  formula_conflict means no pick was
+    ## made (the picker ran but rival structures had different formulas).
+    #################################################################
+
+    if(struct_pass and pick_reason is not None):
+        chosen_aliases_list=[]
+        try:
+            chosen_aliases_iter = chosen_aliases  # set when conflict cascade ran
+        except NameError:
+            chosen_aliases_iter = None
+        if(struct_conflict==0):
+            # Single-structure case: aliases are all those for the picked struct
+            for struct_t in ("InChI","InChIKey","SMILE"):
+                if(struct_t in Structs and struct_stage in Structs[struct_t]):
+                    for s in Structs[struct_t][struct_stage]:
+                        for a in Structs[struct_t][struct_stage][s]:
+                            chosen_aliases_list.append(a)
+                    break
+        else:
+            if(chosen_aliases_iter is not None):
+                chosen_aliases_list = list(chosen_aliases_iter.keys()) if isinstance(chosen_aliases_iter, dict) else list(chosen_aliases_iter)
+        chosen_struct_str = ""
+        try:
+            if(chosen_structure is not None):
+                chosen_struct_str = chosen_structure
+        except NameError:
+            pass
+        if(not chosen_struct_str and struct_conflict==0):
+            chosen_struct_str = list(Structs[struct_type][struct_stage].keys())[0]
+        pick_reasons_file.write("\t".join((msid,struct_type,struct_stage,pick_reason,
+                                           chosen_struct_str,
+                                           ";".join(sorted(set(chosen_aliases_list)))))+"\n")
+    elif(formula_conflict==1):
+        pick_reasons_file.write("\t".join((msid,struct_type,struct_stage,"formula_conflict_no_pick","",""))+"\n")
