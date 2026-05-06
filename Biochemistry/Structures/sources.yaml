@@ -84,10 +84,18 @@ sources:
       - file:    pkas/marvin_23.4.tsv
         tool:    Marvin
         version: "23.4"
-        consumed_by_production: false   # Update_Compound_pKas.py iterates [KEGG,MetaCyc] only
-        todo: |
-          Decide whether ChEBI pKa entries should feed compounds whose
-          only alias is in ChEBI; today such compounds get empty pka.
+        consumed_by_production: true
+        id_normalization: |
+          The pKa file's external_id column is keyed 'CHEBI_15377' but
+          the alias file uses bare numeric ids ('15377'). Compounds.
+          loadPerSourcePkas strips the 'CHEBI_' prefix at ingestion so
+          the lookup matches. Future regenerations of this file should
+          drop the prefix at the source (Marvin export step) so the
+          fix can be retired.
+        coverage: |
+          Enabling ChEBI as a fallback after KEGG and MetaCyc unlocks
+          ~3,800 additional compound pKa attributions (compounds whose
+          only structured alias is ChEBI).
 
   Rhea:
     snapshot: 2023-03-31
@@ -100,4 +108,17 @@ sources:
       - file:    pkas/marvin_23.4.tsv
         tool:    Marvin
         version: "23.4"
-        consumed_by_production: false   # same as ChEBI
+        consumed_by_production: true
+        id_normalization: |
+          The pKa file's external_id column is keyed 'POLYMER_10033'
+          but the alias file uses 'POLYMER:10033'. Compounds.
+          loadPerSourcePkas rewrites the underscore to a colon at
+          ingestion. Future regenerations should match the alias
+          format at the source.
+        coverage: |
+          Rhea's pKa data covers POLYMER_* compounds (structural
+          repeating units). All such compounds already have primary
+          pKa attribution from KEGG/MetaCyc/ChEBI, so Rhea is shadowed
+          for every current compound — added to the cascade for
+          completeness and for graceful degradation if primary
+          sources lose entries in the future.

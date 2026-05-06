@@ -46,7 +46,7 @@ IGNORES_DIR  = os.path.normpath(os.path.join(BIOCHEM_ROOT, 'Curation', 'ignores'
 
 STRUCTURE_SOURCES   = ['KEGG', 'MetaCyc', 'ChEBI', 'Rhea']
 PRIORITY_ORDER      = ['MetaCyc', 'KEGG', 'ChEBI', 'Rhea']
-PKA_REPLAY_SOURCES  = ['KEGG', 'MetaCyc']  # matches Update_Compound_pKas.py hardcode
+PKA_REPLAY_SOURCES  = ['KEGG', 'MetaCyc', 'ChEBI', 'Rhea']  # matches Update_Compound_pKas.py
 GC_REPLAY_SOURCES   = ['KEGG', 'MetaCyc']
 EXCLUDED_CPDS       = {'cpd11632'}  # 'Light', hardcoded skip in production
 

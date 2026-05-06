@@ -270,6 +270,15 @@ class Compounds:
         Reads from <db>/pkas/*.tsv (the post-A1 layout). Iterates every TSV
         in the pkas/ directory; if a source ships multiple snapshots, the
         last-sorted one wins for each (ext_id, kind) pair.
+
+        Normalizes source-specific id quirks so that the returned ext_id
+        matches the alias-file convention:
+          - ChEBI pKa rows are keyed 'CHEBI_15377' but Aliases lists '15377'.
+          - Rhea pKa rows are keyed 'POLYMER_10033' but Aliases lists
+            'POLYMER:10033'.
+        Without this normalization the lookup never matches and the
+        pKa data is silently unused. See sources.yaml for the
+        consumed_by_production flag history.
         """
         if db_array is None:
             db_array = ['KEGG', 'MetaCyc', 'ChEBI', 'Rhea']
@@ -288,6 +297,10 @@ class Compounds:
                         value  = line.get('value')
                         if not ext_id or not kind:
                             continue
+                        if db == 'ChEBI' and ext_id.startswith('CHEBI_'):
+                            ext_id = ext_id[len('CHEBI_'):]
+                        elif db == 'Rhea' and ext_id.startswith('POLYMER_'):
+                            ext_id = 'POLYMER:' + ext_id[len('POLYMER_'):]
                         out.setdefault((db, ext_id), {})[kind] = value
         return out
 
