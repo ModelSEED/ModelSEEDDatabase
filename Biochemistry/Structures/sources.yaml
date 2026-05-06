@@ -1,27 +1,31 @@
 # Source metadata for the per-database structure files in this directory.
 #
-# This file describes the *current* layout (so that consumers and
-# curators can resolve "where did this protonation come from?" without
-# reading every script) AND the *target* layout (the migration plan
-# referenced in README.md).
+# Layout convention (one folder per source):
 #
-# Today, each source folder contains six text files keyed by
-# {InChI,InChIKey,SMILE} × {Original,Charged}, plus pKa_Strings.txt.
-# Protonation method, tool version, and pH are encoded only in the
-# filename "Charged" suffix and in tribal knowledge — this YAML moves
-# that metadata into structured data without yet renaming files.
+#   <source>/
+#     inchi.tsv             external_id, inchi, formula, charge
+#     smiles.tsv            external_id, smiles, formula, charge
+#     inchikey.tsv          external_id, inchikey
+#     protonations/
+#       <tool>_<ver>_ph<n>.tsv
+#                           external_id, type, structure, formula,
+#                           charge, tool, tool_version, ph,
+#                           generated_on
+#     pkas/
+#       <tool>_<ver>.tsv    external_id, kind, value, tool, tool_version
 #
-# A subsequent migration (see README.md "Pipeline" section) will:
-#   1. Generate the target layout files from the current ones.
-#   2. Switch readers (BiochemPy.loadStructures, the four
-#      Update_Compound_*.py scripts) to the new layout.
-#   3. Retire the old *_Strings.txt and *_Formulas_Charges.txt files.
+# This YAML records the per-source state — snapshot dates, the tool
+# and version that produced each protonation/pKa bundle, and which
+# pKa bundles are actually consumed by the production update scripts.
+# Adding a new pH or a new Marvin version means dropping a new file
+# in protonations/ or pkas/ and adding an entry below; nothing else
+# in the layout needs to move.
 
-version: 1
+version: 2
 
-# Sources are listed in pick-priority order. When multiple sources
-# disagree on a structure for a compound and the multi-source-agreement
-# and stereochemistry rules in List_ModelSEED_Structures.py do not
+# Pick-priority order. When multiple sources disagree on a structure
+# for the same compound, and the multi-source-agreement and
+# stereochemistry rules in List_ModelSEED_Structures.py do not
 # decide, the picker takes the first source in this list.
 priority:
   - MetaCyc
@@ -31,158 +35,69 @@ priority:
 
 # When a compound has structures of multiple types/stages, this is the
 # order Update_Compound_Structures_Formulas_Charge.py uses to populate
-# formula/charge/inchikey/smiles. Charged-stage InChI wins where
-# present; Original is the fallback when Marvin failed to protonate.
+# the canonical formula/charge/inchikey/smiles fields.
 structure_pick_order:
   - InChI@Charged
   - InChI@Original
   - SMILE@Charged
   - SMILE@Original
 
-# ---------------------------------------------------------------------
-# Per-source state
-# ---------------------------------------------------------------------
 sources:
 
   KEGG:
-    snapshot: 2024-01-23   # last-touched date of *_ChargedStrings.txt files
-    structure_files:
-      original_inchi:    KEGG/InChI_OriginalStrings.txt
-      original_smiles:   KEGG/SMILE_OriginalStrings.txt
-      original_inchikey: KEGG/InChIKey_OriginalStrings.txt
-      charged_inchi:     KEGG/InChI_ChargedStrings.txt
-      charged_smiles:    KEGG/SMILE_ChargedStrings.txt
-      charged_inchikey:  KEGG/InChIKey_ChargedStrings.txt
-      formulas_charges:
-        - KEGG/InChI_Charged_Formulas_Charges.txt
-        - KEGG/InChI_Original_Formulas_Charges.txt
-        - KEGG/SMILE_Charged_Formulas_Charges.txt
-        - KEGG/SMILE_Original_Formulas_Charges.txt
-    protonation:
-      tool:    Marvin
-      version: "23.4"     # inferred from Curation/ignores/ignored_structures_marvin234_winter2023.txt
-      ph:      7
-    pka:
-      tool:    Marvin
-      version: "23.4"
-      file:    KEGG/pKa_Strings.txt
-      consumed_by_production: true   # Update_Compound_pKas.py reads this
+    snapshot: 2024-01-23           # last-touched date of the source structures
+    protonations:
+      - file:    protonations/marvin_23.4_ph7.tsv
+        tool:    Marvin
+        version: "23.4"
+        ph:      7
+    pkas:
+      - file:    pkas/marvin_23.4.tsv
+        tool:    Marvin
+        version: "23.4"
+        consumed_by_production: true   # Update_Compound_pKas.py reads this
     notes: |
       KEGG mol files were also parsed for SRUs (structural repeating
-      units); the SRU filter file is KEGG/KEGG_SRU_041020.txt.
+      units); the SRU filter file is KEGG_SRU_041020.txt.
 
   MetaCyc:
     snapshot: 2024-01-23
-    structure_files:
-      original_inchi:    MetaCyc/InChI_OriginalStrings.txt
-      original_smiles:   MetaCyc/SMILE_OriginalStrings.txt
-      original_inchikey: MetaCyc/InChIKey_OriginalStrings.txt
-      charged_inchi:     MetaCyc/InChI_ChargedStrings.txt
-      charged_smiles:    MetaCyc/SMILE_ChargedStrings.txt
-      charged_inchikey:  MetaCyc/InChIKey_ChargedStrings.txt
-      formulas_charges:
-        - MetaCyc/InChI_Charged_Formulas_Charges.txt
-        - MetaCyc/InChI_Original_Formulas_Charges.txt
-        - MetaCyc/SMILE_Charged_Formulas_Charges.txt
-        - MetaCyc/SMILE_Original_Formulas_Charges.txt
-    protonation:
-      tool:    Marvin
-      version: "23.4"
-      ph:      7
-    pka:
-      tool:    Marvin
-      version: "23.4"
-      file:    MetaCyc/pKa_Strings.txt
-      consumed_by_production: true
+    protonations:
+      - file:    protonations/marvin_23.4_ph7.tsv
+        tool:    Marvin
+        version: "23.4"
+        ph:      7
+    pkas:
+      - file:    pkas/marvin_23.4.tsv
+        tool:    Marvin
+        version: "23.4"
+        consumed_by_production: true
 
   ChEBI:
     snapshot: 2024-01-23
-    structure_files:
-      original_inchi:    ChEBI/InChI_OriginalStrings.txt
-      original_smiles:   ChEBI/SMILE_OriginalStrings.txt
-      original_inchikey: ChEBI/InChIKey_OriginalStrings.txt
-      charged_inchi:     ChEBI/InChI_ChargedStrings.txt
-      charged_smiles:    ChEBI/SMILE_ChargedStrings.txt
-      charged_inchikey:  ChEBI/InChIKey_ChargedStrings.txt
-      formulas_charges:
-        - ChEBI/InChI_Charged_Formulas_Charges.txt
-        - ChEBI/InChI_Original_Formulas_Charges.txt
-        - ChEBI/SMILE_Charged_Formulas_Charges.txt
-        - ChEBI/SMILE_Original_Formulas_Charges.txt
-    protonation:
-      tool:    Marvin
-      version: "23.4"
-      ph:      7
-    pka:
-      tool:    Marvin
-      version: "23.4"
-      file:    ChEBI/pKa_Strings.txt
-      consumed_by_production: false   # file is present but Update_Compound_pKas.py iterates [KEGG,MetaCyc] only
-      todo: |
-        Decide whether ChEBI pKa entries should feed compounds whose
-        only alias is in ChEBI; today such compounds get empty pka.
+    protonations:
+      - file:    protonations/marvin_23.4_ph7.tsv
+        tool:    Marvin
+        version: "23.4"
+        ph:      7
+    pkas:
+      - file:    pkas/marvin_23.4.tsv
+        tool:    Marvin
+        version: "23.4"
+        consumed_by_production: false   # Update_Compound_pKas.py iterates [KEGG,MetaCyc] only
+        todo: |
+          Decide whether ChEBI pKa entries should feed compounds whose
+          only alias is in ChEBI; today such compounds get empty pka.
 
   Rhea:
     snapshot: 2023-03-31
-    structure_files:
-      original_inchi:    Rhea/InChI_OriginalStrings.txt
-      original_smiles:   Rhea/SMILE_OriginalStrings.txt
-      original_inchikey: Rhea/InChIKey_OriginalStrings.txt
-      charged_inchi:     Rhea/InChI_ChargedStrings.txt
-      charged_smiles:    Rhea/SMILE_ChargedStrings.txt
-      charged_inchikey:  Rhea/InChIKey_ChargedStrings.txt
-      formulas_charges:
-        - Rhea/InChI_Charged_Formulas_Charges.txt
-        - Rhea/InChI_Original_Formulas_Charges.txt
-        - Rhea/SMILE_Charged_Formulas_Charges.txt
-        - Rhea/SMILE_Original_Formulas_Charges.txt
-    protonation:
-      tool:    Marvin
-      version: "23.4"
-      ph:      7
-    pka:
-      tool:    Marvin
-      version: "23.4"
-      file:    Rhea/pKa_Strings.txt
-      consumed_by_production: false   # same as ChEBI
-
-# ---------------------------------------------------------------------
-# Target layout for the planned A1 migration
-# ---------------------------------------------------------------------
-# The current naming bakes the protonation method into the filename
-# axis ("_ChargedStrings"), so every new method or pH would require
-# forking parallel files. The target layout makes protonation a row
-# attribute so that:
-#   - adding pH 5 = new file in protonations/
-#   - bumping Marvin version = new file in protonations/
-#   - diffing two protonation engines = diff one pair of files
-#
-# Per source:
-#
-#   Biochemistry/Structures/<SOURCE>/
-#     inchi.tsv      # external_id, inchi, snapshot_date
-#     smiles.tsv     # external_id, smiles, snapshot_date
-#     inchikey.tsv   # external_id, inchikey, snapshot_date
-#     protonations/
-#       <tool>_<version>_ph<value>.tsv
-#         # external_id, inchi, smiles, inchikey, formula, charge,
-#         # tool, tool_version, ph, generated_on
-#     pkas/
-#       <tool>_<version>.tsv
-#         # external_id, fragment, atom, kind (pKa|pKb), value,
-#         # tool, tool_version
-target_layout:
-  per_source:
-    - inchi.tsv
-    - smiles.tsv
-    - inchikey.tsv
-    - protonations/<tool>_<version>_ph<value>.tsv
-    - pkas/<tool>_<version>.tsv
-
-# Migration is staged so each step can be reviewed independently:
-#   1. Land this schema (this commit).
-#   2. Generate target-layout files alongside the existing ones (no
-#      reader changes; data identical, just regrouped).
-#   3. Switch BiochemPy.loadStructures and the four
-#      Update_Compound_*.py scripts to the new layout.
-#   4. Retire the old *_Strings.txt and *_Formulas_Charges.txt files.
+    protonations:
+      - file:    protonations/marvin_23.4_ph7.tsv
+        tool:    Marvin
+        version: "23.4"
+        ph:      7
+    pkas:
+      - file:    pkas/marvin_23.4.tsv
+        tool:    Marvin
+        version: "23.4"
+        consumed_by_production: false   # same as ChEBI
