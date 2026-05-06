@@ -3,24 +3,24 @@ import os,sys
 sys.path.append('../../Libs/Python')
 from BiochemPy import Compounds
 
-Structures_Root=os.path.dirname(__file__)+"/../../Biochemistry/Structures/"
-
-# Load pKas and pKbs
-cpd_pKab_dict=dict()
-for DB in ["KEGG","MetaCyc"]:
-    with open(Structures_Root+DB+'/pKa_Strings.txt') as fh:
-        for line in fh.readlines():
-            line=line.strip()
-            array=line.split('\t')
-            if(array[0] not in cpd_pKab_dict):
-                cpd_pKab_dict[array[0]]={array[1]:array[2]}
-            else:
-                cpd_pKab_dict[array[0]][array[1]]=array[2]
-
 compounds_helper = Compounds()
 compounds_dict = compounds_helper.loadCompounds()
 structures_dict = compounds_helper.loadStructures(["SMILE","InChI","InChIKey"],["ModelSEED"])
 aliases_dict = compounds_helper.loadMSAliases()
+
+# Load pKas and pKbs from the post-A1 layout: <db>/pkas/<tool>_<ver>.tsv.
+# Iteration order remains [KEGG, MetaCyc] to match production behavior;
+# ChEBI/Rhea pKa data is present on disk but intentionally excluded
+# pending the curation decision tracked in
+# Biochemistry/Structures/sources.yaml under each source's pka.todo.
+PKA_DBS = ["KEGG", "MetaCyc"]
+per_source_pkas = compounds_helper.loadPerSourcePkas(PKA_DBS)
+cpd_pKab_dict = dict()
+for (db, ext_id), entry in per_source_pkas.items():
+    if(ext_id not in cpd_pKab_dict):
+        cpd_pKab_dict[ext_id] = dict()
+    for kind, value in entry.items():
+        cpd_pKab_dict[ext_id][kind] = value
 
 # We're removing all pKa and pKb before loading new ones
 for cpd in compounds_dict:

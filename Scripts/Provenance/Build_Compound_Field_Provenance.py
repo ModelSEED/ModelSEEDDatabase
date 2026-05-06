@@ -99,22 +99,15 @@ def evidence_for(all_evidence, cpd, stype, structure):
     return ';'.join(out)
 
 
-def load_pka_data(struct_root, sources):
-    """{(DB, ext_id): {'pKa': value, 'pKb': value}}"""
-    data = {}
-    seen = []
-    for db in sources:
-        path = os.path.join(struct_root, db, 'pKa_Strings.txt')
-        if not os.path.isfile(path):
-            continue
-        seen.append(db)
-        with open(path) as fh:
-            for line in fh:
-                parts = line.rstrip('\n').split('\t')
-                if len(parts) < 3:
-                    continue
-                ext_id, kind, val = parts[0], parts[1], parts[2]
-                data.setdefault((db, ext_id), {})[kind] = val
+def load_pka_data(helper, sources):
+    """{(DB, ext_id): {'pKa': value, 'pKb': value}}.
+
+    Reads from the post-A1 layout via Compounds.loadPerSourcePkas, which
+    pulls every <db>/pkas/*.tsv. Returns the same dict shape as before
+    so the downstream replay logic is unchanged.
+    """
+    data = helper.loadPerSourcePkas(sources)
+    seen = sorted({db for (db, _ext) in data.keys()})
     return data, seen
 
 
@@ -260,7 +253,7 @@ def main():
     ignored_cpds  = load_ignored_cpds(IGNORES_DIR, helper)
 
     print('Loading pKa data...')
-    pka_data, pka_sources_seen = load_pka_data(STRUCT_ROOT, STRUCTURE_SOURCES)
+    pka_data, pka_sources_seen = load_pka_data(helper, STRUCTURE_SOURCES)
     print(f'  pKa files present: {pka_sources_seen}')
     print(f'  pKa replay sources (matching production): {PKA_REPLAY_SOURCES}')
 

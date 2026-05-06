@@ -19,25 +19,7 @@ Compounds_Dict = CompoundsHelper.loadCompounds()
 #################################################################
 
 Structures_Root=os.path.dirname(__file__)+"/../../Biochemistry/Structures/"
-Formulas_Dict=dict()
-for source in "KEGG","MetaCyc","ChEBI","Rhea":
-    if(source not in Formulas_Dict):
-        Formulas_Dict[source]=dict()
-
-    for struct_type in "InChI","SMILE":
-        if(struct_type not in Formulas_Dict[source]):
-            Formulas_Dict[source][struct_type]=dict()
-
-        for struct_stage in "Charged","Original":
-            if(struct_stage not in Formulas_Dict[source][struct_type]):
-                Formulas_Dict[source][struct_type][struct_stage]=dict()
-
-            file_name=Structures_Root+source+"/"+struct_type+"_"+struct_stage+"_Formulas_Charges.txt"
-            with open(file_name) as file_handle:
-                for line in file_handle.readlines():
-                    line=line.strip()
-                    array=line.split('\t')
-                    Formulas_Dict[source][struct_type][struct_stage][array[0]]={'formula':array[1],'charge':array[2]}
+Formulas_Dict = CompoundsHelper.loadPerSourceFormulasCharges(['InChI','SMILE'], ['KEGG','MetaCyc','ChEBI','Rhea'])
 
 #################################################################
 ## Load Curated Picks for Structures

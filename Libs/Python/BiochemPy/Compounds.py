@@ -167,27 +167,129 @@ class Compounds:
                         structures_dict[line['ID']][line['Source']][line['Structure']]['type']=line['Type']
             return structures_dict
 
+        # Per-source layout (post-A1 migration):
+        #   <db>/inchi.tsv, smiles.tsv, inchikey.tsv  → "Original" stage
+        #   <db>/protonations/*.tsv                   → "Charged" stage
+        # Stage names "Original" / "Charged" preserved so callers
+        # (List_ModelSEED_Structures.py, etc.) keep working unchanged.
+        original_files   = {'InChI': 'inchi.tsv', 'SMILE': 'smiles.tsv', 'InChIKey': 'inchikey.tsv'}
+        original_columns = {'InChI': 'inchi',     'SMILE': 'smiles',     'InChIKey': 'inchikey'}
+
         for struct_type in sources_array:
-            structures_dict[struct_type]=dict()
+            structures_dict[struct_type] = dict()
             for db in db_array:
-                for struct_stage in ["Charged","Original"]:
-                    struct_file = db+"/"+struct_type+"_"+struct_stage+"Strings.txt"
-                    struct_file = self.StructRoot+struct_file
+                # ---- "Original" stage: source-as-downloaded ----
+                f = self.StructRoot + db + "/" + original_files.get(struct_type, '')
+                if os.path.isfile(f):
+                    with open(f) as fh:
+                        reader = DictReader(fh, dialect='excel-tab')
+                        col = original_columns[struct_type]
+                        for line in reader:
+                            ext_id = line.get('external_id') or line.get('ID')
+                            struct = line.get(col)
+                            if not ext_id or not struct:
+                                continue
+                            structures_dict[struct_type].setdefault(ext_id, {}).setdefault('Original', {})[struct] = 1
 
-                    if(os.path.isfile(struct_file)==False):
-                        continue
-
-                    reader = DictReader(open(struct_file), dialect = "excel-tab", fieldnames = ['ID','Structure','Name'])
-                    for line in reader:
-                        if(line['ID'] not in structures_dict[struct_type]):
-                            structures_dict[struct_type][line['ID']]=dict()
-
-                        if(struct_stage not in structures_dict[struct_type][line['ID']]):
-                            structures_dict[struct_type][line['ID']][struct_stage]=dict()
-
-                        structures_dict[struct_type][line['ID']][struct_stage][line['Structure']]=1
+                # ---- "Charged" stage: protonations/<tool>_<ver>_ph<n>.tsv ----
+                proto_dir = self.StructRoot + db + "/protonations"
+                if os.path.isdir(proto_dir):
+                    for proto_file in sorted(glob.glob(proto_dir + "/*.tsv")):
+                        with open(proto_file) as fh:
+                            reader = DictReader(fh, dialect='excel-tab')
+                            for line in reader:
+                                if line.get('type') != struct_type:
+                                    continue
+                                ext_id = line.get('external_id')
+                                struct = line.get('structure')
+                                if not ext_id or not struct:
+                                    continue
+                                structures_dict[struct_type].setdefault(ext_id, {}).setdefault('Charged', {})[struct] = 1
 
         return structures_dict
+
+    def loadPerSourceFormulasCharges(self, struct_types=None, db_array=None):
+        """Returns formulas[db][struct_type][stage][ext_id] = {'formula', 'charge'}.
+
+        Reads from the new layout: inchi.tsv / smiles.tsv carry per-source
+        Original-stage formula+charge; protonations/*.tsv carries Charged-stage
+        formula+charge filtered by the 'type' column. Mirrors the dict shape
+        that List_ModelSEED_Structures.py used to build by reading
+        *_Formulas_Charges.txt files directly.
+        """
+        if struct_types is None:
+            struct_types = ['InChI', 'SMILE']
+        if db_array is None:
+            db_array = ['KEGG', 'MetaCyc', 'ChEBI', 'Rhea']
+
+        original_files   = {'InChI': 'inchi.tsv', 'SMILE': 'smiles.tsv'}
+        out = {}
+        for db in db_array:
+            out[db] = {}
+            for struct_type in struct_types:
+                out[db][struct_type] = {'Charged': {}, 'Original': {}}
+
+                # Original
+                if struct_type in original_files:
+                    f = self.StructRoot + db + '/' + original_files[struct_type]
+                    if os.path.isfile(f):
+                        with open(f) as fh:
+                            reader = DictReader(fh, dialect='excel-tab')
+                            for line in reader:
+                                ext_id = line.get('external_id')
+                                if not ext_id:
+                                    continue
+                                if line.get('formula') or line.get('charge'):
+                                    out[db][struct_type]['Original'][ext_id] = {
+                                        'formula': line.get('formula', ''),
+                                        'charge':  line.get('charge', ''),
+                                    }
+
+                # Charged
+                proto_dir = self.StructRoot + db + '/protonations'
+                if os.path.isdir(proto_dir):
+                    for proto_file in sorted(glob.glob(proto_dir + '/*.tsv')):
+                        with open(proto_file) as fh:
+                            reader = DictReader(fh, dialect='excel-tab')
+                            for line in reader:
+                                if line.get('type') != struct_type:
+                                    continue
+                                ext_id = line.get('external_id')
+                                if not ext_id:
+                                    continue
+                                if line.get('formula') or line.get('charge'):
+                                    out[db][struct_type]['Charged'][ext_id] = {
+                                        'formula': line.get('formula', ''),
+                                        'charge':  line.get('charge', ''),
+                                    }
+        return out
+
+    def loadPerSourcePkas(self, db_array=None):
+        """Returns pkas[(db, ext_id)] = {'pKa': value, 'pKb': value}.
+
+        Reads from <db>/pkas/*.tsv (the post-A1 layout). Iterates every TSV
+        in the pkas/ directory; if a source ships multiple snapshots, the
+        last-sorted one wins for each (ext_id, kind) pair.
+        """
+        if db_array is None:
+            db_array = ['KEGG', 'MetaCyc', 'ChEBI', 'Rhea']
+
+        out = {}
+        for db in db_array:
+            pka_dir = self.StructRoot + db + '/pkas'
+            if not os.path.isdir(pka_dir):
+                continue
+            for pka_file in sorted(glob.glob(pka_dir + '/*.tsv')):
+                with open(pka_file) as fh:
+                    reader = DictReader(fh, dialect='excel-tab')
+                    for line in reader:
+                        ext_id = line.get('external_id')
+                        kind   = line.get('kind')
+                        value  = line.get('value')
+                        if not ext_id or not kind:
+                            continue
+                        out.setdefault((db, ext_id), {})[kind] = value
+        return out
 
     @staticmethod
     def searchname(name):
