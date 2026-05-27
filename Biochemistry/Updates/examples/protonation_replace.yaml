@@ -1,0 +1,35 @@
+# Example manifest: drop in a fresh protonation bundle from a new
+# Marvin version. This is the "bump tool" workflow.
+#
+# Apply_Manifest validates the new file's columns against the schema
+# and copies it into place. The cascade re-runs everything downstream
+# of Print so all derived formulas/charges/fingerprints reflect the
+# new tool.
+
+type: protonation_replace
+title: Marvin 24.0 protonation refresh for KEGG
+author: andrewfreiburger
+date: 2026-05-06
+reason: |
+  Marvin 24.0 corrects ~120 known mis-protonations at pH 7 (the
+  release notes call out aldehyde/hemiketal handling specifically).
+  Bump our KEGG protonation bundle to the new version and re-cascade.
+
+target:
+  source: KEGG
+
+change:
+  source_file: /tmp/incoming/marvin_24.0_kegg_ph7.tsv  # path to the new file
+  destination: protonations/marvin_24.0_ph7.tsv
+  tool: Marvin
+  tool_version: "24.0"
+  ph: 7
+  generated_on: 2026-05-04
+  retire_existing:                    # optional: list of older
+    - protonations/marvin_23.4_ph7.tsv  # files to delete in the same step
+
+expected_effects:
+  affected_compounds: 120
+  fields_changed:
+    - formula
+    - charge

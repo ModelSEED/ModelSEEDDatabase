@@ -1,0 +1,124 @@
+# Source metadata for the per-database structure files in this directory.
+#
+# Layout convention (one folder per source):
+#
+#   <source>/
+#     inchi.tsv             external_id, inchi, formula, charge
+#     smiles.tsv            external_id, smiles, formula, charge
+#     inchikey.tsv          external_id, inchikey
+#     protonations/
+#       <tool>_<ver>_ph<n>.tsv
+#                           external_id, type, structure, formula,
+#                           charge, tool, tool_version, ph,
+#                           generated_on
+#     pkas/
+#       <tool>_<ver>.tsv    external_id, kind, value, tool, tool_version
+#
+# This YAML records the per-source state — snapshot dates, the tool
+# and version that produced each protonation/pKa bundle, and which
+# pKa bundles are actually consumed by the production update scripts.
+# Adding a new pH or a new Marvin version means dropping a new file
+# in protonations/ or pkas/ and adding an entry below; nothing else
+# in the layout needs to move.
+
+version: 2
+
+# Pick-priority order. When multiple sources disagree on a structure
+# for the same compound, and the multi-source-agreement and
+# stereochemistry rules in List_ModelSEED_Structures.py do not
+# decide, the picker takes the first source in this list.
+priority:
+  - MetaCyc
+  - KEGG
+  - ChEBI
+  - Rhea
+
+# When a compound has structures of multiple types/stages, this is the
+# order Update_Compound_Structures_Formulas_Charge.py uses to populate
+# the canonical formula/charge/inchikey/smiles fields.
+structure_pick_order:
+  - InChI@Charged
+  - InChI@Original
+  - SMILE@Charged
+  - SMILE@Original
+
+sources:
+
+  KEGG:
+    snapshot: 2024-01-23           # last-touched date of the source structures
+    protonations:
+      - file:    protonations/marvin_23.4_ph7.tsv
+        tool:    Marvin
+        version: "23.4"
+        ph:      7
+    pkas:
+      - file:    pkas/marvin_23.4.tsv
+        tool:    Marvin
+        version: "23.4"
+        consumed_by_production: true   # Update_Compound_pKas.py reads this
+    notes: |
+      KEGG mol files were also parsed for SRUs (structural repeating
+      units); the SRU filter file is KEGG_SRU_041020.txt.
+
+  MetaCyc:
+    snapshot: 2024-01-23
+    protonations:
+      - file:    protonations/marvin_23.4_ph7.tsv
+        tool:    Marvin
+        version: "23.4"
+        ph:      7
+    pkas:
+      - file:    pkas/marvin_23.4.tsv
+        tool:    Marvin
+        version: "23.4"
+        consumed_by_production: true
+
+  ChEBI:
+    snapshot: 2024-01-23
+    protonations:
+      - file:    protonations/marvin_23.4_ph7.tsv
+        tool:    Marvin
+        version: "23.4"
+        ph:      7
+    pkas:
+      - file:    pkas/marvin_23.4.tsv
+        tool:    Marvin
+        version: "23.4"
+        consumed_by_production: true
+        id_normalization: |
+          The pKa file's external_id column is keyed 'CHEBI_15377' but
+          the alias file uses bare numeric ids ('15377'). Compounds.
+          loadPerSourcePkas strips the 'CHEBI_' prefix at ingestion so
+          the lookup matches. Future regenerations of this file should
+          drop the prefix at the source (Marvin export step) so the
+          fix can be retired.
+        coverage: |
+          Enabling ChEBI as a fallback after KEGG and MetaCyc unlocks
+          ~3,800 additional compound pKa attributions (compounds whose
+          only structured alias is ChEBI).
+
+  Rhea:
+    snapshot: 2023-03-31
+    protonations:
+      - file:    protonations/marvin_23.4_ph7.tsv
+        tool:    Marvin
+        version: "23.4"
+        ph:      7
+    pkas:
+      - file:    pkas/marvin_23.4.tsv
+        tool:    Marvin
+        version: "23.4"
+        consumed_by_production: true
+        id_normalization: |
+          The pKa file's external_id column is keyed 'POLYMER_10033'
+          but the alias file uses 'POLYMER:10033'. Compounds.
+          loadPerSourcePkas rewrites the underscore to a colon at
+          ingestion. Future regenerations should match the alias
+          format at the source.
+        coverage: |
+          Rhea's pKa data covers POLYMER_* compounds (structural
+          repeating units). All such compounds already have primary
+          pKa attribution from KEGG/MetaCyc/ChEBI, so Rhea is shadowed
+          for every current compound — added to the cascade for
+          completeness and for graceful degradation if primary
+          sources lose entries in the future.

@@ -1,0 +1,30 @@
+# Example manifest: flag a source structure as one to ignore at
+# consolidation time.
+#
+# List_ModelSEED_Structures.py reads every *.txt file in
+# Biochemistry/Curation/ignores/. An external_id listed there is
+# excluded from the cross-source structure pick.
+
+type: ignore_add
+title: Ignore MetaCyc CPD-NEW-CONFLICT due to malformed two-R-group structure
+author: andrewfreiburger
+date: 2026-05-06
+reason: |
+  MetaCyc release 2026-Q2 added a new structure for this compound
+  that contains two distinct R groups, which our pipeline does not
+  handle. ChEBI ships the canonical single-R-group form. Ignore the
+  MetaCyc structure so the picker selects ChEBI instead.
+
+target:
+  file: Curation/ignores/ignored_structures_marvin240_2026.txt
+  create_if_missing: true
+
+change:
+  add_row:
+    external_id: CPD-NEW-CONFLICT
+    accepted:    None             # 'None' triggers the R/0 fallback in
+                                  # Update_Compound_Structures_Formulas_Charge
+    notes: "MetaCyc 2026-Q2 added two-R-group structure"
+
+expected_effects:
+  affected_compounds: 1
