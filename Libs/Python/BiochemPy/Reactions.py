@@ -91,7 +91,7 @@ class Reactions:
             if(match is not None):
                 reagent=1
 
-            match=re.search('^\((\d+(?:\.\d+)?)\)$',text)
+            match=re.search(r'^\((\d+(?:\.\d+)?)\)$',text)
             if(match is not None):
                 coeff=match.group(1)
 
@@ -100,7 +100,7 @@ class Reactions:
                 if (str(coeff)[-2:] == ".0"):
                     coeff = int(round(coeff))
 
-            match=re.search('^(cpd\d{5})\[(\d)\]$',text)
+            match=re.search(r'^(cpd\d{5})\[(\d)\]$',text)
             if(match is not None):
 
                 #Side of equation

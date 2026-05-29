@@ -16,7 +16,7 @@ def parse(inchi, merge_formula=False):
     layer_dict = dict([(x, "") for x in InChI_Layers])
 
     # special case for proton
-    m = re.match('^InChI=1S/p([-+]\d*)', inchi)
+    m = re.match(r'^InChI=1S/p([-+]\d*)', inchi)
     if m:
         layer_dict['p'] = m.group(1)
         return "", layer_dict
@@ -63,7 +63,7 @@ def charge(q_layer,p_layer):
                 (multiplier,charge) = (1,0)
 
                 #Match for multiplier
-                m = re.match('^(\d+)\*(.+)$', q_component)
+                m = re.match(r'^(\d+)\*(.+)$', q_component)
                 if m:
                     multiplier = int(m.group(1))
                     charge = int(m.group(2))

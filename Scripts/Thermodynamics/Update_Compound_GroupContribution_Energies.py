@@ -98,10 +98,7 @@ for cpd in sorted (compounds_dict.keys()):
     # values always saved as list of energy and error
     if(not isinstance(compounds_dict[cpd]['thermodynamics'],dict)):
         compounds_dict[cpd]['thermodynamics'] = dict()
-    if('Group contribution' not in compounds_dict[cpd]['thermodynamics']):
-        compounds_dict[cpd]['thermodynamics']['Group contribution']=list()
-    compounds_dict[cpd]['thermodynamics']['Group contribution'].append(lowest_dg)
-    compounds_dict[cpd]['thermodynamics']['Group contribution'].append(lowest_dge)
+    compounds_dict[cpd]['thermodynamics']['Group contribution']=[lowest_dg,lowest_dge]
 
 print("Saving compounds")
 compounds_helper.saveCompounds(compounds_dict)
