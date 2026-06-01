@@ -1,0 +1,556 @@
+\documentclass[aspectratio=169,11pt]{beamer}
+\usetheme{Madrid}
+\usecolortheme{seahorse}
+
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{xcolor}
+\usepackage{tikz}
+\usetikzlibrary{shapes.geometric, arrows.meta, positioning}
+\usepackage{graphicx}
+\graphicspath{{../structure_review_output/struct_imgs/}}
+
+\definecolor{acceptgreen}{RGB}{34,139,34}
+\definecolor{rejectred}{RGB}{178,34,34}
+\definecolor{warnblue}{RGB}{0,90,156}
+
+\setbeamertemplate{navigation symbols}{}
+\setbeamerfont{frametitle}{size=\normalsize}
+\setbeamerfont{title}{size=\large}
+
+\title{ModelSEED PubChem Cross-Validation}
+\subtitle{Production Run Results --- May 2026}
+\author{Ray Zhu}
+\date{\today}
+
+\begin{document}
+
+% =====================================================================
+\begin{frame}
+\titlepage
+\end{frame}
+
+% =====================================================================
+\begin{frame}{Pipeline Overview}
+
+\textbf{Goal}: Validate and correct 37,011 compound structures in
+ModelSEED against PubChem, and classify all discrepancies.
+
+\medskip
+\small
+\textbf{Pipeline} (\texttt{Validate\_PubChem\_Structures.py}):
+\begin{description}\setlength\itemsep{1pt}
+  \item[Phase 0] Self-consistency --- recompute formula/charge
+        from InChI, flag SMILES$\leftrightarrow$InChI mismatches
+  \item[Phase 1] External ID lookup --- query PubChem via
+        ChEBI/KEGG cross-references (highest confidence)
+  \item[Phase 2] Name lookup --- batch compound name queries
+        with multi-name disambiguation (for unresolved compounds)
+  \item[Phase 3] Recovery --- direct InChIKey/InChI lookup in
+        PubChem for compounds still unresolved after Phases~1--2
+  \item[Phase 4] Classification --- InChIKey block comparison
+        + cascading mismatch sub-classification
+  \item[Phase 5] Corrections --- validate stereo (count +
+        inversion check) and protonation (ChemAxon $\mathrm{p}K_\mathrm{a}$)
+  \item[Phase 6] Output --- write corrected structure files,
+        canonicalize SMILES, build Unique file using
+        \texttt{List\_ModelSEED\_Structures.py} selection logic,
+        record structural and formula conflicts
+\end{description}
+
+\end{frame}
+
+% =====================================================================
+\begin{frame}{Dataset \& Scope}
+
+\begin{columns}[T]
+\begin{column}{0.44\textwidth}
+\begin{table}[h]
+\centering
+\small
+\begin{tabular}{lr}
+\toprule
+\textbf{Metric} & \textbf{Count} \\
+\midrule
+Total compounds          & 37,011 \\
+Skipped (R-groups)       &  6,508 \\
+With InChIKey            & 30,431 \\
+With names               & 36,784 \\
+ChemAxon pKa loaded      & 45,708 \\
+\textbf{Validated}       & \textbf{30,333} \\
+\bottomrule
+\end{tabular}
+\end{table}
+\end{column}
+
+\begin{column}{0.52\textwidth}
+\textbf{Self-consistency fixes} (Phase~0):
+\begin{itemize}\setlength\itemsep{1pt}
+  \item Formula recomputed from InChI: 94
+  \item Charge recomputed from InChI: 100
+  \item SMILES parse failures: 12
+  \item Total fixes persisted: 102
+\end{itemize}
+
+\medskip
+\textbf{Validation scope}: 30,333 compounds with both a
+searchable name and a stored InChIKey.
+\end{column}
+\end{columns}
+
+\end{frame}
+
+% =====================================================================
+\begin{frame}{Validation Results (30,333 compounds)}
+
+\begin{columns}[T]
+\begin{column}{0.42\textwidth}
+\begin{table}[h]
+\centering
+\small
+\begin{tabular}{lrr}
+\toprule
+\textbf{Category} & \textbf{Count} & \textbf{\%} \\
+\midrule
+MATCH             & 22,888 & 75.5 \\
+PROTON.\ DIFF     &  5,065 & 16.7 \\
+STEREO\_DIFF      &    572 &  1.9 \\
+MISMATCH          &    759 &  2.5 \\
+NOT\_FOUND        &    826 &  2.7 \\
+XREF\_CONFLICT    &    155 &  0.5 \\
+AMBIGUOUS         &     68 &  0.2 \\
+\midrule
+\textbf{Total}    & \textbf{30,333} & \\
+\bottomrule
+\end{tabular}
+\end{table}
+\end{column}
+
+\begin{column}{0.54\textwidth}
+\begin{itemize}\setlength\itemsep{5pt}
+  \item \textbf{94.0\%} share the same connectivity
+        with PubChem (MATCH + PROT + STEREO)
+  \item \textbf{16.7\%} PROTONATION\_DIFF --- same molecule,
+        different charge state
+  \item \textbf{1.9\%} STEREO\_DIFF --- same connectivity,
+        different stereochemistry
+  \item \textbf{2.5\%} MISMATCH --- different molecular
+        graph $\to$ sub-classified
+  \item \textbf{2.7\%} NOT\_FOUND --- no PubChem record
+\end{itemize}
+\end{column}
+\end{columns}
+
+\end{frame}
+
+% =====================================================================
+\begin{frame}{MISMATCH Sub-Classification (759 compounds)}
+
+\vspace{-2pt}
+\begin{columns}[T]
+\begin{column}{0.50\textwidth}
+\scriptsize
+\begin{tabular}{lr}
+\toprule
+\textbf{Sub-category} & \textbf{Count} \\
+\midrule
+\multicolumn{2}{l}{\textit{Formula differs (non-H atoms):}} \\
+~~wrong\_mapping           & 353 \\
+~~salt\_form\_difference    &   3 \\[2pt]
+\multicolumn{2}{l}{\textit{Formula differs (H only):}} \\
+~~protonation\_formula\_diff       & 561 \\
+~~protonation\_formula\_diff\_large &   3 \\[2pt]
+\multicolumn{2}{l}{\textit{Same formula --- tautomer:}} \\
+~~tautomer (RDKit canonical)      & 148 \\
+~~tautomer\_connectivity (InChI)  & 178 \\
+~~tautomer\_inchikey              &   3 \\
+~~ring\_chain\_tautomer            &   2 \\[2pt]
+\multicolumn{2}{l}{\textit{Metal/coordination:}} \\
+~~metal\_representation\_diff      &  66 \\[2pt]
+\multicolumn{2}{l}{\textit{Needs manual review:}} \\
+~~different\_compound             &   2 \\
+~~likely\_positional\_isomer       &   3 \\
+~~cannot\_parse\_smiles            &   1 \\
+\bottomrule
+\end{tabular}
+\end{column}
+
+\begin{column}{0.46\textwidth}
+\footnotesize
+\textbf{Cascading classification}:
+\begin{enumerate}\setlength\itemsep{1pt}
+  \item Formula comparison $\to$ wrong mapping
+        or salt form
+  \item InChI layer analysis $\to$ protonation
+        or stereo only
+  \item Ring/chain tautomer (O-ring count)
+  \item RDKit tautomer enumerator
+  \item Metal atom detection
+  \item InChI \texttt{c}-layer match $\to$
+        same heavy-atom scaffold
+  \item InChIKey stereo+protonation layers
+  \item Tanimoto ($\geq$0.8) with positional
+        isomer check
+\end{enumerate}
+
+\medskip
+\textbf{753 of 759} mismatches automatically
+classified as IGNORE.\\[2pt]
+\textbf{Only 6} require manual review.
+\end{column}
+\end{columns}
+
+\end{frame}
+
+% =====================================================================
+\begin{frame}{Corrections Overview (126 compounds, 651 field changes)}
+
+\vspace{-4pt}
+\footnotesize
+\begin{tabular}{p{3.2cm}rp{8.2cm}}
+\toprule
+\textbf{Correction} & \textbf{Count} & \textbf{What changes} \\
+\midrule
+Phase~0: Formula/charge consistency & 102 &
+  Recompute formula and charge from InChI when
+  stored values are inconsistent \\[2pt]
+Phase~5a: Stereochemistry & 77 &
+  Replace SMILES, InChI, InChIKey with PubChem's
+  (more stereocenters defined, no inversions) \\[2pt]
+Phase~5a: Stereo pH\,7 normalization & 20 &
+  Adjust accepted stereo corrections to ChemAxon target
+  charge (prevents neutral PubChem forms from overwriting
+  curated ionization) \\[2pt]
+Phase~5b: Protonation (PubChem + pKa) & 23 &
+  For PROTONATION\_DIFF compounds: adjust stored SMILES
+  charge when ChemAxon pKa confirms PubChem \\[2pt]
+Phase~5c: Protonation (pKa only) & 26 &
+  Independent of PubChem: adjust any compound whose
+  stored charge disagrees with ChemAxon pKa at pH\,7 \\[2pt]
+Phase~6: SMILES canonicalization & 86 &
+  Rewrite non-canonical SMILES in RDKit canonical form \\
+\bottomrule
+\end{tabular}
+
+\smallskip
+Fields changed per compound: SMILES, InChI, InChIKey, and
+(where applicable) formula and charge.
+
+\end{frame}
+
+% =====================================================================
+\begin{frame}{Correction Details: Stereochemistry (77 accepted, 1,254 rejected)}
+
+\begin{columns}[T]
+\begin{column}{0.48\textwidth}
+\small
+\textbf{Acceptance criteria} (all must hold):
+\begin{enumerate}\setlength\itemsep{2pt}
+  \item PubChem defines $\geq$ stereocenters than stored
+  \item Shared stereocenters verified via InChI
+        \texttt{/t} (tetrahedral) and \texttt{/b}
+        (double-bond) layers --- no inversions allowed
+  \item PubChem SMILES/InChIKey internally consistent
+\end{enumerate}
+
+\medskip
+\textbf{pH\,7 normalization} (20 of 77):
+\begin{itemize}\setlength\itemsep{1pt}
+  \item PubChem stores neutral forms
+  \item Before applying, adjust PubChem SMILES to
+        ChemAxon target charge at pH\,7
+  \item Prevents overwriting curated ionization states
+\end{itemize}
+\end{column}
+
+\begin{column}{0.48\textwidth}
+\small
+\textbf{Rejection reasons} (1,254):
+\begin{itemize}\setlength\itemsep{2pt}
+  \item PubChem has \textbf{fewer} defined stereocenters
+        than stored (360)
+  \item Stereo \textbf{inversions} at shared centers (135)
+  \item MISMATCH sub-type: wrong mapping, tautomer,
+        or different compound (759)
+\end{itemize}
+
+\medskip
+\textbf{Key design choice}: only \textit{add} missing
+stereochemistry, never change existing assignments.
+Conservative approach avoids overwriting curated data
+from literature sources.
+\end{column}
+\end{columns}
+
+\end{frame}
+
+% =====================================================================
+\begin{frame}{Correction Details: Protonation (49 accepted, 5 flagged)}
+
+\begin{columns}[T]
+\begin{column}{0.48\textwidth}
+\footnotesize
+\textbf{5b. PubChem + pKa} (23 corrections):
+\begin{itemize}\setlength\itemsep{1pt}
+  \item Compound classified as PROTONATION\_DIFF
+  \item ChemAxon $\mathrm{p}K_\mathrm{a}$ confirms that
+        the stored charge is wrong at pH\,7
+  \item Adjusts \textit{stored} SMILES to target charge
+        (does \textbf{not} replace with PubChem's neutral form)
+\end{itemize}
+
+\smallskip
+\textbf{5c. pKa only} (26 corrections):
+\begin{itemize}\setlength\itemsep{1pt}
+  \item Runs on \textbf{all} 30,333 compounds
+  \item Independent of PubChem comparison
+  \item If stored charge $\neq$ ChemAxon target at pH\,7
+        and no borderline pKa $\to$ correct
+\end{itemize}
+\end{column}
+
+\begin{column}{0.48\textwidth}
+\footnotesize
+\textbf{Safety checks} (both paths):
+\begin{itemize}\setlength\itemsep{1pt}
+  \item Borderline $\mathrm{p}K_\mathrm{a}$ (6.0--8.0)
+        $\to$ flagged, not corrected (5 compounds)
+  \item Cross-validation: if ChemAxon ionic charge
+        is closer to stored than to target $\to$ skip (90)
+  \item After adjustment: verify InChIKey connectivity
+        unchanged (protonation-only change)
+\end{itemize}
+
+\smallskip
+\textbf{Design choice}: use ChemAxon $\mathrm{p}K_\mathrm{a}$
+as the authority for pH\,7 ionization, not PubChem
+(which stores neutral forms inappropriate for metabolic
+modeling).
+\end{column}
+\end{columns}
+
+\end{frame}
+
+% =====================================================================
+\begin{frame}{\textcolor{acceptgreen}{Example: Stereochemistry Corrections Applied}}
+
+\begin{columns}[T]
+\begin{column}{0.48\textwidth}
+\begin{center}
+\textbf{cpd01274 --- Scopolamine}\\[2pt]
+\includegraphics[width=\textwidth]{stereo_accepted_cpd01274.png}
+\end{center}
+\scriptsize
+Tropane alkaloid: PubChem adds missing stereocenters
+on the epoxide and ester moieties.
+\end{column}
+\begin{column}{0.48\textwidth}
+\begin{center}
+\textbf{cpd03832 --- Hydrogenobyrinate}\\[2pt]
+\includegraphics[width=\textwidth]{stereo_accepted_cpd03832.png}
+\end{center}
+\scriptsize
+Corrinoid: PubChem defines additional stereocenters
+on the macrocyclic ring system.
+\end{column}
+\end{columns}
+
+\end{frame}
+
+% =====================================================================
+\begin{frame}{\textcolor{acceptgreen}{Example: Protonation (pKa) Corrections Applied}}
+
+\begin{columns}[T]
+\begin{column}{0.48\textwidth}
+\begin{center}
+\textbf{cpd00313 --- Quercetin}\\[2pt]
+\includegraphics[width=\textwidth]{prot_accepted_cpd00313.png}
+\end{center}
+\scriptsize
+Flavonoid: two phenolate \texttt{[O-]} groups protonated
+to \texttt{OH} based on ChemAxon $\mathrm{p}K_\mathrm{a}$.
+Charge: $-2 \to 0$. Formula: C$_{15}$H$_8$O$_7 \to$
+C$_{15}$H$_{10}$O$_7$.
+\end{column}
+\begin{column}{0.48\textwidth}
+\begin{center}
+\textbf{cpd02539 --- Gossypetin}\\[2pt]
+\includegraphics[width=\textwidth]{prot_accepted_cpd02539.png}
+\end{center}
+\scriptsize
+Hexahydroxyflavone: two phenolate \texttt{[O-]} groups
+protonated to \texttt{OH}.
+Charge: $-2 \to 0$. Formula: C$_{15}$H$_8$O$_8 \to$
+C$_{15}$H$_{10}$O$_8$.
+\end{column}
+\end{columns}
+
+\end{frame}
+
+% =====================================================================
+\begin{frame}{Example: Discrepancies Not Corrected}
+
+\begin{columns}[T]
+\begin{column}{0.32\textwidth}
+\begin{center}
+\scriptsize\textbf{Protonation formula diff}\\[2pt]
+\includegraphics[width=\textwidth]{mismatch_rejected_cpd00166.png}
+\end{center}
+\scriptsize
+cpd00166 (Cobalamin): ModelSEED and PubChem differ
+by H count only (H\_diff=$-2$). Stored protonation
+state preserved for metabolic modeling.
+\end{column}
+\begin{column}{0.32\textwidth}
+\begin{center}
+\scriptsize\textbf{Tautomer ignored}\\[2pt]
+\includegraphics[width=\textwidth]{mismatch_rejected_cpd00088.png}
+\end{center}
+\scriptsize
+cpd00088: classified \texttt{tautomer\_connectivity}
+--- same InChI \texttt{c}-layer, different H positions.
+Stored form curated for biological relevance.
+\end{column}
+\begin{column}{0.32\textwidth}
+\begin{center}
+\scriptsize\textbf{Metal repr.\ ignored}\\[2pt]
+\includegraphics[width=\textwidth]{mismatch_rejected_cpd00271.png}
+\end{center}
+\scriptsize
+cpd00271 (Ferricyanide): connected vs.\ disconnected
+Fe--CN SMILES. Same compound, different convention.
+\end{column}
+\end{columns}
+
+\end{frame}
+
+% =====================================================================
+\begin{frame}{Output Files}
+
+\footnotesize
+\begin{tabular}{p{5.5cm}rp{6.5cm}}
+\toprule
+\textbf{File} & \textbf{Rows} & \textbf{Description} \\
+\midrule
+\multicolumn{3}{l}{\textit{Corrected structures
+  (Biochemistry/Structures/):}} \\[1pt]
+All\_ModelSEED\_Structures\_updated.txt   & 281,436 &
+  All structure records (multi-row per cpd) \\
+Unique\_ModelSEED\_Structures\_updated.txt &  97,607 &
+  Unique charged structures (consistent with
+  \texttt{List\_ModelSEED\_Structures.py}; excludes
+  formula conflicts) \\[4pt]
+\multicolumn{3}{l}{\textit{Reports
+  (Scripts/Structures/structure\_review\_output/):}} \\[1pt]
+pubchem\_validation\_report.tsv  & 30,333 &
+  One row per compound with result type \\
+pubchem\_mismatches.tsv          &  1,323 &
+  MISMATCH entries with sub-classification \\
+pubchem\_protonation\_diffs.tsv  &  5,065 &
+  Protonation-only differences \\
+pubchem\_stereo\_diffs.tsv       &    572 &
+  Stereochemistry-only differences \\
+pubchem\_tautomer\_diffs.tsv     &    331 &
+  All tautomer sub-types combined \\
+pubchem\_rejected\_corrections.tsv & 1,254 &
+  Corrections that failed validation \\
+pubchem\_corrections\_log.tsv    &    --- &
+  Per-field correction log \\
+pubchem\_protonation\_corrections.tsv & --- &
+  Protonation correction details (pKa) \\
+pubchem\_xref\_conflicts.tsv     &    --- &
+  ChEBI/KEGG cross-ref CID conflicts \\
+pubchem\_smiles\_failures.tsv    &    --- &
+  Compounds with unparseable SMILES \\
+pubchem\_stereo\_review.tsv      &    --- &
+  Single-inversion stereo cases for review \\
+consistency\_report.tsv          &    242 &
+  Phase~0 self-consistency issues \\
+Structure\_Conflicts\_updated.txt & 2,858 &
+  Structural conflicts (same formula, different structure) \\
+Formula\_Conflicts\_updated.txt  &    418 &
+  Formula conflicts across databases (compounds excluded
+  from Unique) \\
+\bottomrule
+\end{tabular}
+
+\end{frame}
+
+% =====================================================================
+\begin{frame}{Unique Structure Selection (\texttt{-{}-rebuild-unique})}
+
+\begin{columns}[T]
+\begin{column}{0.48\textwidth}
+\small
+\textbf{Algorithm} (consistent with
+\texttt{List\_ModelSEED\_Structures.py}):
+\begin{enumerate}\setlength\itemsep{2pt}
+  \item Filter curated/ignored aliases
+        (Curation/*.txt, 135 entries)
+  \item Priority: Charged InChI $>$ Original InChI
+        $>$ Charged SMILE $>$ Original SMILE
+  \item Formula conflict $\to$ \textbf{exclude} compound
+  \item Multi-database consensus: prefer structures
+        appearing in $\geq$2 databases
+  \item Source priority fallback:
+        MetaCyc $>$ KEGG $>$ ChEBI $>$ Rhea
+  \item InChIKey connectivity analysis with
+        stereochemistry preference
+\end{enumerate}
+\end{column}
+
+\begin{column}{0.48\textwidth}
+\small
+\textbf{Updated Unique file statistics}:
+\begin{itemize}\setlength\itemsep{2pt}
+  \item 36,883 unique compounds (97,607 rows)
+  \item 42 compounds newly included: corrections
+        resolved formula conflicts
+  \item 3 compounds excluded: unresolved formula
+        conflicts (cpd02744, cpd03148, cpd19421)
+  \item 2,858 structural conflict entries recorded
+  \item 418 formula conflict entries recorded
+\end{itemize}
+
+\medskip
+\textbf{Standalone usage}:\\[2pt]
+\texttt{\footnotesize python Validate\_PubChem\_Structures.py
+-{}-rebuild-unique}\\[2pt]
+\scriptsize Rebuilds Unique file from All file without
+rerunning the validation pipeline.
+\end{column}
+\end{columns}
+
+\end{frame}
+
+% =====================================================================
+\begin{frame}{Remaining Work}
+
+\begin{enumerate}\setlength\itemsep{5pt}
+  \item \textbf{Manual review} (6 compounds):
+    \begin{itemize}\setlength\itemsep{0pt}\footnotesize
+      \item 2 genuinely different compounds (cpd46969, cpd32805)
+      \item 3 likely positional isomers (cpd22821, cpd23345, cpd26545)
+      \item 1 invalid stored SMILES (cpd46870)
+    \end{itemize}
+
+  \item \textbf{NOT\_FOUND} (826) --- no PubChem record;
+        mostly rare metabolites or generic class names
+
+  \item \textbf{XREF\_CONFLICT} (155) --- ChEBI/KEGG map to
+        different PubChem CIDs
+
+  \item \textbf{AMBIGUOUS} (68) --- compound names map to
+        multiple PubChem CIDs
+
+  \item \textbf{Edge cases}: 2 antimycin positional isomers
+        (cpd47754/cpd47782) labeled \texttt{tautomer\_inchikey}
+        --- InChI \texttt{c}-layer cannot distinguish
+        bond-order-only differences in acyl chains
+\end{enumerate}
+
+\end{frame}
+
+\end{document}

@@ -50,12 +50,39 @@ class RateLimiter:
             time.sleep(wait)
 
 
+class _ServerHealth:
+    """Coordinate backpressure across threads when PubChem returns 503/429."""
+
+    def __init__(self, pause_seconds=30.0):
+        self._lock = threading.Lock()
+        self._paused_until = 0.0
+        self._pause_seconds = pause_seconds
+
+    def report_error(self):
+        with self._lock:
+            now = time.monotonic()
+            self._paused_until = max(self._paused_until,
+                                     now + self._pause_seconds)
+
+    def wait_if_paused(self):
+        with self._lock:
+            target = self._paused_until
+        now = time.monotonic()
+        if now < target:
+            time.sleep(target - now)
+
+
 _rate_limiter = RateLimiter(rate=5.0)
+_server_health = _ServerHealth()
+
+PUBCHEM_SERVER_ERROR = "PUBCHEM_SERVER_ERROR"
 
 
 def pubchem_request(method, url, **kwargs):
     """Make a PubChem request with retry and rate limiting."""
+    saw_server_error = False
     for attempt in range(MAX_RETRIES):
+        _server_health.wait_if_paused()
         _rate_limiter.acquire()
         try:
             if method == "GET":
@@ -67,16 +94,20 @@ def pubchem_request(method, url, **kwargs):
             if resp.status_code == 404:
                 return None
             if resp.status_code in (429, 500, 502, 503, 504):
+                saw_server_error = True
                 wait = 2 ** (attempt + 1)
                 logger.warning("PubChem %d, retrying in %ds...",
                                resp.status_code, wait)
+                if resp.status_code in (429, 503):
+                    _server_health.report_error()
                 time.sleep(wait)
                 continue
             return None
         except (requests.RequestException, ValueError):
+            saw_server_error = True
             wait = 2 ** (attempt + 1)
             time.sleep(wait)
-    return None
+    return PUBCHEM_SERVER_ERROR if saw_server_error else None
 
 
 def query_xref(xref_id):
@@ -143,15 +174,22 @@ def query_names_batch(name_list):
     return _query_names_batch_recursive(name_list)
 
 
-def _query_names_batch_recursive(name_list):
+_MAX_NAME_SPLIT_DEPTH = 7
+_MAX_BATCH_RETRIES = 2
+
+
+def _query_names_batch_recursive(name_list, _depth=0):
     """Try batch name lookup; on 404, split and retry recursively."""
     if not name_list:
         return {}
 
+    url = f"{PUBCHEM_BASE}/compound/name/property/InChIKey,IsomericSMILES/JSON"
+
     if len(name_list) == 1:
         name = name_list[0]
-        url = f"{PUBCHEM_BASE}/compound/name/property/InChIKey,IsomericSMILES/JSON"
         data = pubchem_request("POST", url, data={"name": name})
+        if data is PUBCHEM_SERVER_ERROR:
+            return {}
         if data and "PropertyTable" in data:
             prop_list = data["PropertyTable"]["Properties"]
             if not prop_list:
@@ -164,9 +202,19 @@ def _query_names_batch_recursive(name_list):
             )}
         return {}
 
-    url = f"{PUBCHEM_BASE}/compound/name/property/InChIKey,IsomericSMILES/JSON"
     joined = "\n".join(name_list)
     data = pubchem_request("POST", url, data={"name": joined})
+
+    if data is PUBCHEM_SERVER_ERROR:
+        for _ in range(_MAX_BATCH_RETRIES):
+            _server_health.wait_if_paused()
+            data = pubchem_request("POST", url, data={"name": joined})
+            if data is not PUBCHEM_SERVER_ERROR:
+                break
+        if data is PUBCHEM_SERVER_ERROR:
+            logger.warning("Persistent server error, skipping %d names",
+                           len(name_list))
+            return {}
 
     if data and "PropertyTable" in data:
         props_list = data["PropertyTable"]["Properties"]
@@ -180,10 +228,15 @@ def _query_names_batch_recursive(name_list):
                 )
         return results
 
-    # Batch failed (likely 404 due to unknown name) — split in half
+    if _depth >= _MAX_NAME_SPLIT_DEPTH:
+        results = {}
+        for name in name_list:
+            results.update(_query_names_batch_recursive([name]))
+        return results
+
     mid = len(name_list) // 2
-    left = _query_names_batch_recursive(name_list[:mid])
-    right = _query_names_batch_recursive(name_list[mid:])
+    left = _query_names_batch_recursive(name_list[:mid], _depth + 1)
+    right = _query_names_batch_recursive(name_list[mid:], _depth + 1)
     left.update(right)
     return left
 

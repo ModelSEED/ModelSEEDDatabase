@@ -1,0 +1,35 @@
+section,category,count,description
+overview,total_compounds_changed,520,Total compounds with any change in the Unique file
+overview,original_unique_compounds,36845,Compounds in original Unique_ModelSEED_Structures.txt
+overview,updated_unique_compounds,36884,Compounds in updated Unique_ModelSEED_Structures_updated.txt
+overview,net_new_compounds,39,"Net new compounds added (42 added, 3 removed)"
+,,,
+genuinely_new,added,42,"Compounds with NO previous entry in Unique file; structures newly resolved via PubChem (these are truly new additions to the Unique file)"
+genuinely_new,removed,3,"Compounds removed from Unique file (cpd02744, cpd03148, cpd19421 — invalid/duplicate structures)"
+,,,
+structure_corrections,stereo_gained,58,"Stereocenters added from PubChem (existing compound, more complete stereochemistry)"
+structure_corrections,connectivity_change,4,"Structural connectivity changed (existing compound, corrected atom bonding)"
+structure_corrections,protonation_correction,1,"Protonation state corrected (existing compound, pKa-validated)"
+structure_corrections,stereo_lost,1,"Lost a stereocenter (existing compound, PubChem has less stereo info)"
+structure_corrections,subtotal_corrections,64,Total existing compounds with actual structural changes
+,,,
+notation_cleanup,canonicalization,402,"SMILES re-canonicalized only (same molecule, cleaner notation — e.g. aromatic [n] vs n, explicit [CH] for metals)"
+notation_cleanup,stereo_representation_change,8,"Different but chemically equivalent stereo notation (e.g. @@ vs @ with re-numbered atoms)"
+notation_cleanup,smiles_representation_change,1,Different SMILES string encoding same molecule
+notation_cleanup,subtotal_cleanup,411,Total compounds with notation-only changes (NO chemical change)
+,,,
+metadata_changes,formula_changed,8,Formula field recalculated from InChI (derived field correction)
+metadata_changes,charge_changed,8,Charge field recalculated from InChI (derived field correction)
+,,,
+unresolved,stereo_diff_rejected_fewer_centers,360,"PubChem has fewer defined stereocenters than stored — kept stored (more complete)"
+unresolved,stereo_diff_rejected_inversion,135,"PubChem has different stereocenter configuration — kept stored (enantiomer/epimer mismatch)"
+unresolved,mismatch_protonation_formula,564,"Different H count only (tautomer/protonation variant) — kept stored form"
+unresolved,mismatch_wrong_mapping,353,"PubChem xref maps to different compound — kept stored (xref error)"
+unresolved,mismatch_tautomer,331,"Tautomeric difference (same connectivity, different H placement) — kept stored biological form"
+unresolved,mismatch_metal,66,"Metal coordination/charge representation difference — kept stored"
+unresolved,mismatch_other,10,"Salt forms, ring-chain tautomers, other minor differences — kept stored"
+unresolved,mismatch_needs_review,6,"Requires manual review: 2 different_compound, 3 likely_positional_isomer, 1 parse failure"
+unresolved,xref_conflicts,155,"Conflicting ChEBI/KEGG cross-references pointing to different PubChem CIDs"
+unresolved,ambiguous_name,68,Ambiguous name lookups (multiple PubChem CIDs matched)
+unresolved,not_found,826,No PubChem match found for these compounds
+unresolved,structure_conflicts_internal,974,Compounds with conflicting structures across aliases in the All file
