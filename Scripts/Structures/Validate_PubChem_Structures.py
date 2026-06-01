@@ -87,6 +87,7 @@ TAUTOMER_FILE = os.path.join(OUTPUT_DIR, 'pubchem_tautomer_diffs.tsv')
 IMAGES_DIR = os.path.join(OUTPUT_DIR, 'struct_imgs')
 CORRECTED_IMAGES_DIR = os.path.join(OUTPUT_DIR, 'corrected_2d')
 ADDED_IMAGES_DIR = os.path.join(OUTPUT_DIR, 'added_2d')
+REPORT_PDF = os.path.join(SCRIPT_DIR, 'PubChem_Validation_Analysis_Report.pdf')
 STEREO_REVIEW_FILE = os.path.join(OUTPUT_DIR, 'pubchem_stereo_review.tsv')
 SMILES_FAILURES_FILE = os.path.join(OUTPUT_DIR, 'pubchem_smiles_failures.tsv')
 XREF_CONFLICTS_FILE = os.path.join(OUTPUT_DIR, 'pubchem_xref_conflicts.tsv')
@@ -2518,6 +2519,7 @@ def apply_corrections_dual_format(corrections, consistency_fixes, structures,
         _run_post_correction_checks(corrected_cpds, unique_rows)
 
     generate_correction_diagrams(corrections, structures, unique_rows)
+    generate_report_pdf(unique_rows)
 
 
 def _run_post_correction_checks(corrected_cpds, unique_rows):
@@ -2960,6 +2962,292 @@ def generate_correction_diagrams(corrections, structures, unique_rows=None,
                           "PDF", save_all=True, append_images=pdf_pages[1:])
     logger.info("  Structure diagrams: %d corrected, %d newly added "
                 "(corrected_2d/ + added_2d/)", n_corr, n_add)
+
+
+def generate_report_pdf(unique_rows, base_unique_path=None, out_path=None):
+    """Build the analysis report PDF: summary + pipeline, then galleries that
+    embed the per-compound diagrams (corrected_2d/ and added_2d/), plus a
+    separate 'InChIKey normalizations' category for field-only fixes that have
+    no visible structural change. Page-numbered. Runs at the end of --apply."""
+    if base_unique_path is None:
+        base_unique_path = UNIQUE_STRUCTURES_FILE
+    if out_path is None:
+        out_path = REPORT_PDF
+    try:
+        import textwrap
+        import matplotlib
+        matplotlib.use("Agg")
+        import matplotlib.pyplot as plt
+        import matplotlib.image as mpimg
+        from matplotlib.backends.backend_pdf import PdfPages
+        from rdkit.Chem import (FindPotentialStereo, StereoSpecified,
+                                GetFormalCharge)
+    except Exception as exc:  # pragma: no cover - optional deps
+        logger.warning("  Skipping report PDF (deps missing): %s", exc)
+        return
+
+    def _load(path):
+        d = {}
+        if not os.path.exists(path):
+            return d
+        with open(path) as fh:
+            next(fh, None)
+            for line in fh:
+                c = line.rstrip('\n').split('\t')
+                if len(c) < 6 or c[0] == 'ID':
+                    continue
+                d.setdefault(c[0], {})[c[1]] = c[5]
+        return d
+
+    base = _load(base_unique_path)
+    new = {}
+    for r in unique_rows:
+        if len(r) >= 6:
+            new.setdefault(r[0], {})[r[1]] = r[5]
+
+    names = {}
+    try:
+        names = load_names(NAMES_FILE)
+    except Exception:
+        pass
+
+    def _nm(cid):
+        v = names.get(cid, [])
+        v = (v[0] if isinstance(v, list) and v else
+             (v if isinstance(v, str) else ''))
+        return re.sub(r'<[^>]+>', '', v)
+
+    usage = Counter()
+    for f in glob.glob(os.path.join(DB_ROOT, "reaction_*.tsv")):
+        try:
+            with open(f) as fh:
+                rdr = csv.reader(fh, delimiter='\t')
+                hdr = next(rdr)
+                if "compound_ids" not in hdr:
+                    continue
+                ci = hdr.index("compound_ids")
+                for row in rdr:
+                    if len(row) > ci:
+                        for cp in row[ci].split(';'):
+                            cp = cp.strip()
+                            if cp:
+                                usage[cp] += 1
+        except Exception:
+            continue
+
+    def _canon(s):
+        m = Chem.MolFromSmiles(s) if s else None
+        return None if m is None else Chem.MolToSmiles(m)
+
+    def _spec(s):
+        m = Chem.MolFromSmiles(s) if s else None
+        return None if m is None else sum(
+            1 for x in FindPotentialStereo(m)
+            if x.specified == StereoSpecified.Specified)
+
+    def _chg(s):
+        m = Chem.MolFromSmiles(s) if s else None
+        return None if m is None else GetFormalCharge(m)
+
+    # Categorise existing-compound changes
+    ident = []
+    for cid in set(base) & set(new):
+        if ((base[cid].get('InChIKey') and new[cid].get('InChIKey')
+             and base[cid]['InChIKey'] != new[cid]['InChIKey'])
+                or (base[cid].get('InChI') and new[cid].get('InChI')
+                    and base[cid]['InChI'] != new[cid]['InChI'])):
+            ident.append(cid)
+    structural, inchikey_only = [], []
+    for cid in ident:
+        cb = _canon(base[cid].get('SMILE', ''))
+        cn = _canon(new[cid].get('SMILE', ''))
+        (inchikey_only if (cb is not None and cb == cn)
+         else structural).append(cid)
+    # SMILES-only canonicalisations (InChIKey unchanged, SMILE text changed)
+    canon_only = sum(
+        1 for cid in set(base) & set(new)
+        if base[cid].get('InChIKey') == new[cid].get('InChIKey')
+        and base[cid].get('SMILE') and new[cid].get('SMILE')
+        and base[cid]['SMILE'] != new[cid]['SMILE'])
+    added = sorted((set(new) - set(base)),
+                   key=lambda c: (-usage.get(c, 0), c))
+    removed = sorted(set(base) - set(new))
+    structural.sort(key=lambda c: (-usage.get(c, 0), c))
+    inchikey_only.sort(key=lambda c: (-usage.get(c, 0), c))
+
+    def _kind(cid):
+        bs, ns = base[cid].get('SMILE', ''), new[cid].get('SMILE', '')
+        bc, ac = _chg(bs), _chg(ns)
+        bp, ap = _spec(bs), _spec(ns)
+        chg = bc is not None and ac is not None and bc != ac
+        det = []
+        if chg:
+            det.append(f"charge {bc} -> {ac}")
+        if bp is not None and ap is not None and bp != ap:
+            det.append(f"stereocenters {bp} -> {ap}")
+        if chg and bp is not None and ap is not None and bp != ap:
+            nm = "Protonation + stereochemistry"
+        elif chg:
+            nm = "Protonation corrected"
+        elif bp is not None and ap is not None and ap > bp:
+            nm = "Stereochemistry added"
+        elif bp is not None and ap is not None and ap < bp:
+            nm = "Stereochemistry reduced"
+        else:
+            nm = "Stereochemistry change"
+        return nm, (("  (" + "; ".join(det) + ")") if det else "")
+
+    kind_counts = Counter(_kind(c)[0] for c in structural)
+
+    pn = [0]
+
+    def _footer(fig):
+        pn[0] += 1
+        fig.text(0.5, 0.012, f"Page {pn[0]}", ha='center', fontsize=8,
+                 color='gray')
+
+    with PdfPages(out_path) as pdf:
+        # --- summary ---
+        fig = plt.figure(figsize=(8.5, 11))
+        y = 0.96
+        fig.text(0.07, y, "PubChem Structure Validation — Analysis Report",
+                 fontsize=17, weight='bold'); y -= 0.035
+        fig.text(0.07, y, "ModelSEEDDatabase · "
+                 "Validate_PubChem_Structures.py", fontsize=9, color='gray')
+        y -= 0.04
+        summary = (
+            f"Result: {len(structural)} existing compound structures corrected "
+            f"(visible change), {len(inchikey_only)} InChIKey normalizations "
+            f"(field-only, no structural change), {len(added)} new compounds "
+            f"resolved, {len(removed)} removed. A further {canon_only} SMILES "
+            f"were re-canonicalized with no change to identity (InChIKey "
+            f"unchanged).")
+        for ln in textwrap.wrap(summary, 92):
+            fig.text(0.07, y, ln, fontsize=10); y -= 0.022
+        y -= 0.02
+        fig.text(0.07, y, f"Structural corrections ({len(structural)})",
+                 fontsize=12, weight='bold'); y -= 0.005
+        rows = [[k, str(v)] for k, v in kind_counts.most_common()]
+        ax = fig.add_axes([0.07, y - 0.025 - 0.028 * len(rows), 0.86,
+                           0.028 * len(rows) + 0.025]); ax.axis('off')
+        t1 = ax.table(cellText=rows, colLabels=["change type", "count"],
+                      loc='upper left', cellLoc='left', colWidths=[0.6, 0.2])
+        t1.auto_set_font_size(False); t1.set_fontsize(9); t1.scale(1, 1.3)
+        y -= 0.028 * len(rows) + 0.06
+        fig.text(0.07, y, "Other changes", fontsize=12, weight='bold')
+        y -= 0.005
+        rows2 = [["InChIKey normalizations (no visible change)",
+                  str(len(inchikey_only))],
+                 ["Newly added to Unique file", str(len(added))],
+                 ["Removed from Unique file", str(len(removed))],
+                 ["SMILES re-canonicalized (cosmetic)", str(canon_only)]]
+        ax2 = fig.add_axes([0.07, y - 0.025 - 0.028 * len(rows2), 0.86,
+                            0.028 * len(rows2) + 0.025]); ax2.axis('off')
+        t2 = ax2.table(cellText=rows2, colLabels=["category", "count"],
+                       loc='upper left', cellLoc='left', colWidths=[0.6, 0.2])
+        t2.auto_set_font_size(False); t2.set_fontsize(9); t2.scale(1, 1.3)
+        _footer(fig); pdf.savefig(fig, dpi=160); plt.close(fig)
+
+        # --- pipeline ---
+        fig = plt.figure(figsize=(8.5, 11)); y = 0.96
+        fig.text(0.07, y, "Pipeline (Phases 0–6)", fontsize=15,
+                 weight='bold'); y -= 0.03
+        phases = [
+            ("Phase 0  Self-consistency", "Parse SMILES; compute missing "
+             "InChI/InChIKey; verify InChIKey and SMILES/InChI connectivity; "
+             "recompute formula & charge from InChI."),
+            ("Phase 1  External-ID lookup", "ChEBI/KEGG aliases -> PubChem CID "
+             "via xref; xref conflicts scored against stored InChIKey."),
+            ("Phase 2  Name lookup", "Batch name -> CID; disambiguate "
+             "multi-hit by InChIKey blocks then Tanimoto."),
+            ("Phase 3  Recovery", "Direct InChIKey then InChI lookup for "
+             "still-unresolved/mismatched compounds."),
+            ("Phase 4  Classification", "MATCH / PROTONATION_DIFF / "
+             "STEREO_DIFF / MISMATCH / NOT_FOUND / XREF_CONFLICT / AMBIGUOUS; "
+             "sub-classify mismatches."),
+            ("Phase 5  Corrections", "STEREO_DIFF (PubChem >= stored stereo, "
+             "no inversion incl. /m enantiomer guard); pKa protonation at pH7 "
+             "(borderline 6-8 skipped, strong-acid & metal-complex guards)."),
+            ("Phase 6  Apply & write", "Write corrections; recompute "
+             "formula/charge; canonicalize SMILES; rebuild Unique via "
+             "dev-branch picker; post-correction checks; render diagrams."),
+        ]
+        for title, body in phases:
+            fig.text(0.07, y, title, fontsize=11, weight='bold'); y -= 0.022
+            for ln in textwrap.wrap(body, 94):
+                fig.text(0.09, y, ln, fontsize=9); y -= 0.019
+            y -= 0.012
+        _footer(fig); pdf.savefig(fig, dpi=160); plt.close(fig)
+
+        # --- InChIKey normalizations (separate category, no diagrams) ---
+        if inchikey_only:
+            fig = plt.figure(figsize=(8.5, 11)); y = 0.95
+            fig.text(0.07, y, f"InChIKey normalizations ({len(inchikey_only)})",
+                     fontsize=14, weight='bold'); y -= 0.025
+            for ln in textwrap.wrap(
+                    "Field-only fixes: the stored InChIKey did not match its "
+                    "own structure (usually a spurious stereo flag) and was "
+                    "corrected. The molecule/SMILES is unchanged, so there is "
+                    "no before/after diagram.", 96):
+                fig.text(0.07, y, ln, fontsize=9, color='gray'); y -= 0.02
+            y -= 0.01
+            hdr = f"{'cpd_id':10} {'rxns':>4}  {'InChIKey  (before -> after)':52} name"
+            fig.text(0.06, y, hdr, fontsize=8, family='monospace',
+                     weight='bold'); y -= 0.02
+            for cid in inchikey_only:
+                ikb = base[cid].get('InChIKey', ''); ika = new[cid].get('InChIKey', '')
+                line = (f"{cid:10} {usage.get(cid,0):>4}  "
+                        f"{ikb} -> {ika}")
+                fig.text(0.06, y, line, fontsize=7.5, family='monospace')
+                fig.text(0.06, y - 0.013, "        " + _nm(cid)[:80],
+                         fontsize=7.5, color='#444444')
+                y -= 0.034
+            _footer(fig); pdf.savefig(fig, dpi=160); plt.close(fig)
+
+        # --- corrected gallery (embed corrected_2d PNGs) ---
+        cg_imgs = [(c, os.path.join(CORRECTED_IMAGES_DIR, f"{c}.png"))
+                   for c in structural
+                   if os.path.exists(os.path.join(CORRECTED_IMAGES_DIR,
+                                                  f"{c}.png"))]
+        for i in range(0, len(cg_imgs), 3):
+            chunk = cg_imgs[i:i + 3]
+            fig = plt.figure(figsize=(8.5, 11))
+            fig.text(0.5, 0.975, "Corrected compounds — before / after  "
+                     f"({i+1}-{i+len(chunk)} of {len(cg_imgs)})",
+                     ha='center', fontsize=11, weight='bold')
+            for j, (cid, path) in enumerate(chunk):
+                ax = fig.add_axes([0.04, 0.66 - j * 0.31, 0.92, 0.28])
+                ax.axis('off'); ax.imshow(mpimg.imread(path))
+            _footer(fig); pdf.savefig(fig, dpi=170); plt.close(fig)
+
+        # --- newly added gallery (embed added_2d PNGs) ---
+        ag_imgs = [(c, os.path.join(ADDED_IMAGES_DIR, f"{c}.png"))
+                   for c in added
+                   if os.path.exists(os.path.join(ADDED_IMAGES_DIR,
+                                                  f"{c}.png"))]
+        if ag_imgs:
+            fig = plt.figure(figsize=(8.5, 11))
+            fig.text(0.5, 0.5, f"Newly added compounds  ({len(ag_imgs)})",
+                     ha='center', fontsize=18, weight='bold')
+            fig.text(0.5, 0.46, "no prior entry in "
+                     "Unique_ModelSEED_Structures.txt", ha='center',
+                     fontsize=10, color='gray')
+            _footer(fig); pdf.savefig(fig, dpi=120); plt.close(fig)
+        for i in range(0, len(ag_imgs), 4):
+            chunk = ag_imgs[i:i + 4]
+            fig = plt.figure(figsize=(8.5, 11))
+            fig.text(0.5, 0.975, "Newly added compounds  "
+                     f"({i+1}-{i+len(chunk)} of {len(ag_imgs)})",
+                     ha='center', fontsize=11, weight='bold')
+            for j, (cid, path) in enumerate(chunk):
+                row, col = divmod(j, 2)
+                ax = fig.add_axes([0.05 + col * 0.48, 0.55 - row * 0.45,
+                                   0.43, 0.40])
+                ax.axis('off'); ax.imshow(mpimg.imread(path))
+            _footer(fig); pdf.savefig(fig, dpi=170); plt.close(fig)
+
+    logger.info("  Report PDF: %s (%d structural, %d InChIKey-only, %d added)",
+                out_path, len(structural), len(inchikey_only), len(added))
 
 
 def generate_comparison_images(conn, candidates, structures, images_dir,
