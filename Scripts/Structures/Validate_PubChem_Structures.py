@@ -438,14 +438,30 @@ def save_batch_to_cache(conn, lock, rows):
 # ═══════════════════════════════════════════════════════════════════════════════
 
 def _load_ignored_structures():
+    # Match List_ModelSEED_Structures.py: the dev branch relocated the curated
+    # ignore lists from Biochemistry/Structures/Curation/ to
+    # Biochemistry/Curation/ignores/. Read both so the Unique-file picker uses
+    # the same ignore set regardless of which repo layout is checked out.
     ignored = set()
-    curation_dir = os.path.join(STRUCTURES_DIR, 'Curation')
-    for path in glob.glob(os.path.join(curation_dir, '*.txt')):
-        with open(path) as fh:
-            for line in fh:
-                alias_id = line.strip().split('\t')[0]
-                if alias_id and alias_id != 'ID':
-                    ignored.add(alias_id)
+    curation_dirs = [
+        os.path.join(STRUCTURES_DIR, 'Curation'),            # legacy layout
+        os.path.join(DB_ROOT, 'Curation', 'ignores'),        # dev layout
+    ]
+    found_dir = False
+    for curation_dir in curation_dirs:
+        if not os.path.isdir(curation_dir):
+            continue
+        found_dir = True
+        for path in glob.glob(os.path.join(curation_dir, '*.txt')):
+            with open(path) as fh:
+                for line in fh:
+                    alias_id = line.strip().split('\t')[0]
+                    if alias_id and alias_id != 'ID':
+                        ignored.add(alias_id)
+    if not found_dir:
+        logger.warning("No curation/ignores directory found (looked in %s); "
+                       "Unique picker will not exclude any curated structures",
+                       ", ".join(curation_dirs))
     return ignored
 
 
@@ -656,6 +672,18 @@ def _check_stereo_compatibility(stored_struct, pubchem_struct):
     if inversions > 0:
         return False, (f"stereo_inversion: {inversions} of {checked} "
                        f"shared stereocenters have different configuration")
+    # Enantiomer guard: InChI encodes relative configuration in the /t layer
+    # and absolute configuration in the /m layer. A full enantiomer has an
+    # IDENTICAL /t but a flipped /m, so the per-center /t comparison above sees
+    # zero inversions and would wrongly accept it. Reject when the relative
+    # configuration matches but the absolute (/m) layer differs — this is the
+    # mirror image, not added stereo (name-lookup matches frequently return the
+    # wrong enantiomer).
+    s_m, p_m = s_layers.get('m', ''), p_layers.get('m', '')
+    if s_t and p_t and s_t == p_t and s_m and p_m and s_m != p_m:
+        return False, ("stereo_inversion: enantiomer (identical relative "
+                       "configuration but opposite InChI /m absolute-config "
+                       "layer)")
     return True, f"compatible ({checked} shared stereocenters agree)"
 
 
@@ -1842,6 +1870,9 @@ def run_phase5_corrections(conn, db_lock, candidates, structures, pka_data,
             pka_info = pka_data.get(cpd_id)
             if not pub_smiles or pka_info is None:
                 continue
+            _m = Chem.MolFromSmiles(pub_smiles)
+            if _m is not None and _has_metal(_m):
+                continue  # don't reprotonate metal coordination shells
             target = pka_info.get('db_charge')
             if target is None:
                 continue
@@ -1871,6 +1902,8 @@ def run_phase5_corrections(conn, db_lock, candidates, structures, pka_data,
             mol = Chem.MolFromSmiles(stored_smiles)
             if mol is None:
                 continue
+            if _has_metal(mol):
+                continue  # see _run_pka_validation: metal coordination unsafe
             stored_charge = Chem.GetFormalCharge(mol)
             target_charge = pka_info.get('db_charge')
             if target_charge is None or stored_charge == target_charge:
@@ -1931,7 +1964,7 @@ def _run_pka_validation(candidates, structures, pka_data, names):
     corrections = {}
     stats = {'already_correct': 0, 'pka_corrected': 0, 'no_pka_data': 0,
              'skipped_crossval': 0, 'adjustment_failed': 0,
-             'parse_failed': 0, 'borderline_skipped': 0}
+             'parse_failed': 0, 'borderline_skipped': 0, 'skipped_metal': 0}
     correction_rows = []
 
     items_iter = (tqdm(work_items, desc="Phase 5: pKa validation")
@@ -1945,6 +1978,13 @@ def _run_pka_validation(candidates, structures, pka_data, names):
         mol = Chem.MolFromSmiles(stored_smiles)
         if mol is None:
             stats['parse_failed'] += 1
+            continue
+        # Coordination complexes: the Uncharger/(de)protonation logic cannot
+        # reliably manipulate metal-ligand dative bonds and tends to rewrite the
+        # whole coordination shell. Skip them (consistent with the metal-aware
+        # handling in _classify_mismatch).
+        if _has_metal(mol):
+            stats['skipped_metal'] += 1
             continue
         stored_charge = Chem.GetFormalCharge(mol)
         target_charge = pka_info.get('db_charge')
@@ -2037,7 +2077,7 @@ def _run_pka_validation(candidates, structures, pka_data, names):
 
     logger.info("  pKa already correct: %d", stats['already_correct'])
     for key in ('pka_corrected', 'borderline_skipped', 'no_pka_data',
-                'skipped_crossval'):
+                'skipped_crossval', 'skipped_metal'):
         if stats[key]:
             logger.info("  pKa %s: %d", key.replace('_', ' '), stats[key])
     return corrections

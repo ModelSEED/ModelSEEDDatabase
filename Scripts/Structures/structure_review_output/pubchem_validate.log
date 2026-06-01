@@ -1,5 +1,81 @@
-2026-05-07 16:51:16  INFO      Rebuilding Unique file from: /nfs/lambda_stor_01/homes/rzhu/ModelSEED_FAISS/ModelSEEDDatabase/Biochemistry/Structures/All_ModelSEED_Structures_updated.txt
-2026-05-07 16:51:19  INFO        Unique file written: /nfs/lambda_stor_01/homes/rzhu/ModelSEED_FAISS/ModelSEEDDatabase/Biochemistry/Structures/Unique_ModelSEED_Structures_updated.txt (97607 rows)
-2026-05-07 16:51:19  INFO        Structure conflicts: /nfs/lambda_stor_01/homes/rzhu/ModelSEED_FAISS/ModelSEEDDatabase/Scripts/Structures/structure_review_output/Structure_Conflicts_updated.txt (2858 rows)
-2026-05-07 16:51:19  INFO        Formula conflicts: /nfs/lambda_stor_01/homes/rzhu/ModelSEED_FAISS/ModelSEEDDatabase/Scripts/Structures/structure_review_output/Formula_Conflicts_updated.txt (418 rows)
-2026-05-07 16:51:19  INFO      Done.
+2026-06-01 12:00:54  INFO      Loading local data...
+2026-06-01 12:01:06  INFO      Coverage statistics:
+2026-06-01 12:01:06  INFO        Total compounds: 37011
+2026-06-01 12:01:06  INFO        With InChIKey: 30431 (6580 without)
+2026-06-01 12:01:06  INFO        With names: 36784 (227 without)
+2026-06-01 12:01:06  INFO      Phase 0: Self-consistency validation
+2026-06-01 12:01:27  INFO        Consistency report: /nfs/lambda_stor_01/homes/rzhu/ModelSEED_FAISS/ModelSEEDDatabase/Scripts/Structures/structure_review_output/consistency_report.tsv
+2026-06-01 12:01:27  INFO        Total compounds: 37011
+2026-06-01 12:01:27  INFO        Skipped (R-groups): 6504
+2026-06-01 12:01:27  INFO        smiles parse fail: 12
+2026-06-01 12:01:27  INFO        inchi computed: 12
+2026-06-01 12:01:27  INFO        inchikey computed: 12
+2026-06-01 12:01:27  INFO        connectivity mismatch: 27
+2026-06-01 12:01:27  INFO        formula fixed: 101
+2026-06-01 12:01:27  INFO        charge fixed: 102
+2026-06-01 12:01:27  INFO        Consistency fixes to persist: 109
+2026-06-01 12:01:27  INFO        SMILES parse failures: /nfs/lambda_stor_01/homes/rzhu/ModelSEED_FAISS/ModelSEEDDatabase/Scripts/Structures/structure_review_output/pubchem_smiles_failures.tsv (12 compounds)
+2026-06-01 12:01:28  INFO      ChemAxon pKa data loaded: 45708 compounds
+2026-06-01 12:01:28  INFO      Validation candidates (name + InChIKey): 30333
+2026-06-01 12:01:28  INFO      Already cached: 30333
+2026-06-01 12:01:28  INFO      To process: 0
+2026-06-01 12:01:28  INFO        Resolving 155 cached xref conflicts via CID properties
+2026-06-01 12:01:29  INFO        Resolved via CID properties: 0
+2026-06-01 12:01:29  INFO      Phase 4: Classification & reporting
+2026-06-01 12:01:30  INFO        Classifying 1323 mismatches...
+2026-06-01 12:02:14  INFO        Reclassified: 564 (STEREO: 0, PROTONATION: 564)
+2026-06-01 12:02:14  INFO      ==================================================
+2026-06-01 12:02:14  INFO      VALIDATION SUMMARY
+2026-06-01 12:02:14  INFO      ==================================================
+2026-06-01 12:02:14  INFO      Total compounds checked: 30333
+2026-06-01 12:02:14  INFO        MATCH               :  22888 ( 75.5%)
+2026-06-01 12:02:14  INFO        STEREO_DIFF         :    572 (  1.9%)
+2026-06-01 12:02:14  INFO        PROTONATION_DIFF    :   5065 ( 16.7%)
+2026-06-01 12:02:14  INFO        MISMATCH            :    759 (  2.5%)
+2026-06-01 12:02:14  INFO        NOT_FOUND           :    826 (  2.7%)
+2026-06-01 12:02:14  INFO        AMBIGUOUS           :     68 (  0.2%)
+2026-06-01 12:02:14  INFO        XREF_CONFLICT       :    155 (  0.5%)
+2026-06-01 12:02:14  INFO        MISMATCH sub-categories:
+2026-06-01 12:02:14  INFO          IGNORE:protonation_formula_diff         :  561
+2026-06-01 12:02:14  INFO          IGNORE:wrong_mapping                    :  353
+2026-06-01 12:02:14  INFO          IGNORE:tautomer_connectivity            :  178
+2026-06-01 12:02:14  INFO          IGNORE:tautomer                         :  148
+2026-06-01 12:02:14  INFO          IGNORE:metal_representation_diff        :   66
+2026-06-01 12:02:14  INFO          IGNORE:protonation_formula_diff_large   :    3
+2026-06-01 12:02:14  INFO          REVIEW:likely_positional_isomer         :    3
+2026-06-01 12:02:14  INFO          IGNORE:tautomer_inchikey                :    3
+2026-06-01 12:02:14  INFO          IGNORE:salt_form_difference             :    3
+2026-06-01 12:02:14  INFO          IGNORE:ring_chain_tautomer              :    2
+2026-06-01 12:02:14  INFO          REVIEW:different_compound               :    2
+2026-06-01 12:02:14  INFO          REVIEW:cannot_parse_smiles              :    1
+2026-06-01 12:02:14  INFO      XREF conflict report: /nfs/lambda_stor_01/homes/rzhu/ModelSEED_FAISS/ModelSEEDDatabase/Scripts/Structures/structure_review_output/pubchem_xref_conflicts.tsv (155 compounds)
+2026-06-01 12:02:14  INFO      Phase 5: Corrections
+2026-06-01 12:02:14  INFO        STEREO_DIFF/MISMATCH candidates: 1331
+2026-06-01 12:02:14  INFO        PROTONATION_DIFF candidates for pKa: 5065
+2026-06-01 12:02:29  INFO        STEREO_DIFF validated: 70, rejected: 1261
+2026-06-01 12:02:29  INFO        Single-inversion stereo review: /nfs/lambda_stor_01/homes/rzhu/ModelSEED_FAISS/ModelSEEDDatabase/Scripts/Structures/structure_review_output/pubchem_stereo_review.tsv (82 compounds)
+2026-06-01 12:02:29  INFO        STEREO_DIFF normalized to pH 7: 18
+2026-06-01 12:02:30  DEBUG       cpd17854 skipped: correction protonates carboxylic_acid (count 0 -> 1, pKa << 7, should remain deprotonated at pH 7)
+2026-06-01 12:02:30  INFO        PROTONATION_DIFF corrected via pKa: 20
+2026-06-01 12:02:38  INFO        pKa already correct: 25690
+2026-06-01 12:02:38  INFO        pKa pka corrected: 41
+2026-06-01 12:02:38  INFO        pKa borderline skipped: 6
+2026-06-01 12:02:38  INFO        pKa skipped crossval: 28
+2026-06-01 12:02:38  INFO        pKa skipped metal: 631
+2026-06-01 12:02:38  INFO        pKa-only corrections: 21
+2026-06-01 12:02:38  INFO      Phase 6: Apply corrections & write output
+2026-06-01 12:02:38  INFO        Reading from: /nfs/lambda_stor_01/homes/rzhu/ModelSEED_FAISS/ModelSEEDDatabase/Biochemistry/Structures/All_ModelSEED_Structures.txt
+2026-06-01 12:02:38  INFO        Writing All to: /nfs/lambda_stor_01/homes/rzhu/ModelSEED_FAISS/ModelSEEDDatabase/Biochemistry/Structures/All_ModelSEED_Structures_updated.txt
+2026-06-01 12:02:38  INFO        Writing Unique to: /nfs/lambda_stor_01/homes/rzhu/ModelSEED_FAISS/ModelSEEDDatabase/Biochemistry/Structures/Unique_ModelSEED_Structures_updated.txt
+2026-06-01 12:02:39  INFO        All file rows: 281436
+2026-06-01 12:02:53  INFO        SMILES canonicalized: 632
+2026-06-01 12:02:53  INFO        All file written: /nfs/lambda_stor_01/homes/rzhu/ModelSEED_FAISS/ModelSEEDDatabase/Biochemistry/Structures/All_ModelSEED_Structures_updated.txt
+2026-06-01 12:02:55  INFO        Unique file written: /nfs/lambda_stor_01/homes/rzhu/ModelSEED_FAISS/ModelSEEDDatabase/Biochemistry/Structures/Unique_ModelSEED_Structures_updated.txt (97601 rows)
+2026-06-01 12:02:55  INFO        Structure conflicts: /nfs/lambda_stor_01/homes/rzhu/ModelSEED_FAISS/ModelSEEDDatabase/Scripts/Structures/structure_review_output/Structure_Conflicts_updated.txt (2867 rows)
+2026-06-01 12:02:55  INFO        Formula conflicts: /nfs/lambda_stor_01/homes/rzhu/ModelSEED_FAISS/ModelSEEDDatabase/Scripts/Structures/structure_review_output/Formula_Conflicts_updated.txt (422 rows)
+2026-06-01 12:02:55  INFO        Compounds corrected: 128, fields changed: 575
+2026-06-01 12:02:55  INFO        Corrections log: /nfs/lambda_stor_01/homes/rzhu/ModelSEED_FAISS/ModelSEEDDatabase/Scripts/Structures/structure_review_output/pubchem_corrections_log.tsv
+2026-06-01 12:02:55  INFO        Running post-correction consistency checks...
+2026-06-01 12:02:55  WARNING     Consistency issue cpd23840: InChI fails RDKit parsing
+2026-06-01 12:02:55  WARNING     1 corrected compounds have consistency issues
+2026-06-01 12:02:55  INFO      Done.
