@@ -2773,12 +2773,23 @@ def generate_correction_diagrams(corrections, structures, out_dir=None,
         out_dir = CORRECTED_IMAGES_DIR
     try:
         import io
-        from PIL import Image, ImageDraw
+        from PIL import Image, ImageDraw, ImageFont
         from rdkit.Chem import AllChem
         from rdkit.Chem.Draw import rdMolDraw2D
     except Exception as exc:  # pragma: no cover - optional deps
         logger.warning("  Skipping correction diagrams (deps missing): %s", exc)
         return
+
+    def _font(mono, size):
+        base = ("DejaVuSansMono.ttf" if mono else "DejaVuSans.ttf")
+        for path in (base,
+                     "/usr/share/fonts/truetype/dejavu/" + base):
+            try:
+                return ImageFont.truetype(path, size)
+            except (OSError, IOError):
+                continue
+        return ImageFont.load_default()
+    f_title, f_mono = _font(False, 24), _font(True, 17)
 
     names = {}
     try:
@@ -2791,20 +2802,22 @@ def generate_correction_diagrams(corrections, structures, out_dir=None,
         if f.endswith('.png') or f.endswith('.pdf'):
             os.remove(os.path.join(out_dir, f))
 
-    def _panel(smi, size=(440, 330)):
+    def _panel(smi, size=(950, 720)):
         mol = Chem.MolFromSmiles(smi) if smi else None
         if mol is None:
             img = Image.new('RGB', size, 'white')
             ImageDraw.Draw(img).text((10, size[1] // 2),
-                                     '(unparseable)', fill='red')
+                                     '(unparseable)', fill='red', font=f_title)
             return img
         AllChem.Compute2DCoords(mol)
         d = rdMolDraw2D.MolDraw2DCairo(size[0], size[1])
+        opts = d.drawOptions()
+        opts.bondLineWidth = 2
         rdMolDraw2D.PrepareAndDrawMolecule(d, mol)
         d.FinishDrawing()
         return Image.open(io.BytesIO(d.GetDrawingText())).convert('RGB')
 
-    W, H, band = 440, 330, 46
+    W, H, band = 950, 720, 90
     pages, n = [], 0
     for cpd_id in sorted(corrections):
         corr = corrections[cpd_id]
@@ -2819,11 +2832,12 @@ def generate_correction_diagrams(corrections, structures, out_dir=None,
         nm = (nm[0] if isinstance(nm, list) and nm else
               (nm if isinstance(nm, str) else ''))
         nm = re.sub(r'<[^>]+>', '', nm)
-        dr.text((8, 6), f"{cpd_id}  {nm[:62]}  [{corr.get('result_type','')}]",
-                fill='black')
-        dr.text((8, 26), f"InChIKey -> {corr.get('inchikey', '')}", fill='gray')
-        dr.text((8, band - 2), "BEFORE", fill='blue')
-        dr.text((W + 8, band - 2), "AFTER", fill='green')
+        dr.text((14, 12), f"{cpd_id}  {nm[:62]}  [{corr.get('result_type','')}]",
+                fill='black', font=f_title)
+        dr.text((14, 48), f"InChIKey -> {corr.get('inchikey', '')}",
+                fill='gray', font=f_mono)
+        dr.text((14, band - 22), "BEFORE", fill='blue', font=f_mono)
+        dr.text((W + 14, band - 22), "AFTER", fill='green', font=f_mono)
         canvas.paste(left, (0, band))
         canvas.paste(right, (W, band))
         dr.line([(W, band), (W, H + band)], fill='lightgray', width=2)
