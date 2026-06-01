@@ -66,6 +66,9 @@ for rxn in sorted(reactions_dict.keys()):
 			if(DB_Level in entry and (entry == "GCC" or entry == "EQU")):
 				DB_Rxn=True
 
+	if rxn_dg is not None:
+		rxn_dg = float(rxn_dg)
+
 	if(rxn_dg == 10000000 or rxn_dg is None or DB_Rxn is False):
 
 		thermoreversibility = "?"
