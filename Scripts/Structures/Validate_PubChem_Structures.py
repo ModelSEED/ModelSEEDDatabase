@@ -85,6 +85,7 @@ REVIEW_FILE = os.path.join(OUTPUT_DIR, 'pubchem_review_different_compounds.tsv')
 CONSISTENCY_FILE = os.path.join(OUTPUT_DIR, 'consistency_report.tsv')
 TAUTOMER_FILE = os.path.join(OUTPUT_DIR, 'pubchem_tautomer_diffs.tsv')
 IMAGES_DIR = os.path.join(OUTPUT_DIR, 'struct_imgs')
+CORRECTED_IMAGES_DIR = os.path.join(OUTPUT_DIR, 'corrected_2d')
 STEREO_REVIEW_FILE = os.path.join(OUTPUT_DIR, 'pubchem_stereo_review.tsv')
 SMILES_FAILURES_FILE = os.path.join(OUTPUT_DIR, 'pubchem_smiles_failures.tsv')
 XREF_CONFLICTS_FILE = os.path.join(OUTPUT_DIR, 'pubchem_xref_conflicts.tsv')
@@ -2515,6 +2516,8 @@ def apply_corrections_dual_format(corrections, consistency_fixes, structures,
     if corrected_cpds:
         _run_post_correction_checks(corrected_cpds, unique_rows)
 
+    generate_correction_diagrams(corrections, structures)
+
 
 def _run_post_correction_checks(corrected_cpds, unique_rows):
     logger.info("  Running post-correction consistency checks...")
@@ -2758,6 +2761,80 @@ def generate_xref_conflict_report(conn, candidates, structures, names):
                    sorted(rows, key=lambda r: r[0]))
         logger.info("XREF conflict report: %s (%d compounds)",
                     XREF_CONFLICTS_FILE, len(rows))
+
+
+def generate_correction_diagrams(corrections, structures, out_dir=None,
+                                 make_pdf=True):
+    """Render before/after 2D diagrams for every applied structural correction:
+    one side-by-side PNG per compound plus a combined multi-page PDF. Runs
+    automatically at the end of an --apply run; safe to skip if drawing
+    dependencies are unavailable."""
+    if out_dir is None:
+        out_dir = CORRECTED_IMAGES_DIR
+    try:
+        import io
+        from PIL import Image, ImageDraw
+        from rdkit.Chem import AllChem
+        from rdkit.Chem.Draw import rdMolDraw2D
+    except Exception as exc:  # pragma: no cover - optional deps
+        logger.warning("  Skipping correction diagrams (deps missing): %s", exc)
+        return
+
+    names = {}
+    try:
+        names = load_names(NAMES_FILE)
+    except Exception:
+        pass
+
+    os.makedirs(out_dir, exist_ok=True)
+    for f in os.listdir(out_dir):
+        if f.endswith('.png') or f.endswith('.pdf'):
+            os.remove(os.path.join(out_dir, f))
+
+    def _panel(smi, size=(440, 330)):
+        mol = Chem.MolFromSmiles(smi) if smi else None
+        if mol is None:
+            img = Image.new('RGB', size, 'white')
+            ImageDraw.Draw(img).text((10, size[1] // 2),
+                                     '(unparseable)', fill='red')
+            return img
+        AllChem.Compute2DCoords(mol)
+        d = rdMolDraw2D.MolDraw2DCairo(size[0], size[1])
+        rdMolDraw2D.PrepareAndDrawMolecule(d, mol)
+        d.FinishDrawing()
+        return Image.open(io.BytesIO(d.GetDrawingText())).convert('RGB')
+
+    W, H, band = 440, 330, 46
+    pages, n = [], 0
+    for cpd_id in sorted(corrections):
+        corr = corrections[cpd_id]
+        after_smi = corr.get('smiles', '')
+        before_smi = structures.get(cpd_id, {}).get('smiles', '')
+        if not after_smi or before_smi == after_smi:
+            continue  # only diagram genuine structural changes
+        left, right = _panel(before_smi), _panel(after_smi)
+        canvas = Image.new('RGB', (W * 2, H + band), 'white')
+        dr = ImageDraw.Draw(canvas)
+        nm = names.get(cpd_id, [])
+        nm = (nm[0] if isinstance(nm, list) and nm else
+              (nm if isinstance(nm, str) else ''))
+        nm = re.sub(r'<[^>]+>', '', nm)
+        dr.text((8, 6), f"{cpd_id}  {nm[:62]}  [{corr.get('result_type','')}]",
+                fill='black')
+        dr.text((8, 26), f"InChIKey -> {corr.get('inchikey', '')}", fill='gray')
+        dr.text((8, band - 2), "BEFORE", fill='blue')
+        dr.text((W + 8, band - 2), "AFTER", fill='green')
+        canvas.paste(left, (0, band))
+        canvas.paste(right, (W, band))
+        dr.line([(W, band), (W, H + band)], fill='lightgray', width=2)
+        canvas.save(os.path.join(out_dir, f"{cpd_id}.png"))
+        pages.append(canvas)
+        n += 1
+
+    if make_pdf and pages:
+        pages[0].save(os.path.join(out_dir, "Corrected_Compounds_2D.pdf"),
+                      "PDF", save_all=True, append_images=pages[1:])
+    logger.info("  Correction diagrams: %d (in %s/)", n, out_dir)
 
 
 def generate_comparison_images(conn, candidates, structures, images_dir,
