@@ -86,6 +86,7 @@ CONSISTENCY_FILE = os.path.join(OUTPUT_DIR, 'consistency_report.tsv')
 TAUTOMER_FILE = os.path.join(OUTPUT_DIR, 'pubchem_tautomer_diffs.tsv')
 IMAGES_DIR = os.path.join(OUTPUT_DIR, 'struct_imgs')
 CORRECTED_IMAGES_DIR = os.path.join(OUTPUT_DIR, 'corrected_2d')
+ADDED_IMAGES_DIR = os.path.join(OUTPUT_DIR, 'added_2d')
 STEREO_REVIEW_FILE = os.path.join(OUTPUT_DIR, 'pubchem_stereo_review.tsv')
 SMILES_FAILURES_FILE = os.path.join(OUTPUT_DIR, 'pubchem_smiles_failures.tsv')
 XREF_CONFLICTS_FILE = os.path.join(OUTPUT_DIR, 'pubchem_xref_conflicts.tsv')
@@ -2516,7 +2517,7 @@ def apply_corrections_dual_format(corrections, consistency_fixes, structures,
     if corrected_cpds:
         _run_post_correction_checks(corrected_cpds, unique_rows)
 
-    generate_correction_diagrams(corrections, structures)
+    generate_correction_diagrams(corrections, structures, unique_rows)
 
 
 def _run_post_correction_checks(corrected_cpds, unique_rows):
@@ -2763,36 +2764,40 @@ def generate_xref_conflict_report(conn, candidates, structures, names):
                     XREF_CONFLICTS_FILE, len(rows))
 
 
-def generate_correction_diagrams(corrections, structures, out_dir=None,
-                                 make_pdf=True):
-    """Render before/after 2D diagrams for every applied structural correction:
-    one side-by-side PNG per compound plus a combined multi-page PDF. Runs
-    automatically at the end of an --apply run; safe to skip if drawing
-    dependencies are unavailable."""
+def generate_correction_diagrams(corrections, structures, unique_rows=None,
+                                 base_unique_path=None, out_dir=None,
+                                 added_dir=None, make_pdf=True):
+    """Render 2D structure diagrams as per-compound PNGs and one combined PDF
+    with two sections: (1) before/after for every applied structural correction
+    that produces a visible change, and (2) the structures of compounds newly
+    added to the Unique file. Corrected PNGs -> corrected_2d/, added PNGs ->
+    added_2d/, combined PDF -> corrected_2d/Structure_Changes_2D.pdf. Runs at
+    the end of an --apply run; safe to skip if drawing deps are unavailable."""
     if out_dir is None:
         out_dir = CORRECTED_IMAGES_DIR
+    if added_dir is None:
+        added_dir = ADDED_IMAGES_DIR
+    if base_unique_path is None:
+        base_unique_path = UNIQUE_STRUCTURES_FILE
     try:
         import io
         from PIL import Image, ImageDraw, ImageFont
-        from rdkit.Chem import AllChem
+        from rdkit.Chem import (AllChem, FindPotentialStereo,
+                                StereoSpecified, GetFormalCharge)
         from rdkit.Chem.Draw import rdMolDraw2D
     except Exception as exc:  # pragma: no cover - optional deps
-        logger.warning("  Skipping correction diagrams (deps missing): %s", exc)
+        logger.warning("  Skipping structure diagrams (deps missing): %s", exc)
         return
 
     def _font(mono, size):
         base = ("DejaVuSansMono.ttf" if mono else "DejaVuSans.ttf")
-        for path in (base,
-                     "/usr/share/fonts/truetype/dejavu/" + base):
+        for path in (base, "/usr/share/fonts/truetype/dejavu/" + base):
             try:
                 return ImageFont.truetype(path, size)
             except (OSError, IOError):
                 continue
         return ImageFont.load_default()
-    f_title, f_mono = _font(False, 24), _font(True, 17)
-
-    from rdkit.Chem import (FindPotentialStereo, StereoSpecified,
-                            GetFormalCharge)
+    f_title, f_mono, f_big = _font(False, 24), _font(True, 17), _font(False, 40)
 
     def _spec(smi):
         m = Chem.MolFromSmiles(smi) if smi else None
@@ -2803,6 +2808,10 @@ def generate_correction_diagrams(corrections, structures, out_dir=None,
     def _chg(smi):
         m = Chem.MolFromSmiles(smi) if smi else None
         return None if m is None else GetFormalCharge(m)
+
+    def _canon(smi):
+        m = Chem.MolFromSmiles(smi) if smi else None
+        return None if m is None else Chem.MolToSmiles(m)
 
     def _kind(before, after):
         """Human-readable label for the correction that was applied."""
@@ -2823,7 +2832,7 @@ def generate_correction_diagrams(corrections, structures, out_dir=None,
         elif bs is not None and as_ is not None and as_ < bs:
             name = "Stereochemistry reduced"
         else:
-            name = "Stereochemistry / representation change"
+            name = "Stereochemistry change"
         return name + (f"  ({'; '.join(det)})" if det else "")
 
     names = {}
@@ -2832,10 +2841,11 @@ def generate_correction_diagrams(corrections, structures, out_dir=None,
     except Exception:
         pass
 
-    os.makedirs(out_dir, exist_ok=True)
-    for f in os.listdir(out_dir):
-        if f.endswith('.png') or f.endswith('.pdf'):
-            os.remove(os.path.join(out_dir, f))
+    def _name(cpd_id):
+        nm = names.get(cpd_id, [])
+        nm = (nm[0] if isinstance(nm, list) and nm else
+              (nm if isinstance(nm, str) else ''))
+        return re.sub(r'<[^>]+>', '', nm)
 
     def _panel(smi, size=(950, 720)):
         mol = Chem.MolFromSmiles(smi) if smi else None
@@ -2846,45 +2856,110 @@ def generate_correction_diagrams(corrections, structures, out_dir=None,
             return img
         AllChem.Compute2DCoords(mol)
         d = rdMolDraw2D.MolDraw2DCairo(size[0], size[1])
-        opts = d.drawOptions()
-        opts.bondLineWidth = 2
+        d.drawOptions().bondLineWidth = 2
         rdMolDraw2D.PrepareAndDrawMolecule(d, mol)
         d.FinishDrawing()
         return Image.open(io.BytesIO(d.GetDrawingText())).convert('RGB')
 
+    for d in (out_dir, added_dir):
+        os.makedirs(d, exist_ok=True)
+        for f in os.listdir(d):
+            if f.endswith('.png') or f.endswith('.pdf'):
+                os.remove(os.path.join(d, f))
+
     W, H, band = 950, 720, 116
-    pages, n = [], 0
+    pdf_pages = []
+
+    # Determine which compounds are newly added to the Unique file
+    base_ids, final_smiles, final_ik = set(), {}, {}
+    if unique_rows:
+        if os.path.exists(base_unique_path):
+            with open(base_unique_path) as fh:
+                next(fh, None)
+                for line in fh:
+                    c = line.split('\t')
+                    if c and c[0] and c[0] != 'ID':
+                        base_ids.add(c[0])
+        for r in unique_rows:
+            if len(r) < 6:
+                continue
+            if r[1] == 'SMILE':
+                final_smiles[r[0]] = r[5]
+            elif r[1] == 'InChIKey':
+                final_ik[r[0]] = r[5]
+    added = sorted(c for c in final_smiles if c not in base_ids)
+    added_set = set(added)
+
+    # --- Section 1: corrected existing compounds (before / after) ---
+    n_corr = 0
     for cpd_id in sorted(corrections):
+        if cpd_id in added_set:
+            continue  # newly-added compounds are shown in Section 2 instead
         corr = corrections[cpd_id]
         after_smi = corr.get('smiles', '')
         before_smi = structures.get(cpd_id, {}).get('smiles', '')
-        if not after_smi or before_smi == after_smi:
-            continue  # only diagram genuine structural changes
-        left, right = _panel(before_smi), _panel(after_smi)
+        if not after_smi:
+            continue
+        # Skip metadata-only changes: if the molecule is unchanged (same
+        # canonical SMILES) the 2D depiction would be identical (e.g. an
+        # InChIKey-field normalization), so there is nothing to visualize.
+        cb, ca = _canon(before_smi), _canon(after_smi)
+        if cb is not None and cb == ca:
+            continue
         canvas = Image.new('RGB', (W * 2, H + band), 'white')
         dr = ImageDraw.Draw(canvas)
-        nm = names.get(cpd_id, [])
-        nm = (nm[0] if isinstance(nm, list) and nm else
-              (nm if isinstance(nm, str) else ''))
-        nm = re.sub(r'<[^>]+>', '', nm)
-        dr.text((14, 12), f"{cpd_id}  {nm[:62]}", fill='black', font=f_title)
+        dr.text((14, 12), f"{cpd_id}  {_name(cpd_id)[:62]}",
+                fill='black', font=f_title)
         dr.text((14, 46), f"Correction: {_kind(before_smi, after_smi)}",
                 fill='#a00000', font=f_mono)
         dr.text((14, 70), f"InChIKey -> {corr.get('inchikey', '')}",
                 fill='gray', font=f_mono)
         dr.text((14, band - 22), "BEFORE", fill='blue', font=f_mono)
         dr.text((W + 14, band - 22), "AFTER", fill='green', font=f_mono)
-        canvas.paste(left, (0, band))
-        canvas.paste(right, (W, band))
+        canvas.paste(_panel(before_smi), (0, band))
+        canvas.paste(_panel(after_smi), (W, band))
         dr.line([(W, band), (W, H + band)], fill='lightgray', width=2)
         canvas.save(os.path.join(out_dir, f"{cpd_id}.png"))
-        pages.append(canvas)
-        n += 1
+        pdf_pages.append(canvas)
+        n_corr += 1
 
-    if make_pdf and pages:
-        pages[0].save(os.path.join(out_dir, "Corrected_Compounds_2D.pdf"),
-                      "PDF", save_all=True, append_images=pages[1:])
-    logger.info("  Correction diagrams: %d (in %s/)", n, out_dir)
+    # --- Section 2: compounds newly added to the Unique file ---
+    n_add = 0
+    if added:
+        divider = Image.new('RGB', (W * 2, H + band), 'white')
+        ImageDraw.Draw(divider).text(
+            (60, (H + band) // 2 - 24),
+            f"Newly added to Unique file  ({len(added)} compounds)",
+            fill='#006000', font=f_big)
+        pdf_pages.append(divider)
+        for cpd_id in added:
+            smi = final_smiles.get(cpd_id, '')
+            canvas = Image.new('RGB', (W, H + band), 'white')
+            dr = ImageDraw.Draw(canvas)
+            dr.text((14, 12), f"{cpd_id}  {_name(cpd_id)[:60]}",
+                    fill='black', font=f_title)
+            dr.text((14, 46), "Newly added to Unique file",
+                    fill='#006000', font=f_mono)
+            dr.text((14, 70), f"InChIKey {final_ik.get(cpd_id, '')}",
+                    fill='gray', font=f_mono)
+            canvas.paste(_panel(smi), (0, band))
+            canvas.save(os.path.join(added_dir, f"{cpd_id}.png"))
+            page = Image.new('RGB', (W * 2, H + band), 'white')
+            page.paste(canvas, (W // 2, 0))  # centre on the wide PDF page
+            pdf_pages.append(page)
+            n_add += 1
+
+    total = len(pdf_pages)
+    for idx, pg in enumerate(pdf_pages, 1):
+        ImageDraw.Draw(pg).text((pg.width - 250, pg.height - 30),
+                                f"Page {idx} / {total}", fill='gray',
+                                font=f_mono)
+
+    if make_pdf and pdf_pages:
+        pdf_pages[0].save(os.path.join(out_dir, "Structure_Changes_2D.pdf"),
+                          "PDF", save_all=True, append_images=pdf_pages[1:])
+    logger.info("  Structure diagrams: %d corrected, %d newly added "
+                "(corrected_2d/ + added_2d/)", n_corr, n_add)
 
 
 def generate_comparison_images(conn, candidates, structures, images_dir,
