@@ -2791,6 +2791,41 @@ def generate_correction_diagrams(corrections, structures, out_dir=None,
         return ImageFont.load_default()
     f_title, f_mono = _font(False, 24), _font(True, 17)
 
+    from rdkit.Chem import (FindPotentialStereo, StereoSpecified,
+                            GetFormalCharge)
+
+    def _spec(smi):
+        m = Chem.MolFromSmiles(smi) if smi else None
+        return None if m is None else sum(
+            1 for s in FindPotentialStereo(m)
+            if s.specified == StereoSpecified.Specified)
+
+    def _chg(smi):
+        m = Chem.MolFromSmiles(smi) if smi else None
+        return None if m is None else GetFormalCharge(m)
+
+    def _kind(before, after):
+        """Human-readable label for the correction that was applied."""
+        bs, as_ = _spec(before), _spec(after)
+        bc, ac = _chg(before), _chg(after)
+        chg = bc is not None and ac is not None and bc != ac
+        det = []
+        if chg:
+            det.append(f"charge {bc} -> {ac}")
+        if bs is not None and as_ is not None and bs != as_:
+            det.append(f"stereocenters {bs} -> {as_}")
+        if chg and bs is not None and as_ is not None and bs != as_:
+            name = "Protonation + stereochemistry"
+        elif chg:
+            name = "Protonation corrected"
+        elif bs is not None and as_ is not None and as_ > bs:
+            name = "Stereochemistry added"
+        elif bs is not None and as_ is not None and as_ < bs:
+            name = "Stereochemistry reduced"
+        else:
+            name = "Stereochemistry / representation change"
+        return name + (f"  ({'; '.join(det)})" if det else "")
+
     names = {}
     try:
         names = load_names(NAMES_FILE)
@@ -2817,7 +2852,7 @@ def generate_correction_diagrams(corrections, structures, out_dir=None,
         d.FinishDrawing()
         return Image.open(io.BytesIO(d.GetDrawingText())).convert('RGB')
 
-    W, H, band = 950, 720, 90
+    W, H, band = 950, 720, 116
     pages, n = [], 0
     for cpd_id in sorted(corrections):
         corr = corrections[cpd_id]
@@ -2832,9 +2867,10 @@ def generate_correction_diagrams(corrections, structures, out_dir=None,
         nm = (nm[0] if isinstance(nm, list) and nm else
               (nm if isinstance(nm, str) else ''))
         nm = re.sub(r'<[^>]+>', '', nm)
-        dr.text((14, 12), f"{cpd_id}  {nm[:62]}  [{corr.get('result_type','')}]",
-                fill='black', font=f_title)
-        dr.text((14, 48), f"InChIKey -> {corr.get('inchikey', '')}",
+        dr.text((14, 12), f"{cpd_id}  {nm[:62]}", fill='black', font=f_title)
+        dr.text((14, 46), f"Correction: {_kind(before_smi, after_smi)}",
+                fill='#a00000', font=f_mono)
+        dr.text((14, 70), f"InChIKey -> {corr.get('inchikey', '')}",
                 fill='gray', font=f_mono)
         dr.text((14, band - 22), "BEFORE", fill='blue', font=f_mono)
         dr.text((W + 14, band - 22), "AFTER", fill='green', font=f_mono)
