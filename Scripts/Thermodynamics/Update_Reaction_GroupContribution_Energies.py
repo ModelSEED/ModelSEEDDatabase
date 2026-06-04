@@ -2,6 +2,7 @@
 import os,sys
 sys.path.append('../../Libs/Python/')
 from BiochemPy import Compounds, Reactions
+from Estimate_Reaction_Reversibility import reversibility_from_energy
 
 label = 'Group contribution'
 
@@ -73,12 +74,15 @@ for rxn in reactions_dict:
         dge_sum =float("{0:.2f}".format(dge_sum**0.5))
         dg_dge_list = (dg_sum,dge_sum)
 
-    # values always saved as list of energy and error
+    # Per-method estimate stored ADDITIVELY (next to, not replacing, the
+    # canonical top-level deltag/deltagerr) as [energy, error, operator],
+    # where the operator is this estimate's own thermodynamic direction.
+    (dg_val,dge_val) = dg_dge_list
+    operator = reversibility_from_energy(reactions_dict[rxn], dg_val, dge_val)
+
     if(not isinstance(reactions_dict[rxn]['thermodynamics'],dict)):
         reactions_dict[rxn]['thermodynamics'] = dict()
-    if(label not in reactions_dict[rxn]['thermodynamics']):
-        reactions_dict[rxn]['thermodynamics'][label]=list()
-    reactions_dict[rxn]['thermodynamics'][label]=dg_dge_list
+    reactions_dict[rxn]['thermodynamics'][label]=[dg_val,dge_val,operator]
 
 print("Saving reactions")
 reactions_helper.saveReactions(reactions_dict)

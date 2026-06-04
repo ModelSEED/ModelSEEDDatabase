@@ -33,6 +33,10 @@ STAGES = {
         'Update_Compound_pKas',
         _cmd('Structures/Update_Compound_pKas.py'),
     ),
+    'AddPkaSources': (
+        'Add_Compound_pKa_Sources',
+        _cmd('Structures/Add_Compound_pKa_Sources.py'),
+    ),
     'UpdateGC': (
         'Update_Compound_GroupContribution_Energies',
         _cmd('Thermodynamics/Update_Compound_GroupContribution_Energies.py'),
@@ -64,12 +68,12 @@ STAGES = {
 # unknown stages with a warning.
 CASCADE = {
     'structure_update': [
-        'Print', 'List', 'UpdateStructures', 'UpdatePkas',
+        'Print', 'List', 'UpdateStructures', 'UpdatePkas', 'AddPkaSources',
         'UpdateGC', 'UpdateEQ', 'Reprint', 'BuildProvenance',
         'ValidateFAISS',
     ],
     'protonation_replace': [
-        'List', 'UpdateStructures', 'UpdatePkas',
+        'List', 'UpdateStructures', 'UpdatePkas', 'AddPkaSources',
         'UpdateGC', 'UpdateEQ', 'Reprint', 'BuildProvenance',
         'ValidateFAISS',
     ],
@@ -89,7 +93,7 @@ CASCADE = {
         'UpdateAliases', 'BuildProvenance',
     ],
     'pka_replace': [
-        'UpdatePkas', 'Reprint', 'BuildProvenance',
+        'UpdatePkas', 'AddPkaSources', 'Reprint', 'BuildProvenance',
     ],
 }
 

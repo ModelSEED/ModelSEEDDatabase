@@ -2,6 +2,7 @@
 import os,sys
 sys.path.append('../../Libs/Python/')
 from BiochemPy import Reactions
+from Estimate_Reaction_Reversibility import reversibility_from_energy
 
 label="eQuilibrator"
 reactions_helper = Reactions()
@@ -46,12 +47,15 @@ for rxn in sorted (reactions_dict.keys()):
     if(float(eq_reactions[rxn][1]) > 100):
         pass
 
-    # values always saved as list of energy and error
+    # Per-method estimate stored ADDITIVELY (next to, not replacing, the
+    # canonical top-level deltag/deltagerr) as [energy, error, operator],
+    # where the operator is this estimate's own thermodynamic direction.
+    (dg_val,dge_val) = eq_reactions[rxn]
+    operator = reversibility_from_energy(reactions_dict[rxn], dg_val, dge_val)
+
     if(not isinstance(reactions_dict[rxn]['thermodynamics'],dict)):
         reactions_dict[rxn]['thermodynamics'] = dict()
-    if(label not in reactions_dict[rxn]['thermodynamics']):
-        reactions_dict[rxn]['thermodynamics'][label]=list()
-    reactions_dict[rxn]['thermodynamics'][label]=eq_reactions[rxn]
+    reactions_dict[rxn]['thermodynamics'][label]=[dg_val,dge_val,operator]
 
 print("Saving reactions")
 reactions_helper.saveReactions(reactions_dict)
