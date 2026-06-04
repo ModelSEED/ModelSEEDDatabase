@@ -264,6 +264,47 @@ class Compounds:
                                     }
         return out
 
+    def loadPerSourceCharges(self, db_array=None, ph=7):
+        """Returns charges[(db, ext_id)] = int(charge_at_ph).
+
+        Reads from <db>/protonations/marvin_*_ph<n>.tsv (the post-A1 layout).
+        Iterates every matching TSV in the protonations/ directory; if a source
+        ships multiple snapshots, the last-sorted one wins for each ext_id.
+
+        Each compound typically has multiple rows in the protonations file
+        (one per structure type: InChI, SMILE, InChIKey) but they all carry
+        the same charge — last-write-wins collapses them safely.
+
+        Applies the same ID normalization as loadPerSourcePkas so the
+        returned ext_id matches the alias-file convention.
+        """
+        if db_array is None:
+            db_array = ['KEGG', 'MetaCyc', 'ChEBI', 'Rhea']
+
+        out = {}
+        for db in db_array:
+            proton_dir = self.StructRoot + db + '/protonations'
+            if not os.path.isdir(proton_dir):
+                continue
+            pattern = proton_dir + '/*_ph' + str(ph) + '.tsv'
+            for proton_file in sorted(glob.glob(pattern)):
+                with open(proton_file) as fh:
+                    reader = DictReader(fh, dialect='excel-tab')
+                    for line in reader:
+                        ext_id = line.get('external_id')
+                        charge = line.get('charge')
+                        if not ext_id or charge in (None, ''):
+                            continue
+                        if db == 'ChEBI' and ext_id.startswith('CHEBI_'):
+                            ext_id = ext_id[len('CHEBI_'):]
+                        elif db == 'Rhea' and ext_id.startswith('POLYMER_'):
+                            ext_id = 'POLYMER:' + ext_id[len('POLYMER_'):]
+                        try:
+                            out[(db, ext_id)] = int(charge)
+                        except ValueError:
+                            continue
+        return out
+
     def loadPerSourcePkas(self, db_array=None):
         """Returns pkas[(db, ext_id)] = {'pKa': value, 'pKb': value}.
 
