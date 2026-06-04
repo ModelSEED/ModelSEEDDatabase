@@ -122,3 +122,42 @@ sources:
           for every current compound — added to the cascade for
           completeness and for graceful degradation if primary
           sources lose entries in the future.
+
+# ---------------------------------------------------------------------------
+# Additive per-source thermodynamic descriptions
+# ---------------------------------------------------------------------------
+#
+# Per-method reaction thermodynamics are recorded ADDITIVELY (next to, never in
+# place of, the canonical top-level deltag/deltagerr/reversibility) under each
+# reaction's `thermodynamics` dict. Every method keeps its own
+# [energy, error, operator] triple, where the operator ('>', '<', '=' or '?')
+# is that estimate's own thermodynamic direction, computed with the same
+# heuristic as the canonical reversibility applied to that method's dG, e.g.:
+#   "thermodynamics": {
+#       "Group contribution": [4.15, 1.22, "="],
+#       "eQuilibrator":       [-3.46, 0.05, ">"],
+#       "dGPredictor":        [-3.82, 0.02, ">"]
+#   }
+# dGPredictor (Wang et al. 2021; staged in Biochemistry/Thermodynamics/
+# dGPredictor/json_files/, kJ->kcal /4.184) is recorded for every reaction it
+# predicts. These records are description-only: the canonical deltag/deltagerr/
+# reversibility are not altered. The operators are generated from the stored
+# energies by Scripts/Thermodynamics/Add_Reaction_Thermodynamics_Operators.py;
+# the shared heuristic lives in Estimate_Reaction_Reversibility.py
+# (reversibility_from_energy).
+#
+# Per-tool compound pKas are likewise recorded ADDITIVELY under each compound's
+# `pkas` dict, next to (never in place of) the served pka/pkb fields. Each tool
+# keeps its own pKa/pKb in the same <microstate>:<atom>:<value> encoding, keyed
+# by the predicting tool -- Marvin (the cascade-winning per-database Marvin
+# value) and MolGpKa (the OPAM2/MolGpKa prediction; file
+# ModelSEED/pkas/opam2_molgpka.tsv), e.g.:
+#   "pkas": {
+#       "Marvin":  {"pKa": "1:14:12.60;1:22:3.33;...",
+#                   "pKb": "1:9:-3.03;1:14:-3.85;..."},
+#       "MolGpKa": {"pKa": "1:14:10.12;1:29:0.98;...",
+#                   "pKb": "1:6:3.66;1:9:3.42;..."}
+#   }
+# The served pka/pkb remain the cascade-picked Marvin value. The dict is
+# (re)built by Scripts/Structures/Add_Compound_pKa_Sources.py (cascade stage
+# AddPkaSources).

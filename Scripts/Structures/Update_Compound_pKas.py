@@ -1,4 +1,11 @@
 #!/usr/bin/env python
+#
+# Picks the single served pka/pkb per compound from the Marvin per-database
+# cascade (KEGG > MetaCyc > ChEBI > Rhea). The companion script
+# Add_Compound_pKa_Sources.py then records each tool's pKa/pKb ADDITIVELY in a
+# per-compound `pkas` dict (Marvin = this cascade-winning value; MolGpKa = the
+# OPAM2/MolGpKa prediction), next to these served values without changing them;
+# the cascade runs it as the AddPkaSources stage right after this one.
 import os,sys
 sys.path.append('../../Libs/Python')
 from BiochemPy import Compounds
