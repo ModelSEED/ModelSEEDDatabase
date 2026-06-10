@@ -26,18 +26,24 @@ own dG:
 
 ```json
 "thermodynamics": {
-    "Group contribution": [4.15, 1.22, "="],
-    "eQuilibrator":       [-3.46, 0.05, ">"],
-    "dGPredictor":        [-3.82, 0.02, ">"]
+    "Group contribution":    [4.15, 1.22, "="],
+    "eQuilibrator":          [-3.46, 0.05, ">"],
+    "dGPredictor":           [-3.82, 0.02, ">"],
+    "dGPredictor-ModelSEED": [-3.77, 0.87, ">"]
 }
 ```
 
 `dGPredictor` (Wang et al. 2021; predictions staged under
 `../../Biochemistry/Thermodynamics/dGPredictor/json_files/`, kJ→kcal `/4.184`)
 is recorded for **every** reaction it predicts, alongside the GC/eQ records.
-These per-method records sit **next to**, and never replace, the canonical
-top-level `deltag` / `deltagerr` / `reversibility` fields — recording
-dGPredictor does not alter the canonical free-energy value. The shared heuristic
+`dGPredictor-ModelSEED` is the same dGPredictor model **retrained on the
+ModelSEED compound structures** (expanded group vocabulary; staged under
+`../../Biochemistry/Thermodynamics/dGPredictor/modelseed_retrained_dG.json`,
+kJ→kcal `/4.184`), recorded as its **own** additive method for the 31,924
+reactions it predicts — next to, and never replacing, the original KEGG-based
+`dGPredictor` record. These per-method records sit **next to**, and never
+replace, the canonical top-level `deltag` / `deltagerr` / `reversibility`
+fields — recording dGPredictor does not alter the canonical free-energy value. The shared heuristic
 lives in `Estimate_Reaction_Reversibility.py` (`reversibility_from_energy`); the
 `Update_Reaction_*_Energies.py` scripts attach the operator when they write each
 method, and `Add_Reaction_Thermodynamics_Operators.py` can (re)generate the
@@ -70,6 +76,8 @@ then running these six commands should not cause any changes to appear in the da
 ./Estimate_Reaction_Reversibility.py EQ
 # Record dGPredictor additively for every predicted reaction (no canonical change)
 ./Update_Reaction_dGPredictor_Energies.py
+# Record the ModelSEED-retrained dGPredictor as its own additive method
+./Update_Reaction_dGPredictor_ModelSEED_Energies.py
 # Backfill/refresh the per-method [energy, error, operator] triples
 ./Add_Reaction_Thermodynamics_Operators.py
 ```
