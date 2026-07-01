@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 import os
 import sys
+import csv
 import json
 import glob
 
@@ -9,6 +10,104 @@ import glob
 #################################################################
 sys.path.append('../../Libs/Python')
 from BiochemPy import Compounds
+
+
+#################################################################
+## Curated structure picks (manual overrides)
+#################################################################
+
+def load_curated_picks():
+    """Read all *.tsv files under Biochemistry/Curation/overrides/structure_picks/
+    and return {cpd_id: {format, structure, source_db, source_id, curator,
+                          date, rationale}}.
+
+    Each TSV file's name is the curator (e.g. samseaver.tsv). Last-write-
+    wins if a compound appears in multiple curator files; warns on overlap.
+    """
+    picks = {}
+    overrides_dir = os.path.join(
+        os.path.dirname(__file__), '..', '..',
+        'Biochemistry', 'Curation', 'overrides', 'structure_picks')
+    overrides_dir = os.path.normpath(overrides_dir)
+    if not os.path.isdir(overrides_dir):
+        return picks
+    for path in sorted(glob.glob(os.path.join(overrides_dir, '*.tsv'))):
+        curator = os.path.splitext(os.path.basename(path))[0]
+        with open(path) as fh:
+            reader = csv.DictReader(fh, delimiter='\t')
+            for row in reader:
+                cpd_id = row.get('cpd_id', '').strip()
+                if not cpd_id:
+                    continue
+                if cpd_id in picks and picks[cpd_id]['curator'] != curator:
+                    print(f"WARN: cpd {cpd_id} curated by both "
+                          f"{picks[cpd_id]['curator']} and {curator}; "
+                          f"using {curator}", file=sys.stderr)
+                picks[cpd_id] = {
+                    'format': row.get('format', '').strip(),
+                    'structure': row.get('structure', '').strip(),
+                    'source_db': row.get('source_db', '').strip(),
+                    'source_id': row.get('source_id', '').strip(),
+                    'curator': curator,
+                    'date': row.get('date', '').strip(),
+                    'rationale': row.get('rationale', '').strip(),
+                }
+    return picks
+
+
+def derive_structures_from_override(override):
+    """Given a curator override row, parse its structure via RDKit and
+    return {'SMILE': str, 'InChI': str, 'InChIKey': str, 'formula': str,
+             'charge': str} -- all derived consistently from the override.
+    Returns None if RDKit can't parse the structure.
+    """
+    import re
+    try:
+        from rdkit import Chem, RDLogger
+        from rdkit.Chem import rdMolDescriptors
+        from rdkit.Chem.inchi import MolFromInchi, MolToInchi, InchiToInchiKey
+        RDLogger.DisableLog('rdApp.*')
+    except ImportError:
+        print("ERROR: RDKit not available; cannot derive structures "
+              "from curator overrides. Skipping override consult.",
+              file=sys.stderr)
+        return None
+
+    fmt = override['format']
+    struct = override['structure']
+    if fmt == 'InChI':
+        mol = MolFromInchi(struct)
+        if mol is None:
+            return None
+        inchi = struct
+    elif fmt == 'SMILE':
+        mol = Chem.MolFromSmiles(struct)
+        if mol is None:
+            return None
+        inchi = MolToInchi(mol)
+        if not inchi:
+            return None
+    else:
+        return None
+
+    smiles = Chem.MolToSmiles(mol, isomericSmiles=True, canonical=True)
+    inchikey = InchiToInchiKey(inchi)
+    # rdMolDescriptors.CalcMolFormula appends the net charge (e.g. "C40H66O7P2-2")
+    # but the Unique file stores formula and charge in separate columns,
+    # so strip a trailing charge marker.
+    formula_raw = rdMolDescriptors.CalcMolFormula(mol)
+    formula = re.sub(r'[+\-]\d*$', '', formula_raw)
+    charge = str(Chem.GetFormalCharge(mol))
+    return {
+        'SMILE': smiles,
+        'InChI': inchi,
+        'InChIKey': inchikey,
+        'formula': formula,
+        'charge': charge,
+    }
+
+
+CURATED_PICKS = load_curated_picks()
 
 #Load Compounds
 CompoundsHelper = Compounds()
@@ -129,7 +228,54 @@ for msid in sorted(MS_Aliases_Dict.keys()):
 
     if(len(Structs.keys())==0):
         continue
-    
+
+    #################################################################
+    ## Curator override consult: if this compound has a manual pick in
+    ## Biochemistry/Curation/overrides/structure_picks/<curator>.tsv,
+    ## use it directly and skip the cascade tiebreaker entirely.
+    ## All three formats (SMILE, InChIKey, InChI) are derived from the
+    ## override's structure via RDKit so they stay internally consistent.
+    #################################################################
+
+    if(msid in CURATED_PICKS):
+        override = CURATED_PICKS[msid]
+        derived = derive_structures_from_override(override)
+        if(derived is None):
+            print(f"WARN: cpd {msid} curator override ({override['curator']}) "
+                  f"could not be parsed by RDKit; falling back to cascade",
+                  file=sys.stderr)
+        else:
+            # Aggregate all aliases for this compound across all sources
+            override_aliases = set()
+            for src in MS_Aliases_Dict[msid]:
+                for alias in MS_Aliases_Dict[msid][src]:
+                    override_aliases.add(alias)
+            aliases_str = ";".join(sorted(override_aliases))
+            # Write the three structure rows to Unique using derived values
+            for stype in ("SMILE", "InChIKey", "InChI"):
+                unique_structs_file.write("\t".join((
+                    msid, stype, aliases_str,
+                    derived['formula'], derived['charge'],
+                    derived[stype])) + "\n")
+            # Record the pick rationale
+            reason = f"manual_curation:{override['curator']}"
+            pick_reasons_file.write("\t".join((
+                msid, override['format'], "Charged", reason,
+                override['structure'], aliases_str)) + "\n")
+            # Also report the underlying conflict (transparency) if any
+            # We pick the priority type/stage for the conflict report only.
+            for try_type in ("InChI", "SMILE"):
+                if(try_type in Structs and "Charged" in Structs[try_type]
+                        and len(Structs[try_type]["Charged"]) > 1):
+                    for structure in Structs[try_type]["Charged"]:
+                        for ext_id in Structs[try_type]["Charged"][structure]:
+                            structure_conflicts_file.write("\t".join((
+                                msid, try_type, "Charged", structure, ext_id,
+                                Structs[try_type]["Charged"][structure][ext_id])) + "\n")
+                    break
+            # Skip the cascade tiebreaker for this compound
+            continue
+
     #################################################################
     ## Prioritized which type and stage for the structure for comparison
     ## Priority Order is:
