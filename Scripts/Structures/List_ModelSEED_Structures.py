@@ -109,6 +109,44 @@ def derive_structures_from_override(override):
 
 CURATED_PICKS = load_curated_picks()
 
+
+#################################################################
+## SMILES canonicalization (idempotent with Recanonicalize_SMILES.py)
+##
+## Every SMILES row this script writes -- to All_ModelSEED_Structures.txt
+## and to Unique_ModelSEED_Structures.txt -- is passed through the same
+## RDKit-canonical function that Recanonicalize_SMILES.py uses. This
+## makes the two scripts' outputs idempotent: running the picker followed
+## by Recanonicalize produces zero further changes.
+##
+## Import lazily-guarded so the picker still runs (with warnings) if
+## RDKit isn't installed; the SMILES would then be written as-is.
+#################################################################
+
+def _make_smiles_canonicalizer():
+    """Return a function s -> canonical(s) that never raises;
+    on parse failure it returns the input unchanged."""
+    try:
+        # Reuse the algorithm from Recanonicalize_SMILES.py in the same
+        # directory to guarantee identical output.
+        script_dir = os.path.dirname(os.path.abspath(__file__))
+        if script_dir not in sys.path:
+            sys.path.insert(0, script_dir)
+        from Recanonicalize_SMILES import canonical_smiles as _canon
+        def _fn(s):
+            if not s:
+                return s
+            new, status = _canon(s)
+            return new if status not in ('parse_failure', 'null_or_empty') else s
+        return _fn
+    except Exception as e:
+        print(f"WARN: could not load SMILES canonicalizer ({e}); "
+              f"picker will write SMILES as-is from sources.", file=sys.stderr)
+        return lambda s: s
+
+
+CANONICALIZE_SMILES = _make_smiles_canonicalizer()
+
 #Load Compounds
 CompoundsHelper = Compounds()
 Compounds_Dict = CompoundsHelper.loadCompounds()
@@ -195,12 +233,16 @@ for msid in sorted(MS_Aliases_Dict.keys()):
 
                         #################################################################
                         ## Write all structures to master 'All_ModelSEED_Strutures.txt'
+                        ## SMILES rows are canonicalized so this file's output stays
+                        ## idempotent with Recanonicalize_SMILES.py.
                         #################################################################
 
+                        structure_to_write = (CANONICALIZE_SMILES(structure)
+                                              if struct_type == "SMILE" else structure)
                         master_structs_file.write("\t".join([msid,struct_type,struct_stage,external_id,source,\
                                                                  formula_charge_dict['formula'],\
                                                                  formula_charge_dict['charge'],\
-                                                                 structure])+"\n")
+                                                                 structure_to_write])+"\n")
                         
                         #################################################################
                         ## Skip if curated structure designated to be ignored
@@ -386,15 +428,18 @@ for msid in sorted(MS_Aliases_Dict.keys()):
                         aliases[alias]=1
 
                 #################################################################
-                ## We write them to file
+                ## We write them to file (SMILES canonicalized to keep Unique
+                ## idempotent with Recanonicalize_SMILES.py)
                 #################################################################
 
+                structure_to_write = (CANONICALIZE_SMILES(structure)
+                                      if structure_type == "SMILE" else structure)
                 unique_structs_file.write("\t".join((msid,\
                                                      structure_type,\
                                                      ";".join(sorted(aliases)),\
                                                      formula_charge_dict['formula'],\
                                                      formula_charge_dict['charge'],\
-                                                     structure))+"\n")
+                                                     structure_to_write))+"\n")
 
         else:
 
@@ -640,15 +685,18 @@ for msid in sorted(MS_Aliases_Dict.keys()):
                         aliases[alias]=1
 
                 #################################################################
-                ## Finally, write to file
+                ## Finally, write to file (SMILES canonicalized to keep Unique
+                ## idempotent with Recanonicalize_SMILES.py)
                 #################################################################
 
+                structure_to_use_out = (CANONICALIZE_SMILES(structure_to_use)
+                                        if structure_type == "SMILE" else structure_to_use)
                 unique_structs_file.write("\t".join((msid,\
                                                      structure_type,\
                                                      ";".join(sorted(aliases)),\
                                                      formula_charge_dict['formula'],\
                                                      formula_charge_dict['charge'],\
-                                                     structure_to_use))+"\n")
+                                                     structure_to_use_out))+"\n")
                                         
     #################################################################
     ## Here we report the structural conflicts
