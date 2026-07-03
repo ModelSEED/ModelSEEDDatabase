@@ -111,6 +111,50 @@ CURATED_PICKS = load_curated_picks()
 
 
 #################################################################
+## ACP formula/charge overrides
+##
+## Biochemistry/Curation/overrides/acps_formula_charge.tsv contains
+## hand-curated formula/charge values for ACP (acyl-carrier-protein)
+## compounds. The formulas include the pantetheine + 4'-phosphate side
+## chain plus the specific acyl group, with a wildcard 'R' representing
+## the protein backbone. Historically only Update_Compound_Structures_
+## Formulas_Charge.py consulted this file (to override the per-compound
+## JSON records); the picker did not, so ACP compounds hit the
+## formula-conflict branch and were dropped from Unique_ModelSEED_
+## Structures.txt entirely (including cpd11493 ACP itself, used in
+## 911 reactions).
+##
+## The picker now reads this file too and uses it as the source of
+## truth for formula/charge on any compound listed. The picked
+## structure comes from a source database (typically KEGG or MetaCyc)
+## because the override file records formula/charge only, not the
+## actual SMILES/InChI/InChIKey.
+#################################################################
+
+def load_acps_overrides():
+    """Read Biochemistry/Curation/overrides/acps_formula_charge.tsv
+    and return {cpd_id: (formula, charge)}."""
+    path = os.path.normpath(os.path.join(
+        os.path.dirname(__file__), '..', '..',
+        'Biochemistry', 'Curation', 'overrides', 'acps_formula_charge.tsv'))
+    d = {}
+    if not os.path.isfile(path):
+        return d
+    with open(path) as fh:
+        reader = csv.DictReader(fh, delimiter='\t')
+        for row in reader:
+            cpd = row.get('ID', '').strip()
+            if not cpd:
+                continue
+            d[cpd] = (row.get('formula', '').strip(),
+                      row.get('charge', '').strip())
+    return d
+
+
+ACP_OVERRIDES = load_acps_overrides()
+
+
+#################################################################
 ## SMILES canonicalization (idempotent with Recanonicalize_SMILES.py)
 ##
 ## Every SMILES row this script writes -- to All_ModelSEED_Structures.txt
@@ -316,6 +360,63 @@ for msid in sorted(MS_Aliases_Dict.keys()):
                                 Structs[try_type]["Charged"][structure][ext_id])) + "\n")
                     break
             # Skip the cascade tiebreaker for this compound
+            continue
+
+    #################################################################
+    ## ACP formula-override consult: for any compound with a hand-
+    ## curated formula/charge in acps_formula_charge.tsv, apply the
+    ## override and pick any source structure. This resolves compounds
+    ## that would otherwise hit the formula_conflict_no_pick branch
+    ## and be dropped from Unique.
+    #################################################################
+
+    if(msid in ACP_OVERRIDES):
+        override_formula, override_charge = ACP_OVERRIDES[msid]
+        # Prefer InChI/Charged, then InChI/Original, then SMILE/Charged, SMILE/Original
+        pick_type, pick_stage = None, None
+        for try_type in ('InChI', 'SMILE'):
+            if try_type not in Structs:
+                continue
+            for try_stage in ('Charged', 'Original'):
+                if try_stage in Structs[try_type]:
+                    pick_type, pick_stage = try_type, try_stage
+                    break
+            if pick_type:
+                break
+        if pick_type is None:
+            print(f"Warning: ACP override for {msid} but no source "
+                  f"structure available; skipping.", file=sys.stderr)
+        else:
+            # Aggregate all aliases for this compound across sources
+            override_aliases = set()
+            for src in MS_Aliases_Dict[msid]:
+                for alias in MS_Aliases_Dict[msid][src]:
+                    override_aliases.add(alias)
+            aliases_str = ";".join(sorted(override_aliases))
+            # Write each format's Unique row using the picked source's structure
+            # for that format, plus the override formula/charge.
+            representative_structure = sorted(Structs[pick_type][pick_stage].keys())[0]
+            for stype in ('SMILE', 'InChIKey', 'InChI'):
+                if stype not in Structs or pick_stage not in Structs[stype]:
+                    continue
+                s = sorted(Structs[stype][pick_stage].keys())[0]
+                s_out = CANONICALIZE_SMILES(s) if stype == 'SMILE' else s
+                unique_structs_file.write("\t".join((
+                    msid, stype, aliases_str,
+                    override_formula, override_charge, s_out)) + "\n")
+            pick_reasons_file.write("\t".join((
+                msid, pick_type, pick_stage, "manual_formula_override:acps",
+                representative_structure, aliases_str)) + "\n")
+            # Report underlying conflict (transparency)
+            for try_type in ("InChI", "SMILE"):
+                if(try_type in Structs and pick_stage in Structs[try_type]
+                        and len(Structs[try_type][pick_stage]) > 1):
+                    for structure in Structs[try_type][pick_stage]:
+                        for ext_id in Structs[try_type][pick_stage][structure]:
+                            structure_conflicts_file.write("\t".join((
+                                msid, try_type, pick_stage, structure, ext_id,
+                                Structs[try_type][pick_stage][structure][ext_id])) + "\n")
+                    break
             continue
 
     #################################################################
