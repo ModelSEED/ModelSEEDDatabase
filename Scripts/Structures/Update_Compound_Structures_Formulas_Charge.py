@@ -1,7 +1,36 @@
 #!/usr/bin/env python
-import os,sys
+import csv, os, sys
 sys.path.append('../../Libs/Python')
 from BiochemPy import Compounds
+
+#################################################################
+## Mass-balance exclusions
+##
+## Compounds listed in Biochemistry/Curation/exclusions/
+## mass_balance_excluded.tsv are ones where the picked structure
+## (from Unique_ModelSEED_Structures.txt) does NOT round-trip to
+## the same formula/charge as what's in compound_*.json. This
+## script normally overwrites compound_*.json's formula/charge with
+## values derived from the picked structure. For excluded compounds
+## we skip that overwrite -- the compound keeps its legacy
+## formula/charge in compound_*.json, and downstream mass-balance
+## checkers know to skip the compound (or accept the structure/
+## formula inconsistency) when evaluating reactions using it.
+##
+## Only the smiles and inchikey fields get updated for excluded
+## compounds (so atom-mapping tools have the picked structure).
+#################################################################
+
+Mass_Balance_Excluded=set()
+_excl_path = (os.path.dirname(__file__)
+              + '/../../Biochemistry/Curation/exclusions/mass_balance_excluded.tsv')
+if os.path.isfile(_excl_path):
+    with open(_excl_path) as _fh:
+        _reader = csv.DictReader(_fh, delimiter='\t')
+        for _row in _reader:
+            _cpd = (_row.get('cpd_id') or '').strip()
+            if _cpd:
+                Mass_Balance_Excluded.add(_cpd)
 
 Overridden_Fields=dict()
 header=list()
@@ -110,6 +139,13 @@ for cpd in sorted (compounds_dict.keys()):
                 print("Warning: Duplicate InChIKey: "+inchikey+" in "+" and ".join(inchikey_dict[inchikey]))
         compounds_dict[cpd]['inchikey']=inchikey
         compounds_dict[cpd]['smiles']=smile
+
+        # Mass-balance-excluded compounds: keep the picked structure's
+        # inchikey/smiles (set above) but DO NOT touch formula/charge.
+        # compound_*.json keeps its legacy values so reactions using this
+        # compound remain balanced against the historical formula.
+        if(cpd in Mass_Balance_Excluded):
+            continue
 
         if(formula_charge_dict['formula'] != "null"):
             compounds_dict[cpd]['formula']=formula_charge_dict['formula']
