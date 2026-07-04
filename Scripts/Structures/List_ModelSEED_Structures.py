@@ -84,19 +84,37 @@ def derive_structures_from_override(override):
         mol = Chem.MolFromSmiles(struct)
         if mol is None:
             return None
-        inchi = MolToInchi(mol)
-        if not inchi:
-            return None
+        # Standard InChI can't represent wildcard atoms (*). For
+        # R-containing picks we still return SMILES + formula + charge;
+        # InChI and InChIKey are left blank and downstream skips them.
+        try:
+            inchi = MolToInchi(mol) or ''
+        except Exception:
+            inchi = ''
     else:
         return None
 
     smiles = Chem.MolToSmiles(mol, isomericSmiles=True, canonical=True)
-    inchikey = InchiToInchiKey(inchi)
-    # rdMolDescriptors.CalcMolFormula appends the net charge (e.g. "C40H66O7P2-2")
-    # but the Unique file stores formula and charge in separate columns,
-    # so strip a trailing charge marker.
-    formula_raw = rdMolDescriptors.CalcMolFormula(mol)
-    formula = re.sub(r'[+\-]\d*$', '', formula_raw)
+    inchikey = InchiToInchiKey(inchi) if inchi else ''
+    # rdMolDescriptors.CalcMolFormula: strip trailing charge marker
+    # (stored in a separate column), rewrite '*' wildcards as 'R'
+    # (ModelSEED convention), and re-sort into Hill+alpha order --
+    # RDKit places '*' immediately after H, but the rest of the
+    # codebase places R alphabetically among the heavy atoms
+    # (e.g. C22H31N7O17P3RS, not C22H31RN7O17P3S).
+    formula_raw = re.sub(r'[+\-]\d*$', '',
+                         rdMolDescriptors.CalcMolFormula(mol))
+    counts = {}
+    for m in re.finditer(r'([A-Z][a-z]?|\*)(\d*)', formula_raw):
+        el = 'R' if m.group(1) == '*' else m.group(1)
+        counts[el] = counts.get(el, 0) + int(m.group(2) or 1)
+    def _key(el):
+        if el == 'C': return (0, '')
+        if el == 'H': return (1, '')
+        return (2, el)
+    formula = ''.join(
+        f"{el}{counts[el] if counts[el] > 1 else ''}"
+        for el in sorted(counts, key=_key))
     charge = str(Chem.GetFormalCharge(mol))
     return {
         'SMILE': smiles,
@@ -337,8 +355,12 @@ for msid in sorted(MS_Aliases_Dict.keys()):
                 for alias in MS_Aliases_Dict[msid][src]:
                     override_aliases.add(alias)
             aliases_str = ";".join(sorted(override_aliases))
-            # Write the three structure rows to Unique using derived values
+            # Write the structure rows to Unique using derived values.
+            # Skip any format the pick doesn't yield (e.g. InChI/InChIKey
+            # for R-containing SMILES picks that RDKit can't represent).
             for stype in ("SMILE", "InChIKey", "InChI"):
+                if not derived.get(stype):
+                    continue
                 unique_structs_file.write("\t".join((
                     msid, stype, aliases_str,
                     derived['formula'], derived['charge'],
