@@ -1,25 +1,39 @@
 #!/usr/bin/env python
+#
+# Picks the single served pka/pkb per compound from the Marvin per-database
+# cascade (KEGG > MetaCyc > ChEBI > Rhea). The companion script
+# Add_Compound_pKa_Sources.py then records each tool's pKa/pKb ADDITIVELY in a
+# per-compound `pkas` dict (Marvin = this cascade-winning value; MolGpKa = the
+# OPAM2/MolGpKa prediction), next to these served values without changing them;
+# the cascade runs it as the AddPkaSources stage right after this one.
 import os,sys
+sys.path.append('../../Libs/Python')
 from BiochemPy import Compounds
-
-Structures_Root=os.path.dirname(__file__)+"/../../Biochemistry/Structures/"
-
-# Load pKas and pKbs
-cpd_pKab_dict=dict()
-for DB in ["KEGG","MetaCyc"]:
-    with open(Structures_Root+DB+'/pKa_Strings.txt') as fh:
-        for line in fh.readlines():
-            line=line.strip()
-            array=line.split('\t')
-            if(array[0] not in cpd_pKab_dict):
-                cpd_pKab_dict[array[0]]={array[1]:array[2]}
-            else:
-                cpd_pKab_dict[array[0]][array[1]]=array[2]
 
 compounds_helper = Compounds()
 compounds_dict = compounds_helper.loadCompounds()
 structures_dict = compounds_helper.loadStructures(["SMILE","InChI","InChIKey"],["ModelSEED"])
 aliases_dict = compounds_helper.loadMSAliases()
+
+# Load pKas and pKbs from the post-A1 layout: <db>/pkas/<tool>_<ver>.tsv.
+# Iteration order is the priority cascade KEGG > MetaCyc > ChEBI > Rhea.
+# First DB with a hit on any of the compound's aliases wins.
+#
+# ChEBI and Rhea were previously unused because of ID-format mismatches
+# (ChEBI: 'CHEBI_15377' in pKa file vs '15377' in aliases; Rhea:
+# 'POLYMER_X' vs 'POLYMER:X'). Compounds.loadPerSourcePkas normalizes
+# both at ingestion now, see sources.yaml for the migration history.
+# Adding ChEBI to the cascade unlocks ~3,800 additional pKa
+# attributions; Rhea's polymer pKa data is fully shadowed by primary
+# sources so its inclusion is for completeness rather than coverage.
+PKA_DBS = ["KEGG", "MetaCyc", "ChEBI", "Rhea"]
+per_source_pkas = compounds_helper.loadPerSourcePkas(PKA_DBS)
+cpd_pKab_dict = dict()
+for (db, ext_id), entry in per_source_pkas.items():
+    if(ext_id not in cpd_pKab_dict):
+        cpd_pKab_dict[ext_id] = dict()
+    for kind, value in entry.items():
+        cpd_pKab_dict[ext_id][kind] = value
 
 # We're removing all pKa and pKb before loading new ones
 for cpd in compounds_dict:
@@ -29,7 +43,7 @@ for cpd in compounds_dict:
 # We're only loading pKa/pKb for compounds that have an accepted unique structure in ModelSEED
 for cpd in structures_dict:
     found=False
-    for DB in ["KEGG","MetaCyc"]:
+    for DB in PKA_DBS:
         if(found is True or DB not in aliases_dict[cpd]):
             continue
 

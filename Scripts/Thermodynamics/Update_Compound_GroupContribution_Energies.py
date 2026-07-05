@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 import os,sys
+sys.path.append('../../Libs/Python/')
 from BiochemPy import Compounds
 
 compounds_helper = Compounds()
@@ -60,20 +61,25 @@ for source in ["KEGG","MetaCyc"]:
 
 for cpd in sorted (compounds_dict.keys()):
 
-    #Energies computed from structures, if no structure, don't even _have_ energies
-    if(cpd not in structures_dict):
-        compounds_dict[cpd]['deltag']=10000000.0
-        compounds_dict[cpd]['deltagerr']=10000000.0
-        compounds_dict[cpd]['notes']="null"
+    #Default energy and error
+    lowest_dg=10000000.0
+    lowest_dge=10000000.0
 
-    else:
+    # Condition 1, no structure, use default
+    # Condition 2, structure is InChIKey or SMILE
 
-        #If inchikey, use that, else use SMILE
-        structure_type='InChIKey'
-        if(structure_type not in structures_dict[cpd]):
-            structure_type='SMILE'
-
+    structure_type=None
+    if(cpd in structures_dict):
+        if('InChIKey' in structures_dict[cpd]):
+            structure_type = 'InChIKey' 
+        elif('SMILE' in structures_dict[cpd]):
+            structure_type = 'SMILE'
+    
+    structure = None
+    if(structure_type is not None):
         structure = list(structures_dict[cpd][structure_type].keys())[0]
+
+    if(structure is not None):
         energies_dict=dict()
         for alias in structures_dict[cpd][structure_type][structure]['alias']:
             if(alias not in thermodynamics_dict):
@@ -82,19 +88,20 @@ for cpd in sorted (compounds_dict.keys()):
 
         #In case where multiple energies because of distribution of bonds
         #Take lowest energy as most likely result of equilibrium
-        lowest_dg=10000000.0
-        lowest_dge=10000000.0
+        #If the lowest energy is the default energy (i.e. 10000000)
+        #We will still save it
         for energy in energies_dict:
             if(energy < lowest_dg):
                 lowest_dg=energy
                 lowest_dge=energies_dict[energy]
 
-        #If the lowest energy is the default energy (i.e. 10000000)
-        #We will still save it, but we're taking notes
-
-        compounds_dict[cpd]['deltag']=lowest_dg
-        compounds_dict[cpd]['deltagerr']=lowest_dge
-        compounds_dict[cpd]['notes']=['GC'] #Meaning group contribution approach
+    # values always saved as list of energy and error
+    if(not isinstance(compounds_dict[cpd]['thermodynamics'],dict)):
+        compounds_dict[cpd]['thermodynamics'] = dict()
+    if('Group contribution' not in compounds_dict[cpd]['thermodynamics']):
+        compounds_dict[cpd]['thermodynamics']['Group contribution']=list()
+    compounds_dict[cpd]['thermodynamics']['Group contribution'].append(lowest_dg)
+    compounds_dict[cpd]['thermodynamics']['Group contribution'].append(lowest_dge)
 
 print("Saving compounds")
 compounds_helper.saveCompounds(compounds_dict)

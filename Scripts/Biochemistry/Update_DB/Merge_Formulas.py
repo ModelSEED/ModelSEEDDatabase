@@ -11,6 +11,10 @@ Compounds_Dict = CompoundsHelper.loadCompounds()
 
 Update_Compounds=0
 for cpd in sorted(Compounds_Dict.keys()):
+    # Skip Light!
+    if(cpd == 'cpd11632'):
+        continue
+    
     old_formula=Compounds_Dict[cpd]["formula"]
     (new_formula, notes) = CompoundsHelper.mergeFormula(old_formula)
 

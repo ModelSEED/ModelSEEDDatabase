@@ -1,0 +1,163 @@
+# Source metadata for the per-database structure files in this directory.
+#
+# Layout convention (one folder per source):
+#
+#   <source>/
+#     inchi.tsv             external_id, inchi, formula, charge
+#     smiles.tsv            external_id, smiles, formula, charge
+#     inchikey.tsv          external_id, inchikey
+#     protonations/
+#       <tool>_<ver>_ph<n>.tsv
+#                           external_id, type, structure, formula,
+#                           charge, tool, tool_version, ph,
+#                           generated_on
+#     pkas/
+#       <tool>_<ver>.tsv    external_id, kind, value, tool, tool_version
+#
+# This YAML records the per-source state — snapshot dates, the tool
+# and version that produced each protonation/pKa bundle, and which
+# pKa bundles are actually consumed by the production update scripts.
+# Adding a new pH or a new Marvin version means dropping a new file
+# in protonations/ or pkas/ and adding an entry below; nothing else
+# in the layout needs to move.
+
+version: 2
+
+# Pick-priority order. When multiple sources disagree on a structure
+# for the same compound, and the multi-source-agreement and
+# stereochemistry rules in List_ModelSEED_Structures.py do not
+# decide, the picker takes the first source in this list.
+priority:
+  - MetaCyc
+  - KEGG
+  - ChEBI
+  - Rhea
+
+# When a compound has structures of multiple types/stages, this is the
+# order Update_Compound_Structures_Formulas_Charge.py uses to populate
+# the canonical formula/charge/inchikey/smiles fields.
+structure_pick_order:
+  - InChI@Charged
+  - InChI@Original
+  - SMILE@Charged
+  - SMILE@Original
+
+sources:
+
+  KEGG:
+    snapshot: 2024-01-23           # last-touched date of the source structures
+    protonations:
+      - file:    protonations/marvin_23.4_ph7.tsv
+        tool:    Marvin
+        version: "23.4"
+        ph:      7
+    pkas:
+      - file:    pkas/marvin_23.4.tsv
+        tool:    Marvin
+        version: "23.4"
+        consumed_by_production: true   # Update_Compound_pKas.py reads this
+    notes: |
+      KEGG mol files were also parsed for SRUs (structural repeating
+      units); the SRU filter file is KEGG_SRU_041020.txt.
+
+  MetaCyc:
+    snapshot: 2024-01-23
+    protonations:
+      - file:    protonations/marvin_23.4_ph7.tsv
+        tool:    Marvin
+        version: "23.4"
+        ph:      7
+    pkas:
+      - file:    pkas/marvin_23.4.tsv
+        tool:    Marvin
+        version: "23.4"
+        consumed_by_production: true
+
+  ChEBI:
+    snapshot: 2024-01-23
+    protonations:
+      - file:    protonations/marvin_23.4_ph7.tsv
+        tool:    Marvin
+        version: "23.4"
+        ph:      7
+    pkas:
+      - file:    pkas/marvin_23.4.tsv
+        tool:    Marvin
+        version: "23.4"
+        consumed_by_production: true
+        id_normalization: |
+          The pKa file's external_id column is keyed 'CHEBI_15377' but
+          the alias file uses bare numeric ids ('15377'). Compounds.
+          loadPerSourcePkas strips the 'CHEBI_' prefix at ingestion so
+          the lookup matches. Future regenerations of this file should
+          drop the prefix at the source (Marvin export step) so the
+          fix can be retired.
+        coverage: |
+          Enabling ChEBI as a fallback after KEGG and MetaCyc unlocks
+          ~3,800 additional compound pKa attributions (compounds whose
+          only structured alias is ChEBI).
+
+  Rhea:
+    snapshot: 2023-03-31
+    protonations:
+      - file:    protonations/marvin_23.4_ph7.tsv
+        tool:    Marvin
+        version: "23.4"
+        ph:      7
+    pkas:
+      - file:    pkas/marvin_23.4.tsv
+        tool:    Marvin
+        version: "23.4"
+        consumed_by_production: true
+        id_normalization: |
+          The pKa file's external_id column is keyed 'POLYMER_10033'
+          but the alias file uses 'POLYMER:10033'. Compounds.
+          loadPerSourcePkas rewrites the underscore to a colon at
+          ingestion. Future regenerations should match the alias
+          format at the source.
+        coverage: |
+          Rhea's pKa data covers POLYMER_* compounds (structural
+          repeating units). All such compounds already have primary
+          pKa attribution from KEGG/MetaCyc/ChEBI, so Rhea is shadowed
+          for every current compound — added to the cascade for
+          completeness and for graceful degradation if primary
+          sources lose entries in the future.
+
+# ---------------------------------------------------------------------------
+# Additive per-source thermodynamic descriptions
+# ---------------------------------------------------------------------------
+#
+# Per-method reaction thermodynamics are recorded ADDITIVELY (next to, never in
+# place of, the canonical top-level deltag/deltagerr/reversibility) under each
+# reaction's `thermodynamics` dict. Every method keeps its own
+# [energy, error, operator] triple, where the operator ('>', '<', '=' or '?')
+# is that estimate's own thermodynamic direction, computed with the same
+# heuristic as the canonical reversibility applied to that method's dG, e.g.:
+#   "thermodynamics": {
+#       "Group contribution": [4.15, 1.22, "="],
+#       "eQuilibrator":       [-3.46, 0.05, ">"],
+#       "dGPredictor":        [-3.82, 0.02, ">"]
+#   }
+# dGPredictor (Wang et al. 2021; staged in Biochemistry/Thermodynamics/
+# dGPredictor/json_files/, kJ->kcal /4.184) is recorded for every reaction it
+# predicts. These records are description-only: the canonical deltag/deltagerr/
+# reversibility are not altered. The operators are generated from the stored
+# energies by Scripts/Thermodynamics/Add_Reaction_Thermodynamics_Operators.py;
+# the shared heuristic lives in Estimate_Reaction_Reversibility.py
+# (reversibility_from_energy).
+#
+# Per-tool compound pKas are likewise recorded ADDITIVELY under each compound's
+# `pkas` dict, next to (never in place of) the served pka/pkb fields. Each tool
+# keeps its own pKa/pKb in the same <microstate>:<atom>:<value> encoding, keyed
+# by the predicting tool -- Marvin (the cascade-winning per-database Marvin
+# value) and MolGpKa (the OPAM2/MolGpKa prediction; file
+# ModelSEED/pkas/opam2_molgpka.tsv), e.g.:
+#   "pkas": {
+#       "Marvin":  {"pKa": "1:14:12.60;1:22:3.33;...",
+#                   "pKb": "1:9:-3.03;1:14:-3.85;..."},
+#       "MolGpKa": {"pKa": "1:14:10.12;1:29:0.98;...",
+#                   "pKb": "1:6:3.66;1:9:3.42;..."}
+#   }
+# The served pka/pkb remain the cascade-picked Marvin value. The dict is
+# (re)built by Scripts/Structures/Add_Compound_pKa_Sources.py (cascade stage
+# AddPkaSources).

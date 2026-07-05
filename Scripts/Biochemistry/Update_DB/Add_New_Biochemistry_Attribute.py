@@ -1,23 +1,18 @@
 #!/usr/bin/env python
-from BiochemPy import Reactions, Compounds
 import sys
+sys.path.append('../../../Libs/Python')
+from BiochemPy import Reactions, Compounds
 
-##########################################
-# Reprinting compounds, aliases and names
-##########################################
+compounds_helper = Compounds()
+compounds_dict = compounds_helper.loadCompounds()
+for cpd in compounds_dict:
+    # consistently add or alter attribute
+    pass
+compounds_helper.saveCompounds(compounds_dict)
+
 reactions_helper = Reactions()
 reactions_dict = reactions_helper.loadReactions()
-#reactions_helper.Headers.append('ontology')
 for rxn in reactions_dict:
-#    reactions_dict[rxn]['ontology']='class:null|context:null|step:null'
-#    reactions_dict[rxn]['ontology']="null"
-    if('None' in reactions_dict[rxn]['notes']):
-        reactions_dict[rxn]['notes']="null"
+    # consistently add or alter attribute
+    pass
 reactions_helper.saveReactions(reactions_dict)
-
-#compounds_helper = Compounds()
-#compounds_dict = compounds_helper.loadCompounds()
-#compounds_helper.Headers.append('notes')
-#for cpd in compounds_dict:
-#    compounds_dict[cpd]['notes']="null"
-#compounds_helper.saveCompounds(compounds_dict)

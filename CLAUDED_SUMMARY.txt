@@ -1,0 +1,359 @@
+ModelSEEDDatabase --- summary of work on the `clauded` branch
+=============================================================
+
+Ten commits ahead of `dev`; pushed to origin/clauded on freiburgermsu's
+fork. The work is organized into four areas: (1) the per-source data
+layout was restructured so protonation is data instead of filename
+metadata; (2) a manifest-based update system was added on top, with
+both a hand-written YAML path and a no-install GitHub Issue Forms
+path; (3) per-field provenance sidecars were added alongside the
+compound TSVs; (4) a FAISS-output validator was added so downstream
+consumer stability can be checked on every change.
+
+No reaction or compound rows in the canonical compound_NN.tsv or
+reaction_NN.tsv files were modified, except where the ChEBI pKa
+bug fix (item 3 below) added newly-attributable pKa values to ~3,600
+compounds. Downstream consumers (KBase, modelseed.org, ModelSEED_FAISS)
+remain compatible — the BiochemPy public API is unchanged.
+
+
+1. Database structure (current state)
+-------------------------------------
+
+Per-source structure data lives under Biochemistry/Structures/<source>/
+for each of KEGG, MetaCyc, ChEBI, Rhea. Before the migration each
+source held eleven files keyed by {InChI,InChIKey,SMILE} x
+{Original,Charged} plus a pKa file; protonation method, tool version,
+and pH were encoded only in the "Charged" suffix and in tribal
+knowledge. After the migration each source holds five files:
+
+  <source>/
+    inchi.tsv             external_id, inchi, formula, charge
+    smiles.tsv            external_id, smiles, formula, charge
+    inchikey.tsv          external_id, inchikey
+    protonations/
+      <tool>_<ver>_ph<n>.tsv
+                          external_id, type, structure, formula,
+                          charge, tool, tool_version, ph,
+                          generated_on
+    pkas/
+      <tool>_<ver>.tsv    external_id, kind, value, tool, tool_version
+
+Adding a new protonation engine, pH, or Marvin version is now a
+drop-in file under protonations/; adding a new pKa snapshot is a
+drop-in file under pkas/. No filenames or per-type fork is required.
+
+Biochemistry/Structures/sources.yaml declares the per-source
+metadata: snapshot dates, which protonation/pKa bundles each source
+owns, the cross-source pick priority (MetaCyc > KEGG > ChEBI > Rhea),
+and the structure-stage pick order (Charged-InChI > Original-InChI >
+Charged-SMILE > Original-SMILE). The picker rules used to live as
+hardcoded if-chains inside List_ModelSEED_Structures.py.
+
+Curation data is consolidated under Biochemistry/Curation/:
+  overrides/   acps_formula_charge.tsv (was Scripts/Structures/...)
+  ignores/     Ignored_Structures_Publication2020.txt and friends
+  history/     per-curator subdirs (Fxe, janakagithub, samseaver)
+               plus all_updates.log
+
+Auto-generated pipeline outputs that used to be tracked next to the
+scripts (Resolved_Structures.txt, Unresolved_Structures.txt,
+Formula_Conflicts.txt, Structure_Conflicts.txt, Current_Diff.txt)
+moved to Biochemistry/Structures/_reports/. List_ModelSEED_Structures
+also emits Pick_Reasons.txt to record which branch of the
+conflict-resolution cascade fired for each compound (single_structure,
+multi_source_agreement, multi_source_stereochemistry,
+smile_db_priority:<DB>, connectivity_stereochemistry, etc.).
+
+Per-field provenance for the compound TSVs lives in sidecar files
+compound_NN.provenance.tsv with columns:
+  id, formula_src, charge_src, inchikey_src, smiles_src,
+  pka_src, pkb_src, deltag_method, deltag_used_src,
+  deltag_gc_src, deltag_eq_src
+Each source pointer has the form <DB>:<external_id>[@<stage>] or
+eQuilibrator:<MNXM> or Override:<reason>. The format is described
+in detail in Biochemistry/Structures/README.md.
+
+The Mermaid dataflow diagram in Biochemistry/Structures/README.md
+shows the full pipeline: source dumps -> Print refresh ->
+List_ModelSEED_Structures consolidation -> per-field application via
+Update_Compound_* scripts -> Reprint -> compound_NN.tsv + json ->
+Build_Compound_Field_Provenance -> sidecars.
+
+
+2. Update workflow (how to change anything)
+-------------------------------------------
+
+Edits go through a manifest system; raw multi-file edits are no
+longer needed. Each curated change is one YAML manifest under
+Biochemistry/Updates/. A manifest declares its type, target, change,
+reason, author, and date. Apply_Manifest.py reads it, dispatches to
+the matching handler in Scripts/Updates/handlers.py, and prints the
+ordered list of pipeline stages that must re-run. Refresh_Pipeline.py
+then executes that cascade.
+
+Supported manifest types and their cascades (see
+Biochemistry/Updates/examples/*.yaml for a worked example of each):
+
+  structure_update     edit one row in <source>/{inchi,smiles,
+                       inchikey}.tsv. Cascade: Print -> List ->
+                       UpdateStructures -> UpdatePkas -> UpdateGC ->
+                       UpdateEQ -> Reprint -> BuildProvenance ->
+                       ValidateFAISS.
+
+  protonation_replace  drop in a new <tool>_<ver>_ph<n>.tsv bundle
+                       (e.g. bumping Marvin 23.4 to 24.0). Cascade:
+                       List -> UpdateStructures -> UpdatePkas ->
+                       UpdateGC -> UpdateEQ -> Reprint ->
+                       BuildProvenance -> ValidateFAISS.
+
+  override_add         append a row to
+                       Curation/overrides/acps_formula_charge.tsv.
+                       Cascade: UpdateStructures -> Reprint ->
+                       BuildProvenance.
+
+  ignore_add           append a row to Curation/ignores/<file>.txt.
+                       Cascade: List -> UpdateStructures -> Reprint ->
+                       BuildProvenance.
+
+  alias_add /          edit Aliases/Unique_ModelSEED_Compound_Aliases.txt.
+  alias_remove         Cascade: UpdateAliases -> BuildProvenance.
+
+  pka_replace          replace one <source>/pkas/<file>.tsv bundle.
+                       Cascade: UpdatePkas -> Reprint -> BuildProvenance.
+
+There are two ways to land a manifest:
+
+Path A --- Issue Forms (no install, no YAML knowledge required)
+
+  Open a new issue and pick one of four forms in
+  .github/ISSUE_TEMPLATE/:
+    Structure update
+    ACP override (add)
+    Alias (add)
+    Ignore a source structure
+  Each form has a handful of fields. On submit, GitHub adds a
+  `manifest:<type>` label, which triggers
+  .github/workflows/manifest-from-issue.yml. The workflow runs
+  Scripts/Updates/Issue_To_Manifest.py to parse the form into a
+  manifest YAML, runs Apply_Manifest --dry-run for a cascade
+  preview, pushes the manifest to a bot/manifest-* branch, and
+  opens a PR linking back to the issue. A reviewer merges the
+  PR; the curator runs Apply_Manifest --cascade locally to land
+  the data changes.
+
+Path B --- hand-written manifest (for power users / bulk edits)
+
+  1. Curator writes <manifest>.yaml in Biochemistry/Updates/
+  2. python Scripts/Updates/Apply_Manifest.py <manifest>.yaml --dry-run
+     to preview without writing files.
+  3. python Scripts/Updates/Apply_Manifest.py <manifest>.yaml --cascade
+     to apply and run the cascade in one step.
+  4. The manifest auto-archives to Biochemistry/Updates/applied/
+     with a YYYY-MM-DD prefix.
+
+Both paths produce the same canonical manifest artifact. Adding a
+new manifest type is one handler function in handlers.py plus one
+entry in cascade.py.
+
+Validation hooks at the end of every cascade:
+  --- Build_Compound_Field_Provenance regenerates the per-field
+      provenance sidecars from purely the data on disk, no recompute.
+  --- Validate_FAISS_Outputs (Tier 1) hashes the reaction SMILES that
+      ModelSEED_FAISS would build, compares against the committed
+      baseline at Biochemistry/Embeddings/rxn_smiles_hashes.tsv.
+      Identical hashes guarantee identical RXNFP fingerprints and
+      identical FAISS index.
+
+
+3. Thermodynamics changes
+-------------------------
+
+No changes to the thermodynamics algorithms (group contribution,
+eQuilibrator lookup, reversibility estimation). The deltag and
+deltagerr values in compound_NN.tsv are byte-identical across all
+ten commits.
+
+What changed around the edges of thermodynamics:
+
+  Provenance for deltag. Each compound TSV row now has a sidecar
+  row in compound_NN.provenance.tsv with four thermo-related
+  columns:
+    deltag_method      "GC" or "EQ" (read from the existing notes
+                       column, which encodes which method won via
+                       the GC/EQ/EQU tags)
+    deltag_used_src    pointer to whichever source actually
+                       produced the final deltag value
+    deltag_gc_src      the (source, stage, external_id) the
+                       Group-Contribution lookup chose, e.g.
+                       KEGG:C00001@Charged
+    deltag_eq_src      the eQuilibrator MNXM id chosen via
+                       InChIKey-deprotonated lookup, e.g.
+                       eQuilibrator:MNXM2
+  The build script (Scripts/Provenance/Build_Compound_Field_Provenance.py)
+  recomputes these purely by joining existing data files --- it
+  does not re-run any thermo calculation.
+
+  Find_eQuilibrator_Structures_in_ModelSEED.py moved from
+  Biochemistry/Structures/MetaNetX/ (where it was a stranded
+  script next to its data) into Scripts/Thermodynamics/, with
+  internal paths updated to read All_ModelSEED_Structures.txt
+  from Biochemistry/Structures/ and write
+  Structures_in_ModelSEED_and_eQuilibrator.txt back into
+  Biochemistry/Structures/MetaNetX/. Behavior unchanged.
+
+  The manifest cascade for structure_update and protonation_replace
+  automatically re-runs Update_Compound_GroupContribution_Energies.py
+  and Update_Compound_eQuilibrator_Energies.py, so any structure
+  change refreshes the downstream thermo without the curator having
+  to remember.
+
+  The FAISS Tier 1 validator does not check thermo directly --- it
+  checks the reaction-SMILES strings the FAISS pipeline would build.
+  But it catches any change that would also perturb thermo input
+  (any SMILES or stoichiometry change).
+
+Outstanding follow-up flagged but not done:
+
+  Some compound TSVs had stale pKa values from old runs of
+  Update_Compound_pKas.py. The ChEBI fix below cleared most of them
+  as a side effect (~28 shards modified). The remaining stale-state
+  cleanup could be done as a standalone refresh commit.
+
+  The Group-Contribution lookup is hardcoded to ["KEGG", "MetaCyc"]
+  in the same way pKa was. Worth a similar audit for ChEBI/Rhea
+  coverage gaps.
+
+
+4. Other changes
+----------------
+
+Per-field provenance sidecars (commit 95cae74)
+  50 new compound_NN.provenance.tsv files alongside the existing
+  compound_NN.tsv shards. Records the source of every derived field
+  (formula, charge, inchikey, smiles, pka, pkb, deltag) as a
+  <DB>:<ext_id>[@stage] pointer. Reconstructible purely by joining
+  existing files; no production data was modified.
+
+Picker reason logging (commit 95cae74)
+  List_ModelSEED_Structures.py now emits Pick_Reasons.txt recording
+  which branch of the picker cascade fired per compound. Generated
+  on the next pipeline run (no retroactive backfill of historical
+  picks).
+
+File reorganization (commit 15ba388)
+  Moved data out of Scripts/, moved scripts out of Biochemistry/.
+  ACPs override, ignored-structures files, auto-generated reports,
+  two stranded scripts (Check_Prior_Curation,
+  Find_eQuilibrator_Structures_in_ModelSEED). Curation tree
+  consolidated into overrides/, ignores/, history/.
+
+Preview tool (commit 65ba75c)
+  Scripts/Structures/Preview_Structure_Update.py <cpd_id> <new_inchi>
+  uses RDKit on the proposed InChI to print a side-by-side diff of
+  formula, charge, inchikey, smiles, and the eQuilibrator deltag
+  bucket against the current TSV state. Flags which fields would
+  change. Does not modify any files.
+
+Mermaid dataflow diagram (commit 65ba75c)
+  Biochemistry/Structures/README.md gained a top-down flow diagram
+  showing source dumps -> derivation -> consolidation -> per-field
+  application -> compound_NN.tsv, with curation-override and
+  provenance branches. Same Mermaid convention as CDM_Schema.md.
+
+sources.yaml schema (commits 65ba75c, 4e73367)
+  Forward-looking schema for per-source metadata that became the
+  canonical layout after the A1 migration completed. Records
+  snapshot dates, protonation tool/version/pH, pKa tool/version,
+  and consumed-by-production flags.
+
+A1 layout migration in three commits (fd09c0e, 3f7fd44, 4e73367)
+  Step 1: generate the new layout files from existing data, leave
+          old files in place.
+  Step 2: switch BiochemPy.loadStructures and four reader scripts
+          to the new layout; verify byte-identical
+          All_/Unique_ModelSEED_Structures.txt and provenance
+          sidecars across the change.
+  Step 3: update Print_Structure_Formula_Charge.py to write the
+          new layout, retire 44 legacy files, update README.
+
+ChEBI/Rhea pKa fix (commit f7c0ebf)
+  Diagnosis: pKa data for ChEBI and Rhea was on disk but never
+  consumed because of two ID-format mismatches --- pKa files were
+  keyed 'CHEBI_15377' but the alias file uses '15377', and
+  'POLYMER_10033' versus 'POLYMER:10033'. Compounds.loadPerSourcePkas
+  now normalizes both at ingestion. Net effect on the database:
+  3,628 compounds gain pKa attribution from ChEBI (coverage rose
+  from 31,763 to 35,391); 0 from Rhea (polymer pKa data is fully
+  shadowed by primary sources but kept in the cascade for graceful
+  degradation).
+
+FAISS-output validator (commit 237a50c)
+  Scripts/Validation/Validate_FAISS_Outputs.py with two modes.
+  Tier 1 (default, no deps, ~10 seconds): hashes the reaction-
+  SMILES string the FAISS pipeline would build; compares against
+  Biochemistry/Embeddings/rxn_smiles_hashes.tsv. Tier 2 (requires
+  rxnfp conda env + sibling clone of Ray16/ModelSEED_FAISS, multi-
+  minute): runs RXNBERT fingerprint generation and hashes each
+  256-D vector. Both modes have a --regenerate flag for refreshing
+  the baseline; both exit non-zero on hash drift with a per-
+  reaction diff.
+
+Modular update manifest system (commit 52ba5fc)
+  See section 2 above for the workflow.
+
+GitHub Issue Forms (commit f64aa16)
+  Adds the zero-install Path A from section 2. Four forms in
+  .github/ISSUE_TEMPLATE/ + a workflow that turns each into a
+  manifest YAML and opens a PR.
+
+
+Commit log (chronological)
+--------------------------
+
+  95cae74  Add per-field provenance sidecars and picker reason logging
+  15ba388  Reorganize curation, overrides, and report file locations
+  65ba75c  Add Preview_Structure_Update tool, dataflow diagram, and sources.yaml
+  fd09c0e  A1 step 1 of 3: generate target-layout structure files
+  3f7fd44  A1 step 2 of 3: switch readers to the new layout
+  4e73367  A1 step 3 of 3: switch writer, retire legacy files, update docs
+  f7c0ebf  Enable ChEBI/Rhea pKa data via id-format normalization
+  237a50c  Add FAISS-output validator with Tier 1 + Tier 2 modes
+  52ba5fc  Add modular update manifest system
+  f64aa16  Add GitHub Issue Forms as a no-YAML path for modular updates
+
+
+Outstanding follow-ups
+----------------------
+
+  Refresh stale compound TSV state. A handful of higher-numbered
+  compound shards have pKa values from old runs that the current
+  Update_Compound_pKas.py no longer produces. Run the script and
+  commit the refreshed TSVs as a separate "refresh" commit.
+
+  Audit GC ΔG source priority for ChEBI/Rhea coverage gaps. The
+  pKa fix surfaced a hardcoded [KEGG, MetaCyc] iteration; the
+  Group-Contribution lookup has the same pattern and is likely
+  missing similar coverage.
+
+  Optional `manifest-apply.yml` workflow that runs the cascade in
+  CI after PR merge, so curators do not have to run anything
+  locally. Trade-off: CI commits data changes back to the branch.
+
+  Optional notebook UI at Biochemistry/Updates/notebooks/curate.ipynb
+  using ipywidgets, for curators in the dev env who want live
+  previews of the current row.
+
+  Per-compound directory layout (Direction B from the original
+  proposal): one folder per compound under Biochemistry/compounds/
+  containing structure.json, pka.json, thermo.json,
+  provenance.json. Would make each compound's downstream graph
+  maximally local. 34K directories is a serious git-tooling
+  change; defer until the per-field provenance sidecars have
+  proven their value.
+
+  Single pipeline runner with explicit DAG (originally proposal A4).
+  Refresh_Pipeline.py already runs the cascade for one manifest
+  type at a time, but doesn't have stage-level "what's stale?"
+  logic like make. Could be extended to skip stages whose inputs
+  haven't changed since the last cascade.

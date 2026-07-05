@@ -3,9 +3,12 @@ import os, sys, re, copy
 import argparse, requests
 from collections import OrderedDict
 
+def list_of_strings(arg):
+    return arg.split(',')
+
 parser = argparse.ArgumentParser()
 parser.add_argument('reactions_file', help="Reactions File")
-parser.add_argument('cpd_database', help="Biochemistry database of origin for compounds")
+parser.add_argument('cpd_database', help="Biochemistry database of origin for compounds", type=list_of_strings)
 parser.add_argument('github_user', help="GitHub username")
 parser.add_argument("-r", dest='report_file', action='store_true')
 parser.add_argument("-s", dest='save_file', action='store_true')
@@ -41,9 +44,10 @@ for msid in compounds_alias_dict:
             source_alias_dict[source][alias].append(msid)
 
 #Check compound source
-if(args.cpd_database != "ModelSEED" and args.cpd_database not in source_alias_dict):
-    print("Alias for source of compounds is not recognized")
-    sys.exit()
+for db in args.cpd_database:
+    if(db != "ModelSEED" and db not in source_alias_dict):
+        print("Alias ("+db+") for source of compounds is not recognized")
+        sys.exit()
 
 compounds_dict = compounds_helper.loadCompounds()
 reactions_helper = Reactions()
@@ -104,17 +108,17 @@ with open(args.reactions_file) as fh:
 
         new_cpd_array=list()
         for i in range(len(original_cpd_array)):
-            if(re.search('^\([\d\.]+\)$',original_cpd_array[i])):
+            if(re.search(r'^\([\d\.]+\)$',original_cpd_array[i])):
                 continue
 
             if(original_cpd_array[i] == '+' ):
                 continue
 
-            if(re.search('^<?[-=]+>?$',original_cpd_array[i])):
+            if(re.search(r'^<?[-=]+>?$',original_cpd_array[i])):
                 continue
 
-            if(re.search('\[[01]\]$',original_cpd_array[i])):
-                new_cpd_array.append(re.sub('\[[01]\]$','',original_cpd_array[i]))
+            if(re.search(r'\[[01]\]$',original_cpd_array[i])):
+                new_cpd_array.append(re.sub(r'\[[01]\]$','',original_cpd_array[i]))
             else:
                 new_cpd_array.append(original_cpd_array[i])
 
@@ -124,10 +128,12 @@ with open(args.reactions_file) as fh:
             
             #if source is ModelSEED
             msid = ""
-            if(args.cpd_database == 'ModelSEED' and new_cpd in compounds_dict):
+            if("ModelSEED" in args.cpd_database and new_cpd in compounds_dict):
                 msid = new_cpd
-            elif(args.cpd_database in source_alias_dict and new_cpd in source_alias_dict[args.cpd_database]):
-                msid = sorted(source_alias_dict[args.cpd_database][new_cpd])[0]
+            else:
+                for db in args.cpd_database:
+                    if(db in source_alias_dict and new_cpd in source_alias_dict[db]):
+                        msid = sorted(source_alias_dict[db][new_cpd])[0]
 
             if(msid != ""):
 
@@ -148,7 +154,7 @@ with open(args.reactions_file) as fh:
                 all_matched=False
 
         if(all_matched is False):
-            print("Warning: missing "+args.cpd_database+" identifiers for reaction "+rxn['id']+": "+"|".join(eqn_missing_cpds))
+            print("Warning: missing "+",".join(args.cpd_database)+" identifiers for reaction "+rxn['id']+": "+"|".join(eqn_missing_cpds))
             continue
         
         rxn_cpds_array = reactions_helper.parseEquation(rxn['equation'])

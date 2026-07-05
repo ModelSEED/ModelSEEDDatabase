@@ -15,7 +15,7 @@ Reactions_Dict = ReactionsHelper.loadReactions()
 # Load ACPs
 Overridden_Fields=dict()
 header=list()
-with open(os.path.dirname(__file__)+'/ACPs_Master_Formula_Charge.txt') as fh:
+with open(os.path.dirname(__file__)+'/../../Biochemistry/Curation/overrides/acps_formula_charge.tsv') as fh:
     for line in fh.readlines():
         line=line.strip()
         array=line.split('\t')
@@ -43,7 +43,7 @@ for rxn in Reactions_Dict:
 
 # Reactions Compound KEGG MetaCyc Name Formula Charge
 cpd_conflicts=dict()
-with open('Formula_Conflicts.txt') as file_handle:
+with open(os.path.dirname(__file__)+'/../../Biochemistry/Structures/_reports/Formula_Conflicts.txt') as file_handle:
     for line in file_handle.readlines():
         line=line.strip()
         array=line.split('\t')
