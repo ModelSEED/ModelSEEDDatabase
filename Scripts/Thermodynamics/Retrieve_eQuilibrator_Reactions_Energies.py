@@ -95,7 +95,7 @@ for rxn in reactions_dict:
     if(reactions_dict[rxn]['status']=='EMPTY'):
         continue
 
-    rxn_cpds_array=reactions_helper.parseStoich(reactions_dict[rxn]["stoichiometry"])
+    rxn_cpds_array=reactions_dict[rxn]["stoichiometry"]
 
     All_Mol=True
     Some_Mol=False
@@ -143,7 +143,7 @@ for rxn in reactions_dict:
     if('EQC' not in notes_list):
         notes_list.append('EQC')
 
-    rxn_cpds_array=reactions_helper.parseStoich(reactions_dict[rxn]["stoichiometry"])
+    rxn_cpds_array=reactions_dict[rxn]["stoichiometry"]
 
     lhs=dict()
     rhs=dict()

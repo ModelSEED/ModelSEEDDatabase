@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 import os.path
 import glob
 import json
@@ -9,6 +10,8 @@ for compounds_file in sorted(glob.glob(search_path)):
 	with open(compounds_file) as json_file_handle:
 		cpds_list = json.load(json_file_handle)
 		for cpd_obj in cpds_list:
+			if('thermodynamics' in cpd_obj):
+				del(cpd_obj['thermodynamics'])
 			global_cpds_list.append(cpd_obj)
 
 with open('solr_compounds.json','w') as json_file_handle:
@@ -22,6 +25,9 @@ for reactions_file in sorted(glob.glob(search_path)):
 		for rxn_obj in rxns_list:
 			if('direction' in rxn_obj):
 				del(rxn_obj['direction'])
+
+			if('thermodynamics' in rxn_obj):
+				del(rxn_obj['thermodynamics'])
 
 			# compile stoichiometry as string
 			stoich_cpd_list = list()

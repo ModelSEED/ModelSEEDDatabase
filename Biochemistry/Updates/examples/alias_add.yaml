@@ -1,0 +1,34 @@
+# Example manifest: add cross-references for an existing compound.
+#
+# Aliases drive nearly every downstream lookup (pKa, GC ΔG, eQ ΔG,
+# structure consolidation) so getting them right matters. Apply_Manifest
+# appends to Aliases/Unique_ModelSEED_Compound_Aliases.txt; the
+# cascade re-runs the per-field provenance + the FAISS Tier 1 check
+# (the FAISS pipeline doesn't read aliases, but a stable check is
+# cheap insurance).
+
+type: alias_add
+title: Cross-reference cpd00567 with new ChEBI and Rhea IDs
+author: andrewfreiburger
+date: 2026-05-06
+reason: |
+  Both databases recently added entries for this compound. Adding
+  the cross-references unlocks ChEBI's pKa data for this compound
+  (currently empty) and gives Rhea's reaction integration something
+  to bind against.
+
+target:
+  modelseed_id: cpd00567
+
+change:
+  add:
+    - source: ChEBI
+      external_id: "12345"
+    - source: Rhea
+      external_id: GENERIC:67890
+
+expected_effects:
+  affected_compounds: 1
+  fields_changed:
+    - aliases
+    - pka      # ChEBI alias may unlock pKa attribution
