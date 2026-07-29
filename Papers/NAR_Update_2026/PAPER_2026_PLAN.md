@@ -110,7 +110,7 @@ Before the first full draft, the team should reach agreement on:
 2. **Whether OpenTECR gets its own Methods paragraph or is folded into the eQuilibrator refresh.**
 3. **How the Nikoloski atom-mapping work is credited** — co-authorship, collaboration acknowledgment, or joint methods citation depending on delivery timing.
 4. **Timing of the direction-field removal** — do we describe it as done (schema-breaking release) or planned (Discussion)?
-5. **Cutoff date** for the compound / reaction growth statistics (i.e. which release version becomes "2026 snapshot").
+5. ~~**Cutoff date** for the compound / reaction growth statistics~~ — **decided 2026-07-29:** the paper snapshot is tagged **`v2.0.0`**, cut from `dev` after guide sections §5–§8 land. Until the tag is cut, the current `dev` HEAD is the provisional snapshot for tracking growth statistics. See `PAPER_2026_GUIDE.md` §1.
 6. **Which external reaction-embedding foundation model** to use — requires a short evaluation (most-discerning embeddings on ModelSEED reactions) so the choice is defensible in the paper.
 7. **Which protein-carrier-cofactor classes make the cut** — biotinyl and lipoyl are the strong candidates alongside acyl-ACP; whether covalent FMN/FAD, molybdopterin, and heme-c are included in this paper or deferred is a scope question that depends on how many compounds each class actually touches in the DB (a quick census would answer it).
 

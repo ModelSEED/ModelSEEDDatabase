@@ -37,11 +37,12 @@ Preferred sequence (dependencies flow downward — anything below can be done in
 
 ## §1 · Cutoff release decision
 
-- [ ] **Repository work**
-    - Pick a specific ModelSEED release tag as the "2026 snapshot" — every growth statistic and coverage number in Results is measured against that release.
-    - Announce the cutoff to the team so late-landing PRs are either merged before the cutoff or held for the next release.
-- [ ] **Writing** — no prose yet, but every subsequent table caption cites this release tag.
-- **Blocked by:** nothing.
+- [x] **Decision (2026-07-29):** the 2026 paper snapshot is tagged **`v2.0.0`**, cut *after* guide sections §5–§8 land (protein-carrier standardization + multi-source thermodynamics + reaction similarity refresh + atom mapping delivered). Until then, the current `dev` HEAD (**`3cc9a1d`**) is the provisional snapshot for tracking growth statistics as they move.
+- [~] **Repository work**
+    - [ ] After §5–§8 land, cut and push `v2.0.0` from `dev`; announce the cutoff so late-landing PRs are held for `v2.1.0`.
+    - [x] Baseline decision recorded here so subsequent guide sections cite the right tag.
+- [ ] **Writing** — every subsequent table caption cites `v2.0.0`; the Data Availability section links to the tagged release on GitHub.
+- **Blocked by:** nothing (for the decision); tagging blocked by §5–§8.
 - **Effort:** S.
 
 ## §2 · Source-database snapshot + growth statistics
@@ -210,7 +211,7 @@ Repeated here so they are visible while tackling sections:
 2. Whether OpenTECR gets its own Methods paragraph or is folded into eQuilibrator (§6).
 3. How the Nikoloski atom-mapping work is credited (§15).
 4. Timing of the direction-field removal — done or planned (§15 Discussion).
-5. Cutoff release for the 2026 snapshot (§1).
+5. ~~Cutoff release for the 2026 snapshot~~ — **decided 2026-07-29:** `v2.0.0`, cut after §5–§8 land.
 6. Which external reaction-embedding foundation model to use (§7).
 7. Which protein-carrier-cofactor classes make the cut (§5).
 
