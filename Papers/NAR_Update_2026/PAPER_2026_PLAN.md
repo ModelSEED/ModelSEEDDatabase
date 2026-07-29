@@ -1,6 +1,6 @@
 # ModelSEED Biochemistry Database — 2026 Update Paper Plan
 
-**Draft plan • 2026-07-27 • prepared for team review**
+**Draft plan • initial 2026-07-27 • updated 2026-07-29 (integrating notes from the paper working session led by Chris with Ray and Sam)**
 
 ## Snapshot
 
@@ -8,6 +8,7 @@
 - **Target venue:** NAR Database Issue (same as 2020 — keeps citation lineage; ~4000-word cap).
 - **Draft window:** TBD by team.
 - **Novel empirical hook:** systematic study of reaction-direction heuristic sensitivity across the ModelSEED v2 draft-model corpus ([10.1101/2023.10.04.556561](https://doi.org/10.1101/2023.10.04.556561)).
+- **Working framing (from the 2026-07 working session):** the paper walks through three technical components in turn — compound **structures**, reaction **similarities**, and **dynamics** (the empirical study of how reaction-direction assignments from different thermodynamics sources impact the ModelSEED v2 core and full models — this *is* the empirical hook detailed below) — and then their integration into the repository, the website, and the manuscript.
 
 ## What the 2020 paper committed to (baseline for the update)
 
@@ -41,10 +42,19 @@ Frame: six years of community-driven biochemistry curation. Motivate: rise of at
 
 ### 2. Materials & Methods
 
-- **Structure-curation pipeline** — PubChem validation stage (Ray's stereo-loss guard); RDKit canonicalization (one-time mass recanonicalization); curator override system (`Biochemistry/Curation/overrides/structure_picks/<curator>.tsv`); mass-balance exclusion mechanism (new file schema: `cpd_id, name, reason, date, curator`); per-source SMILES preserved; PubChem-alias mismap detection surfacing.
+- **Structure-curation pipeline** — PubChem validation stage (Ray's stereo-loss guard); RDKit canonicalization (one-time mass recanonicalization); curator override system (`Biochemistry/Curation/overrides/structure_picks/<curator>.tsv`); **provenance tracking** — every reconciled structure records *what* was chosen, *why*, and *who* decided (per-curator override files + rationale field), which distinguishes reconciled entries from silently overwritten ones; mass-balance exclusion mechanism (new file schema: `cpd_id, name, reason, date, curator`); per-source SMILES preserved; PubChem-alias mismap detection surfacing.
+- **MetaCyc→KEGG structure alignment policy** — ModelSEED originated from KEGG conventions; when MetaCyc contains a structure absent from KEGG, the structure is adjusted so its formula matches what it would be under KEGG conventions. This prevents new MetaCyc-only structures from silently unbalancing reactions that already work under the KEGG-conforming set. Document this policy explicitly.
 - **Formula-conflict resolver** — H-only vs skeleton conflicts; auto-match to `compound_*.json` for zero-disruption picks; explicit exclusion when no source matches (e.g., ascorbate radical, quercetin bissulfate).
 - **ACP formula override framework** — pantetheine-inclusive formula overrides in `acps_formula_charge.tsv`.
+- **AI-assisted database-wide ACP standardization** — acyl-**CoA** compounds are not affected (CoA is fully represented in the compound structure). Acyl-**ACP** compounds are different: the acyl group is bound to the **phosphopantetheine** cofactor of an acyl-carrier protein, and the phosphopantetheine moiety may or may not be included in the stored formula of a given acyl-ACP compound. That inconsistency generates false-positive mass-imbalance flags in reactions that produce or consume phosphopantetheine (biosynthetically) or that transfer acyl groups between the CoA-bound and ACP-bound pools. Methods paragraph should describe the standardization: for every acyl-ACP compound, include the phosphopantetheine formula in the compound record, so that (i) mass balance holds across the ACP-related reactions, and (ii) biosynthetic demand for phosphopantetheine becomes explicitly modelable in metabolic reconstructions. Applied AI-assisted across the full ACP family, extending the current `acps_formula_charge.tsv` framework.
+- **Broader protein-carrier cofactor sweep** — the acyl-ACP / phosphopantetheine pattern (a protein-covalent cofactor carrying a reactive group between enzymes) recurs across several other classes. In each case the paper should scan the database for compounds that represent the loaded state, decide whether the carrier cofactor's atoms are included in the stored formula, and apply the same standardization to make the cofactor's biosynthetic demand modelable. Initial classes to survey:
+    - **Biotinyl carriers** — biotin covalently attached (via amide bond to a lysine ε-amine) on biotin-carboxyl-carrier proteins (BCCP), used by pyruvate carboxylase, acetyl-CoA carboxylase, propionyl-CoA carboxylase, methylcrotonyl-CoA carboxylase and other carboxylases.
+    - **Lipoyl carriers** — lipoic acid covalently attached (again via amide bond to a lysine ε-amine) on the H-protein of the glycine cleavage system and on the E2 subunits of the α-ketoacid dehydrogenase complexes (PDH, KGDH, BCKDH).
+    - **Candidate extensions** to consider surveying but potentially defer: covalently bound **FMN/FAD** (e.g. the histidyl-FAD of succinate dehydrogenase), **molybdopterin** cofactors, **heme c** attached via thioether bonds in c-type cytochromes.
+
+    The unifying claim is that biotinyl-carrier and lipoyl-carrier compounds should include the biotin and lipoyl moieties in their stored formulas for exactly the same reasons phosphopantetheine should be included in acyl-ACPs — the cofactor is biosynthesized, demand for it should be modelable, and reactions handling it should mass-balance. Report the classes surveyed and any deferred.
 - **Multi-source thermodynamics** — rebuild of Group Contribution from MFAToolkit; dGpredictor retrained on ModelSEED; eQuilibrator refresh; OpenTECR integration. Per-reaction-class heuristics applied globally.
+- **Reaction similarity** — describe pipeline for computing reaction similarity from updated compound structures; GPU regeneration is cheap (under ~10 minutes end-to-end per Ray), so the matrix is regenerated on demand as compound structures update. Include the selection procedure for the external reaction-embedding foundation model: candidates are evaluated for how discerning their embeddings are on ModelSEED reactions, and the paper defends the chosen model on scientific grounds rather than default adoption.
 - **Atom mapping** — collaboration with the Nikoloski lab; describe methodology and coverage-to-date.
 - **PR-time validation** — GitHub Actions replacing Travis (Travis is retired). New curated entries validated on submission via a workflow that runs the curation self-check.
 - **Packaging** — PyPi distribution with a documented API.
@@ -52,7 +62,8 @@ Frame: six years of community-driven biochemistry curation. Motivate: rise of at
 ### 3. Results
 
 - **Growth statistics 2020→2026** (mirror Tables 2-3 of the 2020 paper).
-- **Structure-curation improvements** — number of compounds with newly-picked structures, mass-balance exclusions applied, PubChem pipeline yield.
+- **Structure-curation improvements** — number of compounds with newly-picked structures, mass-balance exclusions applied, PubChem pipeline yield. Include the reduction in false-positive mass-imbalance flags attributable to protein-carrier-cofactor standardization (acyl-ACP phosphopantetheine + biotinyl-BCCP + lipoyl-carrier and whichever additional classes make the final cut), broken out per class: how many compounds required an override, how many reactions were rebalanced.
+- **Reaction similarity** — the refreshed reaction-similarity matrix (regenerated against the updated compound structures) and the head-to-head comparison of external reaction-embedding foundation models, with the selection justified on discerning-power grounds.
 - **Multi-source thermodynamics comparison** — heat map / correlation among the four ΔG sources; per-class heuristic direction assignments.
 - **NEW: reaction-direction heuristic sensitivity study** — systematic sweep over the ModelSEED v2 draft-model corpus ([10.1101/2023.10.04.556561](https://doi.org/10.1101/2023.10.04.556561)). Measures per-model: predicted growth rate, essential-gene set overlap, mass-balance survival rate, feasibility under Biolog conditions, as we swap between direction sources (eQuilibrator vs GC vs dGpredictor vs heuristic overlay). This is the empirical hook that lifts the paper above a numbers-refresh.
 - **Atom mapping coverage** — fraction of priority-scope reactions with mappings; example use cases in atom-tracking (C, P, S).
@@ -100,12 +111,12 @@ Before the first full draft, the team should reach agreement on:
 3. **How the Nikoloski atom-mapping work is credited** — co-authorship, collaboration acknowledgment, or joint methods citation depending on delivery timing.
 4. **Timing of the direction-field removal** — do we describe it as done (schema-breaking release) or planned (Discussion)?
 5. **Cutoff date** for the compound / reaction growth statistics (i.e. which release version becomes "2026 snapshot").
+6. **Which external reaction-embedding foundation model** to use — requires a short evaluation (most-discerning embeddings on ModelSEED reactions) so the choice is defensible in the paper.
+7. **Which protein-carrier-cofactor classes make the cut** — biotinyl and lipoyl are the strong candidates alongside acyl-ACP; whether covalent FMN/FAD, molybdopterin, and heme-c are included in this paper or deferred is a scope question that depends on how many compounds each class actually touches in the DB (a quick census would answer it).
 
 ## Explicitly out of scope for this paper
 
 - ANIME-based heuristic-break detection.
-- Full PlantSEED refactor (three-way merge of PlantSEED-Curation / PlantSEED-Refactor / plantseed-v3) — separate concern.
-- Reaction-similarity work (Laino paper embeddings, horizyn) — worth mentioning in Discussion as a future direction but not a Results section.
 - Kinetic-constant integration (mentioned in 2020 Introduction as a related need; still not the focus here).
 
 ## Infrastructure note (Travis → GitHub Actions)
@@ -115,8 +126,7 @@ The 2020 paper's Methods described "We utilize Travis CI along with scripts for 
 ## Relationship to prior in-house work
 
 - **Structure curation stream** (`MSD_Structures/`) — the PubChem pipeline, stereo-loss guard, curator override system, and formula-conflict resolver are all recent products of this working directory. The 2020 paper described mass-balance in one paragraph; the update should devote several paragraphs to the *pipeline* that produces mass-balanced compounds today.
-- **Priority scope** — the ~9K reactions / ~6.5K compounds from v7.0 ModelSEEDTemplates + PlantSEED (`/scratch/seaver/Claude_Projects/priority/`) is the working slice for structure curation; the empirical study extends to the full ModelSEED v2 model corpus.
-- **PlantSEED** — currently spread across three sibling project directories; a merge is pending but out of scope for this paper.
+- **Priority scope** — the ~9K reactions / ~6.5K compounds used in the v7.0 templates is the working slice for structure curation; the empirical study extends to the full ModelSEED v2 model corpus.
 
 ---
 
