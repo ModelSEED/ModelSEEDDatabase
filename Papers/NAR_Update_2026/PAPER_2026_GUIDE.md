@@ -51,9 +51,10 @@ Preferred sequence (dependencies flow downward — anything below can be done in
     - [x] Table 2 and Table 3 numbers computed against dev HEAD `1111754` and persisted at `Papers/NAR_Update_2026/data/snapshot_2026-07-29.md`. Provisional (will be re-run against the v2.0.0 tag when it's cut).
     - [x] Delta narrative captured — balanced-reaction share regressed 70%→61%, which motivates the §5 recovery story.
     - [x] ChEBI now appears in Table 3 alongside the sources named in the 2020 paper.
-    - [ ] Rhea count comes back as 0 in the ad-hoc query; likely an alias-table shape issue. Needs a follow-up before Table 3 is final.
+    - [x] Rhea count fixed — the earlier ad-hoc query used lowercase `rhea`; the alias key is capitalized `Rhea`. Actual: 1,931 compounds, **17,477 reactions** (roughly 2× the 2020 count of 8,786).
     - [ ] Promote the two ad-hoc snippets into a reproducible script under `Scripts/Statistics/Tables/` and refresh `Growth_Stats.tsv` when v2.0.0 is cut.
     - [ ] Record which KEGG / MetaCyc / BioCyc / BiGG / MetaNetX / Rhea version was ingested for the snapshot (Methods "Collation" paragraph needs source version numbers, not just names).
+    - [ ] Decide: aggregate the 11 BioCyc-family sources in Table 3 (as in 2020) or itemize them (as they appear in the current alias table).
 - [ ] **Writing** — Methods "Collation of biochemical data" paragraph updated with source versions; Results "Growth in compounds and reactions" section with the two updated tables and the balanced-share regression narrative.
 - **Blocked by:** §1 (decided).
 - **Effort:** S–M (mostly done; source-version capture + Rhea fix remaining).
