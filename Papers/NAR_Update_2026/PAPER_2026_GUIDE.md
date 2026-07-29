@@ -47,14 +47,16 @@ Preferred sequence (dependencies flow downward — anything below can be done in
 
 ## §2 · Source-database snapshot + growth statistics
 
-- [ ] **Repository work**
-    - Re-run the collation script against the cutoff release; record which KEGG / MetaCyc / BioCyc / BiGG / MetaNetX / Rhea version was ingested.
-    - Regenerate the counts that populate the 2020 Table 2 (compounds, compounds with structures, compounds with generic groups, reactions, complete reactions, balanced reactions, reactions with generic groups) with the 2026 column.
-    - Regenerate the per-source counts that populate the 2020 Table 3.
-    - Confirm no source has been dropped without justification; note any newly added source.
-- [ ] **Writing** — Methods "Collation of biochemical data" paragraph updated with new versions. Results "Growth in compounds and reactions" section with the two updated tables.
-- **Blocked by:** §1.
-- **Effort:** S–M.
+- [~] **Repository work**
+    - [x] Table 2 and Table 3 numbers computed against dev HEAD `1111754` and persisted at `Papers/NAR_Update_2026/data/snapshot_2026-07-29.md`. Provisional (will be re-run against the v2.0.0 tag when it's cut).
+    - [x] Delta narrative captured — balanced-reaction share regressed 70%→61%, which motivates the §5 recovery story.
+    - [x] ChEBI now appears in Table 3 alongside the sources named in the 2020 paper.
+    - [ ] Rhea count comes back as 0 in the ad-hoc query; likely an alias-table shape issue. Needs a follow-up before Table 3 is final.
+    - [ ] Promote the two ad-hoc snippets into a reproducible script under `Scripts/Statistics/Tables/` and refresh `Growth_Stats.tsv` when v2.0.0 is cut.
+    - [ ] Record which KEGG / MetaCyc / BioCyc / BiGG / MetaNetX / Rhea version was ingested for the snapshot (Methods "Collation" paragraph needs source version numbers, not just names).
+- [ ] **Writing** — Methods "Collation of biochemical data" paragraph updated with source versions; Results "Growth in compounds and reactions" section with the two updated tables and the balanced-share regression narrative.
+- **Blocked by:** §1 (decided).
+- **Effort:** S–M (mostly done; source-version capture + Rhea fix remaining).
 
 ## §3 · Structure-curation pipeline (write-up)
 
