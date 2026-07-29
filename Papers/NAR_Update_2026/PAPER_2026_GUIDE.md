@@ -63,12 +63,16 @@ Preferred sequence (dependencies flow downward — anything below can be done in
 
 The pipeline is largely built already in this session's work. This step is *writing*, not building.
 
-- [ ] **Repository work**
-    - Confirm the following live in the repo and are pointer-linkable from the paper: PubChem validation stage with stereo-loss guard; RDKit canonicalization script and canonicalized `All_ModelSEED_Structures.txt`; curator override files at `Biochemistry/Curation/overrides/structure_picks/<curator>.tsv`; mass-balance exclusion file at `Biochemistry/Curation/exclusions/mass_balance_excluded.tsv`; formula-conflict report generator.
-    - Draft one worked example per pipeline stage for the paper (e.g. cpd35693 for the stereo-loss guard; cpd00766 or cpd00849 for the mass-balance exclusion).
-- [ ] **Writing** — Methods "Structure-curation pipeline" section (the biggest new Methods block). Provenance framing throughout (what / why / who).
-- **Blocked by:** §1.
-- **Effort:** M.
+- [~] **Repository work**
+    - [x] Verified pipeline artifacts live on `dev`: `Recanonicalize_SMILES.py`, `List_ModelSEED_Structures.py`, curator overrides (`samseaver.tsv`, `Ray16.tsv`), `mass_balance_excluded.tsv`, `Formula_Conflicts.txt` report.
+    - [ ] `Validate_PubChem_Structures.py` lives on `ray16/structure_update` (with the stereo-loss guard merged via PR `pubchem-stereo-loss-guard_20260704`), not yet on `dev`. Will land via the eventual `structure_update → dev` merge.
+    - [x] Worked examples chosen: cpd35693 (stereo-loss guard); cpd00766 / cpd00849 / cpd27485 / cpd12396 (mass-balance exclusion, one per motivation).
+- [~] **Writing** — first draft of the Methods section at `Papers/NAR_Update_2026/drafts/methods_structure_curation.md`. Covers canonicalisation, PubChem validation, curator override system with provenance framing, formula-conflict resolver, mass-balance exclusion, MetaCyc→KEGG alignment, and a lead-in to §5's protein-carrier cofactor standardisation.
+    - [ ] Trim to fit NAR Database Issue word cap once other Methods sections are drafted and the total budget is clear.
+    - [ ] Confirm `Update_Compound_Structures_Formulas_Charge.py` has a docstring / comment block explaining its skip-formula-on-excluded contract (paper cites this behaviour).
+    - [ ] Systematic MetaCyc→KEGG alignment scan (currently done opportunistically through overrides) would strengthen the corresponding claim.
+- **Blocked by:** §1 (done).
+- **Effort:** M (drafting mostly done; trimming + two loose-end items remain).
 
 ## §4 · Formula-conflict resolver (write-up)
 
