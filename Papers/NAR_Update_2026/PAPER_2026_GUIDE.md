@@ -76,14 +76,15 @@ The pipeline is largely built already in this session's work. This step is *writ
 
 ## §4 · Formula-conflict resolver (write-up)
 
-Also mostly built.
-
-- [ ] **Repository work**
-    - Freeze the H-only vs skeleton vs element-set classifier logic in the repo (script that produces `Formula_Conflicts.txt`).
-    - Report before/after counts of formula conflicts across the priority-scope set.
-- [ ] **Writing** — Methods "Balancing of reactions" section refresh + Results "Structure-curation improvements" bullet on formula-conflict resolution.
-- **Blocked by:** §1.
-- **Effort:** S–M.
+- [x] **Repository work**
+    - [x] Classifier logic promoted from ad-hoc inline Python into `Scripts/Structures/Classify_Formula_Conflicts.py`. Reads `_reports/Formula_Conflicts.txt`, groups by compound, classifies each as H_only / heavy_atom / element_set / single_variant, and emits both a summary count and a per-compound classified TSV. Optional `--priority` flag adds a cross-tabulation against a priority compound list.
+    - [x] Current state: 56 remaining formula-conflict compounds (42 H_only, 12 heavy_atom, 1 element_set, 1 single_variant). Zero in the v7.0 priority set — priority-scope backlog is empty.
+    - [ ] Investigate the one `single_variant` case (all source formulas identical yet the row survived to `Formula_Conflicts.txt`) — likely a picker's conflict-detection artefact worth fixing before v2.0.0.
+- [x] **Writing**
+    - [x] Methods paragraph on the resolver already covered in `drafts/methods_structure_curation.md` (formula-conflict-resolver subsection), updated to reference the new script.
+    - [x] Results bullet drafted at `drafts/results_structure_curation_improvements.md` (formula-conflict-resolution subsection).
+- **Blocked by:** §1 (done).
+- **Effort:** S–M (mostly done; one investigation open).
 
 ## §5 · Protein-carrier cofactor standardization
 
