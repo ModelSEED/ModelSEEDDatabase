@@ -95,8 +95,9 @@ The load-bearing new methods contribution. Not fully built yet.
         - Acyl-ACP: 830 name-matched candidates, 629 already covered (76%), 260 open (structural filter will trim this).
         - Biotinyl-carrier: 21 name-matched, ~4-5 true protein-carrier forms after inspection.
         - Lipoyl-carrier: 82 name-matched, none currently have `R` in the formula — requires per-compound audit and possible SMILES restructuring, not just a formula override.
-    - [ ] **Structural filter pass** on the 260 open ACP candidates (compounds with `R` in formula OR `*` in SMILES).
-    - [ ] **Bulk-add PR** for the surviving ACP candidates: run `Compute_ACP_Overrides.py` → gate through `Report_Formula_Change_Impact.py` → commit only zero-newly-imbalanced rows (mirrors the earlier "Bulk-add 47 safe pantetheine-inclusive ACP formula overrides" PR).
+    - [x] **Structural filter pass** on the 260 open ACP candidates — 179 survivors (R in formula or `*` in SMILES); 81 dropped as name-only false positives.
+    - [x] **Iterative safe-filter** on the 179 survivors — converged at **0 safe proposals**; every candidate cascades into breakage via co-application effects. Zero proposals touch any priority-scope reaction. Full analysis persisted at `data/acp_residual_analysis_2026-07-30.md`. Interpretation: residuals are concentrated in tightly-interconnected specialty secondary metabolism pathways (PKS chains, NRPS chains, actinorhodin/mupirocin/mithramycin biosynthesis) that don't admit a single-compound-at-a-time fix.
+    - [ ] ~~Bulk-add PR for ACP residuals~~ — not viable via the current automated pipeline; deferred to future work with coupled-update reasoning. The priority-scope ACP claim is unchanged (all priority-scope acyl-ACPs already have overrides via commit `9819f3f`).
     - [ ] **Biotinyl-carrier PR** — small hand-authored override file `Biochemistry/Curation/overrides/biotinyl_formula_charge.tsv` (or extend `acps_formula_charge.tsv` to hold both classes).
     - [ ] **Lipoyl-carrier audit** of the 82 candidates: which are genuine free small molecules (keep as-is) vs which represent protein-bound forms (need SMILES restructuring to add the protein `R` attachment).
     - [ ] **Measure** the before/after false-positive mass-imbalance flag counts per class.
