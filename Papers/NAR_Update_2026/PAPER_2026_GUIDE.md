@@ -90,15 +90,23 @@ The pipeline is largely built already in this session's work. This step is *writ
 
 The load-bearing new methods contribution. Not fully built yet.
 
-- [ ] **Repository work**
-    - **Census** — for each candidate carrier class (acyl-ACP, biotinyl-BCCP, lipoyl-carrier + candidate extensions covalent-FMN/FAD, molybdopterin, heme-c), count how many compounds in the DB represent the loaded state and how many currently include vs omit the cofactor's atoms.
-    - **Decide** which classes to include in this paper vs defer (open decision #7 in `PAPER_2026_PLAN.md`).
-    - **Execute** the standardization pass per included class: extend the `acps_formula_charge.tsv` framework (or a sibling file per class) with the cofactor-inclusive formulas and charges.
-    - **Measure** the before/after false-positive mass-imbalance flag counts.
-    - **Sanity-check** with FBA on a representative model that the standardization doesn't introduce infeasibility (should only fix balance, not break flux).
-- [ ] **Writing** — Methods "Protein-carrier cofactor standardization" subsection under Structure-curation pipeline; Results bullet on false-positive reduction broken out per class. Optionally a Discussion paragraph on this as a general DB-cleanup pattern.
-- **Blocked by:** §3.
-- **Effort:** L.
+- [~] **Repository work**
+    - [x] **Census** completed and persisted at `Papers/NAR_Update_2026/data/carrier_census_2026-07-29.md`.
+        - Acyl-ACP: 830 name-matched candidates, 629 already covered (76%), 260 open (structural filter will trim this).
+        - Biotinyl-carrier: 21 name-matched, ~4-5 true protein-carrier forms after inspection.
+        - Lipoyl-carrier: 82 name-matched, none currently have `R` in the formula — requires per-compound audit and possible SMILES restructuring, not just a formula override.
+    - [ ] **Structural filter pass** on the 260 open ACP candidates (compounds with `R` in formula OR `*` in SMILES).
+    - [ ] **Bulk-add PR** for the surviving ACP candidates: run `Compute_ACP_Overrides.py` → gate through `Report_Formula_Change_Impact.py` → commit only zero-newly-imbalanced rows (mirrors the earlier "Bulk-add 47 safe pantetheine-inclusive ACP formula overrides" PR).
+    - [ ] **Biotinyl-carrier PR** — small hand-authored override file `Biochemistry/Curation/overrides/biotinyl_formula_charge.tsv` (or extend `acps_formula_charge.tsv` to hold both classes).
+    - [ ] **Lipoyl-carrier audit** of the 82 candidates: which are genuine free small molecules (keep as-is) vs which represent protein-bound forms (need SMILES restructuring to add the protein `R` attachment).
+    - [ ] **Measure** the before/after false-positive mass-imbalance flag counts per class.
+    - [ ] **Sanity-check** with FBA on a representative model that the standardization doesn't introduce infeasibility.
+    - [ ] **Census extensions** (covalent FMN/FAD, molybdopterin, heme-c) — defer unless a quick census shows they touch a material number of priority reactions.
+- [~] **Writing**
+    - [x] Methods paragraph on protein-carrier cofactor standardisation is already drafted in `drafts/methods_structure_curation.md` (final subsection), covering acyl-ACP + biotinyl + lipoyl + candidate extensions.
+    - [ ] Results bullet on per-class false-positive-reduction — placeholder in `drafts/results_structure_curation_improvements.md`; fill in numbers after the bulk-add PR lands.
+- **Blocked by:** §3 (done).
+- **Effort:** L (census done; three PRs of standardisation work + measurement remain).
 
 ## §6 · Multi-source thermodynamics
 
