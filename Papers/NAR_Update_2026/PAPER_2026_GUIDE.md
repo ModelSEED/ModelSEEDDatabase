@@ -13,6 +13,12 @@ Legend for status boxes: `[ ]` open · `[~]` in progress · `[x]` done.
 
 ---
 
+## Working strategy (as of 2026-07-30)
+
+**First pass: shape-before-depth.** Sweep every guide section and produce first-pass draft prose in `drafts/` — with `[NUMBERS TBD]` and `[FIGURE TBD]` placeholders wherever the underlying analysis / data-collection work is not yet done. That gives a complete manuscript-shape to iterate on before diving into any single heavy piece of work.
+
+**Second pass: fill the placeholders.** Come back to the sections whose numbers depend on unfinished analyses (biotinyl-BCCP + lipoyl-carrier hand-curation, multi-source thermodynamics data collection, empirical-study execution, atom-mapping deliverables, PyPi packaging) and land the real numbers as they become available.
+
 ## Order of attack
 
 Preferred sequence (dependencies flow downward — anything below can be done in parallel with anything above it once its blockers are cleared):
@@ -118,7 +124,7 @@ The load-bearing new methods contribution. Not fully built yet.
     - **OpenTECR integration** — pull OpenTECR values where coverage exists; document the mapping between OpenTECR reaction identifiers and ModelSEED reaction IDs.
     - **Per-reaction-class heuristic overlays** — codify the direction rules for hydrolases, cofactor-loading reactions, transport with proton gradients, and any others the team agrees on.
     - Produce a unified table: per compound / reaction, the ΔG′ and uncertainty from each of the four sources, plus the direction assignment from each source pre- and post-heuristic overlay.
-- [ ] **Writing** — Methods "Multi-source thermodynamics" section; Results "Multi-source thermodynamics" section with a refreshed Figure 2 analogue (correlation + uncertainty distributions across sources).
+- [~] **Writing** — first pass drafted at `drafts/methods_multi_source_thermodynamics.md` (Methods only; Results section pending numbers). Placeholders marked `[TBD]` throughout.
 - **Blocked by:** §3 (curated structures are the input); §5 (some ΔG values change when carrier cofactors are included).
 - **Effort:** L.
 
@@ -128,7 +134,7 @@ The load-bearing new methods contribution. Not fully built yet.
     - Regenerate the reaction-similarity matrix against the updated compound structures (Ray reports ~10 min on GPU end-to-end).
     - **Foundation-model bake-off** — evaluate the candidate external reaction-embedding models on ModelSEED reactions; measure discerning-power (silhouette on curated reaction classes, retrieval quality on held-out reaction pairs, or a similar metric).
     - Pick and defend the model.
-- [ ] **Writing** — Methods "Reaction similarity" section; Results "Reaction similarity" section with the matrix statistics and the model-selection table.
+- [~] **Writing** — first pass drafted at `drafts/methods_reaction_similarity.md` (Methods only; Results section pending). `[TBD]` for candidate-model list, evaluation results, and the regeneration script path.
 - **Blocked by:** §3.
 - **Effort:** M.
 
@@ -139,7 +145,7 @@ The load-bearing new methods contribution. Not fully built yet.
     - Compute coverage: fraction of priority-scope reactions with a delivered mapping.
     - Build the illustrative use case (C/P/S atom tracking across a metabolic pathway).
     - Wire the atom mapping into the website (see §14).
-- [ ] **Writing** — Methods "Atom mapping" section; Results "Atom mapping coverage" section; Discussion note.
+- [~] **Writing** — first pass drafted at `drafts/methods_atom_mapping.md` (Methods only; Results and Discussion pending Nikoloski deliverables). `[TBD]` for group-name formal identification, algorithm, delivery format, coverage numbers, illustrative use-case pathway.
 - **Blocked by:** §3 (mappings depend on canonicalized structures); external delivery timeline.
 - **Effort:** M–L (depends on Nikoloski delivery).
 
@@ -152,7 +158,7 @@ The novel empirical hook. This is the largest single unit of work.
     - For each `(model × direction source)` pair produce: predicted growth rate under original medium; essential-gene set from single-gene knockout FBA; number of reactions removed as thermodynamically infeasible; number of Biolog conditions under which biomass is feasible.
     - Aggregate into a `(model × direction source × metric)` matrix and identify direction sources that systematically break vs preserve biology.
     - Design the summary figure (options: heatmap of essential-gene Jaccard across sources; per-metric delta boxplots across models; a per-model "direction-sensitivity" score).
-- [ ] **Writing** — Results "Empirical study" section — the paper's headline. Materials-and-Methods paragraph on the empirical design (corpus, metrics, statistical treatment).
+- [~] **Writing** — first pass drafted at `drafts/results_reaction_direction_sensitivity.md` (Results section with study design fixed; numbers, figure, and interpretation are placeholders until the study runs).
 - **Blocked by:** §6 (need all four direction sources computed) and §5 (ACP standardization should be applied before running FBA so the "mass-balance survival" metric is not dominated by carrier-cofactor artifacts).
 - **Effort:** L.
 
@@ -161,7 +167,7 @@ The novel empirical hook. This is the largest single unit of work.
 - [ ] **Repository work**
     - Rerun the whole-DB FBA analysis from the 2020 paper against the 2026 compound / reaction set: total reactions, mass-balanced, reversible, functional reactions, functional growth conditions across the 390 Biolog conditions.
     - Include a comparison row to 2020 for the Table 5 analogue.
-- [ ] **Writing** — Results "Database connectivity" section refresh.
+- [~] **Writing** — first pass drafted at `drafts/results_db_connectivity_and_ontology.md` (covers both §10 and §11 as a single Results-section arc, mirroring the 2020 paper's structure). Numbers `[TBD]` until whole-DB FBA re-runs.
 - **Blocked by:** §2, §5, §6.
 - **Effort:** M.
 
@@ -170,7 +176,7 @@ The novel empirical hook. This is the largest single unit of work.
 - [ ] **Repository work**
     - Report any growth in the three ontology types since 2020 (equivalent compound sets, lumped reaction sets, context-specific reaction sets).
     - Refresh the *E. coli* iJR904 vs ModelSEED comparison from the 2020 paper (Figure 4 analogue) — do the improved structures reduce the number of unique-in-iJR904 reactions further?
-- [ ] **Writing** — Results "Ontological mappings" section — mostly a refresh with updated counts.
+- [~] **Writing** — folded into `drafts/results_db_connectivity_and_ontology.md` (shared file with §10 since both are 2020-refresh sections). Ontology-count and iJR904-refresh numbers `[TBD]`.
 - **Blocked by:** §2, §3.
 - **Effort:** S–M.
 
@@ -181,7 +187,7 @@ The novel empirical hook. This is the largest single unit of work.
     - Document the programmatic API (fetch compound, walk reaction, query balance / thermodynamics / atom mapping).
     - Publish to test PyPi, then production PyPi.
     - Add a quickstart to the repo README pointing at the package.
-- [ ] **Writing** — Methods "Distribution: PyPi + API" section; Data Availability entry.
+- [~] **Writing** — first pass drafted at `drafts/methods_distribution_pypi_ci.md` (shared with §13). Package name `[TBD]` until published.
 - **Blocked by:** §1 (need a stable release to package).
 - **Effort:** M.
 
@@ -191,7 +197,7 @@ The novel empirical hook. This is the largest single unit of work.
     - Refactor the validation code (2020's Travis-run scripts) to run under GitHub Actions.
     - Wire it to run on every PR to `dev`.
     - Ensure it catches at least: mass-balance regression, formula-conflict introduction, invalid override file schema, missing provenance fields.
-- [ ] **Writing** — Methods "Community contributions, branches, and CI" paragraph updated with the Actions workflow (short — this is an infrastructure paragraph, not a novel contribution).
+- [~] **Writing** — folded into `drafts/methods_distribution_pypi_ci.md` (shared with §12). Workflow-file path `[TBD]` until landed.
 - **Blocked by:** §3, §4 (the validation checks are defined by these pipelines).
 - **Effort:** M.
 
@@ -200,7 +206,7 @@ The novel empirical hook. This is the largest single unit of work.
 - [ ] **Repository work**
     - Update the ModelSEED website (`modelseed.org/biochem`) to reflect the current schema and to surface atom mappings on the reaction landing pages.
     - Coordinate with Alan on repository / website integration (per the 2026-07 working session).
-- [ ] **Writing** — Data Availability entry updated.
+- [~] **Writing** — Data Availability entry drafted in `drafts/discussion_and_availability.md` (shared with §15). URL and endpoint `[TBD]`.
 - **Blocked by:** §8.
 - **Effort:** M.
 
@@ -209,13 +215,10 @@ The novel empirical hook. This is the largest single unit of work.
 Best written last so the specifics of every prior section are already fixed.
 
 - [ ] **Repository work** — none (this is writing).
-- [ ] **Writing**
-    - **Introduction** — position the six-year update; motivate atom mapping, ML thermodynamics, reaction-direction transparency as drivers.
-    - **Discussion** — six-year retrospective; general lessons from the protein-carrier cofactor standardization pattern; enumerate open problems for the next release (fragment-aware pKa/pKb, EC refresh beyond ExPASy name matching, obsolescence audit, direction-field removal).
-    - **Data Availability** — GitHub, PyPi, Solr, website, atom-mapping endpoint, KBase integration.
-    - **Abstract** — condense the above.
-    - **Author contributions / funding / acknowledgments** — close per team decision on Nikoloski credit (open decision #3 in `PAPER_2026_PLAN.md`).
-- **Blocked by:** everything above.
+- [~] **Writing** — first passes drafted at `drafts/discussion_and_availability.md` (covers Introduction, Discussion, Data Availability, Abstract). Every `[TBD]` marker is a hook for numbers or decisions that finalise later.
+    - [ ] Fill numeric placeholders after §2, §5, §6, §9, §10 finalise.
+    - [ ] Author-contribution paragraph, funding, acknowledgments — deferred to submission-time.
+- **Blocked by:** everything above (for finalisation).
 - **Effort:** M.
 
 ---
