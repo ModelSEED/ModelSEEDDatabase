@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-import os, sys, re, copy, time
+import os, sys, re, copy, time  # !!! re & copy not used
 from BiochemPy import Reactions
 
 if(len(sys.argv)!=2 or os.path.isfile(sys.argv[1]) is False):

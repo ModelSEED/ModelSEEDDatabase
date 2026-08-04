@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 import os,sys,math
-from equilibrator_api import ComponentContribution, Reaction, Q_, ccache
+from equilibrator_api import ComponentContribution, Reaction, Q_
 from BiochemPy import Compounds,Reactions
 
 #We have to try and make sure that we use MetaNetX IDs for which an estimate of energy
@@ -109,7 +109,10 @@ for rxn in reactions_dict:
     elif(Some_Mol is True):
         incomplete_mol_rxns_dict[rxn]=1
 
-equilibrator_calculator = ComponentContribution(p_h=Q_(7.0), ionic_strength=Q_("0.25M"), temperature=Q_("298.15K"))
+equilibrator_calculator = ComponentContribution()
+equilibrator_calculator.p_h = Q_(7.0)
+equilibrator_calculator.ionic_strength = Q_("0.25M")
+equilibrator_calculator.temperature = Q_("298.15K")
 output_name=thermodynamics_root+'eQuilibrator/MetaNetX_Reaction_Energies.tbl'
 output_handle=open(output_name,'w')
 for rxn in reactions_dict:
@@ -162,7 +165,7 @@ for rxn in reactions_dict:
         " = " + \
         ' + '.join([f'{value} {key}' for key, value in rhs.items()])
 
-    equilibrator_reaction = Reaction.parse_formula(ccache.get_compound, equation_str)
+    equilibrator_reaction = Reaction.parse_formula(equilibrator_calculator.get_compound, equation_str)
 
     try:
         result = equilibrator_calculator.standard_dg_prime(equilibrator_reaction)

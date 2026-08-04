@@ -24,7 +24,7 @@ else:
     print ("Github user "+curation_source+" does not exist.")
     sys.exit()
 
-sys.path.append('../../../Libs/Python')
+sys.path.append(os.path.join(os.path.dirname(__file__), '../../../Libs/Python'))
 from BiochemPy import Reactions, Compounds, InChIs
 
 compounds_helper = Compounds()
@@ -127,6 +127,37 @@ with open(args.compounds_file) as fh:
                     structure_list.append('-'.join(cpd[struct_format].split('-')[0:2]))
                     structure_list.append('-'.join(cpd[struct_format].split('-')[0:1]))
 
+        #Check that the Structure doesn't already exist, first as InChI, then as SMILE
+        # if(matched_cpd is None and cpd['inchi'] and cpd['inchi'] in all_inchis):
+        #     msids = dict()
+        #     for alias in all_inchis[cpd['inchi']]:
+
+        #         #The structures are taken from their sources and the corresponding alias may not yet be registered
+        #         if(alias not in all_aliases):
+        #             continue
+
+        #         for msid in all_aliases[alias]:
+        #             msids[msid]=1
+
+        #     msids=list(sorted(msids))
+        #     if(len(msids)>0):
+        #         matched_cpd=msids[0]
+        #         matched_src='InChI'
+
+        # elif(matched_cpd is None and cpd['smile'] and cpd['smile'] in all_smiles):
+        #     msids = dict()
+        #     for alias in all_smiles[cpd['smile']]:
+        #         #The structures are taken from their sources and the corresponding alias may not yet be registered
+        #         if(alias not in all_aliases):
+        #             continue
+
+        #         for msid in all_aliases[alias]:
+        #             msids[msid]=1
+
+        #     msids=list(sorted(msids))
+        #     if(len(msids)>0):
+        #         matched_cpd=msids[0]
+        #         matched_src='SMILE'
                 for structure in structure_list:
                         
                     if(matched_cpd['msid'] is not None):
