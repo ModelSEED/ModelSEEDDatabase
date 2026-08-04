@@ -134,17 +134,24 @@ sources:
 # is that estimate's own thermodynamic direction, computed with the same
 # heuristic as the canonical reversibility applied to that method's dG, e.g.:
 #   "thermodynamics": {
-#       "Group contribution": [4.15, 1.22, "="],
-#       "eQuilibrator":       [-3.46, 0.05, ">"],
-#       "dGPredictor":        [-3.82, 0.02, ">"]
+#       "Group contribution":    [4.15, 1.22, "="],
+#       "eQuilibrator":          [-3.46, 0.05, ">"],
+#       "dGPredictor":           [-3.82, 0.02, ">"],
+#       "dGPredictor-ModelSEED": [-3.77, 0.87, ">"]
 #   }
 # dGPredictor (Wang et al. 2021; staged in Biochemistry/Thermodynamics/
 # dGPredictor/json_files/, kJ->kcal /4.184) is recorded for every reaction it
-# predicts. These records are description-only: the canonical deltag/deltagerr/
+# predicts. dGPredictor-ModelSEED is the same dGPredictor model RETRAINED on the
+# ModelSEED compound structures (expanded group vocabulary; staged in
+# Biochemistry/Thermodynamics/dGPredictor/modelseed_retrained_dG.json, kJ->kcal
+# /4.184), recorded as its own additive method for the 31,924 reactions it
+# predicts -- next to, and never replacing, the original KEGG-based dGPredictor
+# record. These records are description-only: the canonical deltag/deltagerr/
 # reversibility are not altered. The operators are generated from the stored
 # energies by Scripts/Thermodynamics/Add_Reaction_Thermodynamics_Operators.py;
 # the shared heuristic lives in Estimate_Reaction_Reversibility.py
-# (reversibility_from_energy).
+# (reversibility_from_energy). The retrained records are written by
+# Scripts/Thermodynamics/Update_Reaction_dGPredictor_ModelSEED_Energies.py.
 #
 # Per-tool compound pKas are likewise recorded ADDITIVELY under each compound's
 # `pkas` dict, next to (never in place of) the served pka/pkb fields. Each tool
