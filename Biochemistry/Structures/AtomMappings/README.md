@@ -18,6 +18,7 @@ divergence from upstream's `unite_and_filter_mappings.sh`.
 | `all_mapping_no_problem.txt` | 1,329,095 | 32,877 | Clean set — filtered from `all_mapping.txt` by the local row-level filter. **This is what is ingested into `reaction_*.json`'s `atom_mapping` field.** |
 | `all_mapping.txt` | 1,456,896 | 33,931 | Raw superset from RDT — kept for reproducibility and re-filtering. |
 | `rxns_no_problems.txt` | 32,877 | 32,877 | Just the IDs of the clean reactions (equivalent to unique keys in `all_mapping_no_problem.txt`). |
+| `rxns_confidence.tsv` | 32,878 | 32,877 | Per-reaction confidence tag (`clean` or `salvaged`) written by the local filter. `clean` = every raw RDT row was already a canonical single-pair same-element row; `salvaged` = at least one raw row was a run-on chain / dangling orphan / cross-element pair / malformed and this reaction's kept pairs are a strict subset of the raw output. Ingested into `reaction_*.json` as `atom_mapping_confidence`. |
 | `rxns_with_cpds_without_structure.txt` | 18,621 | 18,621 | IDs of reactions RDT could not attempt because one or more of their compounds lacks a SMILES structure in `Unique_ModelSEED_Structures.txt`. |
 | `compounds_without_structure.txt` | 12,318 | — | The compound IDs (cpdXXXXX) referenced by the reactions above but missing a structure. |
 | `all_rxns_with_joker.txt` | 11,993 | 11,993 | IDs of reactions whose SMILES contains a wildcard (`*`) atom — fundamentally unmappable by RDT without picking a concrete placeholder atom. Ingested here for reference; excluded from clean set by construction. |
@@ -55,18 +56,34 @@ target atoms across molecule instances.
 
 ## Integration into reaction_*.json
 
-Each reaction present in `all_mapping_no_problem.txt` gets a new field:
+Each reaction present in `all_mapping_no_problem.txt` gets two new fields:
 
 ```json
 "atom_mapping": [
   "cpd00001:O#1=cpd00009:O#2",
   "cpd00012:O#1=cpd00009:O#1",
   ...
-]
+],
+"atom_mapping_confidence": "clean"
 ```
 
-Reactions not in the clean set do not carry the field. The population script
-lives at `Scripts/Structures/Populate_Atom_Mappings.py`.
+`atom_mapping_confidence` is either `"clean"` or `"salvaged"`:
+
+- **`clean`** — every raw RDT row for this reaction was already a
+  canonical single-pair same-element row. Nothing was salvaged;
+  nothing had to be dropped.
+- **`salvaged`** — at least one raw row was a run-on chain, dangling
+  orphan, cross-element pair, or malformed. The kept pairs are a strict
+  subset of the raw RDT output for that reaction. Sebastian's
+  observation: *"as soon as there is one problem, there are likely
+  more (hidden) problems"* — so a `salvaged` mapping may carry
+  correct-looking rows that are subtly wrong elsewhere. Reachability /
+  neighborhood-level use cases are largely fine with `salvaged`;
+  mechanism-level tracing (¹³C flux, exact atom fate) should filter
+  to `clean` only.
+
+Reactions not in the clean set do not carry either field. The
+population script lives at `Scripts/Structures/Populate_Atom_Mappings.py`.
 
 ## Coverage
 

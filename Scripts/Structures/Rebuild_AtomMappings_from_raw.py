@@ -94,25 +94,45 @@ AM = os.path.join(REPO, 'Biochemistry', 'Structures', 'AtomMappings')
 RAW = os.path.join(AM, 'all_mapping.txt')
 OUT = os.path.join(AM, 'all_mapping_no_problem.txt')
 RXN_LIST = os.path.join(AM, 'rxns_no_problems.txt')
+CONFIDENCE = os.path.join(AM, 'rxns_confidence.tsv')
 
 ATOM = re.compile(r'^cpd\d{5}:([A-Za-z]{1,2})#\d+$')
 
 
-def emit_pairs(body):
-    """Yield canonical ``atomA=atomB`` strings from one raw row body.
+def classify_row(body):
+    """Return (list_of_pair_strings, is_clean_row) for one raw row body.
 
-    Splits the body at ``=`` and keeps every adjacent same-element pair
-    whose endpoints are canonical atom references. Multi-target chains
-    ``A=B=C=D`` yield up to three pairs (only the same-element ones
-    survive). Malformed pieces are ignored — they don't blow up the
-    row, just contribute no pairs.
+    A row is *clean* when it is exactly a canonical single-pair
+    ``atomA=atomB`` with both endpoints matching ``cpd\\d{5}:E#N``
+    (element 1-2 chars) AND sharing the same element symbol. Anything
+    else — run-on chain, dangling orphan, cross-element pair, malformed —
+    is *not clean*; the salvage still yields whatever same-element
+    pairs can be recovered.
+
+    Sebastian's warning applies here: a reaction that requires salvage on
+    any of its rows was one RDT struggled with, and the rows that *look*
+    clean may still be subtly wrong. Downstream consumers should treat
+    the reaction's whole mapping as lower confidence.
     """
     pieces = body.split('=')
+    if len(pieces) == 2:
+        a, b = pieces
+        ma = ATOM.match(a)
+        mb = ATOM.match(b)
+        if ma and mb:
+            if ma.group(1) == mb.group(1):
+                return [f'{a}={b}'], True    # clean canonical pair
+            return [], False                 # canonical but cross-element
+        return [], False                     # single-pair but malformed
+    # Chain (3+ pieces) or dangling (0/1 pieces). Neither is clean;
+    # emit whatever same-element adjacent pairs can be salvaged.
+    pairs = []
     for a, b in zip(pieces, pieces[1:]):
         ma = ATOM.match(a)
         mb = ATOM.match(b)
         if ma and mb and ma.group(1) == mb.group(1):
-            yield f'{a}={b}'
+            pairs.append(f'{a}={b}')
+    return pairs, False
 
 
 def main():
@@ -122,6 +142,7 @@ def main():
     n_raw_rows = 0
     n_raw_rxns = 0
     per_rxn = defaultdict(set)     # rxn -> {pair_string, ...}
+    salvaged = set()               # rxn ids with at least one non-clean raw row
     seen_rxns = set()
 
     with open(RAW) as fh:
@@ -136,11 +157,16 @@ def main():
             if rxn not in seen_rxns:
                 seen_rxns.add(rxn)
                 n_raw_rxns += 1
-            for pair in emit_pairs(body):
+            pairs, is_clean_row = classify_row(body)
+            if not is_clean_row:
+                salvaged.add(rxn)
+            for pair in pairs:
                 per_rxn[rxn].add(pair)
 
     n_out_rows = 0
     n_out_rxns = 0
+    n_clean = 0
+    n_salvaged = 0
     with open(OUT, 'w') as out:
         for rxn in sorted(per_rxn):
             pairs = per_rxn[rxn]
@@ -156,10 +182,21 @@ def main():
             if per_rxn[rxn]:
                 out.write(f'{rxn}\n')
 
+    with open(CONFIDENCE, 'w') as out:
+        out.write('reaction\tatom_mapping_confidence\n')
+        for rxn in sorted(per_rxn):
+            if not per_rxn[rxn]:
+                continue
+            level = 'salvaged' if rxn in salvaged else 'clean'
+            if level == 'clean': n_clean += 1
+            else: n_salvaged += 1
+            out.write(f'{rxn}\t{level}\n')
+
     dropped_rxns = n_raw_rxns - n_out_rxns
     print(f'Read  {n_raw_rows:>10,} rows across {n_raw_rxns:>6,} reactions from {os.path.basename(RAW)}')
     print(f'Wrote {n_out_rows:>10,} rows across {n_out_rxns:>6,} reactions to {os.path.basename(OUT)}')
     print(f'       + wrote {n_out_rxns:>6,} ids to {os.path.basename(RXN_LIST)}')
+    print(f'       + wrote {os.path.basename(CONFIDENCE)}: {n_clean:,} clean, {n_salvaged:,} salvaged')
     print(f'Reactions with no surviving row: {dropped_rxns:,} (all their rows were malformed or element-mismatched)')
 
 
