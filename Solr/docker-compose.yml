@@ -1,0 +1,56 @@
+# Local-development compose for the ModelSEED Biochemistry SOLR container.
+#
+# TESTING MODE: the biochemistry JSON is compiled + baked into the image
+# during `docker compose build`. No external mounts required beyond
+# ./data for index persistence. `docker compose up -d --build` and query
+# — no manual compile-and-post step.
+#
+# Volumes:
+#   modelseed_solr_data (named)   — persistent Solr index (survives restarts).
+#                                    Named rather than bind-mounted so Docker
+#                                    can manage ownership (Solr runs as UID
+#                                    8983 inside the container, which won't
+#                                    have write access to a host-created dir).
+#
+# Query examples:
+#   curl 'http://localhost:8983/solr/reactions/select?q=id:rxn00001&fl=*,[child]&wt=json&indent=true'
+#   curl 'http://localhost:8983/solr/compounds/select?q=id:cpd00002&fl=*,[child]&wt=json&indent=true'
+#
+# When IT provides a persistent mount for the biochemistry data, replace
+# the "TESTING MODE" pattern with:
+#   - Delete the COPY --from=compile lines in Dockerfile (skip baking JSON)
+#   - Add a volume: /path/to/biochemistry:/data/biochemistry:ro
+#   - Add a volume: /path/to/compiled:/data/compilation
+#   - Trigger post via `docker compose exec solr /scripts/post_biochemistry.sh`
+
+services:
+  solr:
+    # Build context = repository root so the Dockerfile can COPY
+    # Biochemistry/ and Solr/ into the compile stage.
+    build:
+      context: ..
+      dockerfile: Solr/Dockerfile
+    image: modelseed-solr:local
+    container_name: modelseed-solr
+    ports:
+      - "8983:8983"
+    volumes:
+      - modelseed_solr_data:/var/solr
+    environment:
+      POST_ON_START: "true"
+      # Multi-env layout (staging + prod share one Solr instance):
+      #   SOLR_ENVIRONMENTS: "staging prod"
+      # Would create four cores: compounds_staging, reactions_staging,
+      # compounds_prod, reactions_prod (all from the same configsets).
+      # POST_ON_START only auto-posts into the first env; others get
+      # populated via `docker exec ... /scripts/post_biochemistry.sh <env>`.
+      # SOLR_ENVIRONMENTS: ""
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS http://localhost:8983/solr/admin/cores?action=STATUS > /dev/null || exit 1"]
+      interval: 30s
+      timeout: 5s
+      start_period: 60s
+
+volumes:
+  modelseed_solr_data:

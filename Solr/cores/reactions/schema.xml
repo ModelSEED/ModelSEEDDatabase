@@ -1,42 +1,151 @@
 <?xml version="1.0" encoding="UTF-8" ?>
+<!-- Schema for ModelSEED Biochemistry: Reactions
+     Solr 9.x, ClassicIndexSchemaFactory, nested-document enabled.
 
-<schema name="reactions" version="1.5">
+     Parent doc = one reaction. Nested child docs carry:
+       - per-source thermodynamics ([energy, error, operator] triples)
+       - per-participant stoichiometry (compound / coefficient / compartment /
+         formula / name)
+     so that the UI can render a full reaction page from a single
+     `q=id:rxnXXXXX&fl=*,[child]` and search can filter parent reactions
+     by child-level conditions (e.g. "reactions where eQuilibrator's
+     operator is > and GC's operator is =").
+
+     Nested layout:
+       reaction (parent, doc_type=reaction)
+         └─ thermodynamics/ (nest_path=/thermodynamics, doc_type=thermodynamics)
+              fields: source, energy, error, operator
+         └─ stoichiometry/  (nest_path=/stoichiometry,  doc_type=stoichiometry)
+              fields: compound, coefficient, compartment, formula, name,
+                      charge, is_reactant
+-->
+
+<schema name="reactions" version="1.6">
 	<fields>
-		<field name="id"		type="string"		indexed="true"	stored="true"/>
-		<field name="abbreviation"	type="string"		indexed="true"	stored="true"/>
-		<field name="name"		type="string"		indexed="true"	stored="true"/>
-		<field name="code"		type="string"		indexed="true"	stored="true"/>
-		<field name="stoichiometry"	type="string"		indexed="true"	stored="true"/>
-		<field name="is_transport"	type="boolean"		indexed="true"	stored="true"/>
-		<field name="equation"		type="string"		indexed="true"	stored="true"/>
-		<field name="definition"	type="string"		indexed="true"	stored="true"/>
-		<field name="reversibility"	type="string"		indexed="true"	stored="true"/>
-		<field name="abstract_reaction"	type="string"	indexed="true"	stored="true"/>
-		<field name="pathways"		type="string"		indexed="true"	stored="true"	multiValued="true"/>
-		<field name="aliases"		type="string_ci"	indexed="true"	stored="true"	multiValued="true"/>
-		<field name="ec_numbers"	type="string"		indexed="true"	stored="true"	multiValued="true"/>
-		<field name="deltag"		type="float"		indexed="true"	stored="true"/>
-		<field name="deltagerr"		type="float"		indexed="true"	stored="true"/>
-		<field name="compound_ids"	type="string"		indexed="true"	stored="true"	multiValued="true"/>
-		<field name="is_obsolete"	type="string"		indexed="true"	stored="true"/>
-		<field name="linked_reaction"	type="string"		indexed="true"	stored="true"/>
-		<field name="status"		type="string"		indexed="true"	stored="true"/>
-		<field name="notes"		type="string"		indexed="true"	stored="true" multiValued="true"/>
-		<field name="source"		type="string"		indexed="true"	stored="true"/>
-		<field name="text"		type="text_custom"	indexed="true"	stored="false"	multiValued="true"/>
-		<field name="_version_"		type="long"		indexed="true"	stored="true"/>
-		<field name="date_inserted"	type="tdate"		indexed="true"	stored="true" default="NOW"/>
-		<field name="date_modified"	type="tdate"		indexed="true"	stored="true" default="NOW"/>
+
+		<!-- ============================================================
+		     Nested-document plumbing (Solr 9)
+		     ============================================================ -->
+		<field name="_root_"        type="string"  indexed="true"  stored="false" docValues="false"/>
+		<field name="_nest_path_"   type="string"  indexed="true"  stored="true"/>
+		<field name="_nest_parent_" type="string"  indexed="true"  stored="true"/>
+		<field name="doc_type"      type="string"  indexed="true"  stored="true"/>
+
+		<!-- ============================================================
+		     Parent reaction fields
+		     ============================================================ -->
+		<field name="id"                type="string"     indexed="true"  stored="true"  required="true"/>
+		<field name="abbreviation"      type="string"     indexed="true"  stored="true"/>
+		<field name="name"              type="string_ci"  indexed="true"  stored="true"  docValues="true"/>
+		<field name="code"              type="string"     indexed="true"  stored="true"/>
+
+		<field name="equation"          type="string"     indexed="true"  stored="true"/>
+		<field name="definition"        type="string"     indexed="true"  stored="true"/>
+
+		<field name="is_transport"      type="boolean"    indexed="true"  stored="true"/>
+		<field name="is_obsolete"       type="boolean"    indexed="true"  stored="true"/>
+
+		<field name="status"            type="string"     indexed="true"  stored="true"/>
+		<field name="source"            type="string"     indexed="true"  stored="true"/>
+
+		<field name="linked_reaction"   type="string"     indexed="true"  stored="true"/>
+		<field name="abstract_reaction" type="string"     indexed="true"  stored="true"/>
+
+		<field name="pathways"          type="string_ci"  indexed="true"  stored="true"  docValues="true"  multiValued="true"/>
+		<field name="aliases"           type="string_ci"  indexed="true"  stored="true"  docValues="true"  multiValued="true"/>
+		<field name="ec_numbers"        type="string"     indexed="true"  stored="true"                     multiValued="true"/>
+		<field name="notes"             type="string"     indexed="true"  stored="true"                     multiValued="true"/>
+
+		<!-- Flat compound_ids retained for backward compatibility with any
+		     consumer that filters "reactions using cpdXXXXX". The nested
+		     stoichiometry children carry the same info plus role
+		     (reactant/product), coefficient, and compartment. -->
+		<field name="compound_ids"      type="string"     indexed="true"  stored="true"                     multiValued="true"/>
+
+		<!-- Backwards-compatible top-level scalars from the pre-2026 schema.
+		     Same value as the promoted per-source pick. Deprecated. -->
+		<field name="deltag"            type="float"      indexed="true"  stored="true"/>
+		<field name="deltagerr"         type="float"      indexed="true"  stored="true"/>
+		<field name="reversibility"     type="string"     indexed="true"  stored="true"/>
+
+		<!-- Atom mapping. `atom_mapping` is a multi-valued list of
+		     `cpdA:E#N=cpdB:E#M` strings; indexed as `string` for exact-
+		     match filters (e.g. show reactions mapping a specific compound's
+		     atom) and prefix wildcards ("all rows involving cpd00007's O
+		     atoms"). Confidence is `clean` or `salvaged`. -->
+		<field name="atom_mapping"              type="string"   indexed="true"  stored="true"  multiValued="true"/>
+		<field name="atom_mapping_confidence"   type="string"   indexed="true"  stored="true"/>
+
+		<!-- ============================================================
+		     Denormalized flat fields — derived from the JSON at compile
+		     time and stored on the parent for fast filtering / faceting
+		     without needing a block-join query.
+		     ============================================================ -->
+		<!-- true when atom_mapping is non-empty. Fast filter for
+		     "reactions with atom mappings". -->
+		<field name="has_atom_mapping"          type="boolean"  indexed="true"  stored="true"/>
+		<!-- How many sources gave a numeric ΔrG for this reaction. Same as
+		     len(thermodynamics{}) at compile time. -->
+		<field name="n_sources_thermodynamics"  type="int"      indexed="true"  stored="true"/>
+		<!-- True when every source's operator is the same non-`?` value
+		     (i.e. all sources agree on direction). NULL when the reaction
+		     has <2 sources. -->
+		<field name="sources_agree_direction"   type="boolean"  indexed="true"  stored="true"/>
+		<!-- Count of stoichiometry entries with negative / positive
+		     coefficient. Useful for "monomolecular vs bimolecular vs
+		     higher" browsing. -->
+		<field name="n_reactants"               type="int"      indexed="true"  stored="true"/>
+		<field name="n_products"                type="int"      indexed="true"  stored="true"/>
+
+		<!-- Compile-time provenance -->
+		<field name="date_inserted"     type="tdate"      indexed="true"  stored="true"  default="NOW"/>
+		<field name="date_modified"     type="tdate"      indexed="true"  stored="true"  default="NOW"/>
+		<field name="_version_"         type="long"       indexed="true"  stored="true"/>
+
+		<!-- Aggregated free-text field for the main search box. See
+		     copyField declarations below. -->
+		<field name="text"              type="text_custom"  indexed="true"  stored="false"  multiValued="true"/>
+
+		<!-- ============================================================
+		     Child-document fields
+
+		     Child docs share the fields namespace with parents in classic
+		     schema; they're distinguished by `doc_type` and `_nest_path_`.
+		     ============================================================ -->
+		<!-- Thermodynamics children (already declared as parent-side fields
+		     above for atom mapping — `source_name`, `energy`, `error`,
+		     `operator` live here as child-side additions). -->
+		<field name="source_name"       type="string_ci"  indexed="true"  stored="true"  docValues="true"/>
+		<field name="energy"            type="float"      indexed="true"  stored="true"/>
+		<field name="error"             type="float"      indexed="true"  stored="true"/>
+		<field name="operator"          type="string"     indexed="true"  stored="true"/>
+
+		<!-- Stoichiometry children -->
+		<field name="compound"          type="string"     indexed="true"  stored="true"/>
+		<field name="coefficient"       type="int"        indexed="true"  stored="true"/>
+		<field name="compartment"       type="int"        indexed="true"  stored="true"/>
+		<field name="participant_charge" type="int"       indexed="true"  stored="true"/>
+		<!-- These duplicate the compound's `formula` and `name` at index
+		     time so the reaction detail view doesn't have to join to
+		     the compounds core to render the equation table. -->
+		<field name="participant_formula" type="string"   indexed="true"  stored="true"/>
+		<field name="participant_name"    type="string_ci" indexed="true" stored="true"/>
+		<!-- Denormalized from sign(coefficient): true for reactants
+		     (coefficient < 0), false for products. -->
+		<field name="is_reactant"       type="boolean"    indexed="true"  stored="true"/>
 	</fields>
 
 	<uniqueKey>id</uniqueKey>
-	
-	<copyField source="id"	dest="text"/>
-	<copyField source="abbreviation"	dest="text"/>
-	<copyField source="name"	dest="text"/>
-	<copyField source="code"	dest="text"/>
-	<copyField source="aliases"	dest="text"/>
 
+	<!-- Free-text search across identity, name, equation-code, alias, note
+	     fields. `text` is not stored; only used for scoring. -->
+	<copyField source="id"           dest="text"/>
+	<copyField source="abbreviation" dest="text"/>
+	<copyField source="name"         dest="text"/>
+	<copyField source="code"         dest="text"/>
+	<copyField source="aliases"      dest="text"/>
+	<copyField source="notes"        dest="text"/>
+	<copyField source="ec_numbers"   dest="text"/>
 
 	<xi:include href="schema_types.xml" xmlns:xi="http://www.w3.org/2001/XInclude">
 		<xi:fallback></xi:fallback>
