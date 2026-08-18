@@ -37,20 +37,78 @@ Evidence, all verified against `origin/dev` rather than inferred:
 
 ### Three defects this surfaced
 
-**(a) The `EQ` run never read eQuilibrator energies.** `_energy_for(entry, 'EQ')`
-pulls the canonical `deltag`, merely *gated* on eQuilibrator eligibility. Since the
-additive-thermodynamics refactor, no updater overwrites `deltag` — so only **1,797 of
-25,028** reactions with an eQuilibrator record actually had
-`deltag == thermodynamics['eQuilibrator'][0]`. The other **23,140** were scored on the
-Group-Contribution number and then labelled eQuilibrator. Canonical `deltagerr` is
-*never* the eQuilibrator sentinel (0 cases), which confirms it is the GC error
-throughout.
+**(a) The `EQ` run stopped reading eQuilibrator energies in 2023.** *This was
+originally documented here as "never read them", which was wrong — the design was
+correct and a later commit broke it.*
 
-**(b) eQuilibrator's "cannot decompose" marker was read as an error bar.** A σ of
-~1e5 kJ/mol is a flag; **4,933** reaction records carry it. The GC bounds rule cannot
-fire at that width, so those reactions fell through to the narrow mM band or the bare
-`default` and came out `=`. Observed *real* σ tops out at **65.35** kcal/mol against a
-marker of **23,900.57**, so the two populations are cleanly separated.
+From 2019 (`c263e233`) through 2023-09-11 (`17c9739b`),
+`Update_Reaction_eQuilibrator_Energies.py` overwrote the canonical energy and stamped
+the note that gates the reversibility step:
+
+```python
+reactions_dict[rxn]['deltag']    = float(eq_reactions[rxn]['dg'])
+reactions_dict[rxn]['deltagerr'] = float(eq_reactions[rxn]['dge'])
+if('EQU' not in notes_list): notes_list.append('EQU')
+```
+
+So `_energy_for(entry, 'EQ')` reading `deltag` gated on `EQU` was reading eQuilibrator
+energies exactly as intended. `DB_LEVEL_NOTE = {"EQ": "EQU"}` is the semantically
+correct gate — `EQU` means "this deltag came from eQuilibrator", written by the
+updater. (It is *not* `EQC`, which the retrieval script writes to mean "all reagents
+had eQuilibrator structures" — a different claim.)
+
+**`3e50646b` (2023-09-13, "Updating integration of thermodynamics data in biochemistry
+for reactions") removed the write half and left the read half in place.** The updater
+moved to writing `thermodynamics['eQuilibrator']` only, dropping both the `deltag`
+overwrite and the `EQU` stamp. The reversibility step kept reading `deltag`. Later GC
+rebuilds (Convention A, `ad34d6ab`) and the PR #265 promotion then rewrote `deltag`
+from other sources.
+
+Result today: only **1,797 of 25,028** reactions with an eQuilibrator record have
+`deltag == thermodynamics['eQuilibrator'][0]`; restricted to the 17,094 still carrying
+`EQU`, only **1,586** do. The other 23,140 are scored on the Group-Contribution number
+and labelled eQuilibrator. Canonical `deltagerr` is *never* the eQuilibrator sentinel
+(0 cases), confirming it is the GC error throughout. `EQU` is now a fossil of the
+pre-2023 pipeline.
+
+Pointing the EQ run at the eQuilibrator sublist restores the original intent rather
+than inventing a new one.
+
+**(b) For most flagged reactions eQuilibrator returns no energy at all — we stored a
+transform term as if it were one.** *Originally written here as "the marker was read as
+an error bar", which understates it.*
+
+`GibbsEnergyPredictor.standard_dg` short-circuits when the reaction has a component
+outside both the reactant- and group-contribution spans:
+
+```python
+mu, sigma_fin, sigma_inf, residual = self.get_reaction_prediction(reaction)
+if residual:
+    return Q_(0, "kJ/mol").plus_minus(self.preprocess.RMSE_inf)
+```
+
+It returns **literally zero**, not a minimum-norm estimate or a projection — the
+computed mean is discarded. `standard_dg_prime`, which our retrieval script calls, then
+adds the Legendre/pH transform on top of that zero. So the nonzero ΔG′° we store for
+these reactions is *only the transform*. `rxn00017`'s −20.46 kcal/mol is the pH-7
+transform of an energy eQuilibrator declined to estimate.
+
+Two populations among the 4,607 σ-flagged reactions in the table:
+
+| | n | σ | what the value is |
+|---|---:|---|---|
+| residual branch | **2,895** | exactly `RMSE_inf` (1e5 kJ/mol) | zero + transform |
+| undetermined direction | **1,712** | `RMSE_inf · ‖σ_inf‖` (e.g. 1/√2) | real mean, inflated error |
+
+Confirmation for the first group: of those with **no net proton change** — nothing for
+the transform to act on — 35% come out below 0.01 kcal/mol, and **61 are exactly
+`0.000000`** (e.g. `rxn02677` cycloeucalenol ⇌ obtusifoliol, `rxn04059`
+16-epivellosimine ⇌ vellosimine).
+
+Neither population can support a directional call, and the GC bounds rule cannot fire
+at that width, so all of them fell through to the narrow mM band or the bare `default`
+and came out `=`. Real σ tops out at **65.35** kcal/mol against a marker of
+**23,900.57**, so the gate's cut is unambiguous.
 
 **(c) Transport energies are for the wrong reaction.**
 `Retrieve_eQuilibrator_Reactions_Energies.py` builds its formula keyed on MetaNetX id,
@@ -156,8 +214,9 @@ Deciding rule in the EQ run: `Incomplete` 24,828 · **`EQ:lnGamma` 8,944** ·
 
 **The database gets less confident, and that is the finding.** The +4,863 unknowns
 track the 4,933 undecomposable records almost exactly. Those reactions had been
-receiving a permissive `=` or an inherited direction on the strength of a ΔG′° carrying
-±23,900 kcal/mol — an unread sentinel, not evidence.
+receiving a permissive `=` or an inherited direction on the strength of a number that,
+for 2,895 of them, is eQuilibrator's literal zero plus a pH transform — not an estimate
+it ever stood behind.
 
 The bare no-evidence `default` fallback went from deciding **7,120** reactions to
 **zero**: everything that used to land there now gets a real index call, an explicit

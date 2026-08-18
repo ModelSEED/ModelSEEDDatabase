@@ -99,12 +99,27 @@ Beber 2022 defines no reversibility index; what eQuilibrator 3.0 contributes is
 rigorous uncertainty, and that is what the two gates ahead of the index rule
 encode. Both address defects in the stored eQuilibrator data:
 
-* **`EQ:undecomposable`** — a σ of ~1e5 kJ/mol is eQuilibrator's "could not
-  decompose this reaction" marker, not an error bar. 4,934 reaction records
-  carry it. The GC bounds rule can never fire at that width, so those reactions
-  used to fall through to a permissive `=`; they now return `?`. (Observed real
-  σ tops out at 65.35 kcal/mol against a marker of 23,900.57, so the cut at
-  1e4 kJ/mol sits in an empty gap.)
+* **`EQ:undecomposable`** — a σ of ~1e5 kJ/mol (`RMSE_inf`) marks a reaction
+  eQuilibrator could not decompose. For the majority of these it does not return
+  a prediction at all: `GibbsEnergyPredictor.standard_dg` short-circuits with
+
+  ```python
+  if residual:
+      return Q_(0, "kJ/mol").plus_minus(self.preprocess.RMSE_inf)
+  ```
+
+  i.e. **literally zero**, and the nonzero ΔG′° we store is only the Legendre/pH
+  transform that `standard_dg_prime` adds on top of that zero. Of the 4,607
+  σ-flagged reactions in the table, **2,895** have σ exactly `RMSE_inf` and are
+  this zeroed case — 61 of them are still exactly `0.000000` because they have no
+  net proton change for the transform to act on. The remaining **1,712** carry
+  `RMSE_inf * ||sigma_inf||` (e.g. 1/√2) and do have a real mean, but with an
+  undetermined direction in the covariance.
+
+  Either way the value cannot support a directional call, so the gate returns
+  `?`. Previously the GC bounds rule could never fire at that width and these
+  fell through to a permissive `=`. (Real σ tops out at 65.35 kcal/mol against a
+  marker of 23,900.57, so the cut at 1e4 kJ/mol sits in an empty gap.)
 * **`EQ:transport-uncorrected`** — `Retrieve_eQuilibrator_Reactions_Energies.py`
   keys its MetaNetX formula on compound id and therefore discards compartment,
   so any species on both sides nets out; 1,102 transport reactions carry a ΔG′°
@@ -121,12 +136,34 @@ the directional call for clear cases.
 
 `Estimate_Reaction_Reversibility.py EQ` reads
 `thermodynamics['eQuilibrator']`'s own dG and σ, **not** the top-level `deltag`.
-Before the split it read `deltag`, merely gated on eQuilibrator eligibility —
-but since the additive-thermodynamics refactor no updater overwrites `deltag`,
-so only 1,797 of the 25,028 reactions with an eQuilibrator record actually had
-`deltag == thermodynamics['eQuilibrator'][0]`. The other 23,140 were scored on
-the Group-Contribution number and labelled eQuilibrator. The EQ rules also need
-eQuilibrator's own σ, which the top-level `deltagerr` never carries.
+
+Reading `deltag` was correct as originally designed. From 2019 (`c263e233`)
+through 2023-09-11 (`17c9739b`), `Update_Reaction_eQuilibrator_Energies.py`
+overwrote the canonical energy and stamped the note that gates this step:
+
+```python
+reactions_dict[rxn]['deltag']    = float(eq_reactions[rxn]['dg'])
+reactions_dict[rxn]['deltagerr'] = float(eq_reactions[rxn]['dge'])
+if('EQU' not in notes_list): notes_list.append('EQU')
+```
+
+so `deltag` *was* the eQuilibrator value wherever `EQU` was set, and
+`DB_LEVEL_NOTE = {"EQ": "EQU"}` gated it exactly right.
+
+**`3e50646b` (2023-09-13) removed the write half and left the read half in
+place.** The updater moved to `thermodynamics['eQuilibrator']` only, stopping
+both the `deltag` overwrite and the `EQU` stamp — but this step kept reading
+`deltag`. Later GC rebuilds (Convention A, `ad34d6ab`) and the PR #265
+promotion then rewrote `deltag` from other sources. Today only **1,797 of
+25,028** reactions with an eQuilibrator record have
+`deltag == thermodynamics['eQuilibrator'][0]`; restricted to the 17,094 still
+carrying `EQU`, only **1,586** do. That note is now a fossil of the pre-2023
+pipeline. (`EQU` is not `EQC`: the retrieval script writes `EQC`/`EQP` to mean
+"all reagents had eQuilibrator structures", a different claim.)
+
+Pointing the EQ run at the eQuilibrator sublist restores the original intent.
+The EQ rules also need eQuilibrator's own σ, which the top-level `deltagerr`
+never carries.
 
 Consequence: canonical `reversibility` for these reactions now derives from the
 eQuilibrator energy while canonical `deltag` mostly remains the GC value.
