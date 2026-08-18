@@ -3,7 +3,7 @@
 **A broken read/write contract in the Thermodynamics pipeline.**
 Introduced 2023-09-13, live on `dev` continuously since. Fixed for `EQ` in
 [PR #285](https://github.com/ModelSEED/ModelSEEDDatabase/pull/285); **the same pattern
-remains in the `GC` and `DGP` paths.**
+remains in the `GC` and `DGP` paths and is analysed in §3.**
 
 Code references are to `origin/dev` @ `49563c6f`.
 Companions: `equilibrator_reversibility_heuristics_2026-08-18.md` (the fix),
@@ -217,10 +217,10 @@ Side effect, and a desirable one: `EQU` stops being consulted. Eligibility becom
 `thermodynamics['eQuilibrator']` hold a non-sentinel pair" — live data rather than a 2023
 fossil.
 
-### NOT fixed: the `GC` and `DGP` paths have the identical defect
+### NOT fixed: the `GC` path has the identical defect
 
-`top_level_energy` is still the source for every other level, so `Estimate_Reaction_Reversibility.py GC`
-reads `deltag` too:
+`top_level_energy` is still the source for every other level, so
+`Estimate_Reaction_Reversibility.py GC` reads `deltag` too — same line, same mechanism:
 
 | GC-eligible reactions with a usable `deltag` | 26,421 |
 |---|---:|
@@ -228,19 +228,90 @@ reads `deltag` too:
 | `deltag` == eQuilibrator value | 1,481 — 5.6% |
 | `deltag` == neither | 19,469 — 73.7% |
 
-**The GC run is reading the wrong energy 79.3% of the time**, for the same structural
-reason. It is less visible only because the stale values are mostly *old GC* values —
-close to the current ones (median 2.07 kcal/mol apart), so most directions happen to come
-out the same.
+**The GC run reads the wrong energy 79.3% of the time.**
 
-I left this deliberately. Changing it in the same PR would have destroyed the control
-that makes the eQuilibrator change reviewable: as submitted, the GC and dGPredictor
-operator columns are **byte-identical** to `dev`, which proves the 7,103 eQuilibrator
-changes come from the new rule set and not from the refactor. Fixing GC is a separate,
-larger change and should be its own PR.
+#### But it fails differently, and that matters
 
-`DGP` shares the pattern but `Estimate_Reaction_Reversibility.py DGP` is not in
-`Rerun_Thermodynamics.sh`, so it is currently inert.
+Simulating the full pipeline both ways — GC step, then EQ step, in
+`Rerun_Thermodynamics.sh` order — and comparing final canonical `reversibility`:
+
+| transition | n |
+|---|---:|
+| `?` → `=` | 608 |
+| `?` → `>` | 213 |
+| `>` → `=` | 105 |
+| `<` → `=` | 43 |
+| `=` → `?` | 43 |
+| `=` → `>` | 41 |
+| `>` → `?` | 32 |
+| `<` → `?` | 30 |
+| `?` → `<` | 22 |
+| `=` → `<` | 14 |
+| `>` → `<` | 4 |
+| `<` → `>` | 1 |
+| **total** | **1,156** |
+
+Only **5** are hard directional flips (`>` ↔ `<`), and 105 turn a confident call into
+`?`. So the eQuilibrator failure mode — confident wrong answers — is largely *absent*
+here, because the stale values are mostly older GC numbers sitting a median of
+2.07 kcal/mol from the current ones. Close enough that the cascade usually lands the same
+way.
+
+**The dominant effect is lost coverage: 843 reactions move from `?` to a confident
+call.** The cause is a different branch of the same defect — `deltag` is the sentinel
+`10000000` for reactions that nonetheless have a perfectly good stored GC energy, so
+`_energy_for` returns `(None, None, None)`, `_incomplete_decision` fires, and the answer
+is `?`:
+
+```
+rxn31387  R_NADH_monodehydroascorbate_oxidoreductase
+   canonical deltag = 10000000.0  (sentinel)   -> current answer '?'
+   GC sublist       = [-2.57, 12.67]           -> correct answer '='
+```
+
+**892 reactions** have a stored Group-Contribution energy that is unreachable through
+`deltag`.
+
+#### Why the GC fix is not a one-line swap
+
+Those 892 are not all worth recovering:
+
+| | n |
+|---|---:|
+| \|dG\| > 1000 kcal/mol — implausible | 3 |
+| error > 100 kcal/mol — uselessly vague | 5 |
+| would pass `Promote_*`'s guards | 884 |
+
+`rxn31466` carries a GC energy of **−3505.99 ± 244.6 kcal/mol**. It is currently
+invisible precisely *because* `Promote_Reaction_Thermodynamics_to_Canonical.py` applies
+`MAX_ABS_DG = 1000.0` and `MAX_ERR = 100.0` before writing `deltag`.
+
+> **`deltag` is accidentally functioning as a quality filter.** Reading it is wrong, but
+> protective. Swapping the GC path to `per_source_energy` without porting those
+> plausibility guards would let all 892 through, including the nonsense.
+
+That is why the eQuilibrator fix could be a clean swap and the GC fix cannot: the EQ rule
+set carries its own quality gate (`eq_undecomposable_heuristic`), so it does not depend on
+`deltag` for filtering. The GC cascade has no equivalent — its `stored_bounds_heuristic`
+simply abstains on a wide error bar rather than rejecting it.
+
+#### Why it is out of scope for PR #285
+
+Changing the GC path in the same PR would destroy the control that makes the eQuilibrator
+change reviewable. As submitted, the GC and dGPredictor operator columns are
+**byte-identical** to `dev`, which is what demonstrates the 7,103 eQuilibrator changes
+come from the new rule set rather than from the refactor. Mixing in ~1,156 GC changes
+would remove that evidence.
+
+A follow-up PR should: swap the GC path to `per_source_energy('Group contribution')`, add
+a plausibility gate to the GC rule set mirroring `Promote_*`'s `MAX_ABS_DG`/`MAX_ERR`, and
+report the ~884 recovered reactions as an intended coverage gain.
+
+#### `DGP`
+
+Shares the pattern, but `Estimate_Reaction_Reversibility.py DGP` is not in
+`Rerun_Thermodynamics.sh`, so it is currently inert. It should be fixed at the same time
+as GC to stop the pattern reappearing if that step is ever enabled.
 
 ### The underlying ambiguity, for a decision
 
@@ -268,4 +339,5 @@ about what `deltag` is *for*, so I have not made it.
 | **Scale** | 92.8% of EQ-eligible reactions score a non-eQuilibrator number; ≥1,575 directions differ |
 | **Root cause** | A two-sided contract where only one side was changed, with no mechanism to detect the breach |
 | **Fixed** | `EQ` path, in PR #285 |
-| **Outstanding** | `GC` path has the same defect (79.3% wrong energy, mostly benign); `deltag`'s role needs a decision |
+| **Outstanding** | `GC` path, same defect: 79.3% wrong energy, 1,156 directions affected, 892 reactions with an unreachable GC energy. Needs a plausibility gate, not just a swap — see §3 |
+| **Also outstanding** | `deltag`'s role is undefined: neither pipeline output nor a curated field |
