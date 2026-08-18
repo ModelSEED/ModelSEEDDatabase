@@ -3,6 +3,9 @@
 **Branch:** `eQuilibrator-fix` (from `ModelSEED/ModelSEEDDatabase` `dev` @ `49563c6f`)
 **PR:** [ModelSEED/ModelSEEDDatabase#285](https://github.com/ModelSEED/ModelSEEDDatabase/pull/285) — `Cooper-Taylor:eQuilibrator-fix` → `ModelSEED:dev`
 **Date:** 2026-08-18
+**Companion:** `equilibrator_zero_energy_defect_2026-08-18.md` — forensic walkthrough of
+the zeroed-energy defect: the full pipeline against `dev`'s code, the commit that
+introduced it, and why a 2026 rerun amplified it.
 
 ---
 
