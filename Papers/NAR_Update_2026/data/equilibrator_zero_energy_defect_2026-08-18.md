@@ -2,7 +2,10 @@
 
 **Forensic walkthrough of the defect fixed by [PR #285](https://github.com/ModelSEED/ModelSEEDDatabase/pull/285).**
 Code references are to `origin/dev` @ `49563c6f` unless stated otherwise.
-Companion document: `equilibrator_reversibility_heuristics_2026-08-18.md` (what was built and why).
+Companion documents:
+`equilibrator_reversibility_heuristics_2026-08-18.md` (what was built and why) and
+`equilibrator_deltag_read_write_defect_2026-08-18.md` (the separate `deltag` read/write
+defect, which also dates to `3e50646b`).
 
 ---
 

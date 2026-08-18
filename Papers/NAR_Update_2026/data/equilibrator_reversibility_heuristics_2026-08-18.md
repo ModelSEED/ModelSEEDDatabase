@@ -3,9 +3,13 @@
 **Branch:** `eQuilibrator-fix` (from `ModelSEED/ModelSEEDDatabase` `dev` @ `49563c6f`)
 **PR:** [ModelSEED/ModelSEEDDatabase#285](https://github.com/ModelSEED/ModelSEEDDatabase/pull/285) — `Cooper-Taylor:eQuilibrator-fix` → `ModelSEED:dev`
 **Date:** 2026-08-18
-**Companion:** `equilibrator_zero_energy_defect_2026-08-18.md` — forensic walkthrough of
-the zeroed-energy defect: the full pipeline against `dev`'s code, the commit that
-introduced it, and why a 2026 rerun amplified it.
+**Companions:**
+`equilibrator_zero_energy_defect_2026-08-18.md` — the zeroed-energy defect: the full
+pipeline against `dev`'s code, the commit that introduced it, and why a 2026 rerun
+amplified it.
+`equilibrator_deltag_read_write_defect_2026-08-18.md` — the `deltag` read/write defect:
+verification that the `EQ` step never scores eQuilibrator's own number, and where the
+same pattern still persists.
 
 ---
 
