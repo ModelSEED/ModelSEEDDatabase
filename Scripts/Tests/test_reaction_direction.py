@@ -20,6 +20,13 @@ Usage:
     ./test_reaction_direction.py --no-run           # skip pipeline; just diff
     ./test_reaction_direction.py --refresh-baseline # re-pull baseline
     ./test_reaction_direction.py --baseline-ref origin/master
+    ./test_reaction_direction.py --strict            # fail on ANY divergence
+
+Note on PASS/FAIL: sources in INVARIANT_SOURCES must match the baseline exactly
+(drift there is a regression). Sources in EXPECTED_CHANGE_SOURCES, and the
+canonical reversibility they feed, are reported but do not fail -- this branch
+re-scores eQuilibrator on purpose. Use --strict to require exact equality
+everywhere, e.g. to check two runs of this branch against each other.
 """
 import argparse
 import json
@@ -41,6 +48,20 @@ SOURCES = [
     ('EQ',  'eQuilibrator'),
     ('DGP', 'dGPredictor'),
 ]
+
+# Sources whose per-method operator must stay byte-identical to the baseline.
+# These are all scored with the GC rule set, which this branch does not touch,
+# so any drift here is a real regression.
+INVARIANT_SOURCES = ['Group contribution', 'dGPredictor', 'dGPredictor-ModelSEED']
+
+# Sources this branch deliberately re-scores, plus the canonical reversibility
+# they feed. eQuilibrator moved from the GC cascade to its own rule set (the
+# Noor 2012 reversibility index gated by eQuilibrator's uncertainty), so it is
+# EXPECTED to differ from a pre-split baseline. Divergence here is reported for
+# review but does not fail the test; regressions are caught by the invariant
+# columns above. Pass --strict to require exact equality everywhere, e.g. when
+# comparing two runs of this same branch.
+EXPECTED_CHANGE_SOURCES = ['eQuilibrator']
 
 PIPELINE = [
     ['./Update_Compound_GroupContribution_Energies.py'],
@@ -109,7 +130,7 @@ def source_operator(rxn, label):
     return sub[2]
 
 
-def compare(current, baseline, max_show):
+def compare(current, baseline, max_show, strict=False):
     cur_ids = set(current)
     base_ids = set(baseline)
     only_cur = cur_ids - base_ids
@@ -167,9 +188,26 @@ def compare(current, baseline, max_show):
         for rid in sorted(only_base)[:max_show]:
             print(f'  - {rid}')
 
-    ok = (not rev_mismatch and not only_cur and not only_base
-          and all(not per_source[label] for _, label in SOURCES))
+    regressions = [label for _, label in SOURCES
+                   if label in INVARIANT_SOURCES and per_source[label]]
+    expected = [label for _, label in SOURCES
+                if label in EXPECTED_CHANGE_SOURCES and per_source[label]]
+
+    if not strict and (expected or rev_mismatch):
+        print('\nIntended changes (not failures -- see EXPECTED_CHANGE_SOURCES):')
+        for label in expected:
+            print(f'  {label:35}: {len(per_source[label]):>5} operators re-scored')
+        if rev_mismatch:
+            print(f'  {"canonical reversibility":35}: {len(rev_mismatch):>5} re-scored')
+        print('  Re-run with --strict to require exact equality everywhere.')
+
+    ok = not only_cur and not only_base and not regressions
+    if strict:
+        ok = ok and not rev_mismatch and not expected
     print('\nRESULT: ' + ('PASS' if ok else 'FAIL'))
+    if not ok and regressions:
+        print('  REGRESSION in rule sets this branch does not touch: '
+              + ', '.join(regressions))
     return ok
 
 
@@ -181,6 +219,9 @@ def main():
                    help='re-extract the baseline')
     p.add_argument('--no-run', action='store_true',
                    help='skip the pipeline; just diff')
+    p.add_argument('--strict', action='store_true',
+                   help='require exact equality for every source, including the '
+                        'ones this branch intentionally re-scores')
     p.add_argument('--display-num', type=int, default=20, metavar='N',
                    help='max rows per diff section (default: 20)')
     args = p.parse_args()
@@ -201,7 +242,7 @@ def main():
 
     baseline = load_reactions(BASELINE_DIR)
     current = load_reactions(BIOCHEM_DIR)
-    ok = compare(current, baseline, max_show=args.display_num)
+    ok = compare(current, baseline, max_show=args.display_num, strict=args.strict)
     sys.exit(0 if ok else 1)
 
 

@@ -13,8 +13,9 @@ from Estimate_Reaction_Reversibility import reversibility_from_energy
 #       "eQuilibrator":       [-3.46, 0.05, ">"]
 #   }
 #
-# The operator is each estimate's OWN thermodynamic direction (computed with the
-# same heuristic as the canonical reversibility, applied to that method's dG).
+# The operator is each estimate's OWN thermodynamic direction, computed with the
+# rule set belonging to that method (eQuilibrator heuristics for eQuilibrator,
+# Group-Contribution heuristics for everything else) applied to that method's dG.
 # The canonical top-level deltag / deltagerr / reversibility fields are NEVER
 # touched: these per-method records are added next to, not in place of, the
 # existing values.
@@ -45,7 +46,9 @@ for rxn in sorted(reactions_dict.keys()):
             continue
 
         (dg_val, dge_val) = (values[0], values[1])
-        operator = reversibility_from_energy(rxn_obj, dg_val, dge_val)
+        # Pass the label: each source is scored with its own rule set
+        # (eQuilibrator gets the EQ heuristics, everything else GC).
+        operator = reversibility_from_energy(rxn_obj, dg_val, dge_val, source=label)
         new_values = [dg_val, dge_val, operator]
         entries += 1
         if(new_values != values):
