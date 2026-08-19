@@ -215,12 +215,11 @@ def build_reaction_doc(rxn):
     _FLAT_STR_KEYS = (
         'id', 'name', 'abbreviation', 'code', 'equation', 'definition',
         'status', 'source', 'linked_reaction', 'abstract_reaction',
-        'reversibility', 'atom_mapping_confidence',
+        'reversibility',
     )
     _FLAT_NUM_KEYS = ('deltag', 'deltagerr')
     _FLAT_BOOL_KEYS = ('is_transport', 'is_obsolete')
-    _FLAT_LIST_KEYS = ('pathways', 'aliases', 'ec_numbers', 'notes',
-                       'atom_mapping')
+    _FLAT_LIST_KEYS = ('pathways', 'aliases', 'ec_numbers', 'notes')
 
     for k in _FLAT_STR_KEYS:
         v = rxn.get(k)
@@ -251,8 +250,23 @@ def build_reaction_doc(rxn):
     elif isinstance(compound_ids, list):
         doc['compound_ids'] = compound_ids
 
-    # Denormalized derived fields
-    doc['has_atom_mapping'] = bool(rxn.get('atom_mapping'))
+    # atom_mapping is a single nested dict on the JSON side:
+    #   {"data": [...], "confidence": "clean|salvaged", "has_symmetry_groups": bool}
+    # Flatten it out into three sibling fields for Solr indexing so the
+    # UI can filter/browse without traversing a nested field name at query
+    # time. Denormalized `has_atom_mapping` remains for quick-existence
+    # filtering. If the dict is absent (reaction not in the clean set),
+    # none of these fields are emitted.
+    am = rxn.get('atom_mapping')
+    if isinstance(am, dict):
+        doc['atom_mapping_data'] = list(am.get('data') or [])
+        conf = am.get('confidence')
+        if conf:
+            doc['atom_mapping_confidence'] = conf
+        doc['atom_mapping_has_symmetry_groups'] = bool(am.get('has_symmetry_groups'))
+        doc['has_atom_mapping'] = bool(am.get('data'))
+    else:
+        doc['has_atom_mapping'] = False
     thermo = rxn.get('thermodynamics') if isinstance(rxn.get('thermodynamics'), dict) else {}
     doc['n_sources_thermodynamics'] = len(thermo)
     agree = sources_agree_direction(thermo)

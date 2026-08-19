@@ -68,13 +68,22 @@
 		<field name="deltagerr"         type="float"      indexed="true"  stored="true"/>
 		<field name="reversibility"     type="string"     indexed="true"  stored="true"/>
 
-		<!-- Atom mapping. `atom_mapping` is a multi-valued list of
-		     `cpdA:E#N=cpdB:E#M` strings; indexed as `string` for exact-
-		     match filters (e.g. show reactions mapping a specific compound's
-		     atom) and prefix wildcards ("all rows involving cpd00007's O
-		     atoms"). Confidence is `clean` or `salvaged`. -->
-		<field name="atom_mapping"              type="string"   indexed="true"  stored="true"  multiValued="true"/>
-		<field name="atom_mapping_confidence"   type="string"   indexed="true"  stored="true"/>
+		<!-- Atom mapping. Flattened from the reaction JSON's nested
+		     `atom_mapping` dict for indexing:
+		       - atom_mapping_data: multi-valued list of `cpdA:E#N=cpdB:E#M`
+		         strings (endpoints may be single-atom refs or `(x;y;...)`
+		         set notation when the atom belongs to an InChI equivalence
+		         class in its compound). Indexed as `string` for exact-match
+		         filters and prefix wildcards.
+		       - atom_mapping_confidence: `clean` or `salvaged` (see
+		         Biochemistry/Structures/AtomMappings/README.md for
+		         semantics).
+		       - atom_mapping_has_symmetry_groups: true when any row uses
+		         set notation. Enables symmetry-aware renderer / query path
+		         in the UI. -->
+		<field name="atom_mapping_data"                type="string"   indexed="true"  stored="true"  multiValued="true"/>
+		<field name="atom_mapping_confidence"          type="string"   indexed="true"  stored="true"/>
+		<field name="atom_mapping_has_symmetry_groups" type="boolean"  indexed="true"  stored="true"/>
 
 		<!-- ============================================================
 		     Denormalized flat fields — derived from the JSON at compile

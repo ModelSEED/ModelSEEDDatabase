@@ -120,8 +120,12 @@ records is preserved in the search index.
 - Flat parent fields — `id`, `name`, `abbreviation`, `code`, `equation`,
   `definition`, `status`, `aliases[]`, `pathways[]`, `ec_numbers[]`,
   `notes[]`, `is_transport`, `is_obsolete`, `reversibility`, ...
-- **Atom mapping** — `atom_mapping[]` (multi-valued `cpdA:E#N=cpdB:E#M`
-  strings) and `atom_mapping_confidence` (`clean` | `salvaged`)
+- **Atom mapping** (flattened from the JSON's nested `atom_mapping` dict):
+  `atom_mapping_data[]` (multi-valued `cpdA:E#N=cpdB:E#M` strings;
+  endpoints may be single atoms or `(x;y;…)` set notation),
+  `atom_mapping_confidence` (`clean` | `salvaged`), and
+  `atom_mapping_has_symmetry_groups` (`true` when any row uses set
+  notation)
 - **Denormalized filters** — `has_atom_mapping`,
   `n_sources_thermodynamics`, `sources_agree_direction`, `n_reactants`,
   `n_products`
