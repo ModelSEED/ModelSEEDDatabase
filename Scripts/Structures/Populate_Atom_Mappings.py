@@ -1,29 +1,50 @@
 #!/usr/bin/env python
-"""Populate the `atom_mapping` and `atom_mapping_confidence` fields in
-reaction_*.json from the outputs of Rebuild_AtomMappings_from_raw.py.
+"""Populate the `atom_mapping` dict on each reaction_*.json from the
+outputs of Rebuild_AtomMappings_from_raw.py.
 
 Reads:  Biochemistry/Structures/AtomMappings/all_mapping_no_problem.txt
         Biochemistry/Structures/AtomMappings/rxns_confidence.tsv
 Writes: Biochemistry/reaction_*.json  (in place)
 
 Each row of `all_mapping_no_problem.txt` is
-`rxnXXXXX cpdAAAAA:E#N=cpdBBBBB:E#M`; rows are grouped by rxn ID and the
-space-delimited-suffix is emitted as an entry in a flat `atom_mapping`
-list on each reaction.
+`rxnXXXXX cpdAAAAA:E#N=cpdBBBBB:E#M`; rows are grouped by rxn ID and
+emitted under the `data` key of a single top-level `atom_mapping` dict:
 
-`rxns_confidence.tsv` (produced by Rebuild_AtomMappings_from_raw.py)
-tags each mapped reaction as `clean` (every raw RDT row was already
-canonical single-pair same-element) or `salvaged` (at least one raw row
-was a run-on chain, dangling orphan, cross-element pair, or malformed
-and the reaction's kept pairs are a strict subset of the raw output).
-The tag is written to the reaction's `atom_mapping_confidence` field so
-downstream consumers can filter conservatively where mapping accuracy
-matters (e.g., mechanism-level tracing or ¹³C flux analysis).
+    "atom_mapping": {
+        "data": [
+            "cpd00001:O#1=cpd00009:O#2",
+            "cpd00012:O#1=cpd00009:O#1",
+            ...
+        ],
+        "confidence": "clean",
+        "has_symmetry_groups": false
+    }
 
-Both fields are added only for reactions that appear in the input. Any
-existing `atom_mapping` / `atom_mapping_confidence` on reactions absent
-from the input is removed, so re-running after a refreshed bundle
-produces a clean state.
+Field meanings:
+
+- `data` — list of atom-pair strings (`cpdA:E#N=cpdB:E#M`). Endpoints
+  may be either a single canonical atom reference or a parenthesised
+  set of comma-`;`-joined atom refs when the symmetry-group rewrite
+  has been applied (see Build_Atom_Equivalence_Groups.py + future
+  extensions to Rebuild_AtomMappings_from_raw.py).
+
+- `confidence` — `clean` (every raw RDT row was already a canonical
+  single-pair same-element row) or `salvaged` (at least one raw row was
+  a run-on chain / dangling orphan / cross-element pair / malformed,
+  and the kept rows are a strict subset). Downstream consumers doing
+  mechanism-level tracing (13C flux, exact atom fate) should filter to
+  `clean` only.
+
+- `has_symmetry_groups` — true when any row in `data` uses set
+  notation for an endpoint. Consumers can use this to enable a
+  symmetry-aware renderer (see Solr/README + methods paper) or fall
+  back to a strict-single-atom view.
+
+The whole `atom_mapping` dict is added only for reactions present in
+the input. Reactions absent from the input have any existing
+`atom_mapping` (or the pre-reorganization flat `atom_mapping` /
+`atom_mapping_confidence` fields) removed, so re-running after a
+refreshed bundle produces a clean state.
 """
 import os
 import sys
@@ -106,33 +127,38 @@ def main():
             total_seen += 1
             rid = r.get('id')
             new_pairs = mappings.get(rid)
-            old_pairs = r.get('atom_mapping')
-            new_conf = confidence.get(rid) if new_pairs is not None else None
-            old_conf = r.get('atom_mapping_confidence')
+            old_am = r.get('atom_mapping')
+            # Detect the pre-reorganization flat layout so we can migrate
+            # cleanly: previously `atom_mapping` was a list of strings and
+            # `atom_mapping_confidence` was a sibling top-level string.
+            old_flat_conf = r.pop('atom_mapping_confidence', None) if isinstance(old_am, list) else None
             if new_pairs is not None:
-                if old_pairs is None:
-                    r['atom_mapping'] = new_pairs
-                    added += 1
-                    file_changed = True
-                elif old_pairs != new_pairs:
-                    r['atom_mapping'] = new_pairs
-                    updated += 1
+                new_conf = confidence.get(rid)
+                new_has_sym = any('(' in pair for pair in new_pairs)
+                new_dict = {
+                    'data': list(new_pairs),
+                    'confidence': new_conf or 'clean',
+                    'has_symmetry_groups': new_has_sym,
+                }
+                if old_am != new_dict:
+                    r['atom_mapping'] = new_dict
+                    if old_am is None:
+                        added += 1
+                    else:
+                        updated += 1
                     file_changed = True
                 else:
                     unchanged += 1
-                if new_conf is not None and new_conf != old_conf:
-                    r['atom_mapping_confidence'] = new_conf
-                    file_changed = True
-                elif new_conf is None and old_conf is not None:
-                    r.pop('atom_mapping_confidence', None)
+                # Migration: strip any lingering flat sibling field.
+                if old_flat_conf is not None:
                     file_changed = True
             else:
-                if old_pairs is not None:
+                if old_am is not None:
                     r.pop('atom_mapping', None)
                     removed += 1
                     file_changed = True
-                if old_conf is not None:
-                    r.pop('atom_mapping_confidence', None)
+                if old_flat_conf is not None:
+                    # already popped above; ensures file write picks up removal
                     file_changed = True
 
         if file_changed:
