@@ -95,8 +95,55 @@ RAW = os.path.join(AM, 'all_mapping.txt')
 OUT = os.path.join(AM, 'all_mapping_no_problem.txt')
 RXN_LIST = os.path.join(AM, 'rxns_no_problems.txt')
 CONFIDENCE = os.path.join(AM, 'rxns_confidence.tsv')
+# Optional — when present, atom-pair rows are rewritten to use set
+# notation for atoms in InChI equivalence groups. Produced by
+# Build_Atom_Equivalence_Groups.py.
+EQUIV_TABLE = os.path.join(AM, 'species_equivalence_groups.tsv')
 
 ATOM = re.compile(r'^cpd\d{5}:([A-Za-z]{1,2})#\d+$')
+
+
+def load_equivalence_map(path):
+    """Return {cpd_id: {atom_label: set_string, ...}, ...}.
+
+    An atom label present as a key indicates the atom is one of an
+    equivalence class in that compound; the value is the set-notation
+    string covering the whole class (e.g. "(O#1;O#2)"). Consumers can
+    look up an atom and, if present, replace the single-atom reference
+    with the set. Absent from the map → the atom is unique (no
+    equivalence class), pass through unchanged.
+
+    Returns an empty dict if the table doesn't exist; downstream logic
+    treats an empty map as "no rewriting". So callers work identically
+    whether or not the equivalence work has been run.
+    """
+    out = defaultdict(dict)
+    if not os.path.isfile(path):
+        return out
+    with open(path) as fh:
+        fh.readline()  # discard header
+        for line in fh:
+            parts = line.rstrip('\n').split('\t')
+            if len(parts) < 2:
+                continue
+            cpd, groups_str = parts[0], parts[1]
+            for set_str in groups_str.split(' '):
+                inner = set_str.strip('()')
+                for atom_label in inner.split(';'):
+                    if atom_label:
+                        out[cpd][atom_label] = set_str
+    return out
+
+
+def rewrite_atom_ref(atom_ref, equiv_map):
+    """Rewrite a single canonical atom ref (`cpdXXXXX:E#N`) via the
+    equivalence map. Returns the set-notation form if the atom is in a
+    group, otherwise the original string unchanged."""
+    cpd, atom = atom_ref.split(':', 1)
+    set_str = equiv_map.get(cpd, {}).get(atom)
+    if set_str is None:
+        return atom_ref
+    return f'{cpd}:{set_str}'
 
 
 def classify_row(body):
@@ -139,6 +186,14 @@ def main():
     if not os.path.isfile(RAW):
         sys.exit(f'Missing raw input: {RAW}')
 
+    equiv_map = load_equivalence_map(EQUIV_TABLE)
+    if equiv_map:
+        print(f'Loaded equivalence map for {len(equiv_map):,} compounds '
+              f'from {os.path.basename(EQUIV_TABLE)} — set-notation rewrite enabled')
+    else:
+        print(f'No equivalence map at {EQUIV_TABLE} — '
+              f'atom-pair rows will not be symmetry-rewritten')
+
     n_raw_rows = 0
     n_raw_rxns = 0
     per_rxn = defaultdict(set)     # rxn -> {pair_string, ...}
@@ -161,7 +216,14 @@ def main():
             if not is_clean_row:
                 salvaged.add(rxn)
             for pair in pairs:
-                per_rxn[rxn].add(pair)
+                # Rewrite endpoints via the equivalence map. When map is
+                # empty this is a no-op; when populated, both endpoints
+                # get replaced with set notation if they belong to any
+                # equivalence class in their compound.
+                a, b = pair.split('=')
+                new_a = rewrite_atom_ref(a, equiv_map)
+                new_b = rewrite_atom_ref(b, equiv_map)
+                per_rxn[rxn].add(f'{new_a}={new_b}')
 
     n_out_rows = 0
     n_out_rxns = 0
