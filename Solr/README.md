@@ -206,23 +206,34 @@ from the same source `Biochemistry/*.json`. Both scripts run
 automatically during `docker build` so the runtime image has all four
 JSONs ready to post.
 
-### Env-name → configset mapping
+### Env-name → configset and core-name mapping
 
-The entrypoint's `configset_for_env` helper picks the appropriate
-configset per env name:
+The entrypoint has two per-env helpers (`configset_for_env` and
+`suffix_for_env`) that together decide, for each env, which configset
+its cores use AND what the cores are named:
 
-- `env == "prod"` → uses `compounds_legacy` / `reactions_legacy`
-- `env == "staging"` (or anything else) → uses `compounds` / `reactions`
+- `env == "prod"` → **bare core names** (`compounds`, `reactions`,
+  matching the URL the production UI hits today) + `*_legacy`
+  configsets (matching the schema the production UI expects)
+- `env == "staging"` (or any other named env) → env-suffixed core
+  names (`compounds_staging`, `reactions_staging`) + new nested
+  configsets
+- `env` unset (standalone dev) → bare core names + new nested
+  configsets
 
 Set `SOLR_ENVIRONMENTS` to a space-separated list of env names — the
 entrypoint creates one pair of cores per env:
 
-| `SOLR_ENVIRONMENTS` | cores created | schema used per core |
+| `SOLR_ENVIRONMENTS` | cores created | configset used per core |
 |---|---|---|
-| unset / empty (default) | `compounds`, `reactions` | new nested |
+| unset / empty (dev) | `compounds`, `reactions` | new nested |
 | `staging` | `compounds_staging`, `reactions_staging` | new nested |
-| `prod` | `compounds_prod`, `reactions_prod` | legacy flat |
-| `staging prod` | all four | new nested for `_staging` cores, legacy flat for `_prod` cores |
+| `prod` | `compounds`, `reactions` (bare) | legacy flat |
+| `staging prod` | `compounds_staging`, `reactions_staging`, `compounds`, `reactions` | new nested for the `_staging` cores, legacy flat for the bare ones |
+
+The bare-name-for-prod choice means production URLs stay stable:
+`/solr/compounds/select?q=...` continues to hit the production data
+regardless of when we cut over the staging schema underneath.
 
 Populate a specific env (auto-picks the matching JSON payload):
 
@@ -238,22 +249,33 @@ back up after populating both envs is fast.
 
 ### Cutover choreography
 
-The staging + prod split means UI cutover happens on the UI side, not
-the SOLR side:
+The staging + prod split means UI cutover happens on the SOLR side,
+not the UI side. The production UI's query URL (`/solr/compounds`,
+`/solr/reactions`) doesn't need to change — what changes is which
+configset + payload sits behind those bare core names.
 
 1. Staging UI evolves against the `_staging` cores using the new
-   schema. Production UI keeps querying the `_prod` cores under the
-   legacy schema — no change visible to users.
-2. When the new UI is ready to become production, the ModelSEED-UI
-   deployment swaps its `NEXT_PUBLIC_SOLR_*_PRODUCTION` env vars to
-   point at what were the `_staging` cores (or the UI is redeployed
-   as the new production version pointing at a fresh set of cores).
-3. The old `_prod` cores stay populated as an instant-rollback lane
-   until the new UI is proven stable.
+   schema. Production UI keeps querying `/solr/compounds` and
+   `/solr/reactions` (bare) which are populated from the legacy
+   payload under the legacy schema — no change visible to production
+   users.
+2. When the new UI is ready to become production, the current
+   bare-name cores get replaced with the new-schema configset +
+   payload. Two options for the swap:
+   - **In-place**: delete the bare cores, recreate them under the
+     new configset, re-post the new-format JSON. Brief interruption
+     during the recreate + post window.
+   - **Blue/green**: leave bare cores untouched, promote the
+     `_staging` cores to bare names via configset swap +
+     `CORE RENAME`. Zero-interruption; needs a small entrypoint
+     script change to skip re-creation.
+3. The old legacy JSON payload stays in the image as an
+   instant-rollback lane until the new UI has been in production for
+   a while.
 
-Both configsets stay in the image indefinitely; retiring the legacy
-schema is a separate cleanup that happens after the new UI has been
-in production for a while.
+Both configset flavours + both JSON payloads stay in the image
+indefinitely; retiring the legacy schema is a separate cleanup that
+happens after the new UI has been in production for a while.
 
 ## Alternate deployments
 

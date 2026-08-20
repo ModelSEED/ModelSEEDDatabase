@@ -6,13 +6,17 @@
 #                                     # (new nested schema, new-format JSON)
 #   post_biochemistry.sh staging      # cores: "compounds_staging", "reactions_staging"
 #                                     # (new nested schema, new-format JSON)
-#   post_biochemistry.sh prod         # cores: "compounds_prod", "reactions_prod"
-#                                     # (legacy flat schema, legacy-format JSON)
+#   post_biochemistry.sh prod         # BARE cores: "compounds", "reactions"
+#                                     # (legacy flat schema, legacy-format JSON) —
+#                                     # matches the URL the production UI hits
+#                                     # today (/solr/compounds/..., /solr/reactions/...
+#                                     # with no suffix).
 #
 # The single-container multi-env layout supports staging + production
 # sharing one Solr instance; see entrypoint.sh's SOLR_ENVIRONMENTS
 # handling. Env=="prod" routes to the *_legacy configsets AND the
-# *_legacy JSON payload; every other env uses the new nested layout.
+# *_legacy JSON payload AND the bare (unsuffixed) core names; every
+# other env uses the new nested layout with an env-suffixed core name.
 #
 # Expects the compiled JSONs (both flavours) under
 # ${BIOCHEMISTRY_JSON_DIR} (default /data/compilation). Generate them
@@ -25,14 +29,19 @@
 set -euo pipefail
 
 TARGET_ENV="${1:-}"
-suffix=""
-[ -n "$TARGET_ENV" ] && suffix="_${TARGET_ENV}"
 
-# Legacy-schema envs use the master-era flat JSON payload; everything
-# else uses the new nested payload.
+# env=="prod" → bare core names (matching the production UI's URL) AND
+# legacy-format JSON payload. Any other env name → suffixed core name AND
+# new-format payload. Unset → bare core name + new-format payload
+# (standalone / dev / test default).
 if [ "$TARGET_ENV" = "prod" ]; then
+    suffix=""
     json_suffix="_legacy"
+elif [ -n "$TARGET_ENV" ]; then
+    suffix="_${TARGET_ENV}"
+    json_suffix=""
 else
+    suffix=""
     json_suffix=""
 fi
 

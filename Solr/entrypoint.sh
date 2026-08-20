@@ -78,16 +78,21 @@ wait_for_solr
 #                                          (new nested schema)
 #      SOLR_ENVIRONMENTS="staging"      → "compounds_staging", "reactions_staging"
 #                                          (new nested schema)
-#      SOLR_ENVIRONMENTS="prod"         → "compounds_prod", "reactions_prod"
-#                                          (legacy flat schema — master-era layout)
-#      SOLR_ENVIRONMENTS="staging prod" → all four cores in one Solr instance,
-#                                          each using the configset appropriate
-#                                          for its consumer UI
+#      SOLR_ENVIRONMENTS="prod"         → bare "compounds", "reactions"
+#                                          (legacy flat schema — the names
+#                                          the production UI queries today)
+#      SOLR_ENVIRONMENTS="staging prod" → all four cores in one Solr instance:
+#                                          "compounds", "reactions" (legacy)
+#                                          "compounds_staging", "reactions_staging" (new)
 #
-#    Configset selection is by env name: env=="prod" uses the *_legacy
-#    configsets (matching what the production UI currently expects);
-#    everything else (staging, dev, test, ...) uses the new nested
-#    schema. Both configset flavours are baked into the image.
+#    Two independent decisions per env, both driven by the env name:
+#      - configset (schema shape): env=="prod" → *_legacy configsets
+#        (matching what the production UI currently expects); anything
+#        else → new nested configsets.
+#      - suffix on the core name: env=="prod" gets bare cores (no suffix)
+#        so that a Solr URL like /solr/compounds/... routes to the
+#        production data — matching the URL production is already hitting.
+#        Every other env gets its name suffixed.
 if [ -z "${SOLR_ENVIRONMENTS:-}" ]; then
     ENVS=("")
 else
@@ -106,9 +111,20 @@ configset_for_env() {
     fi
 }
 
+# Pick the core-name suffix for a given env name. env=="prod" gets bare
+# cores (production UI hits /solr/compounds/... unsuffixed). Every
+# other env gets "_${env}".
+suffix_for_env() {
+    local env="$1"
+    if [ -z "$env" ] || [ "$env" = "prod" ]; then
+        echo ""
+    else
+        echo "_${env}"
+    fi
+}
+
 for env in "${ENVS[@]}"; do
-    suffix=""
-    [ -n "$env" ] && suffix="_${env}"
+    suffix=$(suffix_for_env "$env")
     cfg_cpd=$(configset_for_env "$env" compounds)
     cfg_rxn=$(configset_for_env "$env" reactions)
     if core_exists "compounds${suffix}"; then
@@ -134,8 +150,7 @@ done
 #    `docker exec ... /scripts/post_biochemistry.sh <env>`.
 if [ "${POST_ON_START:-false}" = "true" ]; then
     first_env="${ENVS[0]}"
-    suffix=""
-    [ -n "$first_env" ] && suffix="_${first_env}"
+    suffix=$(suffix_for_env "$first_env")
     n_cpd=$(core_doc_count "compounds${suffix}")
     n_rxn=$(core_doc_count "reactions${suffix}")
     if [ "${n_cpd:-0}" -gt 0 ] && [ "${n_rxn:-0}" -gt 0 ]; then

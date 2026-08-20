@@ -50,7 +50,15 @@ services:
       # POST_ON_START only auto-posts into the FIRST env in this list;
       # others are populated via
       #   docker exec modelseed-solr /scripts/post_biochemistry.sh <env>
-      SOLR_ENVIRONMENTS: "staging prod"
+      #
+      # While the staging UI is under test we keep production cores
+      # OFF the compose default — nothing gets created or populated at
+      # the bare `compounds`/`reactions` names. When the production
+      # release is ready, flip this to "staging prod" and either
+      # restart the container (prod cores auto-created empty) or
+      # `docker exec ... /scripts/post_biochemistry.sh prod` to
+      # populate them from the baked-in legacy JSON.
+      SOLR_ENVIRONMENTS: "staging"
     restart: unless-stopped
     healthcheck:
       test: ["CMD-SHELL", "curl -fsS http://localhost:8983/solr/admin/cores?action=STATUS > /dev/null || exit 1"]
