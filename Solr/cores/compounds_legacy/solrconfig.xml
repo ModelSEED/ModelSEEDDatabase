@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--
+  ModelSEED Biochemistry compounds core — solrconfig for Solr 9.x.
+
+  Minimal single-node, classic-schema configuration with nested-document
+  support. Rewritten from the pre-Solr-9 config, dropping Solr 7-era
+  extras that don't ship with Solr 9:
+    - velocity response writer / /browse handler (velocity removed)
+    - xslt response writer (removed)
+    - contrib/{extraction,clustering,langid,velocity} <lib> refs (path
+      layout changed; not used by ModelSEED anyway)
+    - the AddSchemaFieldsUpdateProcessorFactory chain (schemaless mode;
+      we use classic schema)
+    - <jmx/> (moved to solr.xml in Solr 9)
+
+  Nested docs work out of the box because:
+    - <schemaFactory> is ClassicIndexSchemaFactory (nested plumbing
+      declared explicitly in schema.xml as _root_ / _nest_path_ /
+      _nest_parent_ / doc_type)
+    - <updateLog> is enabled (required for real-time get + nested)
+    - Solr 9's default update chain includes NestedUpdateProcessorFactory
+-->
+
+<config>
+  <luceneMatchVersion>9.8.0</luceneMatchVersion>
+
+  <!-- Use classic schema.xml (with the XInclude'd schema_types.xml). -->
+  <schemaFactory class="ClassicIndexSchemaFactory"/>
+
+  <!-- Data + index storage -->
+  <dataDir>${solr.data.dir:}</dataDir>
+  <directoryFactory name="DirectoryFactory"
+                    class="${solr.directoryFactory:solr.NRTCachingDirectoryFactory}"/>
+  <codecFactory class="solr.SchemaCodecFactory"/>
+
+  <indexConfig>
+    <lockType>${solr.lock.type:native}</lockType>
+  </indexConfig>
+
+  <!-- Update handler: enable transaction log (required for real-time
+       get and nested-document updates) and a hard autoCommit every 15s
+       to bound the log size. autoSoftCommit is off; documents become
+       searchable at hard-commit time only. Our data is refreshed in
+       batch, not streamed, so this is fine. -->
+  <updateHandler class="solr.DirectUpdateHandler2">
+    <updateLog>
+      <str name="dir">${solr.ulog.dir:}</str>
+    </updateLog>
+    <autoCommit>
+      <maxTime>${solr.autoCommit.maxTime:15000}</maxTime>
+      <openSearcher>false</openSearcher>
+    </autoCommit>
+    <autoSoftCommit>
+      <maxTime>${solr.autoSoftCommit.maxTime:-1}</maxTime>
+    </autoSoftCommit>
+  </updateHandler>
+
+  <!-- Query caches. `perSegFilter` is what block-join queries use;
+       leave it in even at small size since we index nested docs. -->
+  <query>
+    <maxBooleanClauses>1024</maxBooleanClauses>
+    <filterCache      class="solr.CaffeineCache" size="512" initialSize="512" autowarmCount="0"/>
+    <queryResultCache class="solr.CaffeineCache" size="512" initialSize="512" autowarmCount="0"/>
+    <documentCache    class="solr.CaffeineCache" size="512" initialSize="512" autowarmCount="0"/>
+    <cache name="perSegFilter"
+           class="solr.CaffeineCache"
+           size="10" initialSize="0" autowarmCount="10"
+           regenerator="solr.NoOpRegenerator"/>
+    <enableLazyFieldLoading>true</enableLazyFieldLoading>
+    <queryResultWindowSize>20</queryResultWindowSize>
+    <queryResultMaxDocsCached>200</queryResultMaxDocsCached>
+    <useColdSearcher>false</useColdSearcher>
+  </query>
+
+  <requestDispatcher>
+    <httpCaching never304="true"/>
+  </requestDispatcher>
+
+  <!-- Standard search handler. `df=text` matches the copyField aggregate
+       defined in schema.xml; `[child]` transformer gives nested output
+       when requested (fl=*,[child]). -->
+  <requestHandler name="/select" class="solr.SearchHandler">
+    <lst name="defaults">
+      <str name="echoParams">explicit</str>
+      <int name="rows">10</int>
+      <str name="df">text</str>
+    </lst>
+  </requestHandler>
+
+  <requestHandler name="/query" class="solr.SearchHandler">
+    <lst name="defaults">
+      <str name="echoParams">explicit</str>
+      <str name="wt">json</str>
+      <str name="indent">true</str>
+      <str name="df">text</str>
+    </lst>
+  </requestHandler>
+
+  <initParams path="/update/**,/query,/select">
+    <lst name="defaults">
+      <str name="df">text</str>
+    </lst>
+  </initParams>
+
+  <!-- Explicit JSON response writer — same as default plus a custom
+       content-type header so browsers render responses inline. -->
+  <queryResponseWriter name="json" class="solr.JSONResponseWriter">
+    <str name="content-type">text/plain; charset=UTF-8</str>
+  </queryResponseWriter>
+</config>

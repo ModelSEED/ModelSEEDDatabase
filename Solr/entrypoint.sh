@@ -75,10 +75,19 @@ wait_for_solr
 
 # 3. Create cores (idempotent). Environment layout:
 #      SOLR_ENVIRONMENTS unset / empty  → bare cores "compounds", "reactions"
+#                                          (new nested schema)
 #      SOLR_ENVIRONMENTS="staging"      → "compounds_staging", "reactions_staging"
-#      SOLR_ENVIRONMENTS="staging prod" → all four cores in one Solr instance
-#    Both configsets are baked into the image, so any number of envs share
-#    the same schema.
+#                                          (new nested schema)
+#      SOLR_ENVIRONMENTS="prod"         → "compounds_prod", "reactions_prod"
+#                                          (legacy flat schema — master-era layout)
+#      SOLR_ENVIRONMENTS="staging prod" → all four cores in one Solr instance,
+#                                          each using the configset appropriate
+#                                          for its consumer UI
+#
+#    Configset selection is by env name: env=="prod" uses the *_legacy
+#    configsets (matching what the production UI currently expects);
+#    everything else (staging, dev, test, ...) uses the new nested
+#    schema. Both configset flavours are baked into the image.
 if [ -z "${SOLR_ENVIRONMENTS:-}" ]; then
     ENVS=("")
 else
@@ -86,23 +95,34 @@ else
     ENVS=(${SOLR_ENVIRONMENTS})
 fi
 
+# Pick the compounds/reactions configset name for a given env name.
+configset_for_env() {
+    local env="$1"
+    local base="$2"        # "compounds" or "reactions"
+    if [ "$env" = "prod" ]; then
+        echo "${base}_legacy"
+    else
+        echo "$base"
+    fi
+}
+
 for env in "${ENVS[@]}"; do
     suffix=""
     [ -n "$env" ] && suffix="_${env}"
-    # `solr create -d NAME` picks NAME from the configsets directory; the
-    # env-suffixed cores still use the two canonical configsets.
+    cfg_cpd=$(configset_for_env "$env" compounds)
+    cfg_rxn=$(configset_for_env "$env" reactions)
     if core_exists "compounds${suffix}"; then
         log "core 'compounds${suffix}' already exists — leaving as-is"
     else
-        log "creating core 'compounds${suffix}' from configset 'compounds' ..."
-        solr create -c "compounds${suffix}" -d compounds
+        log "creating core 'compounds${suffix}' from configset '${cfg_cpd}' ..."
+        solr create -c "compounds${suffix}" -d "$cfg_cpd"
         log "core 'compounds${suffix}' created."
     fi
     if core_exists "reactions${suffix}"; then
         log "core 'reactions${suffix}' already exists — leaving as-is"
     else
-        log "creating core 'reactions${suffix}' from configset 'reactions' ..."
-        solr create -c "reactions${suffix}" -d reactions
+        log "creating core 'reactions${suffix}' from configset '${cfg_rxn}' ..."
+        solr create -c "reactions${suffix}" -d "$cfg_rxn"
         log "core 'reactions${suffix}' created."
     fi
 done

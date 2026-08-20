@@ -24,15 +24,23 @@ FROM python:3.12-slim AS compile
 
 WORKDIR /build
 
-# Mirror the repo layout so the compile script's relative paths
+# Mirror the repo layout so the compile scripts' relative paths
 # (../../Biochemistry/*.json) resolve correctly. Only the compound + reaction
 # JSON files are needed — the rest of Biochemistry/ (TSV, provenance dumps,
 # structure files, thermodynamics tables) totals ~3.5 GB and isn't read by
 # the compile step.
 COPY Biochemistry/compound_*.json Biochemistry/reaction_*.json Biochemistry/
-COPY Solr/compilation/Compile_Biochemistry_for_SOLR.py Solr/compilation/
+COPY Solr/compilation/Compile_Biochemistry_for_SOLR.py \
+     Solr/compilation/Compile_Biochemistry_for_SOLR_legacy.py \
+     Solr/compilation/
 
-RUN cd Solr/compilation && python3 Compile_Biochemistry_for_SOLR.py
+# Two compile passes → four JSON files:
+#   solr_compounds.json / solr_reactions.json                   (new nested schema, for staging)
+#   solr_compounds_legacy.json / solr_reactions_legacy.json     (master-era flat schema, for production)
+# Both get baked into the runtime image so the container can serve
+# either or both without needing to re-run the compile.
+RUN cd Solr/compilation && python3 Compile_Biochemistry_for_SOLR.py \
+                        && python3 Compile_Biochemistry_for_SOLR_legacy.py
 
 # -----------------------------------------------------------------------------
 # Stage 2 — Solr runtime
@@ -42,17 +50,30 @@ FROM solr:9.8
 USER root
 
 # Baked-in configsets. Persistent /var/solr volume will pick these up
-# when the entrypoint creates cores at startup.
+# when the entrypoint creates cores at startup. Four configsets so a
+# single Solr instance can serve staging (new nested schema) and
+# production (legacy flat schema) side by side.
 COPY --chown=solr:solr Solr/cores/compounds \
      /opt/solr/server/solr/configsets/compounds/conf
 COPY --chown=solr:solr Solr/cores/reactions \
      /opt/solr/server/solr/configsets/reactions/conf
+COPY --chown=solr:solr Solr/cores/compounds_legacy \
+     /opt/solr/server/solr/configsets/compounds_legacy/conf
+COPY --chown=solr:solr Solr/cores/reactions_legacy \
+     /opt/solr/server/solr/configsets/reactions_legacy/conf
 
 # Baked-in compiled biochemistry JSON (from the compile stage above).
+# Two flavours: `_legacy` files are shaped for the master-era schema
+# (deployed today in production); the unsuffixed files are shaped for
+# the new nested schema (staging UI).
 COPY --from=compile --chown=solr:solr /build/Solr/compilation/solr_compounds.json \
      /data/compilation/solr_compounds.json
 COPY --from=compile --chown=solr:solr /build/Solr/compilation/solr_reactions.json \
      /data/compilation/solr_reactions.json
+COPY --from=compile --chown=solr:solr /build/Solr/compilation/solr_compounds_legacy.json \
+     /data/compilation/solr_compounds_legacy.json
+COPY --from=compile --chown=solr:solr /build/Solr/compilation/solr_reactions_legacy.json \
+     /data/compilation/solr_reactions_legacy.json
 
 # Entrypoint + helper scripts
 COPY --chown=solr:solr Solr/entrypoint.sh        /scripts/entrypoint.sh

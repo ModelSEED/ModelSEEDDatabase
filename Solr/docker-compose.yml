@@ -38,13 +38,19 @@ services:
       - modelseed_solr_data:/var/solr
     environment:
       POST_ON_START: "true"
-      # Multi-env layout (staging + prod share one Solr instance):
-      #   SOLR_ENVIRONMENTS: "staging prod"
-      # Would create four cores: compounds_staging, reactions_staging,
-      # compounds_prod, reactions_prod (all from the same configsets).
-      # POST_ON_START only auto-posts into the first env; others get
-      # populated via `docker exec ... /scripts/post_biochemistry.sh <env>`.
-      # SOLR_ENVIRONMENTS: ""
+      # Multi-env layout — one Solr instance serves staging AND prod:
+      #   - `staging` cores (compounds_staging, reactions_staging) use
+      #     the NEW nested schema for the staging UI
+      #   - `prod` cores (compounds_prod, reactions_prod) use the LEGACY
+      #     flat schema (matches what production is currently serving),
+      #     so the production UI keeps working during staging tests
+      # Configset selection is by env name — see entrypoint.sh's
+      # `configset_for_env` helper: env=="prod" → *_legacy configsets;
+      # anything else → new nested configsets.
+      # POST_ON_START only auto-posts into the FIRST env in this list;
+      # others are populated via
+      #   docker exec modelseed-solr /scripts/post_biochemistry.sh <env>
+      SOLR_ENVIRONMENTS: "staging prod"
     restart: unless-stopped
     healthcheck:
       test: ["CMD-SHELL", "curl -fsS http://localhost:8983/solr/admin/cores?action=STATUS > /dev/null || exit 1"]

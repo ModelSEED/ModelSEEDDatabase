@@ -3,16 +3,20 @@
 #
 # Usage:
 #   post_biochemistry.sh              # bare cores: "compounds", "reactions"
-#   post_biochemistry.sh staging      # env-suffixed: "compounds_staging", "reactions_staging"
-#   post_biochemistry.sh prod         # env-suffixed: "compounds_prod",    "reactions_prod"
+#                                     # (new nested schema, new-format JSON)
+#   post_biochemistry.sh staging      # cores: "compounds_staging", "reactions_staging"
+#                                     # (new nested schema, new-format JSON)
+#   post_biochemistry.sh prod         # cores: "compounds_prod", "reactions_prod"
+#                                     # (legacy flat schema, legacy-format JSON)
 #
 # The single-container multi-env layout supports staging + production
-# (or any other envs) sharing one Solr instance; see entrypoint.sh's
-# SOLR_ENVIRONMENTS handling.
+# sharing one Solr instance; see entrypoint.sh's SOLR_ENVIRONMENTS
+# handling. Env=="prod" routes to the *_legacy configsets AND the
+# *_legacy JSON payload; every other env uses the new nested layout.
 #
-# Expects `solr_compounds.json` and `solr_reactions.json` under
+# Expects the compiled JSONs (both flavours) under
 # ${BIOCHEMISTRY_JSON_DIR} (default /data/compilation). Generate them
-# by running Solr/compilation/Compile_Biochemistry_for_SOLR.py against
+# by running BOTH compile scripts in Solr/compilation/ against
 # the current Biochemistry/*.json.
 #
 # Idempotent: /update replaces documents matching the same unique key.
@@ -23,6 +27,14 @@ set -euo pipefail
 TARGET_ENV="${1:-}"
 suffix=""
 [ -n "$TARGET_ENV" ] && suffix="_${TARGET_ENV}"
+
+# Legacy-schema envs use the master-era flat JSON payload; everything
+# else uses the new nested payload.
+if [ "$TARGET_ENV" = "prod" ]; then
+    json_suffix="_legacy"
+else
+    json_suffix=""
+fi
 
 SOLR_HOST="${SOLR_HOST:-localhost}"
 SOLR_PORT="${SOLR_PORT:-8983}"
@@ -35,7 +47,7 @@ post_core() {
     local core="$1"
     local file="$2"
     if [ ! -f "$file" ]; then
-        log "ERROR: ${file} not found — run Compile_Biochemistry_for_SOLR.py first"
+        log "ERROR: ${file} not found — run the appropriate Compile_Biochemistry_for_SOLR*.py first"
         exit 1
     fi
     local bytes
@@ -49,8 +61,8 @@ post_core() {
     log "posted ${core}."
 }
 
-post_core "compounds${suffix}" "${DATA_DIR}/solr_compounds.json"
-post_core "reactions${suffix}" "${DATA_DIR}/solr_reactions.json"
+post_core "compounds${suffix}" "${DATA_DIR}/solr_compounds${json_suffix}.json"
+post_core "reactions${suffix}" "${DATA_DIR}/solr_reactions${json_suffix}.json"
 
 log "done. Core doc counts:"
 for core in "compounds${suffix}" "reactions${suffix}"; do
