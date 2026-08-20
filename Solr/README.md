@@ -36,6 +36,32 @@ Solr/
 - Nothing else — Python 3, biochemistry data, and the compile step are
   all inside the image's build.
 
+## Deploy script (wrapper)
+
+`deploy_container.sh` is an interactive wrapper modeled on
+ModelSEED-UI's `deploy_container.sh`. It handles both the compile and
+the deploy in one command, and prompts (or takes args) for:
+
+- **Which env(s) to deploy** — staging, production, or both
+- **How to run** — Docker (containerized Solr) or Local (against an
+  already-installed Solr you point at via `SOLR_URL`)
+
+Examples:
+
+```bash
+./deploy_container.sh                        # interactive prompts
+./deploy_container.sh staging                # deploy staging via Docker
+./deploy_container.sh production --yes       # deploy production, skip confirm
+./deploy_container.sh both --yes             # both envs, no prompts
+EXEC_METHOD=local ./deploy_container.sh both # against a local Solr install
+```
+
+Auto-detects the branch — main/master/production → production default,
+anything else → staging default (matches the UI script's convention).
+Runs the two compile scripts unconditionally, then the appropriate
+Docker or Local post steps. See below for the underlying bring-up
+sequence the script wraps.
+
 ## First-time bring-up (testing mode)
 
 ```bash
