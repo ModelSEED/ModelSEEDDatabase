@@ -1,0 +1,40 @@
+# Methods — Multi-source thermodynamics (draft)
+
+**Target section:** Materials and Methods, "Multi-source thermodynamics" (see `PAPER_2026_SKELETON.md`).
+**Guide reference:** `PAPER_2026_GUIDE.md` §6.
+**Status:** GC subsection filled in against the committed rebuild; eQuilibrator / dGpredictor / OpenTECR versions still `[TBD]`; direction-heuristic rule set still `[TBD]`.
+
+---
+
+The 2020 release combined two thermodynamics sources: eQuilibrator as the primary estimator of Δ<sub>f</sub>G′ and Δ<sub>r</sub>G′, and a Group Contribution (GC) method as a fallback for compounds and reactions eQuilibrator could not estimate. For this update we integrate four sources, each providing an independent estimate wherever its coverage permits, and store per-source `[energy, error, operator]` triples on every compound and reaction — no source is silently overwritten. The top-level `deltag` / `deltagerr` / `reversibility` scalars are still populated from a tier + lowest-uncertainty policy, but are being deprecated in favor of the per-source records.
+
+**eQuilibrator refresh.** [TBD version] was run against the 2026 compound set at pH 7.0, ionic strength 0.25 M and temperature 298.15 K, matching the 2020 conditions. Coverage: [TBD].
+
+**Group Contribution rebuilt from MFAToolkit under Chris Henry's 2010 Convention A.** The 2020 fallback GC method had drifted from its original conventions in a subtle but load-bearing way, and the update rebuilds it from the source implementation with the drift closed. Both the drift finding and the fix are worth documenting here because they change reaction Δ<sub>r</sub>G′ estimates by up to 9.5 kcal/mol on any reaction whose two source values crossed the drift line.
+
+*The drift finding.* Audit against the 2010 GC values (Jankowski et al., <a href="https://doi.org/10.1529/biophysj.107.124784">10.1529/biophysj.107.124784</a>) revealed that the top-level `deltag` scalar in the 2020 database was a 42/58 mixture of two mathematically equivalent but incompatible conventions for encoding pH 7. In **Convention A** (Chris Henry's original 2010 formalism, and what MFAToolkit natively produces), the free-proton formation energy is fixed at Δ<sub>f</sub>G(H⁺) = −9.5 kcal/mol (numerically = −RT ln(10) × pH at pH 7) and compound Δ<sub>f</sub>G values include their full hydrogen accounting — water is −56.687 kcal/mol. In **Convention B** (Alberty's transformed formalism, and what eQuilibrator emits), the free-proton contribution is absorbed into each compound (Δ<sub>f</sub>G(H⁺) ≡ 0) — water is instead ~−37.6 kcal/mol. Both conventions produce identical Δ<sub>r</sub>G′ for a properly-balanced reaction, but mixing them within a single reaction breaks the accounting by (Δn<sub>H</sub> − n<sub>transported H⁺</sub>) × 9.539 kcal/mol.
+
+*The rebuild.* We resurrected the MFAToolkit source tree (build recipe and cue-database provenance pinned in `Biochemistry/Thermodynamics/ModelSEED/MFAToolkit_version.txt`), regenerated the GC values from Chris's original per-source mol-file corpora (KEGG and MetaCyc, each in Original and Charged variants), and stamped them into the database uniformly under Convention A. A per-compound resolver now takes the mean Δ<sub>f</sub>G across curated-alias entries rather than the previous lowest-pick, with an error term inflated to `sqrt(mean(σᵢ²) + var(dgᵢ))` so alias disagreement widens the reported uncertainty rather than being silently collapsed. Nine load-bearing small-molecule compounds whose Δ<sub>f</sub>G values live only in the MFAToolkit cue database — H⁺, H₂O, NH₄⁺, CO₂, HCO₃⁻, H₂O₂, H₂, O₂, H₂S — are injected at the compound level under a documented anchor table.
+
+*Cross-validation.* Every anchor value was independently checked against eQuilibrator's Δ<sub>f</sub>G′ shifted to Convention A via the Legendre transform Δ<sub>f</sub>G<sub>A</sub> = Δ<sub>f</sub>G<sub>B</sub> − n<sub>H</sub> × 9.539. Eight of the nine agree between the two independent methods to within 0.5 kcal/mol; the ninth (H₂S) shows a 2.88 kcal/mol residual attributable to eQuilibrator's pseudo-species treatment (a pKa-weighted mix of H₂S and HS⁻ at pH 7) vs the neutral-form cue value.
+
+*Coverage.* [TBD compounds with numeric GC Δ<sub>f</sub>G; TBD reactions with numeric GC Δ<sub>r</sub>G′] — to be filled from the current DB snapshot.
+
+**dGpredictor retrained on ModelSEED.** dGpredictor (an ML-based Δ<sub>f</sub>G estimator) has been retrained using the ModelSEED-curated compound structures as training data. This produces a ModelSEED-native estimator rather than one trained on a competing biochemistry database, and lets us report Δ<sub>f</sub>G estimates for compounds the other three methods cannot cover. Training procedure and hyperparameters: [TBD]. Coverage: [TBD]. A quinone/quinol audit is outstanding: dGpredictor reportedly carries extreme error on these pairs (see `data/quinone_quinol_investigation_[TBD].md`), and the paper will note whether audit results warrant a correction pass or a per-class error flag.
+
+**OpenTECR integration.** OpenTECR is a community effort to standardize experimentally-measured thermodynamic constants; we integrate its values where a mapping between OpenTECR reaction identifiers and ModelSEED reaction IDs exists. Coverage: [TBD].
+
+**Direction assignment.** For each reaction with an accepted Δ<sub>r</sub>G′ (from any source), we apply the reversibility cascade documented in `Scripts/Thermodynamics/reversibility_heuristics.py` (based on Jankowski et al. and refined in the current update to handle the widened stoichiometry patterns from the H₂/H₃-carrier standardization). Output is one of `=` (reversible), `>` (irreversible left-to-right), `<` (irreversible right-to-left), or `?` (indeterminate — |Δ<sub>r</sub>G′| < error). On top of this we add **per-reaction-class heuristic overlays** — hard rules for classes where the standard thermodynamic assignment is known to disagree with textbook biology (hydrolases; cofactor-loading reactions; proton-gradient transport; electron-carrier-coupled reactions where the carrier's Δ<sub>f</sub>G is indeterminate). Rule set: [TBD; discussed but not yet codified as a single overlay file].
+
+**Combined direction ledger.** For every reaction, the pipeline records: the Δ<sub>r</sub>G′ estimate from each of the four sources (with per-source uncertainty), the base direction assignment from each source, the heuristic overlay if applicable, and the final direction. This ledger is the input to the Results section's empirical study of how the direction-source choice affects metabolic-model output.
+
+**Reproducibility.** MolAnalysis tables from the MFAToolkit runs (four total: KEGG × MetaCyc × Original × Charged) are committed under `Biochemistry/Thermodynamics/ModelSEED/`. A landmark regression test (`Scripts/Tests/test_gc_convention.py`) guards the 9 anchor values, 12 central-metabolism compound landmarks (ATP, NAD, glucose, …), and 2 reaction spot-checks against the water canary that would catch a silent flip back to Convention B.
+
+---
+
+## Open loose ends flagged during drafting
+
+- Version numbers for eQuilibrator, dGpredictor, and OpenTECR need to be captured for reproducibility. Add to the Methods "Collation" subsection alongside the other source-database versions.
+- The heuristic overlay rule set needs codifying as a repo script (probably a YAML or TSV file listing patterns and their direction assignments) before the paper's claim that overlays are "applied globally" is defensible. The electron-carrier universal per-electron anchor prototype (Fdx / Trx / Flx / Grx, see `Scripts/Thermodynamics/Update_Compound_GroupContribution_Energies.py` future commits) is one candidate rule-set component.
+- Whether OpenTECR gets its own Methods paragraph or is folded into the eQuilibrator refresh is an open decision (see `PAPER_2026_PLAN.md` open decision #2).
+- Quinone/quinol dGpredictor error audit needs execution before we can defensibly report that source's coverage numbers for reactions using these carriers.

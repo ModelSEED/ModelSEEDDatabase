@@ -1,0 +1,63 @@
+# MFAToolkit version pinned for the MolAnalysis.tbl files in this directory.
+#
+# The tool source, cue database, and DefaultDBSpec that produced the
+# adjacent {KEGG,MetaCyc}_{Original,Charged}_MolAnalysis.tbl files live in
+# the ModelSEED/MFAToolkit repository. This file records exactly which
+# build was used, so anyone can install that release, rerun it against
+# the per-source mol-file corpora, and diff.
+
+repo:    https://github.com/ModelSEED/MFAToolkit
+tag:     (pending — will be v2.0.0-post-resurrection once the repo is cut)
+sha:     713236ff787c6ac1c9648cb3b78ee7bccca6a332
+run_at:  2026-08-06T23:57Z
+
+# Input mol-file corpora (currently NOT committed to this repo; located
+# on Sam's local machine):
+inputs:
+    KEGG_Original    : /scratch/seaver/Seq_Home/Structures/Mol/KEGG/Initial/                   (16,688 mol files; 1 cycle-finder timeout)
+    KEGG_Charged     : /scratch/seaver/Seq_Home/Structures/Mol/KEGG/MarvinBeans_majorms_pH7/   (16,687 non-empty; 1 cycle-finder timeout)
+    MetaCyc_Original : /scratch/seaver/Seq_Home/Structures/Mol/MetaCyc/Initial/                (25,073 mol files; 11 cycle-finder timeouts)
+    MetaCyc_Charged  : /scratch/seaver/Seq_Home/Structures/Mol/MetaCyc/MarvinBeans_majorms_pH7/(25,072 mol files; 1 empty + 3 cycle-finder timeouts)
+
+# Runtime knobs:
+flags:
+    Baked-in Defaults.txt:  load_cue_structures=1, label_atoms=1, calculate_properties_from_groups=1
+    Runtime override:       cue_directory=../etc/MFAToolkit/cues/
+    Per-mol size cap:       200 KB (defense-in-depth; the 30s cycle timeout is the real bound)
+
+notes:
+    - Fixes since the historical 2020 runs:
+      * H2/H3 phosphates-shadow bugs in _walk_stoichiometry (031122af
+        upstream in Cooper Taylor's branch, ported to
+        reversibility_heuristics.py in this repo).
+      * Species::FindCycles per-molecule timeout lowered from 300s to
+        30s (staging SHA 7045882). Batch runs over 25K compounds
+        previously spent 72 h at 300s each on the ~865 pathological
+        MetaCyc pH7 polymers; the 30s cap makes those bounded.
+      * Species::CyclesIncomplete flag set on timeout; Data::RunWebGCM
+        writes NONE;NONE for the compound instead of the wrong-but-
+        plausible numeric ΔG that came from incomplete ring enumeration
+        (staging SHA 713236f). Empirical justification: on CPD-12063
+        (72 KB mannoprotein) the ΔG shifted 530+ kcal/mol between the
+        30s and 30-min budgets, neither of which completed cycle
+        enumeration — the "value" was pure artifact of how far the
+        DFS walker had gotten.
+        16 total cycle-finder timeouts across the four runs =
+        0.02% of the ~83K attempted compounds; those now land as
+        sentinel rows treated correctly downstream as "no GC value".
+    - Config changes since 2020: DefaultDBSpec.txt introduced pointing at
+      cueTable/compoundTable/reactionTable; RunWebGCM cap raised from 10000
+      to 100000 molecules; Makefile switched to GLPKapiEMPTY.cpp
+      (LP solver stub — GC pipeline doesn't need real GLPK).
+    - Cue database bundled with the tool (~90 MB): 279 cue metadata files
+      + 231 .gds structure files under etc/MFAToolkit/cues/. Recovered
+      2026-08-05 from Chris Henry's archive of the retired
+      /vol/model-dev/MODEL_DEV_DB/ReactionDB/cues/ share.
+    - The above SHA is from a *local staging repo* at
+      /scratch/seaver/Claude_Projects/MSD_Structures/MFAToolkit/ that has
+      not yet been pushed to ModelSEED/MFAToolkit. Update this file with
+      the upstream SHA once the repo is created.
+    - Convention: every ΔfG value in these tables is in Convention A —
+      compound ΔfG includes full hydrogen accounting; H⁺ formation energy
+      is defined as −9.5 kcal/mol (the pH 7 correction lives there).
+      See ../README.md for details.

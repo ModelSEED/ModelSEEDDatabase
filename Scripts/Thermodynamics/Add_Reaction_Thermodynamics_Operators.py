@@ -19,10 +19,13 @@ from Estimate_Reaction_Reversibility import reversibility_from_energy
 # touched: these per-method records are added next to, not in place of, the
 # existing values.
 #
-# The script is idempotent: entries that already carry an operator (length 3)
-# are left unchanged, and entries with no usable energy receive the '?' operator.
-# It only recomputes from values already stored in the database, so it needs no
-# upstream GC / eQuilibrator / dGPredictor inputs and can be re-run at any time.
+# The operator is (re)computed for every entry from its stored [energy, error]:
+# legacy [energy, error] pairs are promoted to triples, and entries that already
+# carry an operator are REFRESHED so they track the current cascade (run this
+# after any change to Estimate_Reaction_Reversibility.py's heuristics). Entries
+# with no usable energy receive the '?' operator. The recompute is deterministic,
+# so the script is idempotent and needs no upstream GC / eQuilibrator /
+# dGPredictor inputs -- it can be re-run at any time.
 
 reactions_helper = Reactions()
 reactions_dict = reactions_helper.loadReactions()
@@ -41,18 +44,15 @@ for rxn in sorted(reactions_dict.keys()):
         if(not isinstance(values, list) or len(values) < 2):
             continue
 
-        # already has an operator -> leave untouched (idempotent)
-        if(len(values) >= 3):
-            entries += 1
-            continue
-
         (dg_val, dge_val) = (values[0], values[1])
         operator = reversibility_from_energy(rxn_obj, dg_val, dge_val)
-        thermo[label] = [dg_val, dge_val, operator]
+        new_values = [dg_val, dge_val, operator]
         entries += 1
-        updated += 1
+        if(new_values != values):
+            updated += 1
+        thermo[label] = new_values
 
 print("Per-method thermodynamics entries seen: " + str(entries))
-print("Entries given an operator: " + str(updated))
+print("Entries refreshed/added: " + str(updated))
 print("Saving reactions")
 reactions_helper.saveReactions(reactions_dict)
