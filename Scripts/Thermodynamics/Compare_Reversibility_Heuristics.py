@@ -147,22 +147,29 @@ SHORT_NAME = {'Group contribution': 'GroupContrib', 'eQuilibrator': 'eQuilibrato
               'dGPredictor': 'dGPredictor', 'dGPredictor-ModelSEED': 'dGP-ModelSEED'}
 
 
-def score_all_sources(reactions, sources, set_name):
-    """``{source: {rxn_id: operator}}`` with one rule set applied to every source.
+def score_all_sources(reactions, set_for_source):
+    """``{source: {rxn_id: operator}}``, each source scored with its own rule set.
 
-    Each source is scored from its *own* ``thermodynamics[source]`` energy, so
-    the only thing varying across the matrix is which prediction the direction
-    came from -- the rules are held fixed.
+    ``set_for_source`` maps a ``thermodynamics`` key to a rule-set name, so the
+    matrix can mix rule sets. That is the realistic configuration: Group
+    contribution keeps the historical cascade it was designed around and is the
+    byte-compare anchor, while the prediction sources move to the index. Passing
+    the same name for every source gives the uniform-rules matrix instead.
+
+    Every source is scored from its *own* ``thermodynamics[source]`` energy, so
+    the direction reflects that prediction and not whichever one last promoted
+    to canonical.
     """
-    scored = {src: {} for src in sources}
-    heuristics = rh.get_heuristics(set_name)
+    scored = {src: {} for src in set_for_source}
+    heuristics = {src: rh.get_heuristics(name)
+                  for src, name in set_for_source.items()}
     for rxn_id, entry in reactions.items():
-        for src in sources:
+        for src in set_for_source:
             pair = rh._thermo_pair(entry, src)
             if pair is None:
                 continue
             _, operator, _ = rh.run_reversibility(
-                entry, rh.explicit_energy(*pair), heuristics)
+                entry, rh.explicit_energy(*pair), heuristics[src])
             scored[src][rxn_id] = operator
     return scored
 
@@ -185,12 +192,15 @@ def similarity_matrix(scored, sources):
     return agreement, overlap
 
 
-def print_similarity(scored, sources, set_name):
+def print_similarity(scored, sources, set_for_source, title):
     agreement, overlap = similarity_matrix(scored, sources)
     labels = [SHORT_NAME.get(s, s) for s in sources]
     width = max(len(l) for l in labels)
 
-    print(f'\n{set_name} rules applied to every source -- % identical direction')
+    print(f'\n{title} -- % identical direction')
+    print('  rule set per source: '
+          + ', '.join(f'{SHORT_NAME.get(s, s)}={set_for_source[s]}'
+                      for s in sources))
     print(f"  {'':{width}s}" + ''.join(f'{l:>15s}' for l in labels))
     for a, la in zip(sources, labels):
         cells = ''.join(
@@ -215,7 +225,7 @@ def print_similarity(scored, sources, set_name):
     return agreement, overlap
 
 
-def print_agreement_decomposition(scored, sources, set_name):
+def print_agreement_decomposition(scored, sources, title):
     """Split each pair's agreement into *why* they agree.
 
     A high agreement number means little on its own: two sources that both
@@ -228,7 +238,7 @@ def print_agreement_decomposition(scored, sources, set_name):
     a call, so the undecomposable records eQuilibrator correctly refuses do not
     read as disagreement.
     """
-    print(f'\n{set_name} rules -- what the agreement is made of '
+    print(f'\n{title} -- what the agreement is made of '
           f'(% of shared reactions)')
     header = (f"  {'pair':30s}{'agree':>8s}{'both =':>9s}{'both ->':>9s}"
               f"{'conflict':>10s}{'excl ?':>9s}")
@@ -270,6 +280,13 @@ def main():
                              'fixed and vary which prediction supplies the energy')
     parser.add_argument('--sources', nargs='+', default=ALL_SOURCES,
                         help='sources for --matrix (default: all four)')
+    parser.add_argument('--index-sources', nargs='+',
+                        default=['eQuilibrator', 'dGPredictor',
+                                 'dGPredictor-ModelSEED'],
+                        help='in --matrix, the sources that take the second and '
+                             'later --sets rule sets. Everything else keeps the '
+                             'first one, so Group contribution stays on the '
+                             'cascade it was designed around.')
     args = parser.parse_args()
 
     for name in args.sets:
@@ -283,10 +300,21 @@ def main():
     reactions = Reactions().loadReactions()
 
     if args.matrix:
-        for set_name in args.sets:
-            scored = score_all_sources(reactions, args.sources, set_name)
-            print_similarity(scored, args.sources, set_name)
-            print_agreement_decomposition(scored, args.sources, set_name)
+        baseline = args.sets[0]
+        # First pass: the baseline rule set everywhere -- what ModelSEED does now.
+        plans = [({src: baseline for src in args.sources},
+                  f'{baseline} rules on every source')]
+        # Then one pass per alternate set, applied only to --index-sources.
+        for name in args.sets[1:]:
+            plans.append((
+                {src: (name if src in args.index_sources else baseline)
+                 for src in args.sources},
+                f'{name} on {", ".join(SHORT_NAME.get(s, s) for s in args.sources if s in args.index_sources)}'
+                f'; {baseline} elsewhere'))
+        for set_for_source, title in plans:
+            scored = score_all_sources(reactions, set_for_source)
+            print_similarity(scored, args.sources, set_for_source, title)
+            print_agreement_decomposition(scored, args.sources, title)
         return
 
     rows = compare(reactions, args.source, args.sets)
