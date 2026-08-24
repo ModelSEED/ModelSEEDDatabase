@@ -16,6 +16,8 @@ used it to ask two questions: *are our structural shortcuts doing real work?* an
   It looks like it agrees with them; the agreement is an artifact.
 - **On eQuilibrator energies the old and new rules agree only 71.6%** — almost
   all of the gap is reactions eQuilibrator never actually scored.
+- **The four sources look more consistent than they are.** Under the current
+  defaults most of their agreement is both sides saying "reversible".
 - **On dGPredictor they agree 85–90%, for a bad reason:** nearly half of the old
   method's directional calls on the high-uncertainty source come from rules that
   never look at the error bar.
@@ -200,7 +202,88 @@ energy is read and the index has no equivalent:
 
 ---
 
-## 4. Two ways of saying "I don't know"
+## 4. Do the four sources agree with each other?
+
+The comparisons so far hold the energy fixed and vary the rules. This one does
+the opposite: **hold the rules fixed and vary which prediction supplies the
+energy.** Every source is scored from its own `thermodynamics[source]` entry,
+first with ModelSEED's current default cascade, then with the index. Each cell
+is the percentage of shared reactions where two sources give the same direction.
+
+`./Compare_Reversibility_Heuristics.py --matrix --sets GC RI`
+
+**Default (GC) heuristics — % identical direction**
+
+| | GroupContrib | eQuilibrator | dGPredictor | dGP-ModelSEED |
+|---|---:|---:|---:|---:|
+| **GroupContrib** | — | 75.7% | 62.2% | **83.3%** |
+| **eQuilibrator** | 75.7% | — | 66.7% | 76.0% |
+| **dGPredictor** | 62.2% | 66.7% | — | 62.2% |
+| **dGP-ModelSEED** | **83.3%** | 76.0% | 62.2% | — |
+
+**eQuilibrator's reversibility index applied to all four — % identical direction**
+
+| | GroupContrib | eQuilibrator | dGPredictor | dGP-ModelSEED |
+|---|---:|---:|---:|---:|
+| **GroupContrib** | — | 68.6% | 51.0% | 63.9% |
+| **eQuilibrator** | 68.6% | — | 51.6% | 55.0% |
+| **dGPredictor** | 51.0% | 51.6% | — | 59.2% |
+| **dGP-ModelSEED** | 63.9% | 55.0% | 59.2% | — |
+
+Overlaps range from 17,021 (eQuilibrator ∩ dGPredictor) to 25,969
+(GroupContrib ∩ dGP-ModelSEED); no cell is computed on fewer than 17,000
+reactions.
+
+### The sources agree *less* under the index, and that is the point
+
+Every pair drops — average agreement falls from about 71% to 58%. That looks
+like the index making things worse. It is the opposite: the default cascade was
+manufacturing agreement. Splitting each pair's agreement into *why* they agree
+shows it:
+
+| pair | rules | agree | both `=` | both same direction | direct conflict |
+|---|---|---:|---:|---:|---:|
+| GroupContrib / dGP-ModelSEED | GC | 83.3% | **54.1%** | 29.2% | 0.4% |
+| GroupContrib / dGP-ModelSEED | index | 63.9% | 30.9% | **32.9%** | 5.7% |
+| GroupContrib / dGPredictor | GC | 62.2% | 33.7% | 28.5% | 2.7% |
+| GroupContrib / dGPredictor | index | 51.0% | 25.4% | 25.6% | 5.3% |
+| dGPredictor / dGP-ModelSEED | GC | 62.2% | 34.5% | 27.7% | 1.9% |
+| dGPredictor / dGP-ModelSEED | index | 59.2% | 27.9% | **31.3%** | 5.9% |
+
+The best-agreeing pair in the whole default matrix is GroupContrib and
+dGP-ModelSEED at 83.3% — and **54.1 of those 83.3 points are both sources saying
+"reversible".** They agree by both declining to answer. Only 29.2% is two
+sources committing to the same direction.
+
+Under the index the picture inverts: mutual abstention falls, genuine
+agreed-upon directions rise, and outright conflicts — one source says forward,
+the other says backward — climb from 0.4% to 5.7%. Those conflicts were always
+there; the default cascade's fallback to "reversible" was hiding them.
+
+**So the current defaults make the four thermodynamic sources look more
+consistent than they are.** Most of that consistency is silence, and the two
+methods with the widest error bars are the ones that look most alike.
+
+### One caveat on the eQuilibrator row
+
+Under the index, eQuilibrator returns `?` for the 4,934 reactions it declined
+(see §5), and a `?` matches nothing. That drags its row down for a reason that
+isn't disagreement. Restricted to reactions where both sources actually made a
+call:
+
+| pair | with `?` | excluding `?` |
+|---|---:|---:|
+| GroupContrib / eQuilibrator | 68.6% | **80.4%** |
+| eQuilibrator / dGPredictor | 51.6% | **63.3%** |
+| eQuilibrator / dGP-ModelSEED | 55.0% | **68.4%** |
+
+The three pairs that involve no `?` at all still drop under the index, so the
+finding above holds — but eQuilibrator is a better-behaved source than its raw
+row suggests, once you stop counting an honest refusal as a wrong answer.
+
+---
+
+## 5. Two ways of saying "I don't know"
 
 | | how it reports "no value" |
 |---|---|

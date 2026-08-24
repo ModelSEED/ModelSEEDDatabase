@@ -140,6 +140,124 @@ def print_transport_split(rows, left, right):
               f'({100.0 * agree / len(subset):5.1f}% agree)')
 
 
+ALL_SOURCES = ['Group contribution', 'eQuilibrator',
+               'dGPredictor', 'dGPredictor-ModelSEED']
+
+SHORT_NAME = {'Group contribution': 'GroupContrib', 'eQuilibrator': 'eQuilibrator',
+              'dGPredictor': 'dGPredictor', 'dGPredictor-ModelSEED': 'dGP-ModelSEED'}
+
+
+def score_all_sources(reactions, sources, set_name):
+    """``{source: {rxn_id: operator}}`` with one rule set applied to every source.
+
+    Each source is scored from its *own* ``thermodynamics[source]`` energy, so
+    the only thing varying across the matrix is which prediction the direction
+    came from -- the rules are held fixed.
+    """
+    scored = {src: {} for src in sources}
+    heuristics = rh.get_heuristics(set_name)
+    for rxn_id, entry in reactions.items():
+        for src in sources:
+            pair = rh._thermo_pair(entry, src)
+            if pair is None:
+                continue
+            _, operator, _ = rh.run_reversibility(
+                entry, rh.explicit_energy(*pair), heuristics)
+            scored[src][rxn_id] = operator
+    return scored
+
+
+def similarity_matrix(scored, sources):
+    """Pairwise agreement, computed only over reactions both sources predict.
+
+    Returns ``(agreement, overlap)``: percent identical operators, and the size
+    of the intersection the percent is over. The second matters as much as the
+    first -- two sources can agree 95% on the 300 reactions they share and say
+    nothing about the other 30,000.
+    """
+    agreement, overlap = {}, {}
+    for a in sources:
+        for b in sources:
+            shared = scored[a].keys() & scored[b].keys()
+            overlap[(a, b)] = len(shared)
+            same = sum(1 for r in shared if scored[a][r] == scored[b][r])
+            agreement[(a, b)] = 100.0 * same / len(shared) if shared else float('nan')
+    return agreement, overlap
+
+
+def print_similarity(scored, sources, set_name):
+    agreement, overlap = similarity_matrix(scored, sources)
+    labels = [SHORT_NAME.get(s, s) for s in sources]
+    width = max(len(l) for l in labels)
+
+    print(f'\n{set_name} rules applied to every source -- % identical direction')
+    print(f"  {'':{width}s}" + ''.join(f'{l:>15s}' for l in labels))
+    for a, la in zip(sources, labels):
+        cells = ''.join(
+            f'{agreement[(a, b)]:14.1f}%' if a != b else f"{'--':>15s}"
+            for b in sources)
+        print(f'  {la:{width}s}{cells}')
+
+    print(f'\n  ...over this many shared reactions')
+    print(f"  {'':{width}s}" + ''.join(f'{l:>15s}' for l in labels))
+    for a, la in zip(sources, labels):
+        cells = ''.join(f'{overlap[(a, b)]:15d}' for b in sources)
+        print(f'  {la:{width}s}{cells}')
+
+    print(f'\n  directions produced per source (own coverage)')
+    for src, label in zip(sources, labels):
+        ops = Counter(scored[src].values())
+        total = len(scored[src])
+        hard = ops['>'] + ops['<']
+        print(f'  {label:{width}s} n={total:6d}  '
+              f'>{ops[">"]:6d}  <{ops["<"]:6d}  ={ops["="]:6d}  ?{ops["?"]:5d}'
+              f'   hard {100.0 * hard / total:.1f}%')
+    return agreement, overlap
+
+
+def print_agreement_decomposition(scored, sources, set_name):
+    """Split each pair's agreement into *why* they agree.
+
+    A high agreement number means little on its own: two sources that both
+    default to "reversible" agree without either having said anything. Splitting
+    the agreement into "both abstained" and "both committed to the same
+    direction" -- and reporting outright directional conflicts alongside --
+    separates consensus from mutual silence.
+
+    ``excl "?"`` repeats the agreement over reactions where *both* sources made
+    a call, so the undecomposable records eQuilibrator correctly refuses do not
+    read as disagreement.
+    """
+    print(f'\n{set_name} rules -- what the agreement is made of '
+          f'(% of shared reactions)')
+    header = (f"  {'pair':30s}{'agree':>8s}{'both =':>9s}{'both ->':>9s}"
+              f"{'conflict':>10s}{'excl ?':>9s}")
+    print(header)
+    for i, a in enumerate(sources):
+        for b in sources[i + 1:]:
+            shared = scored[a].keys() & scored[b].keys()
+            n = len(shared)
+            if not n:
+                continue
+            agree = sum(1 for r in shared if scored[a][r] == scored[b][r])
+            both_eq = sum(1 for r in shared
+                          if scored[a][r] == '=' and scored[b][r] == '=')
+            both_dir = sum(1 for r in shared
+                           if scored[a][r] in '<>' and scored[b][r] in '<>'
+                           and scored[a][r] == scored[b][r])
+            conflict = sum(1 for r in shared
+                           if scored[a][r] in '<>' and scored[b][r] in '<>'
+                           and scored[a][r] != scored[b][r])
+            called = [r for r in shared
+                      if scored[a][r] != '?' and scored[b][r] != '?']
+            excl = (100.0 * sum(1 for r in called if scored[a][r] == scored[b][r])
+                    / len(called)) if called else float('nan')
+            label = f'{SHORT_NAME.get(a, a)} / {SHORT_NAME.get(b, b)}'
+            print(f'  {label:30s}{100.0 * agree / n:7.1f}%{100.0 * both_eq / n:8.1f}%'
+                  f'{100.0 * both_dir / n:8.1f}%{100.0 * conflict / n:9.1f}%'
+                  f'{excl:8.1f}%')
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__.split('\n')[0])
     parser.add_argument('--source', default='eQuilibrator',
@@ -147,17 +265,29 @@ def main():
     parser.add_argument('--sets', nargs='+', default=['GC', 'EQ'],
                         help='rule sets to run (%s)' % ', '.join(sorted(rh.HEURISTIC_SETS)))
     parser.add_argument('--tsv', metavar='PATH', help='per-reaction detail')
+    parser.add_argument('--matrix', action='store_true',
+                        help='cross-source similarity matrix: hold the rule set '
+                             'fixed and vary which prediction supplies the energy')
+    parser.add_argument('--sources', nargs='+', default=ALL_SOURCES,
+                        help='sources for --matrix (default: all four)')
     args = parser.parse_args()
 
     for name in args.sets:
         if name not in rh.HEURISTIC_SETS:
             sys.exit(f'ERROR: unknown rule set {name!r}; choose from '
                      + ', '.join(sorted(rh.HEURISTIC_SETS)))
-    if len(args.sets) < 2:
+    if not args.matrix and len(args.sets) < 2:
         sys.exit('ERROR: need at least two rule sets to compare')
 
     from BiochemPy import Reactions
     reactions = Reactions().loadReactions()
+
+    if args.matrix:
+        for set_name in args.sets:
+            scored = score_all_sources(reactions, args.sources, set_name)
+            print_similarity(scored, args.sources, set_name)
+            print_agreement_decomposition(scored, args.sources, set_name)
+        return
 
     rows = compare(reactions, args.source, args.sets)
     print(f'Source   : thermodynamics["{args.source}"]  '
