@@ -25,7 +25,7 @@ Usage:
 Note on PASS/FAIL: sources in INVARIANT_SOURCES must match the baseline exactly
 (drift there is a regression). Sources in EXPECTED_CHANGE_SOURCES, and the
 canonical reversibility they feed, are reported but do not fail -- this branch
-re-scores eQuilibrator on purpose. Use --strict to require exact equality
+re-scores eQuilibrator and both dGPredictor sources on purpose. Use --strict to require exact equality
 everywhere, e.g. to check two runs of this branch against each other.
 """
 import argparse
@@ -50,9 +50,12 @@ SOURCES = [
 ]
 
 # Sources whose per-method operator must stay byte-identical to the baseline.
-# These are all scored with the GC rule set, which this branch does not touch,
-# so any drift here is a real regression.
-INVARIANT_SOURCES = ['Group contribution', 'dGPredictor', 'dGPredictor-ModelSEED']
+# Group contribution is the anchor: it is still scored with the untouched GC
+# cascade off the flat deltag field, so any drift in it is a real regression.
+# The dGPredictor sources used to be here for the same reason -- they were
+# scored with the GC rule set by default -- and moved out when the reversibility
+# index was applied to them deliberately.
+INVARIANT_SOURCES = ['Group contribution']
 
 # Sources this branch deliberately re-scores, plus the canonical reversibility
 # they feed. eQuilibrator moved from the GC cascade to its own rule set (the
@@ -61,7 +64,13 @@ INVARIANT_SOURCES = ['Group contribution', 'dGPredictor', 'dGPredictor-ModelSEED
 # review but does not fail the test; regressions are caught by the invariant
 # columns above. Pass --strict to require exact equality everywhere, e.g. when
 # comparing two runs of this same branch.
-EXPECTED_CHANGE_SOURCES = ['eQuilibrator']
+# Sources this branch re-scores on purpose. eQuilibrator moved when the EQ rule
+# set was introduced; the two dGPredictor sources moved when the Noor 2012
+# reversibility index replaced the GC concentration-bounds fallback for them.
+# Group contribution is deliberately NOT here -- it is the byte-compare anchor,
+# and any drift in it is a real regression.
+EXPECTED_CHANGE_SOURCES = ['eQuilibrator', 'dGPredictor',
+                           'dGPredictor-ModelSEED']
 
 PIPELINE = [
     ['./Update_Compound_GroupContribution_Energies.py'],

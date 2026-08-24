@@ -133,7 +133,14 @@ def test_registry():
     check('no name -> GC', rh.get_heuristics(None) is rh.GC_HEURISTICS)
     check('empty db_level -> GC', rh.get_heuristics('') is rh.GC_HEURISTICS)
     check('unknown name -> GC', rh.get_heuristics('nope') is rh.GC_HEURISTICS)
-    check('DGP -> GC', rh.heuristics_for_source('dGPredictor') is rh.GC_HEURISTICS)
+    # Both dGPredictor sources now run the reversibility index rather than
+    # falling back to the GC concentration bounds.
+    check('dGPredictor -> DGP',
+          rh.heuristics_for_source('dGPredictor') is rh.DGP_HEURISTICS)
+    check('dGPredictor-ModelSEED -> DGP',
+          rh.heuristics_for_source('dGPredictor-ModelSEED') is rh.DGP_HEURISTICS)
+    check('an unknown source still falls back to GC',
+          rh.heuristics_for_source('Some Future Predictor') is rh.GC_HEURISTICS)
     check('GC -> GC', rh.get_heuristics('GC') is rh.GC_HEURISTICS)
     check('EQ -> EQ', rh.get_heuristics('EQ') is rh.EQ_HEURISTICS)
     check('EQ2 -> EQ2', rh.get_heuristics('EQ2') is rh.EQ2_HEURISTICS)

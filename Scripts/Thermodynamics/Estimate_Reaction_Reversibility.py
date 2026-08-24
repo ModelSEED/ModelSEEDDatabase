@@ -12,6 +12,8 @@ way.
     ./Estimate_Reaction_Reversibility.py EQ         # eQuilibrator, EQ rules
     ./Estimate_Reaction_Reversibility.py EQ --heuristics EQ2   # eQuilibrator 2.0 rules
     ./Estimate_Reaction_Reversibility.py EQ --heuristics GC    # old behaviour
+    ./Estimate_Reaction_Reversibility.py DGP        # dGPredictor, reversibility index
+    ./Estimate_Reaction_Reversibility.py DGPM       # dGPredictor-ModelSEED, ditto
 
 ``GC`` is the default rule set: it is what every level other than ``EQ``
 selects, and what any unrecognised source falls back to. The GC cascade itself
@@ -60,7 +62,8 @@ from reversibility_heuristics import (
     mmdeltag_band_heuristic, low_energy_heuristic, default_heuristic,
     make_ln_reversibility_index_heuristic,
     # source-specific rule sets
-    GC_HEURISTICS, EQ_HEURISTICS, EQ2_HEURISTICS, HEURISTIC_SETS,
+    GC_HEURISTICS, EQ_HEURISTICS, EQ2_HEURISTICS,
+    RI_HEURISTICS, DGP_HEURISTICS, make_ri_heuristics, HEURISTIC_SETS,
     DEFAULT_HEURISTIC_SET, get_heuristics, heuristics_for_source,
     energy_source_for_level,
 )
@@ -175,7 +178,7 @@ def _write_report(db_level, report):
 # ---------------------------------------------------------------------------
 def _parse_db_level(argv):
     for arg in argv[1:]:
-        if arg in ('EQ', 'GC', 'DGP'):
+        if arg in ('EQ', 'GC', 'DGP', 'DGPM'):
             return arg
     return ''
 
