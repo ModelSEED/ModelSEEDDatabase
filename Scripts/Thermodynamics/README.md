@@ -171,6 +171,168 @@ Reconciling `deltag` itself is the job of
 `Promote_Reaction_Thermodynamics_to_Canonical.py`, which is deliberately not
 part of `Rerun_Thermodynamics.sh`.
 
+### The reversibility index as a standalone callable
+
+`reversibility_index.py` is the Noor et al. 2012 / eQuilibrator 2.0 index
+(Bioinformatics 28:2037; NAR 40:D770) on its own, with no cascade around it:
+
+```python
+from reversibility_index import ln_reversibility_index, direction_from_index
+
+ln_gamma = ln_reversibility_index(rxn["stoichiometry"], dg)   # kcal/mol in
+operator = direction_from_index(ln_gamma)                     # '>', '<' or '='
+```
+
+Γ is the fold change every reactant concentration would have to undergo,
+symmetrically, before the reaction ran backwards; `ln Γ = (2/Σ|ν|)·ΔG′m/RT`,
+with water and protons dropped from both coefficient sums and every reagent
+placed at 1 mM. `|ln Γ| > ln(1000)` is Noor's cut.
+
+`Context.ln_gamma` delegates here, so the cascade and any standalone caller
+cannot drift apart. Validated against eQuilibrator's own published
+`ln_reversibility_index` column in `MetaNetX_Reaction_Energies.tbl`: **17,776
+reactions agree**, and 93% of the residual mismatches are the compartment-
+collapse defect described below.
+
+**Transport reactions get no special treatment anywhere in this module.** Every
+`(compound, compartment)` pair is its own species; there is no membrane term, no
+compartment collapse and no structural shortcut. That is what lets a transport
+call be compared with a cytosolic one on the same axis.
+
+#### What the index says about ATP synthase and ABC transporters
+
+`Scripts/Tests/test_reversibility_index.py --report` scores both families as
+ordinary chemistry. Two results worth knowing before trusting the index on them:
+
+* **ATP synthase (15 reactions).** All 15 come out with `|ln Γ| = 11.97` —
+  *identical*, because the translocated protons cancelled in the collapsed
+  MetaNetX formula, so what eQuilibrator actually scored was
+  `ADP + Pi ⇌ ATP + H₂O` every time. The index therefore calls the most
+  famously reversible enzyme in the cell irreversible, and splits 7 `>` / 8 `<`
+  purely on how each reaction happened to be written. Letting the protons count
+  (`exclude_protons=False`) returns 13 of 15 to `=`.
+* **ABC transporters (1,150 scorable).** 94.1% agreement with the structural
+  ATP-sign rule, 29 outright flips, 39 called reversible. The agreement is
+  thinner than it looks: the transported substrate also cancels in the collapsed
+  formula, leaving plain ATP hydrolysis at −6.54 kcal/mol and `ln Γ = −7.18`
+  against a cut of −6.91. 1,074 of the 1,111 hard calls sit within 15% of the
+  threshold.
+
+Both families are decided by structural shortcuts in the `GC` and `EQ` sets
+precisely because the energy behind them cannot be trusted. The index does not
+change that; it just makes the untrustworthiness measurable.
+
+### Applying the index to dGPredictor
+
+`SOURCE_HEURISTIC_SET` now routes `dGPredictor` and `dGPredictor-ModelSEED` to
+`DGP_HEURISTICS` (`make_ri_heuristics(z=1.0, sigma_gate=None)`) instead of
+letting them fall through to the GC concentration bounds. Neither source has a
+"could not decompose" marker, so there is no sentinel to gate on; the one-sigma
+margin is kept because silent extrapolation, not a loud refusal, is how these
+models fail.
+
+The margin lands very differently on the two, and that is the point:
+
+| source | σ median | σ max | `=` from the margin | vs GC operators |
+|---|---:|---:|---:|---|
+| `dGPredictor` | 0.35 | 6.10 | 784 / 27,715 | 2,816 re-scored |
+| `dGPredictor-ModelSEED` | 21.17 | 2,039.14 | 19,512 / 31,924 | — |
+
+Use the `RI` rule set (z = 0, the index exactly as published) to see the
+point-estimate answer for either source.
+
+### Comparing rule sets on one set of energies
+
+`Compare_Reversibility_Heuristics.py` hands two or more rule sets the *same*
+`(dG, σ)` pair, so disagreement is attributable to the rules alone:
+
+```bash
+./Compare_Reversibility_Heuristics.py --sets GC EQ EQ2 RI
+./Compare_Reversibility_Heuristics.py --source dGPredictor --sets GC DGP
+```
+
+On eQuilibrator energies, GC and EQ **agree on 71.6%** of 25,028 reactions. The
+disagreement is dominated by one cell: **4,369 reactions GC calls `=` that EQ
+calls `?`**, which is the undecomposable population the GC bounds rule swallows.
+The next largest is 1,447 that GC calls `>` and EQ calls `=`. Notably, on GC's
+side the terminal `default` rule fires 8,556 times and the concentration-bounds
+rules 8,714 — so a third of GC's answers on this source come from a rule that
+never looks at σ.
+
+### Checking eQuilibrator's error returns
+
+`Check_eQuilibrator_Energy_Errors.py` looks for the records where eQuilibrator
+reported a failure as a number. It never raises, so these are otherwise silent:
+
+```bash
+./Check_eQuilibrator_Energy_Errors.py --table --tsv findings.tsv
+./Check_eQuilibrator_Energy_Errors.py --self-test    # proves each check fires
+```
+
+| code | database | raw table | what it is |
+|---|---:|---:|---|
+| `UNDECOMPOSABLE` | 4,934 | 4,607 | σ at or past `RMSE_inf` = 1e5 kJ/mol — eQuilibrator declined |
+| `ZERO_RETURN` | 632 | 184 | dG exactly 0.0 — the discarded-mean branch showing through |
+| `COLLAPSED_FORMULA` | — | 1,178 | published `ln_RI` disagrees with the index recomputed from our stoichiometry |
+
+`COLLAPSED_FORMULA` is database-invisible because column 4 of the table is
+discarded on the way in (`_thermo_helpers.parse_two_col_energy_table` reads
+columns 1 and 2 only), which is why `--table` exists.
+
+`--self-test` runs 15 synthetic records through the same `check_record()` the
+scans use — including negative controls that must stay clean — and asserts the
+two headline cases explicitly: the 0-return energy and the 1e5 sentinel σ.
+
+### Translating eQuilibrator's sentinel into ModelSEED's
+
+`Normalize_eQuilibrator_Sentinels.py` rewrites eQuilibrator's failure returns in
+ModelSEED's convention, so a consumer that correctly skips one skips the other.
+The two are not compatible:
+
+| | "no value" looks like |
+|---|---|
+| ModelSEED | `[10000000.0, 10000000.0, '?']` — unmistakable |
+| eQuilibrator | a plausible signed energy with σ = 1e5 kJ/mol — indistinguishable |
+
+```bash
+./Normalize_eQuilibrator_Sentinels.py                 # dry run, report only
+./Normalize_eQuilibrator_Sentinels.py --apply         # rewrite the JSON
+./Normalize_eQuilibrator_Sentinels.py --table out.tbl # normalise at ingest instead
+./Normalize_eQuilibrator_Sentinels.py --self-test
+```
+
+Detection is `check_record()` imported from `Check_eQuilibrator_Energy_Errors.py`,
+so there is one definition of "sentinel" and not two. Nothing is written without
+`--apply`.
+
+**Scope: 4,934 of 25,028 records (19.7%)** — 4,590 `UNDECOMPOSABLE` plus 344 that
+are also exactly zero. Only `thermodynamics['eQuilibrator']` is touched; the
+sibling per-source triples and the flat `deltag`/`deltagerr` are left alone.
+4 of the 4,934 are *also* the current canonical `deltag`; those are reported, not
+rewritten, because choosing a replacement is
+`Promote_Reaction_Thermodynamics_to_Canonical.py`'s job.
+
+#### Why `zero_dg` is off by default
+
+It is tempting to also blank the 288 records whose dG is exactly `0.0` with a
+credible σ, reading them as the residual branch showing through where the
+transform was nil. **They are not that branch** — the residual branch always
+stamps `RMSE_inf` on σ, so by construction these are something else. 280 of them
+carry `σ == 0.0` *exactly*, and 232 of those are one-in/one-out isomerizations:
+L-lysine ⇌ D-lysine, D-threo- ⇌ D-erythro-isocitrate, 16α- ⇌ 16β-hydroxysteroid.
+eQuilibrator's decomposition is stereo-blind, so both sides decompose to
+identical groups and the difference is exactly zero with exactly zero propagated
+error. That is a real (if uninformative) statement that the two stereoisomers
+are isoenergetic, not a failure report, and blanking it throws it away.
+
+Enable with `--classes undecomposable non_finite zero_dg`. If what you actually
+want is the 8 records where a zero energy is genuinely suspicious, add
+`--zero-dg-nonzero-sigma` to spare the stereo cases.
+
+`COLLAPSED_FORMULA` is deliberately excluded: a wrong-but-finite energy from our
+own compartment-dropping retrieval step is a different defect needing a
+different fix (rebuild the formula), not a sentinel.
+
 The underlying thermodynamics data is kept in
 `../../Biochemistry/Thermodynamics`. The decomposition of molecular
 structures and their resulting energies for both the older group
