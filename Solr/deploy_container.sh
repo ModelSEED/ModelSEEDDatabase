@@ -165,7 +165,7 @@ if [[ "${EXEC_METHOD}" == "docker" ]]; then
         for env in "${ENV_TOKENS[@]:1}"; do
             echo ""
             echo ">>> posting biochemistry to '${env}' env..."
-            docker compose exec -T modelseed-solr /scripts/post_biochemistry.sh "${env}"
+            docker compose exec -T solr /scripts/post_biochemistry.sh "${env}"
         done
     fi
 

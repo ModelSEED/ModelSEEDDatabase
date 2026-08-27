@@ -335,8 +335,8 @@ regardless of when we cut over the staging schema underneath.
 Populate a specific env (auto-picks the matching JSON payload):
 
 ```bash
-docker compose exec modelseed-solr /scripts/post_biochemistry.sh staging
-docker compose exec modelseed-solr /scripts/post_biochemistry.sh prod
+docker compose exec solr /scripts/post_biochemistry.sh staging
+docker compose exec solr /scripts/post_biochemistry.sh prod
 ```
 
 `POST_ON_START=true` auto-posts into the FIRST env in the list;

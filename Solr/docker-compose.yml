@@ -72,7 +72,7 @@ services:
       # restart the container (prod cores auto-created empty) or
       # `docker exec ... /scripts/post_biochemistry.sh prod` to
       # populate them from the baked-in legacy JSON.
-      SOLR_ENVIRONMENTS: "staging"
+      SOLR_ENVIRONMENTS: "${SOLR_ENVIRONMENTS:-staging}"
     restart: unless-stopped
     healthcheck:
       test: ["CMD-SHELL", "curl -fsS http://localhost:8983/solr/admin/cores?action=STATUS > /dev/null || exit 1"]
