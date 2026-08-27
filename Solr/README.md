@@ -106,6 +106,33 @@ rm -rf data           # clear the persistent volume so post runs again
 docker compose up -d --build
 ```
 
+## Persisting the index on a host path (`SOLR_DATA_DIR`)
+
+By default the Solr index lives in the named volume
+`modelseed_solr_data`, so Docker owns the directory and its permissions.
+To put the index somewhere durable and inspectable instead — an
+IT-provided mount, a project volume — set `SOLR_DATA_DIR` to an absolute
+host path:
+
+```bash
+# Solr/.env  (gitignored, per-deployment)
+SOLR_DATA_DIR=/vol/model-biochem/solr-data
+```
+
+Solr runs as **UID 8983** inside the container and will not be able to
+write a directory created by your host user. Chown it once before the
+first bring-up. If you don't have root on the host but are in the
+`docker` group, a throwaway container does the job:
+
+```bash
+mkdir -p /vol/model-biochem/solr-data
+docker run --rm -v /vol/model-biochem/solr-data:/d alpine \
+    chown -R 8983:8983 /d
+```
+
+Leaving `SOLR_DATA_DIR` unset keeps the named-volume behaviour, so local
+development is unaffected.
+
 ## Production mode — external biochemistry mount
 
 The baked-in data pattern is a testing convenience while IT provides a

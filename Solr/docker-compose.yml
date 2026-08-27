@@ -6,11 +6,15 @@
 # — no manual compile-and-post step.
 #
 # Volumes:
-#   modelseed_solr_data (named)   — persistent Solr index (survives restarts).
-#                                    Named rather than bind-mounted so Docker
-#                                    can manage ownership (Solr runs as UID
-#                                    8983 inside the container, which won't
-#                                    have write access to a host-created dir).
+#   ${SOLR_DATA_DIR}:/var/solr    — persistent Solr index (survives restarts).
+#                                    Defaults to the named volume
+#                                    `modelseed_solr_data`, which lets Docker
+#                                    manage ownership. Set SOLR_DATA_DIR to an
+#                                    absolute host path to bind-mount instead
+#                                    (e.g. a persistent IT-provided mount).
+#                                    Solr runs as UID 8983 in the container, so
+#                                    a bind-mounted host dir must be chowned to
+#                                    8983:8983 first — see Solr/README.md.
 #
 # Query examples:
 #   curl 'http://localhost:8983/solr/reactions/select?q=id:rxn00001&fl=*,[child]&wt=json&indent=true'
@@ -35,7 +39,7 @@ services:
     ports:
       - "8983:8983"
     volumes:
-      - modelseed_solr_data:/var/solr
+      - ${SOLR_DATA_DIR:-modelseed_solr_data}:/var/solr
     environment:
       POST_ON_START: "true"
       # Multi-env layout — one Solr instance serves staging AND prod:
