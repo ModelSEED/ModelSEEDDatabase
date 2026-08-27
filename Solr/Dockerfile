@@ -20,27 +20,42 @@
 # -----------------------------------------------------------------------------
 # Stage 1 — compile biochemistry JSON into the nested-child Solr payload
 # -----------------------------------------------------------------------------
-FROM python:3.12-slim AS compile
+# Non-slim python: rdkit's rdMolDraw2D transitively needs a handful of
+# X11 / expat shared libs even for headless SVG output. The slim image
+# is missing them (libXext, libXrender, libexpat, ...). Since this is a
+# multi-stage build only the compiled JSON copies into the runtime
+# image, so using the full python image here has zero effect on the
+# final image size.
+FROM python:3.12 AS compile
 
 WORKDIR /build
 
+# RDKit for 2D-structure SVG rendering in the structures compile.
+RUN pip install --no-cache-dir rdkit
+
 # Mirror the repo layout so the compile scripts' relative paths
-# (../../Biochemistry/*.json) resolve correctly. Only the compound + reaction
-# JSON files are needed — the rest of Biochemistry/ (TSV, provenance dumps,
-# structure files, thermodynamics tables) totals ~3.5 GB and isn't read by
-# the compile step.
+# (../../Biochemistry/*.json, ../../Biochemistry/Structures/) resolve
+# correctly. Only what the compile scripts actually read is copied —
+# the rest of Biochemistry/ (TSV, provenance dumps, thermodynamics
+# tables) totals ~3.5 GB and isn't touched.
 COPY Biochemistry/compound_*.json Biochemistry/reaction_*.json Biochemistry/
+COPY Biochemistry/Structures/Unique_ModelSEED_Structures.txt Biochemistry/Structures/
 COPY Solr/compilation/Compile_Biochemistry_for_SOLR.py \
      Solr/compilation/Compile_Biochemistry_for_SOLR_legacy.py \
+     Solr/compilation/Compile_Structures_for_SOLR.py \
      Solr/compilation/
 
-# Two compile passes → four JSON files:
-#   solr_compounds.json / solr_reactions.json                   (new nested schema, for staging)
-#   solr_compounds_legacy.json / solr_reactions_legacy.json     (master-era flat schema, for production)
-# Both get baked into the runtime image so the container can serve
-# either or both without needing to re-run the compile.
+# Three compile passes → five JSON files:
+#   solr_compounds.json / solr_reactions.json                   (new nested schema, staging)
+#   solr_compounds_legacy.json / solr_reactions_legacy.json     (master-era flat, production)
+#   solr_structures.json                                        (per-compound smiles/inchi/inchikey + SVG)
+# All get baked into the runtime image so the container can post
+# any/all without re-running the compile. The structures pass is
+# the slowest (~5 min for 30K RDKit renders); build cache reuses it
+# when only the biochemistry data (not the SMILES) changes.
 RUN cd Solr/compilation && python3 Compile_Biochemistry_for_SOLR.py \
-                        && python3 Compile_Biochemistry_for_SOLR_legacy.py
+                        && python3 Compile_Biochemistry_for_SOLR_legacy.py \
+                        && python3 Compile_Structures_for_SOLR.py
 
 # -----------------------------------------------------------------------------
 # Stage 2 — Solr runtime
@@ -61,6 +76,8 @@ COPY --chown=solr:solr Solr/cores/compounds_legacy \
      /opt/solr/server/solr/configsets/compounds_legacy/conf
 COPY --chown=solr:solr Solr/cores/reactions_legacy \
      /opt/solr/server/solr/configsets/reactions_legacy/conf
+COPY --chown=solr:solr Solr/cores/structures \
+     /opt/solr/server/solr/configsets/structures/conf
 
 # Baked-in compiled biochemistry JSON (from the compile stage above).
 # Two flavours: `_legacy` files are shaped for the master-era schema
@@ -74,6 +91,8 @@ COPY --from=compile --chown=solr:solr /build/Solr/compilation/solr_compounds_leg
      /data/compilation/solr_compounds_legacy.json
 COPY --from=compile --chown=solr:solr /build/Solr/compilation/solr_reactions_legacy.json \
      /data/compilation/solr_reactions_legacy.json
+COPY --from=compile --chown=solr:solr /build/Solr/compilation/solr_structures.json \
+     /data/compilation/solr_structures.json
 
 # Entrypoint + helper scripts
 COPY --chown=solr:solr Solr/entrypoint.sh        /scripts/entrypoint.sh

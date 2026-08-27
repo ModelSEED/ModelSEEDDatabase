@@ -70,11 +70,14 @@ post_core() {
     log "posted ${core}."
 }
 
-post_core "compounds${suffix}" "${DATA_DIR}/solr_compounds${json_suffix}.json"
-post_core "reactions${suffix}" "${DATA_DIR}/solr_reactions${json_suffix}.json"
+post_core "compounds${suffix}"  "${DATA_DIR}/solr_compounds${json_suffix}.json"
+post_core "reactions${suffix}"  "${DATA_DIR}/solr_reactions${json_suffix}.json"
+# Structures core has one schema shared across all envs; the same JSON
+# payload is posted to whichever env-suffixed core is being populated.
+post_core "structures${suffix}" "${DATA_DIR}/solr_structures.json"
 
 log "done. Core doc counts:"
-for core in "compounds${suffix}" "reactions${suffix}"; do
+for core in "compounds${suffix}" "reactions${suffix}" "structures${suffix}"; do
     n=$(curl -fsS "${SOLR_URL}/${core}/select?q=*:*&rows=0&wt=json" \
         | grep -oE '"numFound":[0-9]+' | head -1 | cut -d: -f2)
     log "  ${core}: ${n} docs (parent + child)"

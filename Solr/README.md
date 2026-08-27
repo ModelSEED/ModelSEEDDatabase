@@ -14,18 +14,27 @@ Solr/
 ├── entrypoint.sh            # start Solr → wait ready → create cores → optional post
 ├── post_biochemistry.sh     # curl-post the compiled JSON to both cores
 ├── cores/
-│   ├── compounds/           # schema + solrconfig for the compounds core
+│   ├── compounds/           # schema + solrconfig for the compounds core (new nested)
 │   │   ├── schema.xml
 │   │   ├── schema_types.xml
 │   │   └── solrconfig.xml
-│   └── reactions/           # schema + solrconfig for the reactions core
+│   ├── reactions/           # schema + solrconfig for the reactions core (new nested)
+│   │   ├── schema.xml
+│   │   ├── schema_types.xml
+│   │   └── solrconfig.xml
+│   ├── compounds_legacy/    # master-era flat schema for production compounds
+│   ├── reactions_legacy/    # master-era flat schema for production reactions
+│   └── structures/          # smiles / inchi / inchikey / pre-rendered SVG per cpd_id
 │       ├── schema.xml
 │       ├── schema_types.xml
 │       └── solrconfig.xml
 ├── compilation/
-│   ├── Compile_Biochemistry_for_SOLR.py    # produces the nested JSON payload
-│   ├── solr_compounds.json                  # generated (gitignored)
-│   └── solr_reactions.json                  # generated (gitignored)
+│   ├── Compile_Biochemistry_for_SOLR.py         # new nested compound+reaction JSON
+│   ├── Compile_Biochemistry_for_SOLR_legacy.py  # legacy flat compound+reaction JSON
+│   ├── Compile_Structures_for_SOLR.py           # structures JSON (RDKit-rendered SVG)
+│   ├── solr_compounds.json  / solr_reactions.json          # generated (gitignored)
+│   ├── solr_compounds_legacy.json / solr_reactions_legacy.json  # generated (gitignored)
+│   └── solr_structures.json                                # generated (gitignored)
 ├── examples/                # curl / python query samples (unchanged from pre-9)
 └── data/                    # persistent Solr index (gitignored)
 ```
@@ -217,20 +226,26 @@ their own core name on the same host) and — critically — lets the
 production UI keep working during a staging release without any
 UI-side coordination on when to switch fields.
 
-### Two schemas ship in the same container
+### Three cores per env (five configsets total)
 
-The image bakes in **four configsets** and **two flavours of the
-biochemistry JSON payload**:
+The image bakes in **five configsets** and **three JSON payloads**:
 
 | configset | schema shape | consumed by | JSON payload |
 |---|---|---|---|
 | `compounds`, `reactions` | new nested (per-source thermodynamics as child docs, `atom_mapping_data` + `atom_mapping_confidence` + `atom_mapping_has_symmetry_groups` fields, denormalized flat filters like `has_atom_mapping`, `sources_agree_direction`, `atom_count_C`, ...) | the staging UI, exercising the 2026-update fields | `solr_compounds.json` / `solr_reactions.json` |
 | `compounds_legacy`, `reactions_legacy` | master-era flat (single `deltag`/`deltagerr` scalars, `stoichiometry` as a single semicolon-joined string, no `atom_mapping` / no `thermodynamics` dict) | the production UI (unchanged from what's currently deployed) | `solr_compounds_legacy.json` / `solr_reactions_legacy.json` |
+| `structures` | one doc per `compound_id` (all ~45.7K compounds), fields `smiles` / `inchi` / `inchikey` / `svg` are all optional (nulls = absent, not `has_*` booleans) | staging + production UI (same schema everywhere — nothing to be backward-compatible with) | `solr_structures.json` (single payload, shared across envs) |
 
-Two Python scripts under `Solr/compilation/` produce the two payloads
-from the same source `Biochemistry/*.json`. Both scripts run
-automatically during `docker build` so the runtime image has all four
-JSONs ready to post.
+Three Python scripts under `Solr/compilation/` produce the three
+payloads from `Biochemistry/*.json` (+ `Biochemistry/Structures/
+Unique_ModelSEED_Structures.txt` for the structures core). All three
+run automatically during `docker build` so the runtime image has all
+five JSONs ready to post.
+
+The structures compile is the slowest (~5 min for ~30K RDKit
+`MolDraw2DSVG` renders at 300 x 300, capped at 100 KB per SVG). It
+skips wildcard SMILES (`*` atoms render as literal `*`, misleading)
+and lets the UI regenerate SVG on the fly for the skipped compounds.
 
 ### Env-name → configset and core-name mapping
 
@@ -248,14 +263,20 @@ its cores use AND what the cores are named:
   configsets
 
 Set `SOLR_ENVIRONMENTS` to a space-separated list of env names — the
-entrypoint creates one pair of cores per env:
+entrypoint creates one **triple** of cores per env (compounds +
+reactions + structures):
 
 | `SOLR_ENVIRONMENTS` | cores created | configset used per core |
 |---|---|---|
-| unset / empty (dev) | `compounds`, `reactions` | new nested |
-| `staging` | `compounds_staging`, `reactions_staging` | new nested |
-| `prod` | `compounds`, `reactions` (bare) | legacy flat |
-| `staging prod` | `compounds_staging`, `reactions_staging`, `compounds`, `reactions` | new nested for the `_staging` cores, legacy flat for the bare ones |
+| unset / empty (dev) | `compounds`, `reactions`, `structures` | new nested (`structures` for the structures core) |
+| `staging` | `compounds_staging`, `reactions_staging`, `structures_staging` | new nested (`structures` for the structures core) |
+| `prod` | `compounds`, `reactions`, `structures` (bare) | legacy flat + `structures` |
+| `staging prod` | all six above cores | new nested for `_staging`, legacy flat for the bare `compounds`/`reactions`, shared `structures` for both |
+
+The structures core uses the SAME `structures` configset in every env
+— there's no legacy variant since the production UI doesn't have this
+core today. Only the core name gets the env suffix; the schema and
+payload are identical everywhere.
 
 The bare-name-for-prod choice means production URLs stay stable:
 `/solr/compounds/select?q=...` continues to hit the production data

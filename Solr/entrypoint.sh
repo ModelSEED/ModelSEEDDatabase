@@ -141,6 +141,16 @@ for env in "${ENVS[@]}"; do
         solr create -c "reactions${suffix}" -d "$cfg_rxn"
         log "core 'reactions${suffix}' created."
     fi
+    # Structures core (SMILES / InChI / InChIKey / SVG per compound_id)
+    # — same schema for every env; no legacy variant since the
+    # production UI doesn't have this core today.
+    if core_exists "structures${suffix}"; then
+        log "core 'structures${suffix}' already exists — leaving as-is"
+    else
+        log "creating core 'structures${suffix}' from configset 'structures' ..."
+        solr create -c "structures${suffix}" -d structures
+        log "core 'structures${suffix}' created."
+    fi
 done
 
 # 4. Optionally post biochemistry data. Skip the post if the target cores
