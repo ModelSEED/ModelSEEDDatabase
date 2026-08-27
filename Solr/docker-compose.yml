@@ -36,11 +36,21 @@ services:
       dockerfile: Solr/Dockerfile
     image: modelseed-solr:local
     container_name: modelseed-solr
+    # Solr runs as UID 8983 by default, which matches the image. Override
+    # via SOLR_UID/SOLR_GID when /var/solr is bind-mounted onto a share
+    # whose ownership you cannot change — an NFS export with root squash,
+    # for instance, where chowning the host dir to 8983 is impossible.
+    # Point these at the owner of ${SOLR_DATA_DIR} in that case.
+    user: "${SOLR_UID:-8983}:${SOLR_GID:-8983}"
     ports:
       - "8983:8983"
     volumes:
       - ${SOLR_DATA_DIR:-modelseed_solr_data}:/var/solr
     environment:
+      # Solr's start scripts write into $HOME; when SOLR_UID is an
+      # arbitrary host uid there's no passwd entry for it and HOME would
+      # default to an unwritable "/". /var/solr is writable by definition.
+      HOME: /var/solr
       POST_ON_START: "true"
       # Multi-env layout — one Solr instance serves staging AND prod:
       #   - `staging` cores (compounds_staging, reactions_staging) use

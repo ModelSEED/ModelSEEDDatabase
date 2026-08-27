@@ -119,19 +119,42 @@ host path:
 SOLR_DATA_DIR=/vol/model-biochem/solr-data
 ```
 
-Solr runs as **UID 8983** inside the container and will not be able to
-write a directory created by your host user. Chown it once before the
-first bring-up. If you don't have root on the host but are in the
-`docker` group, a throwaway container does the job:
+Solr runs as **UID 8983** inside the container and cannot write a
+directory owned by your host user. There are two ways to reconcile that.
+
+**If you can chown the host directory** (local disk, and you have root
+or are in the `docker` group):
 
 ```bash
-mkdir -p /vol/model-biochem/solr-data
-docker run --rm -v /vol/model-biochem/solr-data:/d alpine \
-    chown -R 8983:8983 /d
+mkdir -p /path/to/solr-data
+docker run --rm -v /path/to/solr-data:/d alpine chown -R 8983:8983 /d
 ```
 
-Leaving `SOLR_DATA_DIR` unset keeps the named-volume behaviour, so local
-development is unaffected.
+**If you cannot** — most importantly on an NFS export with root squash,
+where container root maps to `nobody` and `chown` fails with `EINVAL` no
+matter what privilege you hold on the client — run the container as the
+uid that already owns the directory instead:
+
+```bash
+# Solr/.env
+SOLR_DATA_DIR=/vol/model-biochem/solr-data
+SOLR_UID=20047        # id -u
+SOLR_GID=20001        # id -g
+```
+
+`init-var-solr` performs no chown of its own (it only mkdirs and checks
+writability), and every baked-in configset, script and JSON payload is
+world-readable, so an arbitrary uid can run the image unmodified. The
+compose file sets `HOME=/var/solr` because an arbitrary uid has no passwd
+entry and would otherwise get an unwritable `HOME=/`.
+
+Measured on a NetApp NFSv4.2 export, index and query performance was
+indistinguishable from a local Docker volume (20K-doc index + commit:
+0.84s NFS vs 0.85s local; 12.4 vs 12.9 ms/query), so NFS is a viable home
+for the index here despite the usual Lucene-on-NFS caution.
+
+Leaving all three variables unset keeps the named-volume behaviour, so
+local development is unaffected.
 
 ## Production mode — external biochemistry mount
 
