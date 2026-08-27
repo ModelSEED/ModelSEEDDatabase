@@ -237,8 +237,25 @@ can render a full compound or reaction detail page — flat fields,
 per-source thermodynamics table, atom-mapping list, stoichiometry table
 — from a single request. The `doc_type:...` clause in `q` excludes the
 matching child docs (whose IDs start with the parent's, e.g.
-`rxn00001::thermo::GC`); the `[child limit=100]` transformer defaults
-to 0 children if you omit `limit=`, so it's worth being explicit.
+`rxn00001::thermo::GC`).
+
+Two things about `[child]` will silently return you a childless parent:
+
+- **`limit=` defaults to 0.** `[child]` on its own returns no children at
+  all; always write `[child limit=100]`.
+- **The child field name must be selected by `fl`.** The transformer
+  emits children under `stoichiometry` / `thermodynamics` / `pkas`, and
+  those names are subject to the `fl` filter like any other field:
+
+  | `fl` | children returned |
+  |---|---|
+  | `id,[child limit=10]` | **0** |
+  | `id,stoichiometry,[child limit=10]` | 4 |
+  | `*,[child limit=10]` | 4 |
+
+  Neither case is an error — you get HTTP 200 and a parent doc with the
+  child field simply absent, which reads exactly like "this reaction has
+  no stoichiometry". Use `fl=*` unless you have a reason not to.
 
 ### Filter parents by child conditions
 

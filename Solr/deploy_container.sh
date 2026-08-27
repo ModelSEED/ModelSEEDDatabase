@@ -162,8 +162,31 @@ if [[ "${EXEC_METHOD}" == "docker" ]]; then
             [ "$i" -gt 60 ] && { echo "ERROR: Solr didn't become ready after 60s"; exit 1; }
             sleep 1
         done
+        # Solr answers /admin/info/system as soon as Jetty is up, which is
+        # well before the entrypoint has finished creating cores — posting
+        # at that point 404s. Wait for this env's cores to actually exist.
+        wait_for_cores() {
+            local env="$1" suffix="" core j
+            [ "${env}" = "prod" ] || suffix="_${env}"
+            for core in "compounds${suffix}" "reactions${suffix}" "structures${suffix}"; do
+                j=0
+                until curl -fsS "http://localhost:8983/solr/admin/cores?action=STATUS&core=${core}" 2>/dev/null \
+                        | grep -q "\"name\":\"${core}\""; do
+                    j=$((j + 1))
+                    if [ "$j" -gt 120 ]; then
+                        echo "ERROR: core '${core}' was not created after 120s"
+                        return 1
+                    fi
+                    sleep 1
+                done
+            done
+            echo "    cores for '${env}' are present."
+        }
+
         for env in "${ENV_TOKENS[@]:1}"; do
             echo ""
+            echo ">>> waiting for '${env}' cores to be created..."
+            wait_for_cores "${env}"
             echo ">>> posting biochemistry to '${env}' env..."
             docker compose exec -T solr /scripts/post_biochemistry.sh "${env}"
         done
