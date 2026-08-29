@@ -67,9 +67,10 @@ def fmt_dg_dge(dg, dge):
     return [fmt2(dg), fmt2(dge)]
 
 
-def _per_source_operator(rxn_entry, dg, dge):
+def _per_source_operator(rxn_entry, dg, dge, label=None):
     """Compute the per-source thermodynamic-direction operator for a single
-    ``(dg, dge)`` pair via the upstream cascade heuristic.
+    ``(dg, dge)`` pair via the cascade heuristic that belongs to ``label``
+    (EQ heuristics for ``"eQuilibrator"``, GC heuristics otherwise).
 
     Lazy-imported from ``Estimate_Reaction_Reversibility`` so the helpers
     module stays free of a top-level dependency on the cascade module (and
@@ -82,7 +83,7 @@ def _per_source_operator(rxn_entry, dg, dge):
     sublist's operator a function of THAT source's own energy, independent
     of the cascade's choice of top-level ``deltag``."""
     from Estimate_Reaction_Reversibility import reversibility_from_energy
-    return reversibility_from_energy(rxn_entry, dg, dge)
+    return reversibility_from_energy(rxn_entry, dg, dge, source=label)
 
 
 def pick_structure(structures_dict, cpd, preference=STRUCTURE_PREFERENCE):
@@ -390,7 +391,7 @@ def run_reaction_aggregation_update(reactions_helper, compounds_helper, label):
             dg, dge = sum_reaction_energy(rgts, compounds_dict, label, rxn)
         else:
             dg, dge = DEFAULT_DG, DEFAULT_DG
-        op = _per_source_operator(rxn_entry, dg, dge)
+        op = _per_source_operator(rxn_entry, dg, dge, label)
         set_thermo(rxn_entry, label, [dg, dge, op])
 
     print("Saving reactions")
@@ -410,7 +411,7 @@ def run_reaction_lookup_update(reactions_helper, label, energy_table):
         if rxn not in energy_table:
             continue
         dg, dge = energy_table[rxn][0], energy_table[rxn][1]
-        op = _per_source_operator(reactions_dict[rxn], dg, dge)
+        op = _per_source_operator(reactions_dict[rxn], dg, dge, label)
         set_thermo(reactions_dict[rxn], label, [dg, dge, op])
 
     print("Saving reactions")
