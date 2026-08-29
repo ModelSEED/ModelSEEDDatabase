@@ -1,19 +1,24 @@
 #!/usr/bin/env python
-"""Overwrite compound thermodynamics with eQuilibrator energies.
+"""Write compound formation energies from the regenerated eQuilibrator run.
 
-Source: ``Biochemistry/Thermodynamics/eQuilibrator/MetaNetX_Compound_Energies.tbl``
-(from ``Retrieve_eQuilibrator_Compound_Energies.py``) plus the MetaNetX
-structure-to-InChIKey index under ``Biochemistry/Structures/MetaNetX/``.
+Source: ``Biochemistry/Thermodynamics/eQuilibrator/ModelSEED_Compound_Energies.tsv``
+-- same cache, same parameters and same conditions as the reaction table; see
+``Update_Reaction_eQuilibrator_Energies.py`` for the provenance.
 
-Per-compound resolution:
-  - structure picked via ``InChIKey`` then ``SMILE`` preference
-  - structure deprotonated to a 2-segment InChIKey, then looked up against
-    the MetaNetX index to recover candidate MNX ids
-  - lowest dg among matching MNX records wins
+The lookup is now by ModelSEED compound id, because the cache resolves
+``seed:cpd#####`` to the structure ModelSEED holds for it. The previous script
+had to work backwards: deprotonate the stored InChIKey to two segments, look
+that up in a MetaNetX index, and take the lowest energy among the MetaNetX
+records that matched. Every step of that was a guess about which molecule the
+accession meant, which is the thing this regeneration exists to remove.
 
-Skips writing entirely when the compound has a structure that doesn't
-appear in the MetaNetX index (preserves original eQuilibrator skip
-semantics). Writes the default sentinel when no structure is available."""
+Coverage drops 30,607 -> 16,372. The compound side loses proportionally more
+than the reaction side because 43.7% of ModelSEED compounds fall outside the
+component-contribution span and another 20.5% are absent from the cache -- both
+previously papered over by the loosening-InChIKey fallback. Compounds with no
+energy have the key REMOVED rather than left holding a superseded number.
+
+Compounds store ``[dg, dge]``: a formation energy has no direction."""
 import sys
 sys.path.append('../../Libs/Python/')
 from BiochemPy import Compounds
@@ -21,21 +26,12 @@ import _thermo_helpers as th
 
 LABEL = 'eQuilibrator'
 
-compounds_helper = Compounds()
-eq_compounds = th.parse_two_col_energy_table(
-    th.thermo_path('eQuilibrator', 'MetaNetX_Compound_Energies.tbl'))
-struct_mnx_dict = th.parse_mnx_inchikey_index(
-    th.structures_path('MetaNetX', 'Structures_in_ModelSEED_and_eQuilibrator.txt'))
+eq_compounds = th.parse_modelseed_energy_table(
+    th.thermo_path('eQuilibrator', 'ModelSEED_Compound_Energies.tsv'),
+    id_col='compound_id',
+    dg_col='dgf_prime_kcal_per_mol',
+    err_col='uncertainty_kcal_per_mol')
 
-# 19,432/22,391 (87%) MetaNetX records carry a compound formation energy.
-# 18,206/19,432 (94%) of those map to a unique structure.
+print("%d compounds with an eQuilibrator formation energy" % len(eq_compounds))
 
-
-def resolve(cpd, stype, structure, aliases):
-    deprotonated = "-".join(structure.split('-')[0:2])
-    if deprotonated not in struct_mnx_dict:
-        return None
-    return th.lowest_energy_eq_style(struct_mnx_dict[deprotonated], eq_compounds)
-
-
-th.run_compound_update(compounds_helper, LABEL, resolve, on_no_structure='default')
+th.run_compound_table_update(Compounds(), LABEL, eq_compounds)
