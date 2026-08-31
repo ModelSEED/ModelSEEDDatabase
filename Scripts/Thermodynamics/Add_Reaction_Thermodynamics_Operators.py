@@ -49,7 +49,10 @@ for rxn in sorted(reactions_dict.keys()):
         # Pass the label: each source is scored with its own rule set
         # (eQuilibrator gets the EQ heuristics, everything else GC).
         operator = reversibility_from_energy(rxn_obj, dg_val, dge_val, source=label)
-        new_values = [dg_val, dge_val, operator]
+        # Preserve anything past the operator. dGPredictor records carry a
+        # fourth element (coverage); rebuilding the list as a fixed triple
+        # would silently drop it on every backfill.
+        new_values = [dg_val, dge_val, operator] + list(values[3:])
         entries += 1
         if(new_values != values):
             updated += 1

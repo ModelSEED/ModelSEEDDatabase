@@ -17,39 +17,53 @@ cases, take precedence, are used to overwrite the energies in the database
 
 ### Additive per-method thermodynamics
 
-Each reaction keeps every method's estimate **additively** in its
-`thermodynamics` dict rather than collapsing them into a single value. Each
-method holds an `[energy, error, operator]` triple, where the operator (`>`,
-`<`, `=`, or `?`) is that estimate's own thermodynamic direction — computed with
-that method's own rule set (see *Source-specific reversibility heuristics*
-below) applied to that method's own dG:
+Each reaction and compound keeps every method's estimate **additively** in its
+`thermodynamics` dict rather than collapsing them into a single value:
 
 ```json
 "thermodynamics": {
-    "Group contribution":    [4.15, 1.22, "="],
-    "eQuilibrator":          [-3.46, 0.05, ">"],
-    "dGPredictor":           [-3.82, 0.02, ">"],
-    "dGPredictor-ModelSEED": [-3.77, 0.87, ">"]
+    "Group contribution": [4.15, 1.22, "="],
+    "eQuilibrator":       [-3.46, 0.05, ">"],
+    "dGPredictor":        [-3.82, 0.02, ">", 0.94]
 }
 ```
 
-`dGPredictor` (Wang et al. 2021; predictions staged under
-`../../Biochemistry/Thermodynamics/dGPredictor/json_files/`, kJ→kcal `/4.184`)
-is recorded for **every** reaction it predicts, alongside the GC/eQ records.
-`dGPredictor-ModelSEED` is the same dGPredictor model **retrained on the
-ModelSEED compound structures** (expanded group vocabulary; staged under
-`../../Biochemistry/Thermodynamics/dGPredictor/modelseed_retrained_dG.json`,
-kJ→kcal `/4.184`), recorded as its **own** additive method for the 31,924
-reactions it predicts — next to, and never replacing, the original KEGG-based
-`dGPredictor` record. These per-method records sit **next to**, and never
-replace, the canonical top-level `deltag` / `deltagerr` / `reversibility`
-fields — recording dGPredictor does not alter the canonical free-energy value. The rule sets
-live in `reversibility_heuristics.py`, reached via
-`Estimate_Reaction_Reversibility.reversibility_from_energy(..., source=<label>)`; the
-`Update_Reaction_*_Energies.py` scripts attach the operator when they write each
-method, and `Add_Reaction_Thermodynamics_Operators.py` can (re)generate the
-operators for all stored energies at any time without needing the upstream
-GC / eQuilibrator / dGPredictor inputs.
+Record shape differs by kind and by source:
+
+| kind | source | record |
+|---|---|---|
+| reaction | Group contribution, eQuilibrator | `[dg, err, operator]` |
+| reaction | dGPredictor | `[dg, err, operator, coverage]` |
+| compound | Group contribution, eQuilibrator | `[dg, err]` |
+| compound | dGPredictor | `[dg, err, coverage]` |
+
+kcal/mol throughout. Compounds carry no operator — a formation energy has no
+direction. dGPredictor's trailing `coverage` is appended, so positional readers
+of `[0]`/`[1]`/`[2]` are unaffected; anything **rewriting** these lists must
+preserve elements past the operator.
+
+The **operator** (`>`, `<`, `=`, `?`) is that estimate's own thermodynamic
+direction, computed from that source's own energy with **that source's own rule
+set** — not the canonical reversibility. Passing `source=` to
+`reversibility_from_energy` selects the set; omitting it silently falls back to
+`GC`, scoring an eQuilibrator or dGPredictor energy with Group-Contribution
+rules. The registry is documented in the next section.
+
+`Add_Reaction_Thermodynamics_Operators.py` refreshes every operator from the
+stored energies without needing the upstream inputs. Because each updater
+already computes its operator at write time, a clean run reports
+**"Entries refreshed/added: 0"**; a non-zero count means a record was written
+with the wrong rule set.
+
+These per-source records sit **next to** the canonical top-level
+`deltag` / `deltagerr` / `reversibility` fields and never replace them.
+
+> **The canonical fields are being retired** in favour of this dict. They are
+> currently stale with respect to every source beneath them: derived before the
+> 2026-08 eQuilibrator regeneration and dGPredictor retrain, and some promoted
+> from `dGPredictor-ModelSEED`, which no longer exists.
+> `Promote_Reaction_Thermodynamics_to_Canonical.py` never overwrites an existing
+> canonical value, so re-running it does not repair them.
 
 ### Source-specific reversibility heuristics
 
@@ -334,38 +348,25 @@ own compartment-dropping retrieval step is a different defect needing a
 different fix (rebuild the formula), not a sentinel.
 
 The underlying thermodynamics data is kept in
-`../../Biochemistry/Thermodynamics`. The decomposition of molecular
-structures and their resulting energies for both the older group
-contribution approach and the newer eQuilibrator approach are stored in
-the `ModelSEED` and `eQuilibrator` directories.
+`../../Biochemistry/Thermodynamics`, one directory per source, each with its own
+README recording provenance:
 
-As an addendum, the two scripts used to update the energies from
-eQuilibrator are in this folder, but are dependent on files in
-`../../Biochemistry/Structures/MetaNetX`:
-```
-./Retrieve_eQuilibrator_Compound_Energies.py
-./Retrieve_eQuilibrator_Reactions_Energies.py
-```
+| directory | source | README |
+|---|---|---|
+| `ModelSEED/` | Group contribution — MFAToolkit MolAnalysis tables | — |
+| `eQuilibrator/` | component contribution from ModelSEED structures | yes |
+| `dGPredictor/` | retrained fragment model + staged predictions | yes |
 
-If the underlying thermodynamics data in `../../Biochemistry/Thermodyanmics` hasn't changed,
-then running these six commands should not cause any changes to appear in the database.
+`Retrieve_eQuilibrator_{Compound,Reactions}_Energies.py` built the superseded
+MetaNetX-mediated tables and are kept for reference only; they no longer feed
+the database. See `../../Biochemistry/Thermodynamics/eQuilibrator/README.md`.
 
-```
-./Update_Compound_GroupContribution_Energies.py
-./Update_Reaction_GroupContribution_Energies.py
-./Estimate_Reaction_Reversibility.py GC
-./Update_Compound_eQuilibrator_Energies.py
-./Update_Reaction_eQuilibrator_Energies.py
-./Estimate_Reaction_Reversibility.py EQ
-# Record dGPredictor additively for every predicted reaction (no canonical change)
-./Update_Reaction_dGPredictor_Energies.py
-# Record the ModelSEED-retrained dGPredictor as its own additive method
-./Update_Reaction_dGPredictor_ModelSEED_Energies.py
-# Backfill/refresh the per-method [energy, error, operator] triples
-./Add_Reaction_Thermodynamics_Operators.py
-```
+If the underlying thermodynamics data hasn't changed, running the pipeline
+should produce no diff:
 
-These easily run together by running:
 ```
 ./Rerun_Thermodynamics.sh
 ```
+
+That script documents the full order, including the canonical-field steps that
+are deliberately **not** run while those fields are being retired.
