@@ -26,8 +26,64 @@ Generated 2026-08 from:
 - **conditions** — pH 7.0, ionic strength 0.25 M, pMg 3.0, 298.15 K.
 
 A row exists for every ModelSEED reaction and compound. The `status` column
-says why a row has no energy rather than omitting it — that column is the
-point of the format.
+says why a row has no energy rather than omitting it — that column is the point
+of the format.
+
+### Status vocabulary, and the split that matters
+
+`GibbsEnergyPredictor.standard_dg` has two distinct outcomes and only one is a
+failure:
+
+```python
+mu, sigma_fin, sigma_inf, residual = get_reaction_prediction(reaction)
+if residual:
+    return Q_(0, "kJ/mol").plus_minus(RMSE_inf)      # mu DISCARDED
+else:
+    std = |sigma_fin| + RMSE_inf * |sigma_inf|
+    return Q_(mu, "kJ/mol").plus_minus(max(RMSE_eps, std))
+```
+
+When `residual` is non-empty, some reactant cannot be expressed in the model's
+basis at all, `mu` is thrown away, and the return is literally zero plus the
+pH/ionic-strength transform. **There is no estimate.** Status `undecomposable`,
+with the offending compounds named so curation has a work queue.
+
+When `residual` is empty the prediction is real, even if σ is enormous. Status
+`ok`, and the true σ is recorded.
+
+An earlier version keyed on `err > 1e4`, which cannot tell these apart — both
+return a vast σ — and so filed 3,146 reactions and 9,081 compounds as
+"outside CC span" without distinguishing them. That label is retired.
+
+**Note the input.** `ComponentContribution.standard_dg_prime` calls
+`reaction.separate_stored_dg_prime(...)` first and passes the *residual*
+reaction to the predictor, so compounds carrying a measured dG never reach it.
+Asking `get_reaction_prediction` about the full reaction reports those measured
+compounds as undecomposable and declines reactions the library would answer.
+`tools/verify_regen.py` exists to catch exactly that class of mistake: it fails
+on any reaction that was `ok` and no longer is.
+
+### σ = RMSE_inf is a sentinel, not an error bar
+
+`RMSE_inf` is 100,000 kJ/mol = 23,901 kcal/mol. A reaction with an
+unconstrained direction comes back at or beyond that scale. Of the 3,146
+reactions that gained a value in the split, **none** is usable:
+
+| σ band, kcal/mol | reactions | compounds |
+|---|---|---|
+| usable (< 10) | 0 | 0 |
+| weak (10–100) | 0 | 0 |
+| very weak (100–1,000) | 0 | 0 |
+| unconstrained (> 1,000) | 3,146 | 9,081 |
+
+σ min 11,065, median 23,902 (= RMSE_inf), max 861,957 kcal/mol.
+
+They are stored anyway, with their true σ, so the decline is explicit and
+quantified rather than an absent key — a consumer can see the method was asked
+and answered "I cannot constrain this". Any σ filter removes them instantly,
+and the `EQ` direction cascade already returns `?` for them via
+`eq_undecomposable_heuristic`. **Do not quote the raw record count as
+coverage:** 24,999 reactions carry a value, 21,853 carry a usable one.
 
 ### A note on pMg 3.0
 
@@ -60,10 +116,13 @@ Counting real energies (not keys — the old compound script wrote the
 `10000000` sentinel for structureless compounds, so 8,765 of its 30,607 entries
 were never energies):
 
-| | before | after | lost | gained | net |
-|---|---|---|---|---|---|
-| reactions | 25,028 | 21,853 | 6,238 | 3,063 | −3,175 |
-| compounds | 21,842 | 16,372 | 9,223 | 3,753 | −5,470 |
+| | before | after (usable) | after (all stored) | lost | gained | net usable |
+|---|---|---|---|---|---|---|
+| reactions | 25,028 | 21,853 | 24,999 | 6,238 | 3,063 | −3,175 |
+| compounds | 21,842 | 16,372 | 25,453 | 9,223 | 3,753 | −5,470 |
+
+"All stored" adds the unconstrained rows described above. They are records, not
+coverage.
 
 The new ingests write no sentinels at all: an entry either carries an energy or
 carries no `eQuilibrator` key.
@@ -81,15 +140,18 @@ checking the infinite-uncertainty term. Roughly 270 are a genuine cache gap.
 
 The largest single reason for having no energy, on both sides:
 
-| | outside CC span | share |
-|---|---|---|
-| reactions | 10,693 | 19.1% |
-| compounds | 19,984 | 43.7% |
+| | undecomposable | unconstrained | combined share |
+|---|---|---|---|
+| reactions | 7,547 | 3,146 | 19.1% |
+| compounds | 10,903 | 9,081 | 43.7% |
+
+(These are the two halves of what the old `outside CC span` label lumped
+together: 7,547 + 3,146 = 10,693 and 10,903 + 9,081 = 19,984.)
 
 "Outside the span" means the molecule (or some participant) cannot be expressed
 in the reactant- plus group-contribution basis the model was fitted in, so
-`standard_dg` short-circuits and returns no estimate. **Nobody has yet audited
-what those 19,984 compounds actually are.** The questions worth answering:
+`standard_dg` short-circuits and returns no estimate. **Nobody has yet audited what those
+10,903 undecomposable compounds actually are.** The questions worth answering:
 
 - How much of it is one structural class? Tetrapyrroles, metal complexes and
   polyprenyl chains are the known group-decomposer failures — if the 43.7% is
