@@ -11,23 +11,72 @@ Both carry a `# cache=... params=... p_h=... ionic_strength=... p_mg=... T=...`
 provenance line. **Do not strip it** — it is the only record of which compound
 cache and which component-contribution parameter set produced the numbers.
 
-Generated 2026-08 from:
+Generated 2026-09 from:
 
-- **cache** — eQuilibrator's Zenodo cache with every `seed:` accession
-  repointed at the structure ModelSEED holds (Path A), then training `kegg:`
-  accessions repointed so `kegg:X` and `seed:cpd#####` resolve to the same
-  compound (Path B). 97.1% of the 28,075 compounds where ModelSEED has a
-  structure resolve to that structure; the remaining 2.9% lacked pKas, so the
-  prior mapping was kept and is flagged unverified.
-- **parameters** — component-contribution retrained on that cache with the
-  TECRDB de-duplicated (78 measurement groups eQuilibrator counted 2–6 times;
-  88 redundant rows removed, improving cross-validated prediction at
-  p = 1.7e-05).
+- **cache** — `data/modelseed_cache_msd/compounds.sqlite`, built by
+  `tools/build_modelseed_cache.py`. **26,986 compounds**, against the 699,184
+  of the Zenodo cache this replaces.
+- **parameters** — `data/cc_params_msd.npz`, component contribution retrained
+  against that cache on the de-duplicated TECRDB.
 - **conditions** — pH 7.0, ionic strength 0.25 M, pMg 3.0, 298.15 K.
 
-A row exists for every ModelSEED reaction and compound. The `status` column
-says why a row has no energy rather than omitting it — that column is the point
-of the format.
+### The cache is now ModelSEED's, not MetaNetX's with our labels on it
+
+What shipped before was the Zenodo cache with our accessions overlaid. MetaNetX
+named essentially all 699,184 of its compounds and SwissLipids contributed
+505,004; only ~36,800 ever carried a `seed:` accession and ~640 affect the fit.
+Worse, the overlay builder had a `retain` fallback: wherever we could not
+supply a structure it put the MetaNetX-derived mapping *back*, so some `seed:`
+accessions still resolved to somebody else's molecule.
+
+This cache is built the other way round — start empty, add only what ModelSEED
+needs. With no prior mapping there is nothing to retain, so **every `seed:`
+accession resolves to a structure ModelSEED curates** as a property of the
+build rather than a policy setting.
+
+| population | n | why |
+|---|---|---|
+| carried over from Zenodo | 21,997 | the cache already held **our** molecule (matched on InChIKey, protonation-insensitive). Copying the row is not a provenance compromise. Load-bearing, not an optimisation: phosphate, water, CO₂ and ammonia cannot be built at all, because group decomposition rejects small inorganics — and several are anchors. |
+| created from our SMILES + pKas | 4,864 | the cache lacked our structure |
+| training-only | 129 | `metanetx.chemical:` and `coco:` accessions the training data references and no ModelSEED alias reaches. **Unavoidable**: the measurements are keyed to KEGG and MetaNetX, and without these the training set silently shrinks. This is the one place a foreign structure legitimately remains. |
+
+Every inherited `seed:` identifier was purged before re-attachment, and 73
+`kegg:` accessions were repointed onto our structures so `kegg:X` and
+`seed:cpd#####` resolve to the same compound. Anchors: **Nc = 642**, identical
+to the superseded cache.
+
+**The retrained parameters are numerically identical to the previous set** —
+`dG0_cc`, `dG0_rc`, `dG0_gc` and `train_b` all agree to 1e-9, because
+carry-over preserves Zenodo's compound ids so the anchors kept theirs. The
+model did not change. Only coverage did.
+
+### What it cost, and what that cost bought
+
+| | before | after |
+|---|---|---|
+| reactions with a value | 24,999 | **23,800** |
+| compounds with a value | 25,453 | **24,530** |
+
+Where both caches compute a value the numbers are **bit-identical** — median
+change 0.000, maximum 0.000 kcal/mol over 23,800 reactions. Every loss is
+`compound not in cache`, and every one is accounted for:
+
+| compounds lost | 923 |
+|---|---|
+| we hold **no structure** — the value rested on a MetaNetX inference | **580** |
+| we hold a structure but could not build it | 254 |
+| classified no-structure in the mapping | 89 |
+
+The 580 are the point of the exercise, not a cost: they were energies for
+molecules we had no way to check. dGPredictor never covered them either, for
+the same reason.
+
+`cache_creation_failures.tsv` lists everything the build could not represent —
+**1,839** blocked for want of pKas and **1,267** where group decomposition
+rejected the structure. The old builder's `retain` fallback existed so a failed
+creation would not silently drop an accession; there is nothing to fall back to
+here, so failures are reported instead. The pKa block is fixable: 6,405
+ModelSEED compounds have simply never been through MolGpKa.
 
 ### Status vocabulary, and the split that matters
 
