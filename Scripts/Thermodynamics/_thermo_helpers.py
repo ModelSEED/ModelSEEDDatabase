@@ -139,6 +139,43 @@ def parse_two_col_energy_table(path):
     return out
 
 
+def parse_modelseed_gc_table(path):
+    """Parse the ModelSEED-keyed Group-Contribution table.
+
+    ``Biochemistry/Thermodynamics/ModelSEED/ModelSEED_GroupContribution.tsv`` is
+    MFAToolkit run directly against the structures ModelSEED curates, one row
+    per compound, keyed by ``cpd`` id.
+
+    This supersedes ``parse_gc_compound_table``, which read the four
+    ``{KEGG,MetaCyc}_{Original,Charged}_MolAnalysis.tbl`` corpora keyed by
+    *source* accession and then had to find its way back to a ModelSEED
+    compound through alias resolution -- averaging across whichever KEGG and
+    MetaCyc mol files happened to share an alias, and widening the error bar
+    when they disagreed. That indirection is the same class of guess removed
+    from the eQuilibrator path: the energy came from whichever molecule the
+    alias pointed at, which is not necessarily the molecule we curate.
+
+    Keyed by our own id there is exactly one structure per compound, so there
+    is nothing to average and no alias spread to inflate. Returns
+    ``{cpd: [dg, dge]}`` over ``status == ok`` rows only, 2-decimal formatted
+    to match the other parsers.
+    """
+    out = {}
+    with open(path) as fh:
+        first = fh.readline()
+        if not first.startswith('#'):
+            fh.seek(0)
+        for row in csv.DictReader(fh, delimiter='\t'):
+            if row.get('status') != 'ok':
+                continue
+            try:
+                out[row['compound_id']] = fmt_dg_dge(row['dg_kcal_per_mol'],
+                                                     row['dgerr_kcal_per_mol'])
+            except (KeyError, TypeError, ValueError):
+                continue
+    return out
+
+
 def parse_modelseed_energy_table(path, id_col, dg_col, err_col,
                                  status_col='status', ok='ok'):
     """Parse a regenerated eQuilibrator table produced directly from ModelSEED

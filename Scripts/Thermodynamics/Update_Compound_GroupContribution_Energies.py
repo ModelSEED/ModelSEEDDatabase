@@ -1,41 +1,29 @@
 #!/usr/bin/env python
 """Write Group-Contribution compound energies into the BiochemPy compound JSON.
 
-Source: MFAToolkit mol-analysis tables under
-``Biochemistry/Thermodynamics/ModelSEED/*_MolAnalysis.tbl``.
+Source: ``Biochemistry/Thermodynamics/ModelSEED/ModelSEED_GroupContribution.tsv``
+-- MFAToolkit's group-contribution method run directly against the structures
+ModelSEED curates, keyed by ``cpd`` id.
 
-Per-compound resolution:
-  - structure picked via ``InChIKey`` then ``SMILE`` preference
-  - aliases restricted to those listed for the *curated* structure in
-    ``All_ModelSEED_Structures.txt``
-  - mean of dg across matching aliases; error is
-    sqrt(mean(σᵢ²) + var(dgᵢ)), so alias disagreement widens the reported
-    uncertainty rather than being silently collapsed to a lowest pick.
-    (Prior policy took the lowest; effectively identical for 99.95% of
-    compounds, but the 25 pteridine/flavonoid-like cases with a 1–24
-    kcal/mol spread across aliases now report both the mean value and
-    an honest variance-inflated error.)
+This replaces the alias-mediated route. Previously GC decomposed KEGG and
+MetaCyc mol-file corpora, keyed by *source* accession, and reached a ModelSEED
+compound by matching aliases -- taking the mean across whichever source
+molecules shared an alias, with the error widened by their disagreement. The
+energy therefore came from whichever molecule the alias pointed at, which is
+not necessarily the molecule we hold. That is the same indirection removed from
+the eQuilibrator path in the 2026-08 regeneration; with it gone, all three
+thermodynamic sources derive from ModelSEED structures.
 
-Also stamps Convention A load-bearing constants for small-molecule compounds
-whose ΔfG values live in MFAToolkit's cue database (as ENERGY entries used
-during GC decomposition of larger molecules) but which the alias-lookup
-pipeline can't produce standalone values for. These are Chris Henry's own
-reference values from the cue database — not novel numbers, just injected
-at the compound level where the downstream pipeline needs them.
+Keyed by our own id there is exactly one structure per compound, so the
+mean-of-aliases resolver and its variance inflation no longer have anything to
+operate on and are retired. Note what that costs: for the handful of compounds
+whose aliases genuinely disagreed (pteridines, flavonoids -- spreads of 1-24
+kcal/mol), the old error bar advertised that disagreement. The new one does
+not. The disagreement has not been resolved, it has been made invisible; what
+remains is the group-contribution uncertainty for the one structure we chose.
 
-Each anchor value has been cross-validated by an independent method:
-(Chris cue-db ENERGY) vs (eQuilibrator ΔfG'° shifted to Convention A by
-subtracting n_H × RT·ln(10)·pH = n_H × 9.539). Eight of the nine agree
-between the two independent sources to within 0.5 kcal/mol; the ninth
-(cpd00239 H₂S) shows a 2.88 kcal/mol residual because eQuilibrator
-treats it as a pseudo-species (weighted mix of H₂S and HS⁻ at pH 7,
-pKa₁ ≈ 7.05) while Chris's cue_H2S is for neutral H₂S specifically.
-Both are legitimate reference values for the H₂S identity that
-cpd00239 represents (its formula HS just reflects Marvin's pH 7
-Charged form choice); shipping Chris's value keeps GC uniformly in
-Chris's own reference set.
-
-See Biochemistry/Thermodynamics/README.md."""
+Convention A throughout -- see the anchor table below and
+Biochemistry/Thermodynamics/README.md."""
 import sys
 sys.path.append('../../Libs/Python/')
 from BiochemPy import Compounds
@@ -43,9 +31,6 @@ import _thermo_helpers as th
 
 LABEL = 'Group contribution'
 
-# Convention A anchors — cue-database ENERGY values, cross-validated against
-# eQuilibrator (Convention B) via the ΔfG_A = ΔfG_B − n_H × 9.539 transform.
-# All within 0.5 kcal/mol of the independent method.
 CONVENTION_A_ANCHORS = [
     # (cpd_id, formula, ΔfG kcal/mol, error kcal/mol)
     ('cpd00067', 'H+',    -9.5,     0.0),   # Chris's pH 7 anchor (stated convention)
@@ -60,26 +45,38 @@ CONVENTION_A_ANCHORS = [
 ]
 
 compounds_helper = Compounds()
-gc_table = th.parse_gc_compound_table(th.thermo_path())
-curated_aliases = th.parse_curated_structure_aliases(
-    th.structures_path('All_ModelSEED_Structures.txt'))
+gc = th.parse_modelseed_gc_table(
+    th.thermo_path('ModelSEED', 'ModelSEED_GroupContribution.tsv'))
+
+print("%d compounds with a group-contribution energy" % len(gc))
 
 
 def resolve(cpd, stype, structure, aliases):
-    # dev-drift guard: the picked structure (an InChIKey) may not match any
-    # curated entry when the compound has been re-tautomerized or protonation
-    # state has shifted since the aliases file was regenerated.
-    curated = curated_aliases.get(cpd, {}).get(structure, {})
-    return th.mean_energy_gc_style(
-        (a for a in aliases if a in curated), gc_table)
+    """Direct lookup by ModelSEED id. No alias walk, no averaging.
+
+    A compound whose structure the group decomposer declined gets the SENTINEL,
+    not a skip. Returning None would leave whatever the alias route had written
+    still sitting in the record -- a value derived from some KEGG or MetaCyc
+    molecule, under a label that now claims to mean "computed from the
+    structure we hold". 99 compounds were in exactly that state on the first
+    pass; the point of this change is that no such value survives.
+    """
+    return gc.get(cpd, list(th.DEFAULT_DG_DGE))
 
 
-th.run_compound_update(compounds_helper, LABEL, resolve, on_no_structure='default')
+# on_no_structure='default' preserves the historical sentinel for compounds
+# with no structure at all. Changing that is a separate question (the three
+# sources currently disagree about how to say "no value"); this commit changes
+# only where the energy comes from.
+th.run_compound_update(compounds_helper, LABEL, resolve,
+                       on_no_structure='default')
 
-# Post-run: stamp all Convention A anchors. MFAToolkit's atom-labeler can't
-# decompose these compounds standalone (they end up sentinel via alias
-# lookup); their ΔfG values live only in the cue database, so we inject
-# them at the compound level here.
+# Post-run: stamp all Convention A anchors. MFAToolkit cannot decompose these
+# standalone -- water comes back "unlabeled atoms:3", not an energy -- so their
+# ΔfG values live only in the cue database and are injected here at the
+# compound level. Unchanged by the move to direct lookup: the reason these need
+# injecting was never the alias route, it is that the group decomposer has
+# nothing to say about them.
 compounds_dict = compounds_helper.loadCompounds()
 touched = 0
 for cpd_id, label_name, dg, dge in CONVENTION_A_ANCHORS:
