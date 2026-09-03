@@ -123,6 +123,78 @@ sources:
           completeness and for graceful degradation if primary
           sources lose entries in the future.
 
+  ModelSEED:
+    snapshot: 2026-09-01
+    pkas:
+      - file:    pkas/opam2_molgpka.tsv
+        tool:    MolGpKa
+        version: opam2
+        consumed_by_production: false
+      - file:    pkas/molgpka_stock_2026-09.tsv
+        tool:    MolGpKa
+        version: stock
+        consumed_by_production: true
+    notes: |
+      ModelSEED is not an external structure source, so it has no
+      protonations block and takes no part in the structure-picking
+      priority list above. It is registered here because it is the only
+      pKa source computed on OUR OWN structures: every other file in
+      this manifest was produced by running Marvin over some external
+      database's structure file, and inherits that file's atom
+      numbering. Interpreted against our structures, 64.2% of Marvin's
+      atom indices land on carbon, phosphorus, or an index past the end
+      of the molecule, so they cannot be joined to anything of ours.
+      Atom indices are therefore kept HERE, per source, in the atom
+      space each was computed in, and are not carried into the compound
+      records — nothing in the energy path consumes one.
+
+      Two runs are kept. opam2_molgpka.tsv is the original, covering
+      22,395 compounds, and records site indices as the ionizable
+      HYDROGEN. molgpka_stock_2026-09.tsv covers 32,201 — the gain comes
+      from feeding ModelSEED structures directly rather than matching a
+      precomputed cache — and records the heavy atom bearing the proton,
+      which is the convention Marvin uses.
+
+      Stock MolGpKa weights only. The fine-tuned weight_*_modelseed.pth
+      checkpoints in OPAM2 are degraded: MAE 1.91 against measured pKas
+      versus 0.55 for stock, and 6.6% of their predictions fall outside
+      the physically possible -2..16 range.
+    literature:
+      - file:    pkas/iupac_v2_3b.tsv
+        source:  IUPAC Digitized pKa Dataset v2.3b
+        doi:     10.5281/zenodo.15375522
+        license: CC-BY-NC-4.0
+        redistributable: false
+        gitignored: true
+        regenerate: Scripts/Structures/Fetch_IUPAC_pKas.py
+        notes: |
+          NOT IN THE REPOSITORY. Licensed CC-BY-NC-4.0, which is not
+          compatible with how this database is distributed, so the values
+          are consumed by the pipeline and left on local disk. The file
+          is gitignored; this entry plus the fetch script are the
+          reproducible record. Run the script to recreate it.
+
+          24,211 measured values digitized with IUPAC's permission from
+          Serjeant & Dempsey, Ionisation Constants of Organic Acids in
+          Aqueous Solution (1979), and Perrin, Dissociation Constants of
+          Organic Bases in Aqueous Solution (1965, + 1972 supplement).
+          Rows carry SMILES and InChI, so matching is structural rather
+          than by name, and values are typed pKa1/pKa2/pKaH1 -- the
+          macroscopic ladder is explicit at source, which is what
+          eQuilibrator's transform needs and what a per-site predictor
+          cannot supply. 2,394 dissociations reach 1,453 ModelSEED
+          compounds.
+
+          CAVEAT, ionic strength. eQuilibrator wants pKas at ZERO ionic
+          strength: it applies its own Debye-Huckel correction from the
+          microspecies charge, so pre-corrected values double-count. This
+          dataset has no ionic-strength column -- conditions appear only
+          in free-text remarks such as "I=0.1(NaCl)". Rows therefore
+          carry an ionic_strength_stated flag and the remark text, and
+          the caller decides. ATP's pKa5 reads 6.53 here at I=0.1 against
+          Alberty's 7.60 at I=0, so this is not a small effect. Prefer
+          Alberty wherever the two overlap.
+
 # ---------------------------------------------------------------------------
 # Additive per-source thermodynamic descriptions
 # ---------------------------------------------------------------------------

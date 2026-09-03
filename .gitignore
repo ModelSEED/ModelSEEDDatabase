@@ -8,3 +8,11 @@ Correct_MSDB*
 # Session-tooling / offline summaries (ccrider, recall)
 .recall/
 *.analysis.json
+
+# IUPAC Digitized pKa Dataset -- consumed by the pipeline, never redistributed.
+# Licensed CC-BY-NC-4.0 (Zenodo 10.5281/zenodo.15375522), which is not
+# compatible with how this database is distributed, so the values stay out of
+# the repository in every form. Regenerate locally with
+# Scripts/Structures/Fetch_IUPAC_pKas.py; the manifest entry in
+# Biochemistry/Structures/sources.yaml records the DOI and the procedure.
+Biochemistry/Structures/ModelSEED/pkas/iupac_*.tsv
