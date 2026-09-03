@@ -1,0 +1,20 @@
+%% Source: MANUSCRIPT.md "Materials and Methods > Community contributions,
+%%         branches, and continuous integration"
+%%         (drafts/methods_distribution_pypi_ci.md, CI section).
+\subsection{Community contributions, branches, and continuous integration}
+
+The 2020 release described a Travis CI setup that validated pull requests to
+\texttt{dev} at submission time. Travis is no longer used; the same intent ---
+validating any newly curated entries at PR time --- is now implemented via a
+GitHub Actions workflow. The workflow runs on every PR to \texttt{dev} and
+checks: (i) that the compound and reaction JSON shards parse and match their
+expected schema; (ii) that newly added or modified reactions remain mass- and
+charge-balanced against the (possibly modified) compound set; (iii) that newly
+added override or exclusion file rows conform to the appropriate schema; (iv)
+that every curated pick carries the required provenance fields. Failures block
+the PR from being merged until the contributor addresses them.
+
+The workflow definition is under \file{.github/workflows/} in the repository;
+contributors can run the same checks locally before opening a PR by invoking the
+validation script directly (\file{Scripts/Validation/},
+\TBD[confirm script path]).

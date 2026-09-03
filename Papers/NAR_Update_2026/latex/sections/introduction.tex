@@ -1,0 +1,31 @@
+%% Source: MANUSCRIPT.md "Introduction" (from drafts/discussion_and_availability.md).
+\section{Introduction}
+
+The 2020 release of the ModelSEED biochemistry database~\cite{seaver2020}
+established the database as a curated integration of KEGG, MetaCyc, BiGG,
+MetaNetX, Rhea, BioCyc-family databases, and dozens of published metabolic
+models --- a ``Rosetta Stone'' for cross-database mapping backed by
+structure-first compound reconciliation, per-reaction thermodynamics, and a
+community-contribution workflow on GitHub. Six years later, we present an
+update that extends the database along four axes and provides the first
+systematic empirical accounting of a question the 2020 release could not: how
+much does the choice of a reaction-direction source actually matter for
+downstream metabolic-model output.
+
+Three developments in the field motivate specific parts of this update.
+\textbf{Atom mapping} has matured from a specialty capability into a routine
+expectation for any biochemistry database supporting isotope-tracing or
+degradation-prediction workflows; we present a first-pass integration of atom
+mappings via a collaboration with the \TBD[group] group.
+\textbf{Machine-learning-based thermodynamics} methods (dGpredictor and
+successors) now cover a substantial fraction of the ModelSEED compound set and
+enable a multi-source approach that goes beyond the single-primary-plus-fallback
+strategy of 2020. \textbf{Reaction-direction transparency} has emerged as a
+growing concern in the metabolic-modeling community; each choice a curator
+makes about direction propagates through model output in ways that are rarely
+quantified, and we provide the first systematic quantification here.
+
+The paper walks through three technical components --- compound structures,
+reaction similarities, and dynamics (the reaction-direction empirical study)
+--- and their integration into the repository, the website, and the manuscript.
+\TBD[1--2 sentence roadmap]

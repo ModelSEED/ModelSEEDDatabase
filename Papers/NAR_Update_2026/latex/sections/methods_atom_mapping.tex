@@ -1,0 +1,31 @@
+%% Source: MANUSCRIPT.md "Materials and Methods > Atom mapping"
+%%         (drafts/methods_atom_mapping.md).
+\subsection{Atom mapping}\label{sec:methods-atom-mapping}
+
+Atom mapping --- the assignment of individual reactant atoms to their
+product-side counterparts across a mass-balanced reaction --- is a new
+capability in the 2026 release. Mappings enable atom-level tracing of carbon,
+phosphorus, sulfur, and other atoms through a metabolic network, and are
+increasingly required for downstream applications including
+\textsuperscript{13}C metabolic flux analysis, pathway-degradation prediction,
+and cofactor-usage attribution.
+
+Mappings for the ModelSEED biochemistry are being generated through a
+collaboration with the \TBD[group] group at the \TBD[institution]. Mapping
+methodology: \TBD[will be described briefly with reference to the
+collaborators' methods paper]. Delivery format: \TBD[likely RXN files or a
+tabular format per reaction].
+
+Mapped reactions are integrated into ModelSEED under
+\file{Biochemistry/AtomMappings/} (or equivalent, \TBD{}). Each mapped reaction
+is stored alongside its ModelSEED reaction ID; downstream consumers can access
+mappings through the same Solr endpoint or the new PyPi API (see
+Section~\ref{sec:methods-distribution}).
+
+Coverage as of the 2026 snapshot: \TBD[fraction of priority-scope reactions with
+mappings delivered]. Coverage of the full ModelSEED reaction set: \TBD{}.
+Reactions without a mapping fall into three classes: (i) reactions whose
+reactant compounds do not yet have a stored structure (necessarily unmappable);
+(ii) reactions with \texttt{R} groups whose mapping requires expansion to
+specific chain lengths; (iii) reactions whose complexity (e.g. very long acyl
+chains, PKS/NRPS iterative modules) exceeds the mapper's practical scope.

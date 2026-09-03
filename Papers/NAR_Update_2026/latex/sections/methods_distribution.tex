@@ -1,0 +1,18 @@
+%% Source: MANUSCRIPT.md "Materials and Methods > Distribution: PyPi package + API"
+%%         (drafts/methods_distribution_pypi_ci.md, PyPi section).
+\subsection{Distribution: PyPi package and API}\label{sec:methods-distribution}
+
+The 2020 release published the database as a Git repository and a Solr REST
+endpoint; both remain available. The 2026 release adds an installable PyPi
+package (\texttt{modelseed-biochem}, \TBD[confirm exact package name]) that ships
+the database contents plus a documented Python API for programmatic access.
+Typical use cases include fetching a compound record by ID, walking a reaction's
+reagents, querying the thermodynamics ledger, and retrieving atom mappings.
+Installation and usage examples are documented in the repository README and
+mirror the shape of the existing Solr access patterns, so existing users can
+migrate incrementally.
+
+Version pinning: the PyPi package version tracks the ModelSEED release tag (i.e.
+installing \texttt{modelseed-biochem==2.0.0} pulls the database contents as of
+the \texttt{v2.0.0} release tag). This lets downstream tools depend on a specific
+database state rather than the moving \texttt{master} head.

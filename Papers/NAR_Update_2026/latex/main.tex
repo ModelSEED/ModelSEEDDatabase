@@ -1,0 +1,226 @@
+%%=============================================================================
+%%  The ModelSEED Biochemistry Database: 2026 update
+%%  Target journal: Nucleic Acids Research (NAR), Database Issue
+%%  https://academic.oup.com/nar/pages/Ms_Prep_Database
+%%
+%%  This is the ONLY file that carries journal formatting. All prose lives in
+%%  sections/ and is pulled in by the \input statements at the bottom.
+%%  Build:  pdflatex main -> bibtex main -> pdflatex main -> pdflatex main
+%%          (or simply: latexmk -pdf main.tex)
+%%=============================================================================
+
+%%-----------------------------------------------------------------------------
+%%  NAR DATABASE-ISSUE REQUIREMENTS CHECKLIST
+%%  Summary only. The authoritative, fully-cited version -- including OUP's
+%%  figure format/dpi specification -- is in NAR_REQUIREMENTS.md alongside
+%%  this file. Update that file, not this comment.
+%%  (from academic.oup.com/nar/pages/Ms_Prep_Database, checked 2026-08-26)
+%%
+%%  [ ] LENGTH -- update papers: normally no more than 4-6 typeset journal
+%%      pages. Contact the Executive Editor before submitting anything longer.
+%%      Current draft is deliberately over; trim after [TBD] markers resolve.
+%%  [!] TITLE -- the database name should ideally be the FIRST WORD of the
+%%      title. Current title opens with "The". Consider "ModelSEED Biochemistry
+%%      Database, 2026 update: ..." to comply.
+%%  [ ] URL -- a working URL must appear BOTH in the abstract and in the body.
+%%      See \modelseedurl below; it is used in both places.
+%%  [ ] GRAPHICAL ABSTRACT -- MANDATORY. 5:2 aspect ratio, min 127x50 mm
+%%      (5x2 in), TIF/EPS/editable PDF, 300-600 dpi, landscape, sans-serif
+%%      (Arial) 12-16 pt. Must be ORIGINAL -- not reused from any main or
+%%      supplementary figure. No trademarked/copyrighted logos.
+%%      Submitted as a separate file, not embedded here.
+%%  [ ] REFERENCES -- numbered sequentially in order of appearance. The class
+%%      default (no namedate/numbered option) gives NAR-style numeric (1,2).
+%%      Exclude "submitted"/"in preparation"/personal communications.
+%%      Cite other databases by their most recent published description; if
+%%      none exists, put the URL in body text, NOT in the reference list.
+%%  [ ] FIGURES -- no numeric limit on figure count; the 4-6 page budget is the
+%%      real constraint. The database home page may NOT be used as a typeset
+%%      figure. A representative screenshot of a query result IS allowed.
+%%      Format (OUP artwork guidance): raster -> uncompressed .tif; vector ->
+%%      .eps/.svg/.pdf with embedded fonts. Minimum dpi: 300 colour half-tone,
+%%      600 greyscale, 600-900 combination/line art, 1200 mono line art; vector
+%%      has no inherent resolution. RGB preferred. Arial/Times/Courier/Symbol,
+%%      text >= 7pt, lines 0.25-1pt. Prefer vector PDF/EPS from the figure
+%%      scripts -- it sidesteps the dpi table entirely. See NAR_REQUIREMENTS.md.
+%%  [ ] DATA AVAILABILITY -- must address formats and terms for data download.
+%%  [ ] DATABASE ACCESS -- must be freely accessible without login; HTTPS
+%%      encouraged; URL persistence expected for >= 5 years post-publication.
+%%      Mobile/tablet accessibility is worth mentioning explicitly.
+%%  [ ] INITIAL SUBMISSION -- one .pdf with main text, references, tables and
+%%      figures EMBEDDED. Supplementary data as separate file(s). Number all
+%%      pages (the class does this). Single-column/single-spaced is waived for
+%%      LaTeX, so the two-column class output is correct as-is.
+%%      DO NOT use line-numbering. DO NOT use footnotes. (Verified absent.)
+%%  [ ] DISCLOSURES -- ORCID REQUIRED for the submitting author. Author
+%%      Contributions statement MANDATORY (CRediT encouraged). Conflict of
+%%      interest disclosure REQUIRED. AI assistance used in preparing this
+%%      manuscript MUST be disclosed in the cover letter and in Methods or
+%%      Acknowledgements. See NAR_REQUIREMENTS.md section 13.
+%%  [ ] CODE DEPOSIT -- a GitHub URL is not sufficient; deposit to Zenodo or
+%%      FigShare and put the permanent DOI in Data Availability at revision.
+%%  [ ] SUBMISSION -- at least six suggested referees (name, institute, email),
+%%      independent, not same institution/city as any author. Handled in
+%%      ScholarOne at submission time, not in this file.
+%%  [ ] DEADLINE -- update manuscripts due 15 September. Nothing before 1 June.
+%%-----------------------------------------------------------------------------
+
+%% NAR specifies the OUP template's "Modern Large" design -- do not change these
+%% two options without checking NAR_REQUIREMENTS.md section 7 first.
+%% Modern/large gives: 9bp body on 11.5pt leading, SANS-SERIF body text
+%% (modern is the only one of the three designs that forces \sffamily),
+%% 7.5bp footnotes, 210x276mm paper, two columns.
+%% Other designs exist (contemporary|traditional x large|medium|mediumone|small)
+%% but are not what NAR asks for.
+%% Omitting namedate/numbered keeps the class default = numeric citations (NAR style).
+\documentclass[unnumsec,webpdf,modern,large]{oup-authoring-template}
+
+%\onecolumn  % uncomment for a wide single-column reading/review draft
+
+%%-----------------------------------------------------------------------------
+%%  Packages. The class already loads: amsmath, amssymb, graphicx, hyperref,
+%%  natbib, array, multirow, xcolor, tikz, url, caption, rotating, listings.
+%%  It also defines \toprule / \midrule / \botrule itself -- do NOT load
+%%  booktabs, it clashes.
+%%-----------------------------------------------------------------------------
+%% NOTE: the OUP manual asks authors to "refrain from adding further packages
+%% or macros if possible", so nothing is loaded here. The draft-marker and
+%% domain-shorthand macros below are the only additions, and the markers
+%% disappear entirely under \draftmodefalse.
+
+%%-----------------------------------------------------------------------------
+%%  Draft markers.
+%%  The source manuscript carries [TBD] and [DRAFT PENDING] placeholders.
+%%  They are rendered in colour while drafting so they are impossible to miss.
+%%  Flip \draftmodefalse (or pass \draftmodefalse before \begin{document})
+%%  to make every marker vanish for a clean submission PDF.
+%%-----------------------------------------------------------------------------
+\newif\ifdraftmode
+\draftmodetrue          % <-- set to \draftmodefalse for the submission build
+
+\ifdraftmode
+  \newcommand{\TBD}[1][]{\textcolor{red}{\textbf{[TBD}\ifx\relax#1\relax\else\ #1\fi\textbf{]}}}
+  \newcommand{\DRAFTPENDING}[1]{\textcolor{orange}{\textbf{[DRAFT PENDING]}\ --\ #1}}
+  \newcommand{\NUMBERSPENDING}[1]{\textcolor{orange}{\textbf{[NUMBERS PENDING]}\ #1}}
+\else
+  \newcommand{\TBD}[1][]{}
+  \newcommand{\DRAFTPENDING}[1]{}
+  \newcommand{\NUMBERSPENDING}[1]{}
+\fi
+
+%%-----------------------------------------------------------------------------
+%%  Domain shorthands. Greek in text mode is unreliable under pdflatex, so all
+%%  thermodynamic symbols route through math mode here.
+%%-----------------------------------------------------------------------------
+\newcommand{\dfG}{$\Delta_{\mathrm{f}}G'$}          % formation energy
+\newcommand{\drG}{$\Delta_{\mathrm{r}}G'$}          % reaction energy
+\newcommand{\drGo}{$\Delta_{\mathrm{r}}G'^{\circ}$} % standard reaction energy
+\newcommand{\modelseedurl}{\url{https://modelseed.org}}
+\newcommand{\repourl}{\url{https://github.com/ModelSEED/ModelSEEDDatabase}}
+\newcommand{\file}[1]{\texttt{#1}}                  % repo paths / filenames
+\newcommand{\cpd}[1]{\texttt{#1}}                   % compound identifiers
+
+\begin{document}
+
+%%-----------------------------------------------------------------------------
+%%  Journal metadata -- production fills most of this in.
+%%-----------------------------------------------------------------------------
+\journaltitle{Nucleic Acids Research}
+\DOI{DOI added during production}
+\copyrightyear{2026}
+\pubyear{2026}
+\vol{00}
+\issue{0}
+\access{Advance Access Publication Date: Day Month Year}
+\appnotes{Database Issue}
+
+\firstpage{1}
+
+%\subtitle{Database Issue}
+
+%%-----------------------------------------------------------------------------
+%%  Title
+%%  NAR: the database name should ideally be the first word. See checklist.
+%%-----------------------------------------------------------------------------
+\title[ModelSEED Biochemistry Database, 2026 update]{The ModelSEED Biochemistry
+Database, 2026 update: curated molecular structures, multi-source
+thermodynamics, atom mapping, and the impact of reaction-direction assignments
+on metabolic-model output}
+
+%%-----------------------------------------------------------------------------
+%%  Authors
+%%  \TBD -- the 2020 author list plus this cycle's contributors, minus anyone
+%%  stepping off, in the agreed order. See PAPER_2026_PLAN.md open decision #3
+%%  for the Nikoloski-lab crediting format.
+%%-----------------------------------------------------------------------------
+%% ORCID is REQUIRED for the submitting author (NAR_REQUIREMENTS.md section 13).
+%% Attach with \ORCID{0000-0000-0000-0000} directly after the author name.
+\author[1,$\ast$]{\TBD[First Author]\TBD[\textbackslash ORCID required]}
+\author[1]{\TBD[Additional authors]}
+
+\address[1]{\orgdiv{\TBD[Division]}, \orgname{\TBD[Organization]},
+\orgaddress{\street{\TBD[Street]}, \postcode{\TBD[Postcode]},
+\state{\TBD[State]}, \country{\TBD[Country]}}}
+
+\corresp[$\ast$]{Corresponding author. \TBD[email]}
+
+\received{}{}{}
+\revised{}{}{}
+\accepted{}{}{}
+
+%%-----------------------------------------------------------------------------
+%%  Abstract -- must contain a working URL (NAR requirement).
+%%  Abstracts must stand alone: no citations to the reference list, no
+%%  equations, no cross-references.
+%%-----------------------------------------------------------------------------
+\abstract{\input{sections/abstract}}
+
+\keywords{biochemistry database, metabolic modelling, thermodynamics,
+atom mapping, reaction reversibility, ModelSEED}
+
+\maketitle
+
+%%=============================================================================
+%%  BODY -- every section below is a separate file in sections/.
+%%  Reorder, comment out, or add \input lines here; do not put prose in
+%%  this file.
+%%=============================================================================
+
+\input{sections/introduction}
+
+\section{Materials and Methods}
+\input{sections/methods_collation}
+\input{sections/methods_integration}
+\input{sections/methods_provenance}
+\input{sections/methods_transport}
+\input{sections/methods_structure_curation}
+\input{sections/methods_balancing}
+\input{sections/methods_thermodynamics}
+\input{sections/methods_reaction_similarity}
+\input{sections/methods_atom_mapping}
+\input{sections/methods_undetermined_compounds}
+\input{sections/methods_community_ci}
+\input{sections/methods_release}
+\input{sections/methods_distribution}
+
+\section{Results}
+\input{sections/results_growth}
+\input{sections/results_structure_curation}
+\input{sections/results_thermodynamics}
+\input{sections/results_reaction_similarity}
+\input{sections/results_direction_sensitivity}
+\input{sections/results_atom_mapping}
+\input{sections/results_connectivity_ontology}
+
+\input{sections/discussion}
+\input{sections/data_availability}
+\input{sections/author_contributions}
+
+%%=============================================================================
+%%  Bibliography
+%%  oup-plain  = numeric (NAR style).  oup-abbrvnat = author-year.
+%%=============================================================================
+\bibliographystyle{oup-plain}
+\bibliography{references}
+
+\end{document}

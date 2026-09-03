@@ -1,0 +1,54 @@
+%% Source: MANUSCRIPT.md "Discussion" (drafts/discussion_and_availability.md).
+\section{Discussion}
+
+Six years of community-driven curation have grown the ModelSEED biochemistry
+database by 34\% in compounds and 55\% in reactions. That growth has been driven
+mainly by contributions from MetaCyc and the BioCyc-family databases; KEGG's
+contribution is roughly flat over the interval. The balanced-reaction share of
+the database has regressed from 70\% to 61\% over the interval; the
+structure-curation pipeline described in Methods (particularly the
+protein-carrier cofactor standardisation)
+\TBD[accounts for X percentage points of recovery on that regression once the
+protein-carrier work completes].
+
+\paragraph{Broader lesson: protein-carrier cofactor standardisation as a general
+pattern.} The acyl-ACP work described in Methods is one instance of a general
+pattern: whenever a protein-covalent cofactor carries a reactive group between
+enzymes, some databases include the cofactor in the stored formula for the loaded
+state and others do not, and the inconsistency generates false-positive
+mass-imbalance flags in reactions handling the loaded and unloaded forms. We
+extend the same pattern to biotinyl-carrier (biotin-carboxyl-carrier protein) and
+lipoyl-carrier (H-protein of glycine cleavage, E2 subunits of $\alpha$-ketoacid
+dehydrogenase complexes) classes; candidate extensions to covalent FMN/FAD,
+molybdopterin, and heme-c are surveyed and deferred to future work.
+
+\paragraph{Contrast: automated curation versus coupled-update residuals.} The
+bulk-add-safe pipeline that added 47 pantetheine-inclusive ACP overrides also
+identified 173 further candidates for which every proposal cascades into breakage
+via co-application effects. The dichotomy between the 47-safe and the 0-safe
+subsets --- the low-hanging fruit versus the specialty-metabolism residuals whose
+reactions form tightly-coupled substrate chains --- is itself a lesson:
+single-compound-at-a-time bulk curation reaches a ceiling that the next
+generation of tools will need coupled-update reasoning to break through.
+
+\paragraph{Open problems for the next release.}
+\begin{itemize}
+  \item \textbf{Fragment-aware pKa/pKb.} The current biochemistry object stores
+        pKa/pKb values only for atoms in the first InChI fragment; extending this
+        to multi-fragment compounds requires both a schema change and a
+        corresponding update to the protonation and thermodynamics pipelines.
+  \item \textbf{EC number refresh.} The current ExPASy-name-based mapping between
+        reactions and EC numbers is bound to have false and missing associations;
+        a curation pass beyond name matching would improve annotation quality.
+  \item \textbf{Obsolescence-leakage audit.} The database marks obsolete
+        compounds and reactions as such, but some may still be inadvertently
+        referenced by non-obsolete reactions or models; a systematic audit is
+        warranted.
+  \item \textbf{Direction-field removal.} With thermoreversibility computed per
+        reaction and direction captured in the template, the reaction schema's
+        \texttt{direction} field is arguably redundant; a removal pass has been
+        considered but is \TBD[done / planned] as of the 2026 release.
+\end{itemize}
+
+\paragraph{Where atom mapping and multi-source thermodynamics take the community
+next.} \TBD[2--3 forward-looking sentences]

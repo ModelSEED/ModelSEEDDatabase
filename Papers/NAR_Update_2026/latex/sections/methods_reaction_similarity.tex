@@ -1,0 +1,37 @@
+%% Source: MANUSCRIPT.md "Materials and Methods > Reaction similarity"
+%%         (drafts/methods_reaction_similarity.md).
+\subsection{Reaction similarity}\label{sec:methods-similarity}
+
+Reaction similarity --- a per-pair distance or similarity score across all
+mass-balanced ModelSEED reactions --- is a new capability in the 2026 release.
+It supports two use cases: as a diagnostic for the reconciliation ontology
+described in the 2020 paper (reactions with high similarity that are not already
+ontology-linked are candidates for review), and as an input feature for
+downstream applications including annotation transfer, gap-filling, and
+pathway-inference.
+
+\paragraph{Pipeline.} Every ModelSEED reaction is represented by the
+concatenation of its balanced reactant and product structures. Structures are
+passed through an external reaction-embedding foundation model to produce a
+fixed-dimensional vector; the similarity between two reactions is the cosine
+similarity between their embeddings. GPU-accelerated batching allows the full
+pairwise similarity matrix to be regenerated in under approximately ten minutes
+on a single GPU, so the matrix is treated as a derived artifact and refreshed
+whenever compound curation materially changes the input structures.
+
+\paragraph{External reaction-embedding foundation-model selection.} Several
+external reaction-embedding models are available at the time of this release.
+Rather than adopting one by default, we evaluate the candidate models on their
+discerning power over ModelSEED reactions and defend the chosen model on that
+basis. The evaluation compares candidate models on: (i) intra-EC clustering ---
+reactions sharing the same EC number should embed close together; (ii)
+intra-pathway clustering --- reactions within a KEGG or MetaCyc pathway should
+embed close together; (iii) retrieval quality on a held-out set of known
+reaction-pair relationships (e.g. adjacent reactions in a pathway). Candidate
+models compared: \TBD[list]. Chosen model: \TBD{} on the basis of
+\TBD[metric result].
+
+\paragraph{Publication of the matrix.} The similarity matrix is exported as a
+compressed sparse artifact under \file{Biochemistry/Reaction\_Similarity/}. Users
+can regenerate it locally by rerunning the pipeline script against a specific
+ModelSEED release tag.
