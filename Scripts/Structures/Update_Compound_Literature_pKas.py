@@ -38,12 +38,20 @@ alone, without its 2.15 and 12.35.
 """
 import argparse
 import json
+import os
 import sys
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE))
-sys.path.insert(0, "/scratch/seaver/Claude_Projects/eQuilibrator")
+
+# The eQuilibrator working tree, which supplies ``tools.modelseed_pkas``. It is
+# not part of this repository and its location differs per host, so it is an
+# environment variable rather than a literal. Previously hardcoded to one
+# author's scratch directory, which made this script unrunnable for anyone else.
+EQUILIBRATOR_DIR = os.environ.get("EQUILIBRATOR_DIR")
+if EQUILIBRATOR_DIR:
+    sys.path.insert(0, EQUILIBRATOR_DIR)
 
 from pka_encoding import MACROSCOPIC, encode          # noqa: E402
 
@@ -55,10 +63,20 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--dry-run", action="store_true")
     ap.add_argument("--package", type=Path,
-                    default=Path("/scratch/seaver/BasicBiochemData3.m"))
+                    default=Path(os.environ.get(
+                        "ALBERTY_PACKAGE", "BasicBiochemData3.m")),
+                    help="Alberty's BasicBiochemData3.m. Not redistributable "
+                         "with this repository; set ALBERTY_PACKAGE or pass "
+                         "--package.")
     a = ap.parse_args()
 
-    from tools import modelseed_pkas as msp
+    try:
+        from tools import modelseed_pkas as msp
+    except ImportError as exc:                       # fail with the reason, not a stack trace
+        raise SystemExit(
+            "cannot import tools.modelseed_pkas -- set EQUILIBRATOR_DIR to the "
+            f"eQuilibrator working tree (currently {EQUILIBRATOR_DIR or 'unset'}). "
+            f"Original error: {exc}")
 
     ladders = msp.load_alberty_pkas(a.package)
     if not ladders:
