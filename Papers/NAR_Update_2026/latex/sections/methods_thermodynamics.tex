@@ -1,129 +1,50 @@
-%% Source: MANUSCRIPT.md "Materials and Methods > Multi-source thermodynamics"
-%%         (drafts/methods_multi_source_thermodynamics.md, inlined).
+%% Compressed from 1,058 words. Detail in Supplementary Methods S3.
 \subsection{Multi-source thermodynamics}\label{sec:methods-thermo}
 
-The 2020 release combined two thermodynamics sources: eQuilibrator as the
-primary estimator of \dfG{} and \drG{}, and a group-contribution (GC) method as
-a fallback for compounds and reactions eQuilibrator could not estimate. For this
-update we integrate four sources, each providing an independent estimate
-wherever its coverage permits.
+The 2020 release combined eQuilibrator with a group-contribution fallback. This
+update ships four sources --- eQuilibrator~3.0~\cite{beber2022}, group
+contribution rebuilt from MFAToolkit, dGPredictor retrained on ModelSEED
+structures, and experimental values where they exist --- each stored as its own
+\texttt{[energy, uncertainty, direction]} record so that no source is
+overwritten by another. All values are reported at pH~7.0, ionic strength
+0.25\,M, pMg~3.0 and 298.15\,K; Supplementary Methods~S3 explains why that
+combination matches neither eQuilibrator preset.
 
-\paragraph{eQuilibrator refresh.} eQuilibrator 3.0~\cite{beber2022} was run
-against the 2026 compound set at pH 7.0, ionic strength 0.25\,M, pMg 3.0 and
-temperature 298.15\,K, matching the 2020 conditions. Rather than querying the
-distributed compound cache directly, we rebuilt it from ModelSEED-curated
-structures, so that every estimate derives from a structure this database
-curates. Coverage: \TBD[N compounds with $\Delta_{\mathrm{f}}G'$, N reactions
-with accepted $\Delta_{\mathrm{r}}G'$].
+\paragraph{Protonation.} eQuilibrator's transform requires a \emph{macroscopic}
+pKa ladder per compound: an ordered list in which consecutive species differ by
+one proton. The count of entries above the reported pH sets the proton count of
+the major microspecies, so the composition of the ladder changes the
+transformed energy directly, not merely its precision.
 
-\paragraph{Protonation model.} eQuilibrator's Legendre transform to
-physiological conditions requires, for each compound, a \emph{macroscopic}
-acid-dissociation ladder: an ordered list in which consecutive species differ by
-exactly one proton. The number of ladder entries above the reported pH sets the
-proton count of the major microspecies, so the composition of the ladder changes
-the transformed energy directly, not merely its precision.
+We resolve each compound from measured literature ladders where a complete one
+exists~\cite{alberty2003, iupac_pka}, otherwise from the open-source predictor
+MolGpKa~\cite{pan2021}. That predictor is accurate where a compound's ionizable
+sites are chemically distinct, but it predicts once per atom on the neutral
+molecule, so equivalent sites return the same value and a polyprotic acid loses
+its second and subsequent dissociations --- orthophosphate is returned as three
+copies of its first pKa. The failure is detectable as a repeated predicted
+value, true of 6,664 of 32,201 compounds, and only there do we fall back to the
+ChemAxon-derived ladders in the eQuilibrator cache.
 
-Because the upstream cache derives these ladders by invoking a proprietary tool
-(ChemAxon \texttt{cxcalc}), we evaluated replacing them with an open-source
-predictor, MolGpKa~\cite{pan2021}. That substitution is only partly viable, for
-a structural rather than an accuracy reason. MolGpKa predicts once per ionizable
-atom on the neutral molecule, yielding \emph{microscopic} per-site constants;
-chemically equivalent sites therefore return identical values, and a polyprotic
-acid loses its second and subsequent dissociations. Orthophosphate, for
-instance, is returned as three copies of $\mathrm{p}K_{a1}$. Against measured
-values the predictor is accurate where the ionizable sites are distinct
-(mean absolute error \TBD[MAE] over \TBD[n] measurements), so the limitation is
-specific and bounded rather than general.
+Two consequences are stated rather than elided. The layer is not fully
+open-source: it is reproducible by citation, the cache being a pinned public
+release, but not regenerable without a licensed tool. And although the
+ChemAxon-derived compounds are 20\% of the total, they are the most connected
+polyprotic metabolites, so they participate in 87\% of scored reactions
+(Figure~\ref{fig:thermo}A) --- restricting substitution to where the open
+predictor provably fails \emph{increases} its reach rather than reducing it.
 
-We therefore resolve protonation per compound from an ordered set of sources:
-macroscopic literature ladders where a complete one exists~\cite{alberty2003},
-then digitized measured values~\cite{iupac_pka}, then the ladders carried in the
-pinned eQuilibrator cache, then MolGpKa. The ChemAxon-derived tiers are
-consulted \emph{only} where MolGpKa provably cannot answer --- detected
-mechanically, as a repeated predicted value, which is the signature of two
-chemically equivalent sites returning the same number. This holds for 6,664 of
-32,201 compounds (21\%).
+\paragraph{Uncertainty.} Each source reports its own uncertainty on its own
+scale (Figure~\ref{fig:thermo}C), and those scales are not comparable: measured
+against 802 experimentally-anchored reactions, group contribution overstates
+its error by roughly 2.2$\times$ and eQuilibrator understates by 1.6$\times$.
+eQuilibrator's figure is the covariance of the component-contribution fit and
+carries no term for the protonation model at all, so it does not bound the
+effect described above.
 
-The resulting composition is 75.1\% MolGpKa, 4.8\% digitized measured values and
-0.01\% literature ladders, against 17.1\% ChemAxon-derived and 2.9\%
-unattributed. \TBD[final counts if the build is regenerated]
-
-Two consequences follow and are stated rather than elided. First, the
-protonation layer is not fully open-source: it is reproducible by citation, in
-that the cache is a pinned public release, but it is not regenerable from
-scratch without a licensed tool. Second --- and this is the more important
-number --- the ChemAxon-derived minority are the polyprotic metabolites of
-highest reaction traffic, so although they are 17\% of compounds they
-participate in \textbf{86\% of scored reactions}. Confining the substitution to
-compounds where the open-source predictor degenerates therefore \emph{increases}
-ChemAxon's reach through the database rather than reducing it, because those are
-precisely the compounds that appear everywhere. We report the composition on
-both denominators for that reason; the per-compound figure alone would
-materially misrepresent the dependency.
-
-Separately, the digitized measured values~\cite{iupac_pka} are licensed
-CC-BY-NC-4.0 and are consumed by the pipeline but not redistributed with this
-database, so a reader reconciling the released tables against the deposited
-values will find entries sourced from a file that is not shipped.
-
-\paragraph{Reactions where the protonation model is unreliable.} Substituting a
-compound's pKa source changes how many of its sites lie above the reported pH,
-and each such site places a proton on the major microspecies. Where a reaction's
-partners are substituted too the change cancels; where they are not, it does
-not, and $\Delta_{\mathrm{r}}G'^{\circ}$ moves by $RT\ln(10)\times\mathrm{pH}
-= 9.55$\,kcal\,mol$^{-1}$ per unbalanced proton. This affects 133 reactions,
-which are released with a low-confidence flag and enumerated in the
-supplementary data. They are large glycans --- lipopolysaccharide, peptidoglycan
-and lipid-linked oligosaccharides --- whose partners are equally large and for
-which no experimental measurement exists, so neither the flagged value nor the
-previous release's value can be checked against data. We note explicitly that
-the previous value is not a safe fallback: there both partners carried the same
-spurious sites and the errors cancelled, which is not the same as being correct.
-
-\paragraph{Uncertainty and what it does not cover.} eQuilibrator reports
-uncertainty as the covariance of the component-contribution fit. That covariance
-carries no term for the protonation model, so it does not bound the effect
-described above. Recomputing the database under two different pKa models, 210
-reactions move by more than 1\,kcal\,mol$^{-1}$ \emph{and} by more than their
-own quoted uncertainty; 85 move by more than 10\,kcal\,mol$^{-1}$, of which 68
-are not covered by the reported uncertainty of either model. The affected
-reactions are large polyanions --- lipopolysaccharide core, peptidoglycan,
-O-antigen --- where many ionizable groups compound. We report the covariance as
-published and flag this omission rather than inflating the reported values,
-since the two quantities are not commensurable.
-
-\paragraph{Group Contribution rebuilt from MFAToolkit.} The 2020 fallback GC
-method has been rebuilt from the MFAToolkit implementation against the current
-compound set, so the group definitions and parameter fits reflect the enlarged
-compound base rather than the 2020 snapshot. Coverage: \TBD{}.
-
-\paragraph{dGpredictor retrained on ModelSEED.} dGpredictor (an ML-based
-$\Delta G$ estimator) has been retrained using the ModelSEED-curated compound
-structures as training data. This produces a ModelSEED-native estimator rather
-than one trained on a competing biochemistry database, and lets us report
-$\Delta G$ estimates for compounds the other three methods cannot cover.
-Training procedure and hyperparameters: \TBD{}. Coverage: \TBD{}.
-
-\paragraph{OpenTECR integration.} OpenTECR is a community effort to standardize
-experimentally-measured thermodynamic constants; we integrate its values where a
-mapping between OpenTECR reaction identifiers and ModelSEED reaction IDs exists.
-Coverage: \TBD{}.
-
-\paragraph{Direction assignment.} For each reaction with an accepted \drG{}
-(from any source, chosen with per-compound-consistency constraints described in
-the 2020 paper), we apply the same reversibility rules used in 2020 (based on
-Jankowski \textit{et al.}~\cite{jankowski2008}) to assign one of \texttt{=}
-(reversible), \texttt{\textgreater} (irreversible left-to-right), or
-\texttt{\textless} (irreversible right-to-left). On top of this we add
-per-reaction-class heuristic overlays --- hard rules for classes where the
-standard thermodynamic assignment is known to disagree with textbook biology.
-Rule set: \TBD[discussed in the working session but not yet codified in a repo
-script]. Overlays are applied after the base assignment and their scope is
-documented per class.
-
-\paragraph{Combined direction ledger.} For every reaction, the pipeline records:
-the \drG{} estimate from each of the four sources (with per-source uncertainty),
-the base direction assignment from each source, the heuristic overlay if
-applicable, and the final direction. This ledger is the input to the
-reaction-direction sensitivity study reported in
-Section~\ref{sec:results-direction}.
+\paragraph{Direction.} Reversibility is assigned from the accepted energy by
+the rule set of Jankowski \textit{et al.}~\cite{jankowski2008}, unchanged from
+2020, with eQuilibrator as the primary source and group contribution as
+fallback. Applying the 2020 rules to the 2026 energies leaves 25,060 reactions
+with no direction call, having neither an eQuilibrator nor a
+group-contribution energy.

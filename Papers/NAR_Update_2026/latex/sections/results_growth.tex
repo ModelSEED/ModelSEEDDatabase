@@ -1,57 +1,41 @@
-%% Source: MANUSCRIPT.md "Results > Growth in compounds and reactions"
-%%         (data/snapshot_2026-07-29.md -- provisional numbers against dev HEAD
-%%         1111754; refresh against v2.0.0 when tagged).
-\subsection{Growth in compounds and reactions}
+\begin{figure*}[!t]
+\centerline{\includegraphics[width=0.88\textwidth,page=1]{figures/main_figures_draft.pdf}}
+\caption{\textbf{Structure sources.} (\textbf{A}) Compounds contributed by each
+structure-supplying source, 2020 against 2026. KEGG is static; growth is
+MetaCyc and the newly-integrated ChEBI. (\textbf{B}) How far each source's
+structures reach into the database. Sources overlap, so the bars do not sum to
+the 36,943 compounds carrying a structure.}
+\label{fig:growth}
+\end{figure*}
 
-The database has grown substantially since the 2020 release, driven mainly by
-contributions from MetaCyc and the BioCyc-family databases (Table~\ref{tab:growth}).
-Compound counts grew 34\% (33,992 $\rightarrow$ 45,708), with structure coverage
-rising from 28,120 to 36,943 in absolute terms while the coverage rate slipped
-one percentage point (83\% $\rightarrow$ 81\%) because new compounds are ingested
-faster than the curation pipeline can add structures. Reaction counts grew 55\%
-(36,193 $\rightarrow$ 56,012), with balanced-reaction counts growing 35\%
-(25,457 $\rightarrow$ 34,370). The balanced-share of reactions regressed from
-70\% to 61\%, reflecting the reaction-count growth outpacing balance-restoring
-curation; the structure-curation and protein-carrier-cofactor-standardisation
-pipelines described in Methods are designed to recover this gap, and the impact
-is quantified in the following section.
+%% Table 1 is the only table in the main text; the per-source breakdown that was
+%% Table 3 in 2020 moves to Supplementary Table S1.
+\subsection{Growth and structure coverage}\label{sec:results-growth}
 
-\begin{table*}[!t]
-\caption{Growth in compounds and reactions, 2010--2026.\label{tab:growth}}%
-\begin{tabular*}{\textwidth}{@{\extracolsep\fill}lrrrr@{\extracolsep\fill}}
+The database has grown 34\% in compounds and 55\% in reactions since 2020
+(Table~\ref{tab:growth}), driven mainly by MetaCyc and the BioCyc family.
+Structure coverage rose from 28,120 to 36,943 compounds in absolute terms while
+slipping from 83\% to 81\% as a rate, because compounds are ingested faster
+than structures can be curated for them.
+
+Only three sources supply structures that reach ModelSEED compounds
+(Figure~\ref{fig:growth}). MetaCyc reaches 18,801, KEGG 15,278 and ChEBI 9,446
+of the 36,943 structured compounds; the sets overlap heavily, and Rhea, despite
+contributing 17,477 reactions, supplies structures for none. KEGG is
+essentially static --- 17,760 to 17,803 compounds in six years --- so
+structural growth is almost entirely MetaCyc and the newly-integrated ChEBI.
+
+\begin{table}[!t]
+\caption{Growth since the 2020 release. Per-source counts are in
+Supplementary Table~S1.}\label{tab:growth}
+\begin{tabular}{lrrr}
 \toprule
- & 2010 & 2014 & 2020 & 2026 \\
+& 2020 & 2026 & change \\
 \midrule
-Compounds                      & 16,275       & 27,694       & 33,992       & 45,708 \\
-Compounds with structures      & 13,821 (85\%) & 19,605 (71\%) & 28,120 (83\%) & 36,943 (81\%) \\
-Compounds with generic groups  & 1,261 (8\%)   & 1,402 (5\%)   & 4,416 (13\%)  & 7,071 (15\%) \\
-Reactions                      & 13,257       & 27,558       & 36,193       & 56,012 \\
-Complete reactions             & 11,338 (86\%) & 7,898 (29\%)  & 27,991 (77\%) & 44,877 (80\%) \\
-Balanced reactions             & 10,263 (77\%) & 17,264 (63\%) & 25,457 (70\%) & 34,370 (61\%) \\
-Reactions with generic groups  & 1,988 (15\%)  & 2,939 (11\%)  & 9,772 (27\%)  & 15,357 (27\%) \\
+Compounds            & 33,992 & 45,708 & +34\% \\
+\quad with structure & 28,120 & 36,943 & +31\% \\
+Reactions            & 36,193 & 56,012 & +55\% \\
+\quad mass-balanced  & 25,457 & 34,370 & +35\% \\
 \botrule
-\end{tabular*}
-\end{table*}
-
-Per-source counts have also been refreshed (Table~\ref{tab:persource}). Rhea
-integration doubled (8,786 $\rightarrow$ 17,477 reactions). ChEBI is added as a
-source column not present in the 2020 Table~3.
-\TBD[decision: aggregate 11 BioCyc-family sources into one row as in 2020, or
-itemise separately as the current alias table does]
-
-\begin{table*}[!t]
-\caption{Per-source integration, 2020 versus 2026.\label{tab:persource}}%
-\begin{tabular*}{\textwidth}{@{\extracolsep\fill}lrrrr@{\extracolsep\fill}}
-\toprule
-Source & 2020 compounds & 2026 compounds & 2020 reactions & 2026 reactions \\
-\midrule
-ModelSEED & 33,958 & 45,708 & 36,193 & 56,012 \\
-KEGG      & 17,760 & 17,803 & 10,850 & 14,066 \\
-MetaCyc   & 19,138 & 25,740 & 21,830 & 31,805 \\
-BiGG      &  2,704 &  2,736 &  4,306 &  7,326 \\
-MetaNetX  & 30,858 & 30,896 & 23,758 & 29,323 \\
-Rhea      & ---    &  1,931 &  8,786 & 17,477 \\
-ChEBI     & ---    & 11,429 & ---    & ---    \\
-\botrule
-\end{tabular*}
-\end{table*}
+\end{tabular}
+\end{table}

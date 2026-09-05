@@ -1,38 +1,44 @@
-%% Source: MANUSCRIPT.md "Results > Multi-source thermodynamics"
-%%         (drafts/methods_multi_source_thermodynamics.md, Results portion).
-\subsection{Multi-source thermodynamics}
+\begin{figure*}[!t]
+\centerline{\includegraphics[width=0.88\textwidth,page=2]{figures/main_figures_draft.pdf}}
+\caption{\textbf{Thermodynamic sources.} (\textbf{A}) Provenance of the
+protonation model on two denominators: by compound the layer is largely
+open-source, but the ChemAxon-derived minority are the highly-connected
+polyprotic metabolites, so they participate in 87\% of scored reactions.
+(\textbf{B}) Reactions carrying a real energy from each source, no-estimate
+placeholders excluded. (\textbf{C}) Reported uncertainty, on separate axes
+because the three differ by more than an order of magnitude; a common axis
+would compress two of them to a spike.}
+\label{fig:thermo}
+\end{figure*}
 
-\NUMBERSPENDING{Per-source coverage (compounds with \dfG{}, reactions with
-accepted \drG{}) across eQuilibrator, rebuilt Group Contribution, dGpredictor
-retrained on ModelSEED, and OpenTECR. Head-to-head \drG{} comparison
-(correlation, uncertainty distributions) mirroring the 2020 Figure~2. How
-per-reaction-class heuristic overlays change direction assignments relative to
-the source values alone.}
+\subsection{Thermodynamics}\label{sec:results-thermo}
 
-\paragraph{Sensitivity to the protonation model.} Because the choice of pKa
-model is invisible in the published output, we quantified how far it moves the
-result. Recomputing the database under two protonation models and comparing
-reactions scored by both, the effect concentrates sharply in the near-neutral
-window: reactions containing a compound whose pKa differs between models in the
-pH 6--8 range move by a median of 0.33\,kcal\,mol$^{-1}$, against
-0.06\,kcal\,mol$^{-1}$ for reactions containing no affected compound --- roughly
-an order of magnitude. The mechanism is that a pKa far from the reported pH
-leaves the microspecies distribution saturated, whereas one near pH 7 decides
-which species dominates.
+All three predictors now cover roughly half the database and disagree
+substantially about how well they do it (Figure~\ref{fig:thermo}B). Group
+contribution stores a value for essentially every reaction, but 26,555 of those
+are a no-estimate placeholder; excluding them it covers 29,447 reactions,
+against dGPredictor's 29,617 and eQuilibrator's 25,070. Coverage counts drawn
+from raw entry counts overstate group contribution by a factor of two.
 
-The distribution is not, however, a smooth tail. \TBD[final counts against the
-released tables] Of the reactions in the priority scope used for template
-construction, \TBD[N] change assigned direction under the reversibility rule,
-and these arise by two distinct mechanisms: a minority carry large energy shifts
-on polyanionic substrates, while the remainder sit near a decision boundary and
-are moved across it by a sub-kcal change. The second class is invisible to any
-magnitude-based filter, which is an argument for reporting the ledger of
-per-source directions described in Section~\ref{sec:methods-thermo} rather than
-a single assignment.
+The three report uncertainty on scales that differ by more than an order of
+magnitude (Figure~\ref{fig:thermo}C): median 0.6\,kcal\,mol$^{-1}$ for
+eQuilibrator against 10.4 for group contribution and 17.0 for dGPredictor.
+These are not comparable quantities, and a consumer choosing a source by
+smallest reported error would systematically choose eQuilibrator, which is
+precisely the source that understates. eQuilibrator additionally reports no
+usable uncertainty at all for 3,730 reactions.
 
-On the compounds where the two models can be checked against measured
-macroscopic ladders, the proprietary predictor reproduces the literature ladder
-in \TBD[x] of \TBD[n] cases against \TBD[y] for the open-source predictor, the
-gap arising entirely from polyprotic acids with chemically equivalent ionizable
-sites. This asymmetry, rather than any overall accuracy difference, is what
-determines the source order given in Section~\ref{sec:methods-thermo}.
+Protonation provenance is reported on two denominators
+(Figure~\ref{fig:thermo}A) because one alone misleads. By compound the layer is
+75\% open-source; by reaction, 87\% touch at least one compound whose ladder is
+ChemAxon-derived. The minority are the polyprotic metabolites --- ATP, NAD(P),
+phosphate, coenzyme~A --- that appear nearly everywhere.
+
+\paragraph{A caveat on the rebuild.} Regenerating the protonation layer changed
+133 reactions by more than 10\,kcal\,mol$^{-1}$. These are released with a
+low-confidence flag and enumerated in Supplementary Table~S2. They are large
+glycans whose reaction partners could not be re-protonated alongside them, so a
+spurious ionizable site on one side is no longer cancelled by the same site on
+the other. Neither the flagged value nor the previous release's value can be
+checked against measurement: none of the 133 has an experimental match, and the
+previous agreement arose from two errors cancelling rather than from accuracy.

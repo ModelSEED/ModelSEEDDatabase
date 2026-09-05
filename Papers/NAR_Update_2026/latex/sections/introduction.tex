@@ -1,31 +1,20 @@
-%% Source: MANUSCRIPT.md "Introduction" (from drafts/discussion_and_availability.md).
 \section{Introduction}
 
-The 2020 release of the ModelSEED biochemistry database~\cite{seaver2020}
-established the database as a curated integration of KEGG, MetaCyc, BiGG,
-MetaNetX, Rhea, BioCyc-family databases, and dozens of published metabolic
-models --- a ``Rosetta Stone'' for cross-database mapping backed by
-structure-first compound reconciliation, per-reaction thermodynamics, and a
-community-contribution workflow on GitHub. Six years later, we present an
-update that extends the database along four axes and provides the first
-systematic empirical accounting of a question the 2020 release could not: how
-much does the choice of a reaction-direction source actually matter for
-downstream metabolic-model output.
+Genome-scale metabolic models are only as good as the biochemistry beneath
+them. The ModelSEED Biochemistry Database was built to supply that layer:
+a mass- and charge-balanced reaction network, reconciled across the major
+biochemical databases, with the structures, thermodynamics and atom mappings
+that reconstruction and analysis require~\cite{seaver2020}.
 
-Three developments in the field motivate specific parts of this update.
-\textbf{Atom mapping} has matured from a specialty capability into a routine
-expectation for any biochemistry database supporting isotope-tracing or
-degradation-prediction workflows; we present a first-pass integration of atom
-mappings via a collaboration with the \TBD[group] group.
-\textbf{Machine-learning-based thermodynamics} methods (dGpredictor and
-successors) now cover a substantial fraction of the ModelSEED compound set and
-enable a multi-source approach that goes beyond the single-primary-plus-fallback
-strategy of 2020. \textbf{Reaction-direction transparency} has emerged as a
-growing concern in the metabolic-modeling community; each choice a curator
-makes about direction propagates through model output in ways that are rarely
-quantified, and we provide the first systematic quantification here.
+Six years on it has grown by a third in compounds and half in reactions, and
+the constraints have shifted: growth comes from sources supplying reactions
+faster than structures, so curation rather than collation is now limiting, and
+the thermodynamic layer carries four independent and frequently disagreeing
+sources where it once carried one.
 
-The paper walks through three technical components --- compound structures,
-reaction similarities, and dynamics (the reaction-direction empirical study)
---- and their integration into the repository, the website, and the manuscript.
-\TBD[1--2 sentence roadmap]
+This update reports that growth, the structure-curation pipeline built to
+recover balance where sources conflict, and a thermodynamic layer that
+publishes every source with its own uncertainty rather than promoting one. We
+argue that the disagreement between sources is itself the useful signal, and
+grade every reaction's thermodynamic evidence against experimental
+measurements so that a consumer can see which numbers carry weight.

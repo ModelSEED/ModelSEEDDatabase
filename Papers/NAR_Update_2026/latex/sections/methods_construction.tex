@@ -1,0 +1,17 @@
+%% Consolidates the former methods_{collation,integration,provenance,transport,
+%% balancing,undetermined_compounds,release} sections. Detail moved to
+%% Supplementary Methods S1.
+\subsection{Database construction}\label{sec:methods-construction}
+
+Compounds and reactions are collated from KEGG, MetaCyc and the BioCyc family,
+ChEBI, Rhea, BiGG and MetaNetX, reconciled on structure where one is available
+and on identifier otherwise, and published with per-source attribution on every
+record. Transport reactions, compounds of undetermined structure, and the
+release and versioning procedure follow the 2020 release~\cite{seaver2020} and
+are described in Supplementary Methods~S1.
+
+Mass and charge balance is enforced at build time rather than audited
+afterwards. A reaction that cannot be balanced from its compounds' formulae is
+flagged and excluded from the balanced set rather than silently adjusted; the
+count of such reactions is reported below and is the principal quality metric
+for the collation.
