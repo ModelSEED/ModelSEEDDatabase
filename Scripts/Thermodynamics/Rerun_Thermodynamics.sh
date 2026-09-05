@@ -14,6 +14,12 @@ set -euo pipefail
 ./Update_Compound_GroupContribution_Energies.py
 ./Update_Reaction_GroupContribution_Energies.py
 
+# NOTE: this script is the INGEST stage. It reads committed tables under
+# Biochemistry/Thermodynamics/ and writes them into the JSON. It does NOT
+# regenerate those tables from structures -- that is Pipeline/regenerate.sh,
+# which needs the eQuilibrator working tree and takes about an hour. Run it only
+# when the structures, the pKa layer or the training data have changed.
+
 # --- eQuilibrator -----------------------------------------------------------
 # Component contribution computed from ModelSEED's own structures. Inputs are
 # ModelSEED_{Compound,Reaction}_Energies.tsv, which superseded the
