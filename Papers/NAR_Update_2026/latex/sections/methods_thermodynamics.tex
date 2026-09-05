@@ -38,20 +38,47 @@ specific and bounded rather than general.
 We therefore resolve protonation per compound from an ordered set of sources:
 macroscopic literature ladders where a complete one exists~\cite{alberty2003},
 then digitized measured values~\cite{iupac_pka}, then the ladders carried in the
-pinned eQuilibrator cache, then MolGpKa for compounds none of the preceding
-cover. In practice the polyprotic metabolites of highest reaction traffic ---
-the nucleotide phosphates, the nicotinamide and flavin cofactors, coenzyme A and
-inorganic phosphate --- take the cache's ChemAxon-derived ladders, because these
-are the compounds on which a per-site predictor degenerates and for which
-complete literature ladders are not available. \TBD[final per-tier compound
-counts]. Two consequences follow and are stated rather than elided. First, the
+pinned eQuilibrator cache, then MolGpKa. The ChemAxon-derived tiers are
+consulted \emph{only} where MolGpKa provably cannot answer --- detected
+mechanically, as a repeated predicted value, which is the signature of two
+chemically equivalent sites returning the same number. This holds for 6,664 of
+32,201 compounds (21\%).
+
+The resulting composition is 75.1\% MolGpKa, 4.8\% digitized measured values and
+0.01\% literature ladders, against 17.1\% ChemAxon-derived and 2.9\%
+unattributed. \TBD[final counts if the build is regenerated]
+
+Two consequences follow and are stated rather than elided. First, the
 protonation layer is not fully open-source: it is reproducible by citation, in
 that the cache is a pinned public release, but it is not regenerable from
-scratch without a licensed tool. Second, the digitized measured
-values~\cite{iupac_pka} are licensed CC-BY-NC-4.0 and are consumed by the
-pipeline but not redistributed with this database, so a reader reconciling the
-released tables against the deposited values will find entries sourced from a
-file that is not shipped.
+scratch without a licensed tool. Second --- and this is the more important
+number --- the ChemAxon-derived minority are the polyprotic metabolites of
+highest reaction traffic, so although they are 17\% of compounds they
+participate in \textbf{86\% of scored reactions}. Confining the substitution to
+compounds where the open-source predictor degenerates therefore \emph{increases}
+ChemAxon's reach through the database rather than reducing it, because those are
+precisely the compounds that appear everywhere. We report the composition on
+both denominators for that reason; the per-compound figure alone would
+materially misrepresent the dependency.
+
+Separately, the digitized measured values~\cite{iupac_pka} are licensed
+CC-BY-NC-4.0 and are consumed by the pipeline but not redistributed with this
+database, so a reader reconciling the released tables against the deposited
+values will find entries sourced from a file that is not shipped.
+
+\paragraph{Reactions where the protonation model is unreliable.} Substituting a
+compound's pKa source changes how many of its sites lie above the reported pH,
+and each such site places a proton on the major microspecies. Where a reaction's
+partners are substituted too the change cancels; where they are not, it does
+not, and $\Delta_{\mathrm{r}}G'^{\circ}$ moves by $RT\ln(10)\times\mathrm{pH}
+= 9.55$\,kcal\,mol$^{-1}$ per unbalanced proton. This affects 133 reactions,
+which are released with a low-confidence flag and enumerated in the
+supplementary data. They are large glycans --- lipopolysaccharide, peptidoglycan
+and lipid-linked oligosaccharides --- whose partners are equally large and for
+which no experimental measurement exists, so neither the flagged value nor the
+previous release's value can be checked against data. We note explicitly that
+the previous value is not a safe fallback: there both partners carried the same
+spurious sites and the errors cancelled, which is not the same as being correct.
 
 \paragraph{Uncertainty and what it does not cover.} eQuilibrator reports
 uncertainty as the covariance of the component-contribution fit. That covariance

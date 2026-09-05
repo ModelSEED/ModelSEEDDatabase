@@ -1,23 +1,23 @@
-# Reactions whose energy moved more than 10 kcal/mol when the gated
-# protonation was adopted. Every reaction here should be treated as LOW
-# CONFIDENCE in the adopted build.
+# Reactions whose energy moved more than 10.0 kcal/mol between the
+# reference and shipped builds. Treat every one as LOW CONFIDENCE.
 #
-# This is a RISK MARKER, NOT A VERDICT. The flag records that a structural
-# condition holds, not that the value is wrong:
-#   unbalanced_enumeration  -- a compound's pKa source was substituted while a
-#       partner carrying sites above pH 7 was not, so phantom sites no longer
+# RISK MARKER, NOT A VERDICT:
+#   unbalanced_enumeration  a compound's pKa source was substituted while a
+#       partner carrying sites above pH 7 was not, so spurious sites no longer
 #       cancel (~9.55 kcal/mol per unbalanced proton). rxn08713 satisfies this
-#       and nonetheless lands on the independently-derived Marvin-era value, so
-#       the condition over-selects.
-#   large_shift_mechanism_unidentified -- moved >10 kcal/mol without that
-#       signature. Includes rxn08789, which moved TOWARD the Marvin-era value
-#       and is a correction, and rxn59685 (+656) which is probably not.
+#       and still lands on the independently-derived Marvin-era value, so the
+#       signature over-selects.
+#   large_shift_mechanism_unidentified  moved without that signature. Includes
+#       rxn08789, which moved TOWARD the Marvin-era value and is a correction.
 #
-# The baseline value is NOT a safe fallback. There both sides carried the same
-# phantom sites and the errors cancelled; that is not accuracy.
+# The reference value is NOT a safe fallback: there both partners carried the
+# same spurious sites and the errors cancelled, which is not accuracy.
 # NONE of these reactions has a TECRDB match, so neither value can be checked
 # against experiment.
-reaction_id	name	dg_baseline_kcal	dg_adopted_kcal	shift_kcal	net_site_change	flag	compounds_resubstituted	partners_left_unchanged	largest_partner	largest_partner_name
+#
+# shipped:   /scratch/seaver/Claude_Projects/eQuilibrator/data/cache_final/compounds.sqlite
+# reference: /scratch/seaver/Claude_Projects/eQuilibrator/data/prev_20260903/cache_final/compounds.sqlite
+reaction_id	name	dg_reference_kcal	dg_shipped_kcal	shift_kcal	net_site_change	flag	compounds_resubstituted	partners_left_unchanged	largest_partner	largest_partner_name
 rxn21387	RXN-11082.c	-8300.375	-2901.300	5399.07	-292	unbalanced_enumeration	cpd23216;cpd23217	cpd15942	cpd15942	decaprenylphosphoryl-beta-D-arabinofuranose
 rxn46297		-1418.040	-138.374	1279.67	-99	unbalanced_enumeration	cpd23200;cpd23213	cpd00014;cpd02338	cpd02338	UDP-D-galacto-1,4-furanose
 rxn59685	O-antigen ligase	-659.726	-3.122	656.60	-164	large_shift_mechanism_unidentified	cpd02229;cpd44959;cpd46173;cpd46744			
@@ -26,11 +26,11 @@ rxn57061		-227.121	-10.695	216.43	-86	unbalanced_enumeration	cpd02229;cpd25978;c
 rxn59616		-204.564	-4.671	199.89	-55	large_shift_mechanism_unidentified	cpd02229;cpd46837;cpd47400			
 rxn21393	RXN-11091.c	-351.522	-179.443	172.08	-186	unbalanced_enumeration	cpd23213;cpd23217	cpd15942	cpd15942	decaprenylphosphoryl-beta-D-arabinofuranose
 rxn09024	O16 antigen polymerase (periplasm)	-174.256	-3.121	171.13	-80	unbalanced_enumeration	cpd02229;cpd15517;cpd15519	cpd15520	cpd15520	O16 antigen undecaprenyl diphosphate
-rxn59665		-135.353	-3.961	131.39	-70	unbalanced_enumeration	cpd46254;cpd46256	cpd00031;cpd00083	cpd00083	GDP-mannose
+rxn59665		-135.353	-3.961	131.39	-70	unbalanced_enumeration	cpd46254;cpd46256	cpd00031;cpd00083	cpd00031	GDP
 rxn09023	O16 antigen polymerase (periplasm)	-108.941	-3.121	105.82	-54	unbalanced_enumeration	cpd02229;cpd15516;cpd15517	cpd15520	cpd15520	O16 antigen undecaprenyl diphosphate
 rxn08958	murein polymerizing transglycosylase 2 (three linked units)	-110.302	-13.168	97.13	-54	unbalanced_enumeration	cpd02229;cpd15511;cpd15512	cpd03495	cpd03495	Undecaprenyl-diphospho-N-acetylmuramoyl--N-a
 rxn41158		-203.495	-109.819	93.68	11	large_shift_mechanism_unidentified	cpd07113;cpd25506			
-rxn60588		-69.715	-2.971	66.74	-47	unbalanced_enumeration	cpd46219;cpd46252	cpd00031;cpd00083	cpd00083	GDP-mannose
+rxn60588		-69.715	-2.971	66.74	-47	unbalanced_enumeration	cpd46219;cpd46252	cpd00031;cpd00083	cpd00031	GDP
 rxn08713	heptosyltransferase IV (LPS core synthesis)	-63.501	-3.693	59.81	-82	unbalanced_enumeration	cpd15432;cpd15477	cpd00008;cpd03831	cpd03831	ADP-L-glycero-D-manno-heptose
 rxn22147	RXN-11798.c	-62.961	-3.509	59.45	-37	large_shift_mechanism_unidentified	cpd21099;cpd23574;cpd25775			
 rxn42298		-53.885	-3.693	50.19	-72	unbalanced_enumeration	cpd26544;cpd35738	cpd00008;cpd03831	cpd03831	ADP-L-glycero-D-manno-heptose
@@ -65,7 +65,7 @@ rxn26109	RXN0-5122.p	-36.983	-3.693	33.29	-48	unbalanced_enumeration	cpd26539;cp
 rxn24097	Dol-P-Glc:Glc1Man9GlcNAc2-PP-Dol alpha-1,3-glucosyltransfera	-88.356	-55.360	33.00	-65	unbalanced_enumeration	cpd24562;cpd24563	cpd24351	cpd24351	CPD-166
 rxn24098	Dol-P-Glc:Glc1Man9GlcNAc2-PP-Dol alpha-1,3-glucosyltransfera	-88.356	-55.360	33.00	-65	unbalanced_enumeration	cpd24562;cpd24563	cpd24351	cpd24351	CPD-166
 rxn17896	Glc3Man9NAc2 oligosaccharide glucosidase	32.636	-0.351	-32.99	-69	unbalanced_enumeration	cpd24096;cpd24097	cpd26821	cpd26821	D-Glucose
-rxn42072		15.840	-16.925	-32.77	-31	unbalanced_enumeration	cpd32344;cpd32681	cpd19009	cpd19009	alpha-D-Mannose
+rxn42072		15.840	-16.925	-32.77	-30	unbalanced_enumeration	cpd32344;cpd32681	cpd19009	cpd19009	alpha-D-Mannose
 rxn59138		-35.909	-3.448	32.46	-65	unbalanced_enumeration	cpd47275;cpd47482	cpd00014;cpd30770	cpd30770	UDP-D-galactopyranose
 rxn24095	ALG6	-86.822	-55.360	31.46	-59	unbalanced_enumeration	cpd24561;cpd24562	cpd24351	cpd24351	CPD-166
 rxn24096	ALG6	-86.822	-55.360	31.46	-59	unbalanced_enumeration	cpd24561;cpd24562	cpd24351	cpd24351	CPD-166
@@ -89,8 +89,8 @@ rxn13645	murein polymerizing transglycosylase	-32.417	-7.145	25.27	-21	unbalance
 rxn13936	Peptidoglycan subunit synthesis	-32.417	-7.145	25.27	-21	unbalanced_enumeration	cpd02229;cpd15511	cpd03495	cpd03495	Undecaprenyl-diphospho-N-acetylmuramoyl--N-a
 rxn13946	Peptidoglycan subunit synthesis	-32.417	-7.145	25.27	-21	unbalanced_enumeration	cpd02229;cpd15511	cpd03495	cpd03495	Undecaprenyl-diphospho-N-acetylmuramoyl--N-a
 rxn17901	2-alpha-mannosyl-oligosaccharide alpha-D-mannohydrolase	24.886	-0.351	-25.24	-55	unbalanced_enumeration	cpd27494;cpd27495	cpd27437	cpd27437	MANNOSE
-rxn22896	RXN-12428.c	28.964	4.465	-24.50	-18	large_shift_mechanism_unidentified	cpd23886;cpd23887;cpd23888			
-rxn22897	RXN-12428.e	28.964	4.465	-24.50	-18	large_shift_mechanism_unidentified	cpd23886;cpd23887;cpd23888			
+rxn22896	RXN-12428.c	28.964	4.465	-24.50	-16	unbalanced_enumeration	cpd23886;cpd23887	cpd23888	cpd23888	neo-lambda-carrabiose
+rxn22897	RXN-12428.e	28.964	4.465	-24.50	-16	unbalanced_enumeration	cpd23886;cpd23887	cpd23888	cpd23888	neo-lambda-carrabiose
 rxn24091	Dol-P-Man:Man7GlcNAc2-PP-Dol alpha-1,6-mannosyltransferase	-80.819	-56.890	23.93	-47	unbalanced_enumeration	cpd24559;cpd24560	cpd24353	cpd24353	CPD-171
 rxn24092	Dol-P-Man:Man7GlcNAc2-PP-Dol alpha-1,6-mannosyltransferase	-80.819	-56.890	23.93	-47	unbalanced_enumeration	cpd24559;cpd24560	cpd24353	cpd24353	CPD-171
 rxn60262		-28.297	-4.951	23.35	-22	unbalanced_enumeration	cpd32553	cpd00031;cpd00083;cpd31516	cpd31516	Man3-GlcNAc-PP-undecaprenol
@@ -127,7 +127,7 @@ rxn08709	LPS heptose kinase II (LPS core synthesis)	-22.621	-7.129	15.49	-45	unb
 rxn08789	core oligosaccharide lipid A:hexadecanoate transferase (n-C1	19.701	4.666	-15.04	-85	large_shift_mechanism_unidentified	cpd15432;cpd15482			
 rxn47598		-15.035	-0.189	14.85	-12	unbalanced_enumeration	cpd00852;cpd02671;cpd02748	cpd00027	cpd00027	D-Glucose
 rxn25102	RXN-8717.c	-14.856	-0.021	14.83	-12	unbalanced_enumeration	cpd00852;cpd02671;cpd02748	cpd00190	cpd00190	beta-D-Glucose
-rxn60428		-15.717	-1.517	14.20	-35	unbalanced_enumeration	cpd46219;cpd46238	cpd00031;cpd00083	cpd00083	GDP-mannose
+rxn60428		-15.717	-1.517	14.20	-35	unbalanced_enumeration	cpd46219;cpd46238	cpd00031;cpd00083	cpd00031	GDP
 rxn54869	60416	-3.407	-17.427	-14.02	-9	unbalanced_enumeration	cpd38324	cpd38333	cpd38333	N-(2,3-dihydroxybenzoyl)-L-seryl-[N-(C-5-[de
 rxn60617		-18.088	-4.190	13.90	-49	unbalanced_enumeration	cpd46224;cpd46239	cpd00014;cpd01482	cpd01482	UDP-glucosamine
 rxn58417		-16.393	-3.223	13.17	-44	unbalanced_enumeration	cpd46239;cpd46253	cpd00014;cpd01482	cpd01482	UDP-glucosamine
@@ -135,9 +135,9 @@ rxn03384	Uroporphyrinogen I carboxy-lyase	1.425	-11.146	-12.57	-8	large_shift_me
 rxn35415	RXN-10642.d	1.425	-11.146	-12.57	-8	large_shift_mechanism_unidentified	cpd03414;cpd03416			
 rxn02288	Uroporphyrinogen-III carboxy-lyase	1.407	-11.146	-12.55	-8	large_shift_mechanism_unidentified	cpd00774;cpd02083			
 rxn27432	uroporphyrinogen III decarboxylase	1.407	-11.146	-12.55	-8	large_shift_mechanism_unidentified	cpd00774;cpd02083			
-rxn60464		-13.311	-0.990	12.32	-35	unbalanced_enumeration	cpd46221;cpd46236	cpd00031;cpd00083	cpd00083	GDP-mannose
-rxn05005	S-adenosyl-L-methionine:uroporphyrinogen-III C-methyltransfe	30.135	17.912	-12.22	-4	unbalanced_enumeration	cpd00774	cpd00017;cpd00019;cpd11206	cpd11206	Precorrin 1
-rxn38834	CobA [ambiguous-see EC 2.5.1.17] SUMT	30.135	17.912	-12.22	-4	unbalanced_enumeration	cpd00774	cpd00017;cpd00019;cpd11206	cpd11206	Precorrin 1
+rxn60464		-13.311	-0.990	12.32	-35	unbalanced_enumeration	cpd46221;cpd46236	cpd00031;cpd00083	cpd00031	GDP
+rxn05005	S-adenosyl-L-methionine:uroporphyrinogen-III C-methyltransfe	30.135	17.912	-12.22	-4	unbalanced_enumeration	cpd00774	cpd00017;cpd00019;cpd11206	cpd00017	S-Adenosyl-L-methionine
+rxn38834	CobA [ambiguous-see EC 2.5.1.17] SUMT	30.135	17.912	-12.22	-4	unbalanced_enumeration	cpd00774	cpd00017;cpd00019;cpd11206	cpd00017	S-Adenosyl-L-methionine
 rxn59846		-16.623	-4.416	12.21	-55	unbalanced_enumeration	cpd46224;cpd46763	cpd00014;cpd01482	cpd01482	UDP-glucosamine
 rxn02264	Hydroxymethylbilane hydro-lyase(cyclizing)	-71.684	-59.786	11.90	-4	unbalanced_enumeration	cpd00774	cpd00755	cpd00755	Hydroxymethylbilane
 rxn02265	R03166	-71.684	-59.786	11.90	-4	unbalanced_enumeration	cpd03414	cpd00755	cpd00755	Hydroxymethylbilane
