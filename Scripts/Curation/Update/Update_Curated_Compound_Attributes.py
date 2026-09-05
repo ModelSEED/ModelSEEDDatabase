@@ -1,4 +1,17 @@
 #!/usr/bin/env python
+
+if __name__ == "__main__":
+    # Validate before importing or touching the database. The hand-rolled check
+    # below still runs; this adds --help and rejects extra arguments, neither of
+    # which it did.
+    import argparse as _argparse
+    _p = _argparse.ArgumentParser(
+        description=__doc__,
+        formatter_class=_argparse.RawDescriptionHelpFormatter)
+    _p.add_argument("path", help="file to read")
+    _p.parse_args()
+
+
 import os, sys, re, copy, time
 from BiochemPy import Compounds
 

@@ -23,6 +23,20 @@ offset, and a ladder spans protonation states by construction. It does change
 the reference proton count, which is what the magnesium guard arithmetic uses,
 so it is surfaced per compound.
 """
+
+if __name__ == "__main__":
+    # Validate arguments BEFORE importing anything or touching the database.
+    # These scripts mutate the database, and without this an unknown flag or a
+    # mistyped mode was silently ignored and the script ran with its defaults:
+    # asking Estimate_Reaction_Reversibility.py for --help rewrote 122 files.
+    # Placed above the imports so --help works even where a dependency is
+    # missing from the path.
+    import argparse as _argparse
+    _argparse.ArgumentParser(
+        description=__doc__,
+        formatter_class=_argparse.RawDescriptionHelpFormatter).parse_args()
+
+
 import csv, pickle, re, sqlite3, sys
 from collections import defaultdict
 

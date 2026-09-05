@@ -1,4 +1,18 @@
 #!/usr/bin/env python
+
+if __name__ == "__main__":
+    # Validate arguments BEFORE importing anything or touching the database.
+    # These scripts mutate the database, and without this an unknown flag or a
+    # mistyped mode was silently ignored and the script ran with its defaults:
+    # asking Estimate_Reaction_Reversibility.py for --help rewrote 122 files.
+    # Placed above the imports so --help works even where a dependency is
+    # missing from the path.
+    import argparse as _argparse
+    _argparse.ArgumentParser(
+        description=__doc__,
+        formatter_class=_argparse.RawDescriptionHelpFormatter).parse_args()
+
+
 import os, sys
 
 columns={'2010':{'cpd_id':7,'formula':6,'structure':16,'rxn_id':9,'equation':8,'status':16,'reversibility':18,'direction':14},

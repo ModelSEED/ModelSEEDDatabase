@@ -1,4 +1,17 @@
 #!/usr/bin/env python
+
+if __name__ == "__main__":
+    # Two compound ids. The hand-rolled check below still runs; this adds
+    # --help and a usage line, neither of which existed.
+    import argparse as _argparse
+    _p = _argparse.ArgumentParser(
+        description=__doc__,
+        formatter_class=_argparse.RawDescriptionHelpFormatter)
+    _p.add_argument("kept", help="compound id to keep, e.g. cpd00001")
+    _p.add_argument("merged", help="compound id to merge away")
+    _p.parse_args()
+
+
 import os, sys
 temp=list();
 header=1;

@@ -1,4 +1,14 @@
 #!/usr/bin/env python
+
+if __name__ == "__main__":
+    # Validate before importing or touching the database: unrecognised
+    # arguments used to be ignored and the script ran with its defaults.
+    import argparse as _argparse
+    _argparse.ArgumentParser(
+        description=__doc__,
+        formatter_class=_argparse.RawDescriptionHelpFormatter).parse_args()
+
+
 import os
 import sys
 import subprocess
