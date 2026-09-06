@@ -1,0 +1,153 @@
+# Reactions whose energy moved more than 10 kcal/mol when the gated
+# protonation was adopted. Every reaction here should be treated as LOW
+# CONFIDENCE in the adopted build.
+#
+# This is a RISK MARKER, NOT A VERDICT. The flag records that a structural
+# condition holds, not that the value is wrong:
+#   unbalanced_enumeration  -- a compound's pKa source was substituted while a
+#       partner carrying sites above pH 7 was not, so phantom sites no longer
+#       cancel (~9.55 kcal/mol per unbalanced proton). rxn08713 satisfies this
+#       and nonetheless lands on the independently-derived Marvin-era value, so
+#       the condition over-selects.
+#   large_shift_mechanism_unidentified -- moved >10 kcal/mol without that
+#       signature. Includes rxn08789, which moved TOWARD the Marvin-era value
+#       and is a correction, and rxn59685 (+656) which is probably not.
+#
+# The baseline value is NOT a safe fallback. There both sides carried the same
+# phantom sites and the errors cancelled; that is not accuracy.
+# NONE of these reactions has a TECRDB match, so neither value can be checked
+# against experiment.
+reaction_id	name	dg_baseline_kcal	dg_adopted_kcal	shift_kcal	net_site_change	flag	compounds_resubstituted	partners_left_unchanged	largest_partner	largest_partner_name
+rxn21387	RXN-11082.c	-8300.375	-2901.300	5399.07	-292	unbalanced_enumeration	cpd23216;cpd23217	cpd15942	cpd15942	decaprenylphosphoryl-beta-D-arabinofuranose
+rxn46297		-1418.040	-138.374	1279.67	-99	unbalanced_enumeration	cpd23200;cpd23213	cpd00014;cpd02338	cpd02338	UDP-D-galacto-1,4-furanose
+rxn59685	O-antigen ligase	-659.726	-3.122	656.60	-164	large_shift_mechanism_unidentified	cpd02229;cpd44959;cpd46173;cpd46744			
+rxn44297	peptidoglycan transpeptidase (Gram-negative bacteria)	-310.706	-14.939	295.77	-68	unbalanced_enumeration	cpd23308;cpd23318	cpd00117	cpd00117	D-Alanine
+rxn57061		-227.121	-10.695	216.43	-86	unbalanced_enumeration	cpd02229;cpd25978;cpd35738	cpd47491	cpd47491	4,6-pyr-alpha-D-Gal-(1->4)-beta-D-GlcA-(1->3
+rxn59616		-204.564	-4.671	199.89	-55	large_shift_mechanism_unidentified	cpd02229;cpd46837;cpd47400			
+rxn21393	RXN-11091.c	-351.522	-179.443	172.08	-186	unbalanced_enumeration	cpd23213;cpd23217	cpd15942	cpd15942	decaprenylphosphoryl-beta-D-arabinofuranose
+rxn09024	O16 antigen polymerase (periplasm)	-174.256	-3.121	171.13	-80	unbalanced_enumeration	cpd02229;cpd15517;cpd15519	cpd15520	cpd15520	O16 antigen undecaprenyl diphosphate
+rxn59665		-135.353	-3.961	131.39	-70	unbalanced_enumeration	cpd46254;cpd46256	cpd00031;cpd00083	cpd00083	GDP-mannose
+rxn09023	O16 antigen polymerase (periplasm)	-108.941	-3.121	105.82	-54	unbalanced_enumeration	cpd02229;cpd15516;cpd15517	cpd15520	cpd15520	O16 antigen undecaprenyl diphosphate
+rxn08958	murein polymerizing transglycosylase 2 (three linked units)	-110.302	-13.168	97.13	-54	unbalanced_enumeration	cpd02229;cpd15511;cpd15512	cpd03495	cpd03495	Undecaprenyl-diphospho-N-acetylmuramoyl--N-a
+rxn41158		-203.495	-109.819	93.68	11	large_shift_mechanism_unidentified	cpd07113;cpd25506			
+rxn60588		-69.715	-2.971	66.74	-47	unbalanced_enumeration	cpd46219;cpd46252	cpd00031;cpd00083	cpd00083	GDP-mannose
+rxn08713	heptosyltransferase IV (LPS core synthesis)	-63.501	-3.693	59.81	-82	unbalanced_enumeration	cpd15432;cpd15477	cpd00008;cpd03831	cpd03831	ADP-L-glycero-D-manno-heptose
+rxn22147	RXN-11798.c	-62.961	-3.509	59.45	-37	large_shift_mechanism_unidentified	cpd21099;cpd23574;cpd25775			
+rxn42298		-53.885	-3.693	50.19	-72	unbalanced_enumeration	cpd26544;cpd35738	cpd00008;cpd03831	cpd03831	ADP-L-glycero-D-manno-heptose
+rxn59836		-53.179	-3.448	49.73	-97	unbalanced_enumeration	cpd47237;cpd47416	cpd00014;cpd30770	cpd30770	UDP-D-galactopyranose
+rxn58758		-50.539	-3.179	47.36	-91	unbalanced_enumeration	cpd47336;cpd47416	cpd00014;cpd00037	cpd00037	UDP-N-acetylglucosamine
+rxn08954	3-deoxy-D-manno-octulosonic acid transferase III (LPS core b	-102.362	-58.431	43.93	-51	unbalanced_enumeration	cpd02546;cpd15492;cpd15550	cpd00046	cpd00046	CMP
+rxn21617	RXN-11301.c	-47.836	-4.530	43.31	-22	unbalanced_enumeration	cpd19587;cpd23317	cpd23184	cpd23184	GlcNAc-(1->4)-MurNAc-pentapeptide-diphospho-
+rxn26334	peptidoglycan glycosyltransferase	-47.836	-4.530	43.31	-22	unbalanced_enumeration	cpd02229;cpd23308	cpd22495	cpd22495	GlcNAc-(1->4)-MurNAc-pentapeptide-diphosphou
+rxn26335	peptidoglycan glycosyltransferase	-47.836	-4.530	43.31	-22	unbalanced_enumeration	cpd02229;cpd23308	cpd22495	cpd22495	GlcNAc-(1->4)-MurNAc-pentapeptide-diphosphou
+rxn08619	glucosyltransferase II (LPS core synthesis)	-46.365	-3.183	43.18	-69	unbalanced_enumeration	cpd15469;cpd15475	cpd00014;cpd00026	cpd00026	UDP-glucose
+rxn08620	glucosyltransferase III (LPS core synthesis)	-45.881	-3.183	42.70	-75	unbalanced_enumeration	cpd15475;cpd15477	cpd00014;cpd00026	cpd00026	UDP-glucose
+rxn59984		-44.080	-3.448	40.63	-81	unbalanced_enumeration	cpd47256;cpd47448	cpd00014;cpd30770	cpd30770	UDP-D-galactopyranose
+rxn46135		-44.227	-4.710	39.52	-79	unbalanced_enumeration	cpd26545;cpd35738	cpd00014;cpd00037	cpd00037	UDP-N-acetylglucosamine
+rxn55309	62696	-203.932	-242.813	-38.88	4	large_shift_mechanism_unidentified	cpd07113			
+rxn58388		-39.845	-3.239	36.61	-106	unbalanced_enumeration	cpd46173;cpd47316	cpd00031;cpd23744	cpd23744	GDP-beta-L-fucose
+rxn59397		-39.327	-3.179	36.15	-71	unbalanced_enumeration	cpd32873;cpd46246	cpd00014;cpd00037	cpd00037	UDP-N-acetylglucosamine
+rxn37437	RXN0-5125.c.metaexp.CPD-12575	-39.276	-3.183	36.09	-59	unbalanced_enumeration	cpd26542;cpd26543	cpd00014;cpd00026	cpd00026	UDP-glucose
+rxn26113	RXN0-5125.c	-39.964	-3.906	36.06	-59	unbalanced_enumeration	cpd26542;cpd26543	cpd00014;cpd28293	cpd28293	UDP-GLUCOSE
+rxn57040		-39.507	-3.448	36.06	-59	unbalanced_enumeration	cpd26542;cpd46230	cpd00014;cpd30770	cpd30770	UDP-D-galactopyranose
+rxn08583	galactosyltransferase I (LPS core synthesis)	-40.751	-4.714	36.04	-63	unbalanced_enumeration	cpd15469;cpd15479	cpd00014;cpd00026	cpd00026	UDP-glucose
+rxn37438	RXN0-5126.c.metaexp.CPD-12575	-39.010	-3.183	35.83	-65	unbalanced_enumeration	cpd26543;cpd26544	cpd00014;cpd00026	cpd00026	UDP-glucose
+rxn26115	RXN0-5126.c	-39.698	-3.906	35.79	-65	unbalanced_enumeration	cpd26543;cpd26544	cpd00014;cpd28293	cpd28293	UDP-GLUCOSE
+rxn57446		-39.241	-3.448	35.79	-65	unbalanced_enumeration	cpd46230;cpd46246	cpd00014;cpd30770	cpd30770	UDP-D-galactopyranose
+rxn21612	RXN-11291.c	-39.834	-4.083	35.75	-48	large_shift_mechanism_unidentified	cpd02229;cpd23316;cpd23333			
+rxn57185		-38.441	-3.179	35.26	-75	unbalanced_enumeration	cpd47357;cpd47448	cpd00014;cpd00037	cpd00037	UDP-N-acetylglucosamine
+rxn60295		-36.620	-2.163	34.46	-52	unbalanced_enumeration	cpd47287;cpd47374	cpd00008;cpd03830	cpd03830	ADP-D-glycero-D-manno-heptose
+rxn60601		-37.492	-3.239	34.25	-102	unbalanced_enumeration	cpd47237;cpd47316	cpd00031;cpd23744	cpd23744	GDP-beta-L-fucose
+rxn42839		-89.317	-55.360	33.96	-71	unbalanced_enumeration	cpd24563;cpd36987	cpd24351	cpd24351	CPD-166
+rxn42235		-40.676	-7.136	33.54	-54	unbalanced_enumeration	cpd26540;cpd35078	cpd00014;cpd00144	cpd00144	UDPglucuronate
+rxn26108	RXN0-5122.c	-36.983	-3.693	33.29	-48	unbalanced_enumeration	cpd26539;cpd26540	cpd00008;cpd03831	cpd03831	ADP-L-glycero-D-manno-heptose
+rxn26109	RXN0-5122.p	-36.983	-3.693	33.29	-48	unbalanced_enumeration	cpd26539;cpd26540	cpd00008;cpd03831	cpd03831	ADP-L-glycero-D-manno-heptose
+rxn24097	Dol-P-Glc:Glc1Man9GlcNAc2-PP-Dol alpha-1,3-glucosyltransfera	-88.356	-55.360	33.00	-65	unbalanced_enumeration	cpd24562;cpd24563	cpd24351	cpd24351	CPD-166
+rxn24098	Dol-P-Glc:Glc1Man9GlcNAc2-PP-Dol alpha-1,3-glucosyltransfera	-88.356	-55.360	33.00	-65	unbalanced_enumeration	cpd24562;cpd24563	cpd24351	cpd24351	CPD-166
+rxn17896	Glc3Man9NAc2 oligosaccharide glucosidase	32.636	-0.351	-32.99	-69	unbalanced_enumeration	cpd24096;cpd24097	cpd26821	cpd26821	D-Glucose
+rxn42072		15.840	-16.925	-32.77	-31	unbalanced_enumeration	cpd32344;cpd32681	cpd19009	cpd19009	alpha-D-Mannose
+rxn59138		-35.909	-3.448	32.46	-65	unbalanced_enumeration	cpd47275;cpd47482	cpd00014;cpd30770	cpd30770	UDP-D-galactopyranose
+rxn24095	ALG6	-86.822	-55.360	31.46	-59	unbalanced_enumeration	cpd24561;cpd24562	cpd24351	cpd24351	CPD-166
+rxn24096	ALG6	-86.822	-55.360	31.46	-59	unbalanced_enumeration	cpd24561;cpd24562	cpd24351	cpd24351	CPD-166
+rxn54870	60420	-0.722	-30.762	-30.04	-13	unbalanced_enumeration	cpd38325	cpd38332	cpd38332	[N-(C-5-[deoxy-beta-D-glucosyl]-2,3-dihydrox
+rxn16608	CMP-3-deoxy-D-manno-oct-2-ulosonate:(KDO)3-lipid IVA 3-deoxy	-87.288	-57.270	30.02	-41	unbalanced_enumeration	cpd02546;cpd21115;cpd21116	cpd00046	cpd00046	CMP
+rxn08712	heptosyltransferase III (LPS core synthesis)	-33.102	-3.693	29.41	-42	unbalanced_enumeration	cpd15488;cpd15549	cpd00008;cpd03831	cpd03831	ADP-L-glycero-D-manno-heptose
+rxn26112	RXN0-5124.c	-34.965	-5.977	28.99	-53	unbalanced_enumeration	cpd26541;cpd26542	cpd00014;cpd00043	cpd00043	UDP-galactose
+rxn41869		-33.933	-4.979	28.95	-53	unbalanced_enumeration	cpd26541;cpd26542	cpd00014;cpd30770	cpd30770	UDP-D-galactopyranose
+rxn60375		-31.625	-3.183	28.44	-49	unbalanced_enumeration	cpd26540;cpd47036	cpd00014;cpd00026	cpd00026	UDP-glucose
+rxn57031		-31.368	-3.239	28.13	-86	unbalanced_enumeration	cpd47256;cpd47336	cpd00031;cpd23744	cpd23744	GDP-beta-L-fucose
+rxn59610		-31.724	-3.693	28.03	-42	unbalanced_enumeration	cpd46629;cpd47036	cpd00008;cpd03831	cpd03831	ADP-L-glycero-D-manno-heptose
+rxn59532		-29.800	-2.163	27.64	-44	unbalanced_enumeration	cpd47206;cpd47287	cpd00008;cpd03830	cpd03830	ADP-D-glycero-D-manno-heptose
+rxn42427		28.847	1.856	-26.99	-22	unbalanced_enumeration	cpd15511	cpd25968;cpd32070	cpd32070	a peptidoglycan dimer with pentapeptide stem
+rxn24093	ALG9 mannosyltransferase	-81.375	-55.360	26.02	-53	unbalanced_enumeration	cpd24560;cpd24561	cpd24353	cpd24353	CPD-171
+rxn24094	ALG9 mannosyltransferase	-81.375	-55.360	26.02	-53	unbalanced_enumeration	cpd24560;cpd24561	cpd24353	cpd24353	CPD-171
+rxn57381		-29.193	-3.179	26.01	-59	unbalanced_enumeration	cpd47374;cpd47482	cpd00014;cpd00037	cpd00037	UDP-N-acetylglucosamine
+rxn42708		-20.650	4.876	25.53	10	unbalanced_enumeration	cpd00852;cpd25509;cpd25512	cpd00027	cpd00027	D-Glucose
+rxn25111	RXN-8726.c	-20.472	5.044	25.52	10	unbalanced_enumeration	cpd00852;cpd25509;cpd25512	cpd00190	cpd00190	beta-D-Glucose
+rxn08957	murein polymerizing transglycosylase	-32.417	-7.145	25.27	-21	unbalanced_enumeration	cpd02229;cpd15511	cpd03495	cpd03495	Undecaprenyl-diphospho-N-acetylmuramoyl--N-a
+rxn13645	murein polymerizing transglycosylase	-32.417	-7.145	25.27	-21	unbalanced_enumeration	cpd02229;cpd15511	cpd03495	cpd03495	Undecaprenyl-diphospho-N-acetylmuramoyl--N-a
+rxn13936	Peptidoglycan subunit synthesis	-32.417	-7.145	25.27	-21	unbalanced_enumeration	cpd02229;cpd15511	cpd03495	cpd03495	Undecaprenyl-diphospho-N-acetylmuramoyl--N-a
+rxn13946	Peptidoglycan subunit synthesis	-32.417	-7.145	25.27	-21	unbalanced_enumeration	cpd02229;cpd15511	cpd03495	cpd03495	Undecaprenyl-diphospho-N-acetylmuramoyl--N-a
+rxn17901	2-alpha-mannosyl-oligosaccharide alpha-D-mannohydrolase	24.886	-0.351	-25.24	-55	unbalanced_enumeration	cpd27494;cpd27495	cpd27437	cpd27437	MANNOSE
+rxn22896	RXN-12428.c	28.964	4.465	-24.50	-18	large_shift_mechanism_unidentified	cpd23886;cpd23887;cpd23888			
+rxn22897	RXN-12428.e	28.964	4.465	-24.50	-18	large_shift_mechanism_unidentified	cpd23886;cpd23887;cpd23888			
+rxn24091	Dol-P-Man:Man7GlcNAc2-PP-Dol alpha-1,6-mannosyltransferase	-80.819	-56.890	23.93	-47	unbalanced_enumeration	cpd24559;cpd24560	cpd24353	cpd24353	CPD-171
+rxn24092	Dol-P-Man:Man7GlcNAc2-PP-Dol alpha-1,6-mannosyltransferase	-80.819	-56.890	23.93	-47	unbalanced_enumeration	cpd24559;cpd24560	cpd24353	cpd24353	CPD-171
+rxn60262		-28.297	-4.951	23.35	-22	unbalanced_enumeration	cpd32553	cpd00031;cpd00083;cpd31516	cpd31516	Man3-GlcNAc-PP-undecaprenol
+rxn60136		-26.089	-3.239	22.85	-70	unbalanced_enumeration	cpd47275;cpd47357	cpd00031;cpd23744	cpd23744	GDP-beta-L-fucose
+rxn37435	RXN0-5120.c.metaexp.CPD-12575	-24.510	-3.183	21.33	-43	unbalanced_enumeration	cpd15484;cpd26538	cpd00014;cpd00026	cpd00026	UDP-glucose
+rxn37436	RXN0-5120.p.metaexp.CPD-12575	-24.510	-3.183	21.33	-43	unbalanced_enumeration	cpd15484;cpd26538	cpd00014;cpd00026	cpd00026	UDP-glucose
+rxn26102	RXN0-5120.c	-25.198	-3.906	21.29	-43	unbalanced_enumeration	cpd15484;cpd26538	cpd00014;cpd28293	cpd28293	UDP-GLUCOSE
+rxn26104	RXN0-5120.p	-25.198	-3.906	21.29	-43	unbalanced_enumeration	cpd15484;cpd26538	cpd00014;cpd28293	cpd28293	UDP-GLUCOSE
+rxn08711	RXN0-5061.c	-23.294	-2.163	21.13	-36	unbalanced_enumeration	cpd15484;cpd15485	cpd00008;cpd03831	cpd03831	ADP-L-glycero-D-manno-heptose
+rxn42357		-15.900	4.844	20.74	10	unbalanced_enumeration	cpd00852;cpd25507;cpd25511	cpd00027	cpd00027	D-Glucose
+rxn25112	RXN-8727.c	-15.722	5.012	20.73	10	unbalanced_enumeration	cpd00852;cpd25507;cpd25511	cpd00190	cpd00190	beta-D-Glucose
+rxn57038		-22.972	-3.183	19.79	-49	unbalanced_enumeration	cpd46740;cpd46744	cpd00014;cpd00026	cpd00026	UDP-glucose
+rxn44992		-14.755	4.844	19.60	10	unbalanced_enumeration	cpd00852;cpd25508;cpd25511	cpd00027	cpd00027	D-Glucose
+rxn25110	RXN-8725.c	-14.576	5.012	19.59	10	unbalanced_enumeration	cpd00852;cpd25508;cpd25511	cpd00190	cpd00190	beta-D-Glucose
+rxn26106	RXN0-5121.c	-24.888	-5.580	19.31	-45	unbalanced_enumeration	cpd26538;cpd26539	cpd00002;cpd00008	cpd00008	ADP
+rxn26107	RXN0-5121.p	-24.888	-5.580	19.31	-45	unbalanced_enumeration	cpd26538;cpd26539	cpd00002;cpd00008	cpd00008	ADP
+rxn47353		-14.264	4.844	19.11	10	unbalanced_enumeration	cpd00852;cpd25508;cpd25510	cpd00027	cpd00027	D-Glucose
+rxn25109	RXN-8724.c	-14.085	5.012	19.10	10	unbalanced_enumeration	cpd00852;cpd25508;cpd25510	cpd00190	cpd00190	beta-D-Glucose
+rxn08927	murein L,D-carboxypeptidase (murein4p4p) (periplasm)	4.261	-14.582	-18.84	-20	unbalanced_enumeration	cpd15505	cpd00117;cpd15504	cpd15504	two linked disacharide tetrapeptide and trip
+rxn08894	murein D,D-carboxypeptidase (murein5p3p) (periplasm)	3.469	-14.582	-18.05	-20	unbalanced_enumeration	cpd15509	cpd00117;cpd15504	cpd15504	two linked disacharide tetrapeptide and trip
+rxn08708	LPS heptose kinase I (LPS core synthesis)	-23.590	-5.580	18.01	-39	unbalanced_enumeration	cpd15484;cpd15549	cpd00002;cpd00008	cpd00008	ADP
+rxn26110	RXN0-5123.c	-24.914	-7.129	17.79	-51	unbalanced_enumeration	cpd26540;cpd26541	cpd00002;cpd00008	cpd00008	ADP
+rxn26111	RXN0-5123.p	-24.914	-7.129	17.79	-51	unbalanced_enumeration	cpd26540;cpd26541	cpd00002;cpd00008	cpd00008	ADP
+rxn24089	ALG9 mannosyltransferase	-72.984	-55.360	17.62	-41	unbalanced_enumeration	cpd24558;cpd24559	cpd24353	cpd24353	CPD-171
+rxn24090	ALG9 mannosyltransferase	-72.984	-55.360	17.62	-41	unbalanced_enumeration	cpd24558;cpd24559	cpd24353	cpd24353	CPD-171
+rxn58147		-23.031	-5.580	17.45	-39	unbalanced_enumeration	cpd15484;cpd46629	cpd00002;cpd00008	cpd00008	ADP
+rxn21638	(KDO)3-lipid IVA (2->4) 3-deoxy-D-manno-octulosonic acid tra	-73.344	-56.882	16.46	-35	unbalanced_enumeration	cpd02546;cpd03586;cpd23330	cpd00046	cpd00046	CMP
+rxn59797		-15.846	-32.018	-16.17	-12	unbalanced_enumeration	cpd31861	cpd00009;cpd00023;cpd00031;cpd00038;cpd31456	cpd31456	oxidized coenzyme F420-8
+rxn58661		-14.053	2.064	16.12	-12	unbalanced_enumeration	cpd31861	cpd00009;cpd00023;cpd00031;cpd00038;cpd33955	cpd33955	oxidized coenzyme F420-6
+rxn54611	59100	-32.540	-16.506	16.03	-22	unbalanced_enumeration	cpd38324;cpd38325	cpd00014;cpd00026	cpd00026	UDP-glucose
+rxn21662	RXN-11350.c	-19.072	-3.316	15.76	-24	unbalanced_enumeration	cpd02229;cpd23345	cpd23331	cpd23331	N-acetylmuramoyl-L-alanyl-D-isoglutaminyl-N-
+rxn16607	CMP-3-deoxy-D-manno-oct-2-ulosonate:(KDO)2-lipid IVA 3-deoxy	-74.007	-58.413	15.59	-35	unbalanced_enumeration	cpd02546;cpd03586;cpd21115	cpd00046	cpd00046	CMP
+rxn08709	LPS heptose kinase II (LPS core synthesis)	-22.621	-7.129	15.49	-45	unbalanced_enumeration	cpd15488;cpd15550	cpd00002;cpd00008	cpd00008	ADP
+rxn08789	core oligosaccharide lipid A:hexadecanoate transferase (n-C1	19.701	4.666	-15.04	-85	large_shift_mechanism_unidentified	cpd15432;cpd15482			
+rxn47598		-15.035	-0.189	14.85	-12	unbalanced_enumeration	cpd00852;cpd02671;cpd02748	cpd00027	cpd00027	D-Glucose
+rxn25102	RXN-8717.c	-14.856	-0.021	14.83	-12	unbalanced_enumeration	cpd00852;cpd02671;cpd02748	cpd00190	cpd00190	beta-D-Glucose
+rxn60428		-15.717	-1.517	14.20	-35	unbalanced_enumeration	cpd46219;cpd46238	cpd00031;cpd00083	cpd00083	GDP-mannose
+rxn54869	60416	-3.407	-17.427	-14.02	-9	unbalanced_enumeration	cpd38324	cpd38333	cpd38333	N-(2,3-dihydroxybenzoyl)-L-seryl-[N-(C-5-[de
+rxn60617		-18.088	-4.190	13.90	-49	unbalanced_enumeration	cpd46224;cpd46239	cpd00014;cpd01482	cpd01482	UDP-glucosamine
+rxn58417		-16.393	-3.223	13.17	-44	unbalanced_enumeration	cpd46239;cpd46253	cpd00014;cpd01482	cpd01482	UDP-glucosamine
+rxn03384	Uroporphyrinogen I carboxy-lyase	1.425	-11.146	-12.57	-8	large_shift_mechanism_unidentified	cpd03414;cpd03416			
+rxn35415	RXN-10642.d	1.425	-11.146	-12.57	-8	large_shift_mechanism_unidentified	cpd03414;cpd03416			
+rxn02288	Uroporphyrinogen-III carboxy-lyase	1.407	-11.146	-12.55	-8	large_shift_mechanism_unidentified	cpd00774;cpd02083			
+rxn27432	uroporphyrinogen III decarboxylase	1.407	-11.146	-12.55	-8	large_shift_mechanism_unidentified	cpd00774;cpd02083			
+rxn60464		-13.311	-0.990	12.32	-35	unbalanced_enumeration	cpd46221;cpd46236	cpd00031;cpd00083	cpd00083	GDP-mannose
+rxn05005	S-adenosyl-L-methionine:uroporphyrinogen-III C-methyltransfe	30.135	17.912	-12.22	-4	unbalanced_enumeration	cpd00774	cpd00017;cpd00019;cpd11206	cpd11206	Precorrin 1
+rxn38834	CobA [ambiguous-see EC 2.5.1.17] SUMT	30.135	17.912	-12.22	-4	unbalanced_enumeration	cpd00774	cpd00017;cpd00019;cpd11206	cpd11206	Precorrin 1
+rxn59846		-16.623	-4.416	12.21	-55	unbalanced_enumeration	cpd46224;cpd46763	cpd00014;cpd01482	cpd01482	UDP-glucosamine
+rxn02264	Hydroxymethylbilane hydro-lyase(cyclizing)	-71.684	-59.786	11.90	-4	unbalanced_enumeration	cpd00774	cpd00755	cpd00755	Hydroxymethylbilane
+rxn02265	R03166	-71.684	-59.786	11.90	-4	unbalanced_enumeration	cpd03414	cpd00755	cpd00755	Hydroxymethylbilane
+rxn27433	URO-synthase	-71.684	-59.786	11.90	-4	unbalanced_enumeration	cpd00774	cpd00755	cpd00755	Hydroxymethylbilane
+rxn31104	UROGENIIISYN-RXN	-71.684	-59.786	11.90	-4	unbalanced_enumeration	cpd00774	cpd00755	cpd00755	Hydroxymethylbilane
+rxn35412	uroporphyrinogen I synthase	-71.684	-59.786	11.90	-4	unbalanced_enumeration	cpd03414	cpd00755	cpd00755	Hydroxymethylbilane
+rxn59702		-14.899	-3.497	11.40	-40	unbalanced_enumeration	cpd46221;cpd46253	cpd00014;cpd01482	cpd01482	UDP-glucosamine
+rxn08410	enterobacterial common antigen polymerase (periplasm)	-59.515	-70.788	-11.27	-21	unbalanced_enumeration	cpd02229;cpd15456	cpd15458;cpd15582	cpd15458	(enterobacterial common antigen)x4 undecapre
+rxn15471	1-O-Galloyl-beta-D-glucose:1,2,3,6-tetrakis-O-galloyl-beta-D	-1.673	-12.486	-10.81	-5	unbalanced_enumeration	cpd00852;cpd02748;cpd02785	cpd00190	cpd00190	beta-D-Glucose
+rxn15472	1-O-Galloyl-beta-D-glucose:1,2,3,6-tetrakis-O-galloyl-beta-D	-1.673	-12.486	-10.81	-5	unbalanced_enumeration	cpd00852;cpd02748;cpd02785	cpd19001	cpd19001	alpha-D-Glucose
+rxn03101	1-O-Galloyl-beta-D-glucose:1,2,3,6-tetrakis-O-galloyl-beta-D	-1.852	-12.653	-10.80	-5	unbalanced_enumeration	cpd00852;cpd02748;cpd02785	cpd00027	cpd00027	D-Glucose
+rxn47750		-13.813	-3.183	10.63	-31	unbalanced_enumeration	cpd33701;cpd34405	cpd00014;cpd00026	cpd00026	UDP-glucose
+rxn08931	murein L,D-endopeptidase (murein3px3p) (periplasm)	80.402	90.737	10.33	-18	unbalanced_enumeration	cpd15501	cpd15502	cpd15502	two disacharide linked murein units, tripept

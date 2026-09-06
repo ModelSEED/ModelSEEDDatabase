@@ -1,0 +1,38 @@
+%% Source: MANUSCRIPT.md "Results > Multi-source thermodynamics"
+%%         (drafts/methods_multi_source_thermodynamics.md, Results portion).
+\subsection{Multi-source thermodynamics}
+
+\NUMBERSPENDING{Per-source coverage (compounds with \dfG{}, reactions with
+accepted \drG{}) across eQuilibrator, rebuilt Group Contribution, dGpredictor
+retrained on ModelSEED, and OpenTECR. Head-to-head \drG{} comparison
+(correlation, uncertainty distributions) mirroring the 2020 Figure~2. How
+per-reaction-class heuristic overlays change direction assignments relative to
+the source values alone.}
+
+\paragraph{Sensitivity to the protonation model.} Because the choice of pKa
+model is invisible in the published output, we quantified how far it moves the
+result. Recomputing the database under two protonation models and comparing
+reactions scored by both, the effect concentrates sharply in the near-neutral
+window: reactions containing a compound whose pKa differs between models in the
+pH 6--8 range move by a median of 0.33\,kcal\,mol$^{-1}$, against
+0.06\,kcal\,mol$^{-1}$ for reactions containing no affected compound --- roughly
+an order of magnitude. The mechanism is that a pKa far from the reported pH
+leaves the microspecies distribution saturated, whereas one near pH 7 decides
+which species dominates.
+
+The distribution is not, however, a smooth tail. \TBD[final counts against the
+released tables] Of the reactions in the priority scope used for template
+construction, \TBD[N] change assigned direction under the reversibility rule,
+and these arise by two distinct mechanisms: a minority carry large energy shifts
+on polyanionic substrates, while the remainder sit near a decision boundary and
+are moved across it by a sub-kcal change. The second class is invisible to any
+magnitude-based filter, which is an argument for reporting the ledger of
+per-source directions described in Section~\ref{sec:methods-thermo} rather than
+a single assignment.
+
+On the compounds where the two models can be checked against measured
+macroscopic ladders, the proprietary predictor reproduces the literature ladder
+in \TBD[x] of \TBD[n] cases against \TBD[y] for the open-source predictor, the
+gap arising entirely from polyprotic acids with chemically equivalent ionizable
+sites. This asymmetry, rather than any overall accuracy difference, is what
+determines the source order given in Section~\ref{sec:methods-thermo}.

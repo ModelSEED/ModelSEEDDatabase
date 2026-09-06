@@ -1,0 +1,61 @@
+%% Source: MANUSCRIPT.md "Results > Structure-curation improvements"
+%%         (drafts/results_structure_curation_improvements.md, inlined).
+\subsection{Structure-curation improvements}
+
+At the 2020 release, formula disagreement between source databases silently
+dropped the affected compound from
+\file{Unique\_ModelSEED\_Structures.txt}, cascading into a corresponding reaction
+becoming impossible to balance. The updated pipeline classifies each remaining
+conflict and routes it to one of three outcomes: auto-pick from the source
+variant that matches the historical \file{compound\_*.json} formula
+(zero-disruption), curator-authored override with recorded rationale, or an entry
+in the mass-balance exclusion registry.
+
+Applied to the priority-scope reaction set ($\sim$9,000 reactions used in v7.0
+ModelSEEDTemplates and PlantSEED templates, comprising $\sim$6,500 compounds),
+the pipeline resolved every previously-conflicting compound in three curation
+rounds during this release cycle. Round 1 (2026-07-03): 52 H-only conflicts
+auto-matched to the \file{compound\_*.json} formula, plus two
+mass-balance-exclusion entries for \cpd{cpd00766} (ascorbate radical) and
+\cpd{cpd00849} (quercetin 3,3'-bissulfate) where no source formula matched.
+Round 2 (2026-07-04): 11 remaining priority-scope conflicts resolved --- 9
+auto-matched (spanning the alkyl-glycerol, sulfatide, Descarbamoylnovobiocin, and
+other classes), plus two additional mass-balance-exclusion entries for
+\cpd{cpd27485} (Co(I)-corrinoid Fe--S protein) and \cpd{cpd12396} (a
+pyruvate-kinase phosphoserine residue). Round 3 (2026-07-04): \cpd{cpd00244}
+Ni\textsuperscript{2+} resolved via ChEBI 49786; the one remaining source variant
+(KEGG C00291 at Ni/0) was identified as elemental nickel mis-aliased to the ion,
+flagged for a separate alias cleanup.
+
+After these rounds, the classifier reports 56 remaining formula-conflict
+compounds across 143 source-variant rows (42 H-only, 12 heavy-atom skeleton, 1
+element-set, 1 single-variant). Zero of these fall in the v7.0 priority template
+compound set. The priority-scope formula-conflict backlog is empty, and the
+balanced-reaction rate on the priority set held at 8,683 / 9,000 across all three
+PRs (no regressions).
+
+The \file{mass\_balance\_excluded.tsv} registry --- introduced in this release
+cycle --- records four compounds whose stored formula in \file{compound\_*.json}
+cannot be reproduced from any available source structure. For these compounds the
+picked structure's SMILES and InChIKey populate \file{compound\_*.json} (so
+downstream atom-mapping tools have something to work with), while the historical
+formula and charge are preserved unchanged. As a consequence, the reactions in
+which these compounds appear balance against the historical formula rather than a
+formula computed from the picked structure. The registry is small and expected to
+remain so.
+
+For protein-carrier cofactor standardisation, an earlier commit in this release
+cycle added 47 pantetheine-inclusive acyl-ACP formula overrides in a single PR
+(verified as producing zero newly-imbalanced reactions). A follow-up analysis
+(Round 4, 2026-07-30) applied the same pipeline to the 260 open ACP name-matches:
+179 survived a structural filter (\texttt{R} in formula or \texttt{*} in SMILES),
+173 received a computed override proposal, and an iterative safe-filter converged
+at zero acceptable proposals --- every candidate cascades into breakage through
+co-application effects. The zero-safe result reflects the tight interconnection of
+ACP-bound intermediates in specialty secondary-metabolism pathways (polyketide
+synthase chains, NRPS chains, actinorhodin, mupirocin, mithramycin), and zero of
+the 173 candidates touch any priority-scope reaction; systematic curation of these
+residuals via coupled-update reasoning is future work.
+
+\TBD[Extensions to biotinyl-BCCP and lipoyl-carrier classes are pending as
+smaller PRs.]

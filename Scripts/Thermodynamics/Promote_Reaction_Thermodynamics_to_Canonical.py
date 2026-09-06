@@ -104,11 +104,11 @@ def main():
         dg = float("{0:.2f}".format(float(entry[0])))
         err = float("{0:.2f}".format(float(entry[1])))
 
-        # Adopt the source's own direction operator (computed by the same
-        # heuristic as the canonical reversibility); recompute as a fallback.
+        # Adopt the source's own direction operator (computed with that
+        # source's rule set); recompute with the same rule set as a fallback.
         op = entry[2] if (len(entry) >= 3 and entry[2] in (">", "<", "=")) else None
         if op is None:
-            op = reversibility_from_energy(robj, dg, err)
+            op = reversibility_from_energy(robj, dg, err, source=chosen)
 
         robj['deltag'] = dg
         robj['deltagerr'] = err

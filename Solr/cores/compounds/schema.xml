@@ -1,58 +1,136 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<!-- Schema for Metabolic Modeling: Compounds -->
-<!-- Attributes: id abbreviation name formula mass source smiles inchikey charge is_core is_obsolete -->
-<!-- linked_compound is_cofactor deltag deltagerr pka pkb abstract_compound comprised_of aliases notes -->
+<!-- Schema for ModelSEED Biochemistry: Compounds
+     Solr 9.x, ClassicIndexSchemaFactory, nested-document enabled.
 
+     Parent doc = one compound. Nested child docs carry per-source
+     thermodynamics and per-source pKa/pKb data so that the UI can render
+     everything a compound page needs from a single `q=id:cpdXXXXX&fl=*,[child]`
+     request, and search can filter parent compounds by child-level
+     conditions (e.g. "compounds with an eQuilibrator ΔfG between X and Y").
 
-<!-- {'abbreviation': 'h2o', 'abstract_compound': None, -->
-<!-- 'aliases': ['Name: BOUND WATER; H2O; H3O+; 'KEGG: C00001; C01328', 'MetaCyc: OH; OXONIUM; WATER'], -->
-<!-- 'charge': 0, 'comprised_of': None, 'deltag': -37.54, 'deltagerr': 0.18, 'formula': 'H2O', -->
-<!-- 'id': 'cpd00001', 'inchikey': 'XLYOFNOQVPJJNP-UHFFFAOYSA-N', 'is_cofactor': 0, 'is_core': 1, -->
-<!-- 'is_obsolete': 0, 'linked_compound': None, 'mass': 18.0, 'name': 'H2O', 'notes': ['GC', 'EQ', 'EQU'], -->
-<!-- 'pka': '1:1:15.70', 'pkb': '1:1:-1.80', 'smiles': 'O', 'source': 'Primary Database'} -->
+     Nested layout:
+       compound (parent, doc_type=compound)
+         └─ thermodynamics/ (nest_path=/thermodynamics, doc_type=thermodynamics)
+              fields: source, energy, error
+         └─ pkas/           (nest_path=/pkas,           doc_type=pkas)
+              fields: source, pka, pkb
+-->
 
 <schema name="compounds" version="1.6">
 	<fields>
 
-		<field name="id"		type="string"		indexed="true"	stored="true"/>
-		<field name="abbreviation"		type="string_ci"		indexed="true"	stored="true"	docValues="true"/>
-		<field name="name"		type="string_ci"		indexed="true"	stored="true"	docValues="true"/>
-		<field name="formula"		type="string"		indexed="true"	stored="true"	docValues="true"/>
-		<field name="mass"		type="float"		indexed="true"	stored="true"/>
-		<field name="source"		type="string"		indexed="true"	stored="true"/>
-		<field name="smiles"		type="string"		indexed="true"	stored="true"/>
-		<field name="inchikey"		type="string"		indexed="true"	stored="true"/>
-		<field name="charge"		type="float"		indexed="true"	stored="true"/>
-		<field name="is_core"		type="boolean"		indexed="true"	stored="true"/>
-		<field name="is_obsolete"		type="boolean"		indexed="true"	stored="true"/>
-		<field name="linked_compound"		type="string"		indexed="true"	stored="true"/>
-		<field name="is_cofactor"		type="boolean"		indexed="true"	stored="true"/>
-		<field name="deltag"		type="float"		indexed="true"	stored="true"/>
-		<field name="deltagerr"		type="float"		indexed="true"	stored="true"/>
-		<field name="pka"		type="string"		indexed="true"	stored="true"	 multiValued="true"/>
-		<field name="pkb"		type="string"		indexed="true"	stored="true"	 multiValued="true"/>
-		<field name="abstract_compound"		type="string"		indexed="true"	stored="true"/>
-		<field name="comprised_of"		type="string"		indexed="true"	stored="true"/>
-		<field name="aliases"		type="string_ci"		indexed="true"	stored="true"	docValues="true" multiValued="true"/>
-		<field name="notes"		type="string"		indexed="true"	stored="true" multiValued="true"/>
-		
-		<field name="text"		type="text_custom"	indexed="true"	stored="false"	multiValued="true"/>
-		<field name="_version_"		type="long"		indexed="true"	stored="true"/>
-		<field name="date_inserted"	type="tdate"		indexed="true"	stored="true" default="NOW"/>
-		<field name="date_modified"	type="tdate"		indexed="true"	stored="true" default="NOW"/>
+		<!-- ============================================================
+		     Nested-document plumbing (Solr 9). _root_, _nest_path_, and
+		     _nest_parent_ are auto-populated when a nested add is used.
+		     doc_type is our own explicit discriminator for readable
+		     queries alongside the auto-populated _nest_path_.
+		     ============================================================ -->
+		<field name="_root_"        type="string"  indexed="true"  stored="false" docValues="false"/>
+		<field name="_nest_path_"   type="string"  indexed="true"  stored="true"/>
+		<field name="_nest_parent_" type="string"  indexed="true"  stored="true"/>
+		<field name="doc_type"      type="string"  indexed="true"  stored="true"/>
+
+		<!-- ============================================================
+		     Parent compound fields
+		     ============================================================ -->
+		<field name="id"                type="string"     indexed="true"  stored="true"  required="true"/>
+		<field name="abbreviation"      type="string_ci"  indexed="true"  stored="true"  docValues="true"/>
+		<field name="name"              type="string_ci"  indexed="true"  stored="true"  docValues="true"/>
+		<field name="formula"           type="string"     indexed="true"  stored="true"  docValues="true"/>
+		<field name="mass"              type="float"      indexed="true"  stored="true"/>
+		<field name="charge"            type="float"      indexed="true"  stored="true"/>
+		<field name="source"            type="string"     indexed="true"  stored="true"/>
+
+		<field name="smiles"            type="string"     indexed="true"  stored="true"/>
+		<field name="inchikey"          type="string"     indexed="true"  stored="true"/>
+
+		<field name="is_core"           type="boolean"    indexed="true"  stored="true"/>
+		<field name="is_obsolete"       type="boolean"    indexed="true"  stored="true"/>
+		<field name="is_cofactor"       type="boolean"    indexed="true"  stored="true"/>
+
+		<field name="class"             type="string_ci"  indexed="true"  stored="true"  docValues="true"/>
+
+		<field name="linked_compound"   type="string"     indexed="true"  stored="true"/>
+		<field name="abstract_compound" type="string"     indexed="true"  stored="true"/>
+		<field name="comprised_of"      type="string"     indexed="true"  stored="true"/>
+
+		<field name="aliases"           type="string_ci"  indexed="true"  stored="true"  docValues="true"  multiValued="true"/>
+		<field name="notes"             type="string"     indexed="true"  stored="true"                     multiValued="true"/>
+
+		<!-- Backwards-compatible top-level scalars from the pre-2026 schema.
+		     Same value as the promoted per-source pick. Deprecated; kept so
+		     legacy consumers don't break at cutover. -->
+		<field name="deltag"            type="float"      indexed="true"  stored="true"/>
+		<field name="deltagerr"         type="float"      indexed="true"  stored="true"/>
+		<field name="pka"               type="string"     indexed="true"  stored="true"  multiValued="true"/>
+		<field name="pkb"               type="string"     indexed="true"  stored="true"  multiValued="true"/>
+
+		<!-- ============================================================
+		     Denormalized flat fields — derived from the JSON at compile
+		     time and stored on the parent for fast filtering / faceting
+		     without needing a block-join query.
+		     ============================================================ -->
+		<!-- true when smiles is non-empty. Fast filter for "compounds we
+		     can atom-map / structure-search". -->
+		<field name="has_structure"           type="boolean"  indexed="true"  stored="true"/>
+		<!-- Per-element atom counts parsed from `formula`. Enable range
+		     queries like "atom_count_C:[3 TO 6]" for central-metabolism-
+		     scale browsing. -->
+		<field name="atom_count_C"            type="int"      indexed="true"  stored="true"/>
+		<field name="atom_count_N"            type="int"      indexed="true"  stored="true"/>
+		<field name="atom_count_O"            type="int"      indexed="true"  stored="true"/>
+		<field name="atom_count_P"            type="int"      indexed="true"  stored="true"/>
+		<field name="atom_count_S"            type="int"      indexed="true"  stored="true"/>
+		<!-- Convenience count: how many sources gave a numeric ΔfG. Same as
+		     len(thermodynamics{}) at compile time. -->
+		<field name="n_sources_thermodynamics" type="int"     indexed="true"  stored="true"/>
+		<!-- True when the compound sits in the canonical Convention A
+		     electron-carrier anchor table (ferredoxin / thioredoxin /
+		     flavodoxin / glutaredoxin pairs after that PR lands). -->
+		<field name="is_electron_carrier"     type="boolean"  indexed="true"  stored="true"/>
+
+		<!-- Compile-time provenance -->
+		<field name="date_inserted"     type="tdate"      indexed="true"  stored="true"  default="NOW"/>
+		<field name="date_modified"     type="tdate"      indexed="true"  stored="true"  default="NOW"/>
+		<field name="_version_"         type="long"       indexed="true"  stored="true"/>
+
+		<!-- Aggregated free-text field for the main search box. See
+		     copyField declarations below. -->
+		<field name="text"              type="text_custom"  indexed="true"  stored="false"  multiValued="true"/>
+
+		<!-- ============================================================
+		     Child-document fields (thermodynamics, pkas)
+
+		     Child docs share the fields namespace with parents in classic
+		     schema; they're distinguished by `doc_type` and `_nest_path_`.
+		     ============================================================ -->
+		<!-- Common child fields (used by both thermodynamics and pkas
+		     children; both carry a `source` string). -->
+		<field name="source_name"       type="string_ci"  indexed="true"  stored="true"  docValues="true"/>
+
+		<!-- Thermodynamics child fields -->
+		<field name="energy"            type="float"      indexed="true"  stored="true"/>
+		<field name="error"             type="float"      indexed="true"  stored="true"/>
+
+		<!-- pKas child fields. Stored as the historical string format
+		     "1:14:12.60;1:22:3.33;..." (fragment:atom:value). Not further
+		     parsed here to preserve exact reproducibility with the JSON. -->
+		<field name="pka_value"         type="string"     indexed="true"  stored="true"  multiValued="true"/>
+		<field name="pkb_value"         type="string"     indexed="true"  stored="true"  multiValued="true"/>
 	</fields>
 
 	<uniqueKey>id</uniqueKey>
-	
-	<copyField source="id"		dest="text"/>
-	<copyField source="abbreviation"		dest="text"/>
-	<copyField source="name"		dest="text"/>
-	<copyField source="formula"		dest="text"/>
-	<copyField source="aliases"		dest="text"/>
-	<copyField source="notes"		dest="text"/>
-	
+
+	<!-- Free-text search across identity, name, formula, alias, note fields.
+	     `text` is not stored; only used for scoring. -->
+	<copyField source="id"           dest="text"/>
+	<copyField source="abbreviation" dest="text"/>
+	<copyField source="name"         dest="text"/>
+	<copyField source="formula"      dest="text"/>
+	<copyField source="aliases"      dest="text"/>
+	<copyField source="notes"        dest="text"/>
+
 	<xi:include href="schema_types.xml" xmlns:xi="http://www.w3.org/2001/XInclude">
 		<xi:fallback></xi:fallback>
 	</xi:include>
 </schema>
-

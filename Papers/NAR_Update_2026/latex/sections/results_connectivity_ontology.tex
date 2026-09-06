@@ -1,0 +1,51 @@
+%% Source: MANUSCRIPT.md "Results > Database connectivity and ontological mappings"
+%%         (drafts/results_db_connectivity_and_ontology.md, inlined).
+\subsection{Database connectivity and ontological mappings}
+
+The 2020 release quantified the biochemistry database's suitability for metabolic
+modelling by treating the entire database as a single reaction network and
+applying flux balance analysis. Two metrics were reported (Table~5 of the 2020
+paper): the number of reactions capable of carrying nonzero mass-balanced flux
+(``functional reactions'') assuming every extracellular metabolite is available,
+and the number of the 390 Biolog growth conditions under which the network is
+capable of producing biomass. The 2020 counts were 21,403 functional reactions
+and 355/390 Biolog conditions.
+
+\begin{table*}[!t]
+\caption{Whole-database flux-balance-analysis refresh (see Methods for
+procedure).\label{tab:wholedbfba}}%
+\begin{tabular*}{\textwidth}{@{\extracolsep\fill}lrrrr@{\extracolsep\fill}}
+\toprule
+ & 2010 & 2014 & 2020 & 2026 \\
+\midrule
+Total reactions              & 13,257     & 27,558     & 36,193     & 56,012 \\
+Mass balanced                & 10,263     & 17,264     & 25,457     & 34,370 \\
+Reversible                   & 6,195      & 8,906      & 18,399     & \TBD{} \\
+Functional reactions         & 8,505      & 21,917     & 21,403     & \TBD{} \\
+Functional Biolog conditions & 330 (85\%) & 337 (86\%) & 355 (91\%) & \TBD{} \\
+\botrule
+\end{tabular*}
+\end{table*}
+
+For the ontology mappings, the 2020 release described three ontology types
+(equivalent compound sets, lumped reaction sets, context-specific reaction sets)
+and demonstrated ontology-guided reconciliation reducing apparent-mismatch
+reactions between the \textit{Escherichia coli} iJR904 model and ModelSEED from
+258 to 159. The 2026 refresh reports the counts in Table~\ref{tab:ontology}.
+
+\begin{table}[!t]
+\caption{Ontology growth, 2020 to 2026.\label{tab:ontology}}%
+\begin{tabular*}{\columnwidth}{@{\extracolsep\fill}lrr@{\extracolsep\fill}}
+\toprule
+Ontology type & 2020 entries & 2026 entries \\
+\midrule
+Equivalent compound sets        & \TBD{} & \TBD{} \\
+Lumped reaction sets            & \TBD{} & \TBD{} \\
+Context-specific reaction sets  & \TBD{} & \TBD{} \\
+\botrule
+\end{tabular*}
+\end{table}
+
+iJR904 reconciliation refresh: apparent-mismatch reactions dropped from
+\TBD[2026 baseline] to \TBD[after ontology] via \TBD[dominant equivalence
+categories].

@@ -1,0 +1,84 @@
+# Local-development compose for the ModelSEED Biochemistry SOLR container.
+#
+# TESTING MODE: the biochemistry JSON is compiled + baked into the image
+# during `docker compose build`. No external mounts required beyond
+# ./data for index persistence. `docker compose up -d --build` and query
+# — no manual compile-and-post step.
+#
+# Volumes:
+#   ${SOLR_DATA_DIR}:/var/solr    — persistent Solr index (survives restarts).
+#                                    Defaults to the named volume
+#                                    `modelseed_solr_data`, which lets Docker
+#                                    manage ownership. Set SOLR_DATA_DIR to an
+#                                    absolute host path to bind-mount instead
+#                                    (e.g. a persistent IT-provided mount).
+#                                    Solr runs as UID 8983 in the container, so
+#                                    a bind-mounted host dir must be chowned to
+#                                    8983:8983 first — see Solr/README.md.
+#
+# Query examples:
+#   curl 'http://localhost:8983/solr/reactions/select?q=id:rxn00001&fl=*,[child]&wt=json&indent=true'
+#   curl 'http://localhost:8983/solr/compounds/select?q=id:cpd00002&fl=*,[child]&wt=json&indent=true'
+#
+# When IT provides a persistent mount for the biochemistry data, replace
+# the "TESTING MODE" pattern with:
+#   - Delete the COPY --from=compile lines in Dockerfile (skip baking JSON)
+#   - Add a volume: /path/to/biochemistry:/data/biochemistry:ro
+#   - Add a volume: /path/to/compiled:/data/compilation
+#   - Trigger post via `docker compose exec solr /scripts/post_biochemistry.sh`
+
+services:
+  solr:
+    # Build context = repository root so the Dockerfile can COPY
+    # Biochemistry/ and Solr/ into the compile stage.
+    build:
+      context: ..
+      dockerfile: Solr/Dockerfile
+    image: modelseed-solr:local
+    container_name: modelseed-solr
+    # Solr runs as UID 8983 by default, which matches the image. Override
+    # via SOLR_UID/SOLR_GID when /var/solr is bind-mounted onto a share
+    # whose ownership you cannot change — an NFS export with root squash,
+    # for instance, where chowning the host dir to 8983 is impossible.
+    # Point these at the owner of ${SOLR_DATA_DIR} in that case.
+    user: "${SOLR_UID:-8983}:${SOLR_GID:-8983}"
+    ports:
+      - "8983:8983"
+    volumes:
+      - ${SOLR_DATA_DIR:-modelseed_solr_data}:/var/solr
+    environment:
+      # Solr's start scripts write into $HOME; when SOLR_UID is an
+      # arbitrary host uid there's no passwd entry for it and HOME would
+      # default to an unwritable "/". /var/solr is writable by definition.
+      HOME: /var/solr
+      POST_ON_START: "true"
+      # Multi-env layout — one Solr instance serves staging AND prod:
+      #   - `staging` cores (compounds_staging, reactions_staging) use
+      #     the NEW nested schema for the staging UI
+      #   - `prod` cores (compounds_prod, reactions_prod) use the LEGACY
+      #     flat schema (matches what production is currently serving),
+      #     so the production UI keeps working during staging tests
+      # Configset selection is by env name — see entrypoint.sh's
+      # `configset_for_env` helper: env=="prod" → *_legacy configsets;
+      # anything else → new nested configsets.
+      # POST_ON_START only auto-posts into the FIRST env in this list;
+      # others are populated via
+      #   docker exec modelseed-solr /scripts/post_biochemistry.sh <env>
+      #
+      # While the staging UI is under test we keep production cores
+      # OFF the compose default — nothing gets created or populated at
+      # the bare `compounds`/`reactions` names. When the production
+      # release is ready, flip this to "staging prod" and either
+      # restart the container (prod cores auto-created empty) or
+      # `docker exec ... /scripts/post_biochemistry.sh prod` to
+      # populate them from the baked-in legacy JSON.
+      SOLR_ENVIRONMENTS: "${SOLR_ENVIRONMENTS:-staging}"
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS http://localhost:8983/solr/admin/cores?action=STATUS > /dev/null || exit 1"]
+      interval: 30s
+      timeout: 5s
+      start_period: 60s
+
+volumes:
+  modelseed_solr_data:

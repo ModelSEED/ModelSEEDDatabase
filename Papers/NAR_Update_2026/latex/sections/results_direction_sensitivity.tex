@@ -1,0 +1,60 @@
+%% Source: MANUSCRIPT.md "Results > Empirical study -- reaction-direction
+%%         heuristic sensitivity on ModelSEED v2 models"
+%%         (drafts/results_reaction_direction_sensitivity.md, inlined).
+%% Health check: "biggest gap; needs the thermodynamics section done first".
+\subsection{Empirical study: reaction-direction heuristic sensitivity on
+ModelSEED v2 models}\label{sec:results-direction}
+
+The most consequential open question for a mass-balance-first biochemistry
+database is not ``is the reaction thermodynamically feasible'' --- that question
+is answered per reaction by the \drG{} ledger described in
+Section~\ref{sec:methods-thermo} --- but rather ``does the direction assignment
+materially change what a metabolic model built on top of this database
+predicts''. The 2020 release described a single direction-assignment procedure
+(based on eQuilibrator-derived \drG{} with a group-contribution fallback and a
+reversibility rule set from Jankowski \textit{et al.}~\cite{jankowski2008}). The
+2026 release provides four direction sources (see
+Section~\ref{sec:methods-thermo}), and we present here the first systematic study
+of how the choice between them propagates through metabolic-model output.
+
+\paragraph{Model corpus.} We use the ModelSEED v2 draft-model corpus published in
+Faria \textit{et al.}~\cite{modelseedv2} --- \TBD[N] draft genome-scale metabolic
+models spanning \TBD[taxonomy summary]. Models are used as-published (no manual
+curation) so that the study measures direction-source sensitivity in isolation
+from other model-improvement effects.
+
+\paragraph{Direction sources compared.} Four sources, each producing a full
+reversibility labelling over the ModelSEED reactions used in the model corpus:
+(i) eQuilibrator-derived \drG{} with reversibility rules (the 2020 default); (ii)
+rebuilt group-contribution \drG{} with the same reversibility rules; (iii)
+dGpredictor retrained on ModelSEED with the same reversibility rules; (iv)
+\TBD[OpenTECR integrated as a fourth source, or heuristic-overlay variants of
+(i)--(iii)]. See Methods for the derivation of each.
+
+\paragraph{Per-model metrics.} For each
+$(\text{model} \times \text{direction source})$ pair we compute: (a) predicted
+growth rate under the model's original medium via flux balance analysis; (b)
+essential-gene set derived from single-gene knockout FBA; (c) number of reactions
+marked infeasible under the direction source's constraints; (d) number of the 390
+Biolog conditions from Ye \textit{et al.}~\cite{ye_biolog} under which the model
+produces biomass; (e) \TBD[any additional metric agreed with the co-authors].
+
+\paragraph{Aggregation and reporting.} We report: (1) a
+$(\text{model} \times \text{direction source} \times \text{metric})$ matrix as
+supplementary material; (2) per-metric distributional summaries (median and
+inter-quartile range across the model corpus, per direction source); (3) a
+summary figure with pairwise Jaccard similarity of essential-gene sets across
+direction sources, plus a per-model direction-sensitivity score defined as
+\TBD{}.
+
+\paragraph{Key findings.} \TBD[PLACEHOLDER --- filled after the study runs]
+\begin{itemize}
+  \item \TBD{} direction source(s) produced growth-rate predictions within
+        \TBD[\%] of the corpus median; \TBD{} produced systematic deviations.
+  \item Essential-gene Jaccard between the eQuilibrator and dGpredictor sources
+        was \TBD{} on median, indicating that \TBD[interpretation].
+  \item Under the Biolog condition set, \TBD{} source predicted the largest
+        number of feasible conditions, \TBD{} the smallest; the difference of
+        \TBD{} conditions is (small / substantial) relative to the
+        390-condition baseline.
+\end{itemize}

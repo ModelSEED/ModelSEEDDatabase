@@ -27,6 +27,7 @@ Reaction-energy sources come in two flavors:
 Output of every helper is intentionally bit-for-bit identical to the
 pre-refactor scripts. See the README for the addition walkthrough.
 """
+import csv
 import os
 
 # Sentinel marking "no energy available". Stored as a float so downstream
@@ -67,9 +68,10 @@ def fmt_dg_dge(dg, dge):
     return [fmt2(dg), fmt2(dge)]
 
 
-def _per_source_operator(rxn_entry, dg, dge):
+def _per_source_operator(rxn_entry, dg, dge, label=None):
     """Compute the per-source thermodynamic-direction operator for a single
-    ``(dg, dge)`` pair via the upstream cascade heuristic.
+    ``(dg, dge)`` pair via the cascade heuristic that belongs to ``label``
+    (EQ heuristics for ``"eQuilibrator"``, GC heuristics otherwise).
 
     Lazy-imported from ``Estimate_Reaction_Reversibility`` so the helpers
     module stays free of a top-level dependency on the cascade module (and
@@ -82,7 +84,7 @@ def _per_source_operator(rxn_entry, dg, dge):
     sublist's operator a function of THAT source's own energy, independent
     of the cascade's choice of top-level ``deltag``."""
     from Estimate_Reaction_Reversibility import reversibility_from_energy
-    return reversibility_from_energy(rxn_entry, dg, dge)
+    return reversibility_from_energy(rxn_entry, dg, dge, source=label)
 
 
 def pick_structure(structures_dict, cpd, preference=STRUCTURE_PREFERENCE):
@@ -135,6 +137,150 @@ def parse_two_col_energy_table(path):
                 continue
             out[array[0]] = fmt_dg_dge(array[1], array[2])
     return out
+
+
+def parse_modelseed_gc_table(path):
+    """Parse the ModelSEED-keyed Group-Contribution table.
+
+    ``Biochemistry/Thermodynamics/ModelSEED/ModelSEED_GroupContribution.tsv`` is
+    MFAToolkit run directly against the structures ModelSEED curates, one row
+    per compound, keyed by ``cpd`` id.
+
+    This supersedes ``parse_gc_compound_table``, which read the four
+    ``{KEGG,MetaCyc}_{Original,Charged}_MolAnalysis.tbl`` corpora keyed by
+    *source* accession and then had to find its way back to a ModelSEED
+    compound through alias resolution -- averaging across whichever KEGG and
+    MetaCyc mol files happened to share an alias, and widening the error bar
+    when they disagreed. That indirection is the same class of guess removed
+    from the eQuilibrator path: the energy came from whichever molecule the
+    alias pointed at, which is not necessarily the molecule we curate.
+
+    Keyed by our own id there is exactly one structure per compound, so there
+    is nothing to average and no alias spread to inflate. Returns
+    ``{cpd: [dg, dge]}`` over ``status == ok`` rows only, 2-decimal formatted
+    to match the other parsers.
+    """
+    out = {}
+    with open(path) as fh:
+        first = fh.readline()
+        if not first.startswith('#'):
+            fh.seek(0)
+        for row in csv.DictReader(fh, delimiter='\t'):
+            if row.get('status') != 'ok':
+                continue
+            try:
+                out[row['compound_id']] = fmt_dg_dge(row['dg_kcal_per_mol'],
+                                                     row['dgerr_kcal_per_mol'])
+            except (KeyError, TypeError, ValueError):
+                continue
+    return out
+
+
+def parse_modelseed_energy_table(path, id_col, dg_col, err_col,
+                                 status_col='status', ok='ok'):
+    """Parse a regenerated eQuilibrator table produced directly from ModelSEED
+    structures (``ModelSEED_{Reaction,Compound}_Energies.tsv``).
+
+    These supersede the ``MetaNetX_*_Energies.tbl`` extracts. The difference
+    that matters here is the ``status`` column: the generator emits a row for
+    every ModelSEED reaction/compound and says why it has no energy
+    (``outside CC span``, ``unbalanced``, ``compound not in cache``,
+    ``translocation only``) rather than omitting it or, as the MetaNetX-era
+    retrieval did, reporting a number anyway. Only ``ok`` rows carry an energy.
+
+    Returns ``{id: [dg, dge]}`` in kcal/mol over the ``ok`` rows only, with the
+    same 2-decimal formatting :func:`parse_two_col_energy_table` applies, so
+    callers can compare floats directly.
+
+    The leading ``# cache=... params=... p_h=...`` provenance line records the
+    compound cache, the component-contribution parameter set and the conditions
+    the numbers were computed at. It is skipped here but must not be dropped
+    from the file -- it is the only record of which cache produced these values.
+    """
+    out = {}
+    with open(path) as fh:
+        first = fh.readline()
+        if not first.startswith('#'):
+            fh.seek(0)
+        reader = csv.DictReader(fh, delimiter='\t')
+        for row in reader:
+            if row.get(status_col) != ok:
+                continue
+            try:
+                out[row[id_col]] = fmt_dg_dge(row[dg_col], row[err_col])
+            except (KeyError, TypeError, ValueError):
+                continue
+    return out
+
+
+def run_reaction_table_update(reactions_helper, label, energy_table):
+    """Write ``thermodynamics[label]`` from a regenerated energy table,
+    REMOVING the key where the table has no energy.
+
+    This differs from :func:`run_reaction_lookup_update`, which leaves absent
+    reactions untouched. That behaviour is right for an incremental refresh of
+    the same pipeline, and wrong for a regeneration: a reaction that used to
+    carry a value and no longer earns one must lose it, not keep a stale number
+    from the superseded pipeline sitting under a current-looking key.
+
+    The operator is computed here, at write time, from THIS source's own energy
+    and rule set -- so the stored triple is internally consistent the moment it
+    lands, and the later ``Estimate_Reaction_Reversibility.py`` pass is a
+    confirmation rather than a repair."""
+    reactions_dict = reactions_helper.loadReactions()
+    stats = {'updated': 0, 'added': 0, 'removed': 0, 'absent': 0}
+    for rxn in sorted(reactions_dict.keys()):
+        entry = reactions_dict[rxn]
+        fresh = energy_table.get(rxn)
+        thermo = entry.get('thermodynamics')
+        had = isinstance(thermo, dict) and label in thermo
+        if fresh is None:
+            if had:
+                del thermo[label]
+                stats['removed'] += 1
+            else:
+                stats['absent'] += 1
+            continue
+        dg, dge = fresh[0], fresh[1]
+        op = _per_source_operator(entry, dg, dge, label)
+        set_thermo(entry, label, [dg, dge, op])
+        stats['updated' if had else 'added'] += 1
+
+    for key in ('added', 'updated', 'removed', 'absent'):
+        print("  %-10s %7d" % (key, stats[key]))
+    print("Saving reactions")
+    reactions_helper.saveReactions(reactions_dict)
+    return stats
+
+
+def run_compound_table_update(compounds_helper, label, energy_table):
+    """Compound-side counterpart of :func:`run_reaction_table_update`.
+
+    Compounds store ``[dg, dge]`` with no third element: a formation energy has
+    no direction, so writing an operator slot would invent a field the schema
+    does not have."""
+    compounds_dict = compounds_helper.loadCompounds()
+    stats = {'updated': 0, 'added': 0, 'removed': 0, 'absent': 0}
+    for cpd in sorted(compounds_dict.keys()):
+        entry = compounds_dict[cpd]
+        fresh = energy_table.get(cpd)
+        thermo = entry.get('thermodynamics')
+        had = isinstance(thermo, dict) and label in thermo
+        if fresh is None:
+            if had:
+                del thermo[label]
+                stats['removed'] += 1
+            else:
+                stats['absent'] += 1
+            continue
+        set_thermo(entry, label, [fresh[0], fresh[1]])
+        stats['updated' if had else 'added'] += 1
+
+    for key in ('added', 'updated', 'removed', 'absent'):
+        print("  %-10s %7d" % (key, stats[key]))
+    print("Saving compounds")
+    compounds_helper.saveCompounds(compounds_dict)
+    return stats
 
 
 def parse_gc_compound_table(thermo_root, sources=("KEGG", "MetaCyc"),
@@ -390,7 +536,7 @@ def run_reaction_aggregation_update(reactions_helper, compounds_helper, label):
             dg, dge = sum_reaction_energy(rgts, compounds_dict, label, rxn)
         else:
             dg, dge = DEFAULT_DG, DEFAULT_DG
-        op = _per_source_operator(rxn_entry, dg, dge)
+        op = _per_source_operator(rxn_entry, dg, dge, label)
         set_thermo(rxn_entry, label, [dg, dge, op])
 
     print("Saving reactions")
@@ -410,7 +556,7 @@ def run_reaction_lookup_update(reactions_helper, label, energy_table):
         if rxn not in energy_table:
             continue
         dg, dge = energy_table[rxn][0], energy_table[rxn][1]
-        op = _per_source_operator(reactions_dict[rxn], dg, dge)
+        op = _per_source_operator(reactions_dict[rxn], dg, dge, label)
         set_thermo(reactions_dict[rxn], label, [dg, dge, op])
 
     print("Saving reactions")
