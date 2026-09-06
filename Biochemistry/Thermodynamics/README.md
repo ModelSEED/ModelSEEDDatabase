@@ -10,7 +10,7 @@ The estimates come from four sources today:
   computed against each compound's current SMILES.
 - **eQuilibrator** — Noor et al. 2013 (<a href="https://doi.org/10.1371/journal.pcbi.1003098">10.1371/journal.pcbi.1003098</a>);
   values pulled from eQuilibrator's public cache via InChIKey matching.
-- **dGPredictor** — Wang et al. 2021 (<a href="https://doi.org/10.1016/j.ymben.2021.01.008">10.1016/j.ymben.2021.01.008</a>);
+- **dGPredictor** — Wang et al. 2021 (<a href="https://doi.org/10.1371/journal.pcbi.1009448">10.1371/journal.pcbi.1009448</a>);
   a group-decomposition + ML model.
 - **dGPredictor-ModelSEED** — the dGPredictor model retrained on the
   current ModelSEED compound corpus.
