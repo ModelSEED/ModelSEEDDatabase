@@ -1,0 +1,26 @@
+# Regenerable by-products of grade_thermo_sources.py, untracked 2026-09-06.
+#
+# source_grades.tsv IS shipped: sections/data_availability.tex commits to
+# publishing the evidence grades, and that long form is the release. These two
+# are derived from the same run -- _wide is a pivot of the long form, _heldout
+# a re-scored variant -- and together cost 16 MB for no information the
+# canonical table does not already carry.
+#
+# Regenerate both with:  python3 Scripts/Thermodynamics/SourceGrading/grade_thermo_sources.py
+# Note task #55 (the graded-against-experiment circularity check) will want
+# _heldout; regenerate it there rather than assuming it is present.
+results/thermo_grades/source_grades_wide.tsv
+results/thermo_grades/source_grades_heldout.tsv
+
+# Untracked 2026-09-06 pending Cooper Taylor's agreement to republish.
+#
+# Copied from /scratch/ctaylor/ to unblock the TECRDB-vs-dGPredictor comparison.
+# It is HIS derived data, and this repository is public under MIT, so it should
+# not be redistributed without his say-so. Three files reference it and will
+# not find it in a fresh clone:
+#   Scripts/Thermodynamics/SourceGrading/grade_thermo_sources.py
+#   Scripts/Thermodynamics/SourceGrading/optimize_thermo_source_assignment.py
+#   Scripts/Thermodynamics/SourceGrading/README.md
+# Restore by tracking it again once he agrees, or point those three at a
+# regeneration step.
+tecrdb_vs_dgpredictor_modelseed.csv

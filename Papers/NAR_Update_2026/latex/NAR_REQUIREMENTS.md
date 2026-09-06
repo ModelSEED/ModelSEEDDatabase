@@ -474,7 +474,7 @@ from the source manuscript**, not sourced requirements:
 |---|---|---|---|
 | 1 | `unnumsec` (unnumbered section heads) | `main.tex` class options | Copied from the sample's default line. No source says NAR wants unnumbered headings |
 | 2 | `webpdf` | `main.tex` class options | Same. Manual defines it as "cropped paper size in the PDF output" |
-| 3 | Section order and heading names | `main.tex` `\input` order | Follows `MANUSCRIPT.md`, not a NAR-specified order |
+| 3 | Section order and heading names | `main.tex` `\input` order | Follows `MANUSCRIPT.md` (untracked; local to the author's tree, not in the repository), not a NAR-specified order |
 | 4 | Six keywords | `main.tex` `\keywords` | Invented. Unknown whether the Database issue uses keywords, or how many |
 | 5 | `\appnotes{Database Issue}`, `\vol{00}`, `\issue{0}`, `\firstpage{1}` | `main.tex` metadata | Placeholder values from the sample |
 | 6 | Back-matter **order** | `sections/author_contributions.tex` | The *set* is now confirmed (§13): Acknowledgements, Author Contributions, Funding and Conflict of interest disclosure all appear in NAR's Article structure list. Their required order and exact headings are still unseen |

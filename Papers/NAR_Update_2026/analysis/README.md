@@ -35,7 +35,7 @@ Both stayed in `Scripts/Thermodynamics/ProtonationEvidence/`.
 | `evaluate_path_b.py` | cache variants compared over real ModelSEED reactions |
 | `review_lost_reactions.py` | reactions upstream eQuilibrator can compute and our build cannot |
 
-Findings written up from these live in `../data/`, dated.
+Findings written up from these live in `../data/`, dated -- untracked, local to the author's tree rather than in the repository.
 
 ## Running them
 

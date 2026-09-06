@@ -1,6 +1,6 @@
 # NAR 2026 update — LaTeX source
 
-LaTeX build of `../MANUSCRIPT.md`, targeting **Nucleic Acids Research**,
+LaTeX build of the manuscript, targeting **Nucleic Acids Research**,
 Database Issue ([author guidance](https://academic.oup.com/nar/pages/Ms_Prep_Database)).
 
 > **Journal requirements — page budget, figure formats and dpi, graphical
@@ -44,7 +44,7 @@ paper, and two columns. Don't change `modern` or `large` — see
 | `data_availability.tex` | Data Availability |
 | `author_contributions.tex` | Author contributions / Funding / Acknowledgements / COI |
 
-Each file opens with a comment naming its source in `MANUSCRIPT.md` and the
+Each file opens with a comment naming its source in `MANUSCRIPT.md` (untracked; local to the author's tree, not in the repository) and the
 originating file under `../drafts/`, so prose can be traced back.
 
 ## Building
@@ -75,7 +75,7 @@ grep -rn 'TBD\|DRAFTPENDING\|NUMBERSPENDING' sections/
 
 ## Not carried over
 
-The "Manuscript-shape health check" table at the end of `MANUSCRIPT.md` is a
+The "Manuscript-shape health check" table at the end of `MANUSCRIPT.md` (untracked; local to the author's tree, not in the repository) is a
 project-tracking artifact, not manuscript content, so it is deliberately not in
 the LaTeX. It stays in `MANUSCRIPT.md`.
 

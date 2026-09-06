@@ -40,7 +40,8 @@ plt.rcParams.update(grace.RC)
 
 # ---- measured values -------------------------------------------------------
 NUMBERS = {
-    # MANUSCRIPT.md Table 3 (2020 = Seaver et al., NAR 2021). COMPOUNDS, and
+    # MANUSCRIPT.md Table 3 (untracked; local to the author's tree, not in the repository)
+    # (2020 = Seaver et al., NAR 2021). COMPOUNDS, and
     # only sources that actually supply structures. MetaNetX and BiGG are
     # excluded as mapping / model namespaces rather than structure providers;
     # Rhea is excluded because its 207 InChIKeys alias to zero ModelSEED
