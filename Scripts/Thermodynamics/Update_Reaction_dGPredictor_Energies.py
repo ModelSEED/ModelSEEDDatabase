@@ -21,7 +21,8 @@ sys.path.append('../../Libs/Python/')
 from BiochemPy import Reactions
 from Estimate_Reaction_Reversibility import reversibility_from_energy
 
-# dGPredictor (originally Wang et al. 2021, Metab Eng) — RETRAINED on the
+# dGPredictor (originally Wang et al. 2021, PLOS Comput Biol,
+# doi:10.1371/journal.pcbi.1009448) — RETRAINED on the
 # ModelSEED structure set with current-RDKit fragment canonicalization
 # (2026-08-25). See Biochemistry/Thermodynamics/dGPredictor/README.md for
 # training-pipeline details and the archived Wang-2020 baseline
