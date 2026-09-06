@@ -23,7 +23,8 @@
 %%      title. Current title opens with "The". Consider "ModelSEED Biochemistry
 %%      Database, 2026 update: ..." to comply.
 %%  [ ] URL -- a working URL must appear BOTH in the abstract and in the body.
-%%      See \modelseedurl below; it is used in both places.
+%%      See \modelseedurl below; used in the abstract. The body carries the
+%%      repository URL in sections/data_availability.tex.
 %%  [ ] GRAPHICAL ABSTRACT -- MANDATORY. 5:2 aspect ratio, min 127x50 mm
 %%      (5x2 in), TIF/EPS/editable PDF, 300-600 dpi, landscape, sans-serif
 %%      (Arial) 12-16 pt. Must be ORIGINAL -- not reused from any main or
@@ -125,6 +126,13 @@
 %%-----------------------------------------------------------------------------
 %%  Journal metadata -- production fills most of this in.
 %%-----------------------------------------------------------------------------
+%% The class calls \societylogo{} in the running head but leaves every
+%% definition commented out (oup-authoring-template.cls:921-926), so it is
+%% undefined unless the author supplies one. NAR is not a society journal with
+%% a logo here, so the empty form the class itself offers is used. Without this
+%% every build raised "Undefined control sequence" plus three "Missing number"
+%% errors and still produced a PDF, which is why it went unnoticed.
+\def\societylogo{}%
 \journaltitle{Nucleic Acids Research}
 \DOI{DOI added during production}
 \copyrightyear{2026}
@@ -135,6 +143,11 @@
 \appnotes{Database Issue}
 
 \firstpage{1}
+%% \lastpage must be set too. Unset, the class falls through \setlastpage to
+%% its aux-file path, hands \relax to \@arabic and throws three "Missing
+%% number, treated as zero" errors on every page shipout while still producing
+%% a PDF. Update if the page count changes; production overwrites both.
+\lastpage{6}
 
 %\subtitle{Database Issue}
 
@@ -164,9 +177,15 @@ on metabolic-model output}
 
 \corresp[$\ast$]{Corresponding author. \TBD[email]}
 
-\received{}{}{}
-\revised{}{}{}
-\accepted{}{}{}
+%% Submission history. Left commented out deliberately: the month argument is
+%% fed to \numexpr by the class (\myswitch, cls:1175), so an empty
+%% \received{}{}{} throws "Missing number, treated as zero" -- once per macro --
+%% while still producing a PDF. These dates are not knowable before submission
+%% and are set by production. To use them, give a NUMERIC month:
+%%   \received{1}{9}{2026}
+%\received{}{}{}
+%\revised{}{}{}
+%\accepted{}{}{}
 
 %%-----------------------------------------------------------------------------
 %%  Abstract -- must contain a working URL (NAR requirement).

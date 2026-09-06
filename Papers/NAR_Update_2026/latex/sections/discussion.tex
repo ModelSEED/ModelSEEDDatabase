@@ -1,18 +1,31 @@
 \section{Discussion}
 
-The change with the widest consequences in this release is not a number but a
-policy: no thermodynamic source is promoted over another. The 2020 release
-published one accepted value per reaction. This one publishes four, each with
-its own uncertainty and its own direction call, because the sources disagree in
-ways that a single promoted value conceals --- and because the promotion rule
-itself rewarded the source that reported the smallest error, which is the
-source that understates it.
+The change with the widest consequences here is a policy, not a number: no
+thermodynamic source is promoted over another. The 2020 release published one
+accepted value per reaction; this one publishes four, each with its own
+uncertainty and direction call, because the sources disagree in ways a single
+value conceals --- and because the promotion rule rewarded whichever source
+reported the smallest error, which is the one that understates it.
 
 Grading against experiment makes that tractable. A consumer wanting one number
 takes the highest-graded source and knows what the grade means; one propagating
 uncertainty has the covariance and the caveats. It costs little and prevents the
 common misuse of treating a group-contribution estimate and an anchored
 eQuilibrator value as interchangeable.
+
+Six years of use suggest the integration role is the one the community
+exercises. The 2020 release has been cited 193 times at an undiminished rate,
+and among citing papers with open full text 38\% use the database in their
+methods, overwhelmingly for genome-scale reconstruction. GEMsembler builds
+consensus models across tools, exploiting the fact that independent pipelines
+share the ModelSEED namespace to discard ambiguous identifier
+mappings~\cite{gemsembler2025} --- the ``Rosetta Stone'' function, exercised by
+someone other than us. Yeast9 assigned Gibbs energies to 98\% of its
+metabolites and 97\% of its reactions, taking from this database the metabolite
+values its other sources lacked~\cite{yeast9}. That second case is the rarer
+one, and the thermodynamic layer being used by a minority of citing work is
+part of why this release concentrates on making it auditable rather than
+larger.
 
 Two limitations should be read alongside the results. The protonation layer is
 open-source for three quarters of compounds but not for the highly-connected

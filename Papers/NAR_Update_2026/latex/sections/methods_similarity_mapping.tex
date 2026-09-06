@@ -2,18 +2,15 @@
 %% Detail in Supplementary Methods S4.
 \subsection{Reaction similarity and atom mapping}\label{sec:methods-mapping}
 
-Reactions are compared by a structure-aware similarity that operates on
-compound structures rather than identifiers, so that the same chemistry
-expressed in two namespaces is recognised as one reaction. The resulting
-equivalence classes underpin the connectivity ontology reported below.
+Reactions are compared by a structure-aware similarity operating on compound
+structures rather than identifiers, so the same chemistry expressed in two
+namespaces is recognised as one reaction.
 
 Atom mappings are generated with the Reaction Decoder Tool and filtered:
-mappings are retained only where every raw row is a canonical single-pair
-same-element correspondence, and reactions requiring salvage are tagged rather
-than discarded, because a reaction with one repaired row is likely to carry
-others that are subtly wrong. Mappings use set notation on atoms that are
-chemically indistinguishable --- the two oxygens of CO$_2$, the six equivalent
-terminal oxygens of pyrophosphate --- taken from each compound's
-InChI-canonical equivalence classes, so the recorded ambiguity is honest rather
-than a false precision. Supplementary Methods~S4 gives the filter and the
-equivalence-class derivation.
+retained only where every raw row is a canonical single-pair same-element
+correspondence, with reactions requiring salvage tagged rather than discarded,
+because a reaction needing one repair is likely to carry others. Mappings use
+set notation on chemically indistinguishable atoms --- the two oxygens of
+CO$_2$, the six equivalent terminal oxygens of pyrophosphate --- from each
+compound's InChI-canonical equivalence classes, so the recorded ambiguity is
+honest rather than false precision.

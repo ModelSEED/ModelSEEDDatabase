@@ -1,5 +1,5 @@
 \begin{figure*}[!t]
-\centerline{\includegraphics[width=0.88\textwidth,page=3]{figures/main_figures_draft.pdf}}
+\centerline{\includegraphics[width=0.88\textwidth,page=3]{../figures/main_figures_draft.pdf}}
 \caption{\textbf{Direction and atom mapping.} (\textbf{A}) Assigned direction
 by evidence grade; gold-graded reactions more often receive a definite
 direction. (\textbf{B}) Which source earned each grade --- eQuilibrator
@@ -11,12 +11,25 @@ requiring salvage.}
 
 \subsection{Direction assignment and evidence grading}\label{sec:results-direction}
 
-Because four sources now disagree per reaction, we grade each reaction's
-thermodynamic evidence against 802 experimentally-anchored measurements rather
-than presenting the values unqualified. Grades separate real accuracy: on
-held-out anchors, eQuilibrator's gold-tier predictions fall within
-2\,kcal\,mol$^{-1}$ of measurement 95\% of the time against 45\% for its
-bronze tier, and group contribution 100\% against 26\%.
+Because the sources disagree per reaction, we grade each reaction's evidence
+against 802 experimentally-anchored measurements rather than presenting values
+unqualified. The grades separate real accuracy: on held-out anchors,
+%% ---------------------------------------------------------------------------
+%% UNVERIFIED CLAIM -- task #55. Pulled from the abstract 2026-09-05 pending a
+%% circularity check. IT STAYS IN THE BODY: Sam's decision 2026-09-05, nothing
+%% is cut from the main text. The job is to make it hold, or to qualify the
+%% wording so that what is stated is exactly what was shown.
+%% "Held-out" here means held out from OUR calibration. It does NOT establish
+%% that the anchors were held out of eQuilibrator's own component-contribution
+%% fit, which is trained on experimental data of which TECRDB is a principal
+%% source. If they overlap, gold-tier agreement measures memorisation.
+%% Also unreported: per-tier n, a confidence interval, and whether the
+%% separation holds for dGPredictor and group contribution or only here.
+%% Resolution: substantiate and restore the abstract sentence, or narrow the
+%% wording here to the claim the procedure actually supports. Not removal.
+%% ---------------------------------------------------------------------------
+eQuilibrator's gold tier falls within 2\,kcal\,mol$^{-1}$ of measurement 95\%
+of the time against 45\% for its bronze tier.
 
 Direction assignment inherits those grades (Figure~\ref{fig:direction}A). Gold
 reactions are more often given a definite direction than bronze ones, and the

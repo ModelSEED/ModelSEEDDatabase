@@ -1,5 +1,5 @@
 \begin{figure*}[!t]
-\centerline{\includegraphics[width=0.88\textwidth,page=2]{figures/main_figures_draft.pdf}}
+\centerline{\includegraphics[width=0.88\textwidth,page=2]{../figures/main_figures_draft.pdf}}
 \caption{\textbf{Thermodynamic sources.} (\textbf{A}) Provenance of the
 protonation model on two denominators: by compound the layer is largely
 open-source, but the ChemAxon-derived minority are the highly-connected
@@ -20,13 +20,11 @@ are a no-estimate placeholder; excluding them it covers 29,447 reactions,
 against dGPredictor's 29,617 and eQuilibrator's 25,070. Coverage counts drawn
 from raw entry counts overstate group contribution by a factor of two.
 
-The three report uncertainty on scales that differ by more than an order of
-magnitude (Figure~\ref{fig:thermo}C): median 0.6\,kcal\,mol$^{-1}$ for
-eQuilibrator against 10.4 for group contribution and 17.0 for dGPredictor.
-These are not comparable quantities, and a consumer choosing a source by
-smallest reported error would systematically choose eQuilibrator, which is
-precisely the source that understates. eQuilibrator additionally reports no
-usable uncertainty at all for 3,730 reactions.
+Uncertainty is reported on scales differing by more than an order of magnitude
+(Figure~\ref{fig:thermo}C): median 0.6\,kcal\,mol$^{-1}$ for eQuilibrator
+against 10.4 and 17.0. A consumer choosing by smallest reported error would
+therefore systematically choose the source that understates it. eQuilibrator
+reports no usable uncertainty at all for 3,730 reactions.
 
 Protonation provenance is reported on two denominators
 (Figure~\ref{fig:thermo}A) because one alone misleads. By compound the layer is
@@ -34,11 +32,10 @@ Protonation provenance is reported on two denominators
 ChemAxon-derived. The minority are the polyprotic metabolites --- ATP, NAD(P),
 phosphate, coenzyme~A --- that appear nearly everywhere.
 
-\paragraph{A caveat on the rebuild.} Regenerating the protonation layer changed
-133 reactions by more than 10\,kcal\,mol$^{-1}$. These are released with a
-low-confidence flag and enumerated in Supplementary Table~S2. They are large
-glycans whose reaction partners could not be re-protonated alongside them, so a
-spurious ionizable site on one side is no longer cancelled by the same site on
-the other. Neither the flagged value nor the previous release's value can be
-checked against measurement: none of the 133 has an experimental match, and the
-previous agreement arose from two errors cancelling rather than from accuracy.
+\paragraph{A caveat on the rebuild.} Regenerating the protonation layer moved
+133 reactions by more than 10\,kcal\,mol$^{-1}$ --- large glycans whose partners
+could not be re-protonated alongside them, so a spurious site on one side is no
+longer cancelled by the same site on the other. They ship with a low-confidence
+flag (Supplementary Table~S2). Neither the flagged value nor the previous
+release's can be checked against measurement: none has an experimental match,
+and the previous agreement came from two errors cancelling.
