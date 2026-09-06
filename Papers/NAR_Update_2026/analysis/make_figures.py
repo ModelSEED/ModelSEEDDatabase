@@ -24,24 +24,19 @@ import matplotlib.pyplot as plt
 from matplotlib.backends.backend_pdf import PdfPages
 from pathlib import Path
 
+import grace_style as grace
+
 OUT = Path(__file__).resolve().parent.parent / "figures" / "main_figures_draft.pdf"
 
 # ---- palette (validated: see dataviz references/palette.md) ----------------
 BLUE, ORANGE, AQUA, YELLOW, VIOLET = "#2a78d6", "#eb6834", "#1baf7a", "#eda100", "#4a3aa7"
 BLUE_200, BLUE_350 = "#9ec5f4", "#5598e7"
-INK, INK2, MUTED = "#0b0b0b", "#52514e", "#8a8983"
+INK, INK2, MUTED = "#000000", "#1a1a1a", "#4d4d4d"
 GRID, SURFACE = "#e8e7e3", "#ffffff"
+FRAME = grace.FRAME
 NEUTRAL = "#c9c8c2"
 
-plt.rcParams.update({
-    "font.family": "DejaVu Sans", "font.size": 7.2,
-    "axes.edgecolor": GRID, "axes.linewidth": 0.6,
-    "axes.labelcolor": INK2, "text.color": INK,
-    "xtick.color": INK2, "ytick.color": INK2,
-    "xtick.labelsize": 6.8, "ytick.labelsize": 6.8,
-    "figure.facecolor": SURFACE, "axes.facecolor": SURFACE,
-    "savefig.facecolor": SURFACE,
-})
+plt.rcParams.update(grace.RC)
 
 # ---- measured values -------------------------------------------------------
 NUMBERS = {
@@ -93,23 +88,28 @@ NUMBERS = {
 }
 
 
-def strip(ax, keep_x=True):
-    for s in ("top", "right", "left"):
-        ax.spines[s].set_visible(False)
-    ax.spines["bottom"].set_visible(keep_x)
-    ax.tick_params(length=0)
-    ax.set_axisbelow(True)
+def strip(ax, keep_x=True, value_axis="x"):
+    """Grace frame. Named strip() still because every call site says strip();
+    it no longer strips anything -- Grace closes the box rather than opening it.
+    keep_x is vestigial and ignored: a Grace axes always has all four sides."""
+    return grace.frame(ax, value_axis=value_axis)
 
 
 def panel_tag(ax, letter, title, tx=None):
-    """Letter and title. tx must grow on narrow panels or the two collide."""
-    ax.text(-0.055, 1.16, letter, transform=ax.transAxes, fontsize=9.5,
-            fontweight="bold", va="top", ha="left", color=INK)
-    if tx is None:
-        w = ax.get_position().width
-        tx = 0.022 / max(w, 0.08) * 0.30
-    ax.text(tx, 1.16, title, transform=ax.transAxes, fontsize=7.6,
-            va="top", ha="left", color=INK)
+    """Letter and title, offset in POINTS above the frame.
+
+    Previously offset by axes fraction, which is height-dependent: the same
+    0.16 that cleared a tall panel put figure 2B's title on top of its frame.
+    tx is retained for call-site compatibility and ignored.
+    """
+    ax.annotate(letter, xy=(0, 1), xycoords="axes fraction",
+                xytext=(-7, 8), textcoords="offset points",
+                fontsize=9.5, fontweight="bold", va="baseline", ha="left",
+                color=INK, annotation_clip=False)
+    ax.annotate(title, xy=(0, 1), xycoords="axes fraction",
+                xytext=(8, 8), textcoords="offset points",
+                fontsize=7.6, va="baseline", ha="left", color=INK,
+                annotation_clip=False)
 
 
 def swatches(ax, items, y=-0.15, x0=0.0, dx=None, size=6.4, vertical=False):
@@ -139,7 +139,7 @@ def figure1():
     fig, (a, b) = plt.subplots(1, 2, figsize=(7.0, 4.3))
     fig.subplots_adjust(left=0.115, right=0.975, top=0.80, bottom=0.14, wspace=0.42)
 
-    rows = NUMBERS["growth"]; ys = range(len(rows))[::-1]; h = 0.32
+    rows = NUMBERS["growth"]; ys = range(len(rows))[::-1]; h = 0.38
     for i, (lab, old, new_) in zip(ys, rows):
         if old:
             a.barh(i + h / 2 + 0.02, old, height=h, color=BLUE_200, zorder=3)
@@ -156,14 +156,16 @@ def figure1():
                color=INK2, fontweight="bold")
     a.set_yticks([]); a.set_xlim(0, 36000); a.set_ylim(-0.7, len(rows) - 0.3)
     a.set_xticks([0, 10000, 20000, 30000]); a.set_xticklabels(["0", "10k", "20k", "30k"])
-    a.xaxis.grid(True, color=GRID, lw=0.6); strip(a)
-    swatches(a, [("2020", BLUE_200), ("2026", BLUE)], y=1.02, x0=0.60, dx=0.135)
+    strip(a)
+    # Was above the frame at y=1.02, where it collided with the panel title once
+    # panel_tag moved to a fixed point offset. Below the axis, as in figure 3.
+    swatches(a, [("2020", BLUE_200), ("2026", BLUE)], y=-0.105, x0=0.0, dx=0.135)
     panel_tag(a, "A", "Compounds per structure source")
 
     have, tot = NUMBERS["struct_total"]
     rows = NUMBERS["struct_src"]; ys = range(len(rows))[::-1]
     for i, (lab, v) in zip(ys, rows):
-        b.barh(i, v, height=0.42, color=BLUE, zorder=3)
+        b.barh(i, v, height=0.56, color=BLUE, zorder=3)
         b.text(v + 400, i, f"{k(v)}  {100*v/have:.0f}%", va="center", fontsize=6.6, color=INK)
         b.text(-700, i, lab, va="center", ha="right", fontsize=7.2, color=INK)
     b.axvline(have, color=ORANGE, lw=1.3, zorder=4)
@@ -171,9 +173,13 @@ def figure1():
            ha="right", va="top", fontsize=6.4, color=ORANGE, fontweight="bold")
     b.set_yticks([]); b.set_xlim(0, 41000); b.set_ylim(-0.7, len(rows) - 0.25)
     b.set_xticks([0, 10000, 20000, 30000]); b.set_xticklabels(["0", "10k", "20k", "30k"])
-    b.xaxis.grid(True, color=GRID, lw=0.6); strip(b)
-    b.text(0.0, -0.115, f"sources overlap; {100*have/tot:.0f}% of all {k(tot)} compounds "
-           f"carry a structure", transform=b.transAxes, fontsize=6.3, color=MUTED)
+    strip(b)
+    # Two lines, not one: as a single line this ran past the figure edge and
+    # was clipped mid-word in the typeset PDF.
+    b.text(0.0, -0.105, f"sources overlap; {100*have/tot:.0f}% of all\n"
+           f"{k(tot)} compounds carry a structure",
+           transform=b.transAxes, fontsize=6.3, color=MUTED,
+           va="top", linespacing=1.35)
     panel_tag(b, "B", "Structures reaching ModelSEED compounds")
     return fig
 
@@ -192,8 +198,8 @@ def figure2():
         segs = NUMBERS[key]; tot = sum(v for _, v, _ in segs); x = 0
         for name, v, col in segs:
             pct = v / tot * 100
-            a.barh(row, pct, left=x, height=0.42, color=col, zorder=3,
-                   edgecolor=SURFACE, lw=1.2)
+            a.barh(row, pct, left=x, height=0.54, color=col, zorder=3,
+                   edgecolor=FRAME, lw=0.45)
             if pct > 24:
                 a.text(x + pct / 2, row, f"{name}  {pct:.0f}%", ha="center", va="center",
                        fontsize=6.3, color="white", fontweight="bold")
@@ -204,7 +210,7 @@ def figure2():
         a.text(-1.5, row, label, ha="right", va="center", fontsize=7.0, color=INK)
     a.set_xlim(0, 100); a.set_ylim(-0.55, 1.55); a.set_yticks([])
     a.set_xticks([0, 25, 50, 75, 100]); a.set_xticklabels(["0", "25", "50", "75", "100%"])
-    a.xaxis.grid(True, color=GRID, lw=0.6); strip(a)
+    strip(a)
     swatches(a, [(n, c) for n, _v, c in NUMBERS["pka_cpd"]], y=-0.42, x0=0.0, size=6.1)
     panel_tag(a, "A", "Protonation source")
 
@@ -218,7 +224,7 @@ def figure2():
         b.text(-900, i, lab, va="center", ha="right", fontsize=7.0, color=INK)
     b.set_yticks([]); b.set_xlim(0, tot * 1.02); b.set_ylim(-0.6, len(rows) - 0.4)
     b.set_xticks([0, 20000, 40000, 56012]); b.set_xticklabels(["0", "20k", "40k", "56k"])
-    b.xaxis.grid(True, color=GRID, lw=0.6); strip(b)
+    strip(b)
     panel_tag(b, "B", "Reactions with a real energy, of 56,012 (sentinels excluded)")
 
     # C -- reported uncertainty, one axis per source. Deliberately NOT shared:
@@ -235,7 +241,9 @@ def figure2():
                 color=col, zorder=3, linewidth=0)
         med = v[len(v) // 2]
         ax.axvline(med, color=INK, lw=0.9, zorder=4)
-        ax.text(0.97, 0.90, f"median {med:.1f}", transform=ax.transAxes, ha="right",
+        # White bbox: the median rule runs up through this label's line.
+        ax.text(0.97, 0.86, f"median {med:.1f}", transform=ax.transAxes, ha="right",
+                bbox=dict(facecolor="white", edgecolor="none", pad=0.8),
                 fontsize=6.2, color=INK, fontweight="bold")
         ax.set_title(name, fontsize=6.8, color=INK, pad=3)
         ax.set_yticks([]); ax.tick_params(labelsize=6.0)
@@ -256,7 +264,8 @@ def figure2():
 def figure3():
     fig, (a, b, c) = plt.subplots(1, 3, figsize=(7.0, 4.3),
                                   gridspec_kw={"width_ratios": [1.15, 1.15, 0.62]})
-    fig.subplots_adjust(left=0.095, right=0.975, top=0.80, bottom=0.155, wspace=0.52)
+    # wspace was 0.52, which left A's total labels touching B's row labels.
+    fig.subplots_adjust(left=0.095, right=0.975, top=0.80, bottom=0.155, wspace=0.72)
 
     FWD, REV, BACK = "#1c5cab", NEUTRAL, "#c2410c"
     rows = NUMBERS["dir_grade"]; ys = range(len(rows))[::-1]
@@ -264,18 +273,18 @@ def figure3():
         tot = f + e + r; x = 0
         for v, col, nm in ((f, FWD, "\u2192"), (e, REV, "\u2194"), (r, BACK, "\u2190")):
             pct = v / tot * 100
-            a.barh(i, pct, left=x, height=0.44, color=col, zorder=3,
-                   edgecolor=SURFACE, lw=1.2)
+            a.barh(i, pct, left=x, height=0.60, color=col, zorder=3,
+                   edgecolor=FRAME, lw=0.45)
             if pct > 11:
                 a.text(x + pct / 2, i, f"{nm} {pct:.0f}%", ha="center", va="center",
                        fontsize=6.6, fontweight="bold",
                        color="white" if col != NEUTRAL else INK)
             x += pct
         a.text(-1.8, i, lab, va="center", ha="right", fontsize=7.2, color=INK)
-        a.text(104.0, i, k(tot), va="center", fontsize=6.4, color=MUTED)
-    a.set_xlim(0, 100); a.set_ylim(-0.75, len(rows) - 0.3); a.set_yticks([])
+        a.text(102.5, i, k(tot), va="center", ha="left", fontsize=6.2, color=MUTED)
+    a.set_xlim(0, 100); a.set_ylim(-0.62, len(rows) - 0.38); a.set_yticks([])
     a.set_xticks([0, 50, 100]); a.set_xticklabels(["0", "50", "100%"])
-    a.xaxis.grid(True, color=GRID, lw=0.6); strip(a)
+    strip(a)
     swatches(a, [("forward", FWD), ("reversible", REV), ("reverse", BACK)],
              y=-0.115, x0=0.0, vertical=True, size=6.2)
     panel_tag(a, "A", "Direction by evidence grade")
@@ -287,16 +296,16 @@ def figure3():
         tot = sum(vals); x = 0
         for v, (nm, col) in zip(vals, SC):
             pct = v / tot * 100
-            b.barh(i, pct, left=x, height=0.44, color=col, zorder=3,
-                   edgecolor=SURFACE, lw=1.2)
+            b.barh(i, pct, left=x, height=0.60, color=col, zorder=3,
+                   edgecolor=FRAME, lw=0.45)
             if pct > 13:
                 b.text(x + pct / 2, i, f"{pct:.0f}%", ha="center", va="center",
                        fontsize=6.6, color="white", fontweight="bold")
             x += pct
         b.text(-1.8, i, lab, va="center", ha="right", fontsize=7.2, color=INK)
-    b.set_xlim(0, 100); b.set_ylim(-0.75, len(rows) - 0.3); b.set_yticks([])
+    b.set_xlim(0, 100); b.set_ylim(-0.62, len(rows) - 0.38); b.set_yticks([])
     b.set_xticks([0, 50, 100]); b.set_xticklabels(["0", "50", "100%"])
-    b.xaxis.grid(True, color=GRID, lw=0.6); strip(b)
+    strip(b)
     swatches(b, [(n, c) for n, c in SC], y=-0.115, x0=0.0, vertical=True, size=6.2)
     panel_tag(b, "B", "Which source earned the grade")
 
@@ -309,8 +318,8 @@ def figure3():
         base += v + 260
     c.set_xlim(-0.45, 1.75); c.set_ylim(0, tot * 1.03); c.set_xticks([])
     c.set_yticks([0, 20000, 40000, 56012]); c.set_yticklabels(["0", "20k", "40k", "56k"])
-    c.yaxis.grid(True, color=GRID, lw=0.6); strip(c, keep_x=False)
-    panel_tag(c, "C", "Atom mapping", tx=0.26)
+    strip(c, keep_x=False, value_axis="y")
+    panel_tag(c, "C", "Atom mapping")
     return fig
 
 
