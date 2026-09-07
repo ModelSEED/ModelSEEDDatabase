@@ -38,6 +38,44 @@ NEUTRAL = "#c9c8c2"
 
 plt.rcParams.update(grace.RC)
 
+# ---- provenance, computed from released files ------------------------------
+def _pka_provenance():
+    """Figure 2A's two bars, derived rather than transcribed.
+
+    Reads Biochemistry/Thermodynamics/ProtonationEvidence/pka_provenance.tsv
+    (written by Scripts/Thermodynamics/ProtonationEvidence/build_pka_provenance.py)
+    and ModelSEED_Reaction_Energies.tsv. Both ship, so a reader can reproduce
+    every percentage in the protonation paragraph.
+    """
+    import csv as _csv, collections as _c, re as _re
+    root = Path(__file__).resolve().parents[3]
+    prov = root / "Biochemistry/Thermodynamics/ProtonationEvidence/pka_provenance.tsv"
+    rxns = root / "Biochemistry/Thermodynamics/eQuilibrator/ModelSEED_Reaction_Energies.tsv"
+    rows = [r for r in _csv.DictReader(
+        (l for l in prov.open() if not l.startswith("#")), delimiter="\t")]
+    eff = _c.Counter(r["effective_source"] for r in rows)
+    chemaxon = eff["carried_over"] + eff["marvin"] + eff["cache"]
+    by_cpd = [("MolGpKa", eff["molgpka"], BLUE),
+              ("ChemAxon-derived", chemaxon, ORANGE),
+              ("IUPAC", eff["iupac"], AQUA),
+              ("other / unattributed", eff["alberty"] + eff["unresolved"], VIOLET)]
+    cx = {r["seed_id"] for r in rows if r["shipped_provenance"] == "chemaxon"}
+    op = {r["seed_id"] for r in rows if r["shipped_provenance"] == "open"}
+    CPD = _re.compile(r"cpd\d{5}")
+    a = b = c = 0
+    for r in _csv.DictReader((l for l in rxns.open() if not l.startswith("#")), delimiter="\t"):
+        if r["status"] != "ok":
+            continue
+        cs = set(CPD.findall(r["formula"] or ""))
+        if cs & cx: a += 1
+        elif cs & op: b += 1
+        else: c += 1
+    by_rxn = [("all compounds open", b, BLUE),
+              ("\u2265 1 ChemAxon-derived compound", a, ORANGE),
+              ("no classified compound", c, NEUTRAL)]
+    return by_cpd, by_rxn
+
+
 # ---- measured values -------------------------------------------------------
 NUMBERS = {
     # MANUSCRIPT.md Table 3 (untracked; local to the author's tree, not in the repository)
@@ -54,18 +92,15 @@ NUMBERS = {
     "struct_src": [("MetaCyc", 18801), ("KEGG", 15278), ("ChEBI", 9446)],
     "struct_total": (36943, 45708),
     "coverage": [("2020", 28120, 33992), ("2026", 36943, 45708)],
-    # provenance audit of the ADOPTED (collapse-gated) cache, 2026-09-04.
-    # ChemAxon-derived pools the cache tier (2,238), our own Marvin table
-    # (1,497) and Zenodo carry-over (525): all three descend from cxcalc, and
-    # splitting them in the figure implies a distinction the reader cannot use.
-    "pka_cpd": [("MolGpKa", 18923, BLUE), ("ChemAxon-derived", 5038, ORANGE),
-                ("IUPAC", 1249, AQUA), ("other / unattributed", 19, VIOLET)],
-    # distinct scored reactions classified by their compounds' protonation
-    # provenance -- NOT compound-reaction incidences, which double-count a
-    # reaction once per affected compound
-    "pka_traffic": [("all compounds open", 3186, BLUE),
-                    ("\u2265 1 ChemAxon-derived compound", 21725, ORANGE),
-                    ("no ionizable compound", 159, NEUTRAL)],
+    # Protonation provenance. READ FROM THE SHIPPED TABLE, not transcribed --
+    # see _pka_provenance() below. These were hardcoded constants until
+    # 2026-09-07 and were WRONG: they counted the pKa cascade's answers and
+    # treated carry-over as 525 compounds when the cache holds 4,122 rows from
+    # the pinned release. Correcting it moves the layer from a reported 20%
+    # ChemAxon-derived to 28%, and 87% of scored reactions to 95% -- the
+    # proprietary dependency is LARGER than the paper claimed. Task #58.
+    "pka_cpd": None,      # filled by _pka_provenance()
+    "pka_traffic": None,  # filled by _pka_provenance()
     # Biochemistry/*.json thermodynamics dicts, sentinel (1e7) rows EXCLUDED:
     # Group contribution stores an entry for essentially every reaction but
     # 26,555 of them are the 10000000.0 placeholder, so the raw entry count
@@ -87,6 +122,9 @@ NUMBERS = {
     "atom": [("clean", 25058, BLUE), ("salvaged", 7819, BLUE_350),
              ("not mapped", 56012 - 32877, NEUTRAL)],
 }
+
+
+NUMBERS["pka_cpd"], NUMBERS["pka_traffic"] = _pka_provenance()
 
 
 def strip(ax, keep_x=True, value_axis="x"):

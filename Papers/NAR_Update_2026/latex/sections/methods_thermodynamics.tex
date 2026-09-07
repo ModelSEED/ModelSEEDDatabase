@@ -34,6 +34,14 @@ ChemAxon-derived ladders in the eQuilibrator cache.
 %% been rebuilt. Of those 2,418, MolGpKa agrees with the incumbent on proton
 %% count for 1,597 and disagrees for 821 (NAD +3 sites, NADH +4, ~9.55
 %% kcal/mol per unbalanced proton). We did not rebuild: see the task for why.
+%% 28% / 95% supersede 20% / 87%, corrected 2026-09-07 (task #58). The old
+%% figures came from constants typed into make_figures.py which counted the pKa
+%% cascade's answers and scored carry-over at 525 compounds; the cache actually
+%% holds 4,122 rows from the pinned release, and those keep ChemAxon-derived
+%% ladders whatever the cascade would have said. The dependency is LARGER than
+%% the paper claimed. Both bars are now DERIVED, not transcribed, from
+%% Biochemistry/Thermodynamics/ProtonationEvidence/pka_provenance.tsv, which
+%% ships -- so a reader can tally the percentages themselves.
 Two consequences are stated rather than elided. The layer is not fully
 open-source: it is reproducible by citation, the cache being a pinned public
 release, but not regenerable without a licensed tool. A second route to the
@@ -45,8 +53,8 @@ examined substituting them and did not, because on the highest-traffic cases
 --- the nicotinamide cofactors above all --- the two models disagree on how
 many sites lie above the reported pH, and that disagreement moves a reaction by
 a full proton with no measurement available to arbitrate it. And although the
-ChemAxon-derived compounds are 20\% of the total, they are the most connected
-polyprotic metabolites, so they participate in 87\% of scored reactions
+ChemAxon-derived compounds are 28\% of the total, they are the most connected
+polyprotic metabolites, so they participate in 95\% of scored reactions
 (Figure~\ref{fig:thermo}A) --- restricting substitution to where the open
 predictor provably fails \emph{increases} its reach rather than reducing it.
 
