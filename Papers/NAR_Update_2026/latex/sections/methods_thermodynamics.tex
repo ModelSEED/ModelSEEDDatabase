@@ -26,9 +26,25 @@ copies of its first pKa. The failure is detectable as a repeated predicted
 value, true of 6,664 of 32,201 compounds, and only there do we fall back to the
 ChemAxon-derived ladders in the eQuilibrator cache.
 
+%% Added 2026-09-07 (task #26). The preceding sentence describes the pKa
+%% GATE. Carry-over is a SECOND, ungated route to ChemAxon-derived microspecies
+%% and the paper said nothing about it. Measured on the shipped cache: 4,122
+%% compounds reuse a pinned-release row -- 1,234 have no open prediction, 470
+%% are collapse cases the gate would have caught anyway, and 2,418 could have
+%% been rebuilt. Of those 2,418, MolGpKa agrees with the incumbent on proton
+%% count for 1,597 and disagrees for 821 (NAD +3 sites, NADH +4, ~9.55
+%% kcal/mol per unbalanced proton). We did not rebuild: see the task for why.
 Two consequences are stated rather than elided. The layer is not fully
 open-source: it is reproducible by citation, the cache being a pinned public
-release, but not regenerable without a licensed tool. And although the
+release, but not regenerable without a licensed tool. A second route to the
+same dependency is worth naming: where the pinned release already holds a
+compound with a matching structure, the builder reuses that row wholesale
+rather than rebuilding it, so those compounds retain the release's ladders
+irrespective of whether the open predictor could have supplied them. We
+examined substituting them and did not, because on the highest-traffic cases
+--- the nicotinamide cofactors above all --- the two models disagree on how
+many sites lie above the reported pH, and that disagreement moves a reaction by
+a full proton with no measurement available to arbitrate it. And although the
 ChemAxon-derived compounds are 20\% of the total, they are the most connected
 polyprotic metabolites, so they participate in 87\% of scored reactions
 (Figure~\ref{fig:thermo}A) --- restricting substitution to where the open

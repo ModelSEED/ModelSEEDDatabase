@@ -1,8 +1,14 @@
 %% Consolidates the former methods_{community_ci,distribution} sections.
 \subsection{Distribution and community process}\label{sec:methods-distribution}
 
+%% NOT a PyPI package. Corrected 2026-09-07: there is no ModelSEEDDatabase
+%% distribution on PyPI (pypi.org/pypi/ModelSEEDDatabase/json returns 404) and
+%% this repository carries no packaging config. ModelSEEDpy does exist, but it
+%% does not bundle the biochemistry -- it clones this repository and reads it
+%% from a local path. Do not reinstate the PyPI claim unless one is published.
 The database is distributed as versioned flat files and JSON from the public
-repository, through a PyPI package, and via a Solr endpoint. Every merge runs
+repository, queried programmatically through a Solr endpoint, and browsed
+through the web interface at \modelseedurl. Every merge runs
 continuous integration that rebuilds the database from source records and
 fails on any regression in balance, structure coverage or schema conformance,
 so a curation change that breaks an invariant cannot be merged. External
