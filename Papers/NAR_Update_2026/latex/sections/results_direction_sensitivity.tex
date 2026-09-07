@@ -12,14 +12,27 @@ requiring salvage.}
 \subsection{Direction assignment and evidence grading}\label{sec:results-direction}
 
 Because the sources disagree per reaction, we grade each reaction's evidence
-against 802 experimentally-anchored measurements rather than presenting values
+against 797 experimentally-anchored measurements rather than presenting values
 unqualified. The grades separate real accuracy: under leak-free
+%% Every figure in this paragraph comes from grade_calibration.json
+%% "validation_cv": 5 folds x 4 reps, calibration refitted per fold and scored
+%% only on the held-out anchors. Regenerate with
+%%   Scripts/Thermodynamics/SourceGrading/build_tecrdb_comparison.py   (anchors)
+%%   Scripts/Thermodynamics/SourceGrading/grade_thermo_sources.py --cv (grades)
+%% Anchors were regenerated 2026-09-07 against the live database: 797
+%% stereo-exact, replacing the 802 inherited from Cooper Taylor's tree. 789 are
+%% shared and their measured energies agree to 0.0000 kJ; every figure here
+%% moved by under one point, which is the robustness check for the swap.
+%% Superseded: "95% gold against 45% bronze". 95% was the IN-SAMPLE number
+%% (93.7%); 45% matched no run at all. eQuilibrator's own bronze tier is 14
+%% unique anchors, Wilson [5.9%, 44.2%], so no rate is quoted for it and group
+%% contribution carries the low-tier contrast instead. Task #55.
 cross-validation, refitting the calibration on each training fold and scoring
 only the anchors held out of it, eQuilibrator's gold tier falls within
-2\,kcal\,mol$^{-1}$ of measurement 91.9\% of the time ($n=382$). Its own
+2\,kcal\,mol$^{-1}$ of measurement 92.5\% of the time ($n=352$). Its own
 bronze tier holds too few anchors to support a rate; the separation is clearest
 where the samples are large, group contribution scoring 77.2\% at silver
-($n=452$) against 26.9\% at bronze ($n=336$).
+($n=452$) against 24.8\% at bronze ($n=335$).
 
 Direction assignment inherits those grades (Figure~\ref{fig:direction}A). Gold
 reactions are more often given a definite direction than bronze ones, and the

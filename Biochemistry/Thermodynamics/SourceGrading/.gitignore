@@ -12,15 +12,9 @@
 results/thermo_grades/source_grades_wide.tsv
 results/thermo_grades/source_grades_heldout.tsv
 
-# Untracked 2026-09-06 pending Cooper Taylor's agreement to republish.
-#
-# Copied from /scratch/ctaylor/ to unblock the TECRDB-vs-dGPredictor comparison.
-# It is HIS derived data, and this repository is public under MIT, so it should
-# not be redistributed without his say-so. Three files reference it and will
-# not find it in a fresh clone:
-#   Scripts/Thermodynamics/SourceGrading/grade_thermo_sources.py
-#   Scripts/Thermodynamics/SourceGrading/optimize_thermo_source_assignment.py
-#   Scripts/Thermodynamics/SourceGrading/README.md
-# Restore by tracking it again once he agrees, or point those three at a
-# regeneration step.
-tecrdb_vs_dgpredictor_modelseed.csv
+# _structure_sig.json is a 200 KB intermediate of build_tecrdb_comparison.py,
+# regenerable and read by nothing. The comparison CSV itself is now TRACKED
+# again: as of 2026-09-07 we generate it ourselves with
+# build_tecrdb_comparison.py rather than carrying Cooper Taylor's copy, so the
+# permission question that untracked it on 2026-09-06 no longer applies.
+_structure_sig.json
