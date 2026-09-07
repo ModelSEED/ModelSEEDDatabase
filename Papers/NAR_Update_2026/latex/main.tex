@@ -169,14 +169,87 @@ on metabolic-model output}
 %%-----------------------------------------------------------------------------
 %% ORCID is REQUIRED for the submitting author (NAR_REQUIREMENTS.md section 13).
 %% Attach with \ORCID{0000-0000-0000-0000} directly after the author name.
-\author[1,$\ast$]{\TBD[First Author]\TBD[\textbackslash ORCID required]}
-\author[1]{\TBD[Additional authors]}
+%% AUTHOR LIST, per Sam 2026-09-07. Order: lead, then Argonne/Henry team with
+%% the two interns, then the upstream-tool contributors grouped by tool, then
+%% the KBase PIs, then the two corresponding authors last.
+%%
+%% SPELLINGS VERIFIED against published records, not transcribed. Five were
+%% corrected from the names as first given:
+%%   Beber      not "Bieber"    -- references.bib beber2022, and Seaver 2020
+%%   Giessmann  not "Greissman" -- 10.3762/bjoc.19.26, IGDORE Berlin
+%%   Setlur     not "Setler"    -- his fork, github.com/VibhavSetlur
+%%   Wood-Charlson, Elisha M.   -- given only as "Elisha"; Seaver 2020
+%%   Anand, Mohit               -- the third Maranas-lab author, 10.1371/journal.pcbi.1012516
+%%                                 (novoStoic2.0, with Upadhyay and Maranas)
+%% Faria, Edirisinghe, Liu, Arkin, Cottingham, Henry, Seaver all confirmed
+%% against Seaver et al. 2020 (10.1093/nar/gkaa746).
+%%
+%% ORCIDs. Seven are CONFIRMED FROM A PUBLICATION -- the author list of
+%% Seaver et al. 2020, read through Europe PMC's core result type, which
+%% embeds ORCIDs per author:
+%%   https://www.ebi.ac.uk/europepmc/webservices/rest/search?query=EXT_ID:32986834&resultType=core&format=json
+%% Seaver's also cross-validates against the ORCID public API by name search,
+%% which is the other reliable route:
+%%   https://pub.orcid.org/v3.0/expanded-search/?q=family-name:X+AND+given-names:Y
+%% Publisher pages are NOT a usable source: sciencedirect.com returns 403 to
+%% automated fetches, as do AIP, RSC and ACS.
+%%
+%% HENRY IS NOT FILLED IN. An ORCID name search restricted to Argonne returns
+%% exactly one Christopher Henry, 0000-0001-8058-9123, listing Argonne,
+%% Northwestern and Dayton -- consistent, but NOT confirmed by any publication
+%% author list, and a wrong ORCID on a corresponding author misattributes the
+%% work. Ask Chris, then uncomment:
+%%     \author[1,$\dagger$]{Christopher S. Henry\ORCID{0000-0001-8058-9123}}
+%%
+%% STILL MISSING: Freiburger, Faria, Taylor, Setlur, Upadhyay, Anand, Maranas,
+%% Giessmann, Wood-Charlson. Faria and Wood-Charlson carry no ORCID in either
+%% paper checked, so those must come from the people themselves.
+%%
+%% AFFILIATIONS 3, 5 and 6 are STALE and must be confirmed with the people
+%% themselves: Noor was ETH Zurich in 2020 and has since moved, Beber was DTU,
+%% and Giessmann's IGDORE listing is from 2023.
+\author[1]{Andrew Freiburger}
+\author[1]{Jos\'e P. Faria}
+\author[1]{Janaka N. Edirisinghe\ORCID{0000-0003-2493-234X}}
+\author[1]{Filipe Liu\ORCID{0000-0001-8701-2984}}
+\author[1]{Cooper Taylor}
+\author[1]{Vibhav Setlur}
+\author[3]{Elad Noor\ORCID{0000-0001-8776-4799}}
+\author[4]{Moritz E. Beber\ORCID{0000-0003-2406-1978}}
+\author[5]{Vikas Upadhyay}
+\author[5]{Mohit Anand}
+\author[5]{Costas D. Maranas}
+\author[6]{Robert T. Giessmann}
+\author[2]{Adam P. Arkin\ORCID{0000-0002-4999-2931}}
+\author[7]{Robert W. Cottingham\ORCID{0000-0002-2775-3905}}
+\author[2]{Elisha M. Wood-Charlson}
+\author[1,$\dagger$]{Christopher S. Henry}
+\author[1,$\ast$]{Samuel M. D. Seaver\ORCID{0000-0002-7674-5194}}
 
-\address[1]{\orgdiv{\TBD[Division]}, \orgname{\TBD[Organization]},
-\orgaddress{\street{\TBD[Street]}, \postcode{\TBD[Postcode]},
-\state{\TBD[State]}, \country{\TBD[Country]}}}
+\address[1]{\orgdiv{Computing, Environment and Life Sciences Division},
+\orgname{Argonne National Laboratory}, \orgaddress{\street{9700 S. Cass Ave.},
+\postcode{60439}, \state{Lemont, IL}, \country{USA}}}
 
-\corresp[$\ast$]{Corresponding author. \TBD[email]}
+\address[2]{\orgdiv{Environmental Genomics and Systems Biology Division},
+\orgname{Lawrence Berkeley National Laboratory},
+\orgaddress{\postcode{94720}, \state{Berkeley, CA}, \country{USA}}}
+
+\address[3]{\orgname{\TBD[Noor -- affiliation to confirm]}}
+
+\address[4]{\orgname{\TBD[Beber -- affiliation to confirm]}}
+
+\address[5]{\orgdiv{Department of Chemical Engineering},
+\orgname{The Pennsylvania State University},
+\orgaddress{\postcode{16802}, \state{University Park, PA}, \country{USA}}}
+
+\address[6]{\orgname{\TBD[Giessmann -- affiliation to confirm]}}
+
+\address[7]{\orgdiv{Biosciences Division},
+\orgname{Oak Ridge National Laboratory},
+\orgaddress{\postcode{37830}, \state{Oak Ridge, TN}, \country{USA}}}
+
+\corresp[$\ast$]{Corresponding author. \href{mailto:seaver@anl.gov}{seaver@anl.gov}}
+\corresp[$\dagger$]{Corresponding author. \href{mailto:cshenry@anl.gov}{cshenry@anl.gov}}
 
 %% Submission history. Left commented out deliberately: the month argument is
 %% fed to \numexpr by the class (\myswitch, cls:1175), so an empty
