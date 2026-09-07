@@ -56,6 +56,17 @@ sources:
         tool:    Marvin
         version: "23.4"
         consumed_by_production: true   # Update_Compound_pKas.py reads this
+      - file:    pkas/marvin_26.1.tsv
+        tool:    Marvin
+        version: "26.1"
+        consumed_by_production: true
+        generated_by: Scripts/Structures/Run_Marvin_pKas.py
+        supersedes: |
+          loadPerSourcePkas globs every TSV here and lets the
+          last-sorted file win per (ext_id, kind), so 26.1 overrides
+          23.4 on the 14,588 ids they share. The 1,379 ids carried
+          only by 23.4 are not dropped — they keep their 23.4 values,
+          because the loader accumulates rather than replaces.
     notes: |
       KEGG mol files were also parsed for SRUs (structural repeating
       units); the SRU filter file is KEGG_SRU_041020.txt.
@@ -72,6 +83,14 @@ sources:
         tool:    Marvin
         version: "23.4"
         consumed_by_production: true
+      - file:    pkas/marvin_26.1.tsv
+        tool:    Marvin
+        version: "26.1"
+        consumed_by_production: true
+        generated_by: Scripts/Structures/Run_Marvin_pKas.py
+        supersedes: |
+          Overrides 23.4 on the 18,587 shared ids; the 5,660 ids only
+          23.4 carries keep their 23.4 values (the loader accumulates).
 
   ChEBI:
     snapshot: 2024-01-23
@@ -96,6 +115,20 @@ sources:
           Enabling ChEBI as a fallback after KEGG and MetaCyc unlocks
           ~3,800 additional compound pKa attributions (compounds whose
           only structured alias is ChEBI).
+      - file:    pkas/marvin_26.1.tsv
+        tool:    Marvin
+        version: "26.1"
+        consumed_by_production: true
+        generated_by: Scripts/Structures/Run_Marvin_pKas.py
+        id_normalization: |
+          Still keyed 'CHEBI_15377'. The note above asks future
+          regenerations to drop the prefix at the source; this run
+          deliberately did not, so 26.1 stays a drop-in alongside 23.4
+          and the prefix retirement remains one reviewable change
+          rather than a side effect of a Marvin upgrade.
+        supersedes: |
+          Overrides 23.4 on the 9,134 shared ids; the 2,052 ids only
+          23.4 carries keep their 23.4 values (the loader accumulates).
 
   Rhea:
     snapshot: 2023-03-31
@@ -122,6 +155,18 @@ sources:
           for every current compound — added to the cascade for
           completeness and for graceful degradation if primary
           sources lose entries in the future.
+      - file:    pkas/marvin_26.1.tsv
+        tool:    Marvin
+        version: "26.1"
+        consumed_by_production: true
+        generated_by: Scripts/Structures/Run_Marvin_pKas.py
+        id_normalization: |
+          Still keyed 'POLYMER_10033', for the same reason ChEBI keeps
+          its prefix: the alias-format migration stays a separate,
+          reviewable change.
+        supersedes: |
+          Overrides 23.4 on all 205 shared ids; the 30 ids only 23.4
+          carries keep their 23.4 values (the loader accumulates).
 
   ModelSEED:
     snapshot: 2026-09-01
