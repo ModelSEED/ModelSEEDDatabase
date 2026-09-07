@@ -34,6 +34,13 @@ Both stayed in `Scripts/Thermodynamics/ProtonationEvidence/`.
 | `calibrate_sigma.py` | the empirical scale of each source's reported uncertainty |
 | `evaluate_path_b.py` | cache variants compared over real ModelSEED reactions |
 | `review_lost_reactions.py` | reactions upstream eQuilibrator can compute and our build cannot |
+| `make_figures.py` | the three main-text figures, `../figures/main_figures_draft.pdf` |
+| `make_graphical_abstract.py` | the mandatory graphical abstract, `../figures/graphical_abstract.pdf` |
+| `grace_style.py` | shared Grace/xmgrace visual style used by both |
+
+The graphical abstract is submitted as a **separate file** and is deliberately
+never `\includegraphics`'d into `main.tex` — NAR requires it uploaded on its
+own, and it must not duplicate a main figure.
 
 Findings written up from these live in `../data/`, dated -- untracked, local to the author's tree rather than in the repository.
 
