@@ -37,6 +37,7 @@ The per-source ``GCC``/``EQU`` notes are no longer consulted; ``GC`` and ``EQ``
 runs read directly from ``thermodynamics['Group contribution']`` and
 ``thermodynamics['eQuilibrator']``. After estimation, the computed direction is
 appended to whichever Thermodynamics sublist supplied the energy."""
+import argparse
 import sys
 sys.path.append('../../Libs/Python/')
 from BiochemPy import Reactions
@@ -176,9 +177,35 @@ def _write_report(db_level, report):
 # ---------------------------------------------------------------------------
 # Main
 # ---------------------------------------------------------------------------
+DB_LEVELS = ('EQ', 'GC', 'DGP', 'DGPM')
+
+
+def _build_parser():
+    """Real argument parsing.
+
+    This used to scan argv for one of the four level strings and IGNORE
+    everything else, so an unknown flag -- or a mistyped level such as
+    lowercase 'eq' -- fell through to the default (top-level deltag, GC rules)
+    and the script rewrote all 56,012 reactions. Asking it for --help did
+    exactly that. ``--heuristics`` already rejected unknown names on the
+    grounds that a silent fallback "would be easy to miss in a pipeline log";
+    the same reasoning applies here and did not used to.
+    """
+    ap = argparse.ArgumentParser(
+        description=__doc__,
+        formatter_class=argparse.RawDescriptionHelpFormatter)
+    ap.add_argument("db_level", nargs="?", default="", choices=("",) + DB_LEVELS,
+                    help="thermodynamic source. Omit for the top-level deltag.")
+    ap.add_argument("--heuristics", default=None,
+                    help="override the rule set the source would select")
+    ap.add_argument("--dry-run", action="store_true",
+                    help="report what would change and write nothing")
+    return ap
+
+
 def _parse_db_level(argv):
     for arg in argv[1:]:
-        if arg in ('EQ', 'GC', 'DGP', 'DGPM'):
+        if arg in DB_LEVELS:
             return arg
     return ''
 
@@ -203,8 +230,12 @@ def _parse_heuristics(argv):
 
 
 def main():
-    db_level = _parse_db_level(sys.argv)
-    heuristics_name = _parse_heuristics(sys.argv)
+    args = _build_parser().parse_args()
+    db_level = args.db_level
+    heuristics_name = args.heuristics
+    if heuristics_name is not None and heuristics_name not in HEURISTIC_SETS:
+        sys.exit("ERROR: unknown heuristic set %r; choose from %s"
+                 % (heuristics_name, ', '.join(sorted(HEURISTIC_SETS))))
     heuristics = get_heuristics(heuristics_name) if heuristics_name else None
 
     effective = heuristics_name or (db_level if db_level in HEURISTIC_SETS
@@ -228,7 +259,12 @@ def main():
         rxn_entry['reversibility'] = thermoreversibility
 
     _write_report(db_level, report)
-    print("Saving reactions")
+    changed = sum(1 for v in report.values() if v[1] != v[2])
+    if args.dry_run:
+        print("DRY RUN: %d of %d reactions would change; nothing written"
+              % (changed, len(report)))
+        return
+    print("Saving reactions (%d of %d change)" % (changed, len(report)))
     helper.saveReactions(reactions_dict)
 
 

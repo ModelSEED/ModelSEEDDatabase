@@ -1,0 +1,20 @@
+# Regenerable by-products of grade_thermo_sources.py, untracked 2026-09-06.
+#
+# source_grades.tsv IS shipped: sections/data_availability.tex commits to
+# publishing the evidence grades, and that long form is the release. These two
+# are derived from the same run -- _wide is a pivot of the long form, _heldout
+# a re-scored variant -- and together cost 16 MB for no information the
+# canonical table does not already carry.
+#
+# Regenerate both with:  python3 Scripts/Thermodynamics/SourceGrading/grade_thermo_sources.py
+# Note task #55 (the graded-against-experiment circularity check) will want
+# _heldout; regenerate it there rather than assuming it is present.
+results/thermo_grades/source_grades_wide.tsv
+results/thermo_grades/source_grades_heldout.tsv
+
+# _structure_sig.json is a 200 KB intermediate of build_tecrdb_comparison.py,
+# regenerable and read by nothing. The comparison CSV itself is now TRACKED
+# again: as of 2026-09-07 we generate it ourselves with
+# build_tecrdb_comparison.py rather than carrying Cooper Taylor's copy, so the
+# permission question that untracked it on 2026-09-06 no longer applies.
+_structure_sig.json

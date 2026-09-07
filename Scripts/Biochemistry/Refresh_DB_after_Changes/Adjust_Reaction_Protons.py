@@ -1,4 +1,18 @@
 #!/usr/bin/env python
+
+if __name__ == "__main__":
+    # Validate before importing or touching the database. 'verbose' was matched
+    # by substring against the whole of argv, so any unrecognised argument was
+    # silently ignored and the script ran with its defaults.
+    import argparse as _argparse
+    _p = _argparse.ArgumentParser(
+        description=__doc__,
+        formatter_class=_argparse.RawDescriptionHelpFormatter)
+    _p.add_argument("verbose", nargs="?", choices=("verbose",),
+                    help="print per-reaction detail")
+    _p.parse_args()
+
+
 from os import stat
 import sys
 sys.path.append('../../../Libs/Python')

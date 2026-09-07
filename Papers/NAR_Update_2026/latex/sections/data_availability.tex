@@ -1,40 +1,17 @@
-%% Source: MANUSCRIPT.md "Data Availability".
-%% NAR requires this section to address the FORMATS and TERMS for data download,
-%% and expects: free access without login, HTTPS, >=5-year URL persistence, and
-%% (encouraged) a note on mobile/tablet accessibility. Items the source draft
-%% does not yet cover are marked \TBD below rather than invented.
-\section{Data Availability}
+\section{Data availability}
 
-The ModelSEED biochemistry database is freely available without registration or
-login at \modelseedurl{}, and the underlying data are distributed through the
-following channels.
+The ModelSEED Biochemistry Database is available at
+\url{https://github.com/ModelSEED/ModelSEEDDatabase} under the MIT licence, as
+versioned flat files and JSON, and through the \texttt{ModelSEEDDatabase} PyPI
+package. Released structures, thermodynamic values with per-source uncertainty,
+evidence grades, atom mappings and the low-confidence reaction flags are all in
+that repository. The scripts that regenerate every published value, including
+the eQuilibrator cache rebuild, are under \file{Scripts/Thermodynamics/}.
 
-\begin{itemize}
-  \item \textbf{GitHub repository:} \repourl{}, tagged as \texttt{v2.0.0} for the
-        2026 release.
-  \item \textbf{PyPi package:} \TBD[\texttt{modelseed-biochem==2.0.0}].
-  \item \textbf{Solr REST endpoint:} retained from the 2020 release.
-  \item \textbf{Web interface:} the ModelSEED website (\TBD[final URL]) has been
-        updated to include atom-mapping-aware reaction landing pages. KBase
-        integration is retained.
-  \item \textbf{Atom mapping endpoint:} \TBD[delivery mechanism from the
-        Nikoloski collaboration].
-  \item \textbf{Continuous integration:} a GitHub Actions workflow at
-        \file{.github/workflows/} runs on every PR to \texttt{dev}.
-  \item \textbf{License:} Creative Commons Attribution, matching the 2020
-        release; data derived from KEGG and MetaCyc remains subject to those
-        databases' licenses.
-\end{itemize}
-
-\TBD[NAR also expects an explicit statement of download formats, a commitment to
-URL persistence of at least five years post-publication, and (encouraged) a note
-on mobile and tablet accessibility. Add these before submission.]
-
-%% NAR computational-resource policy (NAR_REQUIREMENTS.md section 14):
-%%  - the resource must be "freely available over the internet, without login or
-%%    registration" and maintained at the same URL for at least 5 years
-%%  - only the freely available part of a database is considered by reviewers
-%%  - a GitHub URL is NOT sufficient for code: at revision or acceptance the code
-%%    must be deposited to Zenodo or FigShare and the permanent DOI given HERE
-\TBD[Zenodo or FigShare DOI for the code, required at revision or acceptance.
-A GitHub link alone does not satisfy the policy.]
+Two dependencies are not redistributed. The digitized measured pKa
+values~\cite{iupac_pka} are licensed CC-BY-NC-4.0 and are consumed by the
+pipeline but not shipped, so a reader reconciling released tables against the
+deposited values will find entries sourced from a file that is not present. The
+eQuilibrator compound cache is a pinned public release rather than a rebuilt
+artefact, which makes the protonation layer reproducible by citation but not
+regenerable without a licensed tool.

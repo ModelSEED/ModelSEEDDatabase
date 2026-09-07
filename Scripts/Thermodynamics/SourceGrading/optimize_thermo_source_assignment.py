@@ -113,6 +113,15 @@ BIOCHEM = MSDB_ROOT / "Biochemistry"
 
 SOURCES = {"Group contribution": "GC", "eQuilibrator": "EQ",
            "dGPredictor-ModelSEED": "DGPMS"}
+# dev has carried the retrained predictor under both names. Accept either, so
+# the harness is not blocked by a rename. Note the values in the current tree
+# match NEITHER the snapshot this method was calibrated on nor the original
+# dGPredictor (median |diff| 1.01 and 1.17 kcal/mol over the 1,346 anchored
+# reactions) -- it is a later regeneration. Grading stays valid because the
+# anchor supplies only the TECRDB measurement and the error models are refitted
+# against whatever the database holds, but accuracy figures quoted from the
+# original method write-up do not transfer.
+SOURCE_ALIASES = {"DGPMS": ("dGPredictor-ModelSEED", "dGPredictor")}
 EQ_SENTINEL = 100.0        # kcal/mol; eQuilibrator's "no estimate" marker
 TOLERANCE = 2.0            # kcal/mol expected error, the shipped operating point
 RNG = np.random.default_rng(20260806)
@@ -141,6 +150,11 @@ def load_db() -> pd.DataFrame:
                  "is_transport": e.get("is_transport", 0)}
             for lbl, key in SOURCES.items():
                 t = th.get(lbl)
+                if not t:
+                    for alt in SOURCE_ALIASES.get(key, ()):
+                        if th.get(alt):
+                            t = th[alt]
+                            break
                 if t and len(t) > 2 and t[2] not in (None, "?"):
                     try:
                         r[f"dg_{key}"] = float(t[0])
