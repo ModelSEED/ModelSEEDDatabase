@@ -57,6 +57,7 @@ from pka_encoding import MACROSCOPIC, encode          # noqa: E402
 
 BIOCHEM = HERE.parents[1] / "Biochemistry"
 LABEL = "Literature"
+REPO = Path(__file__).resolve().parents[2]
 
 
 def main():
@@ -111,6 +112,30 @@ def main():
         if touched and not a.dry_run:
             with path.open("w") as fh:
                 fh.write(json.dumps(entries, indent=4, sort_keys=True))
+
+    # ALSO WRITE THE REDISTRIBUTABLE TABLE. Without this the 31 ladders exist
+    # only inside the compound records: build_ladder_table.py emits an
+    # Alberty-only table but covers just its ranked subset (8 compounds), and
+    # BasicBiochemData3.m is not redistributable, so 23 of the 31 could not be
+    # rebuilt from anything shipped. Add_Compound_pKa_Sources.py carries the
+    # JSON entries forward, which stops them being deleted but makes the JSON
+    # its own source of record. The VALUES are derived numbers from a published
+    # book and are redistributable; only the Mathematica package is not.
+    if not a.dry_run:
+        table = (REPO / "Biochemistry" / "Structures" / "ModelSEED" / "pkas"
+                 / "literature_alberty-2003.tsv")
+        table.parent.mkdir(parents=True, exist_ok=True)
+        with table.open("w", newline="") as fh:
+            fh.write("# Alberty macroscopic pKa ladders, one row per dissociation step.\n"
+                     "# Derived from R. A. Alberty, Thermodynamics of Biochemical Reactions,\n"
+                     "# Wiley 2003, doi:10.1002/0471332607, via the BasicBiochemData3\n"
+                     "# package. The package itself is not redistributable; these derived\n"
+                     "# values are. Regenerate with this script.\n"
+                     "seed_id\tkind\tstep\tpka_value\ttool\ttool_version\n")
+            for cid in sorted(ladders):
+                for n, v in enumerate(ladders[cid], 1):
+                    fh.write(f"{cid}\t{MACROSCOPIC}\t{n}\t{v:.4f}\tAlberty\t2003\n")
+        print(f"wrote {table} ({len(ladders)} compounds)")
 
     seen["no such compound"] = len(set(ladders) - found)
     for k, v in seen.items():

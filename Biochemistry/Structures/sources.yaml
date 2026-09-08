@@ -171,11 +171,11 @@ sources:
   ModelSEED:
     snapshot: 2026-09-01
     pkas:
-      - file:    pkas/opam2_molgpka.tsv
+      - file:    pkas/molgpka_opam2.tsv
         tool:    MolGpKa
         version: opam2
         consumed_by_production: false
-      - file:    pkas/molgpka_stock_2026-09.tsv
+      - file:    pkas/molgpka_stock-2026.09.tsv
         tool:    MolGpKa
         version: stock
         consumed_by_production: true
@@ -193,9 +193,9 @@ sources:
       space each was computed in, and are not carried into the compound
       records — nothing in the energy path consumes one.
 
-      Two runs are kept. opam2_molgpka.tsv is the original, covering
+      Two runs are kept. molgpka_opam2.tsv is the original, covering
       22,395 compounds, and records site indices as the ionizable
-      HYDROGEN. molgpka_stock_2026-09.tsv covers 32,201 — the gain comes
+      HYDROGEN. molgpka_stock-2026.09.tsv covers 32,201 — the gain comes
       from feeding ModelSEED structures directly rather than matching a
       precomputed cache — and records the heavy atom bearing the proton,
       which is the convention Marvin uses.
@@ -205,7 +205,37 @@ sources:
       versus 0.55 for stock, and 6.6% of their predictions fall outside
       the physically possible -2..16 range.
     literature:
-      - file:    pkas/iupac_v2_3b.tsv
+      - file:    pkas/literature_alberty-2003.tsv
+        source:  Alberty, Thermodynamics of Biochemical Reactions (2003)
+        doi:     10.1002/0471332607
+        redistributable: true
+        gitignored: false
+        consumed_by_production: true
+        regenerate: Scripts/Structures/Update_Compound_Literature_pKas.py
+        notes: |
+          MACROSCOPIC ladders -- successive dissociations of the whole
+          molecule -- unlike marvin_*.tsv and molgpka_*.tsv, which are
+          MICROSCOPIC per-site predictions. The two are not interchangeable
+          and must not be concatenated: eQuilibrator reads whatever it is
+          given as a sequential ladder, so mixing them yields a list that is
+          neither. resolve_pkas picks ONE source per compound for that reason.
+
+          Added here 2026-09-07 so every REDISTRIBUTABLE pKa source sits under
+          Structures/<SOURCE>/pkas/ under one naming convention. Written by
+          Update_Compound_Literature_pKas.py, which owns this entry: it parses
+          Alberty's BasicBiochemData3 package and emits all 31 ladders in the
+          same pass that writes them into the compound records, so table and
+          records cannot drift.
+
+          NOT to be confused with ProtonationEvidence/literature_ladders*.tsv,
+          which build_ladder_table.py writes for the evidence-grading work:
+          those cover only its ranked subset (8 compounds) and the non-_open
+          one carries IUPAC values and is gitignored. Before this file existed,
+          23 of the 31 ladders lived only inside the compound records --
+          BasicBiochemData3.m is not redistributable, so nothing shipped could
+          rebuild them. The derived VALUES are redistributable; the package is
+          not.
+      - file:    pkas/iupac_v2.3b.tsv
         source:  IUPAC Digitized pKa Dataset v2.3b
         doi:     10.5281/zenodo.15375522
         license: CC-BY-NC-4.0
@@ -275,7 +305,7 @@ sources:
 # keeps its own pKa/pKb in the same <microstate>:<atom>:<value> encoding, keyed
 # by the predicting tool -- Marvin (the cascade-winning per-database Marvin
 # value) and MolGpKa (the OPAM2/MolGpKa prediction; file
-# ModelSEED/pkas/opam2_molgpka.tsv), e.g.:
+# ModelSEED/pkas/molgpka_opam2.tsv), e.g.:
 #   "pkas": {
 #       "Marvin":  {"pKa": "1:14:12.60;1:22:3.33;...",
 #                   "pKb": "1:9:-3.03;1:14:-3.85;..."},

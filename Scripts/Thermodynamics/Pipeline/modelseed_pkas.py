@@ -6,7 +6,7 @@ mirrors the layout on ``upstream/dev`` of the ModelSEED biochemistry database:
     Unique_ModelSEED_Structures.txt        cpd-keyed, pH-7 charged structures
     <SOURCE>/pkas/marvin_23.4.tsv          Marvin pKa/pKb, keyed by source id
     <SOURCE>/protonations/marvin_*_ph7.tsv per-source pH-7 structures
-    ModelSEED/pkas/opam2_molgpka.tsv       MolGpKa pKa/pKb, keyed by cpd id
+    ModelSEED/pkas/molgpka_opam2.tsv       MolGpKa pKa/pKb, keyed by cpd id
 
 Note this is *not* the layout used by the in-flight
 ``pubchem-stereo-loss-guard_20260704`` branch, which stores the same data as
@@ -306,7 +306,7 @@ def load_molgpka_pkas(dev_dir: Path = DEV_DIR) -> Dict[str, List[float]]:
             )
         return _read_pka_table(path)
 
-    fallback = base / "opam2_molgpka.tsv"
+    fallback = base / "molgpka_opam2.tsv"
     print(f"WARNING: no production pKa table resolved from {manifest}; "
           f"falling back to {fallback.name}, which is the superseded export "
           f"(22,399 compounds, hydrogen-indexed)", file=sys.stderr)
@@ -433,7 +433,7 @@ def load_iupac_pkas(table: Path = None) -> Dict[str, List[float]]:
     """
     if table is None:
         table = (Path(__file__).resolve().parents[3] / "Biochemistry"
-                 / "Structures" / "ModelSEED" / "pkas" / "iupac_v2_3b.tsv")
+                 / "Structures" / "ModelSEED" / "pkas" / "iupac_v2.3b.tsv")
     if not table.exists():
         return {}
     out: Dict[str, List[float]] = {}

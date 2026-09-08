@@ -43,7 +43,7 @@ from pathlib import Path
 from urllib.request import urlopen
 
 ROOT = Path(__file__).resolve().parents[2]
-OUT = ROOT / "Biochemistry" / "Structures" / "ModelSEED" / "pkas" / "iupac_v2_3b.tsv"
+OUT = ROOT / "Biochemistry" / "Structures" / "ModelSEED" / "pkas" / "iupac_v2.3b.tsv"
 ZENODO = ("https://zenodo.org/records/15375522/files/"
           "IUPAC/Dissociation-Constants-v2-3b.zip?download=1")
 MEMBER = "iupac_high-confidence_v2_3.csv"
