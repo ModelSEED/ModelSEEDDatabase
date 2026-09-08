@@ -19,6 +19,8 @@ protonated at pH 7 -- the bypass path derives ``atom_bag`` from whatever
 structure it is given and treats its hydrogen count as the major microspecies.
 """
 
+from __future__ import annotations
+
 if __name__ == "__main__":
     # Validate arguments BEFORE importing anything or touching the database.
     # These scripts mutate the database, and without this an unknown flag or a
@@ -31,9 +33,6 @@ if __name__ == "__main__":
         description=__doc__,
         formatter_class=_argparse.RawDescriptionHelpFormatter).parse_args()
 
-
-
-from __future__ import annotations
 
 import os
 import pickle
@@ -247,11 +246,25 @@ def _read_pka_table(path: Path) -> Dict[str, List[float]]:
 
 
 def load_marvin_pkas(dev_dir: Path = DEV_DIR) -> Dict[str, Dict[str, List[float]]]:
-    """Marvin pKas per source, keyed by that source's own external id."""
-    return {
-        source: _read_pka_table(Path(dev_dir) / source / "pkas" / "marvin_23.4.tsv")
-        for source in MARVIN_SOURCES
-    }
+    """Marvin pKas per source, keyed by that source's own external id.
+
+    GLOBS the directory and lets the last-sorted file win per id, matching what
+    BiochemPy.Compounds.loadPerSourcePkas does for the compound records. This
+    previously hardcoded marvin_23.4.tsv, so adding marvin_26.1.tsv updated the
+    records while the energies silently kept resting on 23.4 -- the database and
+    the thermodynamics disagreeing about which Marvin release they were built
+    on, with no error raised anywhere.
+
+    Accumulating rather than replacing matters: ids that only the older table
+    covers keep their values instead of vanishing.
+    """
+    out: Dict[str, Dict[str, List[float]]] = {}
+    for source in MARVIN_SOURCES:
+        merged: Dict[str, List[float]] = {}
+        for table in sorted((Path(dev_dir) / source / "pkas").glob("marvin_*.tsv")):
+            merged.update(_read_pka_table(table))
+        out[source] = merged
+    return out
 
 
 def load_molgpka_pkas(dev_dir: Path = DEV_DIR) -> Dict[str, List[float]]:

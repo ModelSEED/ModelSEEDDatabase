@@ -37,6 +37,13 @@ def main():
                          "to the upstream Zenodo cache, which is the database "
                          "seed_mapping's our_cache_id indexes; pointing this at "
                          "a cache we rebuilt would be circular.")
+    ap.add_argument("--preference", default=None,
+                    help="comma-separated pKa tier order, e.g. 'marvin' for a "
+                         "Marvin-only layer. Default is the production cascade "
+                         "alberty,iupac,cache,marvin,molgpka. A tier NOT named "
+                         "is not loaded at all -- which for molgpka also lifts "
+                         "the gate on the ChemAxon tiers, since the gate exists "
+                         "only to avoid displacing a MolGpKa answer.")
     ap.add_argument("--no-guard", action="store_true",
                     help="accept a tier's ladder even if the magnesium guard "
                          "would refuse it, instead of falling through")
@@ -48,15 +55,23 @@ def main():
     ref_cache = a.cache or msp.UPSTREAM_CACHE
     cache_ladders = msp.load_cache_ladders(cache=ref_cache)
     guard = None if a.no_guard else msp.magnesium_guard(ref_cache)
+    pref = (tuple(s.strip() for s in a.preference.split(",") if s.strip())
+            if a.preference else msp.DEFAULT_PKA_PREFERENCE)
+    # Load only the tiers actually in play. Omitting molgpka matters twice: the
+    # tier is gone, AND needs_macroscopic_fallback() then returns True for every
+    # compound, so the gated ChemAxon tiers are consulted everywhere instead of
+    # only where MolGpKa degenerates.
     resolved = msp.resolve_pkas(
         structures,
-        msp.load_marvin_pkas(msp.DEV_DIR),
-        msp.load_molgpka_pkas(msp.DEV_DIR),
-        alberty=msp.load_alberty_pkas(),
-        iupac=msp.load_iupac_pkas(),
-        cache=cache_ladders,
+        msp.load_marvin_pkas(msp.DEV_DIR) if "marvin" in pref else {s: {} for s in msp.MARVIN_SOURCES},
+        msp.load_molgpka_pkas(msp.DEV_DIR) if "molgpka" in pref else {},
+        preference=pref,
+        alberty=msp.load_alberty_pkas() if "alberty" in pref else {},
+        iupac=msp.load_iupac_pkas() if "iupac" in pref else {},
+        cache=cache_ladders if "cache" in pref else {},
         admissible=guard,
     )
+    print(f"preference: {' > '.join(pref)}")
     print(f"structures {len(structures):,}   resolved {len(resolved):,}   "
           f"cache-tier ladders available {len(cache_ladders):,}"
           f"{'' if guard else '   [guard disabled]'}")
