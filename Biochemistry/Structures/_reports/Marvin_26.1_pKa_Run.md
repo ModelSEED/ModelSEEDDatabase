@@ -30,17 +30,40 @@ Zero structures failed to parse in any source.
 
 ## 23.4 vs 26.1
 
-| source | 23.4 ids | 26.1 ids | shared | new | 23.4-only | median abs delta | within 0.5 | max delta |
-|---|---:|---:|---:|---:|---:|---:|---:|---:|
-| ChEBI | 11186 | 9139 | 9134 | 5 | 2052 | 0.000 | 83.3% | 23.87 |
-| KEGG | 15967 | 14599 | 14588 | 11 | 1379 | 0.000 | 82.7% | 35.16 |
-| MetaCyc | 24247 | 18605 | 18587 | 18 | 5660 | 0.000 | 83.1% | 32.76 |
-| Rhea | 235 | 205 | 205 | 0 | 30 | 0.000 | 89.3% | 15.53 |
+| source | 23.4 ids | 26.1 ids | shared | new | 23.4-only | median abs delta | within 0.5 |
+|---|---:|---:|---:|---:|---:|---:|---:|
+| ChEBI | 11186 | 9139 | 9134 | 5 | 2052 | 0.000 | 72.2% |
+| KEGG | 15967 | 14599 | 14588 | 11 | 1379 | 0.000 | 75.9% |
+| MetaCyc | 24247 | 18605 | 18587 | 18 | 5660 | 0.000 | 74.3% |
+| Rhea | 235 | 205 | 205 | 0 | 30 | 0.000 | 82.4% |
 
-Values compared as sorted sets per (id, kind) where both versions report the
-same count. The median is 0.000 in every source: the two Marvin releases agree
-on the great majority of sites. The tail beyond 0.5 is genuine model change
-across three releases, not parse error.
+Pairing: for each shared `(external_id, kind)`, both value sets are sorted and
+paired by rank, up to the shorter of the two. **No length filter** — sets where
+the two releases report a different number of sites are included, paired as far
+as they go. Sort direction is irrelevant: ascending and descending zips give the
+same multiset of differences.
+
+### Why the site count itself moved
+
+| source | shared sets | same count | different count | % differing | 26.1 reports more | fewer |
+|---|---:|---:|---:|---:|---:|---:|
+| ChEBI | 17120 | 14302 | 2818 | 16.5% | 1596 | 1222 |
+| KEGG | 26224 | 22834 | 3390 | 12.9% | 1720 | 1670 |
+| MetaCyc | 34418 | 29187 | 5231 | 15.2% | 2964 | 2267 |
+| Rhea | 384 | 343 | 41 | 10.7% | 22 | 19 |
+| **total** | **78146** | **66666** | **11480** | **14.7%** | **6302** | **5178** |
+
+14.7% of shared sets have a different number of predicted
+sites in 26.1 than in 23.4 — the release changed which atoms it considers
+ionizable, not only the values it assigns them. Restricting the comparison to
+equal-count sets would raise `within 0.5` from 74.4% to 83.1%, but that
+conditions the statistic on the sets that changed least. The table above does
+not do this.
+
+Across all 258,786 rank-paired values: median **0.000**, mean 0.859, 74.4% within 0.5, 80.5% within 1.0.
+The median is 0.000 in every source: the two releases agree exactly on the
+majority of sites. The tail is genuine model change across three Marvin
+releases, not parse error — zero structures failed to parse.
 
 The `23.4-only` column is compounds pruned from `inchi.tsv` since the
 2024-01 snapshot. They are not lost: `Compounds.loadPerSourcePkas` accumulates
