@@ -17,6 +17,13 @@ REPO="$(cd "$HERE/../../.." && pwd)"
 : "${EQUILIBRATOR_DIR:?set EQUILIBRATOR_DIR to the eQuilibrator working tree}"
 export EQUILIBRATOR_DIR
 PY="${PYTHON:-python3}"
+# The LOCALLY PATCHED equilibrator-assets, not the copy in site-packages.
+# LocalCompoundCache(pkas_provided_externally=...) and the PKA_MIN/PKA_MAX
+# window exist only in that checkout; against stock upstream stage 4 dies with
+# "unexpected keyword argument 'pkas_provided_externally'". Task #59 tracks
+# getting these patches upstreamed so this line can go away.
+ASSETS="${EQUILIBRATOR_ASSETS:-$EQUILIBRATOR_DIR/equilibrator-assets/src}"
+export PYTHONPATH="$ASSETS:$EQUILIBRATOR_DIR${PYTHONPATH:+:$PYTHONPATH}"
 
 # -2..16, not 0..14: eQuilibrator counts sites above the reported pH to place
 # the major microspecies, so a group at pKa 14.9 is protonated at pH 7. Without
@@ -34,7 +41,17 @@ PARAMS="$EQUILIBRATOR_DIR/data/cc_params_final.npz"
 cd "$HERE"
 echo "=== 1/8 seed mapping";        $PY build_seed_mapping.py
 echo "=== 2/8 must-carry set";      $PY must_carry_over.py
-echo "=== 3/8 resolve pKas";        $PY write_resolved_pkas.py
+# MARVIN-ONLY pKa layer, decided 2026-09-08 (task #61). Every energy in this
+# release derives from Marvin 26.1; MolGpKa, Alberty and IUPAC take no part in
+# the thermodynamics. They remain in the database as reference values.
+#
+# Measured against the shipped cascade before adopting: 3,042 reactions move by
+# more than 1 kcal/mol, no reaction changes status, and on the 797 stereo-exact
+# TECRDB anchors the two are INDISTINGUISHABLE -- net mean change -0.0015
+# kcal/mol, no anchor moving more than 0.79. The within-2 figure shifts by five
+# reactions crossing the threshold, which is noise, not degradation.
+PKA_PREFERENCE="${PKA_PREFERENCE:-marvin}"
+echo "=== 3/8 resolve pKas";        $PY write_resolved_pkas.py --preference "$PKA_PREFERENCE"
 echo "=== 4/8 build cache";         $PY build_modelseed_cache.py --no-carry-over \
       --pkas "$EQUILIBRATOR_DIR/data/resolved_pkas.tsv" --out "$CACHE"
 echo "=== 5/8 refit";               $PY train_path_b.py --cache "$CACHE" --out "$PARAMS"
