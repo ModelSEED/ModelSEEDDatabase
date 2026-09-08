@@ -1,0 +1,64 @@
+%% Direction assignment from reaction chemistry (LLM ensemble).
+%% \TBD values pending the full-database run, in progress.
+\subsection{Direction assignment from reaction chemistry}\label{sec:methods-council}
+
+Thermodynamic direction assignment is bounded by estimate coverage: a reaction
+with no accepted \drG{} receives no call, regardless of how well characterised
+its chemistry is. To assign direction for those reactions we evaluated a
+complementary approach that reasons from the reaction itself rather than from
+an energy estimate, using an ensemble of large language models.
+
+\paragraph{Independence from the thermodynamic estimates.} Two prompt variants
+were run. The heuristic-informed variant additionally presents the eQuilibrator,
+group-contribution and dGPredictor estimates as evidence to weigh. The
+heuristic-agnostic variant presents only the reaction identifier, its name and
+its equation, with the equation rewritten to an undirected arrow so that no
+direction is recoverable from the input text. Neither variant is shown the
+database's own reversibility assignment. Only the heuristic-agnostic variant is
+independent of the existing estimates, so only it can contribute a direction
+call that is not a restatement of the numeric sources, and it alone is used
+here. The informed variant is retained as a control: agreement between the two
+bounds how much of the agnostic variant's output is recoverable from chemistry
+alone.
+
+\paragraph{Ensemble.} Each reaction is presented independently to three models
+that do not share a provider, and each returns a direction
+($>$, $<$, $=$, or $?$ where it judges the evidence insufficient), a confidence,
+and a written justification grounded in the stoichiometry or in known enzyme
+biology. A fourth model, not among the three, audits the resulting vote table
+for internal contradiction. Where the three do not agree, a fifth model
+adjudicates from the votes, the justifications and the audit; where they agree
+unanimously and the auditor raises no objection, that answer is taken directly.
+Model assignments were not chosen a priori. Eleven candidate models were
+scored across the three roles against reactions carrying a measured
+equilibrium constant, and the selected assignment is the one minimising the
+rate at which a reaction is assigned the direction opposite to measurement,
+which is the error class that propagates into flux predictions. The models
+evaluated, their per-role scores and the selected assignment are given in
+Supplementary \TBD[table ref].
+
+\paragraph{Reaction population.} Of 56,012 reactions in the database we
+exclude 7,609 flagged obsolete and 2,756 symmetrical transport
+reactions, whose two sides are identical once compartment labels are removed
+and which therefore carry no chemistry to reason about, leaving 45,647
+reactions. Direction is assigned for all of them, including those the
+thermodynamic pipeline already covers, so that the two methods can be compared
+on the same population rather than only where the numeric sources are silent.
+
+\paragraph{Validation and its limits.} Calls were compared against measured
+equilibrium constants from the NIST Thermodynamics of Enzyme-Catalyzed
+Reactions database, mapped to ModelSEED reaction identifiers through compound
+aliases; 128 reactions in the evaluated slice carry such a measurement.
+This is a small and reversibility-skewed sample, and it bounds what can be
+claimed: it distinguishes clearly weaker configurations from stronger ones but
+does not establish an accuracy figure with useful precision. Two limitations
+follow and are reported rather than corrected. The ensemble commits to a
+direction far more readily than the thermodynamic rules do, returning $?$ on
+\TBD[pct]\% of reactions against the rules' much higher abstention rate, so its
+errors are distributed differently: it assigns a direction where the rules
+decline, and it occasionally assigns the opposite one. And its stated
+confidence does not separate its correct calls from its incorrect ones, so
+confidence cannot be used as an integration filter. Per-reaction justifications
+and the auditor's objections are released alongside the calls
+(Supplementary \TBD[data ref]), so that assignments can be reviewed
+individually rather than accepted on aggregate.
