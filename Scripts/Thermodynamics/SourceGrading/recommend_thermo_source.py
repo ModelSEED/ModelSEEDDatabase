@@ -10,17 +10,17 @@ use". They are different jobs and the same statistic does not serve both.
                                in a fixed priority
 
 THE NEGATIVE RESULT THAT SHAPED THIS, stated up front because it is the whole
-design. Held-out direction accuracy on the 802 TECRDB stereo-exact anchors,
+design. Held-out direction accuracy on the 797 TECRDB stereo-exact anchors,
 20 x 70/30 splits, every strategy at 100% coverage unless noted:
 
-    priority EQ > DGPMS > GC          95.9% +/- 1.1     <-- shipped
+    priority EQ > DGP > GC          95.9% +/- 1.1     <-- shipped
     eQuilibrator only                 95.9% +/- 1.2     (98.3% coverage)
     priority + risk veto at 0.20      94.2% +/- 1.1
     priority + risk veto at 0.05      93.8% +/- 1.4
     argmin calibrated tau             93.7% +/- 1.1
     argmin ehat (magnitude rule)      93.7% +/- 1.1
     priority + risk veto at 0.02      93.0% +/- 1.3
-    dGPredictor-ModelSEED only        91.6% +/- 1.1
+    dGPredictor only        91.6% +/- 1.1
     argmin direction risk             90.9% +/- 1.2
     Group contribution only           85.1% +/- 2.3
 
@@ -39,7 +39,7 @@ the quantity that selects a source.
 
 WHAT THE UNCERTAINTY IS STILL FOR. Three jobs it does do, all validated:
   * FEASIBILITY -- eQuilibrator sentinels (sigma > 100, the source disclaiming
-    the reaction), the MetaNetX collision list, dGPredictor-ModelSEED on
+    the reaction), the MetaNetX collision list, dGPredictor on
     quinones. These remove a source outright.
   * ABSTENTION -- the risk on the CHOSEN source decides whether to answer at
     all. Within a source it is informative: eQuilibrator's accuracy by its own
@@ -53,7 +53,7 @@ eQuilibrator's reactant-contribution layer is FITTED on TECRDB and dGPredictor
 was trained on 4,001 measurements from it, so both are partly in-sample and
 Group Contribution is not. eQuilibrator's edge is concentrated where its own
 sigma is smallest (100% in its lowest sigma quartile, tied with
-dGPredictor-ModelSEED at 92% in the third), which is what partial memorisation
+dGPredictor at 92% in the third), which is what partial memorisation
 would look like. Treat "prefer eQuilibrator" as the best rule available on the
 evidence we have, not as a settled fact about the methods.
 
@@ -79,7 +79,7 @@ short-circuit before any dG is read, so their risk is exactly 0.
 CALIBRATED SIGMA
 ----------------
 tau_s is NOT the reported sigma -- the three sigma scales are not commensurable
-(Group Contribution overstates its error 2.2x, dGPredictor-ModelSEED 1.5x,
+(Group Contribution overstates its error 2.2x, dGPredictor 1.5x,
 eQuilibrator understates 1.6x). tau_s(i) = k_s * ehat_s(i) / sqrt(2/pi): the
 calibrated expected |error| converted to a Gaussian scale, times one per-source
 scalar k_s fitted so +/-tau actually covers 68.3% of measured errors on the
@@ -124,9 +124,9 @@ from optimize_thermo_source_assignment import (  # noqa: E402
 )
 from grade_thermo_sources import load_tecrdb, load_vetoes  # noqa: E402
 
-K = ["GC", "EQ", "DGPMS"]
+K = ["GC", "EQ", "DGP"]
 LABEL = {"GC": "Group contribution", "EQ": "eQuilibrator",
-         "DGPMS": "dGPredictor-ModelSEED"}
+         "DGP": "dGPredictor"}
 SQRT_2_OVER_PI = math.sqrt(2.0 / math.pi)      # E|X| = tau * sqrt(2/pi)
 TAU_FLOOR = 0.05                                # kcal/mol
 TRUTH_SIGMA = 0.15                              # TECRDB median experimental sd
@@ -135,11 +135,11 @@ RNG = np.random.default_rng(20260812)
 
 # Source priority, per target, ordered by MEASURED accuracy on the TECRDB
 # anchor -- not by a hunch and not by reported confidence. Direction:
-# eQuilibrator 95.5% > dGPredictor-ModelSEED 91.8% > Group Contribution 85.5%.
-# Magnitude (median |error|): eQuilibrator 0.45 ~ dGPredictor-ModelSEED 0.47 >
+# eQuilibrator 95.5% > dGPredictor 91.8% > Group Contribution 85.5%.
+# Magnitude (median |error|): eQuilibrator 0.45 ~ dGPredictor 0.47 >
 # Group Contribution 1.57 kcal/mol.
-PRIORITY_DIRECTION = ["EQ", "DGPMS", "GC"]
-PRIORITY_MAGNITUDE = ["EQ", "DGPMS", "GC"]
+PRIORITY_DIRECTION = ["EQ", "DGP", "GC"]
+PRIORITY_MAGNITUDE = ["EQ", "DGP", "GC"]
 
 
 def _phi(z):
@@ -281,7 +281,7 @@ def feasibility(db, veto_eq) -> dict:
         if k == "EQ":
             ok &= db["sig_EQ"] <= EQ_SENTINEL
             ok &= ~db["rxn"].isin(veto_eq)
-        if k == "DGPMS":
+        if k == "DGP":
             ok &= db["is_quinone"] == 0
         f[k] = ok
     return f
@@ -401,7 +401,7 @@ def validate(db, anchor_idx, risk, feasible, ops, ref_op, tau, ehat, n_splits=20
     ids = np.array(anchor_idx)
     rows = []
     strategies = ["recommend_direction", "risk_only_no_tau", "tau_only_no_risk",
-                  "recommend_magnitude", "eq_only", "dgpms_only", "gc_only",
+                  "recommend_magnitude", "eq_only", "dgp_only", "gc_only",
                   "eq_first_then_risk", "priority_plain",
                   "priority_veto_0.02", "priority_veto_0.05", "priority_veto_0.2"]
     acc = {s: [] for s in strategies}
@@ -472,7 +472,7 @@ def validate(db, anchor_idx, risk, feasible, ops, ref_op, tau, ehat, n_splits=20
                             continue
                         pick = min(cands)[1]
                 else:
-                    pick = {"eq_only": "EQ", "dgpms_only": "DGPMS", "gc_only": "GC"}[s]
+                    pick = {"eq_only": "EQ", "dgp_only": "DGP", "gc_only": "GC"}[s]
                     if not feasible[pick].iat[i]:
                         continue
                 op = ops[pick].iat[i]

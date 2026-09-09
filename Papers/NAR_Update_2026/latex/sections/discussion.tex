@@ -28,13 +28,17 @@ part of why this release concentrates on making it auditable rather than
 larger.
 
 Two limitations should be read alongside the results. The protonation layer is
-open-source for three quarters of compounds but not for the highly-connected
-polyprotic metabolites, so 95\% of scored reactions still depend on a
-ChemAxon-derived ladder; removing that dependency requires macroscopic pKa
+no longer open-source at all. Every ladder behind the shipped energies comes
+from one licensed tool, and that is a deliberate exchange: ladders drawn from
+different models do not cancel across a reaction, so mixing them to raise
+coverage introduces an error that no single compound's record reveals. We chose
+internal consistency and disclosed the cost rather than the reverse. The choice
+is auditable and reversible --- the open predictions ship for every compound
+with a structure --- but closing the gap properly needs measured macroscopic
 ladders for compounds no published compilation covers, the nicotinamide
-cofactors chief among them. And 25,060 reactions still have no direction call
-from thermodynamics at all. Neither gap is closed by better prediction: both
-need measurements or curation.
+cofactors chief among them. And 25,855 reactions still receive no direction from
+any source. Neither gap is closed by better prediction: both need measurements
+or curation.
 
 The database is a substrate rather than a product, and this version is designed
 to make the uncertainty in it visible rather than tidy.

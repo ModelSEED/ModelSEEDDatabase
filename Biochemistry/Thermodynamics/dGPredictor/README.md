@@ -31,8 +31,8 @@ are unaffected. **Filter on `err`, not on `coverage`** — see below for why.
 
 ## Why the model was retrained
 
-The predecessor `dGPredictor-ModelSEED` record, added Aug 2026, was
-systematically broken: median dG_uncer 88.6 kJ/mol overall and 259.5 for
+The predecessor record, added Aug 2026 and since retired, was systematically
+broken: median dG_uncer 88.6 kJ/mol overall and 259.5 for
 quinones, 44.5% of predictions past 100 kJ/mol, worst error 8,531 kJ/mol.
 
 The cause was **RDKit canonicalization drift**. The Wang lab shipped a fragment

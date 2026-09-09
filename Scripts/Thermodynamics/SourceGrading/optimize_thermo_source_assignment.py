@@ -27,7 +27,7 @@ to ModelSEED reactions by the SMILES->InChIKey multiset pipeline in
 ``stereo_exact`` -- the tier that distinguishes anomers and D/L pairs, and the
 only tier used for fitting here).
 
-On that reference, median |error| is eQuilibrator 0.45, dGPredictor-ModelSEED
+On that reference, median |error| is eQuilibrator 0.45, dGPredictor
 0.47, Group Contribution 1.60 kcal/mol -- so no source dominates and the
 assignment is worth making.
 
@@ -54,7 +54,7 @@ baselines including the incumbent -- dev's
 Promote_Reaction_Thermodynamics_to_Canonical.py priority, eQuilibrator then
 Group Contribution then the ML tier, lowest reported error within a tier.
 
-OUTPUTS (results/eq_vs_dgpms/)
+OUTPUTS (results/eq_vs_dgp/)
     source_assignment.tsv        per reaction: chosen source, merged dG, ehat
     source_assignment_frontier.tsv   coverage vs error tolerance
     source_assignment_models.json    fitted calibration + validation
@@ -96,23 +96,23 @@ from organic_reaction_types import QUINONE_RE  # noqa: E402
 
 # NOTE: the earlier snapshot /scratch/ctaylor/tmp/devsnap (dev @ 34992d39) was
 # deleted 2026-08-12. devsnap2 is dev @ 49563c6f: eQuilibrator and
-# dGPredictor-ModelSEED are byte-identical to it, Group Contribution is the
+# dGPredictor are byte-identical to it, Group Contribution is the
 # Convention A rebuild (ad34d6ab) -- 53% of values changed, coverage +1,501.
 # Re-running with these defaults therefore refits GC against Convention A and
-# would overwrite results/eq_vs_dgpms/, which was fitted on the OLD GC and is
+# would overwrite results/eq_vs_dgp/, which was fitted on the OLD GC and is
 # what EQUILIBRATOR_VS_DGPREDICTOR_MODELSEED.md quotes. The Convention A refit
-# already exists as results/eq_vs_dgpms_gcA/ -- set EQDGP_OUT to keep them apart.
+# already exists as results/eq_vs_dgp_gcA/ -- set EQDGP_OUT to keep them apart.
 MSDB_ROOT = MSDB_ROOT
 ANALYSIS_DIR = ANALYSIS_DIR
-OUT = Path(os.environ.get("EQDGP_OUT", str(ANALYSIS_DIR / "results" / "eq_vs_dgpms")))
+OUT = Path(os.environ.get("EQDGP_OUT", str(ANALYSIS_DIR / "results" / "eq_vs_dgp")))
 TECRDB = Path(os.environ.get(
     "TECRDB_COMPARISON",
     str(REPO_ROOT / "Biochemistry" / "Thermodynamics" / "SourceGrading"
-        / "tecrdb_vs_dgpredictor_modelseed.csv")))
+        / "tecrdb_comparison.csv")))
 BIOCHEM = MSDB_ROOT / "Biochemistry"
 
 SOURCES = {"Group contribution": "GC", "eQuilibrator": "EQ",
-           "dGPredictor-ModelSEED": "DGPMS"}
+           "dGPredictor": "DGP"}
 # dev has carried the retrained predictor under both names. Accept either, so
 # the harness is not blocked by a rename. Note the values in the current tree
 # match NEITHER the snapshot this method was calibrated on nor the original
@@ -121,8 +121,9 @@ SOURCES = {"Group contribution": "GC", "eQuilibrator": "EQ",
 # anchor supplies only the TECRDB measurement and the error models are refitted
 # against whatever the database holds, but accuracy figures quoted from the
 # original method write-up do not transfer.
-SOURCE_ALIASES = {"DGPMS": ("dGPredictor-ModelSEED", "dGPredictor")}
+SOURCE_ALIASES = {"DGP": ("dGPredictor",)}
 EQ_SENTINEL = 100.0        # kcal/mol; eQuilibrator's "no estimate" marker
+GC_SENTINEL_DG = 1.0e7     # kcal/mol; Group Contribution's "no estimate" marker
 TOLERANCE = 2.0            # kcal/mol expected error, the shipped operating point
 RNG = np.random.default_rng(20260806)
 
@@ -155,13 +156,26 @@ def load_db() -> pd.DataFrame:
                         if th.get(alt):
                             t = th[alt]
                             break
-                if t and len(t) > 2 and t[2] not in (None, "?"):
+                # ADMIT ON ENERGY VALIDITY, NOT ON THE DIRECTION OPERATOR.
+                # This tested `t[2] not in (None, "?")` until 2026-09-08, which
+                # was correct only while "?" meant "no energy". Once "?" also
+                # meant "energy fine, direction undetermined", the test silently
+                # dropped 3,310 reactions that carry a real dG -- 84% of which
+                # grade silver or gold on that dG. Grading is a statement about
+                # energy quality; a reaction can have a well-determined energy
+                # and no callable direction, and those are the reactions the
+                # grade is most useful for. Sentinels are still excluded, by
+                # value: GC marks refusal in the energy, eQuilibrator in the
+                # sigma (handled downstream via EQ_SENTINEL).
+                if t and len(t) > 1:
                     try:
-                        r[f"dg_{key}"] = float(t[0])
-                        r[f"sig_{key}"] = abs(float(t[1]))
-                        r[f"op_{key}"] = t[2]
+                        dg, sg = float(t[0]), abs(float(t[1]))
                     except (TypeError, ValueError):
-                        pass
+                        dg = None
+                    if dg is not None and dg != GC_SENTINEL_DG:
+                        r[f"dg_{key}"] = dg
+                        r[f"sig_{key}"] = sg
+                        r[f"op_{key}"] = t[2] if len(t) > 2 else None
             names = [cpd_name.get(s["compound"], "")
                      for s in (e.get("stoichiometry") or [])]
             r["is_quinone"] = int(any(QUINONE_RE.search(n) for n in names))
@@ -185,7 +199,7 @@ def load_truth(db: pd.DataFrame) -> pd.DataFrame:
 # This is its TECRDB p90, so it is the range where the gold data actually
 # constrains it -- see PROXY REFERENCE below.
 EQ_TRUSTED_SIGMA = 0.70
-DGPMS_TRUSTED_SIGMA = 1.22
+DGP_TRUSTED_SIGMA = 1.22
 
 
 def fit_error_models(train: pd.DataFrame, db: pd.DataFrame | None = None) -> dict:
@@ -198,7 +212,7 @@ def fit_error_models(train: pd.DataFrame, db: pd.DataFrame | None = None) -> dic
     exactly the LOW-sigma regime, so gold data alone cannot calibrate the range
     the model must actually work over:
 
-        dGPredictor-MS sigma   TECRDB p50 0.91, p90 1.22, max 21.6
+        dGPredictor sigma   TECRDB p50 0.91, p90 1.22, max 21.6
                                database p50 21.17, p90 52.89, max 2039
 
     75.6% of database reactions for dGPredictor (43.4% eQuilibrator, 27.8% Group
@@ -220,8 +234,8 @@ def fit_error_models(train: pd.DataFrame, db: pd.DataFrame | None = None) -> dic
     """
     from sklearn.isotonic import IsotonicRegression
     models = {}
-    proxy = {"GC": "EQ", "DGPMS": "EQ", "EQ": "DGPMS"}
-    trusted = {"EQ": EQ_TRUSTED_SIGMA, "DGPMS": DGPMS_TRUSTED_SIGMA}
+    proxy = {"GC": "EQ", "DGP": "EQ", "EQ": "DGP"}
+    trusted = {"EQ": EQ_TRUSTED_SIGMA, "DGP": DGP_TRUSTED_SIGMA}
     for k in SOURCES.values():
         m = train[f"dg_{k}"].notna() & train[f"sig_{k}"].notna()
         if k == "EQ":
@@ -239,7 +253,7 @@ def fit_error_models(train: pd.DataFrame, db: pd.DataFrame | None = None) -> dic
                   & db[f"dg_{ref}"].notna() & (db[f"sig_{ref}"] <= trusted[ref]))
             if k == "EQ":
                 ok &= db[f"sig_{k}"] <= EQ_SENTINEL
-            if k == "DGPMS":
+            if k == "DGP":
                 ok &= db["is_quinone"] == 0      # excluded by override anyway
             sv = db[ok]
             n_silver = len(sv)
@@ -281,7 +295,7 @@ def predict_error(db: pd.DataFrame, models: dict) -> pd.DataFrame:
         # hard overrides: failures a sigma-only model cannot see
         if k == "EQ":
             e[db[f"sig_{k}"] > EQ_SENTINEL] = np.nan          # source disclaims it
-        if k == "DGPMS":
+        if k == "DGP":
             e[db["is_quinone"] == 1] = np.nan                  # section 2
         out[f"ehat_{k}"] = e
     return out
@@ -314,7 +328,7 @@ def baseline_priority(db: pd.DataFrame) -> np.ndarray:
     """dev's Promote_Reaction_Thermodynamics_to_Canonical.py policy: the
     mechanistic tier first, lowest reported error within a tier."""
     out = np.full(len(db), None, dtype=object)
-    for tier in (["EQ", "GC"], ["DGPMS"]):
+    for tier in (["EQ", "GC"], ["DGP"]):
         avail = {k: db[f"dg_{k}"].notna().to_numpy() for k in tier}
         sig = {k: db[f"sig_{k}"].to_numpy(float) for k in tier}
         for i in range(len(db)):
@@ -369,7 +383,7 @@ def main() -> None:
         "assignment (this script)": asg["chosen_source"].to_numpy(),
         "always eQuilibrator": np.where(te["dg_EQ"].notna()
                                         & (te["sig_EQ"] <= EQ_SENTINEL), "EQ", None),
-        "always dGPredictor-MS": np.where(te["dg_DGPMS"].notna(), "DGPMS", None),
+        "always dGPredictor": np.where(te["dg_DGP"].notna(), "DGP", None),
         "always Group contribution": np.where(te["dg_GC"].notna(), "GC", None),
         "dev priority (EQ>GC, then ML)": baseline_priority(te),
     }

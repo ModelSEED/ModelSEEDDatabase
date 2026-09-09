@@ -1,14 +1,14 @@
-# Regenerable by-products of grade_thermo_sources.py, untracked 2026-09-06.
+# Regenerable by-products of grade_thermo_sources.py.
 #
-# source_grades.tsv IS shipped: sections/data_availability.tex commits to
-# publishing the evidence grades, and that long form is the release. These two
-# are derived from the same run -- _wide is a pivot of the long form, _heldout
-# a re-scored variant -- and together cost 16 MB for no information the
-# canonical table does not already carry.
+# WHAT SHIPS: results/thermo_grades/reaction_grades.tsv -- ONE ROW PER REACTION,
+# one grade column. That is the unit the scheme grades: a reaction is graded on
+# its collective evidence, so the release must not also carry a per-source
+# verdict the scheme does not make. Flipped 2026-09-08; source_grades.tsv (the
+# long per-source form) was previously the released table and is now internal.
 #
-# Regenerate both with:  python3 Scripts/Thermodynamics/SourceGrading/grade_thermo_sources.py
-# Note task #55 (the graded-against-experiment circularity check) will want
-# _heldout; regenerate it there rather than assuming it is present.
+# Regenerate all of them with:
+#   python3 Scripts/Thermodynamics/SourceGrading/grade_thermo_sources.py --cv
+results/thermo_grades/source_grades.tsv
 results/thermo_grades/source_grades_wide.tsv
 results/thermo_grades/source_grades_heldout.tsv
 

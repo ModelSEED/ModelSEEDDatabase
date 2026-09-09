@@ -61,7 +61,7 @@ These per-source records sit **next to** the canonical top-level
 > **The canonical fields are being retired** in favour of this dict. They are
 > currently stale with respect to every source beneath them: derived before the
 > 2026-08 eQuilibrator regeneration and dGPredictor retrain, and some promoted
-> from `dGPredictor-ModelSEED`, which no longer exists.
+> from a predecessor source that has since been retired.
 > `Promote_Reaction_Thermodynamics_to_Canonical.py` never overwrites an existing
 > canonical value, so re-running it does not repair them.
 
@@ -238,21 +238,22 @@ change that; it just makes the untrustworthiness measurable.
 
 ### Applying the index to dGPredictor
 
-`SOURCE_HEURISTIC_SET` now routes `dGPredictor` and `dGPredictor-ModelSEED` to
-`DGP_HEURISTICS` (`make_ri_heuristics(z=1.0, sigma_gate=None)`) instead of
-letting them fall through to the GC concentration bounds. Neither source has a
-"could not decompose" marker, so there is no sentinel to gate on; the one-sigma
-margin is kept because silent extrapolation, not a loud refusal, is how these
-models fail.
+`SOURCE_HEURISTIC_SET` routes `dGPredictor` to the same rule set as
+eQuilibrator: `make_ri_heuristics(z=1.0, sigma_gate=EQ_UNDECOMPOSABLE_SIGMA)`,
+rather than letting it fall through to the GC concentration bounds. dGPredictor
+has no "could not decompose" marker, so the sigma gate never fires for it (its
+largest sigma is 1,427.33 against a 2,500 cut) and is carried only as a
+tripwire; the one-sigma margin is kept because silent extrapolation, not a loud
+refusal, is how the model fails.
 
-The margin lands very differently on the two, and that is the point:
+Measured 2026-09-08 on the shipped `Biochemistry/reaction_*.json`:
 
-| source | σ median | σ max | `=` from the margin | vs GC operators |
-|---|---:|---:|---:|---|
-| `dGPredictor` | 0.35 | 6.10 | 784 / 27,715 | 2,816 re-scored |
-| `dGPredictor-ModelSEED` | 21.17 | 2,039.14 | 19,512 / 31,924 | — |
+| source | σ median | σ max | `?` from the margin |
+|---|---:|---:|---:|
+| `eQuilibrator` | 0.63 | 861,955.72 | 4,635 / 25,175 |
+| `dGPredictor` | 17.01 | 1,427.33 | 18,657 / 29,617 |
 
-Use the `RI` rule set (z = 0, the index exactly as published) to see the
+Build the set directly with `make_ri_heuristics(z=0.0)` to see the
 point-estimate answer for either source.
 
 ### Comparing rule sets on one set of energies

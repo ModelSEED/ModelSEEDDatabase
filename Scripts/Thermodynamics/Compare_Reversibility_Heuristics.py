@@ -18,11 +18,9 @@ Transport reactions are ordinary reactions here. The GC and EQ sets contain
 structural shortcuts that fire on them before any energy is read, and those
 shortcuts are reported as their own rows -- one of the things worth seeing is
 how often the shortcut, not the thermodynamics, is what produced the answer.
-The ``RI`` set has no shortcuts at all and serves as the control.
 
 Usage:
     ./Compare_Reversibility_Heuristics.py                       # eQuilibrator: GC vs EQ
-    ./Compare_Reversibility_Heuristics.py --sets GC EQ EQ2 RI
     ./Compare_Reversibility_Heuristics.py --source dGPredictor --sets GC DGP
     ./Compare_Reversibility_Heuristics.py --tsv out.tsv
 """
@@ -141,10 +139,10 @@ def print_transport_split(rows, left, right):
 
 
 ALL_SOURCES = ['Group contribution', 'eQuilibrator',
-               'dGPredictor', 'dGPredictor-ModelSEED']
+               'dGPredictor']
 
 SHORT_NAME = {'Group contribution': 'GroupContrib', 'eQuilibrator': 'eQuilibrator',
-              'dGPredictor': 'dGPredictor', 'dGPredictor-ModelSEED': 'dGP-ModelSEED'}
+              'dGPredictor': 'dGPredictor'}
 
 
 def score_all_sources(reactions, set_for_source):
@@ -282,7 +280,7 @@ def main():
                         help='sources for --matrix (default: all four)')
     parser.add_argument('--index-sources', nargs='+',
                         default=['eQuilibrator', 'dGPredictor',
-                                 'dGPredictor-ModelSEED'],
+
                         help='in --matrix, the sources that take the second and '
                              'later --sets rule sets. Everything else keeps the '
                              'first one, so Group contribution stays on the '

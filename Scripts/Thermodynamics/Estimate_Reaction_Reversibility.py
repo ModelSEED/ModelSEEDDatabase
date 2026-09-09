@@ -10,10 +10,8 @@ way.
     ./Estimate_Reaction_Reversibility.py            # top-level deltag, GC rules
     ./Estimate_Reaction_Reversibility.py GC         # Group contribution, GC rules
     ./Estimate_Reaction_Reversibility.py EQ         # eQuilibrator, EQ rules
-    ./Estimate_Reaction_Reversibility.py EQ --heuristics EQ2   # eQuilibrator 2.0 rules
     ./Estimate_Reaction_Reversibility.py EQ --heuristics GC    # old behaviour
     ./Estimate_Reaction_Reversibility.py DGP        # dGPredictor, reversibility index
-    ./Estimate_Reaction_Reversibility.py DGPM       # dGPredictor-ModelSEED, ditto
 
 ``GC`` is the default rule set: it is what every level other than ``EQ``
 selects, and what any unrecognised source falls back to. The GC cascade itself
@@ -48,7 +46,7 @@ from BiochemPy import Reactions
 # (Update_Reaction_dGPredictor_Energies.py, _thermo_helpers, the tests).
 from reversibility_heuristics import (
     # constants
-    TEMPERATURE, GAS_CONSTANT, RT_CONST, FARADAY, SENTINEL_DG,
+    TEMPERATURE, GAS_CONSTANT, RT_CONST, FARADAY,
     CELL_MAX, CELL_MIN, CELL_CONC, PROTON, WATER, CO2, PROTON_WATER,
     LOW_LOCAL_CONC, ATPS_REAGENTS, ATP, PHOSPHATE_IDS, LOW_ENERGY_CPDS,
     DB_LEVEL_LABEL, DB_LEVEL_NOTE, DB_LEVEL_PRIORITY,
@@ -63,9 +61,10 @@ from reversibility_heuristics import (
     mmdeltag_band_heuristic, low_energy_heuristic, default_heuristic,
     make_ln_reversibility_index_heuristic,
     # source-specific rule sets
-    GC_HEURISTICS, EQ_HEURISTICS, EQ2_HEURISTICS,
-    RI_HEURISTICS, DGP_HEURISTICS, make_ri_heuristics, HEURISTIC_SETS,
+    GC_HEURISTICS, EQ_HEURISTICS,
+    DGP_HEURISTICS, make_ri_heuristics, HEURISTIC_SETS,
     DEFAULT_HEURISTIC_SET, get_heuristics, heuristics_for_source,
+    heuristic_set_for_source,
     energy_source_for_level,
 )
 
@@ -139,8 +138,14 @@ def reversibility_from_energy(rxn_entry, rxn_dg, rxn_dge, source=None):
         return '?'
     if dg != dg:  # NaN
         return '?'
-    if dg == SENTINEL_DG:
-        return '?'
+
+    # NO SENTINEL CHECK HERE, DELIBERATELY. Both "no estimate" markers -- Group
+    # Contribution's dg = 1e7 and eQuilibrator's ~1e5 kJ/mol sigma -- are the
+    # first rule of every cascade (make_sentinel_heuristic). They were once
+    # tested here as well, which is how they came to drift apart in the first
+    # place: two copies at two depths, one of which some entry points skipped.
+    # Verified dead 2026-09-08 -- disabling both copies here changed 0 of
+    # 110,794 per-source decisions. The cascade is the only owner.
 
     if isinstance(rxn_dge, bool) or rxn_dge is None:
         dge = 0.0
@@ -177,7 +182,7 @@ def _write_report(db_level, report):
 # ---------------------------------------------------------------------------
 # Main
 # ---------------------------------------------------------------------------
-DB_LEVELS = ('EQ', 'GC', 'DGP', 'DGPM')
+DB_LEVELS = ('EQ', 'GC', 'DGP')
 
 
 def _build_parser():

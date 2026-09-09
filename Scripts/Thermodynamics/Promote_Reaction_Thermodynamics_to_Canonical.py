@@ -17,7 +17,7 @@ deltag are left untouched.
 
 Selection policy: prefer the mechanistic, experimentally-anchored tier
 (eQuilibrator, then Group Contribution) over the machine-learning tier
-(dGPredictor-ModelSEED, dGPredictor); WITHIN the chosen tier take the estimate
+(dGPredictor); WITHIN the chosen tier take the estimate
 with the smallest reported uncertainty (ties broken by the listed order). The
 within-tier lowest-error rule matters: it stops a wildly-uncertain ML outlier
 (e.g. -100 +/- 71 kcal/mol) from being promoted over a tight prediction
@@ -51,7 +51,7 @@ MAX_ERR = 100.0       # kcal/mol; reject uselessly-uncertain estimates
 # (the per-tier list order is only a tie-breaker).
 TIERS = [
     ["eQuilibrator", "Group contribution"],          # mechanistic / measurement-anchored
-    ["dGPredictor-ModelSEED", "dGPredictor"],         # machine-learning predictors
+    ["dGPredictor"],                                  # machine-learning predictors
 ]
 
 

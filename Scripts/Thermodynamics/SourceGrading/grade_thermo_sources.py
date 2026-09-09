@@ -16,7 +16,7 @@ Four sources are graded:
                             measurement may have been attached to the wrong
                             reaction. --tecrdb-skeleton-gold disables that.
     eQuilibrator            \
-    dGPredictor-ModelSEED    > graded by the cascade below
+    dGPredictor    > graded by the cascade below
     Group contribution      /
 
 WHAT GRADES A PREDICTOR
@@ -24,7 +24,7 @@ WHAT GRADES A PREDICTOR
 1. ``p_ok = P(|dG_s - dG*| <= tau | sigma_s)``, tau = 2.0 kcal/mol -- the
    reversible band the direction cascade itself uses
    (reversibility_heuristics.py mmdeltag_band_heuristic). Fitted per source by
-   isotonic regression on the same two-tier data as ehat (anchor = 802 TECRDB
+   isotonic regression on the same two-tier data as ehat (anchor = 797 TECRDB
    stereo-exact matches, weight 3; proxy = |source - trusted-sigma reference|,
    weight 1), but on the INDICATOR rather than the magnitude.
 
@@ -32,7 +32,7 @@ WHAT GRADES A PREDICTOR
    actual error), and on the Convention A Group Contribution rebuild it spans
    only 3.04-5.70 kcal/mol across the whole database -- a flat curve that
    cannot rank anything. A probability is also comparable across sources,
-   which raw sigma is not (GC overstates its error 2.2x, dGPredictor-MS 1.5x,
+   which raw sigma is not (GC overstates its error 2.2x, dGPredictor 1.5x,
    eQuilibrator understates 1.6x).
 
 2. Direct measurement against TECRDB where it exists -- per source, so the
@@ -82,23 +82,26 @@ from optimize_thermo_source_assignment import (  # noqa: E402
     ANALYSIS_DIR, EQ_SENTINEL, SOURCES, fit_error_models, load_db, predict_error,
 )
 
-K = ["GC", "EQ", "DGPMS"]
+K = ["GC", "EQ", "DGP"]
 LABEL = {"GC": "Group contribution", "EQ": "eQuilibrator",
-         "DGPMS": "dGPredictor-ModelSEED", "TECRDB": "TECRDB"}
+         "DGP": "dGPredictor", "TECRDB": "TECRDB"}
 OUT = Path(os.environ.get("GRADES_OUT", str(ANALYSIS_DIR / "results" / "thermo_grades")))
 TECRDB_CSV = Path(os.environ.get(
     "TECRDB_COMPARISON",
     str(REPO_ROOT / "Biochemistry" / "Thermodynamics" / "SourceGrading"
-        / "tecrdb_vs_dgpredictor_modelseed.csv")))
-RECONCILIATION = ANALYSIS_DIR / "results" / "eq_vs_dgpms" / "reconciliation.tsv"
+        / "tecrdb_comparison.csv")))
+RECONCILIATION = ANALYSIS_DIR / "results" / "eq_vs_dgp" / "reconciliation.tsv"
 
 TAU = 2.0            # kcal/mol -- the cascade's reversible half-band
 P_GOLD = 0.90        # p_ok at or above this is self-certain
 P_SILVER = 0.70
-R_CORROB = 1.5       # Birge ratio at or below which sources corroborate
-Z_CORROB = 1.0
-R_OUTVOTE = 2.0      # Birge ratio above which the set is discrepant...
-Z_OUTVOTE = 3.0      # ...and a source this far out is the one to blame
+# ONE PAIR OF THRESHOLDS, used in both directions (simplified 2026-09-08 from
+# four: R_OUTVOTE=2.0 / Z_OUTVOTE=3.0 were a separate, laxer pair). Sources
+# corroborate at or below them and are outvoted above them. The asymmetry
+# between agreement and disagreement lives in the EFFECT -- agreement only
+# lifts bronze to silver, disagreement costs a tier -- not in the numbers.
+R_CORROB = R_OUTVOTE = 2.0    # Birge ratio: scatter vs the reported error bars
+Z_CORROB = Z_OUTVOTE = 2.0    # a source's residual in its own calibrated sigmas
 MEAS_GOLD = 1.0      # |dG_s - experiment| kcal/mol
 MEAS_SILVER = 3.0
 EHAT_FLOOR = 0.3     # kcal/mol; keeps 1/ehat^2 weights finite
@@ -147,9 +150,9 @@ def fit_p_ok(train: pd.DataFrame, db: pd.DataFrame, tau: float = TAU) -> dict:
     """
     from sklearn.isotonic import IsotonicRegression
     from optimize_thermo_source_assignment import (
-        EQ_TRUSTED_SIGMA, DGPMS_TRUSTED_SIGMA)
-    proxy = {"GC": "EQ", "DGPMS": "EQ", "EQ": "DGPMS"}
-    trusted = {"EQ": EQ_TRUSTED_SIGMA, "DGPMS": DGPMS_TRUSTED_SIGMA}
+        EQ_TRUSTED_SIGMA, DGP_TRUSTED_SIGMA)
+    proxy = {"GC": "EQ", "DGP": "EQ", "EQ": "DGP"}
+    trusted = {"EQ": EQ_TRUSTED_SIGMA, "DGP": DGP_TRUSTED_SIGMA}
     models = {}
     for k in K:
         m = train[f"dg_{k}"].notna() & train[f"sig_{k}"].notna()
@@ -166,7 +169,7 @@ def fit_p_ok(train: pd.DataFrame, db: pd.DataFrame, tau: float = TAU) -> dict:
               & db[f"dg_{ref}"].notna() & (db[f"sig_{ref}"] <= trusted[ref]))
         if k == "EQ":
             ok &= db[f"sig_{k}"] <= EQ_SENTINEL
-        if k == "DGPMS":
+        if k == "DGP":
             ok &= db["is_quinone"] == 0
         sv = db[ok]
         n_silver = len(sv)
@@ -194,7 +197,7 @@ def predict_p_ok(db: pd.DataFrame, models: dict, veto_eq: set) -> pd.DataFrame:
         if k == "EQ":
             p[db["sig_EQ"] > EQ_SENTINEL] = np.nan       # source disclaims it
             p[db["rxn"].isin(veto_eq)] = np.nan          # MetaNetX collision
-        if k == "DGPMS":
+        if k == "DGP":
             p[db["is_quinone"] == 1] = np.nan            # 52.8% sign-wrong
         out[f"p_{k}"] = p
     return out
@@ -238,29 +241,70 @@ def grade_predictors(db, p_ok, fus, tec, disable_measured=False):
     """The cascade, applied independently per source. Returns (grades, reasons)."""
     grades, reasons = {}, {}
     meas_ok = tec["match_tier"].eq("stereo_exact") if "match_tier" in tec else pd.Series(False, index=db.index)
-    corrob = (fus.n_src >= 2) & (~fus.struct_zero) & (fus.birge <= R_CORROB)
+    # struct_zero NO LONGER excluded (2026-09-08). It was, on the reasoning that
+    # agreement forced by the stoichiometry is not earned. But the grade is a
+    # claim about whether the VALUE is right, not about evidential independence,
+    # and against the anchors these are the most accurate reactions in the set:
+    # near-zero 100% within 2 kcal/mol (n=132), transport 95% (n=75), everything
+    # else 79% (n=2,183). Transport is flagged separately in the database, so a
+    # reader can still see why such a reaction agrees.
+    corrob = (fus.n_src >= 2) & (fus.birge <= R_CORROB)
     outvote = (fus.n_src >= 2) & (fus.birge > R_OUTVOTE)
 
     for k in K:
         p = p_ok[f"p_{k}"]
         z = fus[f"z_{k}"]
+        # EVERY REASON IS <self-assessment>-<cross-source verdict>, composed
+        # rather than ad hoc, so the label always says both what the source
+        # claimed and what the other sources made of it. Nothing here describes
+        # a grade the reaction briefly held: the two halves are evaluated
+        # together and only the final grade is written.
+        #
+        #   self-assessment   self-certain    p_ok >= 0.90
+        #                     self-confident  p_ok >= 0.70
+        #                     unconfident     below that
+        #   cross-source      corroborated    agrees within R and z
+        #                     outvoted        disagrees beyond both
+        #                     uncorroborated  no usable cross-check -- a lone
+        #                                     source, a structural zero, or a
+        #                                     case falling between the two
+        conf = pd.Series("unconfident", index=db.index)
+        conf[p >= P_SILVER] = "self-confident"
+        conf[p >= P_GOLD] = "self-certain"
+
+        # FOUR cross-source verdicts, or none. "uncorroborated" was retired
+        # 2026-09-08: it was a residual bucket collecting four unrelated
+        # situations, so the name told a reader nothing.
+        #   corroborated  agrees within R and z
+        #   outvoted      disagrees beyond both
+        #   unpaired      only one source; no cross-check is possible
+        #   (none)        a check ran and resolved neither way -- the set is
+        #                 discrepant but this source is not the outlier, or the
+        #                 reverse. It neither helps nor penalises, so the label
+        #                 is simply the self-assessment.
+        is_corrob = corrob & (z <= Z_CORROB)
+        is_outvote = outvote & (z > Z_OUTVOTE)
+        is_unpaired = fus.n_src < 2
+        cross = pd.Series("", index=db.index)
+        cross[is_corrob] = "corroborated"
+        cross[is_outvote] = "outvoted"
+        cross[is_unpaired] = "unpaired"
+
         g = pd.Series(BRONZE, index=db.index)
-        r = pd.Series("uncorroborated", index=db.index)
-
-        # 2. base grade from the source's own calibrated confidence
-        sel = p >= P_SILVER
-        g[sel], r[sel] = SILVER, "self-confident"
-        sel = p >= P_GOLD
-        g[sel], r[sel] = GOLD, "self-certain"
-
-        # 3. corroboration is a FLOOR, never a promotion to gold
-        sel = corrob & (z <= Z_CORROB) & (g == BRONZE)
-        g[sel], r[sel] = SILVER, "corroborated"
-
-        # 4. being the outlier in a discrepant set costs one tier
-        sel = outvote & (z > Z_OUTVOTE)
-        g[sel] = np.minimum(g[sel] + 1, BRONZE)
-        r[sel] = "outvoted"
+        g[p >= P_SILVER] = SILVER
+        g[p >= P_GOLD] = GOLD
+        # corroboration is a FLOOR, never a promotion to gold
+        g[is_corrob & (g == BRONZE)] = SILVER
+        # being the outlier in a discrepant set costs one tier
+        g[is_outvote] = np.minimum(g[is_outvote] + 1, BRONZE)
+        # A LONE SOURCE CAPS AT SILVER. Gold requires either a measurement or a
+        # confident source that survived a cross-check; a source nobody could
+        # check has not cleared that bar. Not a demotion -- "unchecked" is not
+        # "contradicted" -- so it stops at silver rather than dropping a tier.
+        # No unpaired reaction carries a TECRDB anchor (0 of 6,089), so their
+        # p_ok is an extrapolation from reactions that all had 2-3 sources.
+        g[is_unpaired & (g == GOLD)] = SILVER
+        r = conf.where(cross == "", conf.str.cat(cross, sep="-"))
 
         # 1. measurement overrides everything (applied last so it wins)
         if not disable_measured:
@@ -278,13 +322,23 @@ def grade_predictors(db, p_ok, fus, tec, disable_measured=False):
 
 
 def grade_tecrdb(tec: pd.DataFrame, skeleton_gold: bool) -> tuple:
+    """Grade the experimental source itself. STEREO-EXACT MATCHES ONLY.
+
+    A skeleton match agrees on connectivity but not stereochemistry, so the
+    measurement may belong to a different anomer. Such matches were graded
+    SILVER until 2026-09-08; they are now not graded at all. A measurement that
+    might not be this reaction's is not weak evidence about this reaction, it is
+    evidence about a different one, and a tier implies a claim we cannot make.
+    They remain in tecrdb_comparison.csv for inspection.
+
+    This never affected the predictors: their measurement override has always
+    been gated on stereo_exact (see meas_ok), so a skeleton match could not
+    promote or demote a predicted value.
+    """
     g = pd.Series(np.nan, index=tec.index)
     r = pd.Series("ungraded", index=tec.index)
-    have = tec["tecrdb_dg"].notna()
+    have = tec["tecrdb_dg"].notna() & tec["match_tier"].eq("stereo_exact")
     g[have], r[have] = GOLD, "measured"
-    if not skeleton_gold:
-        skel = have & tec["match_tier"].eq("skeleton")
-        g[skel], r[skel] = SILVER, "measured (skeleton match)"
     return g, r
 
 
@@ -292,12 +346,12 @@ def grade_tecrdb(tec: pd.DataFrame, skeleton_gold: bool) -> tuple:
 def validate(db, p_ok, fus, tec) -> list:
     """Regrade with the measurement override OFF, then score against it.
 
-    IN-SAMPLE with respect to the calibration: the curves were fitted on all 802
-    anchors and this scores those same 802. Disabling the measurement override
+    IN-SAMPLE with respect to the calibration: the curves were fitted on all 797
+    anchors and this scores those same 797. Disabling the measurement override
     removes the *direct* use of the label, not the indirect one. Use
     ``validate_cv`` for the leak-free number; the two agree to 0.04 kcal/mol
     (§ the docs), because the anchor is only 19-37% of the fitting weight and
-    isotonic pooling makes one point out of 802 nearly invisible.
+    isotonic pooling makes one point out of 797 nearly invisible.
     """
     grades, _ = grade_predictors(db, p_ok, fus, tec, disable_measured=True)
     m0 = tec["match_tier"].eq("stereo_exact")
@@ -323,7 +377,7 @@ def validate_cv(db, tec, veto_eq, n_folds: int = 5, n_reps: int = 4,
                 seed: int = 11) -> list:
     """Leak-free validation: refit the calibration on each training fold.
 
-    ``validate`` scores the same 802 anchors the curves were fitted on. Here the
+    ``validate`` scores the same 797 anchors the curves were fitted on. Here the
     anchors are split into folds; for each fold the magnitude and probability
     curves are refitted on the *other* folds only, test reactions are also kept
     out of the proxy tier (matching the guard in
@@ -448,9 +502,28 @@ def build(skeleton_gold: bool = False, heldout: bool = False) -> tuple:
         wide[f"grade_{k}"] = grades[k].map(NAME)
     wide["dg_TECRDB"] = tec.tecrdb_dg
     wide["grade_TECRDB"] = tg.map(NAME)
+    # TIE-BREAK BY PRECEDENCE, NOT COLUMN ORDER. 68% of graded reactions have
+    # more than one source at the best grade, and idxmin() returns the first
+    # COLUMN -- which put Group Contribution ahead of eQuilibrator, naming the
+    # legacy source on 19,433 reactions where a better one was equally graded.
+    # Order here is the recommendation precedence: measurement, then
+    # eQuilibrator, then dGPredictor, then GC last.
+    PRECEDENCE = ["TECRDB", "EQ", "DGP", "GC"]
     ranks = pd.concat([tg.rename("TECRDB")] + [grades[k].rename(k) for k in K], axis=1)
+    ranks = ranks[[c for c in PRECEDENCE if c in ranks.columns]]
     wide["best_grade"] = ranks.min(axis=1).map(NAME)
     wide["best_source"] = ranks.idxmin(axis=1).where(ranks.notna().any(axis=1))
+
+    # THE SHIPPED GRADE IS PER REACTION, NOT PER SOURCE (2026-09-08). The
+    # per-source grade columns are dropped from the release table: a reaction is
+    # graded on its collective evidence, and publishing "eQuilibrator says GOLD,
+    # Group Contribution says BRONZE" beside that invites readers to re-derive a
+    # per-source verdict the scheme does not make. The per-source ENERGIES stay,
+    # since publishing every source's number is the point of the release; only
+    # the grades collapse to one column. source_grades.tsv keeps the long
+    # per-source form for internal use and is no longer released.
+    release = wide.drop(columns=[f"grade_{k}" for k in K] + ["grade_TECRDB"])
+    release.to_csv(OUT / "reaction_grades.tsv", sep="\t", index=False)
     calib = {"tau": TAU, "thresholds": {"p_gold": P_GOLD, "p_silver": P_SILVER,
                                         "r_corrob": R_CORROB, "z_corrob": Z_CORROB,
                                         "r_outvote": R_OUTVOTE, "z_outvote": Z_OUTVOTE,
@@ -460,10 +533,10 @@ def build(skeleton_gold: bool = False, heldout: bool = False) -> tuple:
              "p_ok_models": pmods, "validation": val,
              "vetoes": {"eq_sentinel": int((db.sig_EQ > EQ_SENTINEL).sum()),
                         "eq_mnx_collision": len(veto_eq),
-                        "dgpms_quinone": int(((db.is_quinone == 1) & db.dg_DGPMS.notna()).sum())}}
+                        "dgp_quinone": int(((db.is_quinone == 1) & db.dg_DGP.notna()).sum())}}
     calib["validation_note"] = (
         "validation[] is IN-SAMPLE w.r.t. the calibration: the curves were fitted "
-        "on all 802 anchors and this scores those same 802, with only the "
+        "on all 797 anchors and this scores those same 797, with only the "
         "measurement override disabled. validation_cv[], when present, refits per "
         "fold and is leak-free.")
     return long, wide, calib, (db, tec, veto_eq)
@@ -482,7 +555,7 @@ def frontier(long: pd.DataFrame) -> pd.DataFrame:
 def main() -> None:
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("--tecrdb-skeleton-gold", action="store_true",
-                    help="grade skeleton-tier TECRDB matches GOLD instead of SILVER")
+                    help=argparse.SUPPRESS)   # retired: skeleton matches are not graded
     ap.add_argument("--cv", action="store_true",
                     help="also run the leak-free cross-validated validation "
                          "(refits the calibration per fold; several minutes)")
@@ -493,7 +566,7 @@ def main() -> None:
 
     print("\n=== grades ===")
     tab = pd.crosstab(long.source, long.grade).reindex(
-        index=[LABEL["TECRDB"], LABEL["EQ"], LABEL["DGPMS"], LABEL["GC"]],
+        index=[LABEL["TECRDB"], LABEL["EQ"], LABEL["DGP"], LABEL["GC"]],
         columns=["GOLD", "SILVER", "BRONZE"]).fillna(0).astype(int)
     print(tab.to_string())
     print("\nper reaction:")

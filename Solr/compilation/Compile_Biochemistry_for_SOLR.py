@@ -109,6 +109,27 @@ def sources_agree_direction(thermo):
 
 # --- Compound compilation ----------------------------------------------------
 
+def _pka_numbers(values):
+    """Bare floats out of the pKa encoding, order preserved.
+
+    A value is "<fragment>:<value>", and a compound's whole ladder arrives as
+    one SEMICOLON-JOINED string -- MolGpKa routinely packs five sites into a
+    single field. Splitting only on ":" returned the last site and silently
+    dropped the rest, so split on ";" first.
+    """
+    out = []
+    for v in values:
+        for part in str(v).split(';'):
+            part = part.strip()
+            if not part:
+                continue
+            try:
+                out.append(float(part.rsplit(':', 1)[-1] if ':' in part else part))
+            except ValueError:
+                continue
+    return out
+
+
 def build_compound_doc(cpd):
     """Return a Solr-ready compound doc (parent + nested children)."""
     doc = {}
@@ -183,6 +204,7 @@ def build_compound_doc(cpd):
     if thermo_children:
         doc['thermodynamics'] = thermo_children
 
+
     pkas = cpd.get('pkas') if isinstance(cpd.get('pkas'), dict) else {}
     pkas_children = []
     for source, val in sorted(pkas.items()):
@@ -193,12 +215,24 @@ def build_compound_doc(cpd):
             'doc_type': 'pkas',
             'source_name': source,
         }
+        # `kind` distinguishes a macroscopic ladder (consecutive species differ
+        # by one proton -- what the eQuilibrator transform needs) from a
+        # microscopic per-site prediction. It was dropped before 2026-09-08,
+        # which left a consumer unable to tell the two apart.
+        if val.get('kind'):
+            child['pka_kind'] = val['kind']
         pka = val.get('pKa') or val.get('pka')
         pkb = val.get('pKb') or val.get('pkb')
         if pka is not None:
-            child['pka_value'] = [pka] if isinstance(pka, str) else list(pka)
+            raw = [pka] if isinstance(pka, str) else list(pka)
+            child['pka_value'] = raw
+            # Values ship as "<fragment>:<value>"; also emit the bare numbers so
+            # a range query works without the client parsing the encoding.
+            child['pka_number'] = _pka_numbers(raw)
         if pkb is not None:
-            child['pkb_value'] = [pkb] if isinstance(pkb, str) else list(pkb)
+            raw = [pkb] if isinstance(pkb, str) else list(pkb)
+            child['pkb_value'] = raw
+            child['pkb_number'] = _pka_numbers(raw)
         pkas_children.append(child)
     if pkas_children:
         doc['pkas'] = pkas_children
@@ -304,6 +338,20 @@ def build_reaction_doc(rxn):
         thermo_children.append(child)
     if thermo_children:
         doc['thermodynamics'] = thermo_children
+    # Evidence grade -- reaction-level, so it goes on the PARENT as flat fields
+    # (facetable without a block join) and also as a child for symmetry with the
+    # other named subdocs. Written by
+    # Scripts/Thermodynamics/Apply_Evidence_Grades_And_Recommendation.py.
+    ev = rxn.get('thermo-evidence') if isinstance(rxn.get('thermo-evidence'), dict) else {}
+    if ev:
+        doc['evidence_grade'] = ev.get('grade')
+        doc['evidence_assessment'] = ev.get('assessment')
+        doc['evidence_source'] = ev.get('source')
+        if ev.get('cross-source'):
+            doc['evidence_cross_source'] = ev['cross-source']
+        child = {'id': f"{rxn['id']}::evidence", 'doc_type': 'thermo_evidence'}
+        child.update({k.replace('-', '_'): v for k, v in ev.items()})
+        doc['thermo_evidence'] = [child]
 
     # Named subdocs — stoichiometry per participant
     stoich_children = []

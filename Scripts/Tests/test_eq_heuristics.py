@@ -130,26 +130,44 @@ def test_ln_gamma_matches_equilibrator(reactions):
 
 def test_registry():
     print('\nrule-set registry')
-    check('no name -> GC', rh.get_heuristics(None) is rh.GC_HEURISTICS)
-    check('empty db_level -> GC', rh.get_heuristics('') is rh.GC_HEURISTICS)
-    check('unknown name -> GC', rh.get_heuristics('nope') is rh.GC_HEURISTICS)
+    # get_heuristics() serves the CANONICAL top-level path, which keeps the
+    # historical "=" terminal; heuristics_for_source() serves the per-source
+    # thermodynamics field, which reports "?". Split 2026-09-08 so that changing
+    # one cannot silently change the other.
+    check('no name -> GC canonical', rh.get_heuristics(None) is rh.GC_CANONICAL_HEURISTICS)
+    check('empty db_level -> GC canonical', rh.get_heuristics('') is rh.GC_CANONICAL_HEURISTICS)
+    check('unknown name -> GC canonical', rh.get_heuristics('nope') is rh.GC_CANONICAL_HEURISTICS)
     # Both dGPredictor sources now run the reversibility index rather than
     # falling back to the GC concentration bounds.
     check('dGPredictor -> DGP',
           rh.heuristics_for_source('dGPredictor') is rh.DGP_HEURISTICS)
-    check('dGPredictor-ModelSEED -> DGP',
-          rh.heuristics_for_source('dGPredictor-ModelSEED') is rh.DGP_HEURISTICS)
+    # The retired predecessor label is now UNKNOWN and must fall back to GC
+    # like any other, not silently resolve to DGP as if the source still existed.
+    check('retired predecessor label falls back to GC',
+          rh.heuristics_for_source('dGPredictor-ModelSEED') is rh.GC_HEURISTICS)
     check('an unknown source still falls back to GC',
           rh.heuristics_for_source('Some Future Predictor') is rh.GC_HEURISTICS)
-    check('GC -> GC', rh.get_heuristics('GC') is rh.GC_HEURISTICS)
+    check('GC -> GC canonical', rh.get_heuristics('GC') is rh.GC_CANONICAL_HEURISTICS)
+    check('canonical terminal is "=", per-source terminal is "?"',
+          rh.GC_CANONICAL_HEURISTICS[-1](None)[1] == '='
+          and rh.GC_HEURISTICS[-1](None)[1] == '?')
     check('EQ -> EQ', rh.get_heuristics('EQ') is rh.EQ_HEURISTICS)
-    check('EQ2 -> EQ2', rh.get_heuristics('EQ2') is rh.EQ2_HEURISTICS)
     check('eQuilibrator source -> EQ rules',
           rh.heuristics_for_source('eQuilibrator') is rh.EQ_HEURISTICS)
     check('DEFAULT_HEURISTICS still aliases GC',
           rh.DEFAULT_HEURISTICS is rh.GC_HEURISTICS)
-    check('GC cascade order unchanged',
+    # sentinel_energy_heuristic was prepended 2026-09-08. The historical order
+    # is otherwise preserved: the new rule fires ONLY on dg == 1e7, which the
+    # outer guards already rejected on every production path, so no operator or
+    # status string on real data changes -- verified by re-running
+    # Add_Reaction_Thermodynamics_Operators.py over all 110,794 per-source
+    # entries and getting 0 refreshed. It exists because a caller reaching the
+    # cascade through explicit_energy skipped those outer guards, and the
+    # sentinel then reached stored_bounds_heuristic and came back as a
+    # confident '<' off "MdeltaG(Min): 9999994.50".
+    check('GC cascade order unchanged below the sentinel guard',
           [f.__name__ for f in rh.GC_HEURISTICS] == [
+              'sentinel_energy_heuristic',
               'atp_synthase_heuristic', 'abc_transporter_heuristic',
               'stored_bounds_heuristic', 'mmdeltag_band_heuristic',
               'low_energy_heuristic', 'default_heuristic'])
@@ -201,33 +219,66 @@ def test_eq_rules(reactions):
     abs_nu = ctx.terms['abs_nu_sum']
     dg_at_threshold = rh.LN_RI_THRESHOLD * rh.RT_CONST * abs_nu / 2.0
     status, op = run_eq(simple, dg_at_threshold, 2.0)
-    check('threshold straddled -> "=" ambiguous',
-          op == '=' and 'ambiguous' in status, status)
+    # "ambiguous" means the error bar straddles ln(1000): irreversibility cannot
+    # be ruled out in EITHER direction. That is ignorance, and since 2026-09-08 it
+    # reports "?" rather than "=", which would have been a positive claim of
+    # reversibility the error bar does not support.
+    # A straddling bar that is WIDE relative to the threshold is genuinely
+    # unknown. (A tight one is "near-threshold" and reports "=" -- see below.)
+    check('threshold straddled, wide bar -> "?" unknown',
+          op == '?' and 'unknown' in status, status)
 
-    # The same reaction, same numbers, under eQuilibrator 2.0's point estimate:
-    # no margin required, so it tips over into a directional call.
+    # Same reaction and numbers with the confidence margin switched off: no
+    # margin required, so it tips into a directional call. Constructed inline
+    # rather than from a registered rule set -- the EQ2 set was removed, but the
+    # behaviour it demonstrated (that z actually gates the call) is still worth
+    # asserting.
     status2, op2 = run_eq(simple, dg_at_threshold * 1.01, 2.0,
-                          rules=rh.EQ2_HEURISTICS)
-    check('EQ2 ignores the error bar', op2 == '<', status2)
+                          rules=rh.make_ri_heuristics(z=0.0, sigma_gate=rh.EQ_UNDECOMPOSABLE_SIGMA))
+    check('z=0 ignores the error bar', op2 == '<', status2)
 
-    # Transport without ATP or the ATPS signature -> untrusted energy.
+    # Transport without ATP or the ATPS signature is now scored as ORDINARY
+    # BIOCHEMISTRY. eq_transport_uncorrected_heuristic, which returned "?" for
+    # every is_transport reaction, was removed 2026-09-08: its
+    # compartment-collapse justification described the superseded MetaNetX
+    # retrieval and no longer applies, and the remaining one -- that the
+    # -N_H*RT*ln(10^dpH) - Q*F*dPhi term is not computed -- is now a stated
+    # caveat on the database rather than a refusal, matching how dGPredictor
+    # has always treated transport. The energy decides.
     transport = synthetic([rgt('cpd00020', -1, 0), rgt('cpd00020', 1, 1)],
                           is_transport=1)
     status, op = run_eq(transport, -20.0, 0.1)
-    check('uncorrected transport -> "?"', op == '?', status)
+    check('transport is scored on its energy, not refused',
+          op == '>' and 'lnGamma' in status, status)
 
-    # ...but the structural rules still win, ahead of both gates.
+    # ABC transporters are NO LONGER decided structurally under EQ. The rule was
+    # removed 2026-09-08: across the 1,454 reactions it had decided, the index
+    # reached the same answer for 1,414 with zero reversals, and 26 of the 40
+    # differences contained no ATP hydrolysis at all -- it keys on phosphate-count
+    # sign and had misidentified them. Under EQ the sentinel rule now sees
+    # this input -- eq_undecomposable_heuristic was folded into
+    # make_sentinel_heuristic the same day, since "sigma is the refusal marker"
+    # and "dg is the refusal marker" are one concept wearing two field names.
+    # Under GC the structural rule still fires, because that cascade is
+    # preserved as history.
     abct = synthetic([rgt('cpd00002', -1, 0), rgt('cpd00009', 1, 0),
                       rgt('cpd00020', -1, 0), rgt('cpd00020', 1, 1)],
                      is_transport=1)
     status, op = run_eq(abct, -20.0, 23900.57)
-    check('ABC transporter decided structurally, before both gates',
-          op == '>' and status.startswith('ABCT'), status)
+    check('EQ: ABC transporter no longer shortcut; the sentinel rule sees it',
+          op == '?' and status.startswith('no estimate: sigma'), status)
+    status, op = run_eq(abct, -20.0, 23900.57, rules=rh.GC_HEURISTICS)
+    check('GC: ABC transporter still decided structurally',
+          status.startswith('ABCT'), status)
 
-    # GC rules on the same undecomposable input still return the old permissive
-    # answer -- this is the behaviour the EQ set exists to replace.
+    # GC has no sigma gate -- correctly, since it writes its marker into BOTH
+    # fields and the dg == 1e7 test catches all 26,555 of them. So a sentinel-scale
+    # sigma with a REAL dg falls through GC's sigma-blind rules to its terminal,
+    # which since 2026-09-08 reports "?" rather than "=". GC still reaches that
+    # answer by exhaustion rather than by testing sigma; that gap is real and is
+    # tracked separately for mmdeltag_band and low_energy.
     status, op = run_eq(simple, -50.0, 23900.57, rules=rh.GC_HEURISTICS)
-    check('GC rules unchanged on sentinel sigma', op == '=', status)
+    check('GC terminal now reports "?" on sentinel sigma', op == '?', status)
 
     # Real reaction, checked against eQuilibrator's published ln_RI of -9.18.
     rxn00001 = reactions.get('rxn00001')

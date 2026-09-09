@@ -1,0 +1,206 @@
+%% Supplementary Material -- ModelSEED Biochemistry Database 2026 update.
+%% Separate upload: NAR takes supplementary data as its own file(s), and it does
+%% NOT count against the 4-6 typeset page budget of the main article.
+%% ("Please upload supplementary data as separate file(s)"; page budget covers
+%% "the main text, references, tables, and figures".)
+%%
+%% NUMBERING IS FIXED BY THE MAIN TEXT. Do not renumber without grepping
+%% sections/*.tex first:
+%%   S1 construction    <- methods_construction.tex
+%%   S2 structure curation, conflict taxonomy, per-round record
+%%                      <- methods_structure_curation.tex
+%%   S3 thermodynamic conditions (pH 7.0 / I 0.25 M / pMg 3.0 / 298.15 K)
+%%                      <- methods_thermodynamics.tex
+%%   S4 reaction similarity and atom mapping
+%%                      <- methods_similarity_mapping.tex
+%%   S5 evidence grading  (this file is the first section actually written)
+\documentclass[11pt]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath,graphicx,booktabs,url}
+\usepackage[colorlinks=true,allcolors=blue]{hyperref}
+\renewcommand{\thesection}{S\arabic{section}}
+\title{Supplementary Material\\
+\large The ModelSEED Biochemistry Database: 2026 update}
+\date{}
+\begin{document}
+\maketitle
+
+\section{Database construction}
+\textbf{\textcolor{red}{TBD}} --- collation, integration, provenance, transport,
+mass and charge balancing, undetermined compounds, and the release process.
+Cited from Methods, ``Database construction''.
+
+\section{Structure curation}
+\textbf{\textcolor{red}{TBD}} --- the conflict taxonomy and the per-round
+curation record. Cited from Methods, ``Structure curation''.
+
+\section{Thermodynamic conditions}
+\textbf{\textcolor{red}{TBD}} --- why pH~7.0, ionic strength 0.25\,M, pMg~3.0 and
+298.15\,K correspond to neither eQuilibrator preset, and what changes under the
+alternatives. Cited from Methods, ``Multi-source thermodynamics''.
+
+\section{Reaction similarity and atom mapping}
+\textbf{\textcolor{red}{TBD}} --- the similarity model and the atom-mapping
+salvage procedure. Cited from Methods, ``Reaction similarity and atom mapping''.
+
+\section{Evidence grading}\label{sec:s5}
+
+Every reaction carrying at least one thermodynamic estimate is graded gold,
+silver or bronze. The grade describes \emph{the reaction}, formed from the
+collective evidence available for it; the per-source machinery below exists to
+arrive at that single grade and is not itself published.
+
+\subsection{The band}
+All tests are referred to $\tau = 2.0$\,kcal\,mol$^{-1}$, the half-width of the
+reversible band used by the direction cascade. A source is ``right'' on a
+reaction if it lands within $\tau$ of the reference value.
+
+\subsection{Calibrated confidence}
+Reported uncertainties are not comparable across sources --- group contribution
+overstates its error by roughly $2.2\times$ and eQuilibrator understates by
+$1.6\times$ --- so raw $\sigma$ cannot be thresholded directly. For each source
+we instead fit
+\[
+p_{\text{ok}} \;=\; P\!\left(\left|\Delta G_s - \Delta G^{*}\right| \le \tau \;\middle|\; \sigma_s\right)
+\]
+by isotonic regression, using the experimentally anchored reactions (weight 3)
+and, where no anchor exists, the deviation from a tight-uncertainty reference
+(weight 1). A probability is comparable across sources in a way $\sigma$ is not.
+
+\subsection{Combining sources}
+To ask whether the sources agree, they are combined by precision on the
+\emph{calibrated} error scale $\hat{e}_s$ (floored at 0.3\,kcal\,mol$^{-1}$ so
+the weights stay finite), $w_s = 1/\hat{e}_s^{2}$:
+\[
+\Delta G_{\text{fused}} = \frac{\sum_s w_s \Delta G_s}{\sum_s w_s},
+\qquad
+\chi^{2} = \sum_s w_s \left(\Delta G_s - \Delta G_{\text{fused}}\right)^{2},
+\qquad
+R = \sqrt{\frac{\chi^{2}}{n-1}} .
+\]
+$\Delta G_{\text{fused}}$ is an internal construct --- a reference point against
+which each source is measured --- and is never published or recommended.
+
+$R$ is the Birge ratio, the scale factor the Particle Data Group applies to
+discrepant measurements of one quantity. Its interpretation is the whole point:
+if the reported uncertainties are honest, the scatter among sources should be
+about the size of those uncertainties, giving $R \approx 1$. Values well above 1
+mean the sources lie further apart than their own error bars permit, so at least
+one is wrong. The residual $z_s = |\Delta G_s - \Delta G_{\text{fused}}| /
+\hat{e}_s$ then identifies which.
+
+\subsection{The rules}
+Applied in this order, with measurement applied last so that it wins:
+\begin{enumerate}
+\item \textbf{Self-certainty.} $p_{\text{ok}} \ge 0.90$ grades gold,
+      $\ge 0.70$ silver, otherwise bronze.
+\item \textbf{Corroboration} ($R \le 1.5$ and $z_s \le 1.0$) lifts bronze to
+      silver, and no further.
+\item \textbf{Being outvoted} ($R > 2.0$ and $z_s > 3.0$) costs one tier.
+\item \textbf{Measurement} against an experimentally anchored value overrides
+      everything: within 1.0\,kcal\,mol$^{-1}$ is gold, 1.0--3.0 silver, beyond
+      3.0 bronze. It therefore demotes as readily as it promotes.
+\end{enumerate}
+
+Reactions where every source reports $|\Delta G| < 0.5$\,kcal\,mol$^{-1}$, and
+all transport reactions, are flagged as structural zeros: their concordance is
+imposed by the stoichiometry rather than earned. They are excluded from
+corroboration but not from being outvoted --- agreement one could not avoid
+earns no credit, while disagreeing about such a reaction still counts against a
+source. Structural zeros are no longer excluded from corroboration: against the anchors they are the most accurate reactions in the set (near-zero 100\% within $\tau$, $n=132$; transport 95\%, $n=75$; everything else 79\%, $n=2{,}183$).
+
+\subsection{Why agreement cannot confer gold}
+The treatment of cross-source behaviour is deliberately asymmetric. Agreement
+between two fallible predictors is weak evidence: eQuilibrator and group
+contribution share lineage, both descending from group contribution, so their
+concordance is partly one method agreeing with itself. Disagreement is strong
+evidence, because one of them is definitely wrong and $z_s$ names it.
+
+The cost of the alternative was measured. Allowing corroboration to promote to
+gold grew eQuilibrator's gold column from 2,443 to 9,157 reactions while
+diluting its agreement with measurement from 94\% to 90\% within $\tau$ ---
+nearly four times the gold for a four-point loss in what gold means. Hence the
+cap.
+
+\subsection{Grades and the routes into them}
+
+Every grade is composed of two judgements: what the deciding source's own
+calibrated confidence claims, and what the other sources made of it. Both ship
+alongside the grade in the \texttt{thermo-evidence} block. The cross-source
+verdict is omitted where a check ran and resolved neither way --- the set is
+discrepant but this source is not the outlier, or the reverse.
+
+\begin{table}[h]
+\centering\small
+\begin{tabular}{llllrr}
+\toprule
+Grade & Self-assessment & Cross-source & Parameters & Reactions & Conflict \\
+\midrule
+gold   & self-certain   & corroborated & $p_{\text{ok}}\!\ge\!0.90$; $R\!\le\!2, z\!\le\!2$ & 3{,}863 & 1{,}233 \\
+gold   & measured       & ---          & $|\Delta G-\text{exp}|\le 1.0$                     &   797 &     7 \\
+gold   & self-certain   & ---          & $p_{\text{ok}}\!\ge\!0.90$                          &   682 &    11 \\
+\midrule
+silver & unconfident    & corroborated & $p_{\text{ok}}\!<\!0.70$; $R\!\le\!2, z\!\le\!2$    & 8{,}279 &    59 \\
+silver & self-confident & corroborated & $0.70\!\le\!p_{\text{ok}}\!<\!0.90$; $R\!\le\!2, z\!\le\!2$ & 6{,}059 & 129 \\
+silver & self-confident & ---          & $0.70\!\le\!p_{\text{ok}}\!<\!0.90$                 & 1{,}421 &   278 \\
+silver & self-certain   & unpaired     & $p_{\text{ok}}\!\ge\!0.90$; $n_{\text{src}}\!=\!1$  &   598 &     0 \\
+silver & self-confident & unpaired     & $0.70\!\le\!p_{\text{ok}}\!<\!0.90$; $n_{\text{src}}\!=\!1$ & 89 & 0 \\
+silver & self-certain   & outvoted     & $p_{\text{ok}}\!\ge\!0.90$; $R\!>\!2, z\!>\!2$      &    52 &     3 \\
+\midrule
+bronze & unconfident    & unpaired     & $p_{\text{ok}}\!<\!0.70$; $n_{\text{src}}\!=\!1$    & 5{,}402 &     0 \\
+bronze & unconfident    & outvoted     & $p_{\text{ok}}\!<\!0.70$; $R\!>\!2, z\!>\!2$        & 3{,}808 &   129 \\
+bronze & unconfident    & ---          & $p_{\text{ok}}\!<\!0.70$                            & 1{,}908 &   313 \\
+bronze & self-confident & outvoted     & $0.70\!\le\!p_{\text{ok}}\!<\!0.90$; $R\!>\!2, z\!>\!2$ & 141 & 10 \\
+\midrule
+\multicolumn{4}{l}{\textbf{Total}} & \textbf{33{,}099} & \textbf{2{,}172} \\
+\bottomrule
+\end{tabular}
+\caption{Every route into every grade, per reaction. A reaction takes the best
+grade any single source earns; ties are broken by the recommendation precedence
+(measurement, eQuilibrator, dGPredictor, group contribution), so the labels
+describe the strongest source rather than an arbitrary column order.
+\emph{Conflict} counts reactions where eQuilibrator and dGPredictor give
+different directions --- group contribution is excluded because the
+recommendation precedence overrules it. Two routes cannot occur: gold is never
+outvoted, since outvoting costs a tier, and bronze is never corroborated, since
+corroboration lifts to silver.}
+\end{table}
+
+Conflict is not the complement of corroboration. $R$ and $z$ test agreement on
+the \emph{energy}; direction compares $|\ln\Gamma|$ against $\ln(1000)$. Two
+sources can sit inside each other's error bars and still fall on opposite sides
+of that threshold, which is why 1{,}233 of the 3{,}863 gold-corroborated
+reactions carry a direction conflict.
+
+\subsection{Validation}
+Grades are validated by five-fold cross-validation repeated four times,
+refitting the calibration on each training fold and scoring only the anchors
+held out of it, with the measurement override disabled so that a reaction cannot
+be graded and scored by the same number.
+
+\begin{table}[h]
+\centering
+\begin{tabular}{llrr}
+\toprule
+Unit & Tier & $n$ & Within $\tau$ \\
+\midrule
+Reaction-level    & gold   &   439 & 94\% \\
+                  & silver &   346 & 64\% \\
+                  & bronze &    12 & 50\% \\
+\bottomrule
+\end{tabular}
+\caption{Leak-free cross-validated agreement with experiment, per REACTION ---
+the unit the scheme grades. Confined to the 797 anchored reactions, whose tier
+mix (55\% gold) is nothing like the release's (16\%), because a reaction has an
+experimental value when someone chose to measure it. Bronze is barely assessable
+at reaction level: a reaction is bronze only when every source is.}
+\end{table}
+
+\subsection{Reproducing this}
+\begin{verbatim}
+Scripts/Thermodynamics/SourceGrading/build_tecrdb_comparison.py
+Scripts/Thermodynamics/SourceGrading/grade_thermo_sources.py --cv
+\end{verbatim}
+Thresholds are module constants at the head of \texttt{grade\_thermo\_sources.py}.
+
+\end{document}

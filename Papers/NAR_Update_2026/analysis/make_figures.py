@@ -46,6 +46,12 @@ def _pka_provenance():
     (written by Scripts/Thermodynamics/ProtonationEvidence/build_pka_provenance.py)
     and ModelSEED_Reaction_Energies.tsv. Both ship, so a reader can reproduce
     every percentage in the protonation paragraph.
+
+    REWRITTEN 2026-09-08 for the Marvin 26.1 rebuild. The split is no longer
+    open-vs-proprietary -- every resolved ladder is ChemAxon-derived now -- but
+    NEW-RUN vs CARRIED-OVER, which is the distinction that survived the change.
+    The rebuild reached 67.8% of compounds and 6.1% of scored reactions, because
+    the rows it could not rebuild are the cofactors that appear everywhere.
     """
     import csv as _csv, collections as _c, re as _re
     root = Path(__file__).resolve().parents[3]
@@ -54,26 +60,133 @@ def _pka_provenance():
     rows = [r for r in _csv.DictReader(
         (l for l in prov.open() if not l.startswith("#")), delimiter="\t")]
     eff = _c.Counter(r["effective_source"] for r in rows)
-    chemaxon = eff["carried_over"] + eff["marvin"] + eff["cache"]
-    by_cpd = [("MolGpKa", eff["molgpka"], BLUE),
-              ("ChemAxon-derived", chemaxon, ORANGE),
-              ("IUPAC", eff["iupac"], AQUA),
-              ("other / unattributed", eff["alberty"] + eff["unresolved"], VIOLET)]
-    cx = {r["seed_id"] for r in rows if r["shipped_provenance"] == "chemaxon"}
-    op = {r["seed_id"] for r in rows if r["shipped_provenance"] == "open"}
+    by_cpd = [("Marvin 26.1 (this release)", eff["marvin"], BLUE),
+              ("carried over", eff["carried_over"], ORANGE),
+              ("unresolved", eff["unresolved"] + eff["none"], NEUTRAL)]
+    src = {r["seed_id"]: r["effective_source"] for r in rows}
     CPD = _re.compile(r"cpd\d{5}")
     a = b = c = 0
     for r in _csv.DictReader((l for l in rxns.open() if not l.startswith("#")), delimiter="\t"):
         if r["status"] != "ok":
             continue
-        cs = set(CPD.findall(r["formula"] or ""))
-        if cs & cx: a += 1
-        elif cs & op: b += 1
+        s = {src.get(x) for x in set(CPD.findall(r["formula"] or ""))}
+        if "carried_over" in s: a += 1
+        elif "marvin" in s: b += 1
         else: c += 1
-    by_rxn = [("all compounds open", b, BLUE),
-              ("\u2265 1 ChemAxon-derived compound", a, ORANGE),
-              ("no classified compound", c, NEUTRAL)]
+    by_rxn = [("all Marvin 26.1", b, BLUE),
+              ("\u2265 1 carried over", a, ORANGE),
+              ("no resolved ladder", c, NEUTRAL)]
     return by_cpd, by_rxn
+
+
+def _silver_sigma_band():
+    """Figure 2C shading: the sigma span of reactions graded SILVER, per source.
+
+    Reaction-level grade (best_grade in source_grades_wide.tsv) joined back to
+    each source's own reported sigma. Answers "what uncertainty does a silver
+    reaction actually carry?" -- and shows that the answer is only meaningful
+    for two of the three sources. eQuilibrator and dGPredictor separate their
+    tiers by sigma (medians 0.26/0.62/1.43 and 1.54/16.49/21.85 for
+    gold/silver/bronze); Group contribution does not (9.19/8.99/10.35), which is
+    the same flat-error-curve problem that stopped raw sigma being used to rank
+    sources in the first place. The band is p5-p95.
+    """
+    import csv as _csv, collections as _c
+    root = Path(__file__).resolve().parents[3]
+    g = root / "Biochemistry/Thermodynamics/SourceGrading/results/thermo_grades"
+    best = {}
+    with (g / "source_grades_wide.tsv").open() as fh:
+        for x in _csv.DictReader(fh, delimiter="\t"):
+            if x["best_grade"]:
+                best[x["rxn"]] = x["best_grade"]
+    sig = _c.defaultdict(list)
+    with (g / "source_grades.tsv").open() as fh:
+        for x in _csv.DictReader(fh, delimiter="\t"):
+            if x["source"] == "TECRDB" or best.get(x["rxn"]) != "SILVER":
+                continue
+            try:
+                sig[x["source"]].append(abs(float(x["sigma"])))
+            except (TypeError, ValueError):
+                pass
+    out = {}
+    for k, v in sig.items():
+        v.sort()
+        if len(v) >= 20:
+            out[k] = (v[int(0.05 * len(v))], v[int(0.95 * len(v))])
+    return out
+
+
+def _grade_breakdown():
+    """Figure 3C: what underpins each evidence grade, on two axes.
+
+    Derived from the shipped Biochemistry/reaction_*.json `thermo-evidence`
+    block, so it stays in step with the release rather than the grading run.
+    Returns (by_assessment, by_cross) -- each {grade: [(label, n, colour)]}.
+    """
+    import json as _json, glob as _glob, collections as _c
+    root = Path(__file__).resolve().parents[3]
+    A = _c.defaultdict(_c.Counter); X = _c.defaultdict(_c.Counter)
+    for f in sorted(_glob.glob(str(root / "Biochemistry" / "reaction_*.json"))):
+        for r in _json.load(open(f)):
+            e = r.get("thermo-evidence")
+            if not e:
+                continue
+            A[e["grade"]][e["assessment"]] += 1
+            X[e["grade"]][e.get("cross-source", "no cross-check")] += 1
+    AC = {"measured": ORANGE, "self-certain": BLUE, "self-confident": BLUE_350,
+          "unconfident": NEUTRAL}
+    XC = {"corroborated": BLUE, "outvoted": ORANGE, "unpaired": AQUA,
+          "no cross-check": NEUTRAL}
+    order_a = ["measured", "self-certain", "self-confident", "unconfident"]
+    order_x = ["corroborated", "outvoted", "unpaired", "no cross-check"]
+    by_a = {g: [(k, A[g][k], AC[k]) for k in order_a if A[g][k]] for g in A}
+    by_x = {g: [(k, X[g][k], XC[k]) for k in order_x if X[g][k]] for g in X}
+    return by_a, by_x
+
+
+def _direction_counts():
+    """Figure 3A: direction assigned by each source, DERIVED from the shipped
+    reaction JSON. Four states, not three -- "undetermined" is the one the 2020
+    release folded into "reversible" and is the point of the panel."""
+    import json as _json, glob as _glob, collections as _c
+    root = Path(__file__).resolve().parents[3]
+    counts = {s: _c.Counter() for s in
+              ("eQuilibrator", "Group contribution", "dGPredictor")}
+    for f in sorted(_glob.glob(str(root / "Biochemistry" / "reaction_*.json"))):
+        for r in _json.load(open(f)):
+            for s, v in (r.get("thermodynamics") or {}).items():
+                if s in counts and isinstance(v, list) and len(v) > 2:
+                    counts[s][v[2]] += 1
+    return [(s, counts[s][">"], counts[s]["="], counts[s]["<"], counts[s]["?"])
+            for s in ("eQuilibrator", "dGPredictor", "Group contribution")]
+
+
+def _agreement_counts():
+    """Figure 3B: eQuilibrator against dGPredictor on the reactions both score."""
+    import json as _json, glob as _glob
+    root = Path(__file__).resolve().parents[3]
+    agree = opp = eq_only = dg_only = neither = partial = 0
+    for f in sorted(_glob.glob(str(root / "Biochemistry" / "reaction_*.json"))):
+        for r in _json.load(open(f)):
+            th = r.get("thermodynamics") or {}
+            x, y = th.get("eQuilibrator"), th.get("dGPredictor")
+            if not (isinstance(x, list) and len(x) > 2
+                    and isinstance(y, list) and len(y) > 2):
+                continue
+            e, d = x[2], y[2]
+            if e == "?" and d == "?": neither += 1
+            elif d == "?": eq_only += 1
+            elif e == "?": dg_only += 1
+            elif e == d: agree += 1
+            elif {e, d} == {">", "<"}: opp += 1
+            else: partial += 1     # one calls a direction, the other reversible
+    # Six mutually exclusive states that must sum to the shared total. The
+    # "partial" bucket is 654 reactions and was silently dropped in the first
+    # draft of this function, which made the panel sum to 97.4%.
+    return [("both agree", agree, BLUE), ("only eQuilibrator", eq_only, BLUE_350),
+            ("only dGPredictor", dg_only, AQUA), ("neither", neither, NEUTRAL),
+            ("one direction, one reversible", partial, YELLOW),
+            ("opposite", opp, ORANGE)]
 
 
 # ---- measured values -------------------------------------------------------
@@ -106,7 +219,7 @@ NUMBERS = {
     # 26,555 of them are the 10000000.0 placeholder, so the raw entry count
     # reads as 100% coverage and is not coverage at all.
     "energy_rxn": [("dGPredictor", 29617), ("Group contribution", 29447),
-                   ("eQuilibrator", 25070)],
+                   ("eQuilibrator", 21789)],
     "energy_total": 56012,
     # direction derived per source from the same dicts
     "direction": [("eQuilibrator", 8650, 10957, 1071),
@@ -125,6 +238,10 @@ NUMBERS = {
 
 
 NUMBERS["pka_cpd"], NUMBERS["pka_traffic"] = _pka_provenance()
+NUMBERS["direction"] = _direction_counts()
+NUMBERS["agreement"] = _agreement_counts()
+NUMBERS["silver_sigma"] = _silver_sigma_band()
+NUMBERS["grade_assess"], NUMBERS["grade_cross"] = _grade_breakdown()
 
 
 def strip(ax, keep_x=True, value_axis="x"):
@@ -278,6 +395,16 @@ def figure2():
         hi = sorted(v)[int(0.97 * len(v))]      # clip the tail, then bin INSIDE
         ax.hist([x for x in v if x <= hi], bins=30, range=(0, hi),
                 color=col, zorder=3, linewidth=0)
+        # Shade the sigma span of SILVER-graded reactions, so a reader can see
+        # what uncertainty a tier actually corresponds to -- and, for group
+        # contribution, that it corresponds to almost the whole distribution.
+        band = NUMBERS["silver_sigma"].get(name)
+        if band:
+            lo, bhi = band
+            ax.axvspan(lo, min(bhi, hi), color=YELLOW, alpha=0.20, lw=0, zorder=2)
+            for xv in (lo, bhi):
+                if xv <= hi:
+                    ax.axvline(xv, color=YELLOW, lw=0.7, zorder=2.5)
         med = v[len(v) // 2]
         ax.axvline(med, color=INK, lw=0.9, zorder=4)
         # White bbox: the median rule runs up through this label's line.
@@ -296,57 +423,70 @@ def figure2():
                     fontweight="bold", va="top", color=INK)
             ax.text(0.16, 1.42, "Reported uncertainty (kcal/mol), separate axes",
                     transform=ax.transAxes, fontsize=7.6, va="top", color=INK)
+            # Figure-level so it cannot collide with the per-panel titles.
+            fig.text(0.205, 0.016, "shaded band: p5\u2013p95 of the reactions this "
+                     "source grades silver", fontsize=6.1, color=MUTED)
+
     return fig
 
 
 # ============================ FIGURE 3 ======================================
 def figure3():
-    fig, (a, b, c) = plt.subplots(1, 3, figsize=(7.0, 4.3),
-                                  gridspec_kw={"width_ratios": [1.15, 1.15, 0.62]})
-    # wspace was 0.52, which left A's total labels touching B's row labels.
-    fig.subplots_adjust(left=0.095, right=0.975, top=0.80, bottom=0.155, wspace=0.72)
+    fig = plt.figure(figsize=(7.0, 5.5))
+    gs = fig.add_gridspec(2, 3, width_ratios=[1.15, 1.15, 0.62],
+                          height_ratios=[1.0, 0.88],
+                          left=0.135, right=0.945, top=0.90, bottom=0.085,
+                          wspace=0.80, hspace=0.62)
+    a = fig.add_subplot(gs[0, 0]); b = fig.add_subplot(gs[0, 1])
+    c = fig.add_subplot(gs[0, 2]); d = fig.add_subplot(gs[1, :])
 
     FWD, REV, BACK = "#1c5cab", NEUTRAL, "#c2410c"
-    rows = NUMBERS["dir_grade"]; ys = range(len(rows))[::-1]
-    for i, (lab, f, e, r) in zip(ys, rows):
-        tot = f + e + r; x = 0
-        for v, col, nm in ((f, FWD, "\u2192"), (e, REV, "\u2194"), (r, BACK, "\u2190")):
+    # A -- direction assigned by each SOURCE independently (was: by grade).
+    # FOUR states, not three. "undetermined" is the one the 2020 release folded
+    # into "reversible", and separating them is the point of the panel: 63% of
+    # dGPredictor's calls live there.
+    UND = NEUTRAL
+    rows = NUMBERS["direction"]; ys = range(len(rows))[::-1]
+    for i, (lab, f, e, r, q) in zip(ys, rows):
+        tot = f + e + r + q; x = 0
+        for v, col, nm in ((f, FWD, "\u2192"), (e, AQUA, "\u2194"),
+                           (r, BACK, "\u2190"), (q, UND, "?")):
             pct = v / tot * 100
             a.barh(i, pct, left=x, height=0.60, color=col, zorder=3,
                    edgecolor=FRAME, lw=0.45)
-            if pct > 11:
+            if pct > 9:
                 a.text(x + pct / 2, i, f"{nm} {pct:.0f}%", ha="center", va="center",
-                       fontsize=6.6, fontweight="bold",
-                       color="white" if col != NEUTRAL else INK)
+                       fontsize=6.4, fontweight="bold",
+                       color="white" if col != UND else INK)
             x += pct
-        a.text(-1.8, i, lab, va="center", ha="right", fontsize=7.2, color=INK)
+        a.text(-3.5, i, lab.replace("Group contribution", "Group contrib."),
+               va="center", ha="right", fontsize=7.2, color=INK)
         a.text(102.5, i, k(tot), va="center", ha="left", fontsize=6.2, color=MUTED)
     a.set_xlim(0, 100); a.set_ylim(-0.62, len(rows) - 0.38); a.set_yticks([])
     a.set_xticks([0, 50, 100]); a.set_xticklabels(["0", "50", "100%"])
     strip(a)
-    swatches(a, [("forward", FWD), ("reversible", REV), ("reverse", BACK)],
-             y=-0.115, x0=0.0, vertical=True, size=6.2)
-    panel_tag(a, "A", "Direction by evidence grade")
+    swatches(a, [("forward", FWD), ("reversible", AQUA), ("reverse", BACK),
+                 ("undetermined", UND)], y=-0.115, x0=0.0, vertical=True, size=6.2)
+    panel_tag(a, "A", "Direction by source")
 
-    SC = [("eQuilibrator", BLUE), ("Group contribution", AQUA),
-          ("dGPredictor", VIOLET)]
-    rows = NUMBERS["dir_src"]; ys = range(len(rows))[::-1]
-    for i, (lab, *vals) in zip(ys, rows):
-        tot = sum(vals); x = 0
-        for v, (nm, col) in zip(vals, SC):
-            pct = v / tot * 100
-            b.barh(i, pct, left=x, height=0.60, color=col, zorder=3,
-                   edgecolor=FRAME, lw=0.45)
-            if pct > 13:
-                b.text(x + pct / 2, i, f"{pct:.0f}%", ha="center", va="center",
-                       fontsize=6.6, color="white", fontweight="bold")
-            x += pct
-        b.text(-1.8, i, lab, va="center", ha="right", fontsize=7.2, color=INK)
-    b.set_xlim(0, 100); b.set_ylim(-0.62, len(rows) - 0.38); b.set_yticks([])
-    b.set_xticks([0, 50, 100]); b.set_xticklabels(["0", "50", "100%"])
+    # B -- eQuilibrator against dGPredictor on the 24,804 reactions both score.
+    # Ranked bars rather than one stacked bar: the categories span 13,575 to 198
+    # and the small ones are the interesting ones. Six states, summing to the
+    # shared total exactly.
+    SHORT = {"one direction, one reversible": "one dir., one rev."}
+    segs = sorted(NUMBERS["agreement"], key=lambda s: -s[1])
+    tot = sum(v for _, v, _ in segs)
+    ys = range(len(segs))[::-1]
+    for i, (nm, v, col) in zip(ys, segs):
+        b.barh(i, v, height=0.62, color=col, zorder=3, edgecolor=FRAME, lw=0.45)
+        b.text(v + tot * 0.015, i, f"{k(v)}  {100*v/tot:.1f}%", va="center",
+               ha="left", fontsize=6.2, color=INK)
+        b.text(-tot * 0.02, i, SHORT.get(nm, nm), va="center", ha="right",
+               fontsize=6.6, color=INK)
+    b.set_xlim(0, tot * 0.78); b.set_ylim(-0.62, len(segs) - 0.38); b.set_yticks([])
+    b.set_xticks([0, 5000, 10000, 15000]); b.set_xticklabels(["0", "5k", "10k", "15k"])
     strip(b)
-    swatches(b, [(n, c) for n, c in SC], y=-0.115, x0=0.0, vertical=True, size=6.2)
-    panel_tag(b, "B", "Which source earned the grade")
+    panel_tag(b, "B", "eQuilibrator vs dGPredictor")
 
     segs = NUMBERS["atom"]; tot = sum(v for _, v, _ in segs); base = 0
     for name, v, col in segs:
@@ -359,6 +499,38 @@ def figure3():
     c.set_yticks([0, 20000, 40000, 56012]); c.set_yticklabels(["0", "20k", "40k", "56k"])
     strip(c, keep_x=False, value_axis="y")
     panel_tag(c, "C", "Atom mapping")
+
+    # D -- what underpins each grade, on two axes. Six lanes: each grade split
+    # by the deciding source's self-assessment, then the same three split by
+    # what the other sources made of it. Read together they say where a tier's
+    # authority comes from -- gold from confidence plus corroboration, bronze
+    # from neither.
+    GR = ["gold", "silver", "bronze"]
+    lanes = [(g, NUMBERS["grade_assess"].get(g, [])) for g in GR] + \
+            [(g, NUMBERS["grade_cross"].get(g, [])) for g in GR]
+    ys = range(len(lanes))[::-1]
+    for i, (lab, segs) in zip(ys, lanes):
+        tot = sum(v for _, v, _ in segs) or 1
+        x = 0
+        for nm, v, col in segs:
+            pct = v / tot * 100
+            d.barh(i, pct, left=x, height=0.60, color=col, zorder=3,
+                   edgecolor=FRAME, lw=0.45)
+            if pct > 14:
+                d.text(x + pct / 2, i, f"{nm} {pct:.0f}%", ha="center", va="center",
+                       fontsize=5.9, fontweight="bold",
+                       color="white" if col != NEUTRAL else INK)
+            x += pct
+        d.text(-1.8, i, lab, va="center", ha="right", fontsize=7.0, color=INK)
+        d.text(102.5, i, k(tot), va="center", ha="left", fontsize=6.0, color=MUTED)
+    d.set_xlim(0, 100); d.set_ylim(-0.62, len(lanes) - 0.38); d.set_yticks([])
+    d.set_xticks([0, 50, 100]); d.set_xticklabels(["0", "50", "100%"])
+    strip(d)
+    d.text(-0.118, 0.80, "by self-assessment", transform=d.transAxes,
+           rotation=90, va="center", ha="center", fontsize=6.1, color=MUTED)
+    d.text(-0.118, 0.26, "by cross-source", transform=d.transAxes,
+           rotation=90, va="center", ha="center", fontsize=6.1, color=MUTED)
+    panel_tag(d, "D", "What underpins each evidence grade")
     return fig
 
 

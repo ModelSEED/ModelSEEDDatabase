@@ -70,7 +70,7 @@ INVARIANT_SOURCES = ['Group contribution']
 # Group contribution is deliberately NOT here -- it is the byte-compare anchor,
 # and any drift in it is a real regression.
 EXPECTED_CHANGE_SOURCES = ['eQuilibrator', 'dGPredictor',
-                           'dGPredictor-ModelSEED']
+                           ]
 
 PIPELINE = [
     ['./Update_Compound_GroupContribution_Energies.py'],

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Compare dGPredictor-ModelSEED (retrained) reaction energies to TECRDB.
+"""Compare dGPredictor (retrained) reaction energies to TECRDB.
 
 Matching is done on a "SMILES key" derived from each compound's SMILES via
 RDKit, at TWO tiers:
@@ -31,8 +31,8 @@ RDLogger.DisableLog("rdApp.*")
 # HIS and is unchanged; only the paths are rewritten to derive from this
 # repository so the file it produces is regenerable here.
 #
-# Why: tecrdb_vs_dgpredictor_modelseed.csv is the ground truth behind every
-# accuracy number in the paper -- 802 stereo-exact anchors -- and it was read
+# Why: tecrdb_comparison.csv is the ground truth behind every
+# accuracy number in the paper -- 797 stereo-exact anchors -- and it was read
 # by two committed scripts and produced by none. A release whose headline
 # figure cannot be regenerated from the repository is not reproducible, and
 # data_availability.tex claims otherwise.
@@ -280,13 +280,13 @@ for rid in staged:
             equation_definition=r.get("definition"),equation_ids=r.get("equation"),
             tecrdb_reaction=" | ".join(sorted(g["kegg_rxns"]))[:300],
             n_measurements=len(g["dGs"]),
-            dGpredictor_modelseed_dG_kJ=round(dgpred,3),
+            dGpredictor_dG_kJ=round(dgpred,3),
             tecrdb_dG_kJ=round(tecr_ms,3),
             diff_kJ=round(diff,3),abs_diff_kJ=round(abs(diff),3),
-            dGpredictor_modelseed_dG_kcal=round(dgpred/4.184,3),
+            dGpredictor_dG_kcal=round(dgpred/4.184,3),
             tecrdb_dG_kcal=round(tecr_ms/4.184,3),
             diff_kcal=round(diff/4.184,3),abs_diff_kcal=round(abs(diff)/4.184,3),
-            dGpredictor_modelseed_err_kJ=round(dgerr,3) if dgerr is not None else None,
+            dGpredictor_err_kJ=round(dgerr,3) if dgerr is not None else None,
             tecrdb_dG_sd_kJ=round(exp_sd,3),combined_err_kJ=round(combined_err,3),significant=significant,
             tecrdb_dG_min_kJ=round(min(dgs_ms),3),tecrdb_dG_max_kJ=round(max(dgs_ms),3),
             other_GroupContribution_dG_kJ=gc_kj,
@@ -312,15 +312,15 @@ print(f"matched MS reactions: {len(rows)}  "
 
 cols=["modelseed_rxn","name","ec","enzyme_name","equation_definition","equation_ids",
       "tecrdb_reaction","n_measurements","match_tier",
-      "dGpredictor_modelseed_dG_kJ","tecrdb_dG_kJ","diff_kJ","abs_diff_kJ",
-      "dGpredictor_modelseed_dG_kcal","tecrdb_dG_kcal","diff_kcal","abs_diff_kcal",
-      "dGpredictor_modelseed_err_kJ","tecrdb_dG_sd_kJ","combined_err_kJ","significant",
+      "dGpredictor_dG_kJ","tecrdb_dG_kJ","diff_kJ","abs_diff_kJ",
+      "dGpredictor_dG_kcal","tecrdb_dG_kcal","diff_kcal","abs_diff_kcal",
+      "dGpredictor_err_kJ","tecrdb_dG_sd_kJ","combined_err_kJ","significant",
       "other_GroupContribution_dG_kJ","other_dGPredictor_original_dG_kJ","other_eQuilibrator_dG_kJ",
       "tecrdb_dG_min_kJ","tecrdb_dG_max_kJ",
       "pH_min","pH_max","T_min","T_max","ms_orientation_vs_canonical",
       "reactants_smiles","products_smiles","reaction_smiles","reaction_smiles_complete"]
 OUTDIR.mkdir(parents=True, exist_ok=True)
-out=str(OUTDIR / "tecrdb_vs_dgpredictor_modelseed.csv")
+out=str(OUTDIR / "tecrdb_comparison.csv")
 with open(out,"w",newline="") as fh:
     w=csv.DictWriter(fh,fieldnames=cols); w.writeheader()
     for m in rows: w.writerow({k:m.get(k) for k in cols})

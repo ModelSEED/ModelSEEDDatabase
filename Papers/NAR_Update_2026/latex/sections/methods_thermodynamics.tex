@@ -1,73 +1,101 @@
-%% Compressed from 1,058 words. Detail in Supplementary Methods S3.
+%% Rewritten 2026-09-08 after the Marvin 26.1 regeneration and the reversibility
+%% overhaul. Every number here is measured against the shipped files; see the
+%% inline comments for the command that reproduces each. Detail in
+%% Supplementary Methods S3.
 \subsection{Multi-source thermodynamics}\label{sec:methods-thermo}
 
 The 2020 release combined eQuilibrator with a group-contribution fallback. This
 update ships four sources --- eQuilibrator~3.0~\cite{beber2022}, group
-contribution rebuilt from MFAToolkit, dGPredictor~\cite{wang2021} retrained
-on ModelSEED structures, and experimental values where they exist --- each
-stored as its own \texttt{[energy, uncertainty, direction]} record so that no source is
+contribution rebuilt from MFAToolkit, dGPredictor~\cite{wang2021} retrained on
+ModelSEED structures, and experimental values where they exist --- each stored
+as its own \texttt{[energy, uncertainty, direction]} record so that no source is
 overwritten by another. All values are reported at pH~7.0, ionic strength
 0.25\,M, pMg~3.0 and 298.15\,K; Supplementary Methods~S3 explains why that
-combination matches neither eQuilibrator preset.
+combination matches neither eQuilibrator preset. Only the experimental values
+carry a published direction: the three predictors were released as energy
+estimators, and every direction reported here is our inference from their
+energies, not a claim by their authors.
 
-\paragraph{Protonation.} eQuilibrator's transform requires a \emph{macroscopic}
-pKa ladder per compound: an ordered list in which consecutive species differ by
-one proton. The count of entries above the reported pH sets the proton count of
-the major microspecies, so the composition of the ladder changes the
-transformed energy directly, not merely its precision.
+\paragraph{Protonation.} eQuilibrator's Legendre transform requires a
+\emph{macroscopic} pKa ladder per compound: an ordered list in which
+consecutive species differ by one proton. The count of entries above the
+reported pH sets the proton count of the major microspecies, so the composition
+of the ladder changes the transformed energy directly, not merely its
+precision.
 
-We resolve each compound from measured literature ladders where a complete one
-exists~\cite{alberty2003, iupac_pka}, otherwise from the open-source predictor
-MolGpKa~\cite{pan2021}. That predictor is accurate where a compound's ionizable
-sites are chemically distinct, but it predicts once per atom on the neutral
-molecule, so equivalent sites return the same value and a polyprotic acid loses
-its second and subsequent dissociations --- orthophosphate is returned as three
-copies of its first pKa. The failure is detectable as a repeated predicted
-value, true of 6,664 of 32,201 compounds, and only there do we fall back to the
-ChemAxon-derived ladders in the eQuilibrator cache.
+%% Changed 2026-09-08. The previous build resolved ladders through a cascade
+%% (alberty > iupac > cache > marvin > molgpka, ChemAxon tiers gated on MolGpKa
+%% degeneracy) and reported 62% open by compound / 95% of reactions ChemAxon.
+%% Those figures described a build that no longer ships. Current provenance is
+%% derived, not transcribed, from
+%% Biochemistry/Thermodynamics/ProtonationEvidence/pka_provenance.tsv.
+Earlier builds assembled these ladders from whichever source could supply one,
+preferring measured compilations, then an open predictor, and consulting a
+licensed tool only where the open predictor provably degenerates. We have
+abandoned that arrangement. Ladders from different models are not
+interchangeable within one dataset: where a compound and its reaction partner
+come from different models, a disagreement about how many sites lie above the
+reported pH does not cancel across the reaction, and each unbalanced proton
+displaces the transformed energy. Mixing sources to maximise coverage buys
+coverage with an error invisible in any single compound's record.
 
-%% Added 2026-09-07 (task #26). The preceding sentence describes the pKa
-%% GATE. Carry-over is a SECOND, ungated route to ChemAxon-derived microspecies
-%% and the paper said nothing about it. Measured on the shipped cache: 4,122
-%% compounds reuse a pinned-release row -- 1,234 have no open prediction, 470
-%% are collapse cases the gate would have caught anyway, and 2,418 could have
-%% been rebuilt. Of those 2,418, MolGpKa agrees with the incumbent on proton
-%% count for 1,597 and disagrees for 821 (NAD +3 sites, NADH +4, ~9.55
-%% kcal/mol per unbalanced proton). We did not rebuild: see the task for why.
-%% 28% / 95% supersede 20% / 87%, corrected 2026-09-07 (task #58). The old
-%% figures came from constants typed into make_figures.py which counted the pKa
-%% cascade's answers and scored carry-over at 525 compounds; the cache actually
-%% holds 4,122 rows from the pinned release, and those keep ChemAxon-derived
-%% ladders whatever the cascade would have said. The dependency is LARGER than
-%% the paper claimed. Both bars are now DERIVED, not transcribed, from
-%% Biochemistry/Thermodynamics/ProtonationEvidence/pka_provenance.tsv, which
-%% ships -- so a reader can tally the percentages themselves.
-Two consequences are stated rather than elided. The layer is not fully
-open-source: it is reproducible by citation, the cache being a pinned public
-release, but not regenerable without a licensed tool. A second route to the
-same dependency is worth naming: where the pinned release already holds a
-compound with a matching structure, the builder reuses that row wholesale
-rather than rebuilding it, so those compounds retain the release's ladders
-irrespective of whether the open predictor could have supplied them. We
-examined substituting them and did not, because on the highest-traffic cases
---- the nicotinamide cofactors above all --- the two models disagree on how
-many sites lie above the reported pH, and that disagreement moves a reaction by
-a full proton with no measurement available to arbitrate it. And although the
-ChemAxon-derived compounds are 28\% of the total, they are the most connected
-polyprotic metabolites, so they participate in 95\% of scored reactions
-(Figure~\ref{fig:thermo}A) --- restricting substitution to where the open
-predictor provably fails \emph{increases} its reach rather than reducing it.
+Every ladder behind the shipped energies is therefore ChemAxon-derived, though
+not all from one run: the builder reuses a pinned-release row wholesale wherever
+the cache already holds our molecule, and several such compounds --- small
+inorganics among them --- cannot be rebuilt at all, because group decomposition
+rejects them. Results reports how far the regeneration actually reached. The
+consequence is stated rather than elided: this layer is not open-source, and
+alone in the database it cannot be regenerated without a licensed tool. We make
+the alternative auditable instead, shipping the open predictions beside the ones
+we used --- MolGpKa~\cite{pan2021} for every compound with a structure, and the
+measured ladders of Alberty~\cite{alberty2003}, versioned per structure source
+in an extended pKa dictionary. A reader can rebuild the layer on an open basis
+and see where the models part company. We publish both; we do not mix them.
 
 \paragraph{Uncertainty.} The sources report on scales that are not comparable
-(Figure~\ref{fig:thermo}C): against 797 experimentally-anchored reactions,
-group contribution overstates its error by roughly 2.2$\times$ and
-eQuilibrator understates by 1.6$\times$. eQuilibrator's figure is the
+(Figure~\ref{fig:thermo}C): median 0.63\,kcal\,mol$^{-1}$ for eQuilibrator
+against 10.41 for group contribution and 17.01 for dGPredictor. Against 797
+experimentally-anchored reactions, group contribution overstates its error and
+eQuilibrator understates it. eQuilibrator's figure is the
 component-contribution covariance and carries no protonation term at all, so it
-does not bound the effect described above.
+does not bound the effect described above. dGPredictor's, by contrast, is
+well-calibrated: across 20,093 reactions with a tight eQuilibrator reference,
+the residuals scaled by its own reported sigma have an RMS of 1.15, with 90\%
+inside 1.69 sigma against the 1.645 a Gaussian predicts. Its error bars are
+wide because it is uncertain, not because they are inflated.
 
-\paragraph{Direction.} Reversibility is assigned from the accepted energy by
-the rule set of Jankowski \textit{et al.}~\cite{jankowski2008}, unchanged from
-2020, with eQuilibrator as the primary source and group contribution as
-fallback. Applying the 2020 rules to the 2026 energies leaves 25,060 reactions
-with no direction call, having neither an eQuilibrator nor a
-group-contribution energy.
+\paragraph{Direction.} Group contribution keeps the rule set of Jankowski
+\textit{et al.}~\cite{jankowski2008} unchanged from 2020, so that series stays
+comparable across releases. eQuilibrator and dGPredictor share one rule set
+built on the Noor reversibility index~\cite{noor2012}: a reaction is called
+irreversible when $|\ln\Gamma|$ exceeds $\ln(1000)$ by more than one propagated
+standard deviation~\cite{beber2022}.
+
+Our gate is deliberately more conservative than the index as published. Noor
+\textit{et al.} define $\Gamma$ as a point estimate tested against a threshold,
+so every reaction falls on one side or the other; we require the propagated
+uncertainty to clear the threshold as well, which withholds a directional call
+from 58.9\% of dGPredictor's reactions and 15.7\% of eQuilibrator's that a
+point-estimate test would decide. Two consequences follow. We report fewer
+directions than the published index would on the same energies, and we
+distinguish \emph{reversible} from \emph{undetermined}, a distinction the index
+does not make. The exception is a reaction whose uncertainty is small relative
+to the threshold and yet still straddles it: there the margin cannot resolve
+which side the reaction falls on --- straddling means the estimate lies within
+one standard deviation of the threshold by construction --- so we report it
+reversible rather than undetermined, on the reading that a reaction poised at
+the limit of physiological concentration control is one the cell can push either
+way. Two guards precede it. A source that
+declines to estimate is caught before any rule reads the number it published
+alongside that refusal. And ATP synthase is assigned reversible structurally,
+because the proton-motive force is its entire driving force and no source here
+computes it --- without that rule the index returns $|\ln\Gamma| = 11.70 \pm
+0.09$ and calls the pump irreversible in whichever direction it happens to be
+transcribed. That caveat generalises: transport reactions are scored from
+stoichiometry and energy alone, and neither the membrane potential nor the
+transmembrane pH gradient enters any value in this release.
+
+We also separate two claims the 2020 release conflated. A reaction is marked
+reversible only where the evidence positively supports it --- where the error
+bar fits inside the reversible band --- and undetermined where the uncertainty
+straddles the threshold. Both previously shipped as reversible.

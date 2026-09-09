@@ -219,7 +219,13 @@ def test_atp_synthase(reactions, atps, report=False):
     # And the magnitude is identical across all of them, which is the tell: the
     # protons cancelled in the collapsed MetaNetX formula, so what eQuilibrator
     # actually scored was ADP + Pi <=> ATP + H2O, the same reaction every time.
-    magnitudes = {round(abs(s[2]), 2) for _, s in scored}
+    #
+    # Asserted to 1 dp, not 2, since 2026-09-08. The shipped eQuilibrator
+    # energies were re-imported at two decimal places (previously three) when the
+    # Thermodynamics pipeline was run, and that rounding split a previously exact
+    # degeneracy into {11.69, 11.70}. The collapse is still the point; the third
+    # decimal that demonstrated it exactly is no longer in the released data.
+    magnitudes = {round(abs(s[2]), 1) for _, s in scored}
     check('all share one |ln Gamma| -- the collapsed ADP+Pi<=>ATP formula',
           len(magnitudes) == 1, f'|ln Gamma| = {magnitudes}')
 

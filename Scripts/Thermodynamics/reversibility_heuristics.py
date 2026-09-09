@@ -32,22 +32,34 @@ do not fail in the same way:
     whose estimate it cannot stand behind return "?" rather than a permissive
     "=".
 
-``EQ2_HEURISTICS`` (eQuilibrator 2.0; Flamholz 2012 + Noor 2012)
-    The same cascade with the confidence margin switched off, i.e. the ln(Gamma)
-    point estimate alone. Kept for comparison against the 3.0 behaviour.
+The gate that makes the EQ set differ most from GC exists because ``sigma`` of
+1e5 kJ/mol is eQuilibrator's "could not decompose this reaction" marker, not an
+error bar -- 4,934 reaction records carry it, and the GC bounds rule silently
+swallows them (observed real sigma tops out at 65.35 kcal/mol, so the gap is
+unambiguous).
 
-The two gates that make the EQ set differ most from GC exist because the stored
-eQuilibrator numbers have two known failure modes (see the README):
-  * ``sigma`` of 1e5 kJ/mol is eQuilibrator's "could not decompose this reaction"
-    marker, not an error bar -- 4,934 reaction records carry it, and the GC
-    bounds rule silently swallows them (observed real sigma tops out at 65.35
-    kcal/mol, so the gap is unambiguous).
-  * ``Retrieve_eQuilibrator_Reactions_Energies.py`` keys its reaction formula on
-    MetaNetX id and so discards compartment, collapsing any species present on
-    both sides. 1,102 transport reactions therefore carry a dG for a *different*
-    reaction. Beber 2022 additionally notes the transformed-ensemble framework
-    is invalid across membranes without the -N_H*RT*ln(10^dpH) - Q*F*dPhi term,
-    which this pipeline never applies.
+TRANSPORT. There was a second gate, ``eq_transport_uncorrected_heuristic``,
+returning "?" for every ``is_transport`` reaction. Removed 2026-09-08. It cited
+two reasons and only one had survived:
+
+  * The compartment-collapse defect is FIXED. It described the superseded
+    MetaNetX-mediated retrieval, which keyed the formula on MetaNetX id and so
+    discarded compartment, leaving 1,102 transport reactions carrying a dG for a
+    different reaction. generate_modelseed_energies.py now sums coefficients
+    across compartments deliberately -- a pure translocation cancels to nothing
+    and is refused outright (4,078 such reactions carry no eQ value), while a
+    driven pump keeps the chemistry that powers it.
+  * The electrochemical term is still missing: Beber 2022 needs
+    -N_H*RT*ln(10^dpH) - Q*F*dPhi across a membrane and this pipeline does not
+    compute it. That is now a stated CAVEAT ON THE DATABASE rather than a
+    refusal, matching how dGPredictor has always treated transport: every
+    transport reaction is scored as ordinary biochemistry, without the membrane
+    potential, and the reader is told so.
+
+The rule was also barely reaching its cases -- of 1,687 eQ-scored transport
+reactions, abc_transporter_heuristic decided 1,454 and atp_synthase_heuristic 15,
+leaving it 218. Removing it moves 212 reactions out of "?": 121 to ">", 83 to
+"=", 8 to "<".
 """
 from math import log
 
@@ -78,8 +90,12 @@ PHOSPHATE_IDS = ("cpd00002", "cpd00008", "cpd00018", "cpd00009", "cpd00012")    
 LOW_ENERGY_CPDS = ("cpd00011", "cpd00013", "cpd11493", "cpd00009", "cpd00012",   # CO2, NH3, ACP, Pi, PPi
                    "cpd00010", "cpd00449", "cpd00242")                            # CoA, Dihydrolipoamide, HCO3
 
+# A predecessor dGPredictor record, broken by RDKit canonicalization drift, was
+# retired in Aug 2026 and replaced by the retrained model that ships as
+# "dGPredictor". Its name and its DGPM report level were removed 2026-09-08;
+# nothing in the shipped Biochemistry/*.json ever carried them.
 DB_LEVEL_LABEL = {"GC": "Group contribution", "EQ": "eQuilibrator",
-                  "DGP": "dGPredictor", "DGPM": "dGPredictor-ModelSEED"}
+                  "DGP": "dGPredictor"}
 DB_LEVEL_NOTE = {"GC": "GCC", "EQ": "EQU"}
 DB_LEVEL_PRIORITY = ("EQ", "GC", "DGP")
 
@@ -89,19 +105,38 @@ DB_LEVEL_PRIORITY = ("EQ", "GC", "DGP")
 # *different* source's number under this source's name. GC is deliberately absent:
 # its historical report is byte-compared against upstream, and the flat field is
 # in fact the GC value for the reactions that report covers.
-PER_SOURCE_LEVELS = ("EQ", "DGP", "DGPM")
+PER_SOURCE_LEVELS = ("EQ", "DGP")
 
 LN_RI_THRESHOLD = LN_GAMMA_THRESHOLD    # ln(1000); Noor 2012 default
 
 # --- eQuilibrator-specific constants --------------------------------------
 KJ_PER_KCAL = 4.184
 
-# eQuilibrator reports sigma = 1e5 kJ/mol for a reaction it cannot decompose;
-# multiples of it appear when several degrees of freedom are unknown. This is a
-# marker, not an error bar. The cut sits in the empty gap between the largest
-# genuine sigma observed in MetaNetX_Reaction_Energies.tbl (65.35 kcal/mol) and
-# the smallest marker value (1e5 kJ/mol = 23900.57 kcal/mol).
-EQ_UNDECOMPOSABLE_SIGMA = 1.0e4 / KJ_PER_KCAL        # 2390.06 kcal/mol
+# eQuilibrator reports sigma = 1e5 kJ/mol (= 23,900.57 kcal/mol) for a reaction
+# it cannot decompose; multiples of it appear when several degrees of freedom are
+# unknown. This is a MARKER, not an error bar.
+#
+# THE CUT IS NOT THE MARKER. It sits an order of magnitude below it, in the empty
+# gap that separates real uncertainties from refusals, so that a marker scaled
+# down by propagation is still caught. Measured over the shipped
+# Biochemistry/reaction_*.json on 2026-09-08:
+#
+#   largest GENUINE eQuilibrator sigma        40.24 kcal/mol
+#   ---- the gap ----
+#   smallest MARKER value observed        12,482.48 kcal/mol  (= 52,227 kJ/mol)
+#
+# The smallest observed marker is about half the nominal 1e5 kJ/mol, which is why
+# the cut is not placed at the nominal value. An earlier version of this comment
+# quoted 65.35 and 23,900.57 for those bounds; those came from
+# MetaNetX_Reaction_Energies.tbl, a different corpus from the shipped reactions
+# the gate actually runs against.
+#
+# Set to a round 2,500 kcal/mol on request 2026-09-08, replacing 1e4/KJ_PER_KCAL
+# (2390.06). Both sit in the same gap and the change decides 0 reactions; 2,500
+# is 62x the largest genuine sigma and 5.0x below the smallest marker. It also
+# clears dGPredictor's largest sigma (1,427.33) by 1.75x, which matters now that
+# the gate is shared with that source.
+EQ_UNDECOMPOSABLE_SIGMA = 2500.0                     # kcal/mol
 
 # eQuilibrator's physiological convention: every aqueous reactant at 1 mM.
 # dG'm = dG'^o + RT * sum(nu) * ln(EQ_PHYSIOLOGICAL_CONC), water and protons
@@ -115,6 +150,12 @@ EQ_PHYSIOLOGICAL_CONC = PHYSIOLOGICAL_CONC
 # 1.0 for eQuilibrator 3.0 (Beber 2022 makes uncertainty first-class); 0.0
 # reproduces the eQuilibrator 2.0 point-estimate behaviour.
 EQ_CONFIDENCE_Z = 1.0
+
+# Fraction of the ln(1000) threshold below which the propagated ln(Gamma) sigma
+# is too small for the confidence margin to mean anything. 0.15 x ln(1000) =
+# 1.04. Below that the error bar cannot move the reaction across the threshold
+# in any meaningful sense, so the point estimate decides and "?" is not used.
+RI_TIGHT_FRACTION = 0.15
 
 
 # --- Energy / eligibility -------------------------------------------------
@@ -341,6 +382,42 @@ def stored_bounds_heuristic(ctx):
     return None
 
 
+def make_sentinel_heuristic(sigma_gate=None):
+    """Reject a source's "no estimate" marker before any rule reads it.
+
+    ONE rule for one concept: the source published a number and disowned it in
+    the same breath. Sources differ only in which field carries the message --
+    Group Contribution puts it in the energy (dg = 1e7), eQuilibrator in the
+    uncertainty (a cut at 2,500 kcal/mol, below its 1e5 kJ/mol marker)
+    -- so both are checked here
+    rather than in two rules at different depths, which is what they were until
+    2026-09-08.
+
+    ``sigma_gate`` is the "predictor declined" cut, or None for a source with no
+    such marker. dGPredictor passes None deliberately: a fragment the model has
+    never seen contributes nothing to the sum, so there is no sentinel to gate
+    on and silent extrapolation is the failure mode instead of a loud refusal.
+
+    Placing this first in every rule set makes the guarantee hold regardless of
+    entry point. The dg check previously lived only OUTSIDE the cascade, in
+    _thermo_pair and reversibility_from_energy, so a caller reaching
+    run_reversibility through explicit_energy skipped it and the sentinel flowed
+    into stored_bounds_heuristic, which returned a confident "<" off
+    "MdeltaG(Min): 9999994.50".
+    """
+    def sentinel_energy_heuristic(ctx, _cut=sigma_gate):
+        if ctx.dg == SENTINEL_DG:
+            return f"no estimate: dg sentinel {SENTINEL_DG:.0f}", "?"
+        if _cut is not None and abs(ctx.dge) >= _cut:
+            return f"no estimate: sigma {ctx.dge:.0f}", "?"
+        return None
+    return sentinel_energy_heuristic
+
+
+# Default instance for sources whose only marker is the dg sentinel.
+sentinel_energy_heuristic = make_sentinel_heuristic()
+
+
 def atp_synthase_heuristic(ctx):
     if _is_atp_synthase(ctx.rxn_entry, ctx.terms['proton_cpts']):
         return "ATPS", "="
@@ -366,11 +443,39 @@ def low_energy_heuristic(ctx):
 
 
 def default_heuristic(ctx):
-    """Terminal heuristic — always fires; mirrors the historical final fallback."""
+    """Terminal rule for GC: NOTHING ABOVE COULD DECIDE, so report "?".
+
+    Returned "=" until 2026-09-08, which asserted reversibility for 10,201
+    reactions on the strength of no test at all -- their median sigma is 12.24
+    kcal/mol and 70% of them have sigma >= |mMdeltaG|, so the energy's own SIGN
+    is not established, let alone its magnitude. "?" is what the cascade
+    actually knows here.
+    """
+    return "default", "?"
+
+
+def canonical_default_heuristic(ctx):
+    """Terminal rule for the CANONICAL top-level ``reversibility`` field: "=".
+
+    THE SCOPE SPLIT, 2026-09-08. default_heuristic was changed to "?" so the
+    per-source thermodynamics dict stops asserting reversibility it cannot
+    support. That change was scoped to the thermodynamics field ONLY. It leaked
+    into the canonical field because both paths shared one GC rule list, and
+    Apply_2020_Reversibility_Policy.py runs the GC set -- so regenerating the
+    canonical field silently moved 8,687 reactions from "=" to "?".
+
+    The canonical field is the 2020 series and must stay comparable across
+    releases, exactly as GC's ABC-transporter rule is kept for continuity. It
+    keeps the historical "=" terminal here while GC_HEURISTICS keeps "?" for
+    per-source use. Selected by ENTRY POINT, not caller discipline:
+    get_heuristics() serves the canonical path, heuristics_for_source() the
+    per-source path.
+    """
     return "default", "="
 
 
 GC_HEURISTICS = [
+    sentinel_energy_heuristic,
     atp_synthase_heuristic,
     abc_transporter_heuristic,
     stored_bounds_heuristic,
@@ -388,7 +493,8 @@ def make_ln_reversibility_index_heuristic(ln_ri_by_rxn, threshold=LN_RI_THRESHOL
     """Heuristic driven by a precomputed ``{rxn_id: ln(gamma)}`` map, e.g. the
     fourth column of ``eQuilibrator/MetaNetX_Reaction_Energies.tbl``.
 
-    Prefer :func:`eq_reversibility_index_heuristic`, which derives ln(Gamma)
+    Prefer the ``ri_index_heuristic`` built by :func:`make_ri_heuristics`,
+    which derives ln(Gamma)
     from the stored dG and the reaction's own stoichiometry and so stays correct
     for the reactions where eQuilibrator scored a compartment-collapsed formula.
     Kept for callers that want to inject eQuilibrator's own published values."""
@@ -405,118 +511,52 @@ def make_ln_reversibility_index_heuristic(ln_ri_by_rxn, threshold=LN_RI_THRESHOL
 # al. 2012 / Flamholz et al. 2012 (eQuilibrator 2.0) for the reversibility
 # index that supplies the actual direction.
 
-def eq_undecomposable_heuristic(ctx):
-    """eQuilibrator could not decompose the reaction, and says so with a
-    ~1e5 kJ/mol sigma. There is no information in the accompanying dG, so
-    report "?" rather than let a meaningless number reach the index rule."""
-    if abs(ctx.dge) >= EQ_UNDECOMPOSABLE_SIGMA:
-        return f"EQ:undecomposable: {ctx.dge:.0f}", "?"
-    return None
-
-
-def eq_transport_uncorrected_heuristic(ctx):
-    """Transport reaction whose energy we cannot trust.
-
-    Two independent reasons, both documented in the module docstring: the
-    retrieval step collapses compartments when it builds the MetaNetX formula,
-    and Beber 2022 notes the transformed framework needs a
-    ``-N_H*RT*ln(10^dpH) - Q*F*dPhi`` term across a membrane that this pipeline
-    never applies. ATP synthase and ABC transporters are decided structurally
-    before this rule, so they never reach it."""
-    if ctx.rxn_entry.get('is_transport') == 1:
-        return "EQ:transport-uncorrected", "?"
-    return None
-
-
-def make_eq_reversibility_index_heuristic(z=EQ_CONFIDENCE_Z,
-                                          threshold=LN_RI_THRESHOLD):
-    """Direction from the reversibility index, requiring ``z`` sigma of margin.
-
-    ``|ln Gamma| - z*sigma > ln(1000)`` means even the pessimistic end of the
-    interval needs more than a 1000-fold concentration swing to reverse the
-    reaction -- Noor 2012's headline window of 3 uM to 3 mM around 100 uM.
-    ``z=0`` reduces this to the eQuilibrator 2.0 point-estimate test."""
-    def heuristic(ctx):
-        ln_gamma = ctx.ln_gamma
-        if ln_gamma is None:
-            return None
-        margin = abs(ln_gamma) - z * ctx.ln_gamma_err
-        if margin > threshold:
-            return (f"EQ:lnGamma: {ln_gamma:.2f}+/-{ctx.ln_gamma_err:.2f}",
-                    ">" if ln_gamma < 0 else "<")
-        return None
-    heuristic.__name__ = 'eq_reversibility_index_heuristic'
-    return heuristic
-
-
-def make_eq_default_heuristic(z=EQ_CONFIDENCE_Z, threshold=LN_RI_THRESHOLD):
-    """Terminal EQ rule -- always fires, always "=".
-
-    Splits the label so the report distinguishes a reaction that is confidently
-    inside the reversible window from one whose interval merely straddles the
-    threshold. Both are called reversible: Noor 2012 treats Gamma as a
-    continuous index and reserves the directional call for clear cases, and "="
-    is what the GC cascade's terminal rule returns too."""
-    def heuristic(ctx):
-        ln_gamma = ctx.ln_gamma
-        if ln_gamma is None:
-            return "EQ:no-reagents", "="
-        err = ctx.ln_gamma_err
-        state = "reversible" if abs(ln_gamma) + z * err < threshold else "ambiguous"
-        return f"EQ:{state}: {ln_gamma:.2f}+/-{err:.2f}", "="
-    heuristic.__name__ = 'eq_default_heuristic'
-    return heuristic
-
-
-def make_eq_heuristics(z=EQ_CONFIDENCE_Z, threshold=LN_RI_THRESHOLD):
-    """Assemble an eQuilibrator rule set. ``z`` is the confidence margin in
-    units of the propagated ln(Gamma) sigma (1.0 = eQuilibrator 3.0, 0.0 =
-    eQuilibrator 2.0)."""
-    return [
-        # Structural first: these need no energy, so the two eQuilibrator data
-        # defects cannot reach them.
-        atp_synthase_heuristic,
-        abc_transporter_heuristic,
-        eq_undecomposable_heuristic,
-        eq_transport_uncorrected_heuristic,
-        make_eq_reversibility_index_heuristic(z, threshold),
-        make_eq_default_heuristic(z, threshold),
-    ]
-
-
-# Module-level singletons so ``is`` comparisons in tests and callers are stable.
-eq_reversibility_index_heuristic = make_eq_reversibility_index_heuristic()
-eq_default_heuristic = make_eq_default_heuristic()
-
-EQ_HEURISTICS = make_eq_heuristics()             # eQuilibrator 3.0, Beber 2022
-EQ2_HEURISTICS = make_eq_heuristics(z=0.0)       # eQuilibrator 2.0, Flamholz 2012
-
-
 def make_ri_heuristics(z=0.0, threshold=LN_RI_THRESHOLD,
                        sigma_gate=EQ_UNDECOMPOSABLE_SIGMA):
-    """The Noor 2012 reversibility index on its own, with no structural rules.
+    """The Noor 2012 reversibility index, for any source publishing dG + sigma.
 
-    This is the cascade for a source that publishes a dG and an uncertainty and
-    nothing else: reject the records the predictor disowned, then let the index
-    decide. Unlike :func:`make_eq_heuristics` it carries **no transport
-    handling at all** -- no ATP-synthase shortcut, no ABC-transporter shortcut,
-    no membrane gate. A reaction that moves a species across a compartment is
-    scored exactly like any other reaction, from its own stoichiometry and its
-    own dG. That is the point: it puts every reaction on one axis, so a
-    transport call can be compared with a cytosolic one instead of being
-    decided by a rule that fires before the energy is ever read.
+    THE ONE CASCADE FOR BOTH eQuilibrator AND dGPredictor. Until 2026-09-08
+    there were two, ``make_eq_heuristics`` and this one, whose index and default
+    rules were byte-for-byte equivalent apart from an ``EQ:``/``RI:`` label
+    prefix and a defensive ``or 0.0`` on the sigma. Measured across all 110,703
+    scorable contexts they returned the SAME operator every time, and
+    ``ln_gamma_err`` was never None, so the guard never fired. Two names for one
+    heuristic is how they drift apart, so the EQ copies were deleted and both
+    sources now build from here. Status strings are prefixed ``RI:`` for both;
+    the source is carried separately by ``run_reversibility``, so nothing is lost.
+
+    Carries exactly one structural rule, ATP synthase -- see below. It carries
+    NO ABC-transporter shortcut and no membrane gate: a reaction that moves a
+    species across a compartment is scored like any other, from its own
+    stoichiometry and its own dG. That puts every reaction on one axis, so a
+    transport call can be compared with a cytosolic one instead of being decided
+    by a rule that fires before the energy is ever read.
 
     ``sigma_gate`` is the "predictor declined" cut. Pass ``None`` to disable it
     for a source that has no such marker.
     """
-    rules = []
-    if sigma_gate is not None:
-        def undecomposable(ctx, _cut=sigma_gate):
-            """Uncertainty at or past the predictor's decline marker."""
-            if abs(ctx.dge) >= _cut:
-                return f"RI:undecomposable: {ctx.dge:.0f}", "?"
-            return None
-        rules.append(undecomposable)
+    # Sentinel first, for the same reason as GC: a caller reaching the cascade
+    # through explicit_energy skips the outer guards entirely. One rule,
+    # carrying this source's sigma marker if it has one.
+    #
+    # Then ATP SYNTHASE, THE ONE STRUCTURAL RULE THIS CASCADE NEEDS. Without it
+    # the index calls these confidently and wrongly: lnGamma = +/-11.70 +/- 0.09,
+    # 1.7x the ln(1000) threshold, so no uncertainty gate can soften it. The 15
+    # records are the same chemistry written both ways -- 7 as hydrolysis, 8 as
+    # synthesis -- so the index returns 7 ">" and 8 "<", tracking transcription
+    # order rather than biology. The proton-motive force is the entire driving
+    # force here and this pipeline does not compute it, so "=" is the only
+    # defensible call. Applied to dGPredictor too from 2026-09-08: the exposure
+    # is identical and was simply never put to that source.
+    #
+    # NOT abc_transporter_heuristic. Measured against the 1,454 reactions it had
+    # decided under EQ: the index reaches the same answer for 1,414 with ZERO
+    # reversals, so the ATP hydrolysis in the stoichiometry already drives the
+    # call. Of the 40 differences, 26 contain no ATP hydrolysis at all -- the
+    # rule keys on phosphate-count sign and had misidentified them -- and 14 are
+    # genuine ATP-driven transport sitting inside the reversible band, now "=".
+    # GC keeps it: that cascade is Chris's historical one, preserved as history.
+    rules = [make_sentinel_heuristic(sigma_gate), atp_synthase_heuristic]
 
     def index_rule(ctx, _z=z, _thr=threshold):
         ln_gamma = ctx.ln_gamma
@@ -535,59 +575,135 @@ def make_ri_heuristics(z=0.0, threshold=LN_RI_THRESHOLD,
         if ln_gamma is None:
             return "RI:no-reagents", "="
         err = ctx.ln_gamma_err or 0.0
-        state = "reversible" if abs(ln_gamma) + _z * err < _thr else "ambiguous"
-        return f"RI:{state}: {ln_gamma:.2f}+/-{err:.2f}", "="
+        g = abs(ln_gamma)
+        # "=" MEANS REVERSIBLE and "?" MEANS UNKNOWN. Three states reach here:
+        #
+        #  1. The error bar fits INSIDE the band -> positively reversible, "=".
+        #  2. The bar STRADDLES ln(1000) but is small relative to it: the
+        #     reaction is sitting ON the threshold with a well-determined
+        #     energy. Calling this "?" said "no evidence" about reactions whose
+        #     energy is among the best in the database (rxn01101: dG = 8.09
+        #     +/- 0.14, |lnGamma| = 6.83 +/- 0.12 against a threshold of 6.91).
+        #     It reports "=", NOT a direction, and deliberately so. Straddling
+        #     means |g - thr| <= err BY DEFINITION, so the point estimate is
+        #     always within one sigma of the line -- shrinking sigma moves the
+        #     line closer in absolute terms rather than resolving which side the
+        #     reaction is on. A hard ">" here would be a ~65%-confidence call
+        #     dressed as a determination. "=" is the permissive reading that the
+        #     evidence does support: at physiological concentrations this
+        #     reaction is marginal, and concentration control can cross it.
+        #  3. The bar straddles and is wide -> genuinely unknown, "?".
+        #
+        # Rejected: applying the point estimate unconditionally. On dGPredictor,
+        # whose median propagated sigma is 15.51 against a threshold of 6.91,
+        # that would hand out 11,251 hard directional calls read off noise.
+        # The gate is what makes the point estimate defensible.
+        #
+        # Until 2026-09-08 case 2 shipped as "?" and, before that, cases 2 and 3
+        # both shipped as "=".
+        if g + _z * err < _thr:
+            return f"RI:reversible: {ln_gamma:.2f}+/-{err:.2f}", "="
+        if err < RI_TIGHT_FRACTION * _thr:
+            return f"RI:near-threshold: {ln_gamma:.2f}+/-{err:.2f}", "="
+        return f"RI:unknown: {ln_gamma:.2f}+/-{err:.2f}", "?"
     terminal.__name__ = 'ri_default_heuristic'
     rules.append(terminal)
     return rules
 
 
-# The index as Noor 2012 published it: point estimate, ln(1000) cut, nothing else.
-RI_HEURISTICS = make_ri_heuristics(z=0.0)
-
-# Both dGPredictor sources. Neither has a "could not decompose" marker -- a
-# fragment the model has never seen simply contributes nothing to the sum, so
-# there is no sentinel to gate on and ``sigma_gate`` is off. Silent extrapolation
-# is the failure mode instead of a loud refusal, which is why the one-sigma
-# margin is kept.
+# eQuilibrator and both dGPredictor sources now build from ONE factory with
+# IDENTICAL arguments. Keeping two constants preserves the registry seam (and the
+# EQ/DGP report levels) should they ever need to diverge again; today they
+# do not, and any change must be made to both deliberately rather than to one by
+# accident.
 #
-# The margin lands very differently on the two sources, and that difference is
-# the point rather than a reason to split the rule set:
-#   * ``dGPredictor`` reports a fit residual (median 0.35, max 6.1 kcal/mol), so
-#     z=1 barely bites -- 784 of 27,715 reactions move to "ambiguous".
-#   * ``dGPredictor-ModelSEED`` reports a calibrated uncertainty from the
-#     ModelSEED retrain (median 21.17, max 2,039 kcal/mol), and z=1 sends 19,512
-#     of 31,924 there. That is the honest reading of those error bars, not a
-#     defect: on that source most predictions genuinely cannot support a hard
-#     directional call.
-# Use ``RI`` (z=0) to see the point-estimate answer for either source.
-DGP_HEURISTICS = make_ri_heuristics(z=1.0, sigma_gate=None)
+# THE SIGMA GATE IS NOW SHARED, and the separation is clean. dGPredictor has no
+# "could not decompose" marker -- an unseen fragment contributes nothing to the
+# sum, so silent extrapolation is its failure mode and no sigma cut catches it --
+# but the cut is carried anyway, for consistency and as a tripwire. Measured
+# 2026-09-08 over every shipped thermodynamics entry:
+#
+#   source                  n       median      max sigma   >= 2390.06
+#   dGPredictor          29,617      17.01        1,427.33        0
+#   eQuilibrator         25,175       0.77      861,955.72    3,386   <- markers
+#   Group contribution   56,002      24.61   10,000,000.00   26,555   <- markers
+#
+# Excluding each source's marker records, the largest GENUINE sigma anywhere is
+# 566.61 (GC), and eQuilibrator's real values stop at 40.24 before jumping to the
+# refusal scale. So 2,390.06 sits above every real uncertainty in the database
+# with room to spare, and applying it to dGPredictor changes 0 reactions today.
+# Do NOT read it as evidence that dGPredictor declines -- it does not.
+#
+# GC is deliberately NOT given the gate: it encodes its marker in BOTH fields, so
+# 26,555 of its entries would trip a sigma cut, and the dg == 1e7 test in the
+# same rule already catches every one of them.
+#
+# THE ONE-SIGMA MARGIN COSTS THE TWO SOURCES VERY DIFFERENTLY, and that is the
+# honest reading of their error bars rather than a defect. Threshold = ln(1000)
+# = 6.91. Measured 2026-09-08 on the propagated ln(Gamma) sigma, which is what
+# the index actually consumes:
+#
+#   source          n      med |lnG|   med sigma_lnG   z=0 directional -> z=1
+#   eQuilibrator  21,789       6.77            0.62      10,814 -> 10,209  (-5.6%)
+#   dGPredictor   29,616      11.60           15.51      20,145 ->  8,894 (-55.9%)
+#
+# eQuilibrator's typical error bar is 11x BELOW the decision threshold;
+# dGPredictor's is 2.2x ABOVE it. So dGPredictor makes bolder point predictions
+# (median |lnGamma| 11.60 vs 6.77) and has far less right to them: taken at face
+# value it would out-call eQuilibrator nearly two to one, and once the error bars
+# are honoured it falls below it. The margin is kept precisely because silent
+# extrapolation is its failure mode and nothing else catches it.
+#
+# An earlier version of this comment claimed dGPredictor "reports a fit residual
+# (median 0.35, max 6.1 kcal/mol)" and that z=1 moved only "784 of 27,715"
+# reactions to ambiguous. Both are wrong by more than an order of magnitude: the
+# shipped raw sigma has median 17.01 and max 1,427.33, and z=1 sends 18,657 of
+# 29,616 to "?". Do not restore those figures.
+#
+# The point-estimate answer is available by building the set directly with
+# make_ri_heuristics(z=0.0); it is no longer registered. The RI set was removed
+# 2026-09-08 alongside EQ2 -- both were comparison arms production never
+# selected, and a registry entry is an invitation to select one.
+#
+EQ_HEURISTICS = make_ri_heuristics(z=EQ_CONFIDENCE_Z,
+                                   sigma_gate=EQ_UNDECOMPOSABLE_SIGMA)
+DGP_HEURISTICS = make_ri_heuristics(z=EQ_CONFIDENCE_Z,
+                                    sigma_gate=EQ_UNDECOMPOSABLE_SIGMA)
 
 
 # --- Rule-set registry ----------------------------------------------------
+# GC_CANONICAL is GC with the historical "=" terminal, for the top-level field.
+GC_CANONICAL_HEURISTICS = GC_HEURISTICS[:-1] + [canonical_default_heuristic]
+
 HEURISTIC_SETS = {
     'GC': GC_HEURISTICS,
+    'GC_CANONICAL': GC_CANONICAL_HEURISTICS,
     'EQ': EQ_HEURISTICS,
-    'EQ2': EQ2_HEURISTICS,
-    'RI': RI_HEURISTICS,
     'DGP': DGP_HEURISTICS,
 }
 
 DEFAULT_HEURISTIC_SET = 'GC'
 
-# ``thermodynamics`` subkey -> rule-set name. Anything absent falls back to GC,
-# which is what the dGPredictor sources want: they are bare dG predictions with
-# no eQuilibrator-style uncertainty semantics behind them.
+# ``thermodynamics`` subkey -> rule-set name. Only genuinely UNKNOWN labels fall
+# back to GC; every source shipped today is mapped explicitly below. (The old
+# comment here claimed the dGPredictor sources wanted the GC fallback -- stale
+# since DGP was added, and contradicted by the dict immediately below it.)
 SOURCE_HEURISTIC_SET = {
     'eQuilibrator': 'EQ',
     'dGPredictor': 'DGP',
-    'dGPredictor-ModelSEED': 'DGP',
 }
 
 
 def get_heuristics(name=None):
-    """Rule list for a rule-set name. Unknown or missing name -> GC."""
-    return HEURISTIC_SETS.get(name or DEFAULT_HEURISTIC_SET, GC_HEURISTICS)
+    """Rule list for the CANONICAL top-level path. Unknown/missing name -> GC.
+
+    Returns the GC_CANONICAL variant wherever plain GC is asked for, because
+    every caller of this function writes the top-level ``reversibility`` field
+    and that field keeps the historical "=" terminal. The per-source path uses
+    heuristics_for_source() instead. See canonical_default_heuristic.
+    """
+    resolved = HEURISTIC_SETS.get(name or DEFAULT_HEURISTIC_SET, GC_HEURISTICS)
+    return GC_CANONICAL_HEURISTICS if resolved is GC_HEURISTICS else resolved
 
 
 def heuristic_set_for_source(label=None):
@@ -596,8 +712,14 @@ def heuristic_set_for_source(label=None):
 
 
 def heuristics_for_source(label=None):
-    """Rule *list* appropriate to a ``thermodynamics`` subkey. GC by default."""
-    return get_heuristics(heuristic_set_for_source(label))
+    """Rule *list* for a ``thermodynamics`` subkey -- the PER-SOURCE path.
+
+    Reads HEURISTIC_SETS directly rather than via get_heuristics(), which
+    redirects plain GC to the canonical "=" terminal for the top-level field.
+    This path wants the "?" terminal. GC by default.
+    """
+    name = heuristic_set_for_source(label)
+    return HEURISTIC_SETS.get(name or DEFAULT_HEURISTIC_SET, GC_HEURISTICS)
 
 
 # --- Pluggable energy sources: (rxn_entry) -> (dg, dge, source_label) -----
@@ -638,7 +760,7 @@ def energy_source_for_level(db_level):
     rule set also needs eQuilibrator's own sigma for its undecomposable gate,
     which the top-level ``deltagerr`` never carries.
 
-    ``DGP`` and ``DGPM`` read their own sublists for the same reason: since the
+    ``DGP`` reads its own sublist for the same reason: since the
     additive-thermodynamics refactor nothing overwrites ``deltag``, so scoring a
     dGPredictor level off the flat field scores the Group-Contribution number
     and labels it dGPredictor.
@@ -662,4 +784,7 @@ def run_reversibility(rxn_entry, energy_source, heuristics=DEFAULT_HEURISTICS):
         result = heuristic(ctx)
         if result is not None:
             return result[0], result[1], source_label
-    return "default", "=", source_label
+    # Unreachable: every registered set ends in a terminal rule. Kept as a
+    # backstop, and "?" for the same reason default_heuristic returns it -- a
+    # cascade that decided nothing has not established reversibility.
+    return "default", "?", source_label
