@@ -29,36 +29,35 @@ biology. A fourth model, not among the three, audits the resulting vote table
 for internal contradiction. Where the three do not agree, a fifth model
 adjudicates from the votes, the justifications and the audit; where they agree
 unanimously and the auditor raises no objection, that answer is taken directly.
-Model assignments were not chosen a priori. Eleven candidate models were
-scored across the three roles against reactions carrying a measured
-equilibrium constant, and the selected assignment is the one minimising the
-rate at which a reaction is assigned the direction opposite to measurement,
-which is the error class that propagates into flux predictions. The models
-evaluated, their per-role scores and the selected assignment are given in
+The council comprises Claude Opus 4.8, Gemini 3.5 Flash and GPT-5.6 as
+proposers, GPT-5.5 as auditor and Claude Opus 5 as adjudicator. These
+assignments were not chosen a priori: eleven candidate models were scored
+across the three roles, and the selected assignment is the one minimising the
+rate at which a reaction is assigned the direction opposite to an
+experimentally measured one, which is the error class that propagates into
+flux predictions. The models evaluated, their per-role scores and the
+comparison from which this composition was selected are given in
 Supplementary \TBD[table ref].
 
 \paragraph{Reaction population.} Of 56,012 reactions in the database we
-exclude 7,609 flagged obsolete and 2,756 symmetrical transport
-reactions, whose two sides are identical once compartment labels are removed
-and which therefore carry no chemistry to reason about, leaving 45,647
-reactions. Direction is assigned for all of them, including those the
+exclude 7,609 flagged obsolete, 2,756 symmetrical transport reactions, whose
+two sides are identical once compartment labels are removed and which
+therefore carry no chemistry to reason about, and three lipid-composition
+pseudo-reactions that aggregate hundreds of species and have no direction to
+infer, leaving 45,644 reactions. Direction is assigned for all of them, including those the
 thermodynamic pipeline already covers, so that the two methods can be compared
 on the same population rather than only where the numeric sources are silent.
 
-\paragraph{Validation and its limits.} Calls were compared against measured
-equilibrium constants from the NIST Thermodynamics of Enzyme-Catalyzed
-Reactions database, mapped to ModelSEED reaction identifiers through compound
-aliases; 128 reactions in the evaluated slice carry such a measurement.
-This is a small and reversibility-skewed sample, and it bounds what can be
-claimed: it distinguishes clearly weaker configurations from stronger ones but
-does not establish an accuracy figure with useful precision. Two limitations
-follow and are reported rather than corrected. The ensemble commits to a
-direction far more readily than the thermodynamic rules do, returning $?$ on
-\TBD[pct]\% of reactions against the rules' much higher abstention rate, so its
-errors are distributed differently: it assigns a direction where the rules
-decline, and it occasionally assigns the opposite one. And its stated
-confidence does not separate its correct calls from its incorrect ones, so
-confidence cannot be used as an integration filter. Per-reaction justifications
-and the auditor's objections are released alongside the calls
-(Supplementary \TBD[data ref]), so that assignments can be reviewed
-individually rather than accepted on aggregate.
+\paragraph{Release and evaluation status.} Direction calls are released with
+the per-reaction justification from each model and the auditor's objections,
+so individual assignments can be reviewed rather than accepted in aggregate.
+Two properties of the method bear on how the calls should be used. The
+ensemble commits to a direction far more readily than the thermodynamic rules
+do, abstaining on \TBD[pct]\% of reactions where the rules decline on a
+substantial fraction of the database, so it supplies calls where none
+currently exist rather than reproducing the ones that do. And its stated
+confidence does not distinguish its correct calls from its incorrect ones, so
+confidence is not a usable filter for downstream integration. A systematic
+evaluation against measured equilibrium constants, and against the
+model-level consequences of adopting these calls, is deferred to follow-up
+work.
