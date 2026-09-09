@@ -1,0 +1,63 @@
+%% Direction assignment from reaction chemistry (LLM ensemble).
+%% \TBD values pending the full-database run, in progress.
+\subsection{Direction assignment from reaction chemistry}\label{sec:methods-council}
+
+Thermodynamic direction assignment is bounded by estimate coverage: a reaction
+with no accepted \drG{} receives no call, regardless of how well characterised
+its chemistry is. To assign direction for those reactions we evaluated a
+complementary approach that reasons from the reaction itself rather than from
+an energy estimate, using an ensemble of large language models.
+
+\paragraph{Independence from the thermodynamic estimates.} Two prompt variants
+were run. The heuristic-informed variant additionally presents the eQuilibrator,
+group-contribution and dGPredictor estimates as evidence to weigh. The
+heuristic-agnostic variant presents only the reaction identifier, its name and
+its equation, with the equation rewritten to an undirected arrow so that no
+direction is recoverable from the input text. Neither variant is shown the
+database's own reversibility assignment. Only the heuristic-agnostic variant is
+independent of the existing estimates, so only it can contribute a direction
+call that is not a restatement of the numeric sources, and it alone is used
+here. The informed variant is retained as a control: agreement between the two
+bounds how much of the agnostic variant's output is recoverable from chemistry
+alone.
+
+\paragraph{Ensemble.} Each reaction is presented independently to three models
+that do not share a provider, and each returns a direction
+($>$, $<$, $=$, or $?$ where it judges the evidence insufficient), a confidence,
+and a written justification grounded in the stoichiometry or in known enzyme
+biology. A fourth model, not among the three, audits the resulting vote table
+for internal contradiction. Where the three do not agree, a fifth model
+adjudicates from the votes, the justifications and the audit; where they agree
+unanimously and the auditor raises no objection, that answer is taken directly.
+The council comprises Claude Opus 4.8, Gemini 3.5 Flash and GPT-5.6 as
+proposers, GPT-5.5 as auditor and Claude Opus 5 as adjudicator. These
+assignments were not chosen a priori: eleven candidate models were scored
+across the three roles, and the selected assignment is the one minimising the
+rate at which a reaction is assigned the direction opposite to an
+experimentally measured one, which is the error class that propagates into
+flux predictions. The models evaluated, their per-role scores and the
+comparison from which this composition was selected are given in
+Supplementary \TBD[table ref].
+
+\paragraph{Reaction population.} Of 56,012 reactions in the database we
+exclude 7,609 flagged obsolete, 2,756 symmetrical transport reactions, whose
+two sides are identical once compartment labels are removed and which
+therefore carry no chemistry to reason about, and three lipid-composition
+pseudo-reactions that aggregate hundreds of species and have no direction to
+infer, leaving 45,644 reactions. Direction is assigned for all of them, including those the
+thermodynamic pipeline already covers, so that the two methods can be compared
+on the same population rather than only where the numeric sources are silent.
+
+\paragraph{Release and evaluation status.} Direction calls are released with
+the per-reaction justification from each model and the auditor's objections,
+so individual assignments can be reviewed rather than accepted in aggregate.
+Two properties of the method bear on how the calls should be used. The
+ensemble commits to a direction far more readily than the thermodynamic rules
+do, abstaining on \TBD[pct]\% of reactions where the rules decline on a
+substantial fraction of the database, so it supplies calls where none
+currently exist rather than reproducing the ones that do. And its stated
+confidence does not distinguish its correct calls from its incorrect ones, so
+confidence is not a usable filter for downstream integration. A systematic
+evaluation against measured equilibrium constants, and against the
+model-level consequences of adopting these calls, is deferred to follow-up
+work.
