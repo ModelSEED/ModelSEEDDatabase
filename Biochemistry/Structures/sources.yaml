@@ -64,9 +64,12 @@ sources:
         supersedes: |
           loadPerSourcePkas globs every TSV here and lets the
           last-sorted file win per (ext_id, kind), so 26.1 overrides
-          23.4 on the 14,588 ids they share. The 1,379 ids carried
-          only by 23.4 are not dropped — they keep their 23.4 values,
-          because the loader accumulates rather than replaces.
+          23.4 wherever both carry an id. 931 SMILES-only polymers
+          that an InChI-only run missed are now covered directly, via
+          the Java PkaPlugin path. The 448 ids still carried only by
+          23.4 are dominated by the 403 SRU exclusions listed in
+          KEGG_SRU_041020.txt, which are absent from both structure
+          files; they survive by loader accumulation.
     notes: |
       KEGG mol files were also parsed for SRUs (structural repeating
       units); the SRU filter file is KEGG_SRU_041020.txt.
@@ -89,8 +92,11 @@ sources:
         consumed_by_production: true
         generated_by: Scripts/Structures/Run_Marvin_pKas.py
         supersedes: |
-          Overrides 23.4 on the 18,587 shared ids; the 5,660 ids only
-          23.4 carries keep their 23.4 values (the loader accumulates).
+          Overrides 23.4 wherever both carry an id. All 5,644
+          SMILES-only polymers and organometallics are now covered
+          directly via the Java PkaPlugin path, so 26.1 covers 24,249
+          ids against 23.4's 24,247 -- this source no longer depends
+          on loader accumulation for coverage.
 
   ChEBI:
     snapshot: 2024-01-23
@@ -127,8 +133,9 @@ sources:
           and the prefix retirement remains one reviewable change
           rather than a side effect of a Marvin upgrade.
         supersedes: |
-          Overrides 23.4 on the 9,134 shared ids; the 2,052 ids only
-          23.4 carries keep their 23.4 values (the loader accumulates).
+          Overrides 23.4 wherever both carry an id. 2,038 SMILES-only
+          polymers are now covered directly via the Java PkaPlugin
+          path, leaving 14 ids carried only by 23.4.
 
   Rhea:
     snapshot: 2023-03-31
@@ -165,8 +172,11 @@ sources:
           its prefix: the alias-format migration stays a separate,
           reviewable change.
         supersedes: |
-          Overrides 23.4 on all 205 shared ids; the 30 ids only 23.4
-          carries keep their 23.4 values (the loader accumulates).
+          Overrides 23.4 on every id. All 30 SMILES-only POLYMER_*
+          structures carry '*' attachment points; cxcalc refuses them
+          as query molecules, so they are computed with the Java
+          PkaPlugin instead. 26.1 now matches 23.4's coverage exactly
+          (235 ids) with nothing left to accumulate.
 
   ModelSEED:
     snapshot: 2026-09-01
