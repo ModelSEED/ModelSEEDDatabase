@@ -2,14 +2,50 @@
 """Regenerate the per-source Marvin pKa bundles with ChemAxon cxcalc.
 
 Replaces the pKaMol.java path (which needed MarvinBeans on the classpath) with
-the cxcalc CLI shipped in Marvin Desktop Suite. One cxcalc process per source,
-batch mode.
+the cxcalc CLI shipped in Marvin Desktop Suite. One cxcalc process per input
+representation per source, batch mode.
 
-  input   Biochemistry/Structures/<source>/inchi.tsv   (external_id, inchi, ...)
+  input   Biochemistry/Structures/<source>/inchi.tsv    (preferred)
+          Biochemistry/Structures/<source>/smiles.tsv   (gap-fill only)
   output  Biochemistry/Structures/<source>/pkas/marvin_<ver>.tsv
           columns: external_id, kind, value, tool, tool_version
           value:   ";"-joined <fragment>:<atom>:<pKa>, the three-field
                    atom-indexed form these per-source files keep.
+
+INPUT SELECTION. `smiles.tsv` is a strict superset of `inchi.tsv`: every InChI
+id also has a SMILES, and 8,834 compounds across the four sources have a SMILES
+and no InChI. Those 8,834 are why the 23.4 bundles cover more ids than an
+InChI-only run.
+
+cxcalc cannot process any of them, and the reason they have no InChI is the
+same reason cxcalc refuses them:
+
+  8,728  carry `*` attachment points (structural repeating units). Marvin reads
+         these as QUERY molecules and cxcalc declines outright:
+         "pka: Calculation result is not defined for query molecules".
+    105  are organometallics (Mg-porphyrins, chlorophylls). They parse, but
+         cxcalc returns no pKa and an empty `atoms` column.
+      1  is a dative-bond SMILES ("...[Mg]35<-N2=...") the SMILES parser
+         rejects at the '<' character.
+
+So gap-fill currently recovers nothing. It is kept on by default anyway, and
+`--structures` exposes the choice, so a run REPORTS the refusal instead of
+silently omitting those compounds -- and so the gap closes by itself if these
+structure files ever gain non-query SMILES.
+
+The 23.4 values for those polymers came from pKaMol.java, i.e. the Java
+pKaPlugin API, which accepted `*`-bearing structures that the cxcalc CLI will
+not. That API was renamed in 26.1 (chemaxon.calculations.PkaPlugin) and the
+committed pKaMol.class no longer runs against it. Until it is rewritten,
+Compounds.loadPerSourcePkas' accumulation across bundles is the ONLY thing
+preserving pKas for those 8,637 compounds -- see the note at the end.
+
+InChI and SMILES are also NOT interchangeable where both exist. Measured on 600
+ChEBI compounds, they agree within 0.05 for 80.7% of sites when the SMILES is
+neutral, but only 53.1% when it carries a charge, with a 27% site-count
+mismatch: a charged SMILES is an already-deprotonated species, so Marvin is
+answering a different question than it is for the neutral InChI parent. InChI
+therefore wins wherever it exists, and no InChI-derived value is displaced.
 
 cxcalc invocation:
 
@@ -19,10 +55,10 @@ cxcalc invocation:
 
 WHY -i: under --ignore-error cxcalc *silently drops* molecules it cannot parse
 AND renumbers the surviving rows, so the default `id` column is a position in
-the output, not the input -- one unparseable InChI would shift every id after
-it onto the wrong compound. Passing -i makes cxcalc emit `idError[N]` where N
-is the true 1-based input line, which is what this script anchors on. The
-indices are asserted monotonic and in range before anything is written.
+the output, not the input -- one unparseable structure would shift every id
+after it onto the wrong compound. Passing -i makes cxcalc emit `idError[N]`
+where N is the true 1-based input line, which is what this script anchors on.
+The indices are asserted monotonic and in range before anything is written.
 
 ORDERING is cxcalc's own (by significance: apKa1 is the most significant acidic
 value), deliberately not re-sorted by atom index. These are microscopic values
@@ -54,16 +90,24 @@ if __name__ == "__main__":
     _parser = _argparse.ArgumentParser(
         description=__doc__,
         formatter_class=_argparse.RawDescriptionHelpFormatter)
+    # No choices= here: with nargs="*" argparse validates the DEFAULT against
+    # choices as a single value, so any default fails. Validated by hand below.
     _parser.add_argument(
-        "sources", nargs="*", choices=SOURCES, default=SOURCES,
-        help="sources to regenerate (default: all four)")
+        "sources", nargs="*", default=[],
+        help=f"sources to regenerate, from {SOURCES} (default: all four)")
+    _parser.add_argument(
+        "--structures", choices=["inchi", "smiles", "both"], default="both",
+        help="input representation: 'inchi' only, 'smiles' only, or 'both' "
+             "(default) = InChI where it exists, SMILES to fill the gap")
     _ARGS = _parser.parse_args()
+    _bad = [s for s in _ARGS.sources if s not in SOURCES]
+    if _bad:
+        _parser.error(f"invalid source(s) {_bad}; choose from {SOURCES}")
 
 
 import os
 import re
 import subprocess
-import sys
 import tempfile
 from csv import DictReader
 
@@ -71,8 +115,8 @@ TOOL = "Marvin"
 NUM_ACIDIC = 20
 NUM_BASIC = 20
 
-# ChEBI pKa rows are keyed CHEBI_<id> while inchi.tsv carries the bare id;
-# every other source already agrees. loadPerSourcePkas strips this back off.
+# ChEBI pKa rows are keyed CHEBI_<id> while the structure files carry the bare
+# id; every other source already agrees. loadPerSourcePkas strips this back off.
 ID_PREFIX = {"ChEBI": "CHEBI_"}
 
 STRUCT_ROOT = os.path.join(
@@ -83,30 +127,35 @@ ID_RE = re.compile(r"idError\[(\d+)\]")
 
 
 def marvin_version(cxcalc="cxcalc"):
-    """Major.minor of the installed suite, for the filename and the tool_version column."""
-    out = subprocess.run(
-        [cxcalc, "--help"], capture_output=True, text=True
-    ).stdout
+    """Major.minor of the installed suite, for the filename and tool_version column."""
+    out = subprocess.run([cxcalc, "--help"], capture_output=True, text=True).stdout
     m = re.search(r"(\d+\.\d+)", out)
     return m.group(1) if m else "unknown"
 
 
-def read_inchis(source):
-    """Return [(external_id, inchi)] in file order, skipping rows with no structure."""
-    path = os.path.join(STRUCT_ROOT, source, "inchi.tsv")
+def read_structures(source, column, filename):
+    """Return [(external_id, structure)] in file order, skipping empty rows."""
+    path = os.path.join(STRUCT_ROOT, source, filename)
     rows = []
     with open(path) as fh:
         for line in DictReader(fh, dialect="excel-tab"):
-            ext_id, inchi = line.get("external_id"), line.get("inchi")
-            if ext_id and inchi:
-                rows.append((ext_id, inchi))
+            ext_id, struct = line.get("external_id"), line.get(column)
+            if ext_id and struct:
+                rows.append((ext_id, struct))
     return rows
 
 
-def run_cxcalc(inchis, cxcalc="cxcalc"):
-    """Feed one InChI per line; return the parsed TSV rows as dicts."""
-    with tempfile.NamedTemporaryFile("w", suffix=".inchi", delete=False) as fh:
-        fh.write("\n".join(inchis) + "\n")
+def run_cxcalc(structures, suffix, cxcalc="cxcalc"):
+    """Feed one structure per line; return (input_index, row) pairs.
+
+    The index is the TRUE 1-based input line, read back from cxcalc's
+    idError[N] id column -- never the output row position, which renumbers
+    whenever --ignore-error drops an unparseable structure.
+    """
+    if not structures:
+        return []
+    with tempfile.NamedTemporaryFile("w", suffix=suffix, delete=False) as fh:
+        fh.write("\n".join(structures) + "\n")
         tmp = fh.name
     try:
         proc = subprocess.run(
@@ -117,8 +166,30 @@ def run_cxcalc(inchis, cxcalc="cxcalc"):
     finally:
         os.unlink(tmp)
     if not proc.stdout.strip():
-        raise RuntimeError(f"empty cxcalc output; stderr:\n{proc.stderr[:2000]}")
-    return list(DictReader(proc.stdout.splitlines(), dialect="excel-tab"))
+        # Every structure in the batch failed to parse. That is a legitimate
+        # outcome for a gap-fill batch (see INPUT SELECTION: the SMILES-only
+        # compounds are query molecules and organometallics), so report it
+        # rather than aborting the source. An empty stdout with an empty
+        # stderr is different -- that means cxcalc itself failed.
+        if proc.stderr.strip():
+            print(f"  ! cxcalc returned nothing for all {len(structures)} structures "
+                  f"in this batch; first error: {proc.stderr.splitlines()[0][:120]}")
+            return []
+        raise RuntimeError("cxcalc produced no output and no error")
+
+    out = []
+    for r in DictReader(proc.stdout.splitlines(), dialect="excel-tab"):
+        m = ID_RE.match((r.get("x") or r.get("id") or "").strip())
+        if not m:
+            raise RuntimeError(f"cannot read input index from {r!r}")
+        out.append((int(m.group(1)), r))
+
+    idx = [i for i, _ in out]
+    if idx != sorted(idx) or len(set(idx)) != len(idx):
+        raise RuntimeError("cxcalc input indices are not strictly increasing")
+    if idx and (min(idx) < 1 or max(idx) > len(structures)):
+        raise RuntimeError(f"cxcalc input index out of range 1..{len(structures)}")
+    return out
 
 
 def split_values(row):
@@ -143,37 +214,48 @@ def encode(values, atoms, fragment=1):
     return ";".join(f"{fragment}:{a}:{v}" for v, a in zip(values, atoms))
 
 
-def process(source, version, cxcalc="cxcalc"):
-    rows = read_inchis(source)
-    out_rows = []
-
-    results = run_cxcalc([i for _, i in rows], cxcalc=cxcalc)
-
-    # Anchor every result on the true input line, never on output position.
-    indices = []
-    for r in results:
-        m = ID_RE.match((r.get("x") or r.get("id") or "").strip())
-        if not m:
-            raise RuntimeError(f"{source}: cannot read input index from {r!r}")
-        indices.append(int(m.group(1)))
-    if indices != sorted(indices) or len(set(indices)) != len(indices):
-        raise RuntimeError(f"{source}: cxcalc input indices are not strictly increasing")
-    if indices and (min(indices) < 1 or max(indices) > len(rows)):
-        raise RuntimeError(f"{source}: cxcalc input index out of range 1..{len(rows)}")
-
-    dropped = len(rows) - len(results)
-    prefix = ID_PREFIX.get(source, "")
-
-    for idx, r in zip(indices, results):
-        ext_id = prefix + rows[idx - 1][0]
+def emit(rows, results, prefix, version):
+    """Turn (index, cxcalc row) pairs into output tuples."""
+    out = []
+    for idx, r in results:
         parsed = split_values(r)
         if parsed is None:
             continue
         acidic, basic, atoms = parsed
+        ext_id = prefix + rows[idx - 1][0]
         if acidic:
-            out_rows.append((ext_id, "pKa", encode(acidic, atoms[: len(acidic)]), TOOL, version))
+            out.append((ext_id, "pKa", encode(acidic, atoms[: len(acidic)]), TOOL, version))
         if basic:
-            out_rows.append((ext_id, "pKb", encode(basic, atoms[len(acidic):]), TOOL, version))
+            out.append((ext_id, "pKb", encode(basic, atoms[len(acidic):]), TOOL, version))
+    return out
+
+
+def process(source, version, structures="both", cxcalc="cxcalc"):
+    prefix = ID_PREFIX.get(source, "")
+    out_rows = []
+    stats = {}
+
+    inchi_rows, smiles_rows = [], []
+    if structures in ("inchi", "both"):
+        inchi_rows = read_structures(source, "inchi", "inchi.tsv")
+    if structures in ("smiles", "both"):
+        smiles_rows = read_structures(source, "smiles", "smiles.tsv")
+        if structures == "both":
+            # InChI wins wherever it exists; SMILES fills the gap only.
+            have = {e for e, _ in inchi_rows}
+            smiles_rows = [(e, s) for e, s in smiles_rows if e not in have]
+
+    for label, rows, suffix in (("inchi", inchi_rows, ".inchi"),
+                                ("smiles", smiles_rows, ".smi")):
+        if not rows:
+            continue
+        results = run_cxcalc([s for _, s in rows], suffix, cxcalc=cxcalc)
+        got = emit(rows, results, prefix, version)
+        out_rows += got
+        # "refused" counts structures cxcalc dropped outright (unparseable, or
+        # query molecules it declines); a returned row with no values still
+        # counts as returned. See INPUT SELECTION.
+        stats[label] = (len(rows), len(rows) - len(results), len({r[0] for r in got}))
 
     out_dir = os.path.join(STRUCT_ROOT, source, "pkas")
     os.makedirs(out_dir, exist_ok=True)
@@ -183,18 +265,20 @@ def process(source, version, cxcalc="cxcalc"):
         for row in out_rows:
             fh.write("\t".join(row) + "\n")
 
-    ids = len({r[0] for r in out_rows})
-    print(f"{source:<8} in={len(rows):<6} parsed={len(results):<6} unparseable={dropped:<4} "
-          f"compounds_with_pka={ids:<6} rows={len(out_rows):<6} -> {out_path}")
+    parts = "  ".join(
+        f"{k}: in={v[0]} refused={v[1]} with_pka={v[2]}" for k, v in stats.items())
+    print(f"{source:<8} {parts}")
+    print(f"{'':<8} total compounds={len({r[0] for r in out_rows}):<6} "
+          f"rows={len(out_rows):<6} -> {os.path.relpath(out_path, STRUCT_ROOT)}")
     return out_path
 
 
 def main():
     cxcalc = os.environ.get("CXCALC_BIN", "cxcalc")
     version = marvin_version(cxcalc)
-    print(f"Marvin {version} via {cxcalc}\n")
-    for source in _ARGS.sources:
-        process(source, version, cxcalc=cxcalc)
+    print(f"Marvin {version} via {cxcalc}  (structures={_ARGS.structures})\n")
+    for source in (_ARGS.sources or SOURCES):
+        process(source, version, structures=_ARGS.structures, cxcalc=cxcalc)
 
 
 if __name__ == "__main__":
