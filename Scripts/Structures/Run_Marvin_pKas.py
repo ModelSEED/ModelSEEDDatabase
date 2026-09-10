@@ -346,6 +346,9 @@ def process(source, version, structures="both", cxcalc="cxcalc"):
         results = run_plugin([s for _, s in smiles_rows], cxcalc=cxcalc)
         got = emit_plugin(smiles_rows, results, prefix, version)
         out_rows += got
+        # "no_result" is not all failure: of the 191 across all four sources,
+        # 1 SMILES is unparseable and 1 crashes PkaPlugin.run(); the other 189
+        # run cleanly and simply have no ionizable site.
         stats["smiles (plugin)"] = (
             len(smiles_rows), len(smiles_rows) - len(results), len({r[0] for r in got}))
 
@@ -358,7 +361,7 @@ def process(source, version, structures="both", cxcalc="cxcalc"):
             fh.write("\t".join(row) + "\n")
 
     parts = "  ".join(
-        f"{k}: in={v[0]} refused={v[1]} with_pka={v[2]}" for k, v in stats.items())
+        f"{k}: in={v[0]} no_result={v[1]} with_pka={v[2]}" for k, v in stats.items())
     print(f"{source:<8} {parts}")
     print(f"{'':<8} total compounds={len({r[0] for r in out_rows}):<6} "
           f"rows={len(out_rows):<6} -> {os.path.relpath(out_path, STRUCT_ROOT)}")

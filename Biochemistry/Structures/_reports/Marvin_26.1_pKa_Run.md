@@ -51,8 +51,11 @@ MetaCyc exceeds it, and 448 of the remaining 485 are KEGG's
 SRU exclusions -- absent from both structure files and listed in
 `KEGG/KEGG_SRU_041020.txt`.
 
-Zero InChI structures failed to parse. The plugin declined 191 SMILES across all
-sources, chiefly dative-bond notation its parser rejects.
+Zero InChI structures failed to parse. 191 of the 8,834 SMILES-only structures
+yielded nothing, but only 2 of those are failures: 1 SMILES the parser rejects
+(dative-bond notation, `[Mg]35<-N2=`) and 1 that raises
+`ArrayIndexOutOfBoundsException` inside `PkaPlugin.run()`. The other **189 run
+cleanly and simply have no ionizable site** -- chemistry, not error.
 
 ## 23.4 vs 26.1
 
