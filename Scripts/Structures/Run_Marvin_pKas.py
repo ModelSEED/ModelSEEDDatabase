@@ -17,8 +17,8 @@ id also has a SMILES, and 8,834 compounds across the four sources have a SMILES
 and no InChI. Those 8,834 are why the 23.4 bundles cover more ids than an
 InChI-only run.
 
-cxcalc cannot process any of them, and the reason they have no InChI is the
-same reason cxcalc refuses them:
+The cxcalc CLI cannot process any of them, and the reason they have no InChI is
+the same reason cxcalc refuses them:
 
   8,728  carry `*` attachment points (structural repeating units). Marvin reads
          these as QUERY molecules and cxcalc declines outright:
@@ -28,17 +28,21 @@ same reason cxcalc refuses them:
       1  is a dative-bond SMILES ("...[Mg]35<-N2=...") the SMILES parser
          rejects at the '<' character.
 
-So gap-fill currently recovers nothing. It is kept on by default anyway, and
-`--structures` exposes the choice, so a run REPORTS the refusal instead of
-silently omitting those compounds -- and so the gap closes by itself if these
-structure files ever gain non-query SMILES.
+The Java API underneath the CLI has no such restriction. So those compounds go
+through chemaxon.calculations.PkaPlugin directly, via JPype (a JRE is enough --
+no JDK, nothing to compile). This is the same route pKaMol.java took before the
+API was renamed in 26.1 and its committed .class stopped running.
 
-The 23.4 values for those polymers came from pKaMol.java, i.e. the Java
-pKaPlugin API, which accepted `*`-bearing structures that the cxcalc CLI will
-not. That API was renamed in 26.1 (chemaxon.calculations.PkaPlugin) and the
-committed pKaMol.class no longer runs against it. Until it is rewritten,
-Compounds.loadPerSourcePkas' accumulation across bundles is the ONLY thing
-preserving pKas for those 8,637 compounds -- see the note at the end.
+Both paths are ONE engine, verified rather than assumed: over 300 ChEBI
+compounds the plugin reproduces cxcalc to a median |delta| of 0.0000 and a max
+of 0.000, 100% within 0.01, with 1 site-count difference in 567 sets and
+identical atom ordering in 562. A bundle may therefore mix them. Which rows
+came from the plugin is recoverable from the data: they are exactly the ids in
+the bundle that are absent from `inchi.tsv`.
+
+The plugin does NOT invent sites on the wildcards: across the Rhea polymers,
+0 of 154 predicted sites sat on an atom bonded to a `*`, and site counts match
+23.4 in 40 of 40 comparable sets.
 
 InChI and SMILES are also NOT interchangeable where both exist. Measured on 600
 ChEBI compounds, they agree within 0.05 for 80.7% of sites when the SMILES is
@@ -46,6 +50,11 @@ neutral, but only 53.1% when it carries a charge, with a 27% site-count
 mismatch: a charged SMILES is an already-deprotonated species, so Marvin is
 answering a different question than it is for the neutral InChI parent. InChI
 therefore wins wherever it exists, and no InChI-derived value is displaced.
+
+REQUIRES. `cxcalc` on PATH (Marvin Desktop Suite). For the plugin path only,
+`pip install jpype1`, plus the suite's jars -- found next to the cxcalc binary,
+or point MARVIN_LIB at <marvinsuite>/lib. `--structures inchi` skips the plugin
+path entirely and needs neither.
 
 cxcalc invocation:
 
@@ -105,8 +114,10 @@ if __name__ == "__main__":
         _parser.error(f"invalid source(s) {_bad}; choose from {SOURCES}")
 
 
+import glob
 import os
 import re
+import shutil
 import subprocess
 import tempfile
 from csv import DictReader
@@ -214,6 +225,82 @@ def encode(values, atoms, fragment=1):
     return ";".join(f"{fragment}:{a}:{v}" for v, a in zip(values, atoms))
 
 
+def _marvin_lib(cxcalc="cxcalc"):
+    """The jar directory of the installed suite, for the plugin classpath."""
+    lib = os.environ.get("MARVIN_LIB")
+    if lib:
+        return lib
+    exe = shutil.which(cxcalc)
+    if exe:
+        cand = os.path.join(os.path.dirname(os.path.realpath(exe)), "..", "lib")
+        if os.path.isdir(cand):
+            return os.path.normpath(cand)
+    raise RuntimeError(
+        "cannot locate the Marvin jars; set MARVIN_LIB to <marvinsuite>/lib")
+
+
+def run_plugin(structures, cxcalc="cxcalc"):
+    """pKa via the Java PkaPlugin, for structures the cxcalc CLI refuses.
+
+    Returns [(input_index, {fragment: (acidic, basic)})] where each of acidic
+    and basic is [(atom, value)] -- acidic ascending, basic descending, which
+    is the significance order cxcalc itself emits.
+
+    jpype is imported lazily so --help and the InChI-only path never start a
+    JVM. A JRE is sufficient; nothing here is compiled.
+    """
+    if not structures:
+        return []
+    import jpype                                   # noqa: local by design
+    import jpype.imports                           # noqa: registers importer
+    if not jpype.isJVMStarted():
+        jpype.startJVM(classpath=glob.glob(os.path.join(_marvin_lib(cxcalc), "*.jar")))
+    from chemaxon.calculations import PkaPlugin
+    from chemaxon.formats import MolImporter
+
+    out = []
+    for i, struct in enumerate(structures, start=1):
+        try:
+            mol = MolImporter.importMol(struct)
+            frags = {}
+            for fi, frag in enumerate(mol.convertToFrags(), start=1):
+                plugin = PkaPlugin()
+                plugin.setpH(7.0)
+                plugin.setMolecule(frag)
+                plugin.run()
+                acidic, basic = [], []
+                for atom in range(frag.getAtomCount()):
+                    a = plugin.getpKaValues(atom, PkaPlugin.ACIDIC)
+                    b = plugin.getpKaValues(atom, PkaPlugin.BASIC)
+                    if a is not None:
+                        acidic.append((atom + 1, round(float(a[0]), 2)))
+                    if b is not None:
+                        basic.append((atom + 1, round(float(b[0]), 2)))
+                acidic.sort(key=lambda t: t[1])
+                basic.sort(key=lambda t: -t[1])
+                if acidic or basic:
+                    frags[fi] = (acidic, basic)
+            if frags:
+                out.append((i, frags))
+        except Exception:
+            continue                               # unreadable structure
+    return out
+
+
+def emit_plugin(rows, results, prefix, version):
+    """Plugin results -> output tuples, tokens spanning fragments as 23.4 did."""
+    out = []
+    for idx, frags in results:
+        ext_id = prefix + rows[idx - 1][0]
+        for kind, which in (("pKa", 0), ("pKb", 1)):
+            toks = [f"{fi}:{atom}:{val}"
+                    for fi in sorted(frags)
+                    for atom, val in frags[fi][which]]
+            if toks:
+                out.append((ext_id, kind, ";".join(toks), TOOL, version))
+    return out
+
+
 def emit(rows, results, prefix, version):
     """Turn (index, cxcalc row) pairs into output tuples."""
     out = []
@@ -245,17 +332,22 @@ def process(source, version, structures="both", cxcalc="cxcalc"):
             have = {e for e, _ in inchi_rows}
             smiles_rows = [(e, s) for e, s in smiles_rows if e not in have]
 
-    for label, rows, suffix in (("inchi", inchi_rows, ".inchi"),
-                                ("smiles", smiles_rows, ".smi")):
-        if not rows:
-            continue
-        results = run_cxcalc([s for _, s in rows], suffix, cxcalc=cxcalc)
-        got = emit(rows, results, prefix, version)
+    # InChI through the cxcalc CLI; the SMILES-only remainder through the Java
+    # PkaPlugin, which accepts the query molecules and organometallics the CLI
+    # refuses. Same engine either way -- see INPUT SELECTION.
+    if inchi_rows:
+        results = run_cxcalc([s for _, s in inchi_rows], ".inchi", cxcalc=cxcalc)
+        got = emit(inchi_rows, results, prefix, version)
         out_rows += got
-        # "refused" counts structures cxcalc dropped outright (unparseable, or
-        # query molecules it declines); a returned row with no values still
-        # counts as returned. See INPUT SELECTION.
-        stats[label] = (len(rows), len(rows) - len(results), len({r[0] for r in got}))
+        stats["inchi (cxcalc)"] = (
+            len(inchi_rows), len(inchi_rows) - len(results), len({r[0] for r in got}))
+
+    if smiles_rows:
+        results = run_plugin([s for _, s in smiles_rows], cxcalc=cxcalc)
+        got = emit_plugin(smiles_rows, results, prefix, version)
+        out_rows += got
+        stats["smiles (plugin)"] = (
+            len(smiles_rows), len(smiles_rows) - len(results), len({r[0] for r in got}))
 
     out_dir = os.path.join(STRUCT_ROOT, source, "pkas")
     os.makedirs(out_dir, exist_ok=True)

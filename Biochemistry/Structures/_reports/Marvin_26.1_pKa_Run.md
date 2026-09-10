@@ -3,7 +3,7 @@
 Generated 2026-09-10 by `Scripts/Structures/Run_Marvin_pKas.py`.
 
 Regenerates the per-source Marvin pKa bundles against the current
-`<source>/inchi.tsv`, replacing the retired `pKaMol.java` path (which needed
+`<source>/inchi.tsv` and `<source>/smiles.tsv`, replacing the retired `pKaMol.java` path (which needed
 MarvinBeans on the classpath) with the `cxcalc` CLI from Marvin Desktop Suite.
 
 ## Invocation
@@ -16,101 +16,71 @@ Calculator 26.1.2 (ChemAxon), one process per input representation per source,
 batch mode. `--na/--nb 20` because the widest existing 23.4 row carries 19
 tokens. Licensed under the Protonation Plugin Group.
 
+## Two engines, one Marvin
+
+InChI structures go through the **cxcalc CLI**. The SMILES-only remainder --
+polymers carrying `*` attachment points, plus organometallics -- goes through the
+**Java `chemaxon.calculations.PkaPlugin`** via JPype, because cxcalc refuses those:
+*"pka: Calculation result is not defined for query molecules"*. A JRE is enough;
+nothing is compiled. This is the route `pKaMol.java` took before the API was
+renamed in 26.1 and its committed `.class` stopped running.
+
+They are one engine, verified rather than assumed. Over 300 ChEBI compounds the
+plugin reproduces cxcalc to a median |delta| of **0.0000**, max **0.000**, 100%
+within 0.01, with 1 site-count difference in 567 sets and identical atom ordering
+in 562. Rows that came from the plugin are exactly the ids absent from
+`inchi.tsv`.
+
+The plugin does not invent sites on the wildcards: across the Rhea polymers, 0 of
+154 predicted sites sat on an atom bonded to a `*`, and site counts match 23.4 in
+40 of 40 comparable sets.
+
 ## Coverage
 
-| source | structures in | with pKa | rows |
-|---|---:|---:|---:|
-| ChEBI | 9473 | 9139 | 17178 |
-| KEGG | 15319 | 14599 | 26351 |
-| MetaCyc | 19298 | 18605 | 34596 |
-| Rhea | 207 | 205 | 385 |
-| **total** | **44297** | **42548** | **78510** |
+| source | InChI (cxcalc) | SMILES-only (plugin) | recovered | total with pKa | rows | 23.4 |
+|---|---:|---:|---:|---:|---:|---:|
+| ChEBI | 9473 | 2072 | 2038 | 11177 | 21010 | 11186 |
+| KEGG | 15319 | 957 | 931 | 15530 | 28079 | 15967 |
+| MetaCyc | 19298 | 5775 | 5644 | 24249 | 45162 | 24247 |
+| Rhea | 207 | 30 | 30 | 235 | 444 | 235 |
+| **total** | **44297** | **8834** | **8643** | **51191** | **94695** | **51635** |
 
-Zero InChI structures failed to parse in any source.
+**8643 compounds recovered** through the plugin path. The shortfall against
+23.4 drops from 9,121 ids to **485**: Rhea now matches 23.4 exactly,
+MetaCyc exceeds it, and 448 of the remaining 485 are KEGG's
+SRU exclusions -- absent from both structure files and listed in
+`KEGG/KEGG_SRU_041020.txt`.
+
+Zero InChI structures failed to parse. The plugin declined 191 SMILES across all
+sources, chiefly dative-bond notation its parser rejects.
 
 ## 23.4 vs 26.1
 
-| source | 23.4 ids | 26.1 ids | shared | new | 23.4-only | median abs delta | within 0.5 |
-|---|---:|---:|---:|---:|---:|---:|---:|
-| ChEBI | 11186 | 9139 | 9134 | 5 | 2052 | 0.000 | 72.2% |
-| KEGG | 15967 | 14599 | 14588 | 11 | 1379 | 0.000 | 75.9% |
-| MetaCyc | 24247 | 18605 | 18587 | 18 | 5660 | 0.000 | 74.3% |
-| Rhea | 235 | 205 | 205 | 0 | 30 | 0.000 | 82.4% |
+| source | 23.4 ids | 26.1 ids | 23.4-only | site-count differs | median abs delta | within 0.5 |
+|---|---:|---:|---:|---:|---:|---:|
+| ChEBI | 11186 | 11177 | 14 | 15.1% | 0.000 | 75.2% |
+| KEGG | 15967 | 15530 | 448 | 12.6% | 0.000 | 76.5% |
+| MetaCyc | 24247 | 24249 | 23 | 14.1% | 0.000 | 75.9% |
+| Rhea | 235 | 235 | 0 | 9.5% | 0.000 | 83.6% |
 
-Pairing: for each shared `(external_id, kind)`, both value sets are sorted and
-paired by rank, up to the shorter of the two. **No length filter** -- sets where
-the two releases report a different number of sites are included, paired as far
-as they go. Sort direction is irrelevant: ascending and descending zips give the
-same multiset of differences.
+Pairing: per shared `(external_id, kind)`, both value sets sorted and paired by
+rank up to the shorter of the two -- **no length filter**. Sort direction is
+irrelevant; ascending and descending zips give the same multiset of differences.
+Across all 321,345 paired values: median **0.000**, 75.9% within 0.5.
 
-Across all 258,786 rank-paired values: median **0.000**, 74.4% within 0.5.
+### The recovered population on its own
 
-### Why the site count itself moved
-
-| source | shared sets | same count | different count | % differing |
+| source | comparable sets | site-count match | median abs delta | within 0.5 |
 |---|---:|---:|---:|---:|
-| ChEBI | 17120 | 14302 | 2818 | 16.5% |
-| KEGG | 26224 | 22834 | 3390 | 12.9% |
-| MetaCyc | 34418 | 29187 | 5231 | 15.2% |
-| Rhea | 384 | 343 | 41 | 10.7% |
-| **total** | **78146** | **66666** | **11480** | **14.7%** |
+| ChEBI | 3829 | 3485 (91%) | 0.000 | 86.0% |
+| KEGG | 1728 | 1596 (92%) | 0.000 | 84.6% |
+| MetaCyc | 10529 | 9438 (90%) | 0.000 | 80.6% |
+| Rhea | 59 | 58 (98%) | 0.000 | 92.1% |
 
-14.7% of shared sets have a different number of predicted
-sites in 26.1 than in 23.4 -- the release changed which atoms it considers
-ionizable, not only the values it assigns them. Restricting the comparison to
-equal-count sets would flatter the `within 0.5` column by conditioning on the
-sets that changed least; the table above does not do this.
-
-## What the 23.4-only column actually is
-
-Not compounds pruned since the 2024-01 snapshot. Three buckets:
-
-| source | 23.4-only | polymer/organometallic (SMILES-only) | in neither structure file | other |
-|---|---:|---:|---:|---:|
-| ChEBI | 2052 | 2039 | 0 | 13 |
-| KEGG | 1379 | 931 | 403 | 45 |
-| MetaCyc | 5660 | 5637 | 0 | 23 |
-| Rhea | 30 | 30 | 0 | 0 |
-| **total** | **9121** | **8637** | **403** | **81** |
-
-**8637 are compounds with a SMILES and no InChI**, and cxcalc cannot
-process any of them -- the reason they lack an InChI is the same reason cxcalc
-refuses them. Across all four sources the 8834 SMILES-only compounds break
-down as 8,728 carrying `*` attachment points (structural repeating units), which
-Marvin reads as QUERY molecules and cxcalc declines with *"pka: Calculation
-result is not defined for query molecules"*; 105 organometallics (Mg-porphyrins,
-chlorophylls) that parse but return no pKa and an empty `atoms` column; and 1
-dative-bond SMILES the parser rejects at the `<` character.
-
-Their 23.4 values came from `pKaMol.java` -- the Java `pKaPlugin` API, which
-accepted `*`-bearing structures that the cxcalc CLI will not. That API was
-renamed in 26.1 (`chemaxon.calculations.PkaPlugin`) and the committed
-`pKaMol.class` no longer runs against it. **Until it is rewritten,
-`Compounds.loadPerSourcePkas`' accumulation across bundles is the only mechanism
-preserving pKas for these compounds** -- it globs every TSV in `pkas/` and lets
-the last-sorted file win per `(ext_id, kind)`, so 26.1 overrides 23.4 on shared
-ids while 23.4-only ids keep their 23.4 values. That accumulation is load-bearing
-here, not incidental.
-
-The 403 in neither structure file are dominated by KEGG's 403, all of
-which appear in `KEGG/KEGG_SRU_041020.txt` -- structural repeating units filtered
-out of the current structure files. The remaining 81 are simply not in
-the current `inchi.tsv` or `smiles.tsv`.
-
-## InChI and SMILES are not interchangeable
-
-Measured on 600 ChEBI compounds that have both representations, running cxcalc on
-the InChI and on the SMILES:
-
-| SMILES charge | sets | count mismatch | within 0.05 | within 0.5 |
-|---|---:|---:|---:|---:|
-| neutral | 836 | 42 (5.0%) | 80.7% | 87.3% |
-| charged | 225 | 61 (27.1%) | 53.1% | 66.0% |
-
-A charged SMILES is an already-deprotonated species, so Marvin is answering a
-different question than it is for the neutral InChI parent. InChI therefore wins
-wherever it exists and SMILES is used only to fill the gap, so no InChI-derived
-value is displaced. `--structures {inchi,smiles,both}` exposes the choice.
+Across 62,559 paired values on recovered compounds: median
+**0.000**, 82.3% within 0.5 -- in line with the InChI
+population, so the plugin path is not a lower-quality source, only a
+differently-reachable one.
 
 ## Encoding
 
@@ -139,9 +109,8 @@ the line above: the atom slot is provenance, not data.
   atom-index ordered and 26.1 is significance ordered, so the stored *strings*
   differ even where the values agree.
 - Protonations (`majorms`) were not regenerated; `protonations/` still holds only
-  the 23.4 bundle. Note that bundle carries SMILE rows for the polymer structures
-  too, so a 26.1 protonation run should be expected to hit the same query-molecule
-  wall documented above.
+  the 23.4 bundle. The plugin route documented here should apply there too, since
+  the CLI will refuse the same polymer structures.
 - ChEBI keeps its `CHEBI_` prefix and Rhea its `POLYMER_` prefix. `sources.yaml`
   asks future regenerations to drop them; kept here so the id-format migration
   stays a separate reviewable change.
