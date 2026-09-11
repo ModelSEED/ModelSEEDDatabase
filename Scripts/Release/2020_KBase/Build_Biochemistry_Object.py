@@ -1,18 +1,8 @@
 #!/usr/bin/env python
-
-if __name__ == "__main__":
-    # Validate arguments BEFORE importing anything or touching the database.
-    # These scripts mutate the database, and without this an unknown flag or a
-    # mistyped mode was silently ignored and the script ran with its defaults:
-    # asking Estimate_Reaction_Reversibility.py for --help rewrote 122 files.
-    # Placed above the imports so --help works even where a dependency is
-    # missing from the path.
-    import argparse as _argparse
-    _argparse.ArgumentParser(
-        description=__doc__,
-        formatter_class=_argparse.RawDescriptionHelpFormatter).parse_args()
-
-
+# FROZEN AT THE 2020 RELEASE. Restored verbatim from b83c6fcd (2020-08-24),
+# the last state before the Seaver et al. paper. The ONLY deviation from that
+# commit is the relative-path depth (../../ -> ../../../), because the script
+# now lives one directory deeper. See README.md in this folder.
 from collections import defaultdict
 import csv
 from datetime import datetime
@@ -115,20 +105,20 @@ def parse_aliases(fp):
 
 
 if __name__ == "__main__":
-    biochem_obj = json.load(open("../../Objects/Base_Biochemistry.json"))
-    biochem_obj['compounds'] = parse_compounds('../../Biochemistry/compounds.json')
-    biochem_obj['reactions'] = parse_reactions('../../Biochemistry/reactions.json')
+    biochem_obj = json.load(open("../../../Objects/Base_Biochemistry.json"))
+    biochem_obj['compounds'] = parse_compounds('../../../Biochemistry/compounds.json')
+    biochem_obj['reactions'] = parse_reactions('../../../Biochemistry/reactions.json')
 
     biochem_obj['compound_aliases'] = defaultdict(lambda: defaultdict(list))
     for file in ("Unique_ModelSEED_Compound_Aliases.txt","Unique_ModelSEED_Compound_Names.txt"):
-        aliases = parse_aliases('../../Biochemistry/Aliases/'+file)
+        aliases = parse_aliases('../../../Biochemistry/Aliases/'+file)
         for msid in aliases:
             for source in aliases[msid]:
                 biochem_obj['compound_aliases'][msid][source]=aliases[msid][source]
                 
-    biochem_obj['reaction_aliases'] = parse_aliases('../../Biochemistry/Aliases/Unique_ModelSEED_Reaction_Aliases.txt')
+    biochem_obj['reaction_aliases'] = parse_aliases('../../../Biochemistry/Aliases/Unique_ModelSEED_Reaction_Aliases.txt')
     biochem_obj['description'] = \
         'Biochemistry object generated on {} from ModelSEEDDatabase commit {}'\
         .format(datetime.today(), local_head)
-    out_fp = '../../Objects/{}.json'.format(biochem_obj['id']+"_Biochem")
+    out_fp = '../../../Objects/{}.json'.format(biochem_obj['id']+"_Biochem")
     json.dump(biochem_obj, open(out_fp, 'w'), indent=4, sort_keys=True)
