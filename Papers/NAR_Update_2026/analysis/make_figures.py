@@ -79,6 +79,178 @@ def _pka_provenance():
     return by_cpd, by_rxn
 
 
+def _ladder_vintage():
+    """Figure 2A: the full extent of the shipped pKa ladders, and how each was
+    reached.
+
+    Marvin 26.1 computed most ladders from the per-source InChI files through
+    the cxcalc CLI. That CLI refuses polymers and organometallics as "query
+    molecules", so those are computed instead from SMILES through the Java
+    PkaPlugin (PR #292) -- the same engine and release, a different route in.
+    The SMILES-derived share is hatched rather than given its own colour,
+    because it is a provenance distinction inside one release, not a separate
+    source: engine parity was measured at median |delta| 0.0000 over 300
+    compounds both routes can do.
+
+    Denominator is EVERY compound and EVERY reaction, not the InChI-bearing
+    subset the panel used before the SMILES route existed -- the point of the
+    panel is now coverage of the database rather than of one structure file.
+
+    Resolution goes through BiochemPy.loadPerSourcePkas and the same
+    KEGG > MetaCyc > ChEBI > Rhea cascade Update_Compound_pKas.py applies, so
+    the panel cannot drift from what the database ships.
+    """
+    import csv as _csv, glob as _glob, json as _json, collections as _c, sys as _sys
+    root = Path(__file__).resolve().parents[3]
+    _sys.path.insert(0, str(root / "Libs" / "Python"))
+    from BiochemPy import Compounds
+    DBS = ["KEGG", "MetaCyc", "ChEBI", "Rhea"]
+
+    def norm(db, e):
+        if db == "ChEBI" and e.startswith("CHEBI_"): return e[len("CHEBI_"):]
+        if db == "Rhea" and e.startswith("POLYMER_"): return "POLYMER:" + e[len("POLYMER_"):]
+        return e
+
+    ps = Compounds().loadPerSourcePkas(DBS)
+    inchi = {db: {norm(db, r["external_id"]) for r in _csv.DictReader(
+                 open(root / "Biochemistry/Structures" / db / "inchi.tsv"), dialect="excel-tab")}
+             for db in DBS}
+    ver = {}
+    for db in DBS:
+        for f in sorted(_glob.glob(str(root / "Biochemistry/Structures" / db / "pkas/*.tsv"))):
+            for r in _csv.DictReader(open(f), dialect="excel-tab"):
+                ee, kk = r.get("external_id"), r.get("kind")
+                if ee and kk:
+                    ver[(db, norm(db, ee), kk, r.get("value"))] = r.get("tool_version")
+    al = _c.defaultdict(lambda: _c.defaultdict(list))
+    with (root / "Biochemistry/Aliases/Unique_ModelSEED_Compound_Aliases.txt").open() as fh:
+        rd = _csv.reader(fh, delimiter="\t"); next(rd)
+        for r in rd:
+            if len(r) >= 3: al[r[0]][r[2]].append(r[1])
+
+    allc, struct = set(), set()
+    for f in sorted(_glob.glob(str(root / "Biochemistry/compound_*.json"))):
+        for c in _json.load(open(f)):
+            allc.add(c["id"])
+            if c.get("smiles") or c.get("inchikey"): struct.add(c["id"])
+
+    cls = {}
+    for cpd in allc:
+        got = None
+        for db in DBS:
+            for a in al[cpd].get(db, []):
+                if (db, a) in ps:
+                    vs = {ver.get((db, a, k, v)) for k, v in ps[(db, a)].items()}; vs.discard(None)
+                    got = ("23.4" if vs == {"23.4"} else "26.1",
+                           "InChI" if a in inchi[db] else "SMILES")
+                    break
+            if got: break
+        cls[cpd] = " ".join(got) if got else ("no site" if cpd in struct else "no structure")
+
+    cc = _c.Counter(cls.values())
+    # Grouped by ROUTE, not by release: the 23.4 residue is 400 compounds, all
+    # of them SMILES-only ids, so it folds into the hatched share rather than
+    # earning a fourth colour. The release split is a sentence in the text.
+    by_cpd = [("Marvin", cc["26.1 InChI"] + cc["23.4 InChI"], BLUE, ""),
+              ("from SMILES", cc["26.1 SMILES"] + cc["23.4 SMILES"], BLUE, "xxx"),
+              ("no ionizable site", cc["no site"], NEUTRAL, ""),
+              ("no structure", cc["no structure"], GRID, "")]
+
+    rx = _c.Counter()
+    for f in sorted(_glob.glob(str(root / "Biochemistry/reaction_*.json"))):
+        for r in _json.load(open(f)):
+            st = r.get("stoichiometry")
+            if not isinstance(st, list) or not st: continue
+            v = {cls.get(x["compound"], "no structure") for x in st}
+            if "no structure" in v: rx["inc"] += 1
+            elif any(z.endswith("SMILES") for z in v): rx["smi"] += 1
+            elif any(z.endswith("InChI") for z in v): rx["inchi"] += 1
+            else: rx["none"] += 1
+    by_rxn = [("Marvin", rx["inchi"], BLUE, ""),
+              ("from SMILES", rx["smi"], BLUE, "xxx"),
+              ("no ionizable site", rx["none"], NEUTRAL, ""),
+              ("no structure", rx["inc"], GRID, "")]
+    return by_cpd, by_rxn
+
+
+def _growth():
+    """Figure 1A: compounds carrying an alias from each structure source,
+    2020 against 2026. DERIVED from the shipped alias file on both sides.
+
+    The 2020 column used to be transcribed from an untracked MANUSCRIPT.md and
+    was wrong for both sources that existed then -- MetaCyc 19,138 against a
+    true 19,172, KEGG 17,760 against 17,793. It is now read from
+    Unique_ModelSEED_Compound_Aliases.txt at the last commit of 2020
+    (fd6c7849, 2020-11-10), six weeks after the paper appeared online, so the
+    figure cannot drift from the repository again.
+
+    Rhea is absent by construction: its 207 InChIKeys alias to zero ModelSEED
+    compounds, so it contributes reactions, not structures.
+    """
+    import csv as _csv, io as _io, subprocess as _sp, collections as _c
+    root = Path(__file__).resolve().parents[3]
+    C2020 = "fd6c7849891ef4bbeb6eac072f5a6f7adff05b0e"
+    REL = "Biochemistry/Aliases/Unique_ModelSEED_Compound_Aliases.txt"
+
+    def tally(text):
+        seen = _c.defaultdict(set)
+        rd = _csv.reader(_io.StringIO(text), delimiter="\t"); next(rd)
+        for r in rd:
+            if len(r) >= 3:
+                seen[r[2]].add(r[0])
+        return seen
+
+    old = tally(_sp.run(["git", "show", f"{C2020}:{REL}"], cwd=str(root),
+                        capture_output=True, text=True, check=True).stdout)
+    new = tally((root / REL).read_text())
+    return [(s, len(old[s]), len(new[s])) for s in ("MetaCyc", "KEGG", "ChEBI")]
+
+
+def _reaction_sources():
+    """Figure 1C/D: what each PRIMARY database contributes in reactions.
+
+    A reaction is credited to a source if that source carries an alias for it,
+    and is UNIQUE to a source when no other primary database does -- that is the
+    set the database would not have without it, which is the question Rhea's
+    integration raises. "Complete" means every compound in the stoichiometry
+    carries a structure, so the reaction can be mass-balanced and decomposed;
+    Rhea identifies its compounds through ChEBI, so its completeness is the
+    reach of ChEBI structures into ModelSEED.
+
+    Derived from Biochemistry/Aliases/ and the compound records, both shipped.
+    """
+    import csv as _csv, collections as _c, glob as _glob, json as _json
+    root = Path(__file__).resolve().parents[3]
+    struct = set()
+    for f in sorted(_glob.glob(str(root / "Biochemistry" / "compound_*.json"))):
+        for c in _json.load(open(f)):
+            if c.get("smiles") or c.get("inchikey"):
+                struct.add(c["id"])
+    PRIMARY = ("KEGG", "MetaCyc", "Rhea")
+    src = _c.defaultdict(set)
+    with (root / "Biochemistry/Aliases/Unique_ModelSEED_Reaction_Aliases.txt").open() as fh:
+        rd = _csv.reader(fh, delimiter="\t"); next(rd)
+        for row in rd:
+            if len(row) >= 3 and row[2] in PRIMARY:
+                src[row[0]].add(row[2])
+    rx = {}
+    for f in sorted(_glob.glob(str(root / "Biochemistry" / "reaction_*.json"))):
+        for x in _json.load(open(f)):
+            rx[x["id"]] = {s["compound"] for s in (x.get("stoichiometry") or [])}
+    tot = _c.Counter(); uniq = _c.Counter(); ucomp = _c.Counter()
+    for rid, ss in src.items():
+        cs = rx.get(rid)
+        if cs is None:
+            continue
+        ok = bool(cs) and cs <= struct
+        for s in ss:
+            tot[s] += 1
+        if len(ss) == 1:
+            s = next(iter(ss)); uniq[s] += 1
+            if ok: ucomp[s] += 1
+    return [(s, tot[s], uniq[s], ucomp[s]) for s in PRIMARY]
+
+
 def _silver_sigma_band():
     """Figure 2C shading: the sigma span of reactions graded SILVER, per source.
 
@@ -151,14 +323,16 @@ def _direction_counts():
     import json as _json, glob as _glob, collections as _c
     root = Path(__file__).resolve().parents[3]
     counts = {s: _c.Counter() for s in
-              ("eQuilibrator", "Group contribution", "dGPredictor")}
+              ("eQuilibrator", "Group contribution", "dGPredictor", "LLMs")}
     for f in sorted(_glob.glob(str(root / "Biochemistry" / "reaction_*.json"))):
         for r in _json.load(open(f)):
             for s, v in (r.get("thermodynamics") or {}).items():
                 if s in counts and isinstance(v, list) and len(v) > 2:
                     counts[s][v[2]] += 1
+    # LLMs last: it carries a direction and no energy, so it sits apart from
+    # the three numeric sources and takes no part in the evidence grading.
     return [(s, counts[s][">"], counts[s]["="], counts[s]["<"], counts[s]["?"])
-            for s in ("eQuilibrator", "dGPredictor", "Group contribution")]
+            for s in ("eQuilibrator", "dGPredictor", "Group contribution", "LLMs")]
 
 
 def _agreement_counts():
@@ -197,8 +371,7 @@ NUMBERS = {
     # excluded as mapping / model namespaces rather than structure providers;
     # Rhea is excluded because its 207 InChIKeys alias to zero ModelSEED
     # compounds -- it is a reaction resource here.
-    "growth": [("MetaCyc", 19138, 25740), ("KEGG", 17760, 17803),
-               ("ChEBI", 0, 11429)],
+    "growth": None,       # filled by _growth()
     # ModelSEED compounds for which each source supplies a structure. These
     # overlap: a compound may carry one from several sources, so they do not
     # sum to the 36,943 total.
@@ -242,6 +415,9 @@ NUMBERS["direction"] = _direction_counts()
 NUMBERS["agreement"] = _agreement_counts()
 NUMBERS["silver_sigma"] = _silver_sigma_band()
 NUMBERS["grade_assess"], NUMBERS["grade_cross"] = _grade_breakdown()
+NUMBERS["growth"] = _growth()
+NUMBERS["rxn_sources"] = _reaction_sources()
+NUMBERS["ladder_cpd"], NUMBERS["ladder_rxn"] = _ladder_vintage()
 
 
 def strip(ax, keep_x=True, value_axis="x"):
@@ -291,113 +467,168 @@ def k(n):
 
 # ============================ FIGURE 1 ======================================
 def figure1():
-    """Structure sources only: who supplies structures, and how far they reach."""
-    fig, (a, b) = plt.subplots(1, 2, figsize=(7.0, 4.3))
-    fig.subplots_adjust(left=0.115, right=0.975, top=0.80, bottom=0.14, wspace=0.42)
+    """One row, three panels: what the database gained, and from where.
 
-    rows = NUMBERS["growth"]; ys = range(len(rows))[::-1]; h = 0.38
-    for i, (lab, old, new_) in zip(ys, rows):
-        if old:
-            a.barh(i + h / 2 + 0.02, old, height=h, color=BLUE_200, zorder=3)
-            a.text(old + 400, i + h / 2 + 0.02, k(old), va="center", fontsize=6.4, color=MUTED)
-            pct = f"+{100*(new_-old)/old:.0f}%"
+    A is the only panel on a count axis -- it compares 2020 with 2026, and a
+    percentage axis would erase the thing it exists to show (KEGG flat at 17.8k
+    while ChEBI arrives at 11.4k). B and C are 0-100% so the three sources are
+    directly comparable; every count annotation was dropped in favour of the
+    percentage, and the segment keys are direct-labelled on the top bar rather
+    than carried in a legend outside the frame.
+    """
+    fig = plt.figure(figsize=(7.0, 1.95))
+    gs = fig.add_gridspec(1, 3, left=0.107, right=0.984, top=0.985, bottom=0.135,
+                          wspace=0.30)
+    a, b, c = (fig.add_subplot(gs[0, i]) for i in range(3))
+
+    def key(ax, items):
+        """Colour key inside the frame, upper right. Uses the legend layout
+        engine rather than hand-placed swatches: two attempts at estimating
+        text width in axes fractions put every swatch on top of its own label,
+        because character width at 6pt is roughly twice what it looks like.
+        Inside the frame because a legend under the axes is whitespace the row
+        cannot afford."""
+        from matplotlib.patches import Patch
+        ax.legend(handles=[Patch(facecolor=c, edgecolor="none", label=n)
+                           for n, c in items],
+                  loc="upper right", frameon=False,
+                  fontsize=6.0, ncol=len(items), handlelength=1.0, handleheight=0.85,
+                  handletextpad=0.4, columnspacing=0.85, borderpad=0.1,
+                  borderaxespad=0.45, labelcolor=INK2)
+
+    def tag(ax, letter):
+        ax.annotate(letter, xy=(0.012, 0.955), xycoords="axes fraction",
+                    fontsize=9.5, fontweight="bold", va="top", ha="left", color=INK)
+
+    # -- A: compounds per structure source, 2020 vs 2026. Percentage change only.
+    rows = NUMBERS["growth"]; ys = range(len(rows))[::-1]; h = 0.40
+    for i, (lab, old_, new_) in zip(ys, rows):
+        if old_:
+            a.barh(i + h / 2 + 0.02, old_, height=h, color=BLUE_200, zorder=3)
+            pct = f"+{100*(new_-old_)/old_:.0f}%"
         else:
-            a.text(400, i + h / 2 + 0.02, "not a source in 2020", va="center",
-                   fontsize=6.2, color=MUTED, style="italic")
             pct = "new"
         a.barh(i - h / 2 - 0.02, new_, height=h, color=BLUE, zorder=3)
-        a.text(new_ + 400, i - h / 2 - 0.02, k(new_), va="center", fontsize=6.4, color=INK)
-        a.text(-800, i, lab, va="center", ha="right", fontsize=7.2, color=INK)
-        a.text(35500, i, pct, va="center", ha="right", fontsize=6.8,
+        a.text(-500, i, "ChEBI/Rhea" if lab == "ChEBI" else lab,
+               va="center", ha="right", fontsize=7.0, color=INK)
+        a.text(new_ + 450, i, pct, va="center", ha="left", fontsize=6.8,
                color=INK2, fontweight="bold")
-    a.set_yticks([]); a.set_xlim(0, 36000); a.set_ylim(-0.7, len(rows) - 0.3)
+    top = len(rows) - 1
+    a.text(400, top + h / 2 + 0.02, "2020", va="center", ha="left", fontsize=6.0,
+           color=INK, zorder=5)
+    a.text(400, top - h / 2 - 0.02, "2026", va="center", ha="left", fontsize=6.0,
+           color=SURFACE, fontweight="bold", zorder=5)
+    a.set_yticks([]); a.set_xlim(0, 30500); a.set_ylim(-0.6, len(rows) - 0.05)
     a.set_xticks([0, 10000, 20000, 30000]); a.set_xticklabels(["0", "10k", "20k", "30k"])
-    strip(a)
-    # Was above the frame at y=1.02, where it collided with the panel title once
-    # panel_tag moved to a fixed point offset. Below the axis, as in figure 3.
-    swatches(a, [("2020", BLUE_200), ("2026", BLUE)], y=-0.105, x0=0.0, dx=0.135)
-    panel_tag(a, "A", "Compounds per structure source")
+    strip(a); tag(a, "A")
 
-    have, tot = NUMBERS["struct_total"]
-    rows = NUMBERS["struct_src"]; ys = range(len(rows))[::-1]
-    for i, (lab, v) in zip(ys, rows):
-        b.barh(i, v, height=0.56, color=BLUE, zorder=3)
-        b.text(v + 400, i, f"{k(v)}  {100*v/have:.0f}%", va="center", fontsize=6.6, color=INK)
-        b.text(-700, i, lab, va="center", ha="right", fontsize=7.2, color=INK)
-    b.axvline(have, color=ORANGE, lw=1.3, zorder=4)
-    b.text(have - 500, len(rows) - 0.62, f"{k(have)} compounds\nwith a structure",
-           ha="right", va="top", fontsize=6.4, color=ORANGE, fontweight="bold")
-    b.set_yticks([]); b.set_xlim(0, 41000); b.set_ylim(-0.7, len(rows) - 0.25)
-    b.set_xticks([0, 10000, 20000, 30000]); b.set_xticklabels(["0", "10k", "20k", "30k"])
-    strip(b)
-    # Two lines, not one: as a single line this ran past the figure edge and
-    # was clipped mid-word in the typeset PDF.
-    b.text(0.0, -0.105, f"sources overlap; {100*have/tot:.0f}% of all\n"
-           f"{k(tot)} compounds carry a structure",
-           transform=b.transAxes, fontsize=6.3, color=MUTED,
-           va="top", linespacing=1.35)
-    panel_tag(b, "B", "Structures reaching ModelSEED compounds")
+    # -- B: share of each source's reactions that no other primary supplies.
+    _by = {r[0]: r for r in NUMBERS["rxn_sources"]}
+    rows = [_by[s] for s in ("MetaCyc", "KEGG", "Rhea")]
+    ys = range(len(rows))[::-1]
+    for i, (lab, total, uniq, _uc) in zip(ys, rows):
+        pct = 100 * uniq / total if total else 0
+        b.barh(i, pct, height=0.62, color=BLUE, zorder=4)
+        b.barh(i, 100 - pct, left=pct, height=0.62, color=BLUE_200, zorder=3)
+        b.text(pct - 1.6, i, f"{pct:.0f}%", va="center", ha="right", fontsize=6.6,
+               color=SURFACE, fontweight="bold", zorder=5)
+    key(b, [("unique", BLUE), ("shared", BLUE_200)])
+    b.set_yticks([]); b.set_xlim(0, 100); b.set_ylim(-0.6, len(rows) - 0.05)
+    b.set_xticks([0, 50, 100]); b.set_xticklabels(["0", "50", "100%"])
+    strip(b); tag(b, "B")
+
+    # -- C: of that unique contribution, the share whose every compound carries
+    # a structure, so the reaction can be balanced and decomposed. Categories
+    # are B's, in B's order, so they are labelled once.
+    for i, (lab, _t, uniq, ucomp) in zip(ys, rows):
+        pct = 100 * ucomp / uniq if uniq else 0
+        c.barh(i, pct, height=0.62, color=BLUE, zorder=4)
+        c.barh(i, 100 - pct, left=pct, height=0.62, color=NEUTRAL, zorder=3)
+        c.text(pct - 1.6, i, f"{pct:.0f}%", va="center", ha="right", fontsize=6.6,
+               color=SURFACE, fontweight="bold", zorder=5)
+    key(c, [("complete", BLUE), ("incomplete", NEUTRAL)])
+    c.set_yticks([]); c.set_xlim(0, 100); c.set_ylim(-0.6, len(rows) - 0.05)
+    c.set_xticks([0, 50, 100]); c.set_xticklabels(["0", "50", "100%"])
+    strip(c); tag(c, "C")
     return fig
 
 
 # ============================ FIGURE 2 ======================================
 def figure2():
+    """Two columns: the two coverage bars on the left, the three uncertainty
+    distributions stacked as a column on the right. Previously three full-width
+    rows, which made the figure tall; side by side it spans the page instead and
+    costs roughly a quarter of the vertical space."""
     import json
-    fig = plt.figure(figsize=(7.0, 4.3))
-    gs = fig.add_gridspec(3, 3, height_ratios=[1.25, 0.75, 1.10],
-                          left=0.20, right=0.975, top=0.90, bottom=0.115,
-                          hspace=1.05, wspace=0.34)
-    a = fig.add_subplot(gs[0, :]); b = fig.add_subplot(gs[1, :])
+    fig = plt.figure(figsize=(7.0, 3.05))
+    outer = fig.add_gridspec(1, 2, width_ratios=[1.78, 1.0],
+                             left=0.150, right=0.988, top=0.986, bottom=0.088,
+                             wspace=0.105)
+    left = outer[0, 0].subgridspec(2, 1, hspace=0.318, height_ratios=[1.0, 1.34])
+    right = outer[0, 1].subgridspec(3, 1, hspace=0.392)
+    a = fig.add_subplot(left[0]); b = fig.add_subplot(left[1])
 
-    for row, (key, label) in enumerate([("pka_traffic", "by scored reaction"),
-                                        ("pka_cpd", "by compound")]):
-        segs = NUMBERS[key]; tot = sum(v for _, v, _ in segs); x = 0
-        for name, v, col in segs:
+    def tag(ax, letter):
+        ax.annotate(letter, xy=(0.02, 0.94), xycoords="axes fraction", fontsize=9.0,
+                    fontweight="bold", va="top", ha="left", color=INK, zorder=6)
+
+    for row, (key, label) in enumerate([("ladder_rxn", "reactions"),
+                                        ("ladder_cpd", "compounds")]):
+        segs = NUMBERS[key]; tot = sum(s[1] for s in segs); x = 0
+        for name, v, col, hatch in segs:
             pct = v / tot * 100
-            a.barh(row, pct, left=x, height=0.54, color=col, zorder=3,
-                   edgecolor=FRAME, lw=0.45)
-            if pct > 24:
+            # hatch marks the SMILES-derived route through the same Marvin
+            # release; white strokes read against both the blue and the orange
+            a.barh(row, pct, left=x, height=0.74, color=col, zorder=3,
+                   edgecolor=SURFACE if hatch else FRAME,
+                   lw=0.45, hatch=hatch or None)
+            # ink on the pale fills, white on the saturated ones; a tight
+            # surface-coloured box lifts the number clear of the hatch strokes
+            fg = INK if col in (GRID, NEUTRAL) else "white"
+            box = dict(facecolor=col, edgecolor="none", pad=0.9) if hatch else None
+            if pct > 22:
                 a.text(x + pct / 2, row, f"{name}  {pct:.0f}%", ha="center", va="center",
-                       fontsize=6.3, color="white", fontweight="bold")
-            elif pct > 11:
+                       fontsize=6.0, color=fg, fontweight="bold", zorder=5, bbox=box)
+            elif pct > 9:
                 a.text(x + pct / 2, row, f"{pct:.0f}%", ha="center", va="center",
-                       fontsize=6.3, color="white", fontweight="bold")
+                       fontsize=6.0, color=fg, fontweight="bold", zorder=5, bbox=box)
             x += pct
         a.text(-1.5, row, label, ha="right", va="center", fontsize=7.0, color=INK)
-    a.set_xlim(0, 100); a.set_ylim(-0.55, 1.55); a.set_yticks([])
+    a.set_xlim(0, 100); a.set_ylim(-0.62, 1.62); a.set_yticks([])
     a.set_xticks([0, 25, 50, 75, 100]); a.set_xticklabels(["0", "25", "50", "75", "100%"])
     strip(a)
-    swatches(a, [(n, c) for n, _v, c in NUMBERS["pka_cpd"]], y=-0.42, x0=0.0, size=6.1)
-    panel_tag(a, "A", "Protonation source")
+    tag(a, "A")
 
     rows = NUMBERS["energy_rxn"]; tot = NUMBERS["energy_total"]
     ys = range(len(rows))[::-1]
+    SHORT = {}
     for i, (lab, v) in zip(ys, rows):
-        b.barh(i, v, height=0.46, color=BLUE, zorder=3)
-        b.barh(i, tot - v, left=v + 260, height=0.46, color=NEUTRAL, zorder=3, alpha=0.55)
-        b.text(v - 700, i, f"{k(v)}  ({100*v/tot:.0f}%)", va="center", ha="right",
-               fontsize=6.6, color="white", fontweight="bold")
-        b.text(-900, i, lab, va="center", ha="right", fontsize=7.0, color=INK)
-    b.set_yticks([]); b.set_xlim(0, tot * 1.02); b.set_ylim(-0.6, len(rows) - 0.4)
+        b.barh(i, v, height=0.70, color=BLUE, zorder=3)
+        b.barh(i, tot - v, left=v + 260, height=0.70, color=NEUTRAL, zorder=3, alpha=0.55)
+        b.text(v - 700, i, f"{100*v/tot:.0f}%", va="center", ha="right",
+               fontsize=6.4, color="white", fontweight="bold")
+        b.text(-900, i, SHORT.get(lab, lab), va="center", ha="right",
+               fontsize=7.0, color=INK)
+    b.set_yticks([]); b.set_xlim(0, tot * 1.02); b.set_ylim(-0.62, len(rows) - 0.38)
     b.set_xticks([0, 20000, 40000, 56012]); b.set_xticklabels(["0", "20k", "40k", "56k"])
     strip(b)
-    panel_tag(b, "B", "Reactions with a real energy, of 56,012 (sentinels excluded)")
+    tag(b, "B")
 
-    # C -- reported uncertainty, one axis per source. Deliberately NOT shared:
-    # the three report on different scales, and forcing a common axis would
-    # flatten two of them into a spike against eQuilibrator's tail.
+    # C -- reported uncertainty, one axis per source, stacked as a right-hand
+    # column. Axes are deliberately NOT shared: the three report on different
+    # scales, and a common axis would flatten two into a spike against
+    # eQuilibrator's tail. Source names sit inside the frame; three stacked
+    # titles would cost more height than the panels themselves.
     sig = json.loads((Path(__file__).resolve().parent
                       / "figure_data_sigma.json").read_text())
     order = [("eQuilibrator", BLUE), ("Group contribution", AQUA), ("dGPredictor", VIOLET)]
+    SHORT_C = {}
     for j, (name, col) in enumerate(order):
-        ax = fig.add_subplot(gs[2, j])
+        ax = fig.add_subplot(right[j])
         v = sig[name]["vals"]
         hi = sorted(v)[int(0.97 * len(v))]      # clip the tail, then bin INSIDE
         ax.hist([x for x in v if x <= hi], bins=30, range=(0, hi),
                 color=col, zorder=3, linewidth=0)
-        # Shade the sigma span of SILVER-graded reactions, so a reader can see
-        # what uncertainty a tier actually corresponds to -- and, for group
-        # contribution, that it corresponds to almost the whole distribution.
         band = NUMBERS["silver_sigma"].get(name)
         if band:
             lo, bhi = band
@@ -407,38 +638,35 @@ def figure2():
                     ax.axvline(xv, color=YELLOW, lw=0.7, zorder=2.5)
         med = v[len(v) // 2]
         ax.axvline(med, color=INK, lw=0.9, zorder=4)
-        # White bbox: the median rule runs up through this label's line.
-        ax.text(0.97, 0.86, f"median {med:.1f}", transform=ax.transAxes, ha="right",
-                bbox=dict(facecolor="white", edgecolor="none", pad=0.8),
-                fontsize=6.2, color=INK, fontweight="bold")
-        ax.set_title(name, fontsize=6.8, color=INK, pad=3)
-        ax.set_yticks([]); ax.tick_params(labelsize=6.0)
+        # first panel yields its top-left corner to the "C" tag
+        ax.text(0.105 if j == 0 else 0.030, 0.90, SHORT_C.get(name, name),
+                transform=ax.transAxes, ha="left", va="top", fontsize=6.3, color=INK,
+                fontweight="bold", bbox=dict(facecolor="white", edgecolor="none", pad=0.6),
+                zorder=5)
+        ax.text(0.965, 0.90, f"med {med:.1f}", transform=ax.transAxes, ha="right",
+                va="top", bbox=dict(facecolor="white", edgecolor="none", pad=0.6),
+                fontsize=6.2, color=INK, zorder=5)
+        ax.set_yticks([]); ax.tick_params(labelsize=5.8, pad=1.5)
         ax.set_xlim(0, hi)
         strip(ax, keep_x=True)
-        if sig[name]["dropped"]:
-            ax.text(0.0, -0.30, f"{sig[name]['dropped']:,} with no estimate",
-                    transform=ax.transAxes, fontsize=5.8, color=MUTED)
         if j == 0:
-            ax.text(-0.10, 1.42, "C", transform=ax.transAxes, fontsize=9.5,
-                    fontweight="bold", va="top", color=INK)
-            ax.text(0.16, 1.42, "Reported uncertainty (kcal/mol), separate axes",
-                    transform=ax.transAxes, fontsize=7.6, va="top", color=INK)
-            # Figure-level so it cannot collide with the per-panel titles.
-            fig.text(0.205, 0.016, "shaded band: p5\u2013p95 of the reactions this "
-                     "source grades silver", fontsize=6.1, color=MUTED)
-
+            tag(ax, "C")
     return fig
 
 
 # ============================ FIGURE 3 ======================================
 def figure3():
-    fig = plt.figure(figsize=(7.0, 5.5))
-    gs = fig.add_gridspec(2, 3, width_ratios=[1.15, 1.15, 0.62],
-                          height_ratios=[1.0, 0.88],
-                          left=0.135, right=0.945, top=0.90, bottom=0.085,
-                          wspace=0.80, hspace=0.62)
+    fig = plt.figure(figsize=(7.0, 3.55))
+    gs = fig.add_gridspec(2, 3, width_ratios=[1.15, 1.10, 0.60],
+                          height_ratios=[1.0, 0.94],
+                          left=0.128, right=0.928, top=0.972, bottom=0.072,
+                          wspace=0.62, hspace=0.32)
     a = fig.add_subplot(gs[0, 0]); b = fig.add_subplot(gs[0, 1])
     c = fig.add_subplot(gs[0, 2]); d = fig.add_subplot(gs[1, :])
+
+    def tag(ax, letter, x=0.017, y=0.955):
+        ax.annotate(letter, xy=(x, y), xycoords="axes fraction", fontsize=9.0,
+                    fontweight="bold", va="top", ha="left", color=INK, zorder=6)
 
     FWD, REV, BACK = "#1c5cab", NEUTRAL, "#c2410c"
     # A -- direction assigned by each SOURCE independently (was: by grade).
@@ -452,7 +680,7 @@ def figure3():
         for v, col, nm in ((f, FWD, "\u2192"), (e, AQUA, "\u2194"),
                            (r, BACK, "\u2190"), (q, UND, "?")):
             pct = v / tot * 100
-            a.barh(i, pct, left=x, height=0.60, color=col, zorder=3,
+            a.barh(i, pct, left=x, height=0.72, color=col, zorder=3,
                    edgecolor=FRAME, lw=0.45)
             if pct > 9:
                 a.text(x + pct / 2, i, f"{nm} {pct:.0f}%", ha="center", va="center",
@@ -462,12 +690,19 @@ def figure3():
         a.text(-3.5, i, lab.replace("Group contribution", "Group contrib."),
                va="center", ha="right", fontsize=7.2, color=INK)
         a.text(102.5, i, k(tot), va="center", ha="left", fontsize=6.2, color=MUTED)
-    a.set_xlim(0, 100); a.set_ylim(-0.62, len(rows) - 0.38); a.set_yticks([])
+    a.set_xlim(0, 100); a.set_ylim(-0.60, len(rows) - 0.02); a.set_yticks([])
     a.set_xticks([0, 50, 100]); a.set_xticklabels(["0", "50", "100%"])
     strip(a)
-    swatches(a, [("forward", FWD), ("reversible", AQUA), ("reverse", BACK),
-                 ("undetermined", UND)], y=-0.115, x0=0.0, vertical=True, size=6.2)
-    panel_tag(a, "A", "Direction by source")
+    # key inside the headroom strip rather than four stacked rows beneath the
+    # panel, which was the single largest block of furniture in the figure
+    from matplotlib.patches import Patch as _Patch
+    a.legend(handles=[_Patch(facecolor=cc, edgecolor="none", label=nn)
+                      for nn, cc in (("forward", FWD), ("reversible", AQUA),
+                                     ("reverse", BACK), ("undet.", UND))],
+             loc="upper right", frameon=False, fontsize=5.6, ncol=4,
+             handlelength=0.9, handleheight=0.8, handletextpad=0.3,
+             columnspacing=0.6, borderpad=0.1, borderaxespad=0.25, labelcolor=INK2)
+    tag(a, "A")
 
     # B -- eQuilibrator against dGPredictor on the 24,804 reactions both score.
     # Ranked bars rather than one stacked bar: the categories span 13,575 to 198
@@ -486,7 +721,7 @@ def figure3():
     b.set_xlim(0, tot * 0.78); b.set_ylim(-0.62, len(segs) - 0.38); b.set_yticks([])
     b.set_xticks([0, 5000, 10000, 15000]); b.set_xticklabels(["0", "5k", "10k", "15k"])
     strip(b)
-    panel_tag(b, "B", "eQuilibrator vs dGPredictor")
+    tag(b, "B")
 
     segs = NUMBERS["atom"]; tot = sum(v for _, v, _ in segs); base = 0
     for name, v, col in segs:
@@ -498,7 +733,7 @@ def figure3():
     c.set_xlim(-0.45, 1.75); c.set_ylim(0, tot * 1.03); c.set_xticks([])
     c.set_yticks([0, 20000, 40000, 56012]); c.set_yticklabels(["0", "20k", "40k", "56k"])
     strip(c, keep_x=False, value_axis="y")
-    panel_tag(c, "C", "Atom mapping")
+    tag(c, "C")
 
     # D -- what underpins each grade, on two axes. Six lanes: each grade split
     # by the deciding source's self-assessment, then the same three split by
@@ -514,7 +749,7 @@ def figure3():
         x = 0
         for nm, v, col in segs:
             pct = v / tot * 100
-            d.barh(i, pct, left=x, height=0.60, color=col, zorder=3,
+            d.barh(i, pct, left=x, height=0.78, color=col, zorder=3,
                    edgecolor=FRAME, lw=0.45)
             if pct > 14:
                 d.text(x + pct / 2, i, f"{nm} {pct:.0f}%", ha="center", va="center",
@@ -523,14 +758,14 @@ def figure3():
             x += pct
         d.text(-1.8, i, lab, va="center", ha="right", fontsize=7.0, color=INK)
         d.text(102.5, i, k(tot), va="center", ha="left", fontsize=6.0, color=MUTED)
-    d.set_xlim(0, 100); d.set_ylim(-0.62, len(lanes) - 0.38); d.set_yticks([])
+    d.set_xlim(0, 100); d.set_ylim(-0.58, len(lanes) - 0.12); d.set_yticks([])
     d.set_xticks([0, 50, 100]); d.set_xticklabels(["0", "50", "100%"])
     strip(d)
     d.text(-0.118, 0.80, "by self-assessment", transform=d.transAxes,
            rotation=90, va="center", ha="center", fontsize=6.1, color=MUTED)
     d.text(-0.118, 0.26, "by cross-source", transform=d.transAxes,
            rotation=90, va="center", ha="center", fontsize=6.1, color=MUTED)
-    panel_tag(d, "D", "What underpins each evidence grade")
+    tag(d, "D", y=0.995)
     return fig
 
 

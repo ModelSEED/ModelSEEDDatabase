@@ -1,0 +1,11 @@
+%% Compact Methods statement for BOTH routes to a direction claim. The full
+%% specification of each lives in the supplement:
+%%   grading  -> Supplementary Methods S3
+%%   ensemble -> Supplementary Methods S4
+%% Do not re-expand either here; the budget is 4-6 typeset pages and the detail
+%% was moved out deliberately.
+\subsection{Grading reaction direction}\label{sec:methods-grading}
+
+We apply a classification approach with which we grade the predicted reaction direction based on the available evidence. Very often sources and heuristics disagree, as is the case here, and we qualify what the reaction direction would be, and how reliable the evidence is using several tiers for ease of interpretation: gold, silver, or bronze. Our evaluation splits two ways, on the confidence of a source's own claim --- fitted as a probability against the experimental anchors --- and what the other sources make of it, by a weighted comparison on the same scale. Grades, self-assessments, and cross-source verdicts are stored in the biochemistry database, and can be viewed in the UI. The process of grading reactions is described fully in the Supplementary Methods.
+
+\subsection{Ensemble LLMs predictions}\label{sec:llm-grading} Thermodynamic assignment is bounded by estimate coverage: energies cannot be computed for an incomplete reaction in terms of structures. Furthermore, every reaction is a member of a pathway within a cell, and the overarching drive of the pathway, dynamically changing metabolite concentrations as downstream enzymes process reagents, means a reaction may be driven in a direction on a level that supersedes our evaluation~\cite{mavrovouniotis1993,xu2008,noor2014}. We run a complementary approach using an ensemble, a ``council'' of large language models (LLMs) to interpret the reaction based on its name and stoichiometry alone. Three LLMs independently make their predictions, a fourth audits, and a fifth adjudicates. We list the prompts in the Supplementary Methods, along with the process and limits. We integrate these predictions transparently in our database, but do not include them in our grading of the thermodynamic evidence.

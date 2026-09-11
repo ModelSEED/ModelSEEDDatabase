@@ -121,6 +121,13 @@
 \newcommand{\file}[1]{\texttt{#1}}                  % repo paths / filenames
 \newcommand{\cpd}[1]{\texttt{#1}}                   % compound identifiers
 
+%% The OUP class sets \flushbottom (cls line 2513). With a short column the
+%% slack is absorbed by the most elastic glue on the page -- the space above
+%% \subsection headings -- which opened visible gaps before 'Atom mapping'
+%% and 'Distribution and community process'. \raggedbottom lets a column end
+%% short instead. Standard LaTeX, no package and no class option.
+\raggedbottom
+
 \begin{document}
 
 %%-----------------------------------------------------------------------------
@@ -212,14 +219,16 @@ on metabolic-model output}
 \author[1]{Jos\'e P. Faria}
 \author[1]{Janaka N. Edirisinghe\ORCID{0000-0003-2493-234X}}
 \author[1]{Filipe Liu\ORCID{0000-0001-8701-2984}}
-\author[1]{Cooper Taylor}
+\author[12]{Cooper Taylor}
 \author[1]{Vibhav Setlur}
-\author[3]{Elad Noor\ORCID{0000-0001-8776-4799}}
+\author[6]{Robert T. Giessmann}
 \author[4]{Moritz E. Beber\ORCID{0000-0003-2406-1978}}
-\author[5]{Vikas Upadhyay}
+\author[3]{Elad Noor\ORCID{0000-0001-8776-4799}}
+\author[10,11]{Vikas Upadhyay}
 \author[5]{Mohit Anand}
 \author[5]{Costas D. Maranas}
-\author[6]{Robert T. Giessmann}
+\author[8,9]{Sebastian Hu{\ss}\ORCID{0000-0003-0712-2986}}
+\author[8,9]{Zoran Nikoloski\ORCID{0000-0003-2671-6763}}
 \author[2]{Adam P. Arkin\ORCID{0000-0002-4999-2931}}
 \author[7]{Robert W. Cottingham\ORCID{0000-0002-2775-3905}}
 \author[2]{Elisha M. Wood-Charlson}
@@ -248,6 +257,35 @@ on metabolic-model output}
 \orgname{Oak Ridge National Laboratory},
 \orgaddress{\postcode{37830}, \state{Oak Ridge, TN}, \country{USA}}}
 
+%% 12 supplied by Sam (2026-09-11) on Cooper Taylor moving from Argonne. No
+%% postcode given, so none is written -- every other address here carries one.
+\address[12]{\orgdiv{College of Engineering, Computing and Applied Sciences},
+\orgname{Clemson University},
+\orgaddress{\state{Clemson, SC}, \country{USA}}}
+
+%% 10 and 11 supplied by Vikas Upadhyay himself (2026-09-10) on moving from
+%% Penn State; contact viku@illinois.edu. He holds both.
+\address[10]{\orgdiv{NSF iBioFoundry},
+\orgname{University of Illinois Urbana-Champaign},
+\orgaddress{\postcode{61801}, \state{Urbana, IL}, \country{USA}}}
+
+\address[11]{\orgdiv{Carl R. Woese Institute for Genomic Biology},
+\orgname{University of Illinois Urbana-Champaign},
+\orgaddress{\postcode{61801}, \state{Urbana, IL}, \country{USA}}}
+
+%% 8 and 9 are transcribed from Hu{\ss} et al. 2022 (10.1111/tpj.15903) via
+%% Crossref, so they are 2022-vintage and carry the same caveat as 3, 5 and 6:
+%% confirm with the authors before submission.
+\address[8]{\orgdiv{Systems Biology and Mathematical Modelling Group},
+\orgname{Max Planck Institute of Molecular Plant Physiology},
+\orgaddress{\street{Am M\"uhlenberg 1}, \postcode{14476}, \state{Potsdam},
+\country{Germany}}}
+
+\address[9]{\orgdiv{Bioinformatics, Institute of Biochemistry and Biology},
+\orgname{University of Potsdam},
+\orgaddress{\street{Karl-Liebknecht-Str. 24-25}, \postcode{14476},
+\state{Potsdam}, \country{Germany}}}
+
 \corresp[$\ast$]{Corresponding author. \href{mailto:seaver@anl.gov}{seaver@anl.gov}}
 \corresp[$\dagger$]{Corresponding author. \href{mailto:cshenry@anl.gov}{cshenry@anl.gov}}
 
@@ -266,7 +304,7 @@ on metabolic-model output}
 %%  Abstracts must stand alone: no citations to the reference list, no
 %%  equations, no cross-references.
 %%-----------------------------------------------------------------------------
-\abstract{\input{sections/abstract}}
+\abstract{\input{sections/M01_abstract}}
 
 \keywords{biochemistry database, metabolic modelling, thermodynamics,
 atom mapping, reaction reversibility, ModelSEED}
@@ -279,26 +317,25 @@ atom mapping, reaction reversibility, ModelSEED}
 %%  this file.
 %%=============================================================================
 
-\input{sections/introduction}
+\input{sections/M02_introduction}
 
 \section{Materials and Methods}
-\input{sections/methods_construction}
-\input{sections/methods_structure_curation}
-\input{sections/methods_thermodynamics}
-\input{sections/methods_council_direction}
-\input{sections/methods_similarity_mapping}
-\input{sections/methods_distribution}
+\input{sections/M03_methods_construction}
+\input{sections/M05_methods_thermodynamics}
+\input{sections/M06_methods_council_direction}
+\input{sections/M07_methods_similarity_mapping}
+\input{sections/M08_methods_distribution}
 
 \section{Results}
-\input{sections/results_growth}
-\input{sections/results_structure_curation}
-\input{sections/results_thermodynamics}
-\input{sections/results_direction_sensitivity}
-\input{sections/results_mapping}
+\input{sections/M09_results_growth}
+\input{sections/M10_results_structure_curation}
+\input{sections/M11_results_thermodynamics}
+\input{sections/M12_results_direction_sensitivity}
+\input{sections/M13_results_mapping}
 
-\input{sections/discussion}
-\input{sections/data_availability}
-\input{sections/back_matter}
+\input{sections/M14_discussion}
+\input{sections/M15_data_availability}
+\input{sections/M16_back_matter}
 
 \bibliographystyle{oup-plain}
 \bibliography{references}

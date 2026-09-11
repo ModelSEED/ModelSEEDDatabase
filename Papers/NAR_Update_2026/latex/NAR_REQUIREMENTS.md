@@ -525,6 +525,28 @@ The OUP class supports this inline: `\author[1]{Name\ORCID{0000-0000-0000-0000}}
 CRediT is encouraged. Non-author contributors go under Acknowledgements with
 their contributions described.
 
+Once submitted, roles are not freely editable:
+
+> "any changes to contributor roles require the approval of the editor."
+
+### Who qualifies as an author
+
+> "Authorship is limited to those who have made a significant contribution to
+> the design and execution of the work described."
+
+> "Any contributors whose participation does not meet the criteria for
+> authorship should be acknowledged but not listed as an author."
+
+Lesser contributors are listed "as non-author contributors with their
+contributions clearly described under Acknowledgements". NAR points to the
+ICMJE definitions for the fuller test, and prohibits ghost and guest/gift
+authorship per COPE guidance. Where contributors are equal, the relative
+contributions of ALL authors must appear under Acknowledgements.
+
+Acknowledgement is not free either — because it "may imply endorsement of the
+study", the corresponding author must obtain permission from everyone named
+there.
+
 ### Conflict of interest disclosure is required
 
 > "The Journal requires all authors to disclose any potential conflict of
