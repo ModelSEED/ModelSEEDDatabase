@@ -101,9 +101,15 @@ for rxn in sorted(reactions_dict.keys()):
                                          source=label)
     if not isinstance(robj.get('thermodynamics'), dict):
         robj['thermodynamics'] = dict()
-    # [dg, err, operator, coverage] -- coverage appended, so positional
-    # readers of [0]/[1]/[2] are unaffected.
-    robj['thermodynamics'][label] = [dg_kcal, err_kcal, operator, cov]
+    # [dg, err, operator] -- three elements, matching every other source.
+    # Fragment coverage is NOT stored here. It lives, with more detail than
+    # this list could carry, in
+    # Biochemistry/Thermodynamics/dGPredictor/retrained_dG.json:
+    #   {"coverage": 1.0, "frags_used": 7, "frags_oov": 0}
+    # for all 29,617 predicted reactions. Duplicating a rounded copy into the
+    # reaction record made dGPredictor the only source with a ragged list, and
+    # any consumer reading these positionally had to tolerate both lengths.
+    robj['thermodynamics'][label] = [dg_kcal, err_kcal, operator]
     stored += 1
 
 print(f"dGPredictor reactions available (coverage >= {COVERAGE_FLOOR}): {len(dgp)}")
