@@ -1,0 +1,22 @@
+# Hover text for the four thermo-evidence keys on a reaction page.
+# level = the thermo-evidence key; keyword = its value; tooltip = the hover text.
+# The cross-source row with an EMPTY keyword is the absent case: the key is
+# omitted from the record entirely (4,746 reactions), which is distinct from
+# 'unpaired'. Thresholds follow Scripts/Thermodynamics/SourceGrading/
+# grade_thermo_sources.py: P_GOLD 0.90, P_SILVER 0.70, R and z 2.0, tau 2.0.
+level	keyword	tooltip
+grade	gold	Strongest evidence: matches experiment, or the deciding source is >=90% likely to be within 2 kcal/mol.
+grade	silver	Good evidence: the source is >=70% likely to be within 2 kcal/mol, or a second source corroborates it.
+grade	bronze	Weakest evidence: below 70% likely, or contradicted by the other sources.
+assessment	measured	Checked directly against an experimental value. Overrides everything else.
+assessment	self-certain	At least 90% likely to land within 2 kcal/mol of the truth.
+assessment	self-confident	At least 70% likely to land within 2 kcal/mol.
+assessment	unconfident	Below 70% likely. Most reactions sit here.
+cross-source	corroborated	Another source agrees, within both their error bars. Can lift bronze to silver, never to gold.
+cross-source	outvoted	The other sources disagree by more than their error bars allow, and this one is the outlier. Costs a tier.
+cross-source	unpaired	Only one source scored this reaction, so no cross-check was possible.
+cross-source		A cross-check ran and settled neither way - it neither helped nor penalised.
+source	TECRDB	An experimental measurement from the NIST thermodynamics database.
+source	eQ	eQuilibrator's component-contribution estimate.
+source	dGP	dGPredictor's fragment-based estimate.
+source	GC	The 2008 group-contribution estimate.
