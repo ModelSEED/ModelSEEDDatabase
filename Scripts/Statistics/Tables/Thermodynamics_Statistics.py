@@ -1,3 +1,19 @@
+# deltag/deltagerr were removed from the records on 2026-09-11; energies now
+# live per source under `thermodynamics`. Same precedence as the recommended
+# direction. Sources with no energy are skipped: the LLMs entry carries a
+# direction call and no number.
+def _pick_energy(rec, missing=10000000):
+    thermo = rec.get('thermodynamics')
+    if isinstance(thermo, dict):
+        for src in ('eQuilibrator', 'dGPredictor', 'Group contribution'):
+            v = thermo.get(src)
+            if isinstance(v, list) and len(v) >= 2:
+                try:
+                    return float(v[0]), float(v[1])
+                except (TypeError, ValueError):
+                    continue
+    return float(missing), float(missing)
+
 #!/usr/bin/env python
 import os, sys
 from BiochemPy import Compounds, Reactions,InChIs
@@ -148,7 +164,7 @@ for cpd in compounds_dict:
     if('GC' in cpd_obj['notes'] or 'EQ' in cpd_obj['notes']):
         compound_counts['Structured']+=1
 
-    if(cpd_obj['deltag'] == 10000000):
+    if(_pick_energy(cpd_obj)[0] == 10000000):
         continue
 
     if('GC' in cpd_obj['notes'] and 'EQU' not in cpd_obj['notes']):
@@ -197,7 +213,7 @@ for rxn in reactions_dict:
     if('EQC' in rxn_obj['notes']):
         reaction_counts['Complete (EQ)']+=1
 
-    if(rxn_obj['deltag'] == 10000000):
+    if(_pick_energy(rxn_obj)[0] == 10000000):
         continue
 
     if('EQU' in rxn_obj['notes']):

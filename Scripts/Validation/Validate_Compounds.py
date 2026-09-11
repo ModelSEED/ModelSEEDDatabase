@@ -234,16 +234,21 @@ if __name__ == "__main__":
         if cpd['is_cofactor'] == 1:
             numCofactors += 1
 
-        # Check for unknown deltaG and deltaGerr values.
-        if 'deltag' in cpd:
-            if cpd['deltag'] == float(0):
+        # deltag/deltagerr retired 2026-09-11. The equivalent check is
+        # now per source: a zero energy in any `thermodynamics` entry.
+        for _src, _v in (cpd.get('thermodynamics') or {}).items():
+            if not isinstance(_v, list) or len(_v) < 2:
+                continue
+            try:
+                _dg, _err = float(_v[0]), float(_v[1])
+            except (TypeError, ValueError):
+                continue
+            if _dg == float(0):
                 zeroDeltag.append(index)
-        else:
-            unknownDeltag.append(index)
-        if 'deltagerr' in cpd:
-            if cpd['deltagerr'] == float(0):
+            if _err == float(0):
                 zeroDeltagErr.append(index)
-        else:
+        if not (cpd.get('thermodynamics') or {}):
+            unknownDeltag.append(index)
             unknownDeltagErr.append(index)
 
     # Print summary data.

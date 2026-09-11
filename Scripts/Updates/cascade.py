@@ -29,10 +29,10 @@ STAGES = {
         'Update_Compound_Structures_Formulas_Charge',
         _cmd('Structures/Update_Compound_Structures_Formulas_Charge.py'),
     ),
-    'UpdatePkas': (
-        'Update_Compound_pKas',
-        _cmd('Structures/Update_Compound_pKas.py'),
-    ),
+    # 'UpdatePkas' removed 2026-09-11: it wrote the flat pka/pkb fields, which
+    # no longer exist. AddPkaSources below runs the same KEGG > MetaCyc > ChEBI
+    # > Rhea cascade for the Marvin entry and also carries MolGpKa and
+    # Literature, so it fully supersedes it.
     'AddPkaSources': (
         'Add_Compound_pKa_Sources',
         _cmd('Structures/Add_Compound_pKa_Sources.py'),
@@ -68,12 +68,12 @@ STAGES = {
 # unknown stages with a warning.
 CASCADE = {
     'structure_update': [
-        'Print', 'List', 'UpdateStructures', 'UpdatePkas', 'AddPkaSources',
+        'Print', 'List', 'UpdateStructures', 'AddPkaSources',
         'UpdateGC', 'UpdateEQ', 'Reprint', 'BuildProvenance',
         'ValidateFAISS',
     ],
     'protonation_replace': [
-        'List', 'UpdateStructures', 'UpdatePkas', 'AddPkaSources',
+        'List', 'UpdateStructures', 'AddPkaSources',
         'UpdateGC', 'UpdateEQ', 'Reprint', 'BuildProvenance',
         'ValidateFAISS',
     ],
@@ -93,7 +93,7 @@ CASCADE = {
         'UpdateAliases', 'BuildProvenance',
     ],
     'pka_replace': [
-        'UpdatePkas', 'AddPkaSources', 'Reprint', 'BuildProvenance',
+        'AddPkaSources', 'Reprint', 'BuildProvenance',
     ],
 }
 

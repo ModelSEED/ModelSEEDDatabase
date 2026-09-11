@@ -74,9 +74,6 @@ def main():
     print(f"  charge   : {cpd.get('charge')}")
     print(f"  inchikey : {cpd.get('inchikey')}")
     print(f"  smiles   : {cpd.get('smiles')}")
-    print(f"  pka      : {cpd.get('pka')}")
-    print(f"  pkb      : {cpd.get('pkb')}")
-    print(f"  deltag   : {cpd.get('deltag')}    deltagerr: {cpd.get('deltagerr')}")
     print(f"  thermodynamics: {cur_thermo}")
     print(f"  notes    : {cpd.get('notes')}")
 
@@ -169,7 +166,7 @@ def main():
         for ext in cpd_aliases.get(db, []):
             pka_chain.append(f"{db}:{ext}")
     print(f"\npKa / pKb (alias-based, NOT structure-derived):")
-    print(f"  current : pka={cpd.get('pka')}  pkb={cpd.get('pkb')}")
+    print(f"  current : pkas={list((cpd.get('pkas') or {}).keys())}")
     if pka_chain:
         print(f"  chain   : {' → '.join(pka_chain[:6])}{'…' if len(pka_chain) > 6 else ''}")
     print(f"  note    : updating the structure does NOT change pka unless the alias")
