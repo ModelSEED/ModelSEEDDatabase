@@ -8,7 +8,7 @@ Contribution is BRONZE.
 
 Four sources are graded:
 
-    TECRDB                  experimental dG'^0. ALWAYS GOLD, without
+    openTECR                  experimental dG'^0. ALWAYS GOLD, without
                             exception -- it is a measurement, not a
                             prediction. Only the stereo_exact tier (full
                             InChIKey) is graded at all; skeleton matches
@@ -16,7 +16,7 @@ Four sources are graded:
                             graded, because the measurement may have been
                             attached to the wrong reaction. They are dropped
                             rather than demoted -- an earlier design capped
-                            them at SILVER, and --tecrdb-skeleton-gold is the
+                            them at SILVER, and --opentecr-skeleton-gold is the
                             retired switch for it (argparse.SUPPRESS).
                             Consequence: every anchored reaction has a GOLD
                             source available, so at reaction level a
@@ -33,7 +33,7 @@ WHAT GRADES A PREDICTOR
 1. ``p_ok = P(|dG_s - dG*| <= tau | sigma_s)``, tau = 2.0 kcal/mol -- the
    reversible band the direction cascade itself uses
    (reversibility_heuristics.py mmdeltag_band_heuristic). Fitted per source by
-   isotonic regression on the same two-tier data as ehat (anchor = 797 TECRDB
+   isotonic regression on the same two-tier data as ehat (anchor = 797 openTECR
    stereo-exact matches, weight 3; proxy = |source - trusted-sigma reference|,
    weight 1), but on the INDICATOR rather than the magnitude.
 
@@ -44,7 +44,7 @@ WHAT GRADES A PREDICTOR
    which raw sigma is not (GC overstates its error 2.2x, dGPredictor 1.5x,
    eQuilibrator understates 1.6x).
 
-2. Direct measurement against TECRDB where it exists -- per source, so the
+2. Direct measurement against openTECR where it exists -- per source, so the
    three predictors are scored individually on the same reaction.
 
 3. Cross-source behaviour, used ASYMMETRICALLY. Sources are pooled by their
@@ -56,7 +56,7 @@ WHAT GRADES A PREDICTOR
    lineage (eQuilibrator and Group Contribution both descend from group
    contribution) and 11% of concordant reactions are structural zeros where
    agreement is imposed by the stoichiometry. Disagreement is strong: someone
-   is definitely wrong and z_s says who. Measured on TECRDB, letting
+   is definitely wrong and z_s says who. Measured on openTECR, letting
    corroboration promote to GOLD grew eQuilibrator's GOLD column 2,443 ->
    9,157 but diluted its measured guarantee 94% -> 90% within 2 kcal/mol.
    So: corroboration lifts BRONZE to SILVER and no further; being disputed
@@ -93,12 +93,12 @@ from optimize_thermo_source_assignment import (  # noqa: E402
 
 K = ["GC", "EQ", "DGP"]
 LABEL = {"GC": "Group contribution", "EQ": "eQuilibrator",
-         "DGP": "dGPredictor", "TECRDB": "TECRDB"}
+         "DGP": "dGPredictor", "openTECR": "openTECR"}
 OUT = Path(os.environ.get("GRADES_OUT", str(ANALYSIS_DIR / "results" / "thermo_grades")))
-TECRDB_CSV = Path(os.environ.get(
-    "TECRDB_COMPARISON",
+openTECR_CSV = Path(os.environ.get(
+    "openTECR_COMPARISON",
     str(REPO_ROOT / "Biochemistry" / "Thermodynamics" / "SourceGrading"
-        / "tecrdb_comparison.csv")))
+        / "opentecr_comparison.csv")))
 RECONCILIATION = ANALYSIS_DIR / "results" / "eq_vs_dgp" / "reconciliation.tsv"
 
 TAU = 2.0            # kcal/mol -- the cascade's reversible half-band
@@ -119,12 +119,12 @@ RNG = np.random.default_rng(20260812)
 
 
 # --------------------------------------------------------------------- inputs
-def load_tecrdb() -> pd.DataFrame:
+def load_opentecr() -> pd.DataFrame:
     """Experimental dG'^0 per ModelSEED reaction, best match tier first."""
-    t = pd.read_csv(TECRDB_CSV)
-    t["tecrdb_dg"] = t["tecrdb_dG_kJ"] / 4.184
-    t["tecrdb_sd"] = t["tecrdb_dG_sd_kJ"] / 4.184
-    t = t[["modelseed_rxn", "match_tier", "tecrdb_dg", "tecrdb_sd",
+    t = pd.read_csv(openTECR_CSV)
+    t["opentecr_dg"] = t["opentecr_dG_kJ"] / 4.184
+    t["opentecr_sd"] = t["opentecr_dG_sd_kJ"] / 4.184
+    t = t[["modelseed_rxn", "match_tier", "opentecr_dg", "opentecr_sd",
            "n_measurements"]].rename(columns={"modelseed_rxn": "rxn"})
     # stereo_exact sorts before skeleton, so first() keeps the better tier
     return t.sort_values("match_tier").groupby("rxn", as_index=False).first()
@@ -167,7 +167,7 @@ def fit_p_ok(train: pd.DataFrame, db: pd.DataFrame, tau: float = TAU) -> dict:
             m &= train[f"sig_{k}"] <= EQ_SENTINEL
         sub = train[m]
         xs = list(sub[f"sig_{k}"].to_numpy(float))
-        ys = list(((sub[f"dg_{k}"] - sub["tecrdb_dg"]).abs() <= tau).astype(float))
+        ys = list(((sub[f"dg_{k}"] - sub["opentecr_dg"]).abs() <= tau).astype(float))
         w = [3.0] * len(xs)
         n_gold = len(xs)
 
@@ -307,7 +307,7 @@ def grade_predictors(db, p_ok, fus, tec):
         # confident source that survived a cross-check; a source nobody could
         # check has not cleared that bar. Not a demotion -- "unchecked" is not
         # "contradicted" -- so it stops at silver rather than dropping a tier.
-        # No unpaired reaction carries a TECRDB anchor (0 of 6,089), so their
+        # No unpaired reaction carries a openTECR anchor (0 of 6,089), so their
         # p_ok is an extrapolation from reactions that all had 2-3 sources.
         g[is_unpaired & (g == GOLD)] = SILVER
         r = conf.where(cross == "", conf.str.cat(cross, sep="-"))
@@ -318,7 +318,7 @@ def grade_predictors(db, p_ok, fus, tec):
     return grades, reasons
 
 
-def grade_tecrdb(tec: pd.DataFrame, skeleton_gold: bool) -> tuple:
+def grade_opentecr(tec: pd.DataFrame, skeleton_gold: bool) -> tuple:
     """Grade the experimental source itself. STEREO-EXACT MATCHES ONLY.
 
     A skeleton match agrees on connectivity but not stereochemistry, so the
@@ -326,7 +326,7 @@ def grade_tecrdb(tec: pd.DataFrame, skeleton_gold: bool) -> tuple:
     SILVER until 2026-09-08; they are now not graded at all. A measurement that
     might not be this reaction's is not weak evidence about this reaction, it is
     evidence about a different one, and a tier implies a claim we cannot make.
-    They remain in tecrdb_comparison.csv for inspection.
+    They remain in opentecr_comparison.csv for inspection.
 
     This never affected the predictors: their measurement override has always
     been gated on stereo_exact, so a skeleton match could not
@@ -334,7 +334,7 @@ def grade_tecrdb(tec: pd.DataFrame, skeleton_gold: bool) -> tuple:
     """
     g = pd.Series(np.nan, index=tec.index)
     r = pd.Series("ungraded", index=tec.index)
-    have = tec["tecrdb_dg"].notna() & tec["match_tier"].eq("stereo_exact")
+    have = tec["opentecr_dg"].notna() & tec["match_tier"].eq("stereo_exact")
     g[have], r[have] = GOLD, "measured"
     return g, r
 
@@ -354,7 +354,7 @@ def validate(db, p_ok, fus, tec) -> list:
     m0 = tec["match_tier"].eq("stereo_exact")
     rows = []
     for k in K:
-        err = (db[f"dg_{k}"] - tec["tecrdb_dg"]).abs()
+        err = (db[f"dg_{k}"] - tec["opentecr_dg"]).abs()
         for v in (GOLD, SILVER, BRONZE):
             m = m0 & (grades[k] == v) & err.notna()
             if not m.sum():
@@ -385,7 +385,7 @@ def validate_cv(db, tec, veto_eq, n_folds: int = 5, n_reps: int = 4,
     the default path. ``--cv`` runs it.
     """
     m0 = tec["match_tier"].eq("stereo_exact")
-    anchor_idx = db.index[m0.to_numpy() & db["tecrdb_dg"].notna()]
+    anchor_idx = db.index[m0.to_numpy() & db["opentecr_dg"].notna()]
     rng = np.random.default_rng(seed)
     pooled = {(k, v): [] for k in K for v in (GOLD, SILVER, BRONZE)}
 
@@ -396,11 +396,11 @@ def validate_cv(db, tec, veto_eq, n_folds: int = 5, n_reps: int = 4,
             tr = np.concatenate([folds[j] for j in range(n_folds) if j != f])
             db_tr = db[~db.rxn.isin(set(db.loc[te, "rxn"]))]   # test out of proxy too
             eh = predict_error(db, fit_error_models(
-                db.loc[tr].rename(columns={"tecrdb_dg": "tecrdb"}), db_tr))
+                db.loc[tr].rename(columns={"opentecr_dg": "opentecr"}), db_tr))
             pk = predict_p_ok(db, fit_p_ok(db.loc[tr], db_tr), veto_eq)
             gr, _ = grade_predictors(db, pk, pool_sources(db, eh, pk), tec)
             for k in K:
-                err = (db[f"dg_{k}"] - db["tecrdb_dg"]).abs()
+                err = (db[f"dg_{k}"] - db["opentecr_dg"]).abs()
                 for v in (GOLD, SILVER, BRONZE):
                     m = pd.Series(False, index=db.index)
                     m.loc[te] = True
@@ -427,25 +427,25 @@ def validate_cv(db, tec, veto_eq, n_folds: int = 5, n_reps: int = 4,
 
 # --------------------------------------------------------------------- output
 def build(skeleton_gold: bool = False, heldout: bool = False) -> tuple:
-    """``heldout=True`` omits TECRDB as a source.
+    """``heldout=True`` omits openTECR as a source.
 
-    This exists so the graded map can be scored against TECRDB without
+    This exists so the graded map can be scored against openTECR without
     circularity: the ordinary grades use the measurement, so a graded direction
-    map that includes TECRDB necessarily reproduces TECRDB perfectly. The
+    map that includes openTECR necessarily reproduces openTECR perfectly. The
     held-out grades never see it.
     """
     db = load_db().reset_index(drop=True)
-    tec_raw = load_tecrdb()
+    tec_raw = load_opentecr()
     tec = db[["rxn"]].merge(tec_raw, on="rxn", how="left")
     tec.index = db.index
-    db["tecrdb_dg"] = tec["tecrdb_dg"]
+    db["opentecr_dg"] = tec["opentecr_dg"]
 
-    anchor = db[tec["match_tier"].eq("stereo_exact").to_numpy() & db["tecrdb_dg"].notna()]
-    print(f"non-EMPTY reactions {len(db)};  TECRDB stereo-exact anchor {len(anchor)}, "
+    anchor = db[tec["match_tier"].eq("stereo_exact").to_numpy() & db["opentecr_dg"].notna()]
+    print(f"non-EMPTY reactions {len(db)};  openTECR stereo-exact anchor {len(anchor)}, "
           f"skeleton {int(tec['match_tier'].eq('skeleton').sum())}")
 
     veto_eq = load_vetoes()
-    ehat = predict_error(db, fit_error_models(anchor.rename(columns={"tecrdb_dg": "tecrdb"}), db))
+    ehat = predict_error(db, fit_error_models(anchor.rename(columns={"opentecr_dg": "opentecr"}), db))
     pmods = fit_p_ok(anchor, db)
     p_ok = predict_p_ok(db, pmods, veto_eq)
     fus = pool_sources(db, ehat, p_ok)
@@ -458,7 +458,7 @@ def build(skeleton_gold: bool = False, heldout: bool = False) -> tuple:
               f"anchor frac within tau {m['anchor_frac_within_tau']:.3f}")
 
     val = validate(db, p_ok, fus, tec)
-    print("\nvalidation on TECRDB stereo-exact, measurement override DISABLED:")
+    print("\nvalidation on openTECR stereo-exact, measurement override DISABLED:")
     for r in val:
         if r["n"]:
             print(f"  {r['source']:22s} {r['grade']:6s} n={r['n']:4d}  "
@@ -467,7 +467,7 @@ def build(skeleton_gold: bool = False, heldout: bool = False) -> tuple:
             print(f"  {r['source']:22s} {r['grade']:6s} n=   0")
 
     grades, reasons = grade_predictors(db, p_ok, fus, tec)
-    tg, tr = grade_tecrdb(tec, skeleton_gold)
+    tg, tr = grade_opentecr(tec, skeleton_gold)
 
     long_rows = []
     for k in K:
@@ -480,8 +480,8 @@ def build(skeleton_gold: bool = False, heldout: bool = False) -> tuple:
             "n_anchor": pmods[k]["n_anchor"], "n_proxy": pmods[k]["n_proxy"]}))
     if not heldout:
         long_rows.append(pd.DataFrame({
-            "rxn": db.rxn, "name": db.name, "ec": db.ec, "source": "TECRDB",
-            "dg": tec.tecrdb_dg, "sigma": tec.tecrdb_sd, "operator": None,
+            "rxn": db.rxn, "name": db.name, "ec": db.ec, "source": "openTECR",
+            "dg": tec.opentecr_dg, "sigma": tec.opentecr_sd, "operator": None,
             "ehat": np.nan, "p_ok": np.nan, "z": np.nan, "birge": fus.birge,
             "n_src": fus.n_src, "struct_zero": fus.struct_zero,
             "grade": tg.map(NAME), "reason": tr,
@@ -496,16 +496,16 @@ def build(skeleton_gold: bool = False, heldout: bool = False) -> tuple:
     for k in K:
         wide[f"dg_{k}"] = db[f"dg_{k}"]
         wide[f"grade_{k}"] = grades[k].map(NAME)
-    wide["dg_TECRDB"] = tec.tecrdb_dg
-    wide["grade_TECRDB"] = tg.map(NAME)
+    wide["dg_openTECR"] = tec.opentecr_dg
+    wide["grade_openTECR"] = tg.map(NAME)
     # TIE-BREAK BY PRECEDENCE, NOT COLUMN ORDER. 68% of graded reactions have
     # more than one source at the best grade, and idxmin() returns the first
     # COLUMN -- which put Group Contribution ahead of eQuilibrator, naming the
     # legacy source on 19,433 reactions where a better one was equally graded.
     # Order here is the recommendation precedence: measurement, then
     # eQuilibrator, then dGPredictor, then GC last.
-    PRECEDENCE = ["TECRDB", "EQ", "DGP", "GC"]
-    ranks = pd.concat([tg.rename("TECRDB")] + [grades[k].rename(k) for k in K], axis=1)
+    PRECEDENCE = ["openTECR", "EQ", "DGP", "GC"]
+    ranks = pd.concat([tg.rename("openTECR")] + [grades[k].rename(k) for k in K], axis=1)
     ranks = ranks[[c for c in PRECEDENCE if c in ranks.columns]]
     wide["best_grade"] = ranks.min(axis=1).map(NAME)
     wide["best_source"] = ranks.idxmin(axis=1).where(ranks.notna().any(axis=1))
@@ -518,13 +518,13 @@ def build(skeleton_gold: bool = False, heldout: bool = False) -> tuple:
     # since publishing every source's number is the point of the release; only
     # the grades collapse to one column. source_grades.tsv keeps the long
     # per-source form for internal use and is no longer released.
-    release = wide.drop(columns=[f"grade_{k}" for k in K] + ["grade_TECRDB"])
+    release = wide.drop(columns=[f"grade_{k}" for k in K] + ["grade_openTECR"])
     release.to_csv(OUT / "reaction_grades.tsv", sep="\t", index=False)
     calib = {"tau": TAU, "thresholds": {"p_gold": P_GOLD, "p_silver": P_SILVER,
                                         "r_corrob": R_CORROB, "z_corrob": Z_CORROB,
                                         "r_dispute": R_DISPUTE, "z_dispute": Z_DISPUTE,
                                         },
-             "tecrdb_skeleton_gold": skeleton_gold,
+             "opentecr_skeleton_gold": skeleton_gold,
              "msdb_root": str(MSDB_ROOT),
              "p_ok_models": pmods, "validation": val,
              "vetoes": {"eq_sentinel": int((db.sig_EQ > EQ_SENTINEL).sum()),
@@ -550,7 +550,7 @@ def frontier(long: pd.DataFrame) -> pd.DataFrame:
 
 def main() -> None:
     ap = argparse.ArgumentParser(description=__doc__)
-    ap.add_argument("--tecrdb-skeleton-gold", action="store_true",
+    ap.add_argument("--opentecr-skeleton-gold", action="store_true",
                     help=argparse.SUPPRESS)   # retired: skeleton matches are not graded
     ap.add_argument("--cv", action="store_true",
                     help="also run the leak-free cross-validated validation "
@@ -558,11 +558,11 @@ def main() -> None:
     args = ap.parse_args()
 
     OUT.mkdir(parents=True, exist_ok=True)
-    long, wide, calib, ctx = build(skeleton_gold=args.tecrdb_skeleton_gold)
+    long, wide, calib, ctx = build(skeleton_gold=args.opentecr_skeleton_gold)
 
     print("\n=== grades ===")
     tab = pd.crosstab(long.source, long.grade).reindex(
-        index=[LABEL["TECRDB"], LABEL["EQ"], LABEL["DGP"], LABEL["GC"]],
+        index=[LABEL["openTECR"], LABEL["EQ"], LABEL["DGP"], LABEL["GC"]],
         columns=["GOLD", "SILVER", "BRONZE"]).fillna(0).astype(int)
     print(tab.to_string())
     print("\nper reaction:")
@@ -586,9 +586,9 @@ def main() -> None:
     print(f"\nwrote {OUT}/source_grades.tsv ({len(long)} rows), source_grades_wide.tsv, "
           "grade_frontier.tsv, grade_calibration.json")
 
-    # held-out grades: no TECRDB source, no measurement override. Needed to
-    # score a graded direction map against TECRDB without circularity.
-    ho, _, _, _ = build(skeleton_gold=args.tecrdb_skeleton_gold, heldout=True)
+    # held-out grades: no openTECR source, no measurement override. Needed to
+    # score a graded direction map against openTECR without circularity.
+    ho, _, _, _ = build(skeleton_gold=args.opentecr_skeleton_gold, heldout=True)
     ho.to_csv(OUT / "source_grades_heldout.tsv", sep="\t", index=False, float_format="%.4f")
     print(f"wrote {OUT}/source_grades_heldout.tsv ({len(ho)} rows)")
 
@@ -607,7 +607,7 @@ GRADE_ORDER = {"GOLD": 0, "SILVER": 1, "BRONZE": 2}
 def recommended_energy_map(min_grade: str = "BRONZE", heldout: bool = False) -> dict:
     """``{rxn_id: (dg, dge, source_label)}`` -- the best-graded source per reaction.
 
-    Ranked by grade, then by p_ok descending (TECRDB, having no p_ok, always
+    Ranked by grade, then by p_ok descending (openTECR, having no p_ok, always
     sorts first within GOLD because it is scored as a measurement). Reactions
     whose best grade is worse than ``min_grade`` are omitted entirely, so a
     downstream consumer sees them as "no data" rather than as a bad number.
@@ -619,7 +619,7 @@ def recommended_energy_map(min_grade: str = "BRONZE", heldout: bool = False) -> 
     g = pd.read_csv(path, sep="\t", low_memory=False)
     g = g[g.grade.map(GRADE_ORDER) <= floor].copy()
     g["_g"] = g.grade.map(GRADE_ORDER)
-    g["_p"] = np.where(g.source == "TECRDB", 2.0, g.p_ok.fillna(-1.0))
+    g["_p"] = np.where(g.source == "openTECR", 2.0, g.p_ok.fillna(-1.0))
     g = g.sort_values(["rxn", "_g", "_p"], ascending=[True, True, False])
     best = g.groupby("rxn", as_index=False).first()
     out = {}

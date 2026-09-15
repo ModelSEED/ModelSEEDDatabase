@@ -141,7 +141,7 @@ def main():
 #
 # The reference value is NOT a safe fallback: there both partners carried the
 # same spurious sites and the errors cancelled, which is not accuracy.
-# NONE of these reactions has a TECRDB match, so neither value can be checked
+# NONE of these reactions has a openTECR match, so neither value can be checked
 # against experiment.
 #
 # shipped:   {a.shipped_cache}

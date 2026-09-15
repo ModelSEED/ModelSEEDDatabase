@@ -3,7 +3,7 @@
 
 This grades one dimension only -- how well founded each reaction's protonation
 model is. A full evidence grade would also weigh the energy source (measured
-TECRDB anchor vs fitted prediction), the reported uncertainty, and whether the
+openTECR anchor vs fitted prediction), the reported uncertainty, and whether the
 sources agree on direction. Those are separate axes and are not combined here;
 presenting this as the whole grade would overstate it.
 

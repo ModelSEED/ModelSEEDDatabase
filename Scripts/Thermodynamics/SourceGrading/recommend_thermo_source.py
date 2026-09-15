@@ -10,7 +10,7 @@ use". They are different jobs and the same statistic does not serve both.
                                in a fixed priority
 
 THE NEGATIVE RESULT THAT SHAPED THIS, stated up front because it is the whole
-design. Held-out direction accuracy on the 797 TECRDB stereo-exact anchors,
+design. Held-out direction accuracy on the 797 openTECR stereo-exact anchors,
 20 x 70/30 splits, every strategy at 100% coverage unless noted:
 
     priority EQ > DGP > GC          95.9% +/- 1.1     <-- shipped
@@ -48,8 +48,8 @@ WHAT THE UNCERTAINTY IS STILL FOR. Three jobs it does do, all validated:
     rule and does beat always-eQuilibrator (mean |error| 1.03 vs 1.75 kcal/mol,
     validated in optimize_thermo_source_assignment.py).
 
-CAVEAT ON THE PRIORITY ORDER. It comes from measured accuracy on TECRDB, but
-eQuilibrator's reactant-contribution layer is FITTED on TECRDB and dGPredictor
+CAVEAT ON THE PRIORITY ORDER. It comes from measured accuracy on openTECR, but
+eQuilibrator's reactant-contribution layer is FITTED on openTECR and dGPredictor
 was trained on 4,001 measurements from it, so both are partly in-sample and
 Group Contribution is not. eQuilibrator's edge is concentrated where its own
 sigma is smallest (100% in its lowest sigma quartile, tied with
@@ -122,18 +122,18 @@ from reversibility_heuristics import (  # noqa: E402
 from optimize_thermo_source_assignment import (  # noqa: E402
     EQ_SENTINEL, fit_error_models, load_db, predict_error,
 )
-from grade_thermo_sources import load_tecrdb, load_vetoes  # noqa: E402
+from grade_thermo_sources import load_opentecr, load_vetoes  # noqa: E402
 
 K = ["GC", "EQ", "DGP"]
 LABEL = {"GC": "Group contribution", "EQ": "eQuilibrator",
          "DGP": "dGPredictor"}
 SQRT_2_OVER_PI = math.sqrt(2.0 / math.pi)      # E|X| = tau * sqrt(2/pi)
 TAU_FLOOR = 0.05                                # kcal/mol
-TRUTH_SIGMA = 0.15                              # TECRDB median experimental sd
+TRUTH_SIGMA = 0.15                              # openTECR median experimental sd
 BIG = 1e6
 RNG = np.random.default_rng(20260812)
 
-# Source priority, per target, ordered by MEASURED accuracy on the TECRDB
+# Source priority, per target, ordered by MEASURED accuracy on the openTECR
 # anchor -- not by a hunch and not by reported confidence. Direction:
 # eQuilibrator 95.5% > dGPredictor 91.8% > Group Contribution 85.5%.
 # Magnitude (median |error|): eQuilibrator 0.45 ~ dGPredictor 0.47 >
@@ -155,7 +155,7 @@ def calibrate_tau(db, anchor, ehat) -> dict:
         e = ehat[f"ehat_{k}"]
         raw_tau = np.maximum(e / SQRT_2_OVER_PI, TAU_FLOOR)
         m = anchor.index
-        err = (db.loc[m, f"dg_{k}"] - db.loc[m, "tecrdb_dg"]).abs()
+        err = (db.loc[m, f"dg_{k}"] - db.loc[m, "opentecr_dg"]).abs()
         t = raw_tau.loc[m]
         ok = err.notna() & t.notna()
         if ok.sum() < 30:
@@ -317,7 +317,7 @@ def choose_by_priority(db, risk, feasible, tol, priority) -> pd.DataFrame:
     deliberately does NOT use uncertainty to choose. Every uncertainty-based
     arbitration tested came out worse (see ``validate``): argmin-risk 90.9%,
     argmin-tau 93.7%, argmin-ehat 93.7%, priority 95.9%, all at 100% coverage
-    on the TECRDB anchor. Adding a risk veto on top of priority made it worse
+    on the openTECR anchor. Adding a risk veto on top of priority made it worse
     monotonically (94.2% at 0.2, 93.8% at 0.05, 93.0% at 0.02) because the veto
     pushes reactions off the better source onto a worse one.
 
@@ -502,11 +502,11 @@ def main() -> None:
 
     from build_graded_direction_maps import load_reactions
     db = load_db().reset_index(drop=True)
-    tec = db[["rxn"]].merge(load_tecrdb(), on="rxn", how="left")
+    tec = db[["rxn"]].merge(load_opentecr(), on="rxn", how="left")
     tec.index = db.index
-    db["tecrdb_dg"] = tec["tecrdb_dg"]
-    anchor = db[tec["match_tier"].eq("stereo_exact").to_numpy() & db.tecrdb_dg.notna()]
-    print(f"{len(db)} reactions; TECRDB stereo-exact anchor {len(anchor)}")
+    db["opentecr_dg"] = tec["opentecr_dg"]
+    anchor = db[tec["match_tier"].eq("stereo_exact").to_numpy() & db.opentecr_dg.notna()]
+    print(f"{len(db)} reactions; openTECR stereo-exact anchor {len(anchor)}")
 
     reactions = load_reactions()
     veto_eq = load_vetoes()
@@ -515,7 +515,7 @@ def main() -> None:
         print(f"  {LABEL[k]:24s} feasible on {int(feasible[k].sum()):6d}")
 
     ehat = predict_error(db, fit_error_models(
-        anchor.rename(columns={"tecrdb_dg": "tecrdb"}), db))
+        anchor.rename(columns={"opentecr_dg": "opentecr"}), db))
     kcal = calibrate_tau(db, anchor, ehat)
     print("\ntau calibration (target coverage 0.683 of |error| within +/-tau):")
     for k in K:
@@ -536,19 +536,19 @@ def main() -> None:
     # reference operator from the experiment, for validation
     from reversibility_heuristics import explicit_energy as _ee
     ref_op = {}
-    t2 = load_tecrdb()
+    t2 = load_opentecr()
     for r in t2[t2.match_tier == "stereo_exact"].itertuples():
         e = reactions.get(r.rxn)
         if e is None or e.get("status") == "EMPTY":
             continue
-        _, op, _ = run_reversibility(e, _ee(float(r.tecrdb_dg),
-                                            float(r.tecrdb_sd or 0.0)),
+        _, op, _ = run_reversibility(e, _ee(float(r.opentecr_dg),
+                                            float(r.opentecr_sd or 0.0)),
                                      DEFAULT_HEURISTICS)
         if op:
             ref_op[r.rxn] = op
 
     val = validate(db, list(anchor.index), risk, feasible, ops, ref_op, tau, ehat)
-    print("\nheld-out direction accuracy on the TECRDB anchor "
+    print("\nheld-out direction accuracy on the openTECR anchor "
           "(20 x 70/30 splits, coverage = share of held-out reactions the "
           "strategy will answer for):")
     for r in val.sort_values("mean_accuracy", ascending=False).itertuples():
@@ -575,12 +575,12 @@ def main() -> None:
                          pd.DataFrame({f"dg_{k}": db[f"dg_{k}"] for k in K}),
                          pd.DataFrame({f"risk_{k}": rk[f"risk_{k}"] for k in K}),
                          ch], axis=1)
-        # TECRDB overrides: a measurement outranks every prediction
-        have = db.tecrdb_dg.notna()
-        out.loc[have, "chosen_source"] = "TECRDB"
-        out.loc[have, "chosen_label"] = "TECRDB"
-        out.loc[have, "recommended_dg"] = db.loc[have, "tecrdb_dg"]
-        out.loc[have, "recommended_sigma"] = tec.loc[have, "tecrdb_sd"]
+        # openTECR overrides: a measurement outranks every prediction
+        have = db.opentecr_dg.notna()
+        out.loc[have, "chosen_source"] = "openTECR"
+        out.loc[have, "chosen_label"] = "openTECR"
+        out.loc[have, "recommended_dg"] = db.loc[have, "opentecr_dg"]
+        out.loc[have, "recommended_sigma"] = tec.loc[have, "opentecr_sd"]
         out.loc[have, "risk"] = 0.0
         out.loc[have, "kept"] = True
         path = OUT / f"recommendation_{target}.tsv"

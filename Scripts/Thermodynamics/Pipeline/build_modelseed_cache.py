@@ -269,7 +269,7 @@ def main():
 
     # Accessions the training data references; those with no ModelSEED route
     # must be carried over or the training set shrinks silently.
-    # build_stage2_cache.training_accessions() reads TECRDB + formation only.
+    # build_stage2_cache.training_accessions() reads openTECR + formation only.
     # The 13 redox couples reference their own metanetx accessions in CID_ox /
     # CID_red, and omitting them makes Trainer.read_redox raise ParseException
     # at train time -- loud, but only after the whole cache has been built.

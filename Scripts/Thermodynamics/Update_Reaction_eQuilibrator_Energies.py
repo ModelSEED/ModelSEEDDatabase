@@ -6,7 +6,7 @@ computed directly from the structures ModelSEED holds, against an eQuilibrator
 compound cache whose ``seed:`` accessions were repointed at those structures
 (Path A) and whose training ``kegg:`` accessions were repointed so that
 ``kegg:X`` and ``seed:cpd#####`` resolve to the same compound (Path B), with
-component-contribution retrained on the de-duplicated TECRDB
+component-contribution retrained on the de-duplicated openTECR
 (``cc_params_dedup.npz``). Conditions are recorded in the file's header line.
 
 This replaces the MetaNetX-mediated retrieval that fed

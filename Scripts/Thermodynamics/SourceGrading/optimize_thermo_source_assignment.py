@@ -21,9 +21,9 @@ WHY ehat NEEDS GROUND TRUTH
 ---------------------------
 Cross-source disagreement gives JOINT error, not per-source error: if two
 sources differ by 20 kcal/mol you know one is wrong, not which. Splitting them
-requires an external reference. We use TECRDB (NIST experimental dG'^0), matched
+requires an external reference. We use openTECR (NIST experimental dG'^0), matched
 to ModelSEED reactions by the SMILES->InChIKey multiset pipeline in
-/scratch/ctaylor/dgpredictor_tecrdb (1,550 matches, of which 802 are
+/scratch/ctaylor/dgpredictor_opentecr (1,550 matches, of which 802 are
 ``stereo_exact`` -- the tier that distinguishes anomers and D/L pairs, and the
 only tier used for fitting here).
 
@@ -33,7 +33,7 @@ assignment is worth making.
 
 CALIBRATION
 -----------
-For each source we regress observed |error vs TECRDB| on that source's OWN
+For each source we regress observed |error vs openTECR| on that source's OWN
 reported sigma, using isotonic regression: monotone (more self-reported
 uncertainty must not predict less error) and non-parametric (no functional form
 imposed on a relationship we have no theory for). ehat(i,s) is then that
@@ -49,7 +49,7 @@ neither visible to a sigma-only model:
 
 VALIDATION
 ----------
-Fitted on a TECRDB train split, scored on held-out TECRDB reactions against four
+Fitted on a openTECR train split, scored on held-out openTECR reactions against four
 baselines including the incumbent -- dev's
 Promote_Reaction_Thermodynamics_to_Canonical.py priority, eQuilibrator then
 Group Contribution then the ML tier, lowest reported error within a tier.
@@ -105,10 +105,10 @@ from organic_reaction_types import QUINONE_RE  # noqa: E402
 MSDB_ROOT = MSDB_ROOT
 ANALYSIS_DIR = ANALYSIS_DIR
 OUT = Path(os.environ.get("EQDGP_OUT", str(ANALYSIS_DIR / "results" / "eq_vs_dgp")))
-TECRDB = Path(os.environ.get(
-    "TECRDB_COMPARISON",
+openTECR = Path(os.environ.get(
+    "openTECR_COMPARISON",
     str(REPO_ROOT / "Biochemistry" / "Thermodynamics" / "SourceGrading"
-        / "tecrdb_comparison.csv")))
+        / "opentecr_comparison.csv")))
 BIOCHEM = MSDB_ROOT / "Biochemistry"
 
 SOURCES = {"Group contribution": "GC", "eQuilibrator": "EQ",
@@ -118,7 +118,7 @@ SOURCES = {"Group contribution": "GC", "eQuilibrator": "EQ",
 # match NEITHER the snapshot this method was calibrated on nor the original
 # dGPredictor (median |diff| 1.01 and 1.17 kcal/mol over the 1,346 anchored
 # reactions) -- it is a later regeneration. Grading stays valid because the
-# anchor supplies only the TECRDB measurement and the error models are refitted
+# anchor supplies only the openTECR measurement and the error models are refitted
 # against whatever the database holds, but accuracy figures quoted from the
 # original method write-up do not transfer.
 SOURCE_ALIASES = {"DGP": ("dGPredictor",)}
@@ -184,19 +184,19 @@ def load_db() -> pd.DataFrame:
 
 
 def load_truth(db: pd.DataFrame) -> pd.DataFrame:
-    """TECRDB experimental dG'^0, stereo_exact tier only, joined to the snapshot."""
-    t = pd.read_csv(TECRDB)
+    """openTECR experimental dG'^0, stereo_exact tier only, joined to the snapshot."""
+    t = pd.read_csv(openTECR)
     t = t[t.match_tier == "stereo_exact"].copy()
-    t["tecrdb"] = t["tecrdb_dG_kJ"] / 4.184
-    t = t[["modelseed_rxn", "tecrdb", "n_measurements"]].rename(
+    t["opentecr"] = t["opentecr_dG_kJ"] / 4.184
+    t = t[["modelseed_rxn", "opentecr", "n_measurements"]].rename(
         columns={"modelseed_rxn": "rxn"})
     t = t.groupby("rxn", as_index=False).first()
     return db.merge(t, on="rxn", how="inner")
 
 
 # --------------------------------------------------------------- calibration
-# eQuilibrator sigma below which TECRDB shows it is accurate to ~0.45 kcal/mol.
-# This is its TECRDB p90, so it is the range where the gold data actually
+# eQuilibrator sigma below which openTECR shows it is accurate to ~0.45 kcal/mol.
+# This is its openTECR p90, so it is the range where the gold data actually
 # constrains it -- see PROXY REFERENCE below.
 EQ_TRUSTED_SIGMA = 0.70
 DGP_TRUSTED_SIGMA = 1.22
@@ -208,20 +208,20 @@ def fit_error_models(train: pd.DataFrame, db: pd.DataFrame | None = None) -> dic
     Monotone (a source reporting more uncertainty must not be predicted more
     accurate) and non-parametric (no theory for the shape).
 
-    WHY TWO TIERS. TECRDB only covers well-measured central metabolism, which is
+    WHY TWO TIERS. openTECR only covers well-measured central metabolism, which is
     exactly the LOW-sigma regime, so gold data alone cannot calibrate the range
     the model must actually work over:
 
-        dGPredictor sigma   TECRDB p50 0.91, p90 1.22, max 21.6
+        dGPredictor sigma   openTECR p50 0.91, p90 1.22, max 21.6
                                database p50 21.17, p90 52.89, max 2039
 
     75.6% of database reactions for dGPredictor (43.4% eQuilibrator, 27.8% Group
-    Contribution) lie beyond the TECRDB p90. Fitting on gold alone and clipping
+    Contribution) lie beyond the openTECR p90. Fitting on gold alone and clipping
     would assign them the error learned at sigma ~ 1.2 -- underestimating error
     precisely where the source is least reliable, which is the opposite of what
     a safety filter must do.
 
-    PROXY REFERENCE. TECRDB establishes that eQuilibrator with sigma <= 0.70 is
+    PROXY REFERENCE. openTECR establishes that eQuilibrator with sigma <= 0.70 is
     accurate to a median 0.45 kcal/mol. That earns it the right to stand in as a
     reference where gold data runs out: for the other sources the silver target
     is |source - eQuilibrator| on reactions where eQuilibrator is in its trusted
@@ -242,7 +242,7 @@ def fit_error_models(train: pd.DataFrame, db: pd.DataFrame | None = None) -> dic
             m &= train[f"sig_{k}"] <= EQ_SENTINEL
         sub = train[m]
         xs = list(sub[f"sig_{k}"].to_numpy(float))
-        ys = list((sub[f"dg_{k}"] - sub["tecrdb"]).abs().to_numpy(float))
+        ys = list((sub[f"dg_{k}"] - sub["opentecr"]).abs().to_numpy(float))
         w = [3.0] * len(xs)
         n_gold = len(xs)
 
@@ -272,7 +272,7 @@ def fit_error_models(train: pd.DataFrame, db: pd.DataFrame | None = None) -> dic
         models[k] = {"kind": "isotonic", "n_gold": n_gold, "n_silver": n_silver,
                      "x": iso.X_thresholds_.tolist(), "y": iso.y_thresholds_.tolist(),
                      "gold_median_err": float(np.median(
-                         (sub[f"dg_{k}"] - sub["tecrdb"]).abs())) if n_gold else np.nan,
+                         (sub[f"dg_{k}"] - sub["opentecr"]).abs())) if n_gold else np.nan,
                      "gold_sigma_p90": float(np.percentile(gold_x, 90)) if n_gold else np.nan,
                      "spearman_sigma_vs_err": float(
                          pd.Series(xs).corr(pd.Series(ys), method="spearman"))}
@@ -346,7 +346,7 @@ def realized_error(db: pd.DataFrame, chosen: np.ndarray) -> np.ndarray:
     for i in range(len(db)):
         k = chosen[i]
         if k and np.isfinite(db.iloc[i].get(f"dg_{k}", np.nan)):
-            e[i] = abs(db.iloc[i][f"dg_{k}"] - db.iloc[i]["tecrdb"])
+            e[i] = abs(db.iloc[i][f"dg_{k}"] - db.iloc[i]["opentecr"])
     return e
 
 
@@ -360,7 +360,7 @@ def main() -> None:
     print(f"  union: {union.sum()} ({union.mean():.1%}) -- the coverage ceiling")
 
     truth = load_truth(db)
-    print(f"\nTECRDB stereo-exact ground truth joined: {len(truth)} reactions")
+    print(f"\nopenTECR stereo-exact ground truth joined: {len(truth)} reactions")
 
     # ---- validation: fit on train, score held-out against baselines
     idx = RNG.permutation(len(truth))
@@ -368,7 +368,7 @@ def main() -> None:
     tr, te = truth.iloc[idx[:cut]].copy(), truth.iloc[idx[cut:]].copy()
     db_tr = db[~db.rxn.isin(te.rxn)]          # keep held-out rxns out of silver too
     models = fit_error_models(tr, db_tr)
-    print("\ncalibration (gold = TECRDB train split; silver = vs a trusted-sigma source):")
+    print("\ncalibration (gold = openTECR train split; silver = vs a trusted-sigma source):")
     for k, m in models.items():
         if m["kind"] == "isotonic":
             print(f"  {k:6s} gold n={m['n_gold']:4d} (median|err| {m['gold_median_err']:.2f}, "
@@ -387,7 +387,7 @@ def main() -> None:
         "always Group contribution": np.where(te["dg_GC"].notna(), "GC", None),
         "dev priority (EQ>GC, then ML)": baseline_priority(te),
     }
-    print(f"\nheld-out TECRDB validation (n={len(te)}), |chosen source - experiment|:")
+    print(f"\nheld-out openTECR validation (n={len(te)}), |chosen source - experiment|:")
     rows = []
     for lab, ch in strategies.items():
         err = realized_error(te, ch)
@@ -424,7 +424,7 @@ def main() -> None:
     MODELS_JSON.write_text(json.dumps({
         "tolerance": TOLERANCE, "eq_sentinel": EQ_SENTINEL,
         "models": models, "validation": val.to_dict("records"),
-        "note": "ehat is expected |error vs TECRDB| from each source's own sigma; "
+        "note": "ehat is expected |error vs openTECR| from each source's own sigma; "
                 "hard overrides: eQ sentinels and dGPredictor on quinones are never assigned.",
     }, indent=1))
     print(f"\n=== shipped: expected error <= {TOLERANCE} kcal/mol ===")

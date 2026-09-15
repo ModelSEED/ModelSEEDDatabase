@@ -32,8 +32,8 @@ DEFAULT_OUT = ROOT / "data" / "cc_params_path_b.npz"
 
 
 
-def fixed_tecrdb() -> Path:
-    """Work around a silent pandas-3 breakage in ``read_tecrdb``.
+def fixed_opentecr() -> Path:
+    """Work around a silent pandas-3 breakage in ``read_opentecr``.
 
     component-contribution 0.7.0 applies its documented defaults with
 
@@ -42,7 +42,7 @@ def fixed_tecrdb() -> Path:
 
     Under pandas >= 3 copy-on-write those operate on a temporary Series and do
     nothing at all -- pandas only emits a ChainedAssignmentError *warning*. In
-    this TECRDB snapshot 75% of rows have no ionic strength and 66% have no
+    this openTECR snapshot 75% of rows have no ionic strength and 66% have no
     pMg, so three quarters of the training set would carry NaN conditions
     straight into the reverse transform.
 
@@ -58,10 +58,10 @@ def fixed_tecrdb() -> Path:
     before = (int(df.ionic_strength.isna().sum()), int(df.p_mg.isna().sum()))
     df["ionic_strength"] = df["ionic_strength"].fillna(0.25)
     df["p_mg"] = df["p_mg"].fillna(14)
-    out = ROOT / "data" / "TECRDB_defaults_applied.csv"
+    out = ROOT / "data" / "openTECR_defaults_applied.csv"
     out.parent.mkdir(parents=True, exist_ok=True)
     df.to_csv(out, index=False)
-    print(f"TECRDB defaults applied: ionic_strength {before[0]} NaN -> "
+    print(f"openTECR defaults applied: ionic_strength {before[0]} NaN -> "
           f"{int(df.ionic_strength.isna().sum())}, "
           f"p_mg {before[1]} -> {int(df.p_mg.isna().sum())}")
     return out
@@ -72,8 +72,8 @@ def main():
     ap.add_argument("--cache", type=Path, default=DEFAULT_CACHE)
     ap.add_argument("--out", type=Path, default=DEFAULT_OUT)
     ap.add_argument("--quiet", action="store_true")
-    ap.add_argument("--tecrdb", type=Path, default=None,
-                    help="use this TECRDB CSV instead of the Zenodo one")
+    ap.add_argument("--opentecr", type=Path, default=None,
+                    help="use this openTECR CSV instead of the Zenodo one")
     args = ap.parse_args()
 
     if args.quiet:
@@ -87,11 +87,11 @@ def main():
     print(f"cache: {args.cache}")
     ccache = create_compound_cache_from_sqlite_file(args.cache)
 
-    tecrdb_path = args.tecrdb if args.tecrdb else fixed_tecrdb()
+    opentecr_path = args.opentecr if args.opentecr else fixed_opentecr()
 
-    print("building training data (parses TECRDB + formation + redox) ...")
+    print("building training data (parses openTECR + formation + redox) ...")
     t0 = time.time()
-    td = FullTrainingDataFactory(ccache=ccache).make(tecrdb_path=tecrdb_path)
+    td = FullTrainingDataFactory(ccache=ccache).make(opentecr_path=opentecr_path)
     print(f"  built in {time.time() - t0:.0f}s")
     print(f"  reactions                 : {td.stoichiometric_matrix.shape[1]}")
     print(f"  compounds                 : {len(td.compounds)}")

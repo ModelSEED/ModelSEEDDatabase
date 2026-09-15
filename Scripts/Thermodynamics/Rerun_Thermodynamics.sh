@@ -28,7 +28,7 @@ set -euo pipefail
 ./Update_Reaction_eQuilibrator_Energies.py
 
 # --- dGPredictor ------------------------------------------------------------
-# Retrained on the de-duplicated TECRDB, the same measurements
+# Retrained on the de-duplicated openTECR, the same measurements
 # component-contribution is fitted to. Every prediction is installed with its
 # own uncertainty; there is no coverage floor. See
 # Biochemistry/Thermodynamics/dGPredictor/README.md.

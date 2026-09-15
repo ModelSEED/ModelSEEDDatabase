@@ -95,8 +95,8 @@ does make the stored ladders complete, which is why it is on.
 * **133 reactions carry an unreliable protonation model**, listed in
   `Biochemistry/Thermodynamics/ProtonationEvidence/unbalanced_enumeration_reactions.tsv`.
   Large glycans whose partners could not move with them. Neither the current nor
-  the previous value can be checked against experiment; none has a TECRDB match.
+  the previous value can be checked against experiment; none has a openTECR match.
 * **The rebuild is not measurably better against experiment.** All build
-  variants score MAE 0.74 against the 802 stereo-exact TECRDB anchors, because
+  variants score MAE 0.74 against the 802 stereo-exact openTECR anchors, because
   none of the reactions the rebuild changes has an experimental measurement. The
   case for it is correctness of construction, not demonstrated accuracy.

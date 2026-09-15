@@ -47,7 +47,7 @@ echo "=== 2/8 must-carry set";      $PY must_carry_over.py
 #
 # Measured against the shipped cascade before adopting: 3,042 reactions move by
 # more than 1 kcal/mol, no reaction changes status, and on the 797 stereo-exact
-# TECRDB anchors the two are INDISTINGUISHABLE -- net mean change -0.0015
+# openTECR anchors the two are INDISTINGUISHABLE -- net mean change -0.0015
 # kcal/mol, no anchor moving more than 0.79. The within-2 figure shifts by five
 # reactions crossing the threshold, which is noise, not degradation.
 PKA_PREFERENCE="${PKA_PREFERENCE:-marvin}"

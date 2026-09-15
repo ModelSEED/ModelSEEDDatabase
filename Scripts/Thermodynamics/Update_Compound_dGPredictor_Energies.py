@@ -24,7 +24,7 @@ from BiochemPy import Compounds
 # See Biochemistry/Thermodynamics/dGPredictor/README.md for training-pipeline
 # details.
 #
-# The retrained model was fit on the TECRDB training set alongside 224
+# The retrained model was fit on the openTECR training set alongside 224
 # formation-energy pseudo-reactions of the form `∅ → cpd`, so it has learned
 # per-compound ΔfG'° directly. Predictions are staged at
 # Biochemistry/Thermodynamics/dGPredictor/retrained_dG_compounds.json,

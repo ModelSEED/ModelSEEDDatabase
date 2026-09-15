@@ -27,7 +27,7 @@ from pathlib import Path
 ROOT = Path(os.environ.get("MSDB_ROOT", Path(__file__).resolve().parents[3]))
 G = ROOT / "Biochemistry/Thermodynamics/SourceGrading/results/thermo_grades"
 FULL = {"EQ": "eQuilibrator", "DGP": "dGPredictor",
-        "GC": "Group contribution", "TECRDB": "TECRDB"}
+        "GC": "Group contribution", "openTECR": "openTECR"}
 SELF = ["measured", "self-certain", "self-confident", "unconfident"]
 SORT_SELF = {s: i for i, s in enumerate(SELF)}
 SORT_CROSS = {"corroborated": 0, "disputed": 1, "unpaired": 2, "---": 3}

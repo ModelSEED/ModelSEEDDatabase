@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Compare dGPredictor (retrained) reaction energies to TECRDB.
+"""Compare dGPredictor (retrained) reaction energies to openTECR.
 
 Matching is done on a "SMILES key" derived from each compound's SMILES via
 RDKit, at TWO tiers:
@@ -8,14 +8,14 @@ RDKit, at TWO tiers:
                    independent -- ATP == ATP4-).
   * skeleton     : InChIKey connectivity block (first 14 chars); unifies
                    stereoisomers & protonation states (e.g. all aldohexopyranoses).
-Both sides (ModelSEED cpd SMILES and TECRDB KEGG SMILES) go through the SAME
+Both sides (ModelSEED cpd SMILES and openTECR KEGG SMILES) go through the SAME
 RDKit pipeline, so the keys are directly comparable.
 
 Reaction key = (reactant multiset, product multiset) of (key, coeff), protons
 dropped, matched forward or reverse (sign flipped for reverse).
-TECRDB tested energy: dG'o = -R*T*ln(K'), aggregated (median) per reaction.
+openTECR tested energy: dG'o = -R*T*ln(K'), aggregated (median) per reaction.
 dGPredictor energy: staged modelseed_retrained_dG.json dG_mean (kJ/mol),
-for the reaction as written in ModelSEED. Disparity = dGpred - TECRDB.
+for the reaction as written in ModelSEED. Disparity = dGpred - openTECR.
 """
 import json, glob, re, math, collections, csv, sys, os
 from pathlib import Path
@@ -27,11 +27,11 @@ RDLogger.DisableLog("rdApp.*")
 
 # ---------------------------------------------------------------------------
 # PORTED 2026-09-07 from Cooper Taylor's build_comparison.py
-# (/scratch/ctaylor/dgpredictor_tecrdb/scripts/). The matching logic below is
+# (/scratch/ctaylor/dgpredictor_opentecr/scripts/). The matching logic below is
 # HIS and is unchanged; only the paths are rewritten to derive from this
 # repository so the file it produces is regenerable here.
 #
-# Why: tecrdb_comparison.csv is the ground truth behind every
+# Why: opentecr_comparison.csv is the ground truth behind every
 # accuracy number in the paper -- 797 stereo-exact anchors -- and it was read
 # by two committed scripts and produced by none. A release whose headline
 # figure cannot be regenerated from the repository is not reproducible, and
@@ -40,7 +40,7 @@ RDLogger.DisableLog("rdApp.*")
 # TWO DELIBERATE DIFFERENCES FROM HIS RUN, both of which move the numbers:
 #   * the ModelSEED snapshot is THIS repository's live Biochemistry/, not his
 #     pinned June copy;
-#   * TECRDB comes from our tecrdb_v11 (1.66 MB) because his data/TECRDB.csv is
+#   * openTECR comes from our tecrdb_v11 (1.66 MB) because his data/TECRDB.csv is
 #     mode 600 and unreadable. Same four columns are used -- reaction,
 #     temperature, p_h, K_prime -- so the schema is compatible, but it is a
 #     different vintage.
@@ -52,10 +52,10 @@ SNAP   = Path(os.environ.get("MSDB_BIOCHEM", REPO / "Biochemistry"))
 MSDB   = SNAP.parent
 STAGED = Path(os.environ.get(
     "DGPREDICTOR_JSON", SNAP / "Thermodynamics" / "dGPredictor" / "retrained_dG.json"))
-TECRDB = Path(os.environ.get(
-    "TECRDB_SOURCE",
+openTECR = Path(os.environ.get(
+    "OPENTECR_SOURCE",
     "/scratch/seaver/Claude_Projects/eQuilibrator/data/tecrdb_v11/TECRDB.csv"))
-OUTDIR = Path(os.environ.get("TECRDB_COMPARISON_OUT", SNAP / "Thermodynamics" / "SourceGrading"))
+OUTDIR = Path(os.environ.get("openTECR_COMPARISON_OUT", SNAP / "Thermodynamics" / "SourceGrading"))
 R_KJ   = 8.314462618e-3
 PROTON = "GPRLSGONYQIRFK"      # InChIKey14 of [H+]
 _UN    = rdMolStandardize.Uncharger()
@@ -177,8 +177,8 @@ def kegg_keys(cid):
         if c in cpd_skel: return (cpd_full.get(c),cpd_skel[c])
     return (None,None)
 
-# ---- parse TECRDB ----
-df=pd.read_csv(TECRDB)
+# ---- parse openTECR ----
+df=pd.read_csv(openTECR)
 def parse_side(side, tier):
     d=collections.defaultdict(float); unresolved=[]
     for part in side.split("+"):
@@ -241,7 +241,7 @@ def med(xs):
 tecr={};idx={}
 for tier in ("full","skel"):
     tecr[tier],idx[tier]=build_tecr(tier)
-    print(f"  TECRDB groups[{tier}]={len(tecr[tier])}",file=sys.stderr)
+    print(f"  openTECR groups[{tier}]={len(tecr[tier])}",file=sys.stderr)
 
 # ---- match MS reactions ----
 matches={}   # rid -> row (prefer stereo_exact)
@@ -278,17 +278,17 @@ for rid in staged:
             ec=";".join(sorted(x for x in g["ECs"] if x and x!="nan")),
             enzyme_name=";".join(sorted(x for x in g["enz"] if x and x!="nan"))[:200],
             equation_definition=r.get("definition"),equation_ids=r.get("equation"),
-            tecrdb_reaction=" | ".join(sorted(g["kegg_rxns"]))[:300],
+            opentecr_reaction=" | ".join(sorted(g["kegg_rxns"]))[:300],
             n_measurements=len(g["dGs"]),
             dGpredictor_dG_kJ=round(dgpred,3),
-            tecrdb_dG_kJ=round(tecr_ms,3),
+            opentecr_dG_kJ=round(tecr_ms,3),
             diff_kJ=round(diff,3),abs_diff_kJ=round(abs(diff),3),
             dGpredictor_dG_kcal=round(dgpred/4.184,3),
-            tecrdb_dG_kcal=round(tecr_ms/4.184,3),
+            opentecr_dG_kcal=round(tecr_ms/4.184,3),
             diff_kcal=round(diff/4.184,3),abs_diff_kcal=round(abs(diff)/4.184,3),
             dGpredictor_err_kJ=round(dgerr,3) if dgerr is not None else None,
-            tecrdb_dG_sd_kJ=round(exp_sd,3),combined_err_kJ=round(combined_err,3),significant=significant,
-            tecrdb_dG_min_kJ=round(min(dgs_ms),3),tecrdb_dG_max_kJ=round(max(dgs_ms),3),
+            opentecr_dG_sd_kJ=round(exp_sd,3),combined_err_kJ=round(combined_err,3),significant=significant,
+            opentecr_dG_min_kJ=round(min(dgs_ms),3),opentecr_dG_max_kJ=round(max(dgs_ms),3),
             other_GroupContribution_dG_kJ=gc_kj,
             other_dGPredictor_original_dG_kJ=dgp_orig_kj,
             other_eQuilibrator_dG_kJ=eq_kj,
@@ -311,16 +311,16 @@ print(f"matched MS reactions: {len(rows)}  "
       f"skeleton={sum(1 for r in rows if r['match_tier']=='skeleton')})",file=sys.stderr)
 
 cols=["modelseed_rxn","name","ec","enzyme_name","equation_definition","equation_ids",
-      "tecrdb_reaction","n_measurements","match_tier",
-      "dGpredictor_dG_kJ","tecrdb_dG_kJ","diff_kJ","abs_diff_kJ",
-      "dGpredictor_dG_kcal","tecrdb_dG_kcal","diff_kcal","abs_diff_kcal",
-      "dGpredictor_err_kJ","tecrdb_dG_sd_kJ","combined_err_kJ","significant",
+      "opentecr_reaction","n_measurements","match_tier",
+      "dGpredictor_dG_kJ","opentecr_dG_kJ","diff_kJ","abs_diff_kJ",
+      "dGpredictor_dG_kcal","opentecr_dG_kcal","diff_kcal","abs_diff_kcal",
+      "dGpredictor_err_kJ","opentecr_dG_sd_kJ","combined_err_kJ","significant",
       "other_GroupContribution_dG_kJ","other_dGPredictor_original_dG_kJ","other_eQuilibrator_dG_kJ",
-      "tecrdb_dG_min_kJ","tecrdb_dG_max_kJ",
+      "opentecr_dG_min_kJ","opentecr_dG_max_kJ",
       "pH_min","pH_max","T_min","T_max","ms_orientation_vs_canonical",
       "reactants_smiles","products_smiles","reaction_smiles","reaction_smiles_complete"]
 OUTDIR.mkdir(parents=True, exist_ok=True)
-out=str(OUTDIR / "tecrdb_comparison.csv")
+out=str(OUTDIR / "opentecr_comparison.csv")
 with open(out,"w",newline="") as fh:
     w=csv.DictWriter(fh,fieldnames=cols); w.writeheader()
     for m in rows: w.writerow({k:m.get(k) for k in cols})
@@ -329,10 +329,10 @@ print("WROTE",out)
 # ---- dedup to distinct chemistries, save structure_sig map for top-10 step ----
 json.dump({m["modelseed_rxn"]:list(m["structure_sig"]) for m in rows},
           open(OUTDIR / "_structure_sig.json","w"))
-diag=dict(tecrdb_rows_total=int(len(df)),
+diag=dict(opentecr_rows_total=int(len(df)),
     predicted_reactions=len(staged),matched_reactions=len(rows),
     stereo_exact=sum(1 for r in rows if r["match_tier"]=="stereo_exact"),
     skeleton_only=sum(1 for r in rows if r["match_tier"]=="skeleton"),
     tecr_groups_full=len(tecr["full"]),tecr_groups_skel=len(tecr["skel"]))
-json.dump(diag,open(OUTDIR / "tecrdb_comparison_diagnostics.json","w"),indent=2)
+json.dump(diag,open(OUTDIR / "opentecr_comparison_diagnostics.json","w"),indent=2)
 print(json.dumps(diag,indent=2))
