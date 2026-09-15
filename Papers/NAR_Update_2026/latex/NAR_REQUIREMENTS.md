@@ -707,6 +707,35 @@ journal-specific overrides** before final artwork submission.
 
 ---
 
+## 15. Submission-portal fields (not in the manuscript)
+
+These are entered into the submission system, not into `main.tex`, so they are
+recorded here or they are lost.
+
+### Key Points
+
+NAR asks for three bullet points summarising the contribution, **100 characters
+max each**. Selected 2026-09-15 (character counts in brackets):
+
+1. Four thermodynamic sources are published per reaction, each with its own energy and uncertainty. [96]
+2. Every reaction is graded gold, silver or bronze by the strength of the evidence behind it. [90]
+3. Directions are graded, not asserted: held out, gold and silver match measurement 97% and 91%. [93]
+
+Point 3 rounds 96.9% and 91.3%, and "held out" compresses "graded with the
+openTECR measurement withheld" (see Supplementary Methods S3).
+
+### bioRxiv author import
+
+`../../../../author_template.tsv` is bioRxiv's header-only template; the filled
+version is `authors_biorxiv.tsv` alongside it (outside the repository, since it
+carries contact details). Two constraints the importer enforces:
+
+- **ASCII only.** José -> Jose, Huß -> Huss, Universität -> Universitaet.
+- **Exactly one corresponding author.** Set to Seaver; the manuscript itself
+  correctly lists both Seaver and Henry.
+
+16 of 19 authors carry an ORCID; most have no email in the file.
+
 ## Open items for this manuscript
 
 | # | Item | Where | Blocked on |
