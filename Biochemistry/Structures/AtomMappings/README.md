@@ -15,10 +15,10 @@ divergence from upstream's `unite_and_filter_mappings.sh`.
 
 | File | Rows | Reactions | Description |
 |---|---:|---:|---|
-| `all_mapping_no_problem.txt` | 1,329,095 | 32,877 | Clean set — filtered from `all_mapping.txt` by the local row-level filter. **This is what is ingested into `reaction_*.json`'s `atom_mapping` field.** |
+| `all_mapping_no_problem.txt` | 1,208,127 | 32,378 | Clean set — filtered from `all_mapping.txt` by the local row-level filter. **This is what is ingested into `reaction_*.json`'s `atom_mapping` field.** |
 | `all_mapping.txt` | 1,456,896 | 33,931 | Raw superset from RDT — kept for reproducibility and re-filtering. |
-| `rxns_no_problems.txt` | 32,877 | 32,877 | Just the IDs of the clean reactions (equivalent to unique keys in `all_mapping_no_problem.txt`). |
-| `rxns_confidence.tsv` | 32,878 | 32,877 | Per-reaction confidence tag (`clean` or `salvaged`) written by the local filter. `clean` = every raw RDT row was already a canonical single-pair same-element row; `salvaged` = at least one raw row was a run-on chain / dangling orphan / cross-element pair / malformed and this reaction's kept pairs are a strict subset of the raw output. Ingested into `reaction_*.json` as `atom_mapping_confidence`. |
+| `rxns_no_problems.txt` | 32,378 | 32,378 | Just the IDs of the clean reactions (equivalent to unique keys in `all_mapping_no_problem.txt`). |
+| `rxns_confidence.tsv` | 32,379 | 32,378 | Per-reaction confidence tag (`clean` or `salvaged`) written by the local filter. `clean` = every raw RDT row was already a canonical single-pair same-element row; `salvaged` = at least one raw row was a run-on chain / dangling orphan / cross-element pair / malformed and this reaction's kept pairs are a strict subset of the raw output. Ingested into `reaction_*.json` as `atom_mapping_confidence`. |
 | `rxns_with_cpds_without_structure.txt` | 18,621 | 18,621 | IDs of reactions RDT could not attempt because one or more of their compounds lacks a SMILES structure in `Unique_ModelSEED_Structures.txt`. |
 | `compounds_without_structure.txt` | 12,318 | — | The compound IDs (cpdXXXXX) referenced by the reactions above but missing a structure. |
 | `all_rxns_with_joker.txt` | 11,993 | 11,993 | IDs of reactions whose SMILES contains a wildcard (`*`) atom — fundamentally unmappable by RDT without picking a concrete placeholder atom. Ingested here for reference; excluded from clean set by construction. |
@@ -142,16 +142,18 @@ all. The population script lives at
 
 | Set | Count | % of 56,012 total ModelSEED reactions |
 |---|---:|---:|
-| Clean mapping present in JSON | 32,877 | 59% |
-| Raw rows unrecoverable even at row level | 1,054 | 2% |
+| Clean mapping present in JSON | 32,378 | 58% |
+| Raw rows unrecoverable even at row level | 1,553 | 3% |
 | Unmapable — compound(s) lack SMILES | 18,621 | 33% |
 | Wildcard SMILES (`*` atom) — permanent | 1,725 | 3% |
 | Not attempted by pipeline | 1,735 | 3% |
 
 ### Priority scope (v7.0 ModelSEEDTemplates ∪ PlantSEED_v3 Roles)
 
-Of the 9,125 reactions used by the v7.0 templates and PlantSEED_v3 role
-assignments (the union), 7,378 (80.9%) currently carry a clean atom mapping.
+Of the 9,000 reactions used by the v7.0 templates and PlantSEED_v3 role
+assignments (the union), 7,218 (80.2%) currently carry a clean atom mapping.
+(Was 7,291 before the 2026-09-14 chain-salvage withdrawal, which removed 73
+priority reactions whose mapping was entirely chain-derived.)
 Breakdown of the 1,747 gap:
 
 | Bucket | Count | Notes |
@@ -164,12 +166,16 @@ Breakdown of the 1,747 gap:
 For the Athaliana_TAIR10 reconstruction in plantseed-v3 specifically (782
 unique base reaction IDs across 1,218 modelreactions): 728 mapped (93.1%),
 46 blocked on SMILES, 3 RDT-flagged, 1 wildcard, 4 pipeline-timeout.
+**Not re-measured since the 2026-09-14 chain-salvage withdrawal — treat as an
+upper bound until recomputed.**
 
 ### PlantSEED biomass reachability (carbon-atom trace from CO₂)
 
 Undirected carbon-atom graph over PlantSEED reactions, seeded at
 `cpd00011` (CO₂) + `cpd00242` (bicarbonate): **74 of 76** carbon-containing
-biomass components reachable. The two remaining (Glucotropaeolin, Sinalbin)
+biomass components reachable. **Measured before the 2026-09-14 chain-salvage
+withdrawal; some of the reachability may have depended on fabricated pairs, so
+this needs recomputing.** The two remaining (Glucotropaeolin, Sinalbin)
 are a PlantSEED curation gap — no producing reaction exists for the benzenic
 glucosinolate branch — not an atom-mapping gap.
 
@@ -184,10 +190,6 @@ drops only the bad rows and keeps the reaction's valid pairs.
 
 Recoveries the local filter makes over the shell filter:
 
-- **Run-on chains** (`A=B=C=D`) — split into adjacent pairs, keep the
-  same-element ones. Frequent in decarboxylations that collapse a
-  carboxyl to CO₂: RDT emits `cpd00516:C#6=cpd00516:O#1=cpd00516:O#2=cpd00011:O#1`
-  instead of two clean pair rows.
 - **Two-letter elements** (`Cl`, `Fe`, `Mg`, `Zn`, `Hg`, `Br`, `Se`, …) —
   the shell filter's element slot is a single char; the local filter
   accepts 1–2 chars.
@@ -198,10 +200,41 @@ Recoveries the local filter makes over the shell filter:
 Element-pair whitelist is enforced by construction (only same-element
 pairs are emitted); no separate whitelist file is needed.
 
-The local rewrite raises clean coverage from ~24k to ~33k reactions and
-closes six of eight biomass reachability gaps in PlantSEED
-(Biotin, Leucine, Lysine, Phosphopantetheine, Thiamin diphosphate,
-UDP-Xylose).
+The local rewrite raises clean coverage from 24,267 to 32,378 reactions.
+
+### Run-on chains are dropped, not split (changed 2026-09-14)
+
+This filter used to also split run-on chains (`A=B=C=D`) into adjacent
+same-element pairs, which took coverage to 32,877 reactions. **That was
+wrong.** `run_rdt.sh` assembles pairs by *position*, not identity: it
+sorts the per-atom lines by RDT's atom-atom-mapping number and
+concatenates their text, discarding the numbers. Every `from` line ends
+`=` and every `to` line ends `,`, so whenever RDT leaves an atom
+unmapped its line has no partner and the concatenation glues unrelated
+atoms together. **A chain is the footprint of atoms RDT declined to map,
+not a compressed set of true pairs.**
+
+Splitting them manufactured **20,292 atom pairs across 4,150 reactions**
+(1.7% of shipped rows), of which 16,512 were substrate=substrate or
+product=product rows that RDT cannot emit even in principle. Upstream's
+`unite_and_filter_mappings.sh` rejects all 4,523 chain-carrying
+reactions outright; this filter had been keeping 4,484 of them.
+
+Worked example, `rxn00010` (2 glyoxylate → CO₂ + tartronate
+semialdehyde). RDT left the second glyoxylate's carboxyl and all of CO₂
+unmapped. Positional assembly produced
+
+```
+...,cpd00040:C#2=cpd00040:O#2=cpd00040:O#3=cpd00011:O#1,cpd00011:C#1,cpd00011:O#2
+```
+
+from which the old filter extracted a self-referential
+`cpd00040:(O#2;O#3)=cpd00040:(O#2;O#3)` row and an oxygen "reaching"
+CO₂ — neither asserted by RDT. Both are now gone.
+
+Recovering the *genuine* pairs inside a chain needs RDT's AAM numbers,
+which `all_mapping.txt` no longer carries. That requires a fixed
+`run_rdt.sh` and an RDT rerun, not a smarter filter here.
 
 ## Provenance and regeneration
 
@@ -231,6 +264,9 @@ UDP-Xylose).
 - Fill the ~18K unmapable-because-no-SMILES gap by feeding placeholder
   structures where possible or documenting why (abstract compounds,
   polymers, etc.).
+- Fix `run_rdt.sh` to pair atoms by AAM number instead of by position, then
+  rerun RDT. This is the only way to recover the genuine pairs currently lost
+  inside run-on chains, and it also removes the cause rather than the symptom.
 - Contribute the row-level filter back to
   `unite_and_filter_mappings.sh` upstream so downstream consumers benefit
   without needing to run the local rebuild step.
