@@ -123,6 +123,27 @@ def set_thermo(entry, label, value):
     thermo[label] = value
 
 
+def drop_thermo(entry, label):
+    """Remove ``label`` from ``entry['thermodynamics']`` entirely. Returns True
+    if something was removed. Distinct from writing a sentinel: absence means
+    the source was never run, a sentinel means it ran and could not finish."""
+    thermo = entry.get('thermodynamics') if isinstance(entry, dict) else None
+    if isinstance(thermo, dict) and label in thermo:
+        del thermo[label]
+        return True
+    return False
+
+
+def thermo_present(entry, label):
+    """True iff ``entry`` carries ANY entry for ``label``, sentinel included.
+    ``has_thermo`` asks 'is there a usable number?'; this asks 'was this source
+    ever run on this compound?'."""
+    if not isinstance(entry, dict):
+        return False
+    thermo = entry.get('thermodynamics')
+    return isinstance(thermo, dict) and label in thermo
+
+
 def has_thermo(entry, label):
     """True iff ``entry`` carries a non-sentinel energy for ``label``."""
     if not isinstance(entry, dict):
@@ -546,6 +567,15 @@ def run_reaction_aggregation_update(reactions_helper, compounds_helper, label):
         if rxn_entry['status'] == 'EMPTY':
             continue
         rgts = rxn_entry['stoichiometry']
+        # THREE-WAY (2026-09-15). A sentinel must mean "this source ran and
+        # could not finish", never "this source was never applicable". If any
+        # reagent carries no entry at all for `label`, the source was never run
+        # on this reaction and we write nothing -- matching how the lookup-based
+        # updaters (eQuilibrator, dGPredictor) behave.
+        if any(not thermo_present(compounds_dict.get(rgt['compound']), label)
+               for rgt in rgts):
+            drop_thermo(rxn_entry, label)
+            continue
         if all(rgt['compound'] in eligible for rgt in rgts):
             dg, dge = sum_reaction_energy(rgts, compounds_dict, label, rxn)
         else:
