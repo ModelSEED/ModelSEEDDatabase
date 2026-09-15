@@ -35,6 +35,22 @@ The per-source ``GCC``/``EQU`` notes are no longer consulted; ``GC`` and ``EQ``
 runs read directly from ``thermodynamics['Group contribution']`` and
 ``thermodynamics['eQuilibrator']``. After estimation, the computed direction is
 appended to whichever Thermodynamics sublist supplied the energy."""
+
+# ---------------------------------------------------------------------------
+# SUPERSEDED 2026-09-15 as the writer of the canonical `reversibility` field.
+#
+# Use Promote_Graded_Direction_to_Canonical.py instead. This script chose a
+# source by fixed precedence (eQuilibrator's energy first) regardless of the
+# grading, so on the 3,386 reactions where eQuilibrator disclaims it computed
+# the canonical field from a source the grading had already vetoed -- leaving
+# a reaction `silver, dGPredictor, forward` in thermo-evidence and `?` in
+# reversibility at the same time.
+#
+# The file REMAINS because reversibility_from_energy() is the shared cascade
+# entry point, imported by _thermo_helpers, Add_Reaction_Thermodynamics_
+# Operators and Update_Reaction_dGPredictor_Energies. Running it as a script
+# to write the canonical field will undo the graded recommendation.
+# ---------------------------------------------------------------------------
 import argparse
 import sys
 sys.path.append('../../Libs/Python/')

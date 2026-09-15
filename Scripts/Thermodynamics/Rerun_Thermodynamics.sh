@@ -62,8 +62,6 @@ set -euo pipefail
 # which are slated for removal in favour of the additive per-source dict. They
 # are listed here so the full pipeline stays documented:
 #
-#   ./Estimate_Reaction_Reversibility.py GC
-#   ./Estimate_Reaction_Reversibility.py EQ
 #   ./Promote_Reaction_Thermodynamics_to_Canonical.py
 #
 # Promotion must run LAST if it runs at all -- it weighs reversibility when
@@ -71,3 +69,10 @@ set -euo pipefail
 # promotes a half-regenerated picture. Note also that it never overwrites an
 # existing canonical deltag, so on a database that already has one it is close
 # to a no-op.
+
+# --- Canonical reversibility from the graded recommendation -----------------
+# Requires grade_thermo_sources.py to have run first: it reads best_source per
+# reaction from results/thermo_grades/. Supersedes the two
+# Estimate_Reaction_Reversibility.py passes, which picked a source by fixed
+# precedence and so could contradict the grading.
+./Promote_Graded_Direction_to_Canonical.py

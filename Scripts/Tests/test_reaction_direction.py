@@ -75,10 +75,10 @@ EXPECTED_CHANGE_SOURCES = ['eQuilibrator', 'dGPredictor',
 PIPELINE = [
     ['./Update_Compound_GroupContribution_Energies.py'],
     ['./Update_Reaction_GroupContribution_Energies.py'],
-    ['./Estimate_Reaction_Reversibility.py', 'GC'],
+
     ['./Update_Compound_eQuilibrator_Energies.py'],
     ['./Update_Reaction_eQuilibrator_Energies.py'],
-    ['./Estimate_Reaction_Reversibility.py', 'EQ'],
+
     ['./Update_Reaction_dGPredictor_Energies.py'],
     ['./Add_Reaction_Thermodynamics_Operators.py'],
     # Must follow the operator backfill: that step refreshes every source's
@@ -87,6 +87,10 @@ PIPELINE = [
     # This test runs the pipeline against the WORKING TREE, so the damage is
     # real and persists after the test exits.
     ['./Add_LLM_Direction_Calls.py'],
+    # Canonical `reversibility` from the graded recommendation, replacing the
+    # two Estimate_Reaction_Reversibility.py passes that used to sit above it
+    # (superseded 2026-09-15 -- they ignored the grading).
+    ['./Promote_Graded_Direction_to_Canonical.py'],
 ]
 
 
