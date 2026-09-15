@@ -309,9 +309,9 @@ def _grade_breakdown():
     # were two blues and read as one category. NEUTRAL is deliberately shared
     # between the panels: it is the null case in both. BLUE is the only hue
     # reused with different meanings, and the panels carry separate keys.
-    AC = {"measured": ORANGE, "self-certain": BLUE, "self-confident": YELLOW,
+    AC = {"measured": ORANGE, "self-certain": BLUE, "self-confident": AQUA,
           "unconfident": NEUTRAL}
-    XC = {"corroborated": AQUA, "disputed": VIOLET, "unpaired": BLUE,
+    XC = {"corroborated": AQUA, "disputed": YELLOW, "unpaired": BLUE,
           "neither way": NEUTRAL}
     # Both orders are Table 1's, so figure and table rank the categories alike.
     order_a = ["measured", "self-certain", "self-confident", "unconfident"]
@@ -499,7 +499,7 @@ def figure1():
                   loc="upper right", frameon=False,
                   fontsize=6.0, ncol=len(items), handlelength=1.0, handleheight=0.85,
                   handletextpad=0.4, columnspacing=0.85, borderpad=0.1,
-                  borderaxespad=0.45, labelcolor=INK2)
+                  borderaxespad=0.98, labelcolor=INK2)
 
     def tag(ax, letter):
         ax.annotate(letter, xy=(0.012, 0.955), xycoords="axes fraction",
@@ -567,7 +567,7 @@ def figure2():
     import json
     fig = plt.figure(figsize=(7.0, 3.05))
     outer = fig.add_gridspec(1, 2, width_ratios=[1.78, 1.0],
-                             left=0.150, right=0.988, top=0.986, bottom=0.088,
+                             left=0.093, right=0.988, top=0.986, bottom=0.088,
                              wspace=0.105)
     left = outer[0, 0].subgridspec(2, 1, hspace=0.318, height_ratios=[1.0, 1.34])
     right = outer[0, 1].subgridspec(3, 1, hspace=0.392)
@@ -609,7 +609,7 @@ def figure2():
 
     rows = NUMBERS["energy_rxn"]; tot = NUMBERS["energy_total"]
     ys = range(len(rows))[::-1]
-    SHORT = {}
+    SHORT = {"Group contribution": "Group contr."}
     for i, (lab, v) in zip(ys, rows):
         b.barh(i, v, height=0.70, color=BLUE, zorder=3)
         # grey remainder removed 2026-09-14: the count axis already shows the
@@ -647,14 +647,12 @@ def figure2():
                     ax.axvline(xv, color=YELLOW, lw=0.7, zorder=2.5)
         med = v[len(v) // 2]
         ax.axvline(med, color=INK, lw=0.9, zorder=4)
-        # first panel yields its top-left corner to the "C" tag
-        ax.text(0.105 if j == 0 else 0.030, 0.90, SHORT_C.get(name, name),
+        # all three source names share one left edge; the "C" tag sits at the
+        # top RIGHT (0.98), so the first panel never needed to yield this corner
+        ax.text(0.030, 0.90, SHORT_C.get(name, name),
                 transform=ax.transAxes, ha="left", va="top", fontsize=6.3, color=INK,
                 fontweight="bold", bbox=dict(facecolor="white", edgecolor="none", pad=0.6),
                 zorder=5)
-        ax.text(0.965, 0.90, f"med {med:.1f}", transform=ax.transAxes, ha="right",
-                va="top", bbox=dict(facecolor="white", edgecolor="none", pad=0.6),
-                fontsize=6.2, color=INK, zorder=5)
         ax.set_yticks([]); ax.tick_params(labelsize=5.8, pad=1.5)
         ax.set_xlim(0, hi)
         strip(ax, keep_x=True)
