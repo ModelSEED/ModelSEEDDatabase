@@ -42,6 +42,21 @@ set -euo pipefail
 # with the wrong rule set.
 ./Add_Reaction_Thermodynamics_Operators.py
 
+# --- LLM ensemble directions ------------------------------------------------
+# MUST run after the operator backfill above, and this is not optional.
+#
+# Add_Reaction_Thermodynamics_Operators.py refreshes the operator on EVERY
+# entry in a reaction's thermodynamics dict by recomputing it from that
+# entry's stored energy. The LLM ensemble carries a direction and NO energy by
+# design, so the refresh recomputes it from nothing and writes '?' -- all
+# 45,644 of them, silently, on every pipeline run.
+#
+# Omitting this line is how the calls were lost twice in Sept 2026: once
+# unnoticed until Figure 3A rendered as 100% undetermined, and again simply by
+# running Scripts/Tests/test_reaction_direction.py, which executes this
+# pipeline against the working tree.
+./Add_LLM_Direction_Calls.py
+
 # --- Canonical fields (deltag / deltagerr / reversibility) ------------------
 # NOT run above, deliberately. These write the top-level canonical fields,
 # which are slated for removal in favour of the additive per-source dict. They

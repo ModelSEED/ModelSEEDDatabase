@@ -81,6 +81,12 @@ PIPELINE = [
     ['./Estimate_Reaction_Reversibility.py', 'EQ'],
     ['./Update_Reaction_dGPredictor_Energies.py'],
     ['./Add_Reaction_Thermodynamics_Operators.py'],
+    # Must follow the operator backfill: that step refreshes every source's
+    # operator from its stored energy, and the LLM ensemble has none by design,
+    # so without this the pipeline rewrites all 45,644 LLM directions to '?'.
+    # This test runs the pipeline against the WORKING TREE, so the damage is
+    # real and persists after the test exits.
+    ['./Add_LLM_Direction_Calls.py'],
 ]
 
 
