@@ -176,7 +176,10 @@ Source: [Database Issue Guidelines](https://academic.oup.com/nar/pages/Ms_Prep_D
 Source: [Database Issue Guidelines](https://academic.oup.com/nar/pages/Ms_Prep_Database).
 
 In this project the OUP class default (no `namedate`/`numbered` option) already
-produces NAR-style numeric citations; the bibliography style is `oup-plain`.
+produces NAR-style numeric citations. The bibliography style was `oup-plain`
+until 2026-09-15 and is now `nar` — see §11 for the decision and its evidence.
+`oup-plain` sorted alphabetically and so broke the order-of-appearance rule
+stated above.
 
 ---
 
@@ -439,6 +442,41 @@ and NAR's stated rule.
 
 Do not silently switch styles — record the decision here first.
 
+### DECISION, 2026-09-15: adopted option 3, `nar.bst`
+
+`\bibliographystyle{oup-plain}` → `\bibliographystyle{nar}` in `main.tex`.
+Installed from CTAN with `tlmgr install nar` (v3.19).
+
+Evidence gathered before switching:
+
+- **It fixes the ordering conflict.** Verified by extracting the text of the
+  built PDF: in-text citations now appear 1, 2, 3, … 14 in order of first
+  appearance. Under `oup-plain` they did not ascend.
+- **It builds clean against `oup-authoring-template.cls`** — the caveat this
+  section raised as untested. Zero BibTeX warnings, zero LaTeX errors.
+- **Its output matches the reference format in §7's legacy-template
+  intelligence**: initials not full given names, year in parentheses,
+  abbreviated journal, en-dashed pages.
+
+Residual risk, unchanged: third-party rather than OUP-official, last updated
+2011. If production objects, option 1 (ask whether they renumber at
+typesetting) is still open and costs nothing.
+
+### Author lists truncated to three plus `et al.`
+
+`nar.bst` does not truncate on its own; it emits `et al.` only where a BibTeX
+entry ends `and others`. Nine entries with more than five authors were edited
+in `references.bib` accordingly — Seaver 22 authors, Zhang 15, Bansal 15,
+Rahman 11, Caspi 10, Hastings 10, Beber 7, Noor 6, Noor 6 — removing 102
+names. Entries with five or fewer are untouched.
+
+**The threshold is ours, not NAR's.** "More than five authors, keep three" is
+the common convention and it brought the manuscript from 7 pages to 6. NAR's
+actual cutoff is not recorded anywhere we have: the author-guidelines page was
+truncated before the References section (see Sources, row 9). Worth
+confirming with the editor — it is a one-line change to `references.bib` and a
+rebuild.
+
 ---
 
 ## 12. Unverified — do not treat as settled
@@ -680,7 +718,8 @@ journal-specific overrides** before final artwork submission.
 | 5 | Data availability lacks download formats, 5-year persistence, mobile note | `sections/data_availability.tex` | drafting |
 | 6 | Six referees to nominate | ScholarOne, at submission | author decision |
 | 7 | Figures as vector PDF/EPS, Arial, ≥7pt, 0.25–1pt lines | figure generator scripts | figure work |
-| 8 | Bibliography ordering conflict | `main.tex` `\bibliographystyle` | **editor** (§11) |
+| 8 | ~~Bibliography ordering conflict~~ RESOLVED 2026-09-15: `nar.bst` adopted, citations verified ascending | `main.tex` `\bibliographystyle` | done (§11) |
+| 8b | `et al.` threshold (>5 authors, keep 3) is our convention, not NAR's — NAR's cutoff unknown | `references.bib` | **editor** (§11) |
 | 9 | Ten unverified formatting assumptions | various | **editor** (§12) |
 | 10 | Keep the document free of footnotes and line numbers | all `sections/` | ongoing discipline |
 
