@@ -162,10 +162,12 @@
 %%  Title
 %%  NAR: the database name should ideally be the first word. See checklist.
 %%-----------------------------------------------------------------------------
+%% Shortened 2026-09-15. The previous title's last clause -- "the impact of
+%% reaction-direction assignments on metabolic-model output" -- promised an
+%% analysis the paper does not contain: no section reports model output, flux
+%% or biomass. Do not reinstate it without the analysis.
 \title[ModelSEED Biochemistry Database, 2026 update]{The ModelSEED Biochemistry
-Database, 2026 update: curated molecular structures, multi-source
-thermodynamics, atom mapping, and the impact of reaction-direction assignments
-on metabolic-model output}
+Database, 2026 update: grading multi-source thermodynamics}
 
 %%-----------------------------------------------------------------------------
 %%  Authors
@@ -201,93 +203,97 @@ on metabolic-model output}
 %% Publisher pages are NOT a usable source: sciencedirect.com returns 403 to
 %% automated fetches, as do AIP, RSC and ACS.
 %%
-%% HENRY IS NOT FILLED IN. An ORCID name search restricted to Argonne returns
-%% exactly one Christopher Henry, 0000-0001-8058-9123, listing Argonne,
-%% Northwestern and Dayton -- consistent, but NOT confirmed by any publication
-%% author list, and a wrong ORCID on a corresponding author misattributes the
-%% work. Ask Chris, then uncomment:
-%%     \author[1,$\dagger$]{Christopher S. Henry\ORCID{0000-0001-8058-9123}}
+%% Henry's ORCID 0000-0001-8058-9123 was confirmed by Chris himself
+%% (2026-09-15), along with chenry@anl.gov. It is no longer inferred.
 %%
 %% STILL MISSING: Freiburger, Faria, Taylor, Setlur, Upadhyay, Anand, Maranas,
 %% Giessmann, Wood-Charlson. Faria and Wood-Charlson carry no ORCID in either
 %% paper checked, so those must come from the people themselves.
 %%
-%% AFFILIATIONS 3, 5 and 6 are STALE and must be confirmed with the people
-%% themselves: Noor was ETH Zurich in 2020 and has since moved, Beber was DTU,
-%% and Giessmann's IGDORE listing is from 2023.
+%% AFFILIATION 9 (Penn State) is the only one still unconfirmed by the person
+%% themselves. Noor (6), Beber (5) and Giessmann (3, 4) all supplied theirs
+%% directly in Sept 2026. Numbering below runs in order of first appearance.
 \author[1]{Andrew Freiburger}
 \author[1]{Jos\'e P. Faria}
 \author[1]{Janaka N. Edirisinghe\ORCID{0000-0003-2493-234X}}
 \author[1]{Filipe Liu\ORCID{0000-0001-8701-2984}}
-\author[12]{Cooper Taylor}
+\author[2]{Cooper Taylor}
 \author[1]{Vibhav Setlur}
-\author[6]{Robert T. Giessmann}
-\author[4]{Moritz E. Beber\ORCID{0000-0003-2406-1978}}
-\author[3]{Elad Noor\ORCID{0000-0001-8776-4799}}
-\author[10,11]{Vikas Upadhyay}
-\author[5]{Mohit Anand}
-\author[5]{Costas D. Maranas}
-\author[8,9]{Sebastian Hu{\ss}\ORCID{0000-0003-0712-2986}}
-\author[8,9]{Zoran Nikoloski\ORCID{0000-0003-2671-6763}}
-\author[2]{Adam P. Arkin\ORCID{0000-0002-4999-2931}}
-\author[7]{Robert W. Cottingham\ORCID{0000-0002-2775-3905}}
-\author[2]{Elisha M. Wood-Charlson}
-\author[1,$\dagger$]{Christopher S. Henry}
+\author[3,4]{Robert T. Giessmann}
+\author[5]{Moritz E. Beber\ORCID{0000-0003-2406-1978}}
+\author[6]{Elad Noor\ORCID{0000-0001-8776-4799}}
+\author[7,8]{Vikas Upadhyay}
+\author[9]{Mohit Anand}
+\author[9]{Costas D. Maranas}
+\author[10,11]{Sebastian Hu{\ss}\ORCID{0000-0003-0712-2986}}
+\author[10,11]{Zoran Nikoloski\ORCID{0000-0003-2671-6763}}
+\author[12]{Adam P. Arkin\ORCID{0000-0002-4999-2931}}
+\author[13]{Robert W. Cottingham\ORCID{0000-0002-2775-3905}}
+\author[12]{Elisha M. Wood-Charlson}
+\author[1,$\dagger$]{Christopher S. Henry\ORCID{0000-0001-8058-9123}}
 \author[1,$\ast$]{Samuel M. D. Seaver\ORCID{0000-0002-7674-5194}}
 
 \address[1]{\orgdiv{Computing, Environment and Life Sciences Division},
 \orgname{Argonne National Laboratory}, \orgaddress{\street{9700 S. Cass Ave.},
 \postcode{60439}, \state{Lemont, IL}, \country{USA}}}
 
-\address[2]{\orgdiv{Environmental Genomics and Systems Biology Division},
-\orgname{Lawrence Berkeley National Laboratory},
-\orgaddress{\postcode{94720}, \state{Berkeley, CA}, \country{USA}}}
-
-\address[3]{\orgname{\TBD[Noor -- affiliation to confirm]}}
-
-\address[4]{\orgname{\TBD[Beber -- affiliation to confirm]}}
-
-\address[5]{\orgdiv{Department of Chemical Engineering},
-\orgname{The Pennsylvania State University},
-\orgaddress{\postcode{16802}, \state{University Park, PA}, \country{USA}}}
-
-\address[6]{\orgname{\TBD[Giessmann -- affiliation to confirm]}}
-
-\address[7]{\orgdiv{Biosciences Division},
-\orgname{Oak Ridge National Laboratory},
-\orgaddress{\postcode{37830}, \state{Oak Ridge, TN}, \country{USA}}}
-
-%% 12 supplied by Sam (2026-09-11) on Cooper Taylor moving from Argonne. No
+%% 2 supplied by Sam (2026-09-11) on Cooper Taylor moving from Argonne. No
 %% postcode given, so none is written -- every other address here carries one.
-\address[12]{\orgdiv{College of Engineering, Computing and Applied Sciences},
+\address[2]{\orgdiv{College of Engineering, Computing and Applied Sciences},
 \orgname{Clemson University},
 \orgaddress{\state{Clemson, SC}, \country{USA}}}
 
-%% 10 and 11 supplied by Vikas Upadhyay himself (2026-09-10) on moving from
+\address[3]{\orgname{Institute for Globally Distributed Open Research and Education (IGDORE)},
+\orgaddress{\state{Berlin}, \country{Germany}}}
+
+\address[4]{\orgdiv{Faculty II Mathematics and Natural Sciences, Institute of Chemistry, Chair of Biochemistry of Gas-Converting Biocatalysts},
+\orgname{Technische Universit\"at Berlin},
+\orgaddress{\state{Berlin}, \country{Germany}}}
+
+\address[5]{\orgname{Institute for Globally Distributed Open Research and Education (IGDORE)},
+\orgaddress{\state{Copenhagen}, \country{Denmark}}}
+
+\address[6]{\orgdiv{Department of Plant and Environmental Sciences},
+\orgname{Weizmann Institute of Science},
+\orgaddress{\state{Rehovot}, \country{Israel}}}
+
+%% 7 and 8 supplied by Vikas Upadhyay himself (2026-09-10) on moving from
 %% Penn State; contact viku@illinois.edu. He holds both.
-\address[10]{\orgdiv{NSF iBioFoundry},
+\address[7]{\orgdiv{NSF iBioFoundry},
 \orgname{University of Illinois Urbana-Champaign},
 \orgaddress{\postcode{61801}, \state{Urbana, IL}, \country{USA}}}
 
-\address[11]{\orgdiv{Carl R. Woese Institute for Genomic Biology},
+\address[8]{\orgdiv{Carl R. Woese Institute for Genomic Biology},
 \orgname{University of Illinois Urbana-Champaign},
 \orgaddress{\postcode{61801}, \state{Urbana, IL}, \country{USA}}}
 
-%% 8 and 9 are transcribed from Hu{\ss} et al. 2022 (10.1111/tpj.15903) via
-%% Crossref, so they are 2022-vintage and carry the same caveat as 3, 5 and 6:
-%% confirm with the authors before submission.
-\address[8]{\orgdiv{Systems Biology and Mathematical Modelling Group},
+\address[9]{\orgdiv{Department of Chemical Engineering},
+\orgname{The Pennsylvania State University},
+\orgaddress{\postcode{16802}, \state{University Park, PA}, \country{USA}}}
+
+%% 10 and 11 are transcribed from Hu{\ss} et al. 2022 (10.1111/tpj.15903) via
+%% Crossref, so they are 2022-vintage and unconfirmed by Hu{\ss} or Nikoloski:
+%% confirm with them before submission.
+\address[10]{\orgdiv{Systems Biology and Mathematical Modelling Group},
 \orgname{Max Planck Institute of Molecular Plant Physiology},
 \orgaddress{\street{Am M\"uhlenberg 1}, \postcode{14476}, \state{Potsdam},
 \country{Germany}}}
 
-\address[9]{\orgdiv{Bioinformatics, Institute of Biochemistry and Biology},
+\address[11]{\orgdiv{Bioinformatics, Institute of Biochemistry and Biology},
 \orgname{University of Potsdam},
 \orgaddress{\street{Karl-Liebknecht-Str. 24-25}, \postcode{14476},
 \state{Potsdam}, \country{Germany}}}
 
+\address[12]{\orgdiv{Environmental Genomics and Systems Biology Division},
+\orgname{Lawrence Berkeley National Laboratory},
+\orgaddress{\postcode{94720}, \state{Berkeley, CA}, \country{USA}}}
+
+\address[13]{\orgdiv{Biosciences Division},
+\orgname{Oak Ridge National Laboratory},
+\orgaddress{\postcode{37830}, \state{Oak Ridge, TN}, \country{USA}}}
+
 \corresp[$\ast$]{Corresponding author. \href{mailto:seaver@anl.gov}{seaver@anl.gov}}
-\corresp[$\dagger$]{Corresponding author. \href{mailto:cshenry@anl.gov}{cshenry@anl.gov}}
+\corresp[$\dagger$]{Corresponding author. \href{mailto:chenry@anl.gov}{chenry@anl.gov}}
 
 %% Submission history. Left commented out deliberately: the month argument is
 %% fed to \numexpr by the class (\myswitch, cls:1175), so an empty

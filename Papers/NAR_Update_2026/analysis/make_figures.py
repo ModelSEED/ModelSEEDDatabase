@@ -304,13 +304,18 @@ def _grade_breakdown():
             if not e:
                 continue
             A[e["grade"]][e["assessment"]] += 1
-            X[e["grade"]][e.get("cross-source", "no cross-check")] += 1
-    AC = {"measured": ORANGE, "self-certain": BLUE, "self-confident": BLUE_350,
+            X[e["grade"]][e.get("cross-source", "neither way")] += 1
+    # Four DISTINCT hues per panel (2026-09-15) -- self-certain/self-confident
+    # were two blues and read as one category. NEUTRAL is deliberately shared
+    # between the panels: it is the null case in both. BLUE is the only hue
+    # reused with different meanings, and the panels carry separate keys.
+    AC = {"measured": ORANGE, "self-certain": BLUE, "self-confident": YELLOW,
           "unconfident": NEUTRAL}
-    XC = {"corroborated": BLUE, "outvoted": ORANGE, "unpaired": AQUA,
-          "no cross-check": NEUTRAL}
+    XC = {"corroborated": AQUA, "disputed": VIOLET, "unpaired": BLUE,
+          "neither way": NEUTRAL}
+    # Both orders are Table 1's, so figure and table rank the categories alike.
     order_a = ["measured", "self-certain", "self-confident", "unconfident"]
-    order_x = ["corroborated", "outvoted", "unpaired", "no cross-check"]
+    order_x = ["corroborated", "disputed", "unpaired", "neither way"]
     by_a = {g: [(k, A[g][k], AC[k]) for k in order_a if A[g][k]] for g in A}
     by_x = {g: [(k, X[g][k], XC[k]) for k in order_x if X[g][k]] for g in X}
     return by_a, by_x
@@ -569,14 +574,17 @@ def figure2():
     a = fig.add_subplot(left[0]); b = fig.add_subplot(left[1])
 
     def tag(ax, letter):
-        ax.annotate(letter, xy=(0.02, 0.94), xycoords="axes fraction", fontsize=9.0,
-                    fontweight="bold", va="top", ha="left", color=INK, zorder=6)
+        ax.annotate(letter, xy=(0.98, 0.94), xycoords="axes fraction", fontsize=9.0,
+                    fontweight="bold", va="top", ha="right", color=INK, zorder=6)
 
+    # counts axis: both rows on one scale, so reactions and compounds are
+    # directly comparable -- the thing percentages hid (Sam 2026-09-14)
+    AMAX = max(sum(s[1] for s in NUMBERS[k_]) for k_ in ("ladder_rxn", "ladder_cpd"))
     for row, (key, label) in enumerate([("ladder_rxn", "reactions"),
                                         ("ladder_cpd", "compounds")]):
         segs = NUMBERS[key]; tot = sum(s[1] for s in segs); x = 0
         for name, v, col, hatch in segs:
-            pct = v / tot * 100
+            pct = v                      # counts, not percent
             # hatch marks the SMILES-derived route through the same Marvin
             # release; white strokes read against both the blue and the orange
             a.barh(row, pct, left=x, height=0.74, color=col, zorder=3,
@@ -586,16 +594,16 @@ def figure2():
             # surface-coloured box lifts the number clear of the hatch strokes
             fg = INK if col in (GRID, NEUTRAL) else "white"
             box = dict(facecolor=col, edgecolor="none", pad=0.9) if hatch else None
-            if pct > 22:
-                a.text(x + pct / 2, row, f"{name}  {pct:.0f}%", ha="center", va="center",
+            if pct > AMAX * 0.22:
+                a.text(x + pct / 2, row, f"{name}  {k(v)}", ha="center", va="center",
                        fontsize=6.0, color=fg, fontweight="bold", zorder=5, bbox=box)
-            elif pct > 9:
-                a.text(x + pct / 2, row, f"{pct:.0f}%", ha="center", va="center",
+            elif pct > AMAX * 0.09:
+                a.text(x + pct / 2, row, k(v), ha="center", va="center",
                        fontsize=6.0, color=fg, fontweight="bold", zorder=5, bbox=box)
             x += pct
-        a.text(-1.5, row, label, ha="right", va="center", fontsize=7.0, color=INK)
-    a.set_xlim(0, 100); a.set_ylim(-0.62, 1.62); a.set_yticks([])
-    a.set_xticks([0, 25, 50, 75, 100]); a.set_xticklabels(["0", "25", "50", "75", "100%"])
+        a.text(-AMAX * 0.015, row, label, ha="right", va="center", fontsize=7.0, color=INK)
+    a.set_xlim(0, AMAX); a.set_ylim(-0.62, 1.62); a.set_yticks([])
+    a.set_xticks([0, 20000, 40000, 56002]); a.set_xticklabels(["0", "20k", "40k", "56k"])
     strip(a)
     tag(a, "A")
 
@@ -604,7 +612,8 @@ def figure2():
     SHORT = {}
     for i, (lab, v) in zip(ys, rows):
         b.barh(i, v, height=0.70, color=BLUE, zorder=3)
-        b.barh(i, tot - v, left=v + 260, height=0.70, color=NEUTRAL, zorder=3, alpha=0.55)
+        # grey remainder removed 2026-09-14: the count axis already shows the
+        # shortfall against 56k, so the bar was drawing the same fact twice
         b.text(v - 700, i, f"{100*v/tot:.0f}%", va="center", ha="right",
                fontsize=6.4, color="white", fontweight="bold")
         b.text(-900, i, SHORT.get(lab, lab), va="center", ha="right",
@@ -656,118 +665,110 @@ def figure2():
 
 # ============================ FIGURE 3 ======================================
 def figure3():
-    fig = plt.figure(figsize=(7.0, 3.55))
-    gs = fig.add_gridspec(2, 3, width_ratios=[1.15, 1.10, 0.60],
-                          height_ratios=[1.0, 0.94],
-                          left=0.128, right=0.928, top=0.972, bottom=0.072,
-                          wspace=0.62, hspace=0.32)
-    a = fig.add_subplot(gs[0, 0]); b = fig.add_subplot(gs[0, 1])
-    c = fig.add_subplot(gs[0, 2]); d = fig.add_subplot(gs[1, :])
+    """Three panels in one row (2026-09-15).
 
-    def tag(ax, letter, x=0.017, y=0.955):
+    Was A/B/C with a six-lane C spanning the bottom. B (eQuilibrator against
+    dGPredictor) dropped at Sam's request; the six-lane panel split into two
+    equal panels, one per axis, which also retires the two-legends-in-one-axes
+    hack -- the palette is reused across the axes (BLUE is self-certain here and
+    corroborated there), so a shared key was never safe. Separate panels give
+    each its own.
+    """
+    fig = plt.figure(figsize=(7.0, 2.30))
+    # B and C carry no y labels and A's are abbreviated, so the panels run to
+    # the page edges; wspace is the only furniture left between them.
+    gs = fig.add_gridspec(1, 3, left=0.052, right=0.998, top=0.955,
+                          bottom=0.150, wspace=0.155)
+    a = fig.add_subplot(gs[0, 0])
+    c = fig.add_subplot(gs[0, 1]); d = fig.add_subplot(gs[0, 2])
+    # Gaps are asymmetric and gridspec wspace is not, so place by hand: B needs
+    # room on its left for the gold/silver/bronze labels it carries for both
+    # itself and C; C needs none, so it sits tight against B.
+    L, R, GAP_AB, GAP_BC = 0.052, 0.998, 0.058, 0.016
+    W = (R - L - GAP_AB - GAP_BC) / 3.0
+    for _ax, _x0 in ((a, L), (c, L + W + GAP_AB), (d, L + 2 * W + GAP_AB + GAP_BC)):
+        _b = _ax.get_position()
+        _ax.set_position([_x0, _b.y0, W, _b.height])
+
+    def tag(ax, letter, x=0.017, y=0.985):
         ax.annotate(letter, xy=(x, y), xycoords="axes fraction", fontsize=9.0,
                     fontweight="bold", va="top", ha="left", color=INK, zorder=6)
 
     FWD, REV, BACK = "#1c5cab", NEUTRAL, "#c2410c"
-    # A -- direction assigned by each SOURCE independently (was: by grade).
-    # FOUR states, not three. "undetermined" is the one the 2020 release folded
-    # into "reversible", and separating them is the point of the panel: 63% of
-    # dGPredictor's calls live there.
     UND = NEUTRAL
+    # abbreviated so the y labels cost almost no width; the caption expands them
+    SHORT_SRC = {"eQuilibrator": "eQ", "Group contribution": "GC",
+                 "dGPredictor": "dG", "LLMs": "LLMs"}
     rows = NUMBERS["direction"]; ys = range(len(rows))[::-1]
+    AMAX = max(f + e + r + q for _, f, e, r, q in rows)
     for i, (lab, f, e, r, q) in zip(ys, rows):
         tot = f + e + r + q; x = 0
         for v, col, nm in ((f, FWD, "\u2192"), (e, AQUA, "\u2194"),
                            (r, BACK, "\u2190"), (q, UND, "?")):
-            pct = v / tot * 100
-            a.barh(i, pct, left=x, height=0.72, color=col, zorder=3,
+            pct = v
+            a.barh(i, pct, left=x, height=0.66, color=col, zorder=3,
                    edgecolor=FRAME, lw=0.45)
-            if pct > 9:
-                a.text(x + pct / 2, i, f"{nm} {pct:.0f}%", ha="center", va="center",
-                       fontsize=6.4, fontweight="bold",
-                       color="white" if col != UND else INK)
-            x += pct
-        a.text(-3.5, i, lab.replace("Group contribution", "Group contrib."),
+            x += pct     # no in-bar glyphs (2026-09-15); the key carries them
+        a.text(-AMAX * 0.028, i, SHORT_SRC.get(lab, lab),
                va="center", ha="right", fontsize=7.2, color=INK)
-        a.text(102.5, i, k(tot), va="center", ha="left", fontsize=6.2, color=MUTED)
-    a.set_xlim(0, 100); a.set_ylim(-0.60, len(rows) - 0.02); a.set_yticks([])
-    a.set_xticks([0, 50, 100]); a.set_xticklabels(["0", "50", "100%"])
+    a.set_xlim(0, AMAX); a.set_ylim(-0.60, len(rows) - 0.02); a.set_yticks([])
+    a.set_xticks([0, 20000, 40000]); a.set_xticklabels(["0", "20k", "40k"])
     strip(a)
-    # key inside the headroom strip rather than four stacked rows beneath the
-    # panel, which was the single largest block of furniture in the figure
+    # key as a COLUMN in the white space right of the shortest row (eQuilibrator,
+    # 25k against an axis running to 46k), not a four-across strip in the
+    # headroom, which crowded the panel letter
     from matplotlib.patches import Patch as _Patch
     a.legend(handles=[_Patch(facecolor=cc, edgecolor="none", label=nn)
                       for nn, cc in (("forward", FWD), ("reversible", AQUA),
                                      ("reverse", BACK), ("undet.", UND))],
-             loc="upper right", frameon=False, fontsize=5.6, ncol=4,
-             handlelength=0.9, handleheight=0.8, handletextpad=0.3,
-             columnspacing=0.6, borderpad=0.1, borderaxespad=0.25, labelcolor=INK2)
+             loc="upper right", bbox_to_anchor=(1.0, 0.915), frameon=False,
+             fontsize=5.8, ncol=1, handlelength=0.9, handleheight=0.8,
+             handletextpad=0.32, labelspacing=0.30, borderpad=0.1,
+             borderaxespad=0.35, labelcolor=INK2)
     tag(a, "A")
 
-    # B -- eQuilibrator against dGPredictor on the 24,804 reactions both score.
-    # Ranked bars rather than one stacked bar: the categories span 13,575 to 198
-    # and the small ones are the interesting ones. Six states, summing to the
-    # shared total exactly.
-    SHORT = {"one direction, one reversible": "one dir., one rev."}
-    segs = sorted(NUMBERS["agreement"], key=lambda s: -s[1])
-    tot = sum(v for _, v, _ in segs)
-    ys = range(len(segs))[::-1]
-    for i, (nm, v, col) in zip(ys, segs):
-        b.barh(i, v, height=0.62, color=col, zorder=3, edgecolor=FRAME, lw=0.45)
-        b.text(v + tot * 0.015, i, f"{k(v)}  {100*v/tot:.1f}%", va="center",
-               ha="left", fontsize=6.2, color=INK)
-        b.text(-tot * 0.02, i, SHORT.get(nm, nm), va="center", ha="right",
-               fontsize=6.6, color=INK)
-    b.set_xlim(0, tot * 0.78); b.set_ylim(-0.62, len(segs) - 0.38); b.set_yticks([])
-    b.set_xticks([0, 5000, 10000, 15000]); b.set_xticklabels(["0", "5k", "10k", "15k"])
-    strip(b)
-    tag(b, "B")
-
-    segs = NUMBERS["atom"]; tot = sum(v for _, v, _ in segs); base = 0
-    for name, v, col in segs:
-        c.bar(0, v, bottom=base + (260 if base else 0), width=0.55, color=col, zorder=3)
-        c.text(0.36, base + v / 2, f"{name}\n{k(v)}  {100*v/tot:.0f}%", va="center",
-               ha="left", fontsize=6.3, color=INK if col == NEUTRAL else col,
-               fontweight="bold")
-        base += v + 260
-    c.set_xlim(-0.45, 1.75); c.set_ylim(0, tot * 1.03); c.set_xticks([])
-    c.set_yticks([0, 20000, 40000, 56012]); c.set_yticklabels(["0", "20k", "40k", "56k"])
-    strip(c, keep_x=False, value_axis="y")
-    tag(c, "C")
-
-    # D -- what underpins each grade, on two axes. Six lanes: each grade split
-    # by the deciding source's self-assessment, then the same three split by
-    # what the other sources made of it. Read together they say where a tier's
-    # authority comes from -- gold from confidence plus corroboration, bronze
-    # from neither.
+    # C and D -- the two axes a grade is built from, one panel each, equal size.
     GR = ["gold", "silver", "bronze"]
-    lanes = [(g, NUMBERS["grade_assess"].get(g, [])) for g in GR] + \
-            [(g, NUMBERS["grade_cross"].get(g, [])) for g in GR]
-    ys = range(len(lanes))[::-1]
-    for i, (lab, segs) in zip(ys, lanes):
-        tot = sum(v for _, v, _ in segs) or 1
-        x = 0
-        for nm, v, col in segs:
-            pct = v / tot * 100
-            d.barh(i, pct, left=x, height=0.78, color=col, zorder=3,
-                   edgecolor=FRAME, lw=0.45)
-            if pct > 14:
-                d.text(x + pct / 2, i, f"{nm} {pct:.0f}%", ha="center", va="center",
-                       fontsize=5.9, fontweight="bold",
-                       color="white" if col != NEUTRAL else INK)
-            x += pct
-        d.text(-1.8, i, lab, va="center", ha="right", fontsize=7.0, color=INK)
-        d.text(102.5, i, k(tot), va="center", ha="left", fontsize=6.0, color=MUTED)
-    d.set_xlim(0, 100); d.set_ylim(-0.58, len(lanes) - 0.12); d.set_yticks([])
-    d.set_xticks([0, 50, 100]); d.set_xticklabels(["0", "50", "100%"])
-    strip(d)
-    d.text(-0.118, 0.80, "by self-assessment", transform=d.transAxes,
-           rotation=90, va="center", ha="center", fontsize=6.1, color=MUTED)
-    d.text(-0.118, 0.26, "by cross-source", transform=d.transAxes,
-           rotation=90, va="center", ha="center", fontsize=6.1, color=MUTED)
-    tag(d, "D", y=0.995)
+    ORDER = {"grade_assess": ["measured", "self-certain", "self-confident",
+                              "unconfident"],
+             "grade_cross":  ["corroborated", "disputed", "unpaired",
+                              "neither way"]}
+    DMAX = max(sum(v for _, v, _ in NUMBERS[k].get(g, [])) or 1
+               for k in ("grade_assess", "grade_cross") for g in GR)
+    for ax, key, letter, title in ((c, "grade_assess", "B", "by self-assessment"),
+                                   (d, "grade_cross", "C", "by cross-source")):
+        lanes = [(g, NUMBERS[key].get(g, [])) for g in GR]
+        yy = range(len(lanes))[::-1]
+        seen = []   # filled in encounter order, then sorted to Table 1's below
+        for i, (lab, segs) in zip(yy, lanes):
+            x = 0
+            for nm, v, col in segs:
+                ax.barh(i, v, left=x, height=0.62, color=col, zorder=3,
+                        edgecolor=FRAME, lw=0.45)
+                if nm not in [n for n, _ in seen]:
+                    seen.append((nm, col))
+                x += v
+            if key == "grade_assess":          # C repeats B's lanes; label once
+                ax.text(-DMAX * 0.030, i, lab, va="center", ha="right",
+                        fontsize=7.0, color=INK)
+        ax.set_xlim(0, DMAX); ax.set_ylim(-0.62, len(lanes) - 0.32)
+        ax.set_yticks([])
+        ax.set_xticks([0, 5000, 10000, 15000])
+        ax.set_xticklabels(["0", "5k", "10k", "15k"])
+        strip(ax)
+        # same anchor as A's key, so all three sit on one line across the figure
+        rank = {n_: i for i, n_ in enumerate(ORDER[key])}
+        seen.sort(key=lambda t: rank.get(t[0], 99))
+        ax.legend(handles=[_Patch(facecolor=c_, edgecolor="none", label=n_)
+                           for n_, c_ in seen],
+                  loc="upper right", bbox_to_anchor=(1.0, 0.915), frameon=False,
+                  fontsize=5.8, ncol=1, handlelength=0.9, handleheight=0.8,
+                  handletextpad=0.32, labelspacing=0.30, borderpad=0.1,
+                  borderaxespad=0.35, labelcolor=INK2)
+        ax.text(0.5, -0.20, title, transform=ax.transAxes, ha="center",
+                va="top", fontsize=6.4, color=MUTED)
+        tag(ax, letter)
     return fig
-
 
 def main():
     OUT.parent.mkdir(parents=True, exist_ok=True)
