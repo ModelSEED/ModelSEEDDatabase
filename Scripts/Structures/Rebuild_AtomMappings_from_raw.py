@@ -15,11 +15,7 @@ non-canonical row and then discards the entire reaction — every valid
 row along with the bad one. The pattern it uses (roughly
 ``cpd.....:.#[0-9]*=cpd.....:.#[0-9]*``) rejects:
 
-  1. Run-on chains where RDT emits ``A=B=C=D`` when it can't pick a
-     single 1-1 mapping for a symmetric group. Common in
-     decarboxylations that collapse a carboxyl to CO2:
-
-         cpd00516:C#6=cpd00516:O#1=cpd00516:O#2=cpd00011:O#1
+  1. (withdrawn 2026-09-14 — see "Run-on chains" below)
 
   2. Two-letter element symbols such as ``Cl``, ``Fe``, ``Mg``, ``Zn``,
      ``Hg`` — the shell regex ``:.#`` matches exactly one character on
@@ -33,11 +29,35 @@ row along with the bad one. The pattern it uses (roughly
      element-pair whitelist stage (which only lists single-letter
      pairs: CC NN OO PP SS BB FF II KK).
 
-Any single occurrence of (1)-(3) in a reaction kills that reaction's
-mappings entirely. On the current raw set (260811 rerun), the shell
-filter accepts 24,267 reactions cleanly; a row-level filter that
-recovers what's actually salvageable in the rest brings it to ~32,900
-reactions with useful atom-atom mappings.
+Any single occurrence of (2)-(3) in a reaction kills that reaction's
+mappings entirely under the shell filter. On the current raw set
+(260811 rerun) it accepts 24,267 reactions; this row-level filter keeps
+the valid pairs from the rest, reaching ~32,400 reactions.
+
+Run-on chains
+=============
+
+This script used to also split run-on chains (``A=B=C=D``) into adjacent
+same-element pairs, which took coverage to ~32,900 reactions. That was
+wrong and was withdrawn on 2026-09-14.
+
+``run_rdt.sh`` assembles pairs by position, not by identity: it sorts the
+per-atom lines by RDT's atom-atom-mapping number and concatenates their
+text, discarding the numbers. Every ``from`` line ends ``=`` and every
+``to`` line ends ``,``. So whenever RDT leaves an atom unmapped, that
+atom's line has no partner and the concatenation glues unrelated atoms
+into a chain. A chain is the footprint of atoms RDT *declined to map* --
+not a compressed set of true pairs.
+
+Splitting them manufactured 20,292 atom pairs across 4,150 reactions
+(1.7% of shipped rows), including 16,512 substrate=substrate and
+product=product rows that RDT cannot emit even in principle. Sebastian's
+``unite_and_filter_mappings.sh`` rejects all 4,523 chain-carrying
+reactions outright; this script kept 4,484 of them.
+
+Recovering the genuine pairs inside a chain requires RDT's AAM numbers,
+which all_mapping.txt no longer carries. That needs a fixed run_rdt.sh
+and a rerun.
 
 For the PlantSEED biomass reachability use case this closes six of the
 eight remaining gaps (Biotin, Leucine, Lysine, Phosphopantetheine,
@@ -67,15 +87,18 @@ mapped to the same product atom, etc.).
 What this deliberately does NOT do:
 
   * It does not try to *infer* the partner for a dangling
-    orphan like ``cpd00011:C#1``. The dangling row is dropped
-    silently; other valid pairs in the same reaction survive.
+    orphan like ``cpd00011:C#1``, nor for the atoms inside a run-on
+    chain. Such rows are dropped; other valid pairs in the same
+    reaction survive.
   * It does not rewrite RDT's atom indexing — the numeric suffix
     ``#N`` is passed through untouched, so downstream consumers that
     already parse Sebastian's format work unchanged.
-  * It does not reject self-mappings (``cpd00001:O#1=cpd00001:O#2``),
-    since RDT emits them for symmetric intramolecular rearrangements
-    and they are legitimate mapping data; consumers that only want
-    inter-compound edges can filter them at read time.
+  * It does not reject self-mappings (``cpd00001:O#1=cpd00001:O#2``)
+    that arrive as genuine single-pair rows, since RDT emits them for
+    symmetric intramolecular rearrangements; consumers that only want
+    inter-compound edges can filter them at read time. Self-mappings
+    fabricated by chain splitting are gone as a side effect of the
+    change above.
 
 Idempotency
 ===========
@@ -167,8 +190,8 @@ def classify_row(body):
     ``atomA=atomB`` with both endpoints matching ``cpd\\d{5}:E#N``
     (element 1-2 chars) AND sharing the same element symbol. Anything
     else — run-on chain, dangling orphan, cross-element pair, malformed —
-    is *not clean*; the salvage still yields whatever same-element
-    pairs can be recovered.
+    is *not clean* and yields no pairs at all. Only the reaction's
+    genuine single-pair rows survive.
 
     Sebastian's warning applies here: a reaction that requires salvage on
     any of its rows was one RDT struggled with, and the rows that *look*
@@ -185,15 +208,25 @@ def classify_row(body):
                 return [f'{a}={b}'], True    # clean canonical pair
             return [], False                 # canonical but cross-element
         return [], False                     # single-pair but malformed
-    # Chain (3+ pieces) or dangling (0/1 pieces). Neither is clean;
-    # emit whatever same-element adjacent pairs can be salvaged.
-    pairs = []
-    for a, b in zip(pieces, pieces[1:]):
-        ma = ATOM.match(a)
-        mb = ATOM.match(b)
-        if ma and mb and ma.group(1) == mb.group(1):
-            pairs.append(f'{a}={b}')
-    return pairs, False
+    # Chain (3+ pieces) or dangling (0/1 pieces). Both are dropped.
+    #
+    # A chain is NOT a compressed form of true pairs awaiting unpacking.
+    # run_rdt.sh assembles pairs positionally (`sort -n | cut -f3 |
+    # tr '\n' ' '`), discarding RDT's atom-atom-mapping numbers, so any
+    # atom RDT declined to map leaves its neighbours glued to whatever
+    # happened to sort next to them. Splitting `A=B=C=D` into adjacent
+    # pairs therefore invents atom-atom relationships that RDT never
+    # asserted -- including substrate=substrate rows, which RDT cannot
+    # emit at all. Verified 2026-09-14: of 4,523 reactions carrying a
+    # chain row, Sebastian's own filter keeps 0; this script used to keep
+    # 4,484, contributing 20,292 fabricated pairs (1.7% of shipped rows).
+    # See Biochemistry/Structures/AtomMappings/README.md and the forensics
+    # writeup for the rxn00010 worked example.
+    #
+    # Recovering the genuine pairs inside a chain needs the AAM numbers,
+    # which are absent from all_mapping.txt -- that requires a fixed
+    # run_rdt.sh and an RDT rerun, not a smarter filter here.
+    return [], False
 
 
 def main():
@@ -210,6 +243,8 @@ def main():
 
     n_raw_rows = 0
     n_raw_rxns = 0
+    n_chain_rows = 0               # dropped, not split -- see module docstring
+    chain_rxns = set()
     per_rxn = defaultdict(set)     # rxn -> {pair_string, ...}
     salvaged = set()               # rxn ids with at least one non-clean raw row
     seen_rxns = set()
@@ -226,6 +261,9 @@ def main():
             if rxn not in seen_rxns:
                 seen_rxns.add(rxn)
                 n_raw_rxns += 1
+            if body.count('=') > 1:
+                n_chain_rows += 1
+                chain_rxns.add(rxn)
             pairs, is_clean_row = classify_row(body)
             if not is_clean_row:
                 salvaged.add(rxn)
@@ -274,6 +312,8 @@ def main():
     print(f'       + wrote {n_out_rxns:>6,} ids to {os.path.basename(RXN_LIST)}')
     print(f'       + wrote {os.path.basename(CONFIDENCE)}: {n_clean:,} clean, {n_salvaged:,} salvaged')
     print(f'Reactions with no surviving row: {dropped_rxns:,} (all their rows were malformed or element-mismatched)')
+    print(f'Run-on chain rows dropped: {n_chain_rows:,} across {len(chain_rxns):,} reactions '
+          f'(not split into pairs -- see module docstring)')
 
 
 if __name__ == '__main__':

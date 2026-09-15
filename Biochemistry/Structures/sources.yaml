@@ -62,14 +62,24 @@ sources:
         consumed_by_production: true
         generated_by: Scripts/Structures/Run_Marvin_pKas.py
         supersedes: |
-          loadPerSourcePkas globs every TSV here and lets the
-          last-sorted file win per (ext_id, kind), so 26.1 overrides
-          23.4 wherever both carry an id. 931 SMILES-only polymers
-          that an InChI-only run missed are now covered directly, via
-          the Java PkaPlugin path. The 448 ids still carried only by
-          23.4 are dominated by the 403 SRU exclusions listed in
-          KEGG_SRU_041020.txt, which are absent from both structure
-          files; they survive by loader accumulation.
+          Supplies the whole ladder for every id it and 23.4 share,
+          plus 931 SMILES-only polymers an InChI-only run missed,
+          recovered through the Java PkaPlugin path (PR #292).
+
+          How precedence works, for all four sources:
+          loadPerSourcePkas ranks by the tool_version column, NOT by
+          filename, and applies precedence per (ext_id, tool), so a
+          ladder never mixes two releases. Fallback to an older
+          snapshot is suppressed for any id present in inchi.tsv:
+          26.1 was run over exactly that file, so an absent 26.1 row
+          there is a positive finding -- no ionizable site -- and not
+          a coverage gap to paper over.
+
+          448 KEGG ids remain 23.4-only, and they split two ways. 403
+          are the SRU exclusions listed in KEGG_SRU_041020.txt, absent
+          from both structure files and so still served from 23.4. The
+          other 45 are in inchi.tsv, so their 23.4 ladders are
+          suppressed rather than served.
     notes: |
       KEGG mol files were also parsed for SRUs (structural repeating
       units); the SRU filter file is KEGG_SRU_041020.txt.
@@ -92,11 +102,13 @@ sources:
         consumed_by_production: true
         generated_by: Scripts/Structures/Run_Marvin_pKas.py
         supersedes: |
-          Overrides 23.4 wherever both carry an id. All 5,644
+          Supplies the whole ladder for every shared id. All 5,644
           SMILES-only polymers and organometallics are now covered
-          directly via the Java PkaPlugin path, so 26.1 covers 24,249
-          ids against 23.4's 24,247 -- this source no longer depends
-          on loader accumulation for coverage.
+          directly via the Java PkaPlugin path (PR #292), so 26.1
+          covers 24,249 ids against 23.4's 24,247. The 23 ids still
+          carried only by 23.4 are all in inchi.tsv, so they are
+          suppressed as no-ionizable-site rather than served: this
+          source now draws nothing from 23.4.
 
   ChEBI:
     snapshot: 2024-01-23
@@ -133,9 +145,11 @@ sources:
           and the prefix retirement remains one reviewable change
           rather than a side effect of a Marvin upgrade.
         supersedes: |
-          Overrides 23.4 wherever both carry an id. 2,038 SMILES-only
-          polymers are now covered directly via the Java PkaPlugin
-          path, leaving 14 ids carried only by 23.4.
+          Supplies the whole ladder for every shared id, plus 2,038
+          SMILES-only polymers recovered through the Java PkaPlugin
+          path (PR #292). 14 ids remain 23.4-only: 13 are in
+          inchi.tsv and so are suppressed as no-ionizable-site, and 1
+          is served from 23.4.
 
   Rhea:
     snapshot: 2023-03-31
@@ -172,11 +186,12 @@ sources:
           its prefix: the alias-format migration stays a separate,
           reviewable change.
         supersedes: |
-          Overrides 23.4 on every id. All 30 SMILES-only POLYMER_*
-          structures carry '*' attachment points; cxcalc refuses them
-          as query molecules, so they are computed with the Java
-          PkaPlugin instead. 26.1 now matches 23.4's coverage exactly
-          (235 ids) with nothing left to accumulate.
+          Supplies the whole ladder for every id. All 30 SMILES-only
+          POLYMER_* structures carry '*' attachment points, which
+          cxcalc refuses as query molecules, so they are computed with
+          the Java PkaPlugin instead (PR #292). 26.1 now matches
+          23.4's coverage exactly at 235 ids, with nothing served from
+          23.4.
 
   ModelSEED:
     snapshot: 2026-09-01

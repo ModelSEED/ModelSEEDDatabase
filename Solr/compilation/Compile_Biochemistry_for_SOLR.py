@@ -70,6 +70,27 @@ def parse_formula_atoms(formula):
     return counts
 
 
+def as_number(v):
+    """Coerce a numeric-looking value to int/float, or None if it is neither.
+
+    _FLAT_NUM_KEYS fields are declared `float` in the schema, but the source
+    JSON is not uniformly typed: three reactions carry the group-contribution
+    sentinel as the STRING "10000000" rather than the number, so the field was
+    copied through as a str. Solr coerces a numeric string silently, which is
+    exactly why it went unnoticed -- those three sorted and facetted alongside
+    the other 16,808 sentinel rows only by luck of the parse.
+    """
+    if v is None or isinstance(v, bool):
+        return None
+    if isinstance(v, (int, float)):
+        return v
+    try:
+        f = float(v)
+    except (TypeError, ValueError):
+        return None
+    return int(f) if f.is_integer() and abs(f) < 2**53 else f
+
+
 def as_bool(value):
     """Solr's BoolField accepts true/false JSON literals. Convert 0/1
     ints and None to booleans; leave real booleans alone."""
@@ -142,7 +163,9 @@ def build_compound_doc(cpd):
         'inchikey', 'linked_compound', 'abstract_compound', 'comprised_of',
         'class',
     )
-    _FLAT_NUM_KEYS = ('mass', 'charge', 'deltag', 'deltagerr')
+    # deltag/deltagerr retired 2026-09-11: superseded by the per-source
+    # `thermodynamics` children, which carry energy, error AND the source.
+    _FLAT_NUM_KEYS = ('mass', 'charge')
     _FLAT_BOOL_KEYS = ('is_core', 'is_obsolete', 'is_cofactor')
     _FLAT_LIST_KEYS = ('aliases', 'notes', 'pka', 'pkb')
 
@@ -151,7 +174,7 @@ def build_compound_doc(cpd):
         if v is not None and v != '':
             doc[k] = v
     for k in _FLAT_NUM_KEYS:
-        v = cpd.get(k)
+        v = as_number(cpd.get(k))
         if v is not None:
             doc[k] = v
     for k in _FLAT_BOOL_KEYS:
@@ -251,7 +274,8 @@ def build_reaction_doc(rxn):
         'status', 'source', 'linked_reaction', 'abstract_reaction',
         'reversibility',
     )
-    _FLAT_NUM_KEYS = ('deltag', 'deltagerr')
+    # deltag/deltagerr retired 2026-09-11: see the compounds note above.
+    _FLAT_NUM_KEYS = ()
     _FLAT_BOOL_KEYS = ('is_transport', 'is_obsolete')
     _FLAT_LIST_KEYS = ('pathways', 'aliases', 'ec_numbers', 'notes')
 
@@ -260,7 +284,7 @@ def build_reaction_doc(rxn):
         if v is not None and v != '':
             doc[k] = v
     for k in _FLAT_NUM_KEYS:
-        v = rxn.get(k)
+        v = as_number(rxn.get(k))
         if v is not None:
             doc[k] = v
     for k in _FLAT_BOOL_KEYS:

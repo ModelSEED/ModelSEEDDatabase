@@ -14,10 +14,25 @@
      Nested layout:
        reaction (parent, doc_type=reaction)
          └─ thermodynamics/ (nest_path=/thermodynamics, doc_type=thermodynamics)
-              fields: source, energy, error, operator
+              fields: source_name, energy, error, operator
          └─ stoichiometry/  (nest_path=/stoichiometry,  doc_type=stoichiometry)
-              fields: compound, coefficient, compartment, formula, name,
-                      charge, is_reactant
+              fields: compound, coefficient, compartment, is_reactant,
+                      participant_formula, participant_name, participant_charge
+         └─ thermo_evidence/ (nest_path=/thermo_evidence,
+                              doc_type=thermo_evidence)
+              fields: grade, assessment, cross_source, source
+
+     Four sources appear under thermodynamics: eQuilibrator, Group
+     contribution, dGPredictor, and LLMs. The LLMs child carries an `operator`
+     and NO energy or error — the ensemble reasons from the reaction rather
+     than from a number, so there is nothing to report. Consumers averaging or
+     sorting on `energy` therefore see three sources, not four, which is
+     intended: the LLM call ships in the index but is excluded from the
+     evidence grading and cannot become the recommended direction.
+
+     thermo_evidence duplicates the reaction-level grade that is also flat on
+     the parent as evidence_grade / evidence_assessment / evidence_source /
+     evidence_cross_source, so a grade facet needs no block join.
 -->
 
 <schema name="reactions" version="1.6">
@@ -64,8 +79,6 @@
 
 		<!-- Backwards-compatible top-level scalars from the pre-2026 schema.
 		     Same value as the promoted per-source pick. Deprecated. -->
-		<field name="deltag"            type="float"      indexed="true"  stored="true"/>
-		<field name="deltagerr"         type="float"      indexed="true"  stored="true"/>
 		<field name="reversibility"     type="string"     indexed="true"  stored="true"/>
 
 		<!-- Atom mapping. Flattened from the reaction JSON's nested
@@ -106,6 +119,16 @@
 		<field name="n_reactants"               type="int"      indexed="true"  stored="true"/>
 		<field name="n_products"                type="int"      indexed="true"  stored="true"/>
 
+		<!-- Evidence grading, denormalized onto the parent so a grade facet
+		     or filter needs no block-join. Mirrors the thermo_evidence child
+		     declared below: grade / assessment / cross_source / source.
+		     evidence_cross_source is absent where the reaction has no
+		     corroborating or dissenting second source. -->
+		<field name="evidence_grade"            type="string"   indexed="true"  stored="true"/>
+		<field name="evidence_assessment"       type="string"   indexed="true"  stored="true"/>
+		<field name="evidence_source"           type="string"   indexed="true"  stored="true"/>
+		<field name="evidence_cross_source"     type="string"   indexed="true"  stored="true"/>
+
 		<!-- Compile-time provenance -->
 		<field name="date_inserted"     type="tdate"      indexed="true"  stored="true"  default="NOW"/>
 		<field name="date_modified"     type="tdate"      indexed="true"  stored="true"  default="NOW"/>
@@ -142,6 +165,14 @@
 		<!-- Denormalized from sign(coefficient): true for reactants
 		     (coefficient < 0), false for products. -->
 		<field name="is_reactant"       type="boolean"    indexed="true"  stored="true"/>
+
+		<!-- Thermo-evidence children. The reaction-level grade of the
+		     direction claim: gold | silver | bronze, with the deciding
+		     source's self-assessment and what the other sources made of
+		     it. Child-side names, mirrored flat on the parent below. -->
+		<field name="grade"             type="string"     indexed="true"  stored="true"/>
+		<field name="assessment"        type="string"     indexed="true"  stored="true"/>
+		<field name="cross_source"      type="string"     indexed="true"  stored="true"/>
 	</fields>
 
 	<uniqueKey>id</uniqueKey>

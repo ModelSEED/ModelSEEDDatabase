@@ -282,16 +282,21 @@ if __name__ == "__main__":
                 if rxnid not in reactionDict:
                     badLink.append(index)
         
-        # Check for unknown deltaG and deltaGerr values.
-        if 'deltag' in rxn:
-            if rxn['deltag'] == float(0):
+        # deltag/deltagerr retired 2026-09-11. The equivalent check is
+        # now per source: a zero energy in any `thermodynamics` entry.
+        for _src, _v in (rxn.get('thermodynamics') or {}).items():
+            if not isinstance(_v, list) or len(_v) < 2:
+                continue
+            try:
+                _dg, _err = float(_v[0]), float(_v[1])
+            except (TypeError, ValueError):
+                continue
+            if _dg == float(0):
                 zeroDeltag.append(index)
-        else:
-            unknownDeltag.append(index)
-        if 'deltagerr' in rxn:
-            if rxn['deltagerr'] == float(0):
+            if _err == float(0):
                 zeroDeltagerr.append(index)
-        else:
+        if not (rxn.get('thermodynamics') or {}):
+            unknownDeltag.append(index)
             unknownDeltagErr.append(index)
 
     # Print summary data.

@@ -11,9 +11,17 @@
      Nested layout:
        compound (parent, doc_type=compound)
          └─ thermodynamics/ (nest_path=/thermodynamics, doc_type=thermodynamics)
-              fields: source, energy, error
+              fields: source_name, energy, error
          └─ pkas/           (nest_path=/pkas,           doc_type=pkas)
-              fields: source, pka, pkb
+              fields: source_name, pka_kind,
+                      pka_value, pka_number, pkb_value, pkb_number
+
+     pKa children are per SOURCE, not per site: Marvin, MolGpKa and Literature
+     each contribute one child. *_value keeps the stored "<fragment>:<value>"
+     encoding; *_number is the same ladder as bare floats so it is
+     range-queryable. pka_kind distinguishes microscopic (per-site values on
+     one protonation state) from macroscopic (sequential dissociations) —
+     reading the first as the second is a category error, so filter on it.
 -->
 
 <schema name="compounds" version="1.6">
@@ -60,10 +68,6 @@
 		<!-- Backwards-compatible top-level scalars from the pre-2026 schema.
 		     Same value as the promoted per-source pick. Deprecated; kept so
 		     legacy consumers don't break at cutover. -->
-		<field name="deltag"            type="float"      indexed="true"  stored="true"/>
-		<field name="deltagerr"         type="float"      indexed="true"  stored="true"/>
-		<field name="pka"               type="string"     indexed="true"  stored="true"  multiValued="true"/>
-		<field name="pkb"               type="string"     indexed="true"  stored="true"  multiValued="true"/>
 
 		<!-- ============================================================
 		     Denormalized flat fields — derived from the JSON at compile
@@ -117,6 +121,17 @@
 		     parsed here to preserve exact reproducibility with the JSON. -->
 		<field name="pka_value"         type="string"     indexed="true"  stored="true"  multiValued="true"/>
 		<field name="pkb_value"         type="string"     indexed="true"  stored="true"  multiValued="true"/>
+		<!-- microscopic | macroscopic. Per-site values on one protonation
+		     state versus sequential dissociations of the whole molecule.
+		     Treating the first as the second is a category error, so a
+		     consumer must be able to filter on it. -->
+		<field name="pka_kind"          type="string"     indexed="true"  stored="true"/>
+		<!-- The bare floats parsed out of *_value, order preserved, so the
+		     ladder is range-queryable without the caller parsing the
+		     "<fragment>:<value>" encoding. One compound's ladder arrives as
+		     a single semicolon-joined string, hence multiValued. -->
+		<field name="pka_number"        type="float"      indexed="true"  stored="true"  multiValued="true"/>
+		<field name="pkb_number"        type="float"      indexed="true"  stored="true"  multiValued="true"/>
 	</fields>
 
 	<uniqueKey>id</uniqueKey>

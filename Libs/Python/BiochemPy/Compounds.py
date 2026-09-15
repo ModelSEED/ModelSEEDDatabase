@@ -267,9 +267,30 @@ class Compounds:
     def loadPerSourcePkas(self, db_array=None):
         """Returns pkas[(db, ext_id)] = {'pKa': value, 'pKb': value}.
 
-        Reads from <db>/pkas/*.tsv (the post-A1 layout). Iterates every TSV
-        in the pkas/ directory; if a source ships multiple snapshots, the
-        last-sorted one wins for each (ext_id, kind) pair.
+        Reads from <db>/pkas/*.tsv (the post-A1 layout). Where a source ships
+        several snapshots of the same tool, the NEWEST version supplies the
+        whole ladder for a given external id, and an older snapshot is used
+        only for ids the newest one does not carry at all.
+
+        Version precedence comes from the tool_version column, parsed
+        numerically -- NOT from the filename. Sorting filenames happens to put
+        marvin_26.1 after marvin_23.4, but it is coincidence: a hypothetical
+        marvin_9.0 sorts after both, and marvin_100.1 before both.
+
+        Precedence is per (ext_id, tool), not per (ext_id, kind, tool). The
+        previous per-kind rule let a compound take its pKa from one Marvin
+        release and its pKb from another whenever the newer run emitted only
+        one of the two -- 557 compounds shipped such a mixed-vintage ladder.
+        A ladder now comes from exactly one run.
+
+        Fallback to an older snapshot is suppressed for any id present in the
+        source's inchi.tsv. Marvin 26.1 was run over exactly that file, with
+        zero parse failures, so for those ids an absent 26.1 row is a positive
+        finding -- no ionizable site in range -- and reinstating a 23.4 ladder
+        would override the newer run rather than fall back to it. 81 ids are
+        in this position. Ids NOT in inchi.tsv keep the older ladder: they are
+        the 8,637 compounds carrying a SMILES but no InChI, which the 26.1 run
+        never saw, and refreshing those is deferred to a SMILES-based run.
 
         Normalizes source-specific id quirks so that the returned ext_id
         matches the alias-file convention:
@@ -283,12 +304,39 @@ class Compounds:
         if db_array is None:
             db_array = ['KEGG', 'MetaCyc', 'ChEBI', 'Rhea']
 
+        def version_key(raw, file_index):
+            """Sortable key for a tool_version. Numeric where possible so 26.1
+            beats 23.4 and 100.1 beats 26.1; non-numeric versions (MolGpKa
+            ships 'opam2' and 'stock') fall back to file order, which is the
+            old behaviour and the best available for an unordered label."""
+            parts = []
+            for chunk in str(raw or '').split('.'):
+                parts.append(int(chunk) if chunk.isdigit() else -1)
+            numeric = all(x >= 0 for x in parts) and bool(parts)
+            return (1, tuple(parts)) if numeric else (0, (file_index,))
+
         out = {}
         for db in db_array:
             pka_dir = self.StructRoot + db + '/pkas'
             if not os.path.isdir(pka_dir):
                 continue
-            for pka_file in sorted(glob.glob(pka_dir + '/*.tsv')):
+            # ids the newest run was actually given -- see the docstring
+            covered = set()
+            inchi_path = self.StructRoot + db + '/inchi.tsv'
+            if os.path.isfile(inchi_path):
+                with open(inchi_path) as fh:
+                    for line in DictReader(fh, dialect='excel-tab'):
+                        e = line.get('external_id')
+                        if not e:
+                            continue
+                        if db == 'ChEBI' and e.startswith('CHEBI_'):
+                            e = e[len('CHEBI_'):]
+                        elif db == 'Rhea' and e.startswith('POLYMER_'):
+                            e = 'POLYMER:' + e[len('POLYMER_'):]
+                        covered.add(e)
+            # (ext_id, tool) -> (version_key, {kind: value})
+            best = {}
+            for file_index, pka_file in enumerate(sorted(glob.glob(pka_dir + '/*.tsv'))):
                 with open(pka_file) as fh:
                     reader = DictReader(fh, dialect='excel-tab')
                     for line in reader:
@@ -301,7 +349,28 @@ class Compounds:
                             ext_id = ext_id[len('CHEBI_'):]
                         elif db == 'Rhea' and ext_id.startswith('POLYMER_'):
                             ext_id = 'POLYMER:' + ext_id[len('POLYMER_'):]
-                        out.setdefault((db, ext_id), {})[kind] = value
+                        tool = line.get('tool') or ''
+                        vk = version_key(line.get('tool_version'), file_index)
+                        slot = best.get((ext_id, tool))
+                        if slot is None:
+                            best[(ext_id, tool)] = slot = (vk, {})
+                        elif vk > slot[0]:
+                            best[(ext_id, tool)] = slot = (vk, {})
+                        elif vk < slot[0]:
+                            continue        # an older run, and this id is covered
+                        slot[1][kind] = value
+            # Drop older-snapshot ladders for ids the newest run was given.
+            newest = {}
+            for (ext_id, tool), (vk, _kinds) in best.items():
+                if vk > newest.get(tool, ()):
+                    newest[tool] = vk
+            for key in [k for k in best
+                        if k[0] in covered and best[k][0] < newest.get(k[1], ())]:
+                del best[key]
+            # Several tools in one directory keep the old cross-tool behaviour:
+            # later-sorted tool wins. Only same-tool versions are collapsed.
+            for (ext_id, _tool) in sorted(best):
+                out.setdefault((db, ext_id), {}).update(best[(ext_id, _tool)][1])
         return out
 
     @staticmethod

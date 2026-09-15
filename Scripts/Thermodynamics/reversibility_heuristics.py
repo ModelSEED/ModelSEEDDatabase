@@ -192,13 +192,18 @@ def _energy_for(rxn_entry, db_level):
     ``db_level`` gates eligibility. Returns ``(dg, dge, append_label)`` or
     ``(None, None, None)``. ``append_label`` is the thermodynamics subkey
     that supplied the matching per-source pair (or None)."""
-    rxn_dg = rxn_entry['deltag']
-    if rxn_dg is None:
+    # The flat deltag/deltagerr fields were removed on 2026-09-11. They held
+    # whichever source last promoted to canonical, and for the reactions the
+    # historical GC report covers that value WAS the Group-contribution entry
+    # -- so the GC entry is the faithful replacement here. Callers passing an
+    # explicit db_level get that source's own pair, as before.
+    src = DB_LEVEL_LABEL.get(db_level) if db_level else DB_LEVEL_LABEL["GC"]
+    pair = _thermo_pair(rxn_entry, src)
+    if pair is None:
         return None, None, None
-    rxn_dg = float(rxn_dg)
+    rxn_dg, rxn_dge = float(pair[0]), pair[1]
     if rxn_dg == SENTINEL_DG:
         return None, None, None
-    rxn_dge = rxn_entry['deltagerr']
     if rxn_dge is not None:
         rxn_dge = float(rxn_dge)
 

@@ -64,8 +64,10 @@ if(len(Disambiguated_Compound['to'])==0 or Disambiguated_Compound['to'][0]['id']
     next_identifier = 'cpd'+str(int(re.sub('^cpd','',last_identifier))+1)
 
     New_Cpd = OrderedDict({ "id":next_identifier,"name":"null","abbreviation":"null","aliases":"null",
-                            "formula":"null","mass":"10000000","charge":"0",
-                            "deltag":"10000000","deltagerr":"10000000","pka":"","pkb":"",
+                            "formula":"null","mass":10000000.0,"charge":0,
+                            # deltag/deltagerr/pka/pkb retired 2026-09-11:
+                            # energies live in `thermodynamics` per source,
+                            # protonation in `pkas` per tool.
                             "inchikey":"","smiles":"",
                             "is_cofactor":0,"is_core":0,"is_obsolete":0,
                             "abstract_compound":"null","comprised_of":"null","linked_compound":"null",

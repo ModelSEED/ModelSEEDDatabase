@@ -82,9 +82,21 @@ def ladder(entry, fragment=1):
     return decode(entry.get("pKa"), fragment) + decode(entry.get("pKb"), fragment)
 
 
-def migrate(text, fragment=1):
+def migrate(text):
     """Convert a stored three-field ``<fragment>:<atom>:<value>`` string to the
-    two-field form, dropping the atom index."""
+    two-field form, dropping the atom index and KEEPING every fragment.
+
+    This used to take a ``fragment`` argument and discard every token outside
+    it, which destroyed data the encoding is designed to hold: the fragment
+    index is retained precisely so a salt's counter-ion pKas can be told apart
+    from the parent's, and ``decode(text, fragment=n)`` already makes that
+    selection at read time. Filtering here as well was redundant and lossy --
+    for a molecule whose sites all sit on fragment 2, both kinds migrated to
+    "" and the whole per-tool record was silently dropped. 14 compounds were
+    in that state (B12-corrinoid complexes, benzalkonium chloride, two
+    O-antigens, succinoglycan) once the Marvin 26.1 plugin path began
+    supplying multi-fragment rows.
+    """
     out = []
     for tok in (text or "").split(";"):
         if not tok:
@@ -93,8 +105,7 @@ def migrate(text, fragment=1):
         if len(parts) == 2:
             out.append(tok)
         elif len(parts) == 3:
-            if int(parts[0]) == fragment:
-                out.append(f"{parts[0]}:{float(parts[2]):.2f}")
+            out.append(f"{parts[0]}:{float(parts[2]):.2f}")
         else:
             raise ValueError(f"malformed pKa token {tok!r}")
     return ";".join(out)
@@ -115,5 +126,6 @@ if __name__ == "__main__":
     old = "1:2:12.90;1:3:1.80;1:4:6.95"
     print("migrate     :", old, "->", migrate(old))
     assert decode(encode([2.15, 7.20])) == [2.15, 7.20]
-    assert migrate("1:2:12.90;2:9:3.00") == "1:12.90"
+    assert migrate("1:2:12.90;2:9:3.00") == "1:12.90;2:3.00"   # every fragment kept
+    assert decode("1:12.90;2:3.00") == [12.90] and decode("1:12.90;2:3.00", 2) == [3.00]
     print("\nassertions passed")

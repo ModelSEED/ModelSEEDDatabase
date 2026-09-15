@@ -192,7 +192,10 @@ def _canonical_matches(entry, dg):
     the canonical value is that script's job, not this one's.
     """
     try:
-        return float(entry.get('deltag')) == float(dg)
+        # was the flat `deltag`; that field is retired, so compare against
+        # the eQuilibrator entry this script is actually reasoning about
+        eq = (entry.get('thermodynamics') or {}).get('eQuilibrator')
+        return bool(eq) and float(eq[0]) == float(dg)
     except (TypeError, ValueError):
         return False
 

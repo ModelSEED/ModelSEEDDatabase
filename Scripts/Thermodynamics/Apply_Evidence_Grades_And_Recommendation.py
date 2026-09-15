@@ -31,7 +31,7 @@ REPO = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)
 GRADES = os.path.join(REPO, "Biochemistry/Thermodynamics/SourceGrading/results/thermo_grades")
 KEY = {"EQ": "eQuilibrator", "GC": "Group contribution",
        "DGP": "dGPredictor", "TECRDB": "TECRDB"}
-VERDICTS = ("corroborated", "outvoted", "unpaired")
+VERDICTS = ("corroborated", "disputed", "unpaired")
 ABBREV = {"eQuilibrator": "eQ", "Group contribution": "GC",
           "dGPredictor": "dGP", "TECRDB": "TECRDB"}
 PRECEDENCE = ["eQuilibrator", "dGPredictor", "Group contribution"]
