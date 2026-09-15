@@ -1,0 +1,56 @@
+%% preprint.tex -- single-PDF build for bioRxiv.
+%%
+%% NOT a new manuscript. It concatenates the two PDFs the submission itself
+%% uses, so there is exactly one source of truth for the text:
+%%
+%%     main.pdf           built from main.tex          (OUP NAR class)
+%%     supplementary.pdf  built from supplementary.tex (article class)
+%%
+%% The two use different document classes and cannot be \input into one file,
+%% so they are merged as finished pages with pdfpages. Build order matters:
+%%
+%%     pdflatex main; bibtex main; pdflatex main x2
+%%     pdflatex supplementary x3
+%%     pdflatex preprint
+%%
+%% Edit the manuscript in main.tex / supplement/, never here.
+
+\documentclass[11pt]{article}
+\usepackage{pdfpages}
+\usepackage[margin=1in]{geometry}
+\usepackage[colorlinks=true,allcolors=blue]{hyperref}
+\pagestyle{empty}
+
+\begin{document}
+
+%% ---- the manuscript, as submitted --------------------------------------
+\includepdf[pages=-]{main.pdf}
+
+%% ---- divider page for the supplement ------------------------------------
+\clearpage
+\thispagestyle{empty}
+\vspace*{\fill}
+\begin{center}
+  {\Large\bfseries Supplementary Information\par}
+  \vspace{1.4em}
+  {\large The ModelSEED Biochemistry Database, 2026 update:\\
+   grading multi-source thermodynamics\par}
+  \vspace{2.2em}
+  \begin{minipage}{0.86\textwidth}
+    \centering\small
+    Andrew Freiburger, Jos\'e P. Faria, Janaka N. Edirisinghe, Filipe Liu, Cooper Taylor, Vibhav Setlur, Robert T. Giessmann, Moritz E. Beber, Elad Noor, Vikas Upadhyay, Mohit Anand, Costas D. Maranas, Sebastian Hu{\ss}, Zoran Nikoloski, Adam P. Arkin, Robert W. Cottingham, Elisha M. Wood-Charlson, Christopher S. Henry, Samuel M. D. Seaver
+  \end{minipage}
+  \vspace{2.2em}
+
+  {\small Correspondence: \href{mailto:seaver@anl.gov}{seaver@anl.gov},
+   \href{mailto:chenry@anl.gov}{chenry@anl.gov}\par}
+  \vspace{1.0em}
+  {\small\itshape Supplementary Methods S1--S4 and Supplementary Table~1\par}
+\end{center}
+\vspace*{\fill}
+\clearpage
+
+%% ---- the supplement, as submitted ---------------------------------------
+\includepdf[pages=-]{supplementary.pdf}
+
+\end{document}
