@@ -34,8 +34,10 @@ Both stayed in `Scripts/Thermodynamics/ProtonationEvidence/`.
 | `calibrate_sigma.py` | the empirical scale of each source's reported uncertainty |
 | `evaluate_path_b.py` | cache variants compared over real ModelSEED reactions |
 | `review_lost_reactions.py` | reactions upstream eQuilibrator can compute and our build cannot |
-| `make_figures.py` | the three main-text figures, `../figures/main_figures_draft.pdf` |
-| `make_graphical_abstract.py` | the mandatory graphical abstract, `../figures/graphical_abstract.pdf` |
+| `figure_common.py` | shared palette, derived `NUMBERS` and panel helpers |
+| `make_figure1_growth.py` | Figure 1, `../figures/figure1_growth.pdf` |
+| `make_figure2_thermodynamics.py` | Figure 2, `../figures/figure2_thermodynamics.pdf` |
+| `make_figure3_direction.py` | Figure 3, `../figures/figure3_direction.pdf` |
 | `grace_style.py` | shared Grace/xmgrace visual style used by both |
 
 The graphical abstract is submitted as a **separate file** and is deliberately

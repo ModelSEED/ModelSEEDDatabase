@@ -1,17 +1,18 @@
 #!/usr/bin/env python
-"""Draft the three main-text figures as one PDF.
+"""Shared foundation for the three main-text figure scripts.
 
-Half-page each (7.0 x 4.3 in, double-column width), two panels apiece, covering
-the six things the paper has to show: network expansion, structure curation,
-pKa integration, reaction-energy generation and comparison, direction-prediction
-approaches compared, and atom mapping.
+Holds the palette, the derived NUMBERS table and the panel helpers. Every
+number is measured from the released database or from this session's audits;
+none is illustrative, and each entry in NUMBERS names the file it came from so
+a reviewer can retrace it.
 
-Every number is measured from the database or from this session's audits; none
-is illustrative. Sources are named in NUMBERS below so a reviewer can retrace
-each one. Where a figure would need a result that does not exist yet -- the
-direction-sensitivity study over the model corpus is still \\TBD in the draft --
-the panel shows what IS measurable (cross-source direction agreement over the
-database) rather than inventing the missing study.
+Split out of the former make_figures.py (2026-09-15), which emitted all three
+figures as one three-page PDF. The figures are now separate files, one script
+each, so a figure can be regenerated without rebuilding its siblings:
+
+    make_figure1_growth.py          -> ../figures/figure1_growth.pdf
+    make_figure2_thermodynamics.py  -> ../figures/figure2_thermodynamics.pdf
+    make_figure3_direction.py       -> ../figures/figure3_direction.pdf
 
 Colours are the validated categorical palette; direction uses a diverging
 encoding because the variable is polarity (forward / reversible / reverse), and
@@ -21,12 +22,20 @@ time, not identity.
 import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
-from matplotlib.backends.backend_pdf import PdfPages
 from pathlib import Path
 
 import grace_style as grace
 
-OUT = Path(__file__).resolve().parent.parent / "figures" / "main_figures_draft.pdf"
+FIGDIR = Path(__file__).resolve().parent.parent / "figures"
+
+
+def save(fig, name):
+    """Write one figure to ../figures/<name>.pdf and report the path."""
+    FIGDIR.mkdir(parents=True, exist_ok=True)
+    out = FIGDIR / name
+    fig.savefig(out, format="pdf")
+    plt.close(fig)
+    print(f"wrote {out}")
 
 # ---- palette (validated: see dataviz references/palette.md) ----------------
 BLUE, ORANGE, AQUA, YELLOW, VIOLET = "#2a78d6", "#eb6834", "#1baf7a", "#eda100", "#4a3aa7"
@@ -37,7 +46,6 @@ FRAME = grace.FRAME
 NEUTRAL = "#c9c8c2"
 
 plt.rcParams.update(grace.RC)
-
 # ---- provenance, computed from released files ------------------------------
 def _pka_provenance():
     """Figure 2A's two bars, derived rather than transcribed.
@@ -469,312 +477,3 @@ def swatches(ax, items, y=-0.15, x0=0.0, dx=None, size=6.4, vertical=False):
 def k(n):
     return f"{n/1000:.1f}k" if n >= 1000 else str(n)
 
-
-# ============================ FIGURE 1 ======================================
-def figure1():
-    """One row, three panels: what the database gained, and from where.
-
-    A is the only panel on a count axis -- it compares 2020 with 2026, and a
-    percentage axis would erase the thing it exists to show (KEGG flat at 17.8k
-    while ChEBI arrives at 11.4k). B and C are 0-100% so the three sources are
-    directly comparable; every count annotation was dropped in favour of the
-    percentage, and the segment keys are direct-labelled on the top bar rather
-    than carried in a legend outside the frame.
-    """
-    fig = plt.figure(figsize=(7.0, 1.95))
-    gs = fig.add_gridspec(1, 3, left=0.107, right=0.984, top=0.985, bottom=0.135,
-                          wspace=0.30)
-    a, b, c = (fig.add_subplot(gs[0, i]) for i in range(3))
-
-    def key(ax, items):
-        """Colour key inside the frame, upper right. Uses the legend layout
-        engine rather than hand-placed swatches: two attempts at estimating
-        text width in axes fractions put every swatch on top of its own label,
-        because character width at 6pt is roughly twice what it looks like.
-        Inside the frame because a legend under the axes is whitespace the row
-        cannot afford."""
-        from matplotlib.patches import Patch
-        ax.legend(handles=[Patch(facecolor=c, edgecolor="none", label=n)
-                           for n, c in items],
-                  loc="upper right", frameon=False,
-                  fontsize=6.0, ncol=len(items), handlelength=1.0, handleheight=0.85,
-                  handletextpad=0.4, columnspacing=0.85, borderpad=0.1,
-                  borderaxespad=0.98, labelcolor=INK2)
-
-    def tag(ax, letter):
-        ax.annotate(letter, xy=(0.012, 0.955), xycoords="axes fraction",
-                    fontsize=9.5, fontweight="bold", va="top", ha="left", color=INK)
-
-    # -- A: compounds per structure source, 2020 vs 2026. Percentage change only.
-    rows = NUMBERS["growth"]; ys = range(len(rows))[::-1]; h = 0.40
-    for i, (lab, old_, new_) in zip(ys, rows):
-        if old_:
-            a.barh(i + h / 2 + 0.02, old_, height=h, color=BLUE_200, zorder=3)
-            pct = f"+{100*(new_-old_)/old_:.0f}%"
-        else:
-            pct = "new"
-        a.barh(i - h / 2 - 0.02, new_, height=h, color=BLUE, zorder=3)
-        a.text(-500, i, "ChEBI/Rhea" if lab == "ChEBI" else lab,
-               va="center", ha="right", fontsize=7.0, color=INK)
-        a.text(new_ + 450, i, pct, va="center", ha="left", fontsize=6.8,
-               color=INK2, fontweight="bold")
-    top = len(rows) - 1
-    a.text(400, top + h / 2 + 0.02, "2020", va="center", ha="left", fontsize=6.0,
-           color=INK, zorder=5)
-    a.text(400, top - h / 2 - 0.02, "2026", va="center", ha="left", fontsize=6.0,
-           color=SURFACE, fontweight="bold", zorder=5)
-    a.set_yticks([]); a.set_xlim(0, 30500); a.set_ylim(-0.6, len(rows) - 0.05)
-    a.set_xticks([0, 10000, 20000, 30000]); a.set_xticklabels(["0", "10k", "20k", "30k"])
-    strip(a); tag(a, "A")
-
-    # -- B: share of each source's reactions that no other primary supplies.
-    _by = {r[0]: r for r in NUMBERS["rxn_sources"]}
-    rows = [_by[s] for s in ("MetaCyc", "KEGG", "Rhea")]
-    ys = range(len(rows))[::-1]
-    for i, (lab, total, uniq, _uc) in zip(ys, rows):
-        pct = 100 * uniq / total if total else 0
-        b.barh(i, pct, height=0.62, color=BLUE, zorder=4)
-        b.barh(i, 100 - pct, left=pct, height=0.62, color=BLUE_200, zorder=3)
-        b.text(pct - 1.6, i, f"{pct:.0f}%", va="center", ha="right", fontsize=6.6,
-               color=SURFACE, fontweight="bold", zorder=5)
-    key(b, [("unique", BLUE), ("shared", BLUE_200)])
-    b.set_yticks([]); b.set_xlim(0, 100); b.set_ylim(-0.6, len(rows) - 0.05)
-    b.set_xticks([0, 50, 100]); b.set_xticklabels(["0", "50", "100%"])
-    strip(b); tag(b, "B")
-
-    # -- C: of that unique contribution, the share whose every compound carries
-    # a structure, so the reaction can be balanced and decomposed. Categories
-    # are B's, in B's order, so they are labelled once.
-    for i, (lab, _t, uniq, ucomp) in zip(ys, rows):
-        pct = 100 * ucomp / uniq if uniq else 0
-        c.barh(i, pct, height=0.62, color=BLUE, zorder=4)
-        c.barh(i, 100 - pct, left=pct, height=0.62, color=NEUTRAL, zorder=3)
-        c.text(pct - 1.6, i, f"{pct:.0f}%", va="center", ha="right", fontsize=6.6,
-               color=SURFACE, fontweight="bold", zorder=5)
-    key(c, [("complete", BLUE), ("incomplete", NEUTRAL)])
-    c.set_yticks([]); c.set_xlim(0, 100); c.set_ylim(-0.6, len(rows) - 0.05)
-    c.set_xticks([0, 50, 100]); c.set_xticklabels(["0", "50", "100%"])
-    strip(c); tag(c, "C")
-    return fig
-
-
-# ============================ FIGURE 2 ======================================
-def figure2():
-    """Two columns: the two coverage bars on the left, the three uncertainty
-    distributions stacked as a column on the right. Previously three full-width
-    rows, which made the figure tall; side by side it spans the page instead and
-    costs roughly a quarter of the vertical space."""
-    import json
-    fig = plt.figure(figsize=(7.0, 3.05))
-    outer = fig.add_gridspec(1, 2, width_ratios=[1.78, 1.0],
-                             left=0.093, right=0.988, top=0.986, bottom=0.088,
-                             wspace=0.105)
-    left = outer[0, 0].subgridspec(2, 1, hspace=0.318, height_ratios=[1.0, 1.34])
-    right = outer[0, 1].subgridspec(3, 1, hspace=0.392)
-    a = fig.add_subplot(left[0]); b = fig.add_subplot(left[1])
-
-    def tag(ax, letter):
-        ax.annotate(letter, xy=(0.98, 0.94), xycoords="axes fraction", fontsize=9.0,
-                    fontweight="bold", va="top", ha="right", color=INK, zorder=6)
-
-    # counts axis: both rows on one scale, so reactions and compounds are
-    # directly comparable -- the thing percentages hid (Sam 2026-09-14)
-    AMAX = max(sum(s[1] for s in NUMBERS[k_]) for k_ in ("ladder_rxn", "ladder_cpd"))
-    for row, (key, label) in enumerate([("ladder_rxn", "reactions"),
-                                        ("ladder_cpd", "compounds")]):
-        segs = NUMBERS[key]; tot = sum(s[1] for s in segs); x = 0
-        for name, v, col, hatch in segs:
-            pct = v                      # counts, not percent
-            # hatch marks the SMILES-derived route through the same Marvin
-            # release; white strokes read against both the blue and the orange
-            a.barh(row, pct, left=x, height=0.74, color=col, zorder=3,
-                   edgecolor=SURFACE if hatch else FRAME,
-                   lw=0.45, hatch=hatch or None)
-            # ink on the pale fills, white on the saturated ones; a tight
-            # surface-coloured box lifts the number clear of the hatch strokes
-            fg = INK if col in (GRID, NEUTRAL) else "white"
-            box = dict(facecolor=col, edgecolor="none", pad=0.9) if hatch else None
-            if pct > AMAX * 0.22:
-                a.text(x + pct / 2, row, f"{name}  {k(v)}", ha="center", va="center",
-                       fontsize=6.0, color=fg, fontweight="bold", zorder=5, bbox=box)
-            elif pct > AMAX * 0.09:
-                a.text(x + pct / 2, row, k(v), ha="center", va="center",
-                       fontsize=6.0, color=fg, fontweight="bold", zorder=5, bbox=box)
-            x += pct
-        a.text(-AMAX * 0.015, row, label, ha="right", va="center", fontsize=7.0, color=INK)
-    a.set_xlim(0, AMAX); a.set_ylim(-0.62, 1.62); a.set_yticks([])
-    a.set_xticks([0, 20000, 40000, 56002]); a.set_xticklabels(["0", "20k", "40k", "56k"])
-    strip(a)
-    tag(a, "A")
-
-    rows = NUMBERS["energy_rxn"]; tot = NUMBERS["energy_total"]
-    ys = range(len(rows))[::-1]
-    SHORT = {"Group contribution": "Group contr."}
-    for i, (lab, v) in zip(ys, rows):
-        b.barh(i, v, height=0.70, color=BLUE, zorder=3)
-        # grey remainder removed 2026-09-14: the count axis already shows the
-        # shortfall against 56k, so the bar was drawing the same fact twice
-        b.text(v - 700, i, f"{100*v/tot:.0f}%", va="center", ha="right",
-               fontsize=6.4, color="white", fontweight="bold")
-        b.text(-900, i, SHORT.get(lab, lab), va="center", ha="right",
-               fontsize=7.0, color=INK)
-    b.set_yticks([]); b.set_xlim(0, tot * 1.02); b.set_ylim(-0.62, len(rows) - 0.38)
-    b.set_xticks([0, 20000, 40000, 56012]); b.set_xticklabels(["0", "20k", "40k", "56k"])
-    strip(b)
-    tag(b, "B")
-
-    # C -- reported uncertainty, one axis per source, stacked as a right-hand
-    # column. Axes are deliberately NOT shared: the three report on different
-    # scales, and a common axis would flatten two into a spike against
-    # eQuilibrator's tail. Source names sit inside the frame; three stacked
-    # titles would cost more height than the panels themselves.
-    sig = json.loads((Path(__file__).resolve().parent
-                      / "figure_data_sigma.json").read_text())
-    order = [("eQuilibrator", BLUE), ("Group contribution", AQUA), ("dGPredictor", VIOLET)]
-    SHORT_C = {}
-    for j, (name, col) in enumerate(order):
-        ax = fig.add_subplot(right[j])
-        v = sig[name]["vals"]
-        hi = sorted(v)[int(0.97 * len(v))]      # clip the tail, then bin INSIDE
-        ax.hist([x for x in v if x <= hi], bins=30, range=(0, hi),
-                color=col, zorder=3, linewidth=0)
-        band = NUMBERS["silver_sigma"].get(name)
-        if band:
-            lo, bhi = band
-            ax.axvspan(lo, min(bhi, hi), color=YELLOW, alpha=0.20, lw=0, zorder=2)
-            for xv in (lo, bhi):
-                if xv <= hi:
-                    ax.axvline(xv, color=YELLOW, lw=0.7, zorder=2.5)
-        med = v[len(v) // 2]
-        ax.axvline(med, color=INK, lw=0.9, zorder=4)
-        # all three source names share one left edge; the "C" tag sits at the
-        # top RIGHT (0.98), so the first panel never needed to yield this corner
-        ax.text(0.030, 0.90, SHORT_C.get(name, name),
-                transform=ax.transAxes, ha="left", va="top", fontsize=6.3, color=INK,
-                fontweight="bold", bbox=dict(facecolor="white", edgecolor="none", pad=0.6),
-                zorder=5)
-        ax.set_yticks([]); ax.tick_params(labelsize=5.8, pad=1.5)
-        ax.set_xlim(0, hi)
-        strip(ax, keep_x=True)
-        if j == 0:
-            tag(ax, "C")
-    return fig
-
-
-# ============================ FIGURE 3 ======================================
-def figure3():
-    """Three panels in one row (2026-09-15).
-
-    Was A/B/C with a six-lane C spanning the bottom. B (eQuilibrator against
-    dGPredictor) dropped at Sam's request; the six-lane panel split into two
-    equal panels, one per axis, which also retires the two-legends-in-one-axes
-    hack -- the palette is reused across the axes (BLUE is self-certain here and
-    corroborated there), so a shared key was never safe. Separate panels give
-    each its own.
-    """
-    fig = plt.figure(figsize=(7.0, 2.30))
-    # B and C carry no y labels and A's are abbreviated, so the panels run to
-    # the page edges; wspace is the only furniture left between them.
-    gs = fig.add_gridspec(1, 3, left=0.052, right=0.998, top=0.955,
-                          bottom=0.150, wspace=0.155)
-    a = fig.add_subplot(gs[0, 0])
-    c = fig.add_subplot(gs[0, 1]); d = fig.add_subplot(gs[0, 2])
-    # Gaps are asymmetric and gridspec wspace is not, so place by hand: B needs
-    # room on its left for the gold/silver/bronze labels it carries for both
-    # itself and C; C needs none, so it sits tight against B.
-    L, R, GAP_AB, GAP_BC = 0.052, 0.998, 0.058, 0.016
-    W = (R - L - GAP_AB - GAP_BC) / 3.0
-    for _ax, _x0 in ((a, L), (c, L + W + GAP_AB), (d, L + 2 * W + GAP_AB + GAP_BC)):
-        _b = _ax.get_position()
-        _ax.set_position([_x0, _b.y0, W, _b.height])
-
-    def tag(ax, letter, x=0.017, y=0.985):
-        ax.annotate(letter, xy=(x, y), xycoords="axes fraction", fontsize=9.0,
-                    fontweight="bold", va="top", ha="left", color=INK, zorder=6)
-
-    FWD, REV, BACK = "#1c5cab", NEUTRAL, "#c2410c"
-    UND = NEUTRAL
-    # abbreviated so the y labels cost almost no width; the caption expands them
-    SHORT_SRC = {"eQuilibrator": "eQ", "Group contribution": "GC",
-                 "dGPredictor": "dG", "LLMs": "LLMs"}
-    rows = NUMBERS["direction"]; ys = range(len(rows))[::-1]
-    AMAX = max(f + e + r + q for _, f, e, r, q in rows)
-    for i, (lab, f, e, r, q) in zip(ys, rows):
-        tot = f + e + r + q; x = 0
-        for v, col, nm in ((f, FWD, "\u2192"), (e, AQUA, "\u2194"),
-                           (r, BACK, "\u2190"), (q, UND, "?")):
-            pct = v
-            a.barh(i, pct, left=x, height=0.66, color=col, zorder=3,
-                   edgecolor=FRAME, lw=0.45)
-            x += pct     # no in-bar glyphs (2026-09-15); the key carries them
-        a.text(-AMAX * 0.028, i, SHORT_SRC.get(lab, lab),
-               va="center", ha="right", fontsize=7.2, color=INK)
-    a.set_xlim(0, AMAX); a.set_ylim(-0.60, len(rows) - 0.02); a.set_yticks([])
-    a.set_xticks([0, 20000, 40000]); a.set_xticklabels(["0", "20k", "40k"])
-    strip(a)
-    # key as a COLUMN in the white space right of the shortest row (eQuilibrator,
-    # 25k against an axis running to 46k), not a four-across strip in the
-    # headroom, which crowded the panel letter
-    from matplotlib.patches import Patch as _Patch
-    a.legend(handles=[_Patch(facecolor=cc, edgecolor="none", label=nn)
-                      for nn, cc in (("forward", FWD), ("reversible", AQUA),
-                                     ("reverse", BACK), ("undet.", UND))],
-             loc="upper right", bbox_to_anchor=(1.0, 0.915), frameon=False,
-             fontsize=5.8, ncol=1, handlelength=0.9, handleheight=0.8,
-             handletextpad=0.32, labelspacing=0.30, borderpad=0.1,
-             borderaxespad=0.35, labelcolor=INK2)
-    tag(a, "A")
-
-    # C and D -- the two axes a grade is built from, one panel each, equal size.
-    GR = ["gold", "silver", "bronze"]
-    ORDER = {"grade_assess": ["measured", "self-certain", "self-confident",
-                              "unconfident"],
-             "grade_cross":  ["corroborated", "disputed", "unpaired",
-                              "neither way"]}
-    DMAX = max(sum(v for _, v, _ in NUMBERS[k].get(g, [])) or 1
-               for k in ("grade_assess", "grade_cross") for g in GR)
-    for ax, key, letter, title in ((c, "grade_assess", "B", "by self-assessment"),
-                                   (d, "grade_cross", "C", "by cross-source")):
-        lanes = [(g, NUMBERS[key].get(g, [])) for g in GR]
-        yy = range(len(lanes))[::-1]
-        seen = []   # filled in encounter order, then sorted to Table 1's below
-        for i, (lab, segs) in zip(yy, lanes):
-            x = 0
-            for nm, v, col in segs:
-                ax.barh(i, v, left=x, height=0.62, color=col, zorder=3,
-                        edgecolor=FRAME, lw=0.45)
-                if nm not in [n for n, _ in seen]:
-                    seen.append((nm, col))
-                x += v
-            if key == "grade_assess":          # C repeats B's lanes; label once
-                ax.text(-DMAX * 0.030, i, lab, va="center", ha="right",
-                        fontsize=7.0, color=INK)
-        ax.set_xlim(0, DMAX); ax.set_ylim(-0.62, len(lanes) - 0.32)
-        ax.set_yticks([])
-        ax.set_xticks([0, 5000, 10000, 15000])
-        ax.set_xticklabels(["0", "5k", "10k", "15k"])
-        strip(ax)
-        # same anchor as A's key, so all three sit on one line across the figure
-        rank = {n_: i for i, n_ in enumerate(ORDER[key])}
-        seen.sort(key=lambda t: rank.get(t[0], 99))
-        ax.legend(handles=[_Patch(facecolor=c_, edgecolor="none", label=n_)
-                           for n_, c_ in seen],
-                  loc="upper right", bbox_to_anchor=(1.0, 0.915), frameon=False,
-                  fontsize=5.8, ncol=1, handlelength=0.9, handleheight=0.8,
-                  handletextpad=0.32, labelspacing=0.30, borderpad=0.1,
-                  borderaxespad=0.35, labelcolor=INK2)
-        ax.text(0.5, -0.20, title, transform=ax.transAxes, ha="center",
-                va="top", fontsize=6.4, color=MUTED)
-        tag(ax, letter)
-    return fig
-
-def main():
-    OUT.parent.mkdir(parents=True, exist_ok=True)
-    with PdfPages(OUT) as pdf:
-        for fn in (figure1, figure2, figure3):
-            fig = fn(); pdf.savefig(fig); plt.close(fig)
-    print(f"wrote {OUT}")
-
-
-if __name__ == "__main__":
-    main()

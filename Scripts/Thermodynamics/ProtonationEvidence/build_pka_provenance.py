@@ -3,7 +3,7 @@
 
 WHY THIS EXISTS. The paper states what fraction of the protonation layer is
 open-source. Until 2026-09-07 those percentages were CONSTANTS TYPED INTO
-make_figures.py, derived from a file that is not shipped
+figure_common.py, derived from a file that is not shipped
 (eQuilibrator/data/resolved_pkas.provenance.tsv). A reader could not reproduce
 them from anything in this repository, which is not acceptable in a paper whose
 argument is transparency. This writes one small table that makes both the
