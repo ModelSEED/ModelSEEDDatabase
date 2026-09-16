@@ -140,14 +140,47 @@
 %% every build raised "Undefined control sequence" plus three "Missing number"
 %% errors and still produced a PDF, which is why it went unnoticed.
 \def\societylogo{}%
-\journaltitle{Nucleic Acids Research}
-\DOI{DOI added during production}
-\copyrightyear{2026}
-\pubyear{2026}
-\vol{00}
-\issue{0}
-\access{Advance Access Publication Date: Day Month Year}
-\appnotes{Database Issue}
+%% Journal identity is switched off for the bioRxiv build. preprint.tex
+%% compiles this same file a second time with \PREPRINTBUILD defined, so the
+%% preprint carries no NAR or OUP identity for a paper the journal has not
+%% accepted. The \else branch is the NAR submission and is unchanged.
+\ifdefined\PREPRINTBUILD
+  \journaltitle{}
+  \DOI{}
+  \copyrightyear{2026}
+  \pubyear{2026}
+  \vol{}
+  \issue{}
+  \access{}
+  \appnotes{}
+  %% Blanking the metadata empties the strings but leaves the running head's
+  %% punctuation skeleton (", 2026, Volume , Issue"), and the title-page band
+  %% still draws its rule and logo box. Both page styles are therefore replaced
+  %% outright with a bare folio. Defined after \documentclass, so these override
+  %% the class definitions at lines 870 and 928.
+  \makeatletter
+  \def\ps@headings{%
+    \def\@oddhead{\hfill{\sffamily\fontsize{9bp}{11bp}\selectfont\thepage}}%
+    \def\@evenhead{{\sffamily\fontsize{9bp}{11bp}\selectfont\thepage}\hfill}%
+    \def\@oddfoot{}\def\@evenfoot{}}
+  \def\ps@opening{%
+    \def\@oddhead{}\def\@evenhead{}\def\@oddfoot{}\def\@evenfoot{}}
+  %% The class EXECUTES \ps@headings at load time (cls line 2515), so \@oddhead
+  %% was already fixed before the redefinition above. Re-invoke it to install
+  %% the new one. \ps@opening needs no such call: \maketitle reaches it later
+  %% through \thispagestyle{opening}.
+  \ps@headings
+  \makeatother
+\else
+  \journaltitle{Nucleic Acids Research}
+  \DOI{DOI added during production}
+  \copyrightyear{2026}
+  \pubyear{2026}
+  \vol{00}
+  \issue{0}
+  \access{Advance Access Publication Date: Day Month Year}
+  \appnotes{Database Issue}
+\fi
 
 \firstpage{1}
 %% \lastpage must be set too. Unset, the class falls through \setlastpage to
@@ -326,7 +359,7 @@ Database, 2026 update: grading multi-source thermodynamics}
 \abstract{\input{sections/M01_abstract}}
 
 \keywords{biochemistry database, metabolic modelling, thermodynamics,
-atom mapping, reaction reversibility, ModelSEED}
+reaction reversibility, ModelSEED}
 
 \maketitle
 

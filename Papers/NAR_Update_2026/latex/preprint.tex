@@ -10,6 +10,7 @@
 %% so they are merged as finished pages with pdfpages. Build order matters:
 %%
 %%     pdflatex main; bibtex main; pdflatex main x2
+%%     pdflatex -jobname=main_preprint "\def\PREPRINTBUILD{}\input{main}" x3
 %%     pdflatex supplementary x3
 %%     pdflatex preprint
 %%
@@ -24,7 +25,9 @@
 \begin{document}
 
 %% ---- the manuscript, as submitted --------------------------------------
-\includepdf[pages=-]{main.pdf}
+%% main_preprint.pdf, NOT main.pdf: same source, compiled with \PREPRINTBUILD
+%% so it carries no journal identity. See the conditional in main.tex.
+\includepdf[pages=-]{main_preprint.pdf}
 
 %% ---- divider page removed 2026-09-15: supplementary.tex now carries the
 %% title, author list and correspondence on its own first page, so the

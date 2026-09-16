@@ -513,7 +513,7 @@ from the source manuscript**, not sourced requirements:
 | 1 | `unnumsec` (unnumbered section heads) | `main.tex` class options | Copied from the sample's default line. No source says NAR wants unnumbered headings |
 | 2 | `webpdf` | `main.tex` class options | Same. Manual defines it as "cropped paper size in the PDF output" |
 | 3 | Section order and heading names | `main.tex` `\input` order | Follows `MANUSCRIPT.md` (untracked; local to the author's tree, not in the repository), not a NAR-specified order |
-| 4 | Six keywords | `main.tex` `\keywords` | Invented. Unknown whether the Database issue uses keywords, or how many |
+| 4 | ~~Six keywords~~ **RESOLVED 2026-09-15** | `main.tex` `\keywords` | The submission portal asks for "between three and five keywords". Cut to five by dropping *atom mapping*, the thinnest-covered topic in the main text |
 | 5 | `\appnotes{Database Issue}`, `\vol{00}`, `\issue{0}`, `\firstpage{1}` | `main.tex` metadata | Placeholder values from the sample |
 | 6 | Back-matter **order** | `sections/author_contributions.tex` | The *set* is now confirmed (§13): Acknowledgements, Author Contributions, Funding and Conflict of interest disclosure all appear in NAR's Article structure list. Their required order and exact headings are still unseen |
 | 7 | Abstract length | `sections/abstract.tex` | No limit found anywhere. Current draft is ~150 words |
@@ -531,7 +531,8 @@ Bundle these into one message; several are cheap to answer and unblock real work
    artwork guidance? (§3, item 10 above)
 3. Should section headings be numbered or unnumbered? (item 1)
 4. Is there an abstract word limit? (item 7)
-5. Does the Database issue use keywords, and how many? (item 4)
+5. ~~Does the Database issue use keywords, and how many?~~ **ANSWERED** by the
+   submission portal: three to five. (item 4)
 6. The draft currently exceeds 4–6 typeset pages — is a longer update paper
    acceptable, or should we cut to fit? (§1)
 7. Are there colour or page charges that scale with figure count? (The Charges
