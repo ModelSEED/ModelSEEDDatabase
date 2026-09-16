@@ -19,7 +19,7 @@ import sys
 
 sys.path.append('../../Libs/Python/')
 from BiochemPy import Reactions
-from Estimate_Reaction_Reversibility import reversibility_from_energy
+from reversibility_heuristics import reversibility_from_energy
 
 # dGPredictor (originally Wang et al. 2021, PLOS Comput Biol,
 # doi:10.1371/journal.pcbi.1009448) — RETRAINED on the

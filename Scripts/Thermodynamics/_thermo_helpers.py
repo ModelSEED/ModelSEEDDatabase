@@ -87,7 +87,7 @@ def _per_source_operator(rxn_entry, dg, dge, label=None):
     ``(dg, dge)`` pair via the cascade heuristic that belongs to ``label``
     (EQ heuristics for ``"eQuilibrator"``, GC heuristics otherwise).
 
-    Lazy-imported from ``Estimate_Reaction_Reversibility`` so the helpers
+    Lazy-imported from ``reversibility_heuristics`` so the helpers
     module stays free of a top-level dependency on the cascade module (and
     avoids any circular-import risk if that direction is ever reversed).
     Returns one of ``'>' | '<' | '=' | '?'``.
@@ -97,7 +97,7 @@ def _per_source_operator(rxn_entry, dg, dge, label=None):
     than relying on a placeholder + downstream backfill — keeps each
     sublist's operator a function of THAT source's own energy, independent
     of the cascade's choice of top-level ``deltag``."""
-    from Estimate_Reaction_Reversibility import reversibility_from_energy
+    from reversibility_heuristics import reversibility_from_energy
     return reversibility_from_energy(rxn_entry, dg, dge, source=label)
 
 

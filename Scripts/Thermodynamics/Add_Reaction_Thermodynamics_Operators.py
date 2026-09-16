@@ -16,7 +16,7 @@ if __name__ == "__main__":
 import sys
 sys.path.append('../../Libs/Python/')
 from BiochemPy import Reactions
-from Estimate_Reaction_Reversibility import reversibility_from_energy
+from reversibility_heuristics import reversibility_from_energy
 
 # Backfill the per-method thermodynamic-direction operator onto every entry in a
 # reaction's `thermodynamics` dict, turning the legacy [energy, error] pairs into

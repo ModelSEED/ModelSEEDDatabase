@@ -793,3 +793,60 @@ def run_reversibility(rxn_entry, energy_source, heuristics=DEFAULT_HEURISTICS):
     # backstop, and "?" for the same reason default_heuristic returns it -- a
     # cascade that decided nothing has not established reversibility.
     return "default", "?", source_label
+
+
+def reversibility_from_energy(rxn_entry, rxn_dg, rxn_dge, source=None):
+    """Compute the thermodynamic direction operator for a single per-source
+    ``(dg, dge)`` pair without the source-eligibility filter or the top-level
+    deltag pick. Returns one of ``'>'`` / ``'<'`` / ``'='`` / ``'?'``.
+
+    ``source`` is the ``thermodynamics`` subkey the pair came from (e.g.
+    ``"eQuilibrator"``); it selects the rule set, defaulting to GC for every
+    source without one of its own. Callers that iterate a reaction's
+    ``thermodynamics`` dict should pass it — otherwise an eQuilibrator energy
+    gets scored with Group-Contribution rules.
+
+    Moved here from Estimate_Reaction_Reversibility.py (2026-09-16), which was
+    superseded as the canonical-field writer but could not be deleted while it
+    owned this function.
+
+    Used by the per-source updaters (``Update_Reaction_dGPredictor_Energies.py``)
+    and the operator backfill (``Add_Reaction_Thermodynamics_Operators.py``).
+    Input coercion mirrors the upstream per-source updater:
+      * ``rxn_entry['status'] == 'EMPTY'`` -> ``'?'``
+      * ``rxn_dg`` that cannot be ``float()``-coerced (``None``, bools, NaN) -> ``'?'``
+      * ``rxn_dg == SENTINEL_DG`` -> ``'?'``
+      * ``rxn_dge`` that cannot be coerced -> treated as ``0.0``"""
+    if isinstance(rxn_entry, dict) and rxn_entry.get('status') == 'EMPTY':
+        return '?'
+
+    if isinstance(rxn_dg, bool) or rxn_dg is None:
+        return '?'
+    try:
+        dg = float(rxn_dg)
+    except (TypeError, ValueError):
+        return '?'
+    if dg != dg:  # NaN
+        return '?'
+
+    # NO SENTINEL CHECK HERE, DELIBERATELY. Both "no estimate" markers -- Group
+    # Contribution's dg = 1e7 and eQuilibrator's ~1e5 kJ/mol sigma -- are the
+    # first rule of every cascade (make_sentinel_heuristic). They were once
+    # tested here as well, which is how they came to drift apart in the first
+    # place: two copies at two depths, one of which some entry points skipped.
+    # Verified dead 2026-09-08 -- disabling both copies here changed 0 of
+    # 110,794 per-source decisions. The cascade is the only owner.
+
+    if isinstance(rxn_dge, bool) or rxn_dge is None:
+        dge = 0.0
+    else:
+        try:
+            dge = float(rxn_dge)
+        except (TypeError, ValueError):
+            dge = 0.0
+        if dge != dge:  # NaN
+            dge = 0.0
+
+    _status, operator, _ = run_reversibility(
+        rxn_entry, explicit_energy(dg, dge), heuristics_for_source(source))
+    return operator

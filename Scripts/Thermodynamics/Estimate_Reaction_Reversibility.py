@@ -46,10 +46,16 @@ appended to whichever Thermodynamics sublist supplied the energy."""
 # a reaction `silver, dGPredictor, forward` in thermo-evidence and `?` in
 # reversibility at the same time.
 #
-# The file REMAINS because reversibility_from_energy() is the shared cascade
-# entry point, imported by _thermo_helpers, Add_Reaction_Thermodynamics_
-# Operators and Update_Reaction_dGPredictor_Energies. Running it as a script
-# to write the canonical field will undo the graded recommendation.
+# reversibility_from_energy() MOVED to reversibility_heuristics.py on
+# 2026-09-16, so nothing imports this module any more. It is now a CLI only.
+#
+# The file REMAINS solely because Apply_2020_Reversibility_Policy.py invokes it
+# as a subprocess, and that script is the documented way to undo the graded
+# canonical direction. Delete the two together, or make Apply_2020 self
+# contained first; deleting this alone silently breaks the rollback path.
+#
+# Running it as a script to write the canonical field will undo the graded
+# recommendation.
 # ---------------------------------------------------------------------------
 import argparse
 import sys
@@ -58,7 +64,7 @@ from BiochemPy import Reactions
 
 # Composable cascade core. Re-imported here so the historical public surface of
 # this module (constants + ``_*`` building blocks + ``estimate_one`` /
-# ``reversibility_from_energy``) keeps working for existing importers
+# ``estimate_one``) keeps working for the CLI
 # (Update_Reaction_dGPredictor_Energies.py, _thermo_helpers, the tests).
 from reversibility_heuristics import (
     # constants
@@ -123,58 +129,6 @@ def estimate_one(rxn_entry, db_level, heuristics=None, energy_source=None):
         status, thermoreversibility = _incomplete_decision(rxn_entry, db_level)
         return status, thermoreversibility, None
     return status, thermoreversibility, source_label
-
-
-def reversibility_from_energy(rxn_entry, rxn_dg, rxn_dge, source=None):
-    """Compute the thermodynamic direction operator for a single per-source
-    ``(dg, dge)`` pair without the source-eligibility filter or the top-level
-    deltag pick. Returns one of ``'>'`` / ``'<'`` / ``'='`` / ``'?'``.
-
-    ``source`` is the ``thermodynamics`` subkey the pair came from (e.g.
-    ``"eQuilibrator"``); it selects the rule set, defaulting to GC for every
-    source without one of its own. Callers that iterate a reaction's
-    ``thermodynamics`` dict should pass it — otherwise an eQuilibrator energy
-    gets scored with Group-Contribution rules.
-
-    Used by the per-source updaters (``Update_Reaction_dGPredictor_Energies.py``)
-    and the operator backfill (``Add_Reaction_Thermodynamics_Operators.py``).
-    Input coercion mirrors the upstream per-source updater:
-      * ``rxn_entry['status'] == 'EMPTY'`` -> ``'?'``
-      * ``rxn_dg`` that cannot be ``float()``-coerced (``None``, bools, NaN) -> ``'?'``
-      * ``rxn_dg == SENTINEL_DG`` -> ``'?'``
-      * ``rxn_dge`` that cannot be coerced -> treated as ``0.0``"""
-    if isinstance(rxn_entry, dict) and rxn_entry.get('status') == 'EMPTY':
-        return '?'
-
-    if isinstance(rxn_dg, bool) or rxn_dg is None:
-        return '?'
-    try:
-        dg = float(rxn_dg)
-    except (TypeError, ValueError):
-        return '?'
-    if dg != dg:  # NaN
-        return '?'
-
-    # NO SENTINEL CHECK HERE, DELIBERATELY. Both "no estimate" markers -- Group
-    # Contribution's dg = 1e7 and eQuilibrator's ~1e5 kJ/mol sigma -- are the
-    # first rule of every cascade (make_sentinel_heuristic). They were once
-    # tested here as well, which is how they came to drift apart in the first
-    # place: two copies at two depths, one of which some entry points skipped.
-    # Verified dead 2026-09-08 -- disabling both copies here changed 0 of
-    # 110,794 per-source decisions. The cascade is the only owner.
-
-    if isinstance(rxn_dge, bool) or rxn_dge is None:
-        dge = 0.0
-    else:
-        try:
-            dge = float(rxn_dge)
-        except (TypeError, ValueError):
-            dge = 0.0
-        if dge != dge:  # NaN
-            dge = 0.0
-
-    _status, operator = _cascade(rxn_entry, dg, dge, heuristics_for_source(source))
-    return operator
 
 
 # ---------------------------------------------------------------------------
