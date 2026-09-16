@@ -14,8 +14,9 @@
 #
 # The single-container multi-env layout supports staging + production
 # sharing one Solr instance; see entrypoint.sh's SOLR_ENVIRONMENTS
-# handling. Env=="prod" routes to the *_legacy configsets AND the
-# *_legacy JSON payload AND the bare (unsuffixed) core names; every
+# handling. Env=="prod" keeps the bare (unsuffixed) core names, because that
+# is the URL the production UI hits, but since the 2026-09-16 cutover it posts
+# the nested (non-legacy) payload like every other env; every
 # other env uses the new nested layout with an env-suffixed core name.
 #
 # Expects the compiled JSONs (both flavours) under
@@ -36,7 +37,12 @@ TARGET_ENV="${1:-}"
 # (standalone / dev / test default).
 if [ "$TARGET_ENV" = "prod" ]; then
     suffix=""
-    json_suffix="_legacy"
+    # CUTOVER 2026-09-16: was "_legacy". Prod now takes the nested payload,
+    # matching the nested configset entrypoint.sh creates its cores from. Both
+    # must change together: a flat payload into a nested core, or the reverse,
+    # will not load correctly. Roll back by restoring "_legacy" here AND the
+    # prod branch in entrypoint.sh's configset_for_env.
+    json_suffix=""
 elif [ -n "$TARGET_ENV" ]; then
     suffix="_${TARGET_ENV}"
     json_suffix=""

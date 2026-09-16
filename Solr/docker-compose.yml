@@ -58,8 +58,8 @@ services:
       #   - `prod` cores (compounds_prod, reactions_prod) use the LEGACY
       #     flat schema (matches what production is currently serving),
       #     so the production UI keeps working during staging tests
-      # Configset selection is by env name — see entrypoint.sh's
-      # `configset_for_env` helper: env=="prod" → *_legacy configsets;
+      # Configset selection is by env name — see entrypoint.sh's      # `configset_for_env` helper: every env uses the nested configsets
+      # (prod moved off *_legacy on 2026-09-16);
       # anything else → new nested configsets.
       # POST_ON_START only auto-posts into the FIRST env in this list;
       # others are populated via

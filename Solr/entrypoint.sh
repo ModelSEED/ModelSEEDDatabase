@@ -86,13 +86,9 @@ wait_for_solr
 #                                          "compounds_staging", "reactions_staging" (new)
 #
 #    Two independent decisions per env, both driven by the env name:
-#      - configset (schema shape): env=="prod" → *_legacy configsets
-#        (matching what the production UI currently expects); anything
-#        else → new nested configsets.
-#      - suffix on the core name: env=="prod" gets bare cores (no suffix)
-#        so that a Solr URL like /solr/compounds/... routes to the
-#        production data — matching the URL production is already hitting.
-#        Every other env gets its name suffixed.
+#      - configset (schema shape): every env now uses the nested
+#        configsets. Until 2026-09-16 prod used *_legacy instead,
+#        matching the flat pre-Solr-9 schema the old UI expected.
 if [ -z "${SOLR_ENVIRONMENTS:-}" ]; then
     ENVS=("")
 else
@@ -101,14 +97,20 @@ else
 fi
 
 # Pick the compounds/reactions configset name for a given env name.
+# CUTOVER 2026-09-16: prod moved off the *_legacy (flat, pre-Solr-9)
+# configsets onto the nested ones staging has used all along, so that
+# ModelSEED-UI v3.6.5 can issue nested-document queries against production.
+# Every env now resolves to the same schema.
+#
+# ROLLBACK: restore the branch below, unload the prod cores, restart, repost.
+# The *_legacy configsets and payloads are still built into the image, so this
+# needs no rebuild of the compile stage.
+#
+#     if [ "$env" = "prod" ]; then echo "${base}_legacy"; else echo "$base"; fi
 configset_for_env() {
-    local env="$1"
+    local env="$1"         # unused since the cutover; kept for the rollback
     local base="$2"        # "compounds" or "reactions"
-    if [ "$env" = "prod" ]; then
-        echo "${base}_legacy"
-    else
-        echo "$base"
-    fi
+    echo "$base"
 }
 
 # Pick the core-name suffix for a given env name. env=="prod" gets bare
