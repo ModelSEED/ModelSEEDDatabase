@@ -21,12 +21,16 @@ Helvetica comes from TeX Gyre Heros, the URW Nimbus Sans clone shipped with TeX
 Live -- the same metrics Grace used. If TeX Live moves, FONT falls back to
 DejaVu Sans and everything still renders, just not in Helvetica.
 """
+import os
 from pathlib import Path
 
 import matplotlib.font_manager as fm
 
-TEXLIVE_HEROS = Path("/scratch/seaver/texlive/2026/texmf-dist/fonts/opentype"
-                     "/public/tex-gyre")
+# Overridable; _register_helvetica() already falls back to DejaVu Sans when the
+# directory is absent, so a machine without this TeX Live still draws figures.
+TEXLIVE_HEROS = Path(os.environ.get(
+    "TEXGYRE_FONT_DIR",
+    "/scratch/seaver/texlive/2026/texmf-dist/fonts/opentype/public/tex-gyre"))
 
 FRAME = "#000000"   # Grace draws the frame and ticks in pure black
 INK = "#000000"

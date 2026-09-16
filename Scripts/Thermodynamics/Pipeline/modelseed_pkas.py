@@ -399,7 +399,8 @@ def load_alberty_pkas(package: Path = None) -> Dict[str, List[float]]:
     Alberty only tabulates species that matter between roughly pH 5 and 9;
     phosphate yields 7.22 alone, without its 2.15 and 12.35.
     """
-    package = package or Path("/scratch/seaver/BasicBiochemData3.m")
+    package = package or Path(os.environ.get(
+        "BASIC_BIOCHEM_DATA", "/scratch/seaver/BasicBiochemData3.m"))
     if not package.exists():
         return {}
     text = package.read_text(encoding="utf-8", errors="ignore")

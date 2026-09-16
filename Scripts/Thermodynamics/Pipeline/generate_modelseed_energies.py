@@ -30,7 +30,12 @@ ROOT = Path(os.environ.get("EQUILIBRATOR_DIR",
                            "/scratch/seaver/Claude_Projects/eQuilibrator"))
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
-MSD = Path("/scratch/seaver/Claude_Projects/MSD_Structures/ModelSEEDDatabase/Biochemistry")
+# Derived from this file's location rather than hardcoded: the script lives at
+# Scripts/Thermodynamics/Pipeline/, so parents[3] is the repository root. An
+# absolute path here meant the pipeline only ran on one machine.
+MSD = Path(os.environ.get(
+    "MODELSEED_BIOCHEMISTRY",
+    Path(__file__).resolve().parents[3] / "Biochemistry"))
 
 import re as _re
 # ModelSEED stores all thermodynamics in kcal/mol
