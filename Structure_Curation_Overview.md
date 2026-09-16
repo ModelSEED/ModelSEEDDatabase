@@ -84,6 +84,13 @@ adds `N` lines to one TSV is one we can read in a minute.
 
 ## 4. What happens next
 
+You do not run any of this yourself, which is why no script is named anywhere in
+this guide. Validation is a maintainer step: it happens on our side, against the
+whole database, once you open the pull request. Running the cascade against a
+partial checkout would not see every reaction the compound appears in, so its
+mass-balance verdict would be misleading, and that is exactly the check a pick
+most needs.
+
 We fetch the branch, apply the pick, and run the cascade
 (`UpdateStructures → Reprint → BuildProvenance`) on our side. Then we tell you
 what it did. Typically:
