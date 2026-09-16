@@ -162,6 +162,7 @@
 		     the compounds core to render the equation table. -->
 		<field name="participant_formula" type="string"   indexed="true"  stored="true"/>
 		<field name="participant_name"    type="string_ci" indexed="true" stored="true"/>
+		<field name="participant_aliases" type="string_ci" indexed="true" stored="true" multiValued="true"/>
 		<!-- Denormalized from sign(coefficient): true for reactants
 		     (coefficient < 0), false for products. -->
 		<field name="is_reactant"       type="boolean"    indexed="true"  stored="true"/>
