@@ -265,7 +265,11 @@ def build_compound_doc(cpd):
 
 # --- Reaction compilation ----------------------------------------------------
 
-def build_reaction_doc(rxn):
+def build_reaction_doc(rxn, compound_aliases=None):
+    """``compound_aliases`` maps compound id -> that compound's alias list, so a
+    stoichiometry child can carry the aliases of the compound it points at. Without
+    it a reaction can only be found by participant id or participant name, never by
+    a participant's KEGG/ChEBI/MetaCyc alias."""
     """Return a Solr-ready reaction doc (parent + nested children)."""
     doc = {}
 
@@ -401,6 +405,10 @@ def build_reaction_doc(rxn):
             child['participant_formula'] = entry['formula']
         if entry.get('name'):
             child['participant_name'] = entry['name']
+        if compound_aliases:
+            al = compound_aliases.get(compound)
+            if al:
+                child['participant_aliases'] = al
         stoich_children.append(child)
     if stoich_children:
         doc['stoichiometry'] = stoich_children
@@ -413,10 +421,14 @@ def build_reaction_doc(rxn):
 def main():
     # Compounds
     compound_docs = []
+    compound_aliases = {}
     for path in sorted(glob.glob(os.path.join(BIOCHEM_ROOT, 'compound_*.json'))):
         with open(path) as fh:
             for cpd in json.load(fh):
                 compound_docs.append(build_compound_doc(cpd))
+                al = cpd.get('aliases')
+                if al and cpd.get('id'):
+                    compound_aliases[cpd['id']] = al if isinstance(al, list) else [al]
     with open(OUT_COMPOUNDS, 'w') as fh:
         json.dump(compound_docs, fh, indent=None, separators=(',', ':'))
 
@@ -425,7 +437,7 @@ def main():
     for path in sorted(glob.glob(os.path.join(BIOCHEM_ROOT, 'reaction_*.json'))):
         with open(path) as fh:
             for rxn in json.load(fh):
-                reaction_docs.append(build_reaction_doc(rxn))
+                reaction_docs.append(build_reaction_doc(rxn, compound_aliases))
     with open(OUT_REACTIONS, 'w') as fh:
         json.dump(reaction_docs, fh, indent=None, separators=(',', ':'))
 
