@@ -725,6 +725,35 @@ max each**. Selected 2026-09-15 (character counts in brackets):
 Point 3 rounds 96.9% and 91.3%, and "held out" compresses "graded with the
 openTECR measurement withheld" (see Supplementary Methods S3).
 
+### Zenodo deposit
+
+NAR requires software/source code to carry a permanent DOI cited **in the Data
+Availability statement**, so this cannot be deferred to revision.
+
+Deposited 2026-09-16 via the GitHub release integration (webhook on `release`
+events, installed against `ModelSEED/ModelSEEDDatabase`):
+
+| | |
+|---|---|
+| concept DOI (cited in the paper) | `10.5281/zenodo.22782602` |
+| version DOI for v2.0.0 | `10.5281/zenodo.22782603` |
+| archive | `ModelSEEDDatabase-v2.0.0.zip`, 123 MB |
+| licence recorded | `cc-by-4.0` |
+
+The concept DOI always resolves to the newest release, so a later cleanup
+release moves it automatically. Only the concept DOI appears in the manuscript;
+the version DOI and the tag name are deliberately omitted.
+
+**TODO: add a `.zenodo.json`.** Without one, Zenodo derives the creator list
+from GitHub contributor history. The v2.0.0 record therefore names nine people,
+including the raw username `cshenry`, carries no ORCIDs, and does not match the
+paper's nineteen authors. A `.zenodo.json` at the repository root fixes this for
+every future release and is the only durable remedy; editing the record by hand
+fixes one deposit only. Include the full author list with ORCIDs, the title, the
+CC-BY-4.0 licence and the related-identifier link to the paper's DOI once it is
+assigned. A `CITATION.cff` would serve the same purpose and additionally gives
+GitHub's "Cite this repository" widget.
+
 ### bioRxiv author import
 
 `../../../../author_template.tsv` is bioRxiv's header-only template; the filled
