@@ -22,7 +22,8 @@
 #   SOLR_URL       for EXEC_METHOD=local; default http://localhost:8983/solr
 #
 # "production" is the user-facing name; the entrypoint's env token is
-# "prod" (bare-name cores + legacy configset). "staging" maps 1:1 to
+# "prod" (bare-name cores; nested configset since the 2026-09-16 cutover).
+# "staging" maps 1:1 to
 # the "staging" env token (env-suffixed cores + new nested configset).
 
 set -euo pipefail
@@ -64,7 +65,7 @@ fi
 if [ -t 0 ] && [ "${AUTO_YES}" != "true" ]; then
     echo "Select deployment target:"
     echo "  1) Staging     (new nested schema — cores 'compounds_staging', 'reactions_staging')"
-    echo "  2) Production  (legacy flat schema — bare cores 'compounds', 'reactions')"
+    echo "  2) Production  (nested schema — bare cores 'compounds', 'reactions')"
     echo "  3) Both"
     read -r -p "Enter choice [1/2/3, default based on branch: ${TARGET_ENV}]: " env_choice
     case "${env_choice}" in

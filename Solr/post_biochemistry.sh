@@ -58,6 +58,43 @@ DATA_DIR="${BIOCHEMISTRY_JSON_DIR:-/data/compilation}"
 
 log() { echo "[post-biochemistry] $*" >&2; }
 
+# Refuse to post a nested payload into a core that was created from a flat
+# configset. The configset is bound when a core is created, so changing
+# configset_for_env and restarting is NOT enough: entrypoint.sh leaves existing
+# cores alone, and Solr would accept the parent documents while silently
+# dropping every child. That failure is invisible until the UI returns empty
+# nested queries against a core whose doc count looks plausible.
+#
+# _nest_path_ exists only in the nested configsets, so its presence is a
+# reliable proxy for which schema a live core is running.
+assert_schema_matches() {
+    local core="$1"
+    local want_nested="$2"     # "yes" when posting a non-legacy payload
+    local fields
+    fields=$(curl -fsS "${SOLR_URL}/${core}/schema/fields?wt=json" 2>/dev/null) || {
+        log "WARNING: could not read schema for ${core}; skipping the check"
+        return 0
+    }
+    local has_nested=no
+    case "$fields" in *'"_nest_path_"'*) has_nested=yes;; esac
+    if [ "$want_nested" = "$has_nested" ]; then
+        return 0
+    fi
+    log "ERROR: ${core} is running the $([ "$has_nested" = yes ] && echo nested || echo flat) schema,"
+    log "       but the payload for this env is $([ "$want_nested" = yes ] && echo nested || echo flat)."
+    log ""
+    log "       A core keeps the configset it was created from. To move it:"
+    log "         curl \"\${SOLR_URL}/admin/cores?action=UNLOAD&core=${core}&deleteInstanceDir=true\""
+    log "         then restart the container so entrypoint.sh recreates it,"
+    log "         then re-run this script."
+    log ""
+    log "       Refusing to post rather than load data the core cannot represent."
+    exit 1
+}
+
+want_nested=yes
+[ "$json_suffix" = "_legacy" ] && want_nested=no
+
 post_core() {
     local core="$1"
     local file="$2"
@@ -75,6 +112,9 @@ post_core() {
         > /dev/null
     log "posted ${core}."
 }
+
+assert_schema_matches "compounds${suffix}" "$want_nested"
+assert_schema_matches "reactions${suffix}" "$want_nested"
 
 post_core "compounds${suffix}"  "${DATA_DIR}/solr_compounds${json_suffix}.json"
 post_core "reactions${suffix}"  "${DATA_DIR}/solr_reactions${json_suffix}.json"
