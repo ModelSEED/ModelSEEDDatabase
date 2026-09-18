@@ -1,6 +1,15 @@
 #!/usr/bin/env python
+
+if __name__ == "__main__":
+    # Argument guard -- see "The argument guard" in Scripts/README.md.
+    import argparse as _argparse
+    _argparse.ArgumentParser(
+        description=__doc__,
+        formatter_class=_argparse.RawDescriptionHelpFormatter).parse_args()
+
+
 import os,sys,math
-from equilibrator_api import ComponentContribution, Reaction, Q_, ccache
+from equilibrator_api import ComponentContribution, Reaction, Q_
 from BiochemPy import Compounds,Reactions
 
 #We have to try and make sure that we use MetaNetX IDs for which an estimate of energy
@@ -95,7 +104,7 @@ for rxn in reactions_dict:
     if(reactions_dict[rxn]['status']=='EMPTY'):
         continue
 
-    rxn_cpds_array=reactions_helper.parseStoich(reactions_dict[rxn]["stoichiometry"])
+    rxn_cpds_array=reactions_dict[rxn]["stoichiometry"]
 
     All_Mol=True
     Some_Mol=False
@@ -109,7 +118,10 @@ for rxn in reactions_dict:
     elif(Some_Mol is True):
         incomplete_mol_rxns_dict[rxn]=1
 
-equilibrator_calculator = ComponentContribution(p_h=Q_(7.0), ionic_strength=Q_("0.25M"), temperature=Q_("298.15K"))
+equilibrator_calculator = ComponentContribution()
+equilibrator_calculator.p_h = Q_(7.0)
+equilibrator_calculator.ionic_strength = Q_("0.25M")
+equilibrator_calculator.temperature = Q_("298.15K")
 output_name=thermodynamics_root+'eQuilibrator/MetaNetX_Reaction_Energies.tbl'
 output_handle=open(output_name,'w')
 for rxn in reactions_dict:
@@ -143,7 +155,7 @@ for rxn in reactions_dict:
     if('EQC' not in notes_list):
         notes_list.append('EQC')
 
-    rxn_cpds_array=reactions_helper.parseStoich(reactions_dict[rxn]["stoichiometry"])
+    rxn_cpds_array=reactions_dict[rxn]["stoichiometry"]
 
     lhs=dict()
     rhs=dict()
@@ -162,7 +174,7 @@ for rxn in reactions_dict:
         " = " + \
         ' + '.join([f'{value} {key}' for key, value in rhs.items()])
 
-    equilibrator_reaction = Reaction.parse_formula(ccache.get_compound, equation_str)
+    equilibrator_reaction = Reaction.parse_formula(equilibrator_calculator.get_compound, equation_str)
 
     try:
         result = equilibrator_calculator.standard_dg_prime(equilibrator_reaction)

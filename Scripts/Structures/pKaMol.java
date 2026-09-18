@@ -34,25 +34,9 @@ public final class pKaMol {
 
 	//Ready Plugin
 	pKaPlugin plugin = new pKaPlugin();
-
-	//Try on whole molecule despite possible fragments
-	try { 
-	    plugin.setMolecule(mol);
-	    plugin.run();
-	    
-	    // get the acidic and basic macro pKa values
-	    double[] apka = plugin.getMacropKaValues(pKaPlugin.ACIDIC); 
-	    double[] bpka = plugin.getMacropKaValues(pKaPlugin.BASIC);
-	    
-	    String Output = Arrays.toString(apka)+"\t"+Arrays.toString(bpka);
-	    //System.out.println(Output);
-
-	}catch(PluginException PIE){
-	    System.out.println("Error: "+PIE.getMessage());
-	}
+	double pH = 7.0;
+	plugin.setpH(pH);
 	
-	//System.out.println("\n");
-
 	//Fragment Molecule and iterate
 	Molecule frags[] = mol.convertToFrags();
 	for(int frag = 0; frag < frags.length; frag++){
@@ -63,7 +47,7 @@ public final class pKaMol {
 		
 		// get pKa values for each atom
 		int atom_count = frags[frag].getAtomCount();
-		for (int atom=0; atom < atom_count; ++atom) {
+		for (int atom=0; atom < atom_count; atom++) {
 		    
 		    // get ACIDIC and BASIC pKa values
 		    double [] apka = plugin.getpKaValues(atom, pKaPlugin.ACIDIC);
@@ -77,8 +61,13 @@ public final class pKaMol {
 		    if (bpka != null) {
 			bpka_str = String.valueOf(bpka[0]);
 		    }
-		    String Output = frag+"\t"+atom+"\t"+apka_str+"\t"+bpka_str;
-		    System.out.println(Output);
+		    if(apka_str != "null" || bpka_str != "null"){
+			String label = frags[frag].getAtom(atom).getSymbol();
+			
+			String Output = frag+"\t"+(atom+1)+"\t"+label+"\t"+apka_str+"\t"+bpka_str;
+
+			System.out.println(Output);
+		    }
 		}
 	    }catch(PluginException PIE){
 		System.out.println("Error: "+PIE.getMessage());

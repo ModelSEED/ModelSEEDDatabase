@@ -1,8 +1,22 @@
 #!/usr/bin/env python
-import os
-from equilibrator_api import ComponentContribution, Q_, Reaction, ccache
 
-equilibrator_calculator = ComponentContribution(p_h=Q_(7.0), ionic_strength=Q_("0.25M"), temperature=Q_("298.15K"))
+if __name__ == "__main__":
+    # Argument guard -- see "The argument guard" in Scripts/README.md.
+    import argparse as _argparse
+    _argparse.ArgumentParser(
+        description=__doc__,
+        formatter_class=_argparse.RawDescriptionHelpFormatter).parse_args()
+
+
+import os
+from equilibrator_api import ComponentContribution, Q_, Reaction
+
+# equilibrator_api 0.6.x: no module-level `ccache` singleton, and reaction
+# conditions are set as properties after construction (not constructor kwargs).
+equilibrator_calculator = ComponentContribution()
+equilibrator_calculator.p_h = Q_(7.0)
+equilibrator_calculator.ionic_strength = Q_("0.25M")
+equilibrator_calculator.temperature = Q_("298.15K")
 
 structures_root=os.path.dirname(__file__)+"/../../Biochemistry/Structures/"
 thermodynamics_root=os.path.dirname(__file__)+"/../../Biochemistry/Thermodynamics/"
@@ -15,7 +29,7 @@ with open(file_name) as file_handle:
         line=line.strip()
         (mnx,inchikey)=line.split('\t')
 
-        equilibrator_reaction = Reaction.parse_formula(ccache.get_compound, ' = ' + mnx)
+        equilibrator_reaction = Reaction.parse_formula(equilibrator_calculator.get_compound, ' = ' + mnx)
 
         try:
             result = equilibrator_calculator.standard_dg_prime(equilibrator_reaction)

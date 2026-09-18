@@ -1,0 +1,18 @@
+%% Figure 1 is declared here, not in M09 where it is discussed, so that LaTeX
+%% can place it at the top of page 3, where Sam wants it. A float cannot move
+%% backwards past its declaration, so the position of this block IS the page
+%% choice: M05/M06/M07 all give page 3, M08 gives page 4, M02/M03 give page 2.
+%% \ref{fig:growth} still resolves from M09, where the figure is discussed.
+\begin{figure*}[!t] \centerline{\includegraphics[width=0.88\textwidth]{../figures/figure1_growth.pdf}} \caption{\textbf{Sources of compounds and reactions.} (\textbf{A}) compounds contributed by each source that also supplied molecular structures, 2020 against 2026: we did not introduce any new biochemistry from KEGG; (\textbf{B}) the share of each primary database's reactions that are unique; (\textbf{C}) the share of those unique reactions that are complete, meaning reagent in a reaction is assigned a complete structure, so the reaction can be balanced and decomposed. The three panels share one row per source; the third row is ChEBI in (\textbf{A}) and Rhea in (\textbf{B}) and (\textbf{C}), because ChEBI supplies structures but no reactions and Rhea supplies reactions but no structures. Rhea identifies its compounds through ChEBI, so its completeness is dependent on ChEBI structures.} \label{fig:growth} \end{figure*}
+
+%% Compact Methods statement for BOTH routes to a direction claim. The full
+%% specification of each lives in the supplement:
+%%   grading  -> Supplementary Methods S3
+%%   ensemble -> Supplementary Methods S4
+%% Do not re-expand either here; the budget is 4-6 typeset pages and the detail
+%% was moved out deliberately.
+\subsection{Grading reaction direction}\label{sec:methods-grading}
+
+We apply a classification approach with which we grade the predicted reaction direction based on the available evidence. Very often sources and heuristics disagree, as is the case here, and we qualify what the reaction direction would be, and how reliable the evidence is using several tiers for ease of interpretation: gold, silver, or bronze. Our evaluation splits two ways, on the confidence of a source's own claim, fitted as a probability against the experimental anchors, and what the other sources make of it, by a weighted comparison on the same scale. Grades, self-assessments, and cross-source verdicts are stored in the biochemistry database, and can be viewed in the UI. The process of grading reactions is described fully in Supplementary Methods~S3.
+
+\subsection{Ensemble LLMs predictions}\label{sec:llm-grading} Thermodynamic assignment is bounded by estimate coverage: energies cannot be computed for an incomplete reaction in terms of structures. Furthermore, every reaction is a member of a pathway within a cell, and the overarching drive of the pathway, dynamically changing metabolite concentrations as downstream enzymes process reagents, means a reaction may be driven in a direction on a level that supersedes our evaluation~\cite{mavrovouniotis1993,xu2008,noor2014}. We run a complementary approach using an ensemble, a ``council'' of large language models (LLMs) to interpret the reaction based on its name and stoichiometry alone. Three LLMs independently make their predictions, a fourth audits, and a fifth adjudicates. We provide the prompts in the repository, and describe the process and its limits in Supplementary Methods~S4. We integrate these predictions transparently in our database, but do not include them in our grading of the thermodynamic evidence.

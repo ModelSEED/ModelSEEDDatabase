@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 import os
 import sys
+sys.path.append('../../../Libs/Python')
 import subprocess
 import time
 import copy

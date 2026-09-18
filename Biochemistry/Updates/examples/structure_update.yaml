@@ -1,0 +1,38 @@
+# Example manifest: change one compound's source-as-downloaded structure.
+#
+# Apply_Manifest will rewrite the matching row in
+# Biochemistry/Structures/<source>/{inchi,smiles,inchikey}.tsv. If
+# the InChI changes, formula/charge are recomputed by Print at the
+# refresh step (NOT in this manifest's apply step) so we don't have
+# to ship RDKit as a manifest-time dependency.
+#
+# To preview without writing files:
+#   python Scripts/Updates/Apply_Manifest.py \
+#          Biochemistry/Updates/examples/structure_update.yaml --dry-run
+
+type: structure_update
+title: Fix tautomerism in cpd09193's KEGG InChI
+author: andrewfreiburger
+date: 2026-05-06
+reason: |
+  Per discussion with @samseaver in #issue-XXX, the keto/enol
+  representation of this compound was incorrect in KEGG release 2024-Q1.
+  Update to the keto form to match MetaCyc and ChEBI.
+
+target:
+  source: KEGG
+  external_id: C00001              # demo: water — replace with the
+                                   # ext_id you actually want to fix
+  field: inchi                     # one of: inchi, smiles, inchikey
+
+change:
+  new_value: "InChI=1S/H2O/h1H2"   # demo: unchanged structure for water
+
+expected_effects:
+  affected_compounds: 1
+  fields_changed:
+    - formula
+    - charge
+    - inchikey
+    - smiles
+    - thermodynamics.eQuilibrator

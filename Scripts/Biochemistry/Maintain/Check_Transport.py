@@ -1,4 +1,15 @@
 #!/usr/bin/env python
+
+if __name__ == "__main__":
+    # Argument guard -- see "The argument guard" in Scripts/README.md.
+    import argparse as _argparse
+    _argparse.ArgumentParser(
+        description=__doc__,
+        formatter_class=_argparse.RawDescriptionHelpFormatter).parse_args()
+
+
+import sys
+sys.path.append('../../../Libs/Python/')
 from BiochemPy import Reactions
 
 ReactionsHelper = Reactions()
@@ -11,9 +22,7 @@ for rxn in sorted(Reactions_Dict.keys()):
         continue
 
     old_stoichiometry=Reactions_Dict[rxn]["stoichiometry"]
-    Rxn_Cpds_Array=ReactionsHelper.parseStoich(old_stoichiometry)
-
-    is_transport = ReactionsHelper.isTransport(Rxn_Cpds_Array)
+    is_transport = ReactionsHelper.isTransport(old_stoichiometry)
 
     if(is_transport != Reactions_Dict[rxn]["is_transport"]):
         print("Updating: ",rxn,is_transport)

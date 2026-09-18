@@ -1,11 +1,12 @@
 import re
 import os
 import json
+import glob
 from csv import DictReader
 
 class Compounds:
     def __init__(self, biochem_root='../../../Biochemistry/',
-                 cpds_file='compounds.tsv'):
+                 cpds_file='compound_00.tsv'):
 
         self.BiochemRoot = os.path.dirname(__file__)+'/'+biochem_root
         self.CpdsFile = self.BiochemRoot + cpds_file
@@ -17,6 +18,33 @@ class Compounds:
         self.Headers = reader.fieldnames
 
     def loadCompounds(self):
+
+        search_path = os.path.join(self.BiochemRoot,"compound_*.json")
+        cpds_dict = dict()
+        for compounds_file in sorted(glob.glob(search_path)):
+            with open(compounds_file) as json_file_handle:
+                cpds_list = json.load(json_file_handle)
+                for cpd_obj in cpds_list:
+                    for key in cpd_obj:
+                        if(isinstance(cpd_obj[key],list)):
+                            for i in range(len(cpd_obj[key])):
+                                if(cpd_obj[key][i] is None):
+                                    cpd_obj[key][i]="null"
+                            
+                        if(isinstance(cpd_obj[key],dict)):
+                            for entry in cpd_obj[key]:
+                                if(cpd_obj[key][entry] is None):
+                                    cpd_obj[key][entry]="null"
+                            
+                        if(cpd_obj[key] is None):
+                            cpd_obj[key]="null"
+                        
+                    cpds_dict[cpd_obj['id']]=cpd_obj
+                    
+        return cpds_dict
+
+    def loadCompounds_tsv(self):
+        print("WARNING: This function is currently redundant and will only load one file!")
         reader = DictReader(open(self.CpdsFile), dialect='excel-tab')
         type_mapping = {"is_core": int, "is_obsolete": int, "is_cofactor": int, "charge": int,
                         "mass": float, "deltag": float, "deltagerr": float}
@@ -27,7 +55,10 @@ class Compounds:
         for line in reader:
             for list_type in lists:
                 if(line[list_type] != "null"):
-                    line[list_type]=line[list_type].split("|")
+                    if(line[list_type] == ""):
+                        line[list_type]="null"
+                    else:
+                        line[list_type]=line[list_type].split("|")
             for dict_type in dicts:
                 if(line[dict_type] != "null"):
                     entries = line[dict_type].split('|')
@@ -132,35 +163,222 @@ class Compounds:
                     structures_dict[line['ID']][line['Source']][line['Structure']]={'formula':line['Formula'],
                                                                                     'charge':line['Charge'],
                                                                                     'alias':line['Alias'].split(';')}
-
+                    if('Type' in line):
+                        structures_dict[line['ID']][line['Source']][line['Structure']]['type']=line['Type']
             return structures_dict
 
+        # Per-source layout (post-A1 migration):
+        #   <db>/inchi.tsv, smiles.tsv, inchikey.tsv  → "Original" stage
+        #   <db>/protonations/*.tsv                   → "Charged" stage
+        # Stage names "Original" / "Charged" preserved so callers
+        # (List_ModelSEED_Structures.py, etc.) keep working unchanged.
+        original_files   = {'InChI': 'inchi.tsv', 'SMILE': 'smiles.tsv', 'InChIKey': 'inchikey.tsv'}
+        original_columns = {'InChI': 'inchi',     'SMILE': 'smiles',     'InChIKey': 'inchikey'}
+
         for struct_type in sources_array:
-            structures_dict[struct_type]=dict()
+            structures_dict[struct_type] = dict()
             for db in db_array:
-                for struct_stage in ["Charged","Original"]:
-                    struct_file = db+"/"+struct_type+"_"+struct_stage+"Strings.txt"
-                    struct_file = self.StructRoot+struct_file
+                # ---- "Original" stage: source-as-downloaded ----
+                f = self.StructRoot + db + "/" + original_files.get(struct_type, '')
+                if os.path.isfile(f):
+                    with open(f) as fh:
+                        reader = DictReader(fh, dialect='excel-tab')
+                        col = original_columns[struct_type]
+                        for line in reader:
+                            ext_id = line.get('external_id') or line.get('ID')
+                            struct = line.get(col)
+                            if not ext_id or not struct:
+                                continue
+                            structures_dict[struct_type].setdefault(ext_id, {}).setdefault('Original', {})[struct] = 1
 
-                    if(os.path.isfile(struct_file)==False):
-                        continue
-
-                    reader = DictReader(open(struct_file), dialect = "excel-tab", fieldnames = ['ID','Structure','Name'])
-                    for line in reader:
-                        if(line['ID'] not in structures_dict[struct_type]):
-                            structures_dict[struct_type][line['ID']]=dict()
-
-                        if(struct_stage not in structures_dict[struct_type][line['ID']]):
-                            structures_dict[struct_type][line['ID']][struct_stage]=dict()
-
-                        structures_dict[struct_type][line['ID']][struct_stage][line['Structure']]=1
+                # ---- "Charged" stage: protonations/<tool>_<ver>_ph<n>.tsv ----
+                proto_dir = self.StructRoot + db + "/protonations"
+                if os.path.isdir(proto_dir):
+                    for proto_file in sorted(glob.glob(proto_dir + "/*.tsv")):
+                        with open(proto_file) as fh:
+                            reader = DictReader(fh, dialect='excel-tab')
+                            for line in reader:
+                                if line.get('type') != struct_type:
+                                    continue
+                                ext_id = line.get('external_id')
+                                struct = line.get('structure')
+                                if not ext_id or not struct:
+                                    continue
+                                structures_dict[struct_type].setdefault(ext_id, {}).setdefault('Charged', {})[struct] = 1
 
         return structures_dict
 
+    def loadPerSourceFormulasCharges(self, struct_types=None, db_array=None):
+        """Returns formulas[db][struct_type][stage][ext_id] = {'formula', 'charge'}.
+
+        Reads from the new layout: inchi.tsv / smiles.tsv carry per-source
+        Original-stage formula+charge; protonations/*.tsv carries Charged-stage
+        formula+charge filtered by the 'type' column. Mirrors the dict shape
+        that List_ModelSEED_Structures.py used to build by reading
+        *_Formulas_Charges.txt files directly.
+        """
+        if struct_types is None:
+            struct_types = ['InChI', 'SMILE']
+        if db_array is None:
+            db_array = ['KEGG', 'MetaCyc', 'ChEBI', 'Rhea']
+
+        original_files   = {'InChI': 'inchi.tsv', 'SMILE': 'smiles.tsv'}
+        out = {}
+        for db in db_array:
+            out[db] = {}
+            for struct_type in struct_types:
+                out[db][struct_type] = {'Charged': {}, 'Original': {}}
+
+                # Original
+                if struct_type in original_files:
+                    f = self.StructRoot + db + '/' + original_files[struct_type]
+                    if os.path.isfile(f):
+                        with open(f) as fh:
+                            reader = DictReader(fh, dialect='excel-tab')
+                            for line in reader:
+                                ext_id = line.get('external_id')
+                                if not ext_id:
+                                    continue
+                                if line.get('formula') or line.get('charge'):
+                                    out[db][struct_type]['Original'][ext_id] = {
+                                        'formula': line.get('formula', ''),
+                                        'charge':  line.get('charge', ''),
+                                    }
+
+                # Charged
+                proto_dir = self.StructRoot + db + '/protonations'
+                if os.path.isdir(proto_dir):
+                    for proto_file in sorted(glob.glob(proto_dir + '/*.tsv')):
+                        with open(proto_file) as fh:
+                            reader = DictReader(fh, dialect='excel-tab')
+                            for line in reader:
+                                if line.get('type') != struct_type:
+                                    continue
+                                ext_id = line.get('external_id')
+                                if not ext_id:
+                                    continue
+                                if line.get('formula') or line.get('charge'):
+                                    out[db][struct_type]['Charged'][ext_id] = {
+                                        'formula': line.get('formula', ''),
+                                        'charge':  line.get('charge', ''),
+                                    }
+        return out
+
+    def loadPerSourcePkas(self, db_array=None):
+        """Returns pkas[(db, ext_id)] = {'pKa': value, 'pKb': value}.
+
+        Reads from <db>/pkas/*.tsv (the post-A1 layout). Where a source ships
+        several snapshots of the same tool, the NEWEST version supplies the
+        whole ladder for a given external id, and an older snapshot is used
+        only for ids the newest one does not carry at all.
+
+        Version precedence comes from the tool_version column, parsed
+        numerically -- NOT from the filename. Sorting filenames happens to put
+        marvin_26.1 after marvin_23.4, but it is coincidence: a hypothetical
+        marvin_9.0 sorts after both, and marvin_100.1 before both.
+
+        Precedence is per (ext_id, tool), not per (ext_id, kind, tool). The
+        previous per-kind rule let a compound take its pKa from one Marvin
+        release and its pKb from another whenever the newer run emitted only
+        one of the two -- 557 compounds shipped such a mixed-vintage ladder.
+        A ladder now comes from exactly one run.
+
+        Fallback to an older snapshot is suppressed for any id present in the
+        source's inchi.tsv. Marvin 26.1 was run over exactly that file, with
+        zero parse failures, so for those ids an absent 26.1 row is a positive
+        finding -- no ionizable site in range -- and reinstating a 23.4 ladder
+        would override the newer run rather than fall back to it. 81 ids are
+        in this position. Ids NOT in inchi.tsv keep the older ladder: they are
+        the 8,637 compounds carrying a SMILES but no InChI, which the 26.1 run
+        never saw, and refreshing those is deferred to a SMILES-based run.
+
+        Normalizes source-specific id quirks so that the returned ext_id
+        matches the alias-file convention:
+          - ChEBI pKa rows are keyed 'CHEBI_15377' but Aliases lists '15377'.
+          - Rhea pKa rows are keyed 'POLYMER_10033' but Aliases lists
+            'POLYMER:10033'.
+        Without this normalization the lookup never matches and the
+        pKa data is silently unused. See sources.yaml for the
+        consumed_by_production flag history.
+        """
+        if db_array is None:
+            db_array = ['KEGG', 'MetaCyc', 'ChEBI', 'Rhea']
+
+        def version_key(raw, file_index):
+            """Sortable key for a tool_version. Numeric where possible so 26.1
+            beats 23.4 and 100.1 beats 26.1; non-numeric versions (MolGpKa
+            ships 'opam2' and 'stock') fall back to file order, which is the
+            old behaviour and the best available for an unordered label."""
+            parts = []
+            for chunk in str(raw or '').split('.'):
+                parts.append(int(chunk) if chunk.isdigit() else -1)
+            numeric = all(x >= 0 for x in parts) and bool(parts)
+            return (1, tuple(parts)) if numeric else (0, (file_index,))
+
+        out = {}
+        for db in db_array:
+            pka_dir = self.StructRoot + db + '/pkas'
+            if not os.path.isdir(pka_dir):
+                continue
+            # ids the newest run was actually given -- see the docstring
+            covered = set()
+            inchi_path = self.StructRoot + db + '/inchi.tsv'
+            if os.path.isfile(inchi_path):
+                with open(inchi_path) as fh:
+                    for line in DictReader(fh, dialect='excel-tab'):
+                        e = line.get('external_id')
+                        if not e:
+                            continue
+                        if db == 'ChEBI' and e.startswith('CHEBI_'):
+                            e = e[len('CHEBI_'):]
+                        elif db == 'Rhea' and e.startswith('POLYMER_'):
+                            e = 'POLYMER:' + e[len('POLYMER_'):]
+                        covered.add(e)
+            # (ext_id, tool) -> (version_key, {kind: value})
+            best = {}
+            for file_index, pka_file in enumerate(sorted(glob.glob(pka_dir + '/*.tsv'))):
+                with open(pka_file) as fh:
+                    reader = DictReader(fh, dialect='excel-tab')
+                    for line in reader:
+                        ext_id = line.get('external_id')
+                        kind   = line.get('kind')
+                        value  = line.get('value')
+                        if not ext_id or not kind:
+                            continue
+                        if db == 'ChEBI' and ext_id.startswith('CHEBI_'):
+                            ext_id = ext_id[len('CHEBI_'):]
+                        elif db == 'Rhea' and ext_id.startswith('POLYMER_'):
+                            ext_id = 'POLYMER:' + ext_id[len('POLYMER_'):]
+                        tool = line.get('tool') or ''
+                        vk = version_key(line.get('tool_version'), file_index)
+                        slot = best.get((ext_id, tool))
+                        if slot is None:
+                            best[(ext_id, tool)] = slot = (vk, {})
+                        elif vk > slot[0]:
+                            best[(ext_id, tool)] = slot = (vk, {})
+                        elif vk < slot[0]:
+                            continue        # an older run, and this id is covered
+                        slot[1][kind] = value
+            # Drop older-snapshot ladders for ids the newest run was given.
+            newest = {}
+            for (ext_id, tool), (vk, _kinds) in best.items():
+                if vk > newest.get(tool, ()):
+                    newest[tool] = vk
+            for key in [k for k in best
+                        if k[0] in covered and best[k][0] < newest.get(k[1], ())]:
+                del best[key]
+            # Several tools in one directory keep the old cross-tool behaviour:
+            # later-sorted tool wins. Only same-tool versions are collapsed.
+            for (ext_id, _tool) in sorted(best):
+                out.setdefault((db, ext_id), {}).update(best[(ext_id, _tool)][1])
+        return out
+
     @staticmethod
     def searchname(name):
+        searchnames_list = [name]
         searchname = name.lower()
-
+        searchnames_list.append(searchname)
+        
         #try to keep/maintain charges
         ending = ""
         if(searchname.endswith("-")):
@@ -170,28 +388,33 @@ class Compounds:
             ending="+"
 
         searchname = ''.join(char for char in searchname if char.isalnum())
-
+        searchnames_list.append(searchname+ending)
+        
         #attempting to match fatty acids
-        searchname = re.sub('icacid','ate',searchname)
-
+        if(re.search('icacid$',searchname)):
+            searchname = re.sub('icacid','ate',searchname)
+            searchnames_list.append(searchname+ending)
+        elif(re.search('ate$',searchname)):
+            searchname = re.sub('ate','icacid',searchname)
+            searchnames_list.append(searchname+ending)
+            
         #remove redundant articles
-        if(re.search('^an?\s',name)):
+        if(re.search(r'^an?\s',searchname)):
             searchname = re.sub('^an?','',searchname)
+            searchnames_list.append(searchname+ending)
 
-        searchname+=ending
-
-        return searchname
+        return searchnames_list
 
     @staticmethod
     def parseFormula(formula):
         if (formula.strip() in {None, "", "noFormula", "null"}):
             return {}
 
-        atoms = re.findall("\D[a-z]?\d*", formula)
+        atoms = re.findall(r"\D[a-z]?\d*", formula)
 
         atoms_dict = dict()
         for atom in atoms:
-            match = re.match("(\D[a-z]?)(\d*)", atom)
+            match = re.match(r"(\D[a-z]?)(\d*)", atom)
             atoms_dict[match.group(1)] = match.group(2)
 
             # Default empty string to 1
@@ -210,11 +433,11 @@ class Compounds:
                 re.findall("no[Ff]ormula", formula)) > 0):
             return ("null", Notes)
 
-        if (len(re.findall("(\)[nx])", formula)) > 0):
+        if (len(re.findall(r"(\)[nx])", formula)) > 0):
             Notes = "PO"
 
         global_atoms_dict = dict()
-        for subformula in re.findall("\(?([\w\s\.]+)\)?([nx*]?)?(\d?)",
+        for subformula in re.findall(r"\(?([\w\s\.]+)\)?([nx*]?)?(\d?)",
                                      formula):
             # The regex works, but returns empty hits for either beginning or end of string
             # The regex is trying to find formulas outside and within parentheses eg: Mg(Al,Fe)Si4O10(OH).4H2O
@@ -231,9 +454,9 @@ class Compounds:
                     fragment = fragment.strip()
                     fragment_multiplier = 1
                     # Fragments can have a multiplier at the beginning of the string, such as 4H2O
-                    if (len(re.findall("^(\d+)(.*)$", fragment))):
+                    if (len(re.findall(r"^(\d+)(.*)$", fragment))):
                         (fragment_multiplier, fragment) = \
-                        re.findall("^(\d+)(.*)$", fragment)[0]
+                        re.findall(r"^(\d+)(.*)$", fragment)[0]
                         fragment_multiplier = int(fragment_multiplier)
 
                     fragment_atoms_dict = Compounds.parseFormula(fragment)
@@ -289,15 +512,67 @@ class Compounds:
         alias_file.close()
 
     def saveCompounds(self, compounds_dict):
-        cpds_root = os.path.splitext(self.CpdsFile)[0]
 
-        # Print to TSV
-        cpds_file = open(cpds_root + ".tsv", 'w')
-        cpds_file.write("\t".join(self.Headers) + "\n")
-        for cpd in sorted(compounds_dict.keys()):
+        cpds_root = self.BiochemRoot + 'compound_'
+
+        # Initiate count
+        cpds_count_thousands=0
+        cpds_count_string=f"{cpds_count_thousands:02}"
+
+        # Initiate TSV file handle
+        cpds_tsv_file_handle = open(cpds_root + cpds_count_string+".tsv", 'w')
+        cpds_tsv_file_handle.write("\t".join(self.Headers) + "\n")
+
+        # Initiate JSON file handle
+        cpds_json_file_handle = open(cpds_root + cpds_count_string+".json", 'w')
+        cpds_json_list = list()
+
+        # Initiate counting
+        prev_rounded_count = 0
+        
+        # Iterate through compounds
+        for cpd_id in sorted(compounds_dict.keys()):
+
+            # Reset for every 1000
+            # NB: we want a direct link between the filename and the compound id
+            # and for legacy reasons, there may not be a compound id that falls on
+            # a multiple of 1000, so, here we find the compound id that "crosses"
+            # a multiple of 1000 in order to keep count
+            #
+            # for the same legacy reasons, this means there won't be
+            # 1000 compounds in every file
+            cpd_count = int(cpd_id[3:])
+            cur_rounded_count = cpd_count - cpd_count % 1000
+            if(cur_rounded_count > prev_rounded_count):
+
+                prev_rounded_count = cur_rounded_count
+
+                # Write JSON list
+                cpds_json_file_handle.write(json.dumps(cpds_json_list, indent=4, sort_keys=True))
+
+                # Reset JSON list
+                cpds_json_list = list()
+
+                # Increment count
+                cpds_count_thousands+=1
+                cpds_count_string=f"{cpds_count_thousands:02}"
+
+                # Reset tsv file handle
+                cpds_tsv_file_handle.close()
+                cpds_tsv_file_handle = open(cpds_root + cpds_count_string+".tsv", 'w')
+                cpds_tsv_file_handle.write("\t".join(self.Headers) + "\n")
+
+                # Reset json file handle
+                cpds_json_file_handle.close()
+                cpds_json_file_handle = open(cpds_root + cpds_count_string+".json", 'w')
+                pass
+
+            # Write TSV
             values_list=list()
             for header in self.Headers:
-                value=compounds_dict[cpd][header]
+                value=compounds_dict[cpd_id][header]
+                if(value is None):
+                    value="null"
                 if(isinstance(value,list)):
                     value = "|".join(value)
                 if(isinstance(value,dict)):
@@ -306,12 +581,9 @@ class Compounds:
                         entries.append(entry+':'+value[entry])
                     value = "|".join(entries)
                 values_list.append(str(value))
-            cpds_file.write("\t".join(values_list)+"\n")
-        cpds_file.close()
+            cpds_tsv_file_handle.write("\t".join(values_list)+"\n")
 
-        #Re-configure JSON
-        new_compounds_dict = list()
-        for cpd_id in sorted(compounds_dict):
+            # Collect list for JSON
             cpd_obj = compounds_dict[cpd_id]
             for key in cpd_obj:
                 if(isinstance(cpd_obj[key],dict)):
@@ -320,9 +592,12 @@ class Compounds:
                             cpd_obj[key][entry]=None
                 if(cpd_obj[key]=="null"):
                     cpd_obj[key]=None
-            new_compounds_dict.append(cpd_obj)
 
-        # Print to JSON
-        cpds_file = open(cpds_root + ".json", 'w', newline='\n')
-        cpds_file.write(json.dumps(new_compounds_dict, indent=4, sort_keys=True))
-        cpds_file.close()
+            cpds_json_list.append(cpd_obj)
+
+        # Close TSV file handle
+        cpds_tsv_file_handle.close()
+
+        # Write last JSON list and close file handle
+        cpds_json_file_handle.write(json.dumps(cpds_json_list, indent=4, sort_keys=True))
+        cpds_json_file_handle.close()
