@@ -51,6 +51,29 @@ sources:
         tool:    Marvin
         version: "23.4"
         ph:      7
+      - file:    protonations/marvin_26.1_ph7.tsv
+        tool:    Marvin
+        version: "26.1"
+        ph:      7
+        generated_by: Scripts/Structures/Run_Marvin_Protonations.py
+        notes: |
+          Major microspecies only. ChargeMol.java, which produced the
+          23.4 bundle, took the dominant tautomer at pH 7 first; that
+          step needs the Isomers Plugin Group, which the licence these
+          regenerations run on does not cover (verified -- cxcalc
+          majortautomer returns a LicenseException). Against 23.4 the
+          net charge is unchanged for 79.7% of shared compounds. The
+          remaining 20.3% mixes the missing tautomer step with the
+          genuine 23.4 -> 26.1 engine change and the two cannot be
+          separated without that licence. See
+          _reports/Marvin_26.1_Protonation_Run.md.
+
+          Structures are bridged through RDKit into a molblock before
+          Marvin reads them: Marvin's own InChI and SMILES importers
+          drop stereo parity (61% and 39% round-trip fidelity against
+          99.6% for the molblock), which is why ChargeMol.java read a
+          mol file rather than a string. Row counts match 23.4 exactly
+          in all four sources.
     pkas:
       - file:    pkas/marvin_23.4.tsv
         tool:    Marvin
@@ -91,6 +114,29 @@ sources:
         tool:    Marvin
         version: "23.4"
         ph:      7
+      - file:    protonations/marvin_26.1_ph7.tsv
+        tool:    Marvin
+        version: "26.1"
+        ph:      7
+        generated_by: Scripts/Structures/Run_Marvin_Protonations.py
+        notes: |
+          Major microspecies only. ChargeMol.java, which produced the
+          23.4 bundle, took the dominant tautomer at pH 7 first; that
+          step needs the Isomers Plugin Group, which the licence these
+          regenerations run on does not cover (verified -- cxcalc
+          majortautomer returns a LicenseException). Against 23.4 the
+          net charge is unchanged for 79.7% of shared compounds. The
+          remaining 20.3% mixes the missing tautomer step with the
+          genuine 23.4 -> 26.1 engine change and the two cannot be
+          separated without that licence. See
+          _reports/Marvin_26.1_Protonation_Run.md.
+
+          Structures are bridged through RDKit into a molblock before
+          Marvin reads them: Marvin's own InChI and SMILES importers
+          drop stereo parity (61% and 39% round-trip fidelity against
+          99.6% for the molblock), which is why ChargeMol.java read a
+          mol file rather than a string. Row counts match 23.4 exactly
+          in all four sources.
     pkas:
       - file:    pkas/marvin_23.4.tsv
         tool:    Marvin
@@ -117,6 +163,29 @@ sources:
         tool:    Marvin
         version: "23.4"
         ph:      7
+      - file:    protonations/marvin_26.1_ph7.tsv
+        tool:    Marvin
+        version: "26.1"
+        ph:      7
+        generated_by: Scripts/Structures/Run_Marvin_Protonations.py
+        notes: |
+          Major microspecies only. ChargeMol.java, which produced the
+          23.4 bundle, took the dominant tautomer at pH 7 first; that
+          step needs the Isomers Plugin Group, which the licence these
+          regenerations run on does not cover (verified -- cxcalc
+          majortautomer returns a LicenseException). Against 23.4 the
+          net charge is unchanged for 79.7% of shared compounds. The
+          remaining 20.3% mixes the missing tautomer step with the
+          genuine 23.4 -> 26.1 engine change and the two cannot be
+          separated without that licence. See
+          _reports/Marvin_26.1_Protonation_Run.md.
+
+          Structures are bridged through RDKit into a molblock before
+          Marvin reads them: Marvin's own InChI and SMILES importers
+          drop stereo parity (61% and 39% round-trip fidelity against
+          99.6% for the molblock), which is why ChargeMol.java read a
+          mol file rather than a string. Row counts match 23.4 exactly
+          in all four sources.
     pkas:
       - file:    pkas/marvin_23.4.tsv
         tool:    Marvin
@@ -158,6 +227,29 @@ sources:
         tool:    Marvin
         version: "23.4"
         ph:      7
+      - file:    protonations/marvin_26.1_ph7.tsv
+        tool:    Marvin
+        version: "26.1"
+        ph:      7
+        generated_by: Scripts/Structures/Run_Marvin_Protonations.py
+        notes: |
+          Major microspecies only. ChargeMol.java, which produced the
+          23.4 bundle, took the dominant tautomer at pH 7 first; that
+          step needs the Isomers Plugin Group, which the licence these
+          regenerations run on does not cover (verified -- cxcalc
+          majortautomer returns a LicenseException). Against 23.4 the
+          net charge is unchanged for 79.7% of shared compounds. The
+          remaining 20.3% mixes the missing tautomer step with the
+          genuine 23.4 -> 26.1 engine change and the two cannot be
+          separated without that licence. See
+          _reports/Marvin_26.1_Protonation_Run.md.
+
+          Structures are bridged through RDKit into a molblock before
+          Marvin reads them: Marvin's own InChI and SMILES importers
+          drop stereo parity (61% and 39% round-trip fidelity against
+          99.6% for the molblock), which is why ChargeMol.java read a
+          mol file rather than a string. Row counts match 23.4 exactly
+          in all four sources.
     pkas:
       - file:    pkas/marvin_23.4.tsv
         tool:    Marvin
