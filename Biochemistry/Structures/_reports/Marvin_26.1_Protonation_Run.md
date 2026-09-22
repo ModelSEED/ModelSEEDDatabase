@@ -159,8 +159,8 @@ this repository renders them as R**, in one line of that script:
 formula = re.sub(r'\*', 'R', formula)
 ```
 
-The result was that SMILE rows whose formula contains R fell from 23.4's 8,712
-to **8**. `Stearoyl-ACPs` went from `C32H60N3O9PR2S` to `C32H60N3O9PS`, and
+The result was that SMILE rows whose formula contains R fell from 23.4's 8,704
+to **zero**. `Stearoyl-ACPs` went from `C32H60N3O9PR2S` to `C32H60N3O9PS`, and
 downstream `Update_Compound_Structures_Formulas_Charge.py` propagated that into
 6,052 compound records — turning `cpd00049` "carboxylic acid" from `CHO2R` into
 `CHO2`, which is a generic compound quietly ceasing to be generic.
@@ -175,10 +175,17 @@ invisible to all of it. The table below is the check that was missing.
 | source | SMILE rows with R (26.1) | 23.4 | identical formula | identical charge |
 |---|---:|---:|---:|---:|
 | ChEBI | 2,071 | 2,071 | 16,129/21,016 (76.7%) | 16,138/21,016 (76.8%) |
-| KEGG | 964 | 964 | 26,345/31,593 (83.4%) | 26,371/31,593 (83.5%) |
-| MetaCyc | 5,670 | 5,647 | 33,723/44,367 (76.0%) | 33,788/44,367 (76.2%) |
+| KEGG | 957 | 957 | 26,345/31,593 (83.4%) | 26,371/31,593 (83.5%) |
+| MetaCyc | 5,669 | 5,646 | 33,723/44,367 (76.0%) | 33,788/44,367 (76.2%) |
 | Rhea | 30 | 30 | 282/444 (63.5%) | 282/444 (63.5%) |
-| **total** | **8,735** | **8,712** | **76,479/97,420 (78.5%)** | **76,579/97,420 (78.6%)** |
+| **total** | **8,727** | **8,704** | **76,479/97,420 (78.5%)** | **76,579/97,420 (78.6%)** |
+
+Count R with `R(?![a-z])`, not a substring test for `"R"`: the elements Ru, Rb,
+Rh, Re and Rn match the naive test and inflate every figure in this table by 8.
+That is not hypothetical — the first version of this section reported 8,735 and
+8,712 for exactly that reason, and it makes the regression look milder than it
+was, since the eight survivors it appeared to leave were all ruthenium and
+rubidium compounds rather than R groups.
 
 Formula and charge now come from `parse_structure` — this repository's own
 function, imported rather than reimplemented, computed per row from that row's

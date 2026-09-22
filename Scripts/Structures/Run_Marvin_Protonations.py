@@ -146,8 +146,9 @@ a formula; this repository renders them as R, in one line of that function:
 
 The first cut of this script wrote Marvin's formula and deferred the refresh to
 Print_Structure_Formula_Charge.py as a follow-up step. That was wrong, and it
-shipped: 8,703 rows lost their R groups, taking the count of SMILE rows whose
-formula contains R from 23.4's 8,712 down to 8. Stearoyl-ACPs went from
+shipped: every one of the 8,704 rows that should carry an R group lost it,
+taking the count of SMILE rows whose formula contains R from 23.4's 8,704 down
+to zero. Stearoyl-ACPs went from
 C32H60N3O9PR2S to C32H60N3O9PS -- and downstream, `Update_Compound_Structures_
 Formulas_Charge.py` propagated that into 6,052 compound records, turning
 cpd00049 "carboxylic acid" from CHO2R into CHO2. A generic compound stopped
@@ -162,6 +163,12 @@ as written rather than correct after a second script runs.
 Marvin's getFormula() survives as the fallback for the handful of rows
 parse_structure cannot read, counted as `formula_from_marvin` in the per-source
 stats so it can never again be a silent substitution.
+
+When checking any of this, count R with HAS_R_GROUP (`R(?![a-z])`) and not a
+substring test for "R": Ru, Rb, Rh, Re and Rn all match the naive test and
+inflate the count by 8 across these bundles. The first report of this
+regression said 8,735 and 8,712 for that reason, which made it look as though
+eight rows had survived when in fact none had.
 
 REQUIRES. `pip install jpype1` and rdkit (already a dependency of
 Print_Structure_Formula_Charge.py), plus the Marvin jars -- found next to the
