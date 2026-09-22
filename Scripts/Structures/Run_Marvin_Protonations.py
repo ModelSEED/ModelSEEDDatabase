@@ -53,6 +53,30 @@ an already-deprotonated species and Marvin would be answering a different
 question than it does for the neutral InChI parent. Each compound is protonated
 exactly once, from its preferred representation.
 
+WITH ONE EXCEPTION, and it is not a small one. InChI DISCONNECTS METAL-LIGAND
+BONDS by design. Triphenyltin chloride is stored in smiles.tsv as the intact
+molecule `Cl[Sn](c1ccccc1)(c1ccccc1)c1ccccc1`, but its InChI is
+
+    InChI=1S/3C6H5.ClH.Sn/c3*1-2-4-6-5-3-1;;/h3*1-5H;1H;/q;;;;+1/p-1
+
+-- three phenyl radicals, HCl and a tin atom, as five separate components. Take
+InChI-first on that and Marvin is handed an already-shattered molecule; it
+protonates each piece on its own and the bundle ships
+`[Cl-].[SnH3+].[c]1ccccc1.[c]1ccccc1.[c]1ccccc1` where 23.4 shipped the intact
+structure. 487 compounds across the four sources have an InChI more fragmented
+than their SMILES -- cobalamins, Ni/Fe/Mg porphyrins, molybdenum cofactors,
+organotins -- and the first cut of this bundle shattered 461 of them.
+
+So the rule is InChI-first UNLESS the InChI is the more fragmented of the two,
+in which case the SMILES wins. Comparing fragment counts rather than screening
+for metals keeps this general: whatever the reason an InChI has taken a
+molecule apart, the representation that keeps it together is the better input.
+Counted as `smiles_preferred` in the per-source stats.
+
+Nothing in this is RDKit's doing, and swapping the importers would not help:
+Marvin reads the same disconnected InChI the same way. The loss happens in the
+InChI string itself, before any parser sees it.
+
 OUTPUT LAYOUT reproduces the 23.4 bundles exactly, which is one row per
 representation rather than one row per compound:
 
@@ -316,6 +340,19 @@ class Protonator:
                 return self.MolImporter.importMol(block)
         return self.MolImporter.importMol(struct)
 
+    def fragment_count(self, struct):
+        """Disconnected components RDKit sees in a structure string, or None.
+
+        Used to catch metal disconnection -- see INPUT SELECTION.
+        """
+        Chem = self._Chem
+        try:
+            mol = (Chem.MolFromInchi(struct) if struct.startswith("InChI=")
+                   else Chem.MolFromSmiles(struct))
+            return len(Chem.GetMolFrags(mol)) if mol is not None else None
+        except Exception:
+            return None
+
     def protonate(self, struct, aromatize=True):
         """Protonated Molecule for one structure string, or None if unusable."""
         mol = self._import(struct)
@@ -442,13 +479,44 @@ def process(source, version, ph, limit=0, cxcalc="cxcalc"):
     # it were all failure -- the pKa run had to walk that conflation back once.
     stats = {"in": len(compounds), "ok": 0, "unparseable": 0,
              "plugin_error": 0, "empty": 0, "nonstandard_inchi": 0,
-             "formula_from_marvin": 0, "wildcard_r_added": 0}
+             "formula_from_marvin": 0, "wildcard_r_added": 0,
+             "smiles_preferred_disconnected_inchi": 0}
 
     for ext_id, smiles in compounds:
-        # InChI first, the compound's own SMILES as the fallback rung.
-        candidates = [inchi_by_id[ext_id], smiles] if ext_id in inchi_by_id else [smiles]
+        # InChI first, the compound's own SMILES as the fallback rung -- unless
+        # the InChI is the MORE fragmented of the two, which means it has
+        # disconnected something the SMILES keeps bonded. See INPUT SELECTION.
+        last_resort = []
+        disconnected = False
+        if ext_id in inchi_by_id:
+            inchi = inchi_by_id[ext_id]
+            f_inchi = prot.fragment_count(inchi)
+            f_smiles = prot.fragment_count(smiles)
+            # RDKit failing to read the SMILES is not evidence it is the worse
+            # input -- Marvin reads every one of these clusters fine. Treat an
+            # unknown SMILES count as "not more fragmented".
+            disconnected = (f_inchi is not None and f_inchi > 1
+                            and (f_smiles is None or f_smiles < f_inchi))
+            if disconnected:
+                # DEMOTE the InChI rather than just reordering. Sharing one
+                # ladder lets a writable-but-wrong rung beat a correct one: on
+                # KEGG C18384 the SMILES yields the right dative-bonded
+                # magnesium propionate, which Marvin's SMILES writer refuses,
+                # while the disconnected InChI yields `[Mg++].CCC([O-])=O.
+                # CCC([O-])=O` -- writable, and three fragments where 23.4 has
+                # one. The InChI stays only as a last resort, so it is reached
+                # when the SMILES gives NOTHING rather than when it merely
+                # needs the molblock rescue.
+                stats["smiles_preferred_disconnected_inchi"] += 1
+                candidates, last_resort = [smiles], [inchi]
+            else:
+                candidates = [inchi, smiles]
+        else:
+            candidates = [smiles]
         try:
             mol, smile_out = prot.protonate_best(candidates)
+            if (mol is None or not smile_out) and last_resort:
+                mol, smile_out = prot.protonate_best(last_resort)
         except Exception as exc:
             name = type(exc).__name__
             # A rejected structure and a plugin crash are different findings.
@@ -508,7 +576,24 @@ def process(source, version, ph, limit=0, cxcalc="cxcalc"):
         # InChI and InChIKey only where the source carries an InChI: InChI
         # cannot represent the query molecules -- see OUTPUT LAYOUT.
         if ext_id in inchi_by_id:
-            inchi_out = prot.export(mol, Protonator.INCHI_FORMAT)
+            # The InChI row is written from the INCHI-derived molecule when the
+            # two representations disagree about connectivity, because each
+            # column should carry what its own representation can express --
+            # which is exactly what 23.4 did. For CPD-18407 it shipped a
+            # connected 8-iron cluster in SMILE and the disconnected
+            # `InChI=1S/C.8Fe.6HS.3S/...` in InChI.
+            #
+            # This is also load-bearing for stability, not just fidelity.
+            # Asking Marvin to write an InChI for a CONNECTED metal cluster
+            # aborts the JVM outright: `free(): double free detected in tcache
+            # 2` from InChINativeGenerateInChICall, a native fault no Python or
+            # Java handler can catch. Feeding the InChI writer the structure
+            # InChI can actually represent avoids the crash by construction.
+            inchi_source = mol
+            if disconnected:
+                alt, _ = prot.protonate_best([inchi_by_id[ext_id]])
+                inchi_source = alt
+            inchi_out = prot.export(inchi_source, Protonator.INCHI_FORMAT) if inchi_source is not None else ""
             if inchi_out:
                 if not inchi_out.startswith("InChI=1S/"):
                     # Standard InChI only; a non-standard string would not be
@@ -540,7 +625,8 @@ def process(source, version, ph, limit=0, cxcalc="cxcalc"):
           f"unparseable={stats['unparseable']:<4} plugin_error={stats['plugin_error']:<4} "
           f"empty={stats['empty']:<4} nonstandard_inchi={stats['nonstandard_inchi']:<4} "
           f"formula_from_marvin={stats['formula_from_marvin']:<4} "
-          f"wildcard_r_added={stats['wildcard_r_added']}")
+          f"wildcard_r_added={stats['wildcard_r_added']:<4} "
+          f"smiles_preferred={stats['smiles_preferred_disconnected_inchi']}")
     print(f"{'':<8} rows={len(out_rows):<7} -> {os.path.relpath(out_path, STRUCT_ROOT)}")
     return out_path, stats
 

@@ -165,12 +165,18 @@ downstream `Update_Compound_Structures_Formulas_Charge.py` propagated that into
 6,052 compound records — turning `cpd00049` "carboxylic acid" from `CHO2R` into
 `CHO2`, which is a generic compound quietly ceasing to be generic.
 
-**The structures were never affected.** 8,727 SMILE structures carry a `*` in
-both bundles, identically. Only the column was wrong — which is exactly why it
-survived every check in the original validation suite: coverage, compound sets,
-InChI agreement, InChIKey consistency and stereochemical fidelity all inspect
-*structures*, and the structures were always right. A column-only defect was
-invisible to all of it. The table below is the check that was missing.
+**No structure was affected by THIS defect.** 8,727 SMILE structures carry a
+`*` in both bundles, identically; the R groups were lost from the column alone.
+That is exactly why it survived the original validation suite — coverage,
+compound sets, InChI agreement, InChIKey consistency and stereochemical
+fidelity all inspect *structures*, and on this axis the structures were right.
+A column-only defect was invisible to all of it. The table below is the check
+that was missing.
+
+(Structures were not uniformly safe, though. A separate defect — InChI-first
+input selection meeting InChI's metal disconnection — shattered 461 metal
+compounds in the same first cut. See "InChI disconnects metals" below. The two
+defects are unrelated in mechanism and were found by different checks.)
 
 | source | SMILE rows with R (26.1) | 23.4 | identical formula | identical charge |
 |---|---:|---:|---:|---:|
@@ -212,6 +218,61 @@ that is **not** a wildcard: InChI uses `n*` for repeated components, so
 `InChI=1S/Mn.2H2O/h;2*1H2` is manganese with two waters. A naive grep reports
 255 false positives here and 217 in 23.4. The invariant is meaningful on SMILE
 rows only.
+
+## InChI disconnects metals, and that shattered 461 compounds
+
+The first cut of this bundle took InChI-first unconditionally, inheriting the
+rule from `Run_Marvin_pKas.py` where it is correct. On metal compounds it is
+not, because **InChI disconnects metal–ligand bonds by design**. Triphenyltin
+chloride is stored in `smiles.tsv` as the intact molecule, but its InChI is
+
+```
+InChI=1S/3C6H5.ClH.Sn/c3*1-2-4-6-5-3-1;;/h3*1-5H;1H;/q;;;;+1/p-1
+```
+
+— three phenyl radicals, HCl and a tin atom, five separate components. Marvin
+was handed an already-shattered molecule, protonated each piece, and the bundle
+shipped `[Cl-].[SnH3+].[c]1ccccc1.[c]1ccccc1.[c]1ccccc1` where 23.4 shipped the
+intact structure.
+
+**487 compounds** have an InChI more fragmented than their SMILES — cobalamins,
+Ni/Fe/Mg porphyrins, molybdenum cofactors, organotins, iron–sulfur clusters —
+and **461 shipped fragmented**.
+
+The rule is now InChI-first *unless the InChI is the more fragmented of the
+two*. Comparing fragment counts rather than screening for metals keeps it
+general: whatever the reason an InChI has taken a molecule apart, the
+representation that keeps it together is the better input. 493 compounds take
+the SMILES route on that test.
+
+Two subtleties made this harder than it sounds, both recorded in the script:
+
+- **The InChI is demoted, not merely reordered.** Sharing one ladder lets a
+  writable-but-wrong rung beat a correct one — on KEGG `C18384` the SMILES
+  yields the right dative-bonded magnesium propionate, which Marvin's SMILES
+  writer refuses, while the disconnected InChI yields a writable three-fragment
+  answer and would win.
+- **The InChI ROW is written from the InChI-derived molecule.** Each column
+  should carry what its own representation can express, which is exactly what
+  23.4 did: for `CPD-18407` it shipped a connected 8-iron cluster in SMILE and
+  the disconnected `InChI=1S/C.8Fe.6HS.3S/...` in InChI. This is also load
+  bearing for stability — asking Marvin to write an InChI for a *connected*
+  metal cluster aborts the JVM outright with `free(): double free detected in
+  tcache 2` from `InChINativeGenerateInChICall`, a native fault no Python or
+  Java handler can catch.
+
+| fragmented vs 23.4 | count |
+|---|---:|
+| first cut (InChI-first everywhere) | 461 |
+| after the fragment-count rule | 16 |
+| after demotion + per-column sourcing | **8** |
+
+The remaining 8 are not an input-selection problem. Marvin 26.1's microspecies
+plugin breaks metal coordination bonds during protonation itself, from either
+input: ferrocene (`CPD-21742`, `CPD-21743`) splits into iron plus two
+cyclopentadienyls, and `C12862` sheds both ammines. Confirmed by protonating
+the connected SMILES directly. That is an engine behaviour change, recorded
+rather than worked around.
 
 ## One engine, and why not the CLI
 
