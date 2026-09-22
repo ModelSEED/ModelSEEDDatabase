@@ -1,6 +1,6 @@
 # Marvin 26.1 protonation regeneration
 
-Generated 2026-09-18 by `Scripts/Structures/Run_Marvin_Protonations.py`.
+Generated 2026-09-22 by `Scripts/Structures/Run_Marvin_Protonations.py`.
 
 Regenerates the per-source pH 7 protonation bundles against the current
 `<source>/inchi.tsv` and `<source>/smiles.tsv`, replacing the retired
@@ -41,11 +41,11 @@ toward deprotonation:
 
 | Δ net charge (26.1 − 23.4) | compounds | share |
 |---|---:|---:|
-| −2 or lower | 2,173 | 4.10% |
+| −2 or lower | 2,260 | 4.26% |
 | −1 | 6,234 | 11.76% |
-| **0** | **42,252** | **79.69%** |
-| +1 | 1,887 | 3.56% |
-| +2 or higher | 381 | 0.72% |
+| **0** | **42,251** | **79.69%** |
+| +1 | 1,888 | 3.56% |
+| +2 or higher | 388 | 0.73% |
 
 That 20.3% is an **upper bound on the tautomer effect, not a measurement of
 it**. It also contains the genuine 23.4 → 26.1 engine change, which the pKa
@@ -92,9 +92,9 @@ changed nothing, so the output should equal the input:
 
 | source | no-op compounds | 26.1 reproduces the source | 23.4 on the same set |
 |---|---:|---:|---:|
-| ChEBI | 7,128 | 7,055 (99.0%) | 8,618/8,918 (96.6%) |
-| KEGG | 8,346 | 8,263 (99.0%) | 8,833/9,031 (97.8%) |
-| MetaCyc | 13,738 | 13,551 (98.6%) | 16,748/17,448 (96.0%) |
+| ChEBI | 7,135 | 7,058 (98.9%) | 8,618/8,918 (96.6%) |
+| KEGG | 8,351 | 8,263 (98.9%) | 8,833/9,031 (97.8%) |
+| MetaCyc | 13,743 | 13,554 (98.6%) | 16,748/17,448 (96.0%) |
 | Rhea | 135 | 133 (98.5%) | 194/197 (98.5%) |
 
 An unbridged run scores 55–61% here and would have shipped a stereochemistry
@@ -136,18 +136,75 @@ molecule.
 |---|---:|---:|---:|---:|
 | ChEBI | 11,544 | 9,026 (78.2%) | 6,795/9,472 (71.7%) | 6,795/9,472 (71.7%) |
 | KEGG | 16,275 | 13,636 (83.8%) | 12,195/15,318 (79.6%) | 12,195/15,318 (79.6%) |
-| MetaCyc | 25,070 | 19,435 (77.5%) | 13,534/19,297 (70.1%) | 13,534/19,297 (70.1%) |
+| MetaCyc | 25,070 | 19,434 (77.5%) | 13,534/19,297 (70.1%) | 13,534/19,297 (70.1%) |
 | Rhea | 237 | 155 (65.4%) | 127/207 (61.4%) | 127/207 (61.4%) |
-| **total** | **53,126** | **42,252 (79.5%)** | **32,651/44,294 (73.7%)** | **32,651/44,294 (73.7%)** |
+| **total** | **53,126** | **42,251 (79.5%)** | **32,651/44,294 (73.7%)** | **32,651/44,294 (73.7%)** |
 
-Net charge is the honest headline rather than the formula string: 23.4's
-formula and charge columns were re-derived by `Print_Structure_Formula_Charge.py`
-with RDKit/OpenBabel while these are Marvin's, so the two can spell the same
-molecule differently — R-group counts on the polymers especially — without
-disagreeing about chemistry.
+Net charge is the honest headline rather than the formula string, because a
+formula moves whenever the hydrogen count does and so mixes the protonation
+change with everything else. Both columns are now derived the same way in both
+bundles — see The formula column below.
 
 InChI and InChIKey agreement track each other exactly, which is the internal
 consistency check passing: the key always hashes the string beside it.
+
+## The formula column, and the R groups it nearly lost
+
+The first cut of this bundle wrote Marvin's own `getFormula()` into the formula
+column and deferred `Print_Structure_Formula_Charge.py` to a follow-up step.
+That was wrong and it shipped. **Marvin omits wildcard atoms from a formula;
+this repository renders them as R**, in one line of that script:
+
+```python
+formula = re.sub(r'\*', 'R', formula)
+```
+
+The result was that SMILE rows whose formula contains R fell from 23.4's 8,712
+to **8**. `Stearoyl-ACPs` went from `C32H60N3O9PR2S` to `C32H60N3O9PS`, and
+downstream `Update_Compound_Structures_Formulas_Charge.py` propagated that into
+6,052 compound records — turning `cpd00049` "carboxylic acid" from `CHO2R` into
+`CHO2`, which is a generic compound quietly ceasing to be generic.
+
+**The structures were never affected.** 8,727 SMILE structures carry a `*` in
+both bundles, identically. Only the column was wrong — which is exactly why it
+survived every check in the original validation suite: coverage, compound sets,
+InChI agreement, InChIKey consistency and stereochemical fidelity all inspect
+*structures*, and the structures were always right. A column-only defect was
+invisible to all of it. The table below is the check that was missing.
+
+| source | SMILE rows with R (26.1) | 23.4 | identical formula | identical charge |
+|---|---:|---:|---:|---:|
+| ChEBI | 2,071 | 2,071 | 16,129/21,016 (76.7%) | 16,138/21,016 (76.8%) |
+| KEGG | 964 | 964 | 26,345/31,593 (83.4%) | 26,371/31,593 (83.5%) |
+| MetaCyc | 5,670 | 5,647 | 33,723/44,367 (76.0%) | 33,788/44,367 (76.2%) |
+| Rhea | 30 | 30 | 282/444 (63.5%) | 282/444 (63.5%) |
+| **total** | **8,735** | **8,712** | **76,479/97,420 (78.5%)** | **76,579/97,420 (78.6%)** |
+
+Formula and charge now come from `parse_structure` — this repository's own
+function, imported rather than reimplemented, computed per row from that row's
+structure string. The ~21% that differ from 23.4 are the protonation-state
+changes described above; a formula moves whenever the hydrogen count does.
+
+The 26.1 total exceeds 23.4's because the convention is now enforced as an
+invariant — **a SMILE structure carrying `*` gets an R in its formula** — which
+23.4 violates 23 times and this bundle violates 0 times. Two parsers had to be
+reconciled to get there: RDKit renders a dummy atom as `*`, so the substitution
+above catches it, but OpenBabel and Marvin both omit dummy atoms entirely, so on
+those paths there is nothing for it to rewrite. Structures like `ISOCITHASE-P`'s
+`*OP(=O)(=O)=O` have deliberately invalid valences that only OpenBabel will
+read, and were losing their R that way.
+
+Counting wildcards to enforce this has its own trap, recorded in the script: a
+molblock `R` atom — which is how RDKit writes *every* dummy atom, and therefore
+how every structure arrives through the import bridge — reads back from Marvin
+as symbol `R#`, not `R`. A wildcard set without `R#` counts zero on a molecule
+that plainly has them.
+
+Note when checking this yourself that an InChI string may contain a literal `*`
+that is **not** a wildcard: InChI uses `n*` for repeated components, so
+`InChI=1S/Mn.2H2O/h;2*1H2` is manganese with two waters. A naive grep reports
+255 false positives here and 217 in 23.4. The invariant is meaningful on SMILE
+rows only.
 
 ## One engine, and why not the CLI
 
@@ -224,9 +281,11 @@ there is nothing left to permute.
 
 - Compound records are unchanged. `Update_Compound_Structures_Formulas_Charge.py`
   is the step that rewrites them.
-- `Print_Structure_Formula_Charge.py` has not been re-run. It re-derives the
-  formula and charge columns of this file in place with RDKit/OpenBabel; the
-  values committed here are Marvin's own and agree with 23.4's on spot checks.
+- `Print_Structure_Formula_Charge.py` has not been re-run over these files as a
+  whole — but it no longer needs to be for the formula and charge columns, which
+  are computed with its own `parse_structure` as the bundle is written. Running
+  it should be a no-op on those two columns; it was treating it as a deferred
+  follow-up that produced the R-group regression above.
   Pyruvate (`C00022`) is representative: identical InChI
   (`InChI=1S/C3H4O3/...../p-1`), identical InChIKey
   (`LCTONWCANYUPML-UHFFFAOYSA-M`), identical formula and charge (`C3H3O3`, −1).

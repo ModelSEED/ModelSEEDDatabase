@@ -32,7 +32,7 @@ So this script runs (i), (ii), (iv), (v) and SKIPS (iii). The consequence is
 measurable and is not small. Across the 53,021 compounds both bundles cover,
 the net charge at pH 7 is unchanged for 79.7% and different for 20.3%, skewed
 toward deprotonation: 11.8% of compounds sit one charge unit lower under 26.1
-and 4.1% two or more lower, against 3.6% one higher and 0.7% two or more.
+and 4.3% two or more lower, against 3.6% one higher and 0.7% two or more.
 
 That 20.3% is an UPPER BOUND on the tautomer effect, not a measurement of it.
 It also contains the genuine 23.4 -> 26.1 engine improvement, which is already
@@ -135,11 +135,33 @@ Everything else that the first attempt could not write -- query molecules
 broken by aromatize(), and InChIs like azide's that rebuild as radicals -- is
 recovered by the ladder rather than dropped. See protonate_best().
 
-FORMULA AND CHARGE are Marvin's own, read off the protonated molecule. Note
-that Print_Structure_Formula_Charge.py re-derives both columns with
-RDKit/OpenBabel and rewrites this file in place; that is the repository's
-convention and this script does not try to pre-empt it. The two agree on the
-spot checks in the report.
+FORMULA AND CHARGE come from Print_Structure_Formula_Charge.parse_structure --
+this repository's own function, imported rather than reimplemented, computed per
+ROW from that row's structure string.
+
+Do NOT substitute Marvin's getFormula() here. Marvin omits wildcard atoms from
+a formula; this repository renders them as R, in one line of that function:
+
+    formula = re.sub(r'\\*', 'R', formula)
+
+The first cut of this script wrote Marvin's formula and deferred the refresh to
+Print_Structure_Formula_Charge.py as a follow-up step. That was wrong, and it
+shipped: 8,703 rows lost their R groups, taking the count of SMILE rows whose
+formula contains R from 23.4's 8,712 down to 8. Stearoyl-ACPs went from
+C32H60N3O9PR2S to C32H60N3O9PS -- and downstream, `Update_Compound_Structures_
+Formulas_Charge.py` propagated that into 6,052 compound records, turning
+cpd00049 "carboxylic acid" from CHO2R into CHO2. A generic compound stopped
+being generic.
+
+The STRUCTURES were never affected -- 8,727 SMILE structures carry a `*` in
+both bundles, identically -- which is exactly why this was invisible in every
+coverage count and every InChI comparison. Only the formula column was wrong,
+and the cascade consumes that column directly, so the bundle has to be correct
+as written rather than correct after a second script runs.
+
+Marvin's getFormula() survives as the fallback for the handful of rows
+parse_structure cannot read, counted as `formula_from_marvin` in the per-source
+stats so it can never again be a silent substitution.
 
 REQUIRES. `pip install jpype1` and rdkit (already a dependency of
 Print_Structure_Formula_Charge.py), plus the Marvin jars -- found next to the
@@ -180,8 +202,28 @@ import os
 import re
 import shutil
 import subprocess
+import sys
 from csv import DictReader
 from datetime import date
+
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+sys.path.insert(0, os.path.join(
+    os.path.dirname(os.path.abspath(__file__)), "..", "..", "Libs", "Python"))
+# The formula/charge columns of this file belong to Print_Structure_Formula_Charge,
+# so they are computed with ITS function rather than a second implementation --
+# see FORMULA AND CHARGE.
+from Print_Structure_Formula_Charge import parse_structure    # noqa: E402
+from BiochemPy import Compounds                              # noqa: E402
+
+# What Marvin calls a wildcard atom, across the notations it accepts. `R#` is
+# the one that matters and the one easiest to miss: a molblock R atom -- which
+# is how RDKit writes every dummy atom, and therefore how EVERY structure
+# arrives here through the import bridge -- reads back as symbol "R#", not "R".
+# A set without it counts zero wildcards on a molecule that plainly has them.
+WILDCARD_SYMBOLS = {"*", "A", "R", "R#"}
+
+# An R group in a formula, not the R of Ru/Rb/Rh/Re/Rn.
+HAS_R_GROUP = re.compile(r"R(?![a-z])")
 
 TOOL = "Marvin"
 
@@ -392,7 +434,8 @@ def process(source, version, ph, limit=0, cxcalc="cxcalc"):
     # Failure taxonomy, kept separate so "no result" is never reported as though
     # it were all failure -- the pKa run had to walk that conflation back once.
     stats = {"in": len(compounds), "ok": 0, "unparseable": 0,
-             "plugin_error": 0, "empty": 0, "nonstandard_inchi": 0}
+             "plugin_error": 0, "empty": 0, "nonstandard_inchi": 0,
+             "formula_from_marvin": 0, "wildcard_r_added": 0}
 
     for ext_id, smiles in compounds:
         # InChI first, the compound's own SMILES as the fallback rung.
@@ -413,11 +456,46 @@ def process(source, version, ph, limit=0, cxcalc="cxcalc"):
             stats["empty"] += 1
             continue
 
-        formula = str(mol.getFormula())
-        charge = str(mol.getTotalCharge())
+        def columns(struct_type, structure):
+            """(formula, charge) for one row, the way this repository derives them.
+
+            Per ROW, not per compound, because refresh_file() recomputes each
+            row from its own structure string and the two representations can
+            disagree. Marvin's own getFormula() is the fallback only.
+            """
+            try:
+                f, c, _ = parse_structure(struct_type, structure)
+            except Exception:
+                f = c = None
+            if f is None:
+                # Neither RDKit nor OpenBabel could read it -- typically a
+                # deliberately invalid valence like ISOCITHASE-P's
+                # `*OP(=O)(=O)=O`. Marvin's formula is the only one available.
+                stats["formula_from_marvin"] += 1
+                f, c = str(mol.getFormula()), str(mol.getTotalCharge())
+
+            # INVARIANT: a structure carrying `*` gets an R in its formula.
+            # parse_structure implements that as re.sub(r'\\*', 'R', formula),
+            # which only works when RDKit produced the formula -- RDKit renders
+            # a dummy atom as `*`, OpenBabel and Marvin both omit it entirely.
+            # So on the OpenBabel path the substitution finds nothing to rewrite
+            # and the row ships a formula contradicting its own structure
+            # column. Enforcing the invariant here completes the convention; it
+            # does not re-derive the formula, and it is asserted over the whole
+            # bundle afterwards so it cannot regress silently again.
+            if not HAS_R_GROUP.search(f):
+                wildcards = sum(
+                    1 for i in range(mol.getAtomCount())
+                    if str(mol.getAtom(i).getSymbol()) in WILDCARD_SYMBOLS)
+                if wildcards:
+                    stats["wildcard_r_added"] += 1
+                    f = Compounds.mergeFormula(
+                        f + ("R" if wildcards == 1 else f"R{wildcards}"))[0]
+            return f, c
 
         stats["ok"] += 1
-        out_rows.append((ext_id, "SMILE", smile_out, formula, charge,
+        smile_formula, smile_charge = columns("SMILE", smile_out)
+        out_rows.append((ext_id, "SMILE", smile_out, smile_formula, smile_charge,
                          TOOL, version, ph_out, generated_on))
 
         # InChI and InChIKey only where the source carries an InChI: InChI
@@ -430,7 +508,9 @@ def process(source, version, ph, limit=0, cxcalc="cxcalc"):
                     # comparable with the rest of the column.
                     stats["nonstandard_inchi"] += 1
                 else:
-                    out_rows.append((ext_id, "InChI", inchi_out, formula, charge,
+                    inchi_formula, inchi_charge = columns("InChI", inchi_out)
+                    out_rows.append((ext_id, "InChI", inchi_out,
+                                     inchi_formula, inchi_charge,
                                      TOOL, version, ph_out, generated_on))
                     # Hash the string just written, never a second export -- see
                     # EXPORT for why Marvin's own inchikey disagrees with it.
@@ -451,7 +531,9 @@ def process(source, version, ph, limit=0, cxcalc="cxcalc"):
 
     print(f"{source:<8} in={stats['in']:<6} protonated={stats['ok']:<6} "
           f"unparseable={stats['unparseable']:<4} plugin_error={stats['plugin_error']:<4} "
-          f"empty={stats['empty']:<4} nonstandard_inchi={stats['nonstandard_inchi']}")
+          f"empty={stats['empty']:<4} nonstandard_inchi={stats['nonstandard_inchi']:<4} "
+          f"formula_from_marvin={stats['formula_from_marvin']:<4} "
+          f"wildcard_r_added={stats['wildcard_r_added']}")
     print(f"{'':<8} rows={len(out_rows):<7} -> {os.path.relpath(out_path, STRUCT_ROOT)}")
     return out_path, stats
 
