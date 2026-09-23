@@ -95,29 +95,29 @@ today, which is worth fixing on its own merits.
 
 Joining ModelSEED → MetaCyc alias → `Scripts/Provenance/MetaCyc/MetaCyc_pathways.tsv`
 reaches 2,282 of the 4,206 new MetaCyc-sourced reactions without any new
-downloads, and 12,518 of the carried-over reactions through the same join, so
-the two columns are comparable. Distinct reactions, not reaction–pathway pairs:
+downloads, and 16,499 of the carried-over reactions through the same join, so
+the two columns are comparable. Distinct reactions, not reaction–pathway pairs,
+all records:
 
 | MetaCyc class | new | % of new | carried over | % of old | enrichment |
 |---|---:|---:|---:|---:|---:|
-| Antibiotic-Biosynthesis | 265 | 11.6% | 740 | 5.9% | 2.0× |
-| O-Antigen-Biosynthesis | 218 | 9.6% | 29 | 0.2% | **41×** |
-| POLYKETIDE-SYN | 169 | 7.4% | 214 | 1.7% | 4.3× |
-| Toxin-Biosynthesis | 142 | 6.2% | 192 | 1.5% | 4.1× |
-| Lipid-Biosynthesis | 140 | 6.1% | 281 | 2.2% | 2.7× |
-| Branched-Fatty-Acids-Biosynthesis | 98 | 4.3% | 8 | 0.1% | **67×** |
-| Fatty-acid-biosynthesis | 77 | 3.4% | 358 | 2.9% | 1.2× |
-| ALKALOIDS-SYN | 53 | 2.3% | 196 | 1.6% | 1.5× |
-| Sterol-Biosynthesis | 50 | 2.2% | 168 | 1.3% | 1.6× |
-| Lipid-IV-A-Biosynthesis | 37 | 1.6% | 6 | 0.0% | **34×** |
-| ACYLSUGAR-BIOSYNTHESIS | 26 | 1.1% | 0 | 0.0% | new |
-| *Super-Pathways* | *299* | *13.1%* | *3,650* | *29.2%* | *0.45×* |
+| Antibiotic-Biosynthesis | 265 | 11.6% | 824 | 5.0% | 2.3× |
+| O-Antigen-Biosynthesis | 218 | 9.6% | 29 | 0.2% | **54×** |
+| POLYKETIDE-SYN | 169 | 7.4% | 224 | 1.4% | 5.5× |
+| Toxin-Biosynthesis | 142 | 6.2% | 223 | 1.4% | 4.6× |
+| Lipid-Biosynthesis | 140 | 6.1% | 438 | 2.7% | 2.3× |
+| Branched-Fatty-Acids-Biosynthesis | 98 | 4.3% | 22 | 0.1% | **32×** |
+| Fatty-acid-biosynthesis | 77 | 3.4% | 637 | 3.9% | 0.9× |
+| ALKALOIDS-SYN | 53 | 2.3% | 223 | 1.4% | 1.7× |
+| Sterol-Biosynthesis | 50 | 2.2% | 249 | 1.5% | 1.5× |
+| Lipid-IV-A-Biosynthesis | 37 | 1.6% | 9 | 0.1% | **30×** |
+| *Super-Pathways* | *299* | *13.1%* | *5,706* | *34.6%* | *0.38×* |
 
 **The reviewer's hypothesis is right, and we can quantify it.** Only **41 of
 the 12,261 new reactions (0.3%)** fall in a central-carbon or energy-metabolism
 class (Energy-Metabolism, Electron-Transfer, Fermentation, TCA-VARIANTS,
 Glycolysis, Pentose-Phosphate-Cycle, Photosynthesis, Respiration,
-Methanogenesis), against 328 of 43,751 (0.7%) among the reactions already
+Methanogenesis), against 770 of 43,751 (1.8%) among the reactions already
 there. The gain is in specialised metabolism — antibiotics, polyketides,
 toxins, alkaloids — and in cell-envelope and lipid biosynthesis, where
 O-antigen, lipid IV-A and branched fatty acids are enriched by one to two
