@@ -49,14 +49,29 @@ The compound figure is the first row and is correct. The 55% is the third row:
 2026's totals set against a 2020 baseline with its 7,577 obsolete rows removed.
 It is not reproducible on any single consistent basis.
 
-**Fix: quote 28%.** That keeps the whole paper on one population — the
-abstract's "~56,000 reactions", Figure 2A's 56,002, M12's 25,855 and
-Supplementary Table S1 are all all-records figures, and Figure 1's source
-counts (which apply no obsolete filter — verified in `_reaction_sources()`)
-become consistent rather than wrong. The live-only basis is equally defensible
-but would require converting every other number in the paper, including the
-abstract's headline. Recommend 28%; this is the corresponding author's call and
-is raised as such in the PR.
+**Fix, decided by the corresponding author: the live-only basis, 34% / 34%.**
+The whole paper is converted to it rather than the reporting basis being
+matched to the draft's existing numbers. That moves the abstract's headline
+from "~56,000 reactions" to "~48,000", and every count in M09, M11, M12, M13
+and Supplementary Table S1 with it. `analysis/population_basis_table.py` prints
+every quantity on both populations so the conversion can be audited rather than
+trusted, and `figure_common.LIVE_ONLY` puts all three figures on the same
+footing — none of them filtered obsolete records before.
+
+Two things the conversion exposed, both now disclosed in the text rather than
+absorbed silently:
+
+- **The anchor set is duplicated.** 806 records carry a stereo-exact
+  measurement, but 441 are obsolete duplicates that each link to a live entry,
+  so the number of *distinct* anchored reactions is 365. The calibration was
+  fitted over all 806 and has **not** been refit — refitting changes the
+  published grades and needs its own PR — so S03 and M12 now state that the
+  effective sample size is smaller than the count implies.
+- **M13's atom-mapping numbers were stale**, independently of any population
+  question: the draft said 32,877 / 25,058 / 7,819 against a shipped 32,378 /
+  25,058 / 7,320, the difference being the 2026-09-14 chain-salvage withdrawal
+  recorded in `Biochemistry/Structures/AtomMappings/README.md`. On the live
+  basis they are 26,256 / 19,810 / 6,446.
 
 ## R1 #1 — pathway/subsystem distribution of the new biochemistry
 

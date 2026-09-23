@@ -41,6 +41,7 @@ Both stayed in `Scripts/Thermodynamics/ProtonationEvidence/`.
 | `grace_style.py` | shared Grace/xmgrace visual style used by both |
 | `pathway_distribution_of_growth.py` | where the 2020→2026 growth landed at MetaCyc class level — reviewer 1 comment 1 |
 | `review_transport_and_llm.py` | what the transport caveat costs, and what the LLM ensemble is worth — reviewer 1 comment 2, reviewer 2 comment 2 |
+| `population_basis_table.py` | every count the manuscript quotes, on both populations, side by side — the audit trail for the live-basis conversion |
 
 The graphical abstract is submitted as a **separate file** and is deliberately
 never `\includegraphics`'d into `main.tex` — NAR requires it uploaded on its

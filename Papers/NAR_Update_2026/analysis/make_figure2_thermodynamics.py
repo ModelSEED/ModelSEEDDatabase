@@ -53,7 +53,9 @@ def figure2():
             x += pct
         a.text(-AMAX * 0.015, row, label, ha="right", va="center", fontsize=7.0, color=INK)
     a.set_xlim(0, AMAX); a.set_ylim(-0.62, 2.42); a.set_yticks([])
-    a.set_xticks([0, 20000, 40000, 56002]); a.set_xticklabels(["0", "20k", "40k", "56k"])
+    _end = NUMBERS["energy_total"]
+    a.set_xticks([0, 20000, 40000, _end])
+    a.set_xticklabels(["0", "20k", "40k", f"{_end//1000}k"])
     strip(a)
     # Four segments, two of them previously identified only in the caption.
     # The key names all four; hatch is reproduced in its own swatch so the
@@ -76,13 +78,14 @@ def figure2():
     for i, (lab, v) in zip(ys, rows):
         b.barh(i, v, height=0.70, color=BLUE, zorder=3)
         # grey remainder removed 2026-09-14: the count axis already shows the
-        # shortfall against 56k, so the bar was drawing the same fact twice
+        # shortfall against the total, so the bar drew the same fact twice
         b.text(v - 700, i, f"{100*v/tot:.0f}%", va="center", ha="right",
                fontsize=6.4, color="white", fontweight="bold")
         b.text(-900, i, SHORT.get(lab, lab), va="center", ha="right",
                fontsize=7.0, color=INK)
     b.set_yticks([]); b.set_xlim(0, tot * 1.02); b.set_ylim(-0.62, len(rows) - 0.38)
-    b.set_xticks([0, 20000, 40000, 56012]); b.set_xticklabels(["0", "20k", "40k", "56k"])
+    b.set_xticks([0, 20000, 40000, _end])
+    b.set_xticklabels(["0", "20k", "40k", f"{_end//1000}k"])
     strip(b)
     tag(b, "B")
 

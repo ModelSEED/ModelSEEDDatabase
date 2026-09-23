@@ -28,6 +28,29 @@ import grace_style as grace
 
 FIGDIR = Path(__file__).resolve().parent.parent / "figures"
 
+# ---- population -----------------------------------------------------------
+# Obsolete records are excluded from every figure. The 2026 draft mixed two
+# populations -- "34% growth in compounds" counted all records, "55% in
+# reactions" counted 2026 totals against a 2020 baseline with obsolete rows
+# stripped -- and the figures silently counted all records throughout. One
+# flag, threaded through every loader below, so a figure cannot disagree with
+# the text. Flip it to False to reproduce the all-records numbers.
+LIVE_ONLY = True
+
+
+def _live(records):
+    """Filter a list of loaded records to the reporting population."""
+    if not LIVE_ONLY:
+        return records
+    return [r for r in records if r.get("is_obsolete") not in (1, "1")]
+
+
+def _live_rows(rows, col="is_obsolete"):
+    """Same, for DictReader rows off a TSV."""
+    if not LIVE_ONLY:
+        return rows
+    return [r for r in rows if r.get(col) != "1"]
+
 
 def save(fig, name):
     """Write one figure to ../figures/<name>.pdf and report the path."""
@@ -145,7 +168,7 @@ def _ladder_vintage():
 
     allc, struct = set(), set()
     for f in sorted(_glob.glob(str(root / "Biochemistry/compound_*.json"))):
-        for c in _json.load(open(f)):
+        for c in _live(_json.load(open(f))):
             allc.add(c["id"])
             if c.get("smiles") or c.get("inchikey"): struct.add(c["id"])
 
@@ -173,7 +196,7 @@ def _ladder_vintage():
 
     rx = _c.Counter()
     for f in sorted(_glob.glob(str(root / "Biochemistry/reaction_*.json"))):
-        for r in _json.load(open(f)):
+        for r in _live(_json.load(open(f))):
             st = r.get("stoichiometry")
             if not isinstance(st, list) or not st: continue
             v = {cls.get(x["compound"], "no structure") for x in st}
@@ -202,7 +225,7 @@ def _growth():
     Rhea is absent by construction: its 207 InChIKeys alias to zero ModelSEED
     compounds, so it contributes reactions, not structures.
     """
-    import csv as _csv, io as _io, subprocess as _sp, collections as _c
+    import csv as _csv, io as _io, subprocess as _sp, collections as _c, glob as _glob
     root = Path(__file__).resolve().parents[3]
     C2020 = "fd6c7849891ef4bbeb6eac072f5a6f7adff05b0e"
     REL = "Biochemistry/Aliases/Unique_ModelSEED_Compound_Aliases.txt"
@@ -218,6 +241,22 @@ def _growth():
     old = tally(_sp.run(["git", "show", f"{C2020}:{REL}"], cwd=str(root),
                         capture_output=True, text=True, check=True).stdout)
     new = tally((root / REL).read_text())
+
+    # The alias files carry no is_obsolete column, so the population filter has
+    # to come from the records on each side. The effect is small -- 34 obsolete
+    # compounds in 2020, 46 now -- but leaving it out would put this panel on a
+    # different population from every other one.
+    if LIVE_ONLY:
+        import json as _js
+        live_new = set()
+        for f in sorted(_glob.glob(str(root / "Biochemistry/compound_*.json"))):
+            live_new |= {c["id"] for c in _live(_js.load(open(f)))}
+        live_old = {r["id"] for r in _csv.DictReader(_io.StringIO(_sp.run(
+            ["git", "show", f"{C2020}:Biochemistry/compounds.tsv"], cwd=str(root),
+            capture_output=True, text=True, check=True).stdout), delimiter="\t")
+            if r.get("is_obsolete") != "1"}
+        old = _c.defaultdict(set, {k: v & live_old for k, v in old.items()})
+        new = _c.defaultdict(set, {k: v & live_new for k, v in new.items()})
     return [(s, len(old[s]), len(new[s])) for s in ("MetaCyc", "KEGG", "ChEBI")]
 
 
@@ -238,7 +277,7 @@ def _reaction_sources():
     root = Path(__file__).resolve().parents[3]
     struct = set()
     for f in sorted(_glob.glob(str(root / "Biochemistry" / "compound_*.json"))):
-        for c in _json.load(open(f)):
+        for c in _live(_json.load(open(f))):
             if c.get("smiles") or c.get("inchikey"):
                 struct.add(c["id"])
     PRIMARY = ("KEGG", "MetaCyc", "Rhea")
@@ -250,7 +289,7 @@ def _reaction_sources():
                 src[row[0]].add(row[2])
     rx = {}
     for f in sorted(_glob.glob(str(root / "Biochemistry" / "reaction_*.json"))):
-        for x in _json.load(open(f)):
+        for x in _live(_json.load(open(f))):
             rx[x["id"]] = {s["compound"] for s in (x.get("stoichiometry") or [])}
     tot = _c.Counter(); uniq = _c.Counter(); ucomp = _c.Counter()
     for rid, ss in src.items():
@@ -282,7 +321,7 @@ def _euler_regions():
     root = Path(__file__).resolve().parents[3]
     ids = set()
     for f in sorted(_glob.glob(str(root / "Biochemistry" / "reaction_[0-9][0-9].json"))):
-        for r in _json.load(open(f)):
+        for r in _live(_json.load(open(f))):
             ids.add(r["id"])
     mem = _c.defaultdict(set)
     with (root / "Biochemistry/Aliases/Unique_ModelSEED_Reaction_Aliases.txt").open() as fh:
@@ -352,6 +391,36 @@ def _pathway_classes(top=8):
     return rows
 
 
+def _energy_coverage():
+    """Figure 2B: reactions carrying an energy from each source, and the
+    denominator.
+
+    Was a hardcoded triple, which is why it stayed on the all-records
+    population when everything else moved. Sentinels are excluded, as the
+    comment on the old constant said: group contribution writes dg = 1e7 when
+    it declines and eQuilibrator writes sigma >= 2500 kcal/mol, and counting
+    those reads as coverage that does not exist.
+    """
+    import json as _json, glob as _glob, collections as _c
+    root = Path(__file__).resolve().parents[3]
+    n = _c.Counter(); total = 0
+    for f in sorted(_glob.glob(str(root / "Biochemistry" / "reaction_*.json"))):
+        for r in _live(_json.load(open(f))):
+            total += 1
+            for src, t in (r.get("thermodynamics") or {}).items():
+                if src == "LLMs" or not t or t[0] in ("", None):
+                    continue
+                try:
+                    dg, sd = float(t[0]), abs(float(t[1]))
+                except (TypeError, ValueError):
+                    continue
+                if dg >= 1e7 or sd >= 2500:
+                    continue
+                n[src] += 1
+    order = sorted(n, key=lambda k: -n[k])
+    return [(k, n[k]) for k in order], total
+
+
 def _silver_sigma_band():
     """Figure 2C shading: the sigma span of reactions graded SILVER, per source.
 
@@ -387,7 +456,7 @@ def _silver_sigma_band():
                 best[x["rxn"]] = x["best_grade"]
     sig = _c.defaultdict(list)
     for f in sorted(_glob.glob(str(root / "Biochemistry" / "reaction_[0-9][0-9].json"))):
-        for r in _json.load(open(f)):
+        for r in _live(_json.load(open(f))):
             if best.get(r["id"]) != "SILVER":
                 continue
             for name, triple in (r.get("thermodynamics") or {}).items():
@@ -423,7 +492,7 @@ def _grade_breakdown():
     root = Path(__file__).resolve().parents[3]
     A = _c.defaultdict(_c.Counter); X = _c.defaultdict(_c.Counter)
     for f in sorted(_glob.glob(str(root / "Biochemistry" / "reaction_*.json"))):
-        for r in _json.load(open(f)):
+        for r in _live(_json.load(open(f))):
             e = r.get("thermo-evidence")
             if not e:
                 continue
@@ -454,7 +523,7 @@ def _direction_counts():
     counts = {s: _c.Counter() for s in
               ("eQuilibrator", "Group contribution", "dGPredictor", "LLMs")}
     for f in sorted(_glob.glob(str(root / "Biochemistry" / "reaction_*.json"))):
-        for r in _json.load(open(f)):
+        for r in _live(_json.load(open(f))):
             for s, v in (r.get("thermodynamics") or {}).items():
                 if s in counts and isinstance(v, list) and len(v) > 2:
                     counts[s][v[2]] += 1
@@ -470,7 +539,7 @@ def _agreement_counts():
     root = Path(__file__).resolve().parents[3]
     agree = opp = eq_only = dg_only = neither = partial = 0
     for f in sorted(_glob.glob(str(root / "Biochemistry" / "reaction_*.json"))):
-        for r in _json.load(open(f)):
+        for r in _live(_json.load(open(f))):
             th = r.get("thermodynamics") or {}
             x, y = th.get("eQuilibrator"), th.get("dGPredictor")
             if not (isinstance(x, list) and len(x) > 2
@@ -520,9 +589,8 @@ NUMBERS = {
     # Group contribution stores an entry for essentially every reaction but
     # 26,555 of them are the 10000000.0 placeholder, so the raw entry count
     # reads as 100% coverage and is not coverage at all.
-    "energy_rxn": [("dGPredictor", 29617), ("Group contribution", 29447),
-                   ("eQuilibrator", 21789)],
-    "energy_total": 56012,
+    "energy_rxn": None,    # filled by _energy_coverage()
+    "energy_total": None,  # filled by _energy_coverage()
     # direction derived per source from the same dicts
     "direction": [("eQuilibrator", 8650, 10957, 1071),
                   ("Group contribution", 10514, 17510, 1423),
@@ -547,6 +615,7 @@ NUMBERS["grade_assess"], NUMBERS["grade_cross"] = _grade_breakdown()
 NUMBERS["growth"] = _growth()
 NUMBERS["rxn_sources"] = _reaction_sources()
 NUMBERS["ladder_cpd"], NUMBERS["ladder_rxn"] = _ladder_vintage()
+NUMBERS["energy_rxn"], NUMBERS["energy_total"] = _energy_coverage()
 
 
 def strip(ax, keep_x=True, value_axis="x"):
