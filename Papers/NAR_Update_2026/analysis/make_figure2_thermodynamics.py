@@ -94,13 +94,12 @@ def figure2():
     # scales, and a common axis would flatten two into a spike against
     # eQuilibrator's tail. Source names sit inside the frame; three stacked
     # titles would cost more height than the panels themselves.
-    sig = json.loads((Path(__file__).resolve().parent
-                      / "figure_data_sigma.json").read_text())
+    sig = NUMBERS["sigma"]   # derived, live basis; see _sigma_values()
     order = [("eQuilibrator", BLUE), ("Group contribution", AQUA), ("dGPredictor", VIOLET)]
     SHORT_C = {}
     for j, (name, col) in enumerate(order):
         ax = fig.add_subplot(right[j])
-        v = sig[name]["vals"]
+        v = sig[name]
         hi = sorted(v)[int(0.97 * len(v))]      # clip the tail, then bin INSIDE
         ax.hist([x for x in v if x <= hi], bins=30, range=(0, hi),
                 color=col, zorder=3, linewidth=0)

@@ -163,7 +163,10 @@ def _euler_panel(ax):
                           "H": (0.475, 0.018, "center")}.items():
         ax.text(x, y, f"{full[k]}  {tot[full[k]]:,}", ha=ha, va="center",
                 fontsize=6.2, color=col[k], fontweight="bold")
-    ax.text(1.045, 0.018, f"+{r['none']:,} from other sources", ha="right",
+    # Bottom-right corner, above the baseline: at y=0.10 the Rhea circle spans
+    # only x=0.33-0.67, so a note right-aligned at 1.04 clears it, and it no
+    # longer shares a baseline with the Rhea set label.
+    ax.text(1.040, 0.100, f"+{r['none']:,} from other sources", ha="right",
             va="center", fontsize=5.5, color=MUTED)
     ax.set_xlim(0, 1); ax.set_ylim(0, 1)
     ax.set_xticks([]); ax.set_yticks([]); ax.set_aspect("equal")

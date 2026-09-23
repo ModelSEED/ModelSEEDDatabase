@@ -215,12 +215,14 @@ def _growth():
     """Figure 1A: compounds carrying an alias from each structure source,
     2020 against 2026. DERIVED from the shipped alias file on both sides.
 
-    The 2020 column used to be transcribed from an untracked MANUSCRIPT.md and
-    was wrong for both sources that existed then -- MetaCyc 19,138 against a
-    true 19,172, KEGG 17,760 against 17,793. It is now read from
-    Unique_ModelSEED_Compound_Aliases.txt at the last commit of 2020
-    (fd6c7849, 2020-11-10), six weeks after the paper appeared online, so the
-    figure cannot drift from the repository again.
+    The 2020 column is read from Unique_ModelSEED_Compound_Aliases.txt at the
+    last commit of 2020 (fd6c7849, 2020-11-10), six weeks after the paper
+    appeared online, so the figure cannot drift from the repository. An
+    earlier note here called the transcribed values -- MetaCyc 19,138, KEGG
+    17,760 -- "wrong" against 19,172 and 17,793 read from the file. They were
+    not wrong; they were the same counts with the 34 obsolete 2020 compounds
+    removed, i.e. the live basis this function now uses. Both differences are
+    exactly that 34 (33 for KEGG, one obsolete compound having no KEGG alias).
 
     Rhea is absent by construction: its 207 InChIKeys alias to zero ModelSEED
     compounds, so it contributes reactions, not structures.
@@ -356,7 +358,7 @@ def _pathway_classes(top=8):
     Super-Pathways is dropped: it is an organisational class, not a biological
     one, and it would otherwise top the chart.
     """
-    import csv as _csv, collections as _c, io as _io, subprocess as _sp
+    import csv as _csv, collections as _c, io as _io, subprocess as _sp, glob as _glob, json as _json
     root = Path(__file__).resolve().parents[3]
     C2020 = "fd6c7849891ef4bbeb6eac072f5a6f7adff05b0e"
     DROP = {"Super-Pathways"}
@@ -381,8 +383,18 @@ def _pathway_classes(top=8):
             if len(row) >= 3 and row[2] == "MetaCyc":
                 s2m[row[0]].add(row[1])
 
+    # The population filter: this loader iterates the alias file, which has no
+    # is_obsolete column, so it was still counting obsolete reactions as
+    # "already held" (antibiotics 824 rather than 740) after every other
+    # loader had moved to the live basis.
+    live = set()
+    for f in sorted(_glob.glob(str(root / "Biochemistry" / "reaction_*.json"))):
+        live |= {r["id"] for r in _live(_json.load(open(f)))}
+
     new_c, old_c = _c.Counter(), _c.Counter()
     for sid, mcs in s2m.items():
+        if sid not in live:
+            continue
         cls = {p for mc in mcs for pwy in rx2pwy.get(mc, ()) for p in parent.get(pwy, [])}
         cls -= DROP
         for c in cls:
@@ -419,6 +431,35 @@ def _energy_coverage():
                 n[src] += 1
     order = sorted(n, key=lambda k: -n[k])
     return [(k, n[k]) for k in order], total
+
+
+def _sigma_values():
+    """Figure 2C histograms: each source's reported sigma, sentinels excluded.
+
+    Was read from figure_data_sigma.json, a static cache with no generator
+    that had been built on ALL records (n = 21,789 / 29,447 / 29,617, medians
+    0.63 / 10.41 / 17.01) -- so after the text moved to the live population
+    the drawn median lines disagreed with M11's 0.62 / 10.83 / 17.56. Derived
+    here through the same population filter and the same sentinel rule as
+    _energy_coverage(), so the figure and the text cannot drift apart again.
+    Returns {source: sorted list of sigma}.
+    """
+    import json as _json, glob as _glob, collections as _c
+    root = Path(__file__).resolve().parents[3]
+    out = _c.defaultdict(list)
+    for f in sorted(_glob.glob(str(root / "Biochemistry" / "reaction_*.json"))):
+        for r in _live(_json.load(open(f))):
+            for src, t in (r.get("thermodynamics") or {}).items():
+                if src == "LLMs" or not t or t[0] in ("", None):
+                    continue
+                try:
+                    dg, sd = float(t[0]), abs(float(t[1]))
+                except (TypeError, ValueError):
+                    continue
+                if dg >= 1e7 or sd >= 2500:
+                    continue
+                out[src].append(sd)
+    return {k: sorted(v) for k, v in out.items()}
 
 
 def _silver_sigma_band():
@@ -616,6 +657,7 @@ NUMBERS["growth"] = _growth()
 NUMBERS["rxn_sources"] = _reaction_sources()
 NUMBERS["ladder_cpd"], NUMBERS["ladder_rxn"] = _ladder_vintage()
 NUMBERS["energy_rxn"], NUMBERS["energy_total"] = _energy_coverage()
+NUMBERS["sigma"] = _sigma_values()
 
 
 def strip(ax, keep_x=True, value_axis="x"):
