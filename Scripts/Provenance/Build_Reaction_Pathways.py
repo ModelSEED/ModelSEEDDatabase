@@ -63,6 +63,7 @@ TABLES = {
 # free-text category names. The shipped annotation contains rn ids only, so
 # anything else is dropped rather than emitted with an empty name.
 KEEP = {"KEGG": lambda i: i.startswith("rn"), "MetaCyc": lambda i: True}
+SOURCE_ORDER = ("MetaCyc", "KEGG")
 
 
 def load_table(path):
@@ -199,8 +200,10 @@ def write_records(rows):
             by_src = by_rxn.get(rxn["id"])
             if not by_src:
                 continue
+            # Source order matches every existing multi-source record, all
+            # 2,023 of which are MetaCyc first, then KEGG -- not alphabetical.
             rxn["pathways"] = [f"{src}: " + "; ".join(sorted(by_src[src]))
-                               for src in sorted(by_src)]
+                               for src in SOURCE_ORDER if src in by_src]
             changed = True
             touched += 1
         if changed:
