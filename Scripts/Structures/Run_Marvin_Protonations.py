@@ -73,6 +73,20 @@ for metals keeps this general: whatever the reason an InChI has taken a
 molecule apart, the representation that keeps it together is the better input.
 Counted as `smiles_preferred` in the per-source stats.
 
+For those same compounds the InChI ROW is built from the InChI-derived
+molecule rather than the SMILES-derived one (`inchi_from_inchi_form`), so each
+column carries what its own representation can express. It is PROTONATED, not
+passed through: 23.4 protonated this form uniformly, and the protonation merely
+happened to be a no-op for 234 of the 493 while changing the other 259 -- the
+chlorophylls and cobalamins pick up a /p-2 layer. Passing the source through
+would silently un-protonate those 259.
+
+The cost is visible and is recorded rather than hidden: Marvin 26.1 reads the
+detached `4Fe.4S` as four FREE sulfide ions and protonates them to H2S at pH 7,
+where 23.4 left them alone, so ChEBI 33722 ships Fe4S4 as H8Fe4S4 and 136511
+ships MnO2 as H4MnO2. That is the same class of engine change as the 20.3%
+net-charge delta above, confined to ligands InChI detached from their metal.
+
 Nothing in this is RDKit's doing, and swapping the importers would not help:
 Marvin reads the same disconnected InChI the same way. The loss happens in the
 InChI string itself, before any parser sees it.
@@ -480,7 +494,7 @@ def process(source, version, ph, limit=0, cxcalc="cxcalc"):
     stats = {"in": len(compounds), "ok": 0, "unparseable": 0,
              "plugin_error": 0, "empty": 0, "nonstandard_inchi": 0,
              "formula_from_marvin": 0, "wildcard_r_added": 0,
-             "smiles_preferred_disconnected_inchi": 0}
+             "smiles_preferred_disconnected_inchi": 0, "inchi_from_inchi_form": 0}
 
     for ext_id, smiles in compounds:
         # InChI first, the compound's own SMILES as the fallback rung -- unless
@@ -589,11 +603,31 @@ def process(source, version, ph, limit=0, cxcalc="cxcalc"):
             # 2` from InChINativeGenerateInChICall, a native fault no Python or
             # Java handler can catch. Feeding the InChI writer the structure
             # InChI can actually represent avoids the crash by construction.
+            # Protonate the INCHI-derived molecule for this row when the two
+            # representations disagree about connectivity. Each column then
+            # carries what its own representation can express, which is what
+            # 23.4 did -- CPD-18407 ships a connected 8-iron cluster in SMILE
+            # and the disconnected `InChI=1S/C.8Fe.6HS.3S/...` in InChI.
+            #
+            # Protonate it rather than passing the source through. 23.4
+            # protonated this form uniformly; the protonation merely happened
+            # to be a no-op for 234 of the 493, and was a real change for the
+            # other 259 (chlorophylls and cobalamins pick up a /p-2 layer).
+            # Passing the source through would silently un-protonate those 259.
+            #
+            # This is also load bearing for stability. Asking Marvin to write
+            # an InChI for a CONNECTED metal cluster aborts the JVM outright:
+            # `free(): double free detected in tcache 2` from
+            # InChINativeGenerateInChICall, a native fault no Python or Java
+            # handler can catch, and one a previous regeneration died on.
+            # Feeding the InChI writer the structure InChI can actually
+            # represent avoids the crash by construction.
             inchi_source = mol
             if disconnected:
-                alt, _ = prot.protonate_best([inchi_by_id[ext_id]])
-                inchi_source = alt
-            inchi_out = prot.export(inchi_source, Protonator.INCHI_FORMAT) if inchi_source is not None else ""
+                stats["inchi_from_inchi_form"] += 1
+                inchi_source, _ = prot.protonate_best([inchi_by_id[ext_id]])
+            inchi_out = (prot.export(inchi_source, Protonator.INCHI_FORMAT)
+                         if inchi_source is not None else "")
             if inchi_out:
                 if not inchi_out.startswith("InChI=1S/"):
                     # Standard InChI only; a non-standard string would not be
@@ -626,7 +660,8 @@ def process(source, version, ph, limit=0, cxcalc="cxcalc"):
           f"empty={stats['empty']:<4} nonstandard_inchi={stats['nonstandard_inchi']:<4} "
           f"formula_from_marvin={stats['formula_from_marvin']:<4} "
           f"wildcard_r_added={stats['wildcard_r_added']:<4} "
-          f"smiles_preferred={stats['smiles_preferred_disconnected_inchi']}")
+          f"smiles_preferred={stats['smiles_preferred_disconnected_inchi']:<4} "
+          f"inchi_from_inchi_form={stats['inchi_from_inchi_form']}")
     print(f"{'':<8} rows={len(out_rows):<7} -> {os.path.relpath(out_path, STRUCT_ROOT)}")
     return out_path, stats
 

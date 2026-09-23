@@ -274,6 +274,33 @@ cyclopentadienyls, and `C12862` sheds both ammines. Confirmed by protonating
 the connected SMILES directly. That is an engine behaviour change, recorded
 rather than worked around.
 
+### The InChI row, and 75 formula rows that still differ from 23.4
+
+The InChI row for these compounds is written from the **InChI-derived**
+molecule, so each column carries what its own representation can express —
+`CPD-18407` ships a connected 8-iron cluster in SMILE and the disconnected
+`InChI=1S/C.8Fe.6HS.3S/...` in InChI, exactly as 23.4 did.
+
+That form is **protonated, not passed through**. 23.4 protonated it uniformly;
+the protonation merely happened to be a no-op for 234 of the 493 while changing
+the other 259 — chlorophylls and cobalamins pick up a `/p-2` layer. Passing the
+source through scores better on a naive diff (60 differing rows instead of 75)
+but only by silently un-protonating those 259, so it is not done.
+
+The visible cost, stated rather than buried: Marvin 26.1 reads the detached
+`4Fe.4S` as four **free sulfide ions** and protonates them to H₂S at pH 7,
+where 23.4 left them alone. So ChEBI `33722` ships `Fe4S4` as `H8Fe4S4` and
+`136511` ships `MnO2` as `H4MnO2`. Both bundles are internally consistent —
+each formula matches its own structure — and the difference is entirely which
+protonation state the engine assigns to a ligand InChI has detached from its
+metal.
+
+Against the merged #295, **9,491 formula rows move**: 8,388 restore agreement
+with 23.4, 1,028 agree with neither, and **75 break agreement** (54
+metal-bearing). Those 75 are the same class as the 20.3% net-charge delta
+above — Marvin 26.1 protonating what 23.4 did not — confined here to detached
+metal ligands.
+
 ## One engine, and why not the CLI
 
 Every compound goes through the Java plugin, including the ones `cxcalc majorms`
