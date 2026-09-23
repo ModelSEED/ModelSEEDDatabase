@@ -74,6 +74,17 @@ sources:
           99.6% for the molblock), which is why ChargeMol.java read a
           mol file rather than a string. Row counts match 23.4 exactly
           in all four sources.
+
+          formula and charge are computed with
+          Print_Structure_Formula_Charge.parse_structure, imported by the
+          generator rather than reimplemented, so the columns are correct
+          as written and re-running that script over this file should be
+          a no-op on them. Do not substitute Marvin's own getFormula():
+          it omits wildcard atoms, and deferring the refresh instead of
+          importing the function is what dropped the R group from 8,704
+          rows in the first cut of this bundle. A SMILE structure
+          carrying `*` must carry an R in its formula; this file honours
+          that 8,727 times and violates it 0 times.
     pkas:
       - file:    pkas/marvin_23.4.tsv
         tool:    Marvin
@@ -137,6 +148,17 @@ sources:
           99.6% for the molblock), which is why ChargeMol.java read a
           mol file rather than a string. Row counts match 23.4 exactly
           in all four sources.
+
+          formula and charge are computed with
+          Print_Structure_Formula_Charge.parse_structure, imported by the
+          generator rather than reimplemented, so the columns are correct
+          as written and re-running that script over this file should be
+          a no-op on them. Do not substitute Marvin's own getFormula():
+          it omits wildcard atoms, and deferring the refresh instead of
+          importing the function is what dropped the R group from 8,704
+          rows in the first cut of this bundle. A SMILE structure
+          carrying `*` must carry an R in its formula; this file honours
+          that 8,727 times and violates it 0 times.
     pkas:
       - file:    pkas/marvin_23.4.tsv
         tool:    Marvin
@@ -186,6 +208,17 @@ sources:
           99.6% for the molblock), which is why ChargeMol.java read a
           mol file rather than a string. Row counts match 23.4 exactly
           in all four sources.
+
+          formula and charge are computed with
+          Print_Structure_Formula_Charge.parse_structure, imported by the
+          generator rather than reimplemented, so the columns are correct
+          as written and re-running that script over this file should be
+          a no-op on them. Do not substitute Marvin's own getFormula():
+          it omits wildcard atoms, and deferring the refresh instead of
+          importing the function is what dropped the R group from 8,704
+          rows in the first cut of this bundle. A SMILE structure
+          carrying `*` must carry an R in its formula; this file honours
+          that 8,727 times and violates it 0 times.
     pkas:
       - file:    pkas/marvin_23.4.tsv
         tool:    Marvin
@@ -250,6 +283,17 @@ sources:
           99.6% for the molblock), which is why ChargeMol.java read a
           mol file rather than a string. Row counts match 23.4 exactly
           in all four sources.
+
+          formula and charge are computed with
+          Print_Structure_Formula_Charge.parse_structure, imported by the
+          generator rather than reimplemented, so the columns are correct
+          as written and re-running that script over this file should be
+          a no-op on them. Do not substitute Marvin's own getFormula():
+          it omits wildcard atoms, and deferring the refresh instead of
+          importing the function is what dropped the R group from 8,704
+          rows in the first cut of this bundle. A SMILE structure
+          carrying `*` must carry an R in its formula; this file honours
+          that 8,727 times and violates it 0 times.
     pkas:
       - file:    pkas/marvin_23.4.tsv
         tool:    Marvin

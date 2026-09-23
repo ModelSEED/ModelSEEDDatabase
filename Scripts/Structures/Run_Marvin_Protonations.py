@@ -32,7 +32,7 @@ So this script runs (i), (ii), (iv), (v) and SKIPS (iii). The consequence is
 measurable and is not small. Across the 53,021 compounds both bundles cover,
 the net charge at pH 7 is unchanged for 79.7% and different for 20.3%, skewed
 toward deprotonation: 11.8% of compounds sit one charge unit lower under 26.1
-and 4.1% two or more lower, against 3.6% one higher and 0.7% two or more.
+and 4.3% two or more lower, against 3.6% one higher and 0.7% two or more.
 
 That 20.3% is an UPPER BOUND on the tautomer effect, not a measurement of it.
 It also contains the genuine 23.4 -> 26.1 engine improvement, which is already
@@ -52,6 +52,44 @@ of `inchi.tsv`, and InChI wins wherever it exists, because a charged SMILES is
 an already-deprotonated species and Marvin would be answering a different
 question than it does for the neutral InChI parent. Each compound is protonated
 exactly once, from its preferred representation.
+
+WITH ONE EXCEPTION, and it is not a small one. InChI DISCONNECTS METAL-LIGAND
+BONDS by design. Triphenyltin chloride is stored in smiles.tsv as the intact
+molecule `Cl[Sn](c1ccccc1)(c1ccccc1)c1ccccc1`, but its InChI is
+
+    InChI=1S/3C6H5.ClH.Sn/c3*1-2-4-6-5-3-1;;/h3*1-5H;1H;/q;;;;+1/p-1
+
+-- three phenyl radicals, HCl and a tin atom, as five separate components. Take
+InChI-first on that and Marvin is handed an already-shattered molecule; it
+protonates each piece on its own and the bundle ships
+`[Cl-].[SnH3+].[c]1ccccc1.[c]1ccccc1.[c]1ccccc1` where 23.4 shipped the intact
+structure. 487 compounds across the four sources have an InChI more fragmented
+than their SMILES -- cobalamins, Ni/Fe/Mg porphyrins, molybdenum cofactors,
+organotins -- and the first cut of this bundle shattered 461 of them.
+
+So the rule is InChI-first UNLESS the InChI is the more fragmented of the two,
+in which case the SMILES wins. Comparing fragment counts rather than screening
+for metals keeps this general: whatever the reason an InChI has taken a
+molecule apart, the representation that keeps it together is the better input.
+Counted as `smiles_preferred` in the per-source stats.
+
+For those same compounds the InChI ROW is built from the InChI-derived
+molecule rather than the SMILES-derived one (`inchi_from_inchi_form`), so each
+column carries what its own representation can express. It is PROTONATED, not
+passed through: 23.4 protonated this form uniformly, and the protonation merely
+happened to be a no-op for 234 of the 493 while changing the other 259 -- the
+chlorophylls and cobalamins pick up a /p-2 layer. Passing the source through
+would silently un-protonate those 259.
+
+The cost is visible and is recorded rather than hidden: Marvin 26.1 reads the
+detached `4Fe.4S` as four FREE sulfide ions and protonates them to H2S at pH 7,
+where 23.4 left them alone, so ChEBI 33722 ships Fe4S4 as H8Fe4S4 and 136511
+ships MnO2 as H4MnO2. That is the same class of engine change as the 20.3%
+net-charge delta above, confined to ligands InChI detached from their metal.
+
+Nothing in this is RDKit's doing, and swapping the importers would not help:
+Marvin reads the same disconnected InChI the same way. The loss happens in the
+InChI string itself, before any parser sees it.
 
 OUTPUT LAYOUT reproduces the 23.4 bundles exactly, which is one row per
 representation rather than one row per compound:
@@ -135,11 +173,40 @@ Everything else that the first attempt could not write -- query molecules
 broken by aromatize(), and InChIs like azide's that rebuild as radicals -- is
 recovered by the ladder rather than dropped. See protonate_best().
 
-FORMULA AND CHARGE are Marvin's own, read off the protonated molecule. Note
-that Print_Structure_Formula_Charge.py re-derives both columns with
-RDKit/OpenBabel and rewrites this file in place; that is the repository's
-convention and this script does not try to pre-empt it. The two agree on the
-spot checks in the report.
+FORMULA AND CHARGE come from Print_Structure_Formula_Charge.parse_structure --
+this repository's own function, imported rather than reimplemented, computed per
+ROW from that row's structure string.
+
+Do NOT substitute Marvin's getFormula() here. Marvin omits wildcard atoms from
+a formula; this repository renders them as R, in one line of that function:
+
+    formula = re.sub(r'\\*', 'R', formula)
+
+The first cut of this script wrote Marvin's formula and deferred the refresh to
+Print_Structure_Formula_Charge.py as a follow-up step. That was wrong, and it
+shipped: every one of the 8,704 rows that should carry an R group lost it,
+taking the count of SMILE rows whose formula contains R from 23.4's 8,704 down
+to zero. Stearoyl-ACPs went from
+C32H60N3O9PR2S to C32H60N3O9PS -- and downstream, `Update_Compound_Structures_
+Formulas_Charge.py` propagated that into 6,052 compound records, turning
+cpd00049 "carboxylic acid" from CHO2R into CHO2. A generic compound stopped
+being generic.
+
+The STRUCTURES were never affected -- 8,727 SMILE structures carry a `*` in
+both bundles, identically -- which is exactly why this was invisible in every
+coverage count and every InChI comparison. Only the formula column was wrong,
+and the cascade consumes that column directly, so the bundle has to be correct
+as written rather than correct after a second script runs.
+
+Marvin's getFormula() survives as the fallback for the handful of rows
+parse_structure cannot read, counted as `formula_from_marvin` in the per-source
+stats so it can never again be a silent substitution.
+
+When checking any of this, count R with HAS_R_GROUP (`R(?![a-z])`) and not a
+substring test for "R": Ru, Rb, Rh, Re and Rn all match the naive test and
+inflate the count by 8 across these bundles. The first report of this
+regression said 8,735 and 8,712 for that reason, which made it look as though
+eight rows had survived when in fact none had.
 
 REQUIRES. `pip install jpype1` and rdkit (already a dependency of
 Print_Structure_Formula_Charge.py), plus the Marvin jars -- found next to the
@@ -180,8 +247,28 @@ import os
 import re
 import shutil
 import subprocess
+import sys
 from csv import DictReader
 from datetime import date
+
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+sys.path.insert(0, os.path.join(
+    os.path.dirname(os.path.abspath(__file__)), "..", "..", "Libs", "Python"))
+# The formula/charge columns of this file belong to Print_Structure_Formula_Charge,
+# so they are computed with ITS function rather than a second implementation --
+# see FORMULA AND CHARGE.
+from Print_Structure_Formula_Charge import parse_structure    # noqa: E402
+from BiochemPy import Compounds                              # noqa: E402
+
+# What Marvin calls a wildcard atom, across the notations it accepts. `R#` is
+# the one that matters and the one easiest to miss: a molblock R atom -- which
+# is how RDKit writes every dummy atom, and therefore how EVERY structure
+# arrives here through the import bridge -- reads back as symbol "R#", not "R".
+# A set without it counts zero wildcards on a molecule that plainly has them.
+WILDCARD_SYMBOLS = {"*", "A", "R", "R#"}
+
+# An R group in a formula, not the R of Ru/Rb/Rh/Re/Rn.
+HAS_R_GROUP = re.compile(r"R(?![a-z])")
 
 TOOL = "Marvin"
 
@@ -266,6 +353,19 @@ class Protonator:
             if block:
                 return self.MolImporter.importMol(block)
         return self.MolImporter.importMol(struct)
+
+    def fragment_count(self, struct):
+        """Disconnected components RDKit sees in a structure string, or None.
+
+        Used to catch metal disconnection -- see INPUT SELECTION.
+        """
+        Chem = self._Chem
+        try:
+            mol = (Chem.MolFromInchi(struct) if struct.startswith("InChI=")
+                   else Chem.MolFromSmiles(struct))
+            return len(Chem.GetMolFrags(mol)) if mol is not None else None
+        except Exception:
+            return None
 
     def protonate(self, struct, aromatize=True):
         """Protonated Molecule for one structure string, or None if unusable."""
@@ -392,13 +492,45 @@ def process(source, version, ph, limit=0, cxcalc="cxcalc"):
     # Failure taxonomy, kept separate so "no result" is never reported as though
     # it were all failure -- the pKa run had to walk that conflation back once.
     stats = {"in": len(compounds), "ok": 0, "unparseable": 0,
-             "plugin_error": 0, "empty": 0, "nonstandard_inchi": 0}
+             "plugin_error": 0, "empty": 0, "nonstandard_inchi": 0,
+             "formula_from_marvin": 0, "wildcard_r_added": 0,
+             "smiles_preferred_disconnected_inchi": 0, "inchi_from_inchi_form": 0}
 
     for ext_id, smiles in compounds:
-        # InChI first, the compound's own SMILES as the fallback rung.
-        candidates = [inchi_by_id[ext_id], smiles] if ext_id in inchi_by_id else [smiles]
+        # InChI first, the compound's own SMILES as the fallback rung -- unless
+        # the InChI is the MORE fragmented of the two, which means it has
+        # disconnected something the SMILES keeps bonded. See INPUT SELECTION.
+        last_resort = []
+        disconnected = False
+        if ext_id in inchi_by_id:
+            inchi = inchi_by_id[ext_id]
+            f_inchi = prot.fragment_count(inchi)
+            f_smiles = prot.fragment_count(smiles)
+            # RDKit failing to read the SMILES is not evidence it is the worse
+            # input -- Marvin reads every one of these clusters fine. Treat an
+            # unknown SMILES count as "not more fragmented".
+            disconnected = (f_inchi is not None and f_inchi > 1
+                            and (f_smiles is None or f_smiles < f_inchi))
+            if disconnected:
+                # DEMOTE the InChI rather than just reordering. Sharing one
+                # ladder lets a writable-but-wrong rung beat a correct one: on
+                # KEGG C18384 the SMILES yields the right dative-bonded
+                # magnesium propionate, which Marvin's SMILES writer refuses,
+                # while the disconnected InChI yields `[Mg++].CCC([O-])=O.
+                # CCC([O-])=O` -- writable, and three fragments where 23.4 has
+                # one. The InChI stays only as a last resort, so it is reached
+                # when the SMILES gives NOTHING rather than when it merely
+                # needs the molblock rescue.
+                stats["smiles_preferred_disconnected_inchi"] += 1
+                candidates, last_resort = [smiles], [inchi]
+            else:
+                candidates = [inchi, smiles]
+        else:
+            candidates = [smiles]
         try:
             mol, smile_out = prot.protonate_best(candidates)
+            if (mol is None or not smile_out) and last_resort:
+                mol, smile_out = prot.protonate_best(last_resort)
         except Exception as exc:
             name = type(exc).__name__
             # A rejected structure and a plugin crash are different findings.
@@ -413,24 +545,98 @@ def process(source, version, ph, limit=0, cxcalc="cxcalc"):
             stats["empty"] += 1
             continue
 
-        formula = str(mol.getFormula())
-        charge = str(mol.getTotalCharge())
+        def columns(struct_type, structure):
+            """(formula, charge) for one row, the way this repository derives them.
+
+            Per ROW, not per compound, because refresh_file() recomputes each
+            row from its own structure string and the two representations can
+            disagree. Marvin's own getFormula() is the fallback only.
+            """
+            try:
+                f, c, _ = parse_structure(struct_type, structure)
+            except Exception:
+                f = c = None
+            if f is None:
+                # Neither RDKit nor OpenBabel could read it -- typically a
+                # deliberately invalid valence like ISOCITHASE-P's
+                # `*OP(=O)(=O)=O`. Marvin's formula is the only one available.
+                stats["formula_from_marvin"] += 1
+                f, c = str(mol.getFormula()), str(mol.getTotalCharge())
+
+            # INVARIANT: a structure carrying `*` gets an R in its formula.
+            # parse_structure implements that as re.sub(r'\\*', 'R', formula),
+            # which only works when RDKit produced the formula -- RDKit renders
+            # a dummy atom as `*`, OpenBabel and Marvin both omit it entirely.
+            # So on the OpenBabel path the substitution finds nothing to rewrite
+            # and the row ships a formula contradicting its own structure
+            # column. Enforcing the invariant here completes the convention; it
+            # does not re-derive the formula, and it is asserted over the whole
+            # bundle afterwards so it cannot regress silently again.
+            if not HAS_R_GROUP.search(f):
+                wildcards = sum(
+                    1 for i in range(mol.getAtomCount())
+                    if str(mol.getAtom(i).getSymbol()) in WILDCARD_SYMBOLS)
+                if wildcards:
+                    stats["wildcard_r_added"] += 1
+                    f = Compounds.mergeFormula(
+                        f + ("R" if wildcards == 1 else f"R{wildcards}"))[0]
+            return f, c
 
         stats["ok"] += 1
-        out_rows.append((ext_id, "SMILE", smile_out, formula, charge,
+        smile_formula, smile_charge = columns("SMILE", smile_out)
+        out_rows.append((ext_id, "SMILE", smile_out, smile_formula, smile_charge,
                          TOOL, version, ph_out, generated_on))
 
         # InChI and InChIKey only where the source carries an InChI: InChI
         # cannot represent the query molecules -- see OUTPUT LAYOUT.
         if ext_id in inchi_by_id:
-            inchi_out = prot.export(mol, Protonator.INCHI_FORMAT)
+            # The InChI row is written from the INCHI-derived molecule when the
+            # two representations disagree about connectivity, because each
+            # column should carry what its own representation can express --
+            # which is exactly what 23.4 did. For CPD-18407 it shipped a
+            # connected 8-iron cluster in SMILE and the disconnected
+            # `InChI=1S/C.8Fe.6HS.3S/...` in InChI.
+            #
+            # This is also load-bearing for stability, not just fidelity.
+            # Asking Marvin to write an InChI for a CONNECTED metal cluster
+            # aborts the JVM outright: `free(): double free detected in tcache
+            # 2` from InChINativeGenerateInChICall, a native fault no Python or
+            # Java handler can catch. Feeding the InChI writer the structure
+            # InChI can actually represent avoids the crash by construction.
+            # Protonate the INCHI-derived molecule for this row when the two
+            # representations disagree about connectivity. Each column then
+            # carries what its own representation can express, which is what
+            # 23.4 did -- CPD-18407 ships a connected 8-iron cluster in SMILE
+            # and the disconnected `InChI=1S/C.8Fe.6HS.3S/...` in InChI.
+            #
+            # Protonate it rather than passing the source through. 23.4
+            # protonated this form uniformly; the protonation merely happened
+            # to be a no-op for 234 of the 493, and was a real change for the
+            # other 259 (chlorophylls and cobalamins pick up a /p-2 layer).
+            # Passing the source through would silently un-protonate those 259.
+            #
+            # This is also load bearing for stability. Asking Marvin to write
+            # an InChI for a CONNECTED metal cluster aborts the JVM outright:
+            # `free(): double free detected in tcache 2` from
+            # InChINativeGenerateInChICall, a native fault no Python or Java
+            # handler can catch, and one a previous regeneration died on.
+            # Feeding the InChI writer the structure InChI can actually
+            # represent avoids the crash by construction.
+            inchi_source = mol
+            if disconnected:
+                stats["inchi_from_inchi_form"] += 1
+                inchi_source, _ = prot.protonate_best([inchi_by_id[ext_id]])
+            inchi_out = (prot.export(inchi_source, Protonator.INCHI_FORMAT)
+                         if inchi_source is not None else "")
             if inchi_out:
                 if not inchi_out.startswith("InChI=1S/"):
                     # Standard InChI only; a non-standard string would not be
                     # comparable with the rest of the column.
                     stats["nonstandard_inchi"] += 1
                 else:
-                    out_rows.append((ext_id, "InChI", inchi_out, formula, charge,
+                    inchi_formula, inchi_charge = columns("InChI", inchi_out)
+                    out_rows.append((ext_id, "InChI", inchi_out,
+                                     inchi_formula, inchi_charge,
                                      TOOL, version, ph_out, generated_on))
                     # Hash the string just written, never a second export -- see
                     # EXPORT for why Marvin's own inchikey disagrees with it.
@@ -451,7 +657,11 @@ def process(source, version, ph, limit=0, cxcalc="cxcalc"):
 
     print(f"{source:<8} in={stats['in']:<6} protonated={stats['ok']:<6} "
           f"unparseable={stats['unparseable']:<4} plugin_error={stats['plugin_error']:<4} "
-          f"empty={stats['empty']:<4} nonstandard_inchi={stats['nonstandard_inchi']}")
+          f"empty={stats['empty']:<4} nonstandard_inchi={stats['nonstandard_inchi']:<4} "
+          f"formula_from_marvin={stats['formula_from_marvin']:<4} "
+          f"wildcard_r_added={stats['wildcard_r_added']:<4} "
+          f"smiles_preferred={stats['smiles_preferred_disconnected_inchi']:<4} "
+          f"inchi_from_inchi_form={stats['inchi_from_inchi_form']}")
     print(f"{'':<8} rows={len(out_rows):<7} -> {os.path.relpath(out_path, STRUCT_ROOT)}")
     return out_path, stats
 
