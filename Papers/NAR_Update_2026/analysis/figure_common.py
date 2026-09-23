@@ -55,6 +55,13 @@ def _pka_provenance():
     and ModelSEED_Reaction_Energies.tsv. Both ship, so a reader can reproduce
     every percentage in the protonation paragraph.
 
+    COLOUR, 2026-09-22: "no ionizable site" was NEUTRAL grey, the same family
+    as "no structure", which merged a chemistry RESULT (Marvin ran and found no
+    dissociable proton between pH -2 and 16) with a curation GAP (there is no
+    structure to run on). Reviewer 1 asked for a different scheme for this
+    panel; the result now takes its own categorical slot and only the genuine
+    absence stays grey.
+
     REWRITTEN 2026-09-08 for the Marvin 26.1 rebuild. The split is no longer
     open-vs-proprietary -- every resolved ladder is ChemAxon-derived now -- but
     NEW-RUN vs CARRIED-OVER, which is the distinction that survived the change.
@@ -161,7 +168,7 @@ def _ladder_vintage():
     # earning a fourth colour. The release split is a sentence in the text.
     by_cpd = [("Marvin", cc["26.1 InChI"] + cc["23.4 InChI"], BLUE, ""),
               ("from SMILES", cc["26.1 SMILES"] + cc["23.4 SMILES"], BLUE, "xxx"),
-              ("no ionizable site", cc["no site"], NEUTRAL, ""),
+              ("no ionizable site", cc["no site"], ORANGE, ""),
               ("no structure", cc["no structure"], GRID, "")]
 
     rx = _c.Counter()
@@ -176,7 +183,7 @@ def _ladder_vintage():
             else: rx["none"] += 1
     by_rxn = [("Marvin", rx["inchi"], BLUE, ""),
               ("from SMILES", rx["smi"], BLUE, "xxx"),
-              ("no ionizable site", rx["none"], NEUTRAL, ""),
+              ("no ionizable site", rx["none"], ORANGE, ""),
               ("no structure", rx["inc"], GRID, "")]
     return by_cpd, by_rxn
 
@@ -259,35 +266,144 @@ def _reaction_sources():
     return [(s, tot[s], uniq[s], ucomp[s]) for s in PRIMARY]
 
 
+def _euler_regions():
+    """Figure 1B: the seven-region overlap of the three primary reaction sources.
+
+    The stacked unique/shared bar this replaces said that 67% of MetaCyc's
+    reactions are unique, but never said who the other 33% are shared WITH --
+    which is the question integrating Rhea actually raises. These are the
+    region counts an Euler diagram needs.
+
+    All records, obsolete included: that is the population the manuscript
+    counts everywhere else, and _reaction_sources() above applies no filter
+    either, so the two panels stay on one basis.
+    """
+    import csv as _csv, collections as _c, glob as _glob, json as _json
+    root = Path(__file__).resolve().parents[3]
+    ids = set()
+    for f in sorted(_glob.glob(str(root / "Biochemistry" / "reaction_[0-9][0-9].json"))):
+        for r in _json.load(open(f)):
+            ids.add(r["id"])
+    mem = _c.defaultdict(set)
+    with (root / "Biochemistry/Aliases/Unique_ModelSEED_Reaction_Aliases.txt").open() as fh:
+        rd = _csv.reader(fh, delimiter="\t"); next(rd)
+        for row in rd:
+            if len(row) >= 3 and row[2] in ("MetaCyc", "KEGG", "Rhea") and row[0] in ids:
+                mem[row[0]].add(row[2])
+    M = {i for i, v in mem.items() if "MetaCyc" in v}
+    K = {i for i, v in mem.items() if "KEGG" in v}
+    H = {i for i, v in mem.items() if "Rhea" in v}
+    return {"M": len(M - K - H), "K": len(K - M - H), "H": len(H - M - K),
+            "MK": len((M & K) - H), "MH": len((M & H) - K), "KH": len((K & H) - M),
+            "MKH": len(M & K & H), "none": len(ids - (M | K | H)),
+            "totals": {"MetaCyc": len(M), "KEGG": len(K), "Rhea": len(H)}}
+
+
+def _pathway_classes(top=8):
+    """Figure 1D: where the growth landed, at MetaCyc class level.
+
+    Reviewer 1 asked where new information is still being gained. The released
+    pathway alias file cannot answer it -- it stops at rxn48568, below the 2020
+    boundary, so every post-2020 reaction reads as unannotated. This rebuilds
+    the mapping from the shipped source table instead:
+
+        ModelSEED id -> MetaCyc reaction id   (Unique_ModelSEED_Reaction_Aliases)
+        MetaCyc reaction -> pathway -> parent (Scripts/Provenance/MetaCyc)
+
+    BOTH eras go through that same join, so the two bars are comparable. Reading
+    the pre-2020 side out of the alias file instead would compare a full
+    ancestor closure against a one-level parent lookup.
+
+    Super-Pathways is dropped: it is an organisational class, not a biological
+    one, and it would otherwise top the chart.
+    """
+    import csv as _csv, collections as _c, io as _io, subprocess as _sp
+    root = Path(__file__).resolve().parents[3]
+    C2020 = "fd6c7849891ef4bbeb6eac072f5a6f7adff05b0e"
+    DROP = {"Super-Pathways"}
+
+    old_ids = {r["id"] for r in _csv.DictReader(_io.StringIO(_sp.run(
+        ["git", "show", f"{C2020}:Biochemistry/reactions.tsv"], cwd=str(root),
+        capture_output=True, text=True, check=True).stdout), delimiter="\t")}
+
+    rx2pwy, parent, names = _c.defaultdict(set), {}, {}
+    with (root / "Scripts/Provenance/MetaCyc/MetaCyc_pathways.tsv").open() as fh:
+        for r in _csv.DictReader(fh, delimiter="\t"):
+            names[r["id"]] = r["name"] or r["id"]
+            parent[r["id"]] = [x for x in (r.get("parent") or "").split("|") if x]
+            for rx in (r["reactions"] or "").split("|"):
+                if rx:
+                    rx2pwy[rx].add(r["id"])
+
+    s2m = _c.defaultdict(set)
+    with (root / "Biochemistry/Aliases/Unique_ModelSEED_Reaction_Aliases.txt").open() as fh:
+        rd = _csv.reader(fh, delimiter="\t"); next(rd)
+        for row in rd:
+            if len(row) >= 3 and row[2] == "MetaCyc":
+                s2m[row[0]].add(row[1])
+
+    new_c, old_c = _c.Counter(), _c.Counter()
+    for sid, mcs in s2m.items():
+        cls = {p for mc in mcs for pwy in rx2pwy.get(mc, ()) for p in parent.get(pwy, [])}
+        cls -= DROP
+        for c in cls:
+            (old_c if sid in old_ids else new_c)[c] += 1
+    rows = [(names.get(c, c), n, old_c.get(c, 0)) for c, n in new_c.most_common(top)]
+    return rows
+
+
 def _silver_sigma_band():
     """Figure 2C shading: the sigma span of reactions graded SILVER, per source.
 
-    Reaction-level grade (best_grade in source_grades_wide.tsv) joined back to
-    each source's own reported sigma. Answers "what uncertainty does a silver
-    reaction actually carry?" -- and shows that the answer is only meaningful
-    for two of the three sources. eQuilibrator and dGPredictor separate their
-    tiers by sigma (medians 0.26/0.62/1.43 and 1.54/16.49/21.85 for
-    gold/silver/bronze); Group contribution does not (9.19/8.99/10.35), which is
-    the same flat-error-curve problem that stopped raw sigma being used to rank
-    sources in the first place. The band is p5-p95.
+    Answers "what uncertainty does a silver reaction actually carry?" -- and
+    shows that the answer is only meaningful for two of the three sources.
+    eQuilibrator and dGPredictor separate their tiers by sigma; Group
+    contribution does not, which is the same flat-error-curve problem that
+    stopped raw sigma being used to rank sources in the first place. The band
+    is p5-p95.
+
+    REWRITTEN to read only files that ship. It previously joined two
+    intermediates under results/thermo_grades/ -- source_grades_wide.tsv and
+    source_grades.tsv -- both of which are .gitignore'd (see
+    Biochemistry/Thermodynamics/SourceGrading/.gitignore line 12). Neither is
+    present in a clean checkout, so importing this module raised
+    FileNotFoundError and NO figure could be regenerated, this one included.
+    Regenerating them is not a way out either: grade_thermo_sources.py fails
+    under the pinned pandas.
+
+    The same two quantities are available from files that are committed:
+    best_grade from reaction_grades.tsv, and each source's reported sigma from
+    the released Biochemistry/reaction_*.json, which is where the published
+    uncertainty lives anyway. Same band, reproducible by a reader.
     """
-    import csv as _csv, collections as _c
+    import csv as _csv, collections as _c, glob as _glob, json as _json
     root = Path(__file__).resolve().parents[3]
-    g = root / "Biochemistry/Thermodynamics/SourceGrading/results/thermo_grades"
+    grades = root / ("Biochemistry/Thermodynamics/SourceGrading/results/"
+                     "thermo_grades/reaction_grades.tsv")
     best = {}
-    with (g / "source_grades_wide.tsv").open() as fh:
+    with grades.open() as fh:
         for x in _csv.DictReader(fh, delimiter="\t"):
-            if x["best_grade"]:
+            if x.get("best_grade"):
                 best[x["rxn"]] = x["best_grade"]
     sig = _c.defaultdict(list)
-    with (g / "source_grades.tsv").open() as fh:
-        for x in _csv.DictReader(fh, delimiter="\t"):
-            if x["source"] == "TECRDB" or best.get(x["rxn"]) != "SILVER":
+    for f in sorted(_glob.glob(str(root / "Biochemistry" / "reaction_[0-9][0-9].json"))):
+        for r in _json.load(open(f)):
+            if best.get(r["id"]) != "SILVER":
                 continue
-            try:
-                sig[x["source"]].append(abs(float(x["sigma"])))
-            except (TypeError, ValueError):
-                pass
+            for name, triple in (r.get("thermodynamics") or {}).items():
+                if name == "LLMs" or not triple or len(triple) < 2:
+                    continue
+                try:
+                    dg, sd = float(triple[0]), abs(float(triple[1]))
+                except (TypeError, ValueError):
+                    continue
+                # Sentinels, not error bars. Same exclusions the Results
+                # section documents: group contribution writes dg = 1e7 when
+                # it declines, and eQuilibrator writes sigma >= 2500 kcal/mol.
+                # Leaving them in put eQuilibrator's p95 at 23,901.
+                if dg >= 1e7 or sd >= 2500:
+                    continue
+                sig[name].append(sd)
     out = {}
     for k, v in sig.items():
         v.sort()

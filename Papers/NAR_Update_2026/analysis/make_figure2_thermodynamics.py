@@ -52,9 +52,22 @@ def figure2():
                        fontsize=6.0, color=fg, fontweight="bold", zorder=5, bbox=box)
             x += pct
         a.text(-AMAX * 0.015, row, label, ha="right", va="center", fontsize=7.0, color=INK)
-    a.set_xlim(0, AMAX); a.set_ylim(-0.62, 1.62); a.set_yticks([])
+    a.set_xlim(0, AMAX); a.set_ylim(-0.62, 2.42); a.set_yticks([])
     a.set_xticks([0, 20000, 40000, 56002]); a.set_xticklabels(["0", "20k", "40k", "56k"])
     strip(a)
+    # Four segments, two of them previously identified only in the caption.
+    # The key names all four; hatch is reproduced in its own swatch so the
+    # SMILES route is not left to be inferred from the fill.
+    from matplotlib.patches import Patch
+    a.legend(handles=[
+        Patch(facecolor=BLUE, edgecolor=FRAME, lw=0.45, label="Marvin"),
+        Patch(facecolor=BLUE, edgecolor=SURFACE, lw=0.45, hatch="xxx",
+              label="Marvin, from SMILES"),
+        Patch(facecolor=ORANGE, edgecolor=FRAME, lw=0.45, label="no ionizable site"),
+        Patch(facecolor=GRID, edgecolor=FRAME, lw=0.45, label="no structure")],
+        loc="upper left", frameon=False, fontsize=5.9, ncol=4, handlelength=1.1,
+        handleheight=0.85, handletextpad=0.4, columnspacing=0.9, borderpad=0.1,
+        borderaxespad=0.15, labelcolor=INK2)
     tag(a, "A")
 
     rows = NUMBERS["energy_rxn"]; tot = NUMBERS["energy_total"]
