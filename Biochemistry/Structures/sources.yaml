@@ -51,11 +51,31 @@ sources:
         tool:    Marvin
         version: "23.4"
         ph:      7
+        invariant_gate: |
+          22 rows were replaced by their unprotonated source row because the
+          protonated row broke the invariant a protonation must obey, dH == dcharge
+          with heavy atoms conserved (Scripts/Structures/Repair_Protonation_Rows.py,
+          2026-09-24), and the InChIKey rows of the replaced InChI rows re-hashed.
+          What each row was and now is: _reports/marvin_23.4_ph7_passthrough_KEGG.tsv.
+          24 InChI rows had their formula/charge re-derived from the string's own
+          /q and /p layers (Print_Structure_Formula_Charge.inchi_layers); the previous
+          values came from a parser that had failed the string.
       - file:    protonations/marvin_26.1_ph7.tsv
         tool:    Marvin
         version: "26.1"
         ph:      7
         generated_by: Scripts/Structures/Run_Marvin_Protonations.py
+        invariant_gate: |
+          34 rows were replaced by their unprotonated source row because the
+          protonated row broke the invariant a protonation must obey, dH == dcharge
+          with heavy atoms conserved (Scripts/Structures/Repair_Protonation_Rows.py,
+          2026-09-24), and the InChIKey rows of the replaced InChI rows re-hashed.
+          What each row was and now is: _reports/marvin_26.1_ph7_passthrough_KEGG.tsv.
+          31 InChI rows had their formula/charge re-derived from the string's own
+          /q and /p layers (Print_Structure_Formula_Charge.inchi_layers); the previous
+          values came from a parser that had failed the string.
+          Run_Marvin_Protonations.py now applies the same gate as it writes, so a
+          regeneration reproduces this file without the post-hoc repair.
         notes: |
           Major microspecies only. ChargeMol.java, which produced the
           23.4 bundle, took the dominant tautomer at pH 7 first; that
@@ -78,8 +98,10 @@ sources:
           formula and charge are computed with
           Print_Structure_Formula_Charge.parse_structure, imported by the
           generator rather than reimplemented, so the columns are correct
-          as written and re-running that script over this file should be
-          a no-op on them. Do not substitute Marvin's own getFormula():
+          as written. Re-running that script over this file is a no-op on
+          the SMILE rows; on InChI rows it is not, because parse_structure
+          now reads formula and charge from the InChI's own layers (see
+          invariant_gate above for how many moved). Do not substitute Marvin's own getFormula():
           it omits wildcard atoms, and deferring the refresh instead of
           importing the function is what dropped the R group from 8,704
           rows in the first cut of this bundle. A SMILE structure
@@ -125,11 +147,31 @@ sources:
         tool:    Marvin
         version: "23.4"
         ph:      7
+        invariant_gate: |
+          13 rows were replaced by their unprotonated source row because the
+          protonated row broke the invariant a protonation must obey, dH == dcharge
+          with heavy atoms conserved (Scripts/Structures/Repair_Protonation_Rows.py,
+          2026-09-24), and the InChIKey rows of the replaced InChI rows re-hashed.
+          What each row was and now is: _reports/marvin_23.4_ph7_passthrough_MetaCyc.tsv.
+          54 InChI rows had their formula/charge re-derived from the string's own
+          /q and /p layers (Print_Structure_Formula_Charge.inchi_layers); the previous
+          values came from a parser that had failed the string.
       - file:    protonations/marvin_26.1_ph7.tsv
         tool:    Marvin
         version: "26.1"
         ph:      7
         generated_by: Scripts/Structures/Run_Marvin_Protonations.py
+        invariant_gate: |
+          77 rows were replaced by their unprotonated source row because the
+          protonated row broke the invariant a protonation must obey, dH == dcharge
+          with heavy atoms conserved (Scripts/Structures/Repair_Protonation_Rows.py,
+          2026-09-24), and the InChIKey rows of the replaced InChI rows re-hashed.
+          What each row was and now is: _reports/marvin_26.1_ph7_passthrough_MetaCyc.tsv.
+          35 InChI rows had their formula/charge re-derived from the string's own
+          /q and /p layers (Print_Structure_Formula_Charge.inchi_layers); the previous
+          values came from a parser that had failed the string.
+          Run_Marvin_Protonations.py now applies the same gate as it writes, so a
+          regeneration reproduces this file without the post-hoc repair.
         notes: |
           Major microspecies only. ChargeMol.java, which produced the
           23.4 bundle, took the dominant tautomer at pH 7 first; that
@@ -152,8 +194,10 @@ sources:
           formula and charge are computed with
           Print_Structure_Formula_Charge.parse_structure, imported by the
           generator rather than reimplemented, so the columns are correct
-          as written and re-running that script over this file should be
-          a no-op on them. Do not substitute Marvin's own getFormula():
+          as written. Re-running that script over this file is a no-op on
+          the SMILE rows; on InChI rows it is not, because parse_structure
+          now reads formula and charge from the InChI's own layers (see
+          invariant_gate above for how many moved). Do not substitute Marvin's own getFormula():
           it omits wildcard atoms, and deferring the refresh instead of
           importing the function is what dropped the R group from 8,704
           rows in the first cut of this bundle. A SMILE structure
@@ -185,11 +229,31 @@ sources:
         tool:    Marvin
         version: "23.4"
         ph:      7
+        invariant_gate: |
+          3 rows were replaced by their unprotonated source row because the
+          protonated row broke the invariant a protonation must obey, dH == dcharge
+          with heavy atoms conserved (Scripts/Structures/Repair_Protonation_Rows.py,
+          2026-09-24), and the InChIKey rows of the replaced InChI rows re-hashed.
+          What each row was and now is: _reports/marvin_23.4_ph7_passthrough_ChEBI.tsv.
+          41 InChI rows had their formula/charge re-derived from the string's own
+          /q and /p layers (Print_Structure_Formula_Charge.inchi_layers); the previous
+          values came from a parser that had failed the string.
       - file:    protonations/marvin_26.1_ph7.tsv
         tool:    Marvin
         version: "26.1"
         ph:      7
         generated_by: Scripts/Structures/Run_Marvin_Protonations.py
+        invariant_gate: |
+          19 rows were replaced by their unprotonated source row because the
+          protonated row broke the invariant a protonation must obey, dH == dcharge
+          with heavy atoms conserved (Scripts/Structures/Repair_Protonation_Rows.py,
+          2026-09-24), and the InChIKey rows of the replaced InChI rows re-hashed.
+          What each row was and now is: _reports/marvin_26.1_ph7_passthrough_ChEBI.tsv.
+          17 InChI rows had their formula/charge re-derived from the string's own
+          /q and /p layers (Print_Structure_Formula_Charge.inchi_layers); the previous
+          values came from a parser that had failed the string.
+          Run_Marvin_Protonations.py now applies the same gate as it writes, so a
+          regeneration reproduces this file without the post-hoc repair.
         notes: |
           Major microspecies only. ChargeMol.java, which produced the
           23.4 bundle, took the dominant tautomer at pH 7 first; that
@@ -212,8 +276,10 @@ sources:
           formula and charge are computed with
           Print_Structure_Formula_Charge.parse_structure, imported by the
           generator rather than reimplemented, so the columns are correct
-          as written and re-running that script over this file should be
-          a no-op on them. Do not substitute Marvin's own getFormula():
+          as written. Re-running that script over this file is a no-op on
+          the SMILE rows; on InChI rows it is not, because parse_structure
+          now reads formula and charge from the InChI's own layers (see
+          invariant_gate above for how many moved). Do not substitute Marvin's own getFormula():
           it omits wildcard atoms, and deferring the refresh instead of
           importing the function is what dropped the R group from 8,704
           rows in the first cut of this bundle. A SMILE structure
@@ -260,11 +326,17 @@ sources:
         tool:    Marvin
         version: "23.4"
         ph:      7
+        invariant_gate: |
+          0 rows broke the protonation invariant dH == dcharge (Validate_Protonations.py).
       - file:    protonations/marvin_26.1_ph7.tsv
         tool:    Marvin
         version: "26.1"
         ph:      7
         generated_by: Scripts/Structures/Run_Marvin_Protonations.py
+        invariant_gate: |
+          0 rows broke the protonation invariant dH == dcharge (Validate_Protonations.py).
+          Run_Marvin_Protonations.py now applies the same gate as it writes, so a
+          regeneration reproduces this file without the post-hoc repair.
         notes: |
           Major microspecies only. ChargeMol.java, which produced the
           23.4 bundle, took the dominant tautomer at pH 7 first; that
@@ -287,8 +359,10 @@ sources:
           formula and charge are computed with
           Print_Structure_Formula_Charge.parse_structure, imported by the
           generator rather than reimplemented, so the columns are correct
-          as written and re-running that script over this file should be
-          a no-op on them. Do not substitute Marvin's own getFormula():
+          as written. Re-running that script over this file is a no-op on
+          the SMILE rows; on InChI rows it is not, because parse_structure
+          now reads formula and charge from the InChI's own layers (see
+          invariant_gate above for how many moved). Do not substitute Marvin's own getFormula():
           it omits wildcard atoms, and deferring the refresh instead of
           importing the function is what dropped the R group from 8,704
           rows in the first cut of this bundle. A SMILE structure

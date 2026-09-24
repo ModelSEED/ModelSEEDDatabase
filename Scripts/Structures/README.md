@@ -15,6 +15,32 @@ do to get these working on a new mac below.
 
 EDIT: As of 09/15/22 we used RDKit 2022.03.5 and OpenBabel 3.1.1
 EDIT: This the same as of 01/23/24
+EDIT 2026-09-24: InChI rows no longer depend on either parser. A
+standard InChI declares its formula, /p and /q layers, and
+`parse_structure` reads those directly (`inchi_layers`); RDKit and
+OpenBabel remain for SMILES and as the fallback for a non-standard
+InChI. `--types InChI` or `--types SMILE` scopes a refresh to one
+representation. Two bugs fixed the same day: the script had never
+refreshed `inchi.tsv`/`smiles.tsv` (it looked for a `structure`
+column they do not have), and the OpenBabel path stripped the R
+group from wildcard SMILES.
+
+* `Validate_Protonations.py`
+* `Repair_Protonation_Rows.py`
+
+A protonation moves protons, so a protonated row must satisfy
+`dH == dcharge` against its source with heavy atoms conserved. The
+first script checks every row of a protonation bundle against that
+(and the bundle's two representations against each other, the source
+files against each other, and each `inchi.tsv` row against its own
+InChI layers); `--fail-on-violation` makes it a CI gate, with an
+allowlist at `Biochemistry/Curation/exclusions/protonation_invariant_excluded.tsv`.
+The second applies the fix: a row that fails is replaced by its
+unprotonated source row (and a replaced InChI row's InChIKey row is
+re-hashed from it), and every replacement is recorded in
+`Biochemistry/Structures/_reports/<bundle>_passthrough_<source>.tsv`.
+`Run_Marvin_Protonations.py` applies the same rule as it writes.
+`Scripts/Tests/test_protonation_invariant.py` holds all of it.
 
 * `List_ModelSEED_Structures.py` 
 

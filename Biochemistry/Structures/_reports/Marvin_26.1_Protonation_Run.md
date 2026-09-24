@@ -301,6 +301,76 @@ metal-bearing). Those 75 are the same class as the 20.3% net-charge delta
 above — Marvin 26.1 protonating what 23.4 did not — confined here to detached
 metal ligands.
 
+## Rows that are not protonations, and the gate that removes them
+
+The "visible cost" above was stated as a difference in protonation state. It is
+not one. A protonation moves protons, so between a source structure and its
+pH-adjusted form **dH must equal dcharge and no other element may change**.
+`Fe4S4 -> H8Fe4S4` gains eight hydrogens with no change in charge; that is not
+a protonation state, and neither is `S -> H2S` (elemental sulfur), `Se -> H2Se`,
+`P -> PH3` or `MnO2 -> H4MnO2`. Run through the structure picker, this bundle
+would have shipped **69 impossible formulas** into the compound records --
+26 "hydrogens gained, no charge change", 11 "charge changed, no hydrogen
+change", 32 mixed -- 6 of them in the v7.0 template scope.
+
+`Scripts/Structures/Validate_Protonations.py` checks every row against that
+invariant; it is representation-agnostic and needs no list of metals.
+
+| bundle | rows that break it | compounds | of which SMILE row clean |
+|---|---:|---:|---:|
+| 23.4 | 42 | 22 | 10 |
+| 26.1 as first written | 139 | 96 | 113 |
+| 26.1 after the layer refresh below | 130 | | |
+
+Preferring the SMILE row fixes most but not all: for the iron–sulfur cubanes
+MetaCyc's own SMILES writes `[SH]` on the bridging sulfides, so `smiles.tsv`
+says `H4Fe4S4` where `inchi.tsv` says `Fe4S4`. That is a source-level
+disagreement (39 compounds; `Validate_Protonations.py`'s `source` check) and
+belongs to curation.
+
+**The rule applied instead: a row that fails the invariant is replaced by its
+own source row, unprotonated.** The protonation state of a shattered fragment
+set is undefined; the source is at least a self-consistent description. The
+rule only touches rows the invariant rejects, so the 297 disconnected-InChI
+compounds Marvin *legitimately* protonates -- the chlorophylls and cobalamins
+picking up `/p-2`, which "protonate rather than pass through" above exists to
+protect -- are untouched by construction. `Repair_Protonation_Rows.py` applied
+it after the fact (130 rows here, 38 in 23.4, plus the InChIKey row of every
+compound whose InChI row was replaced, re-hashed from the InChI now written --
+the first version of the script left those keys hashed from the discarded
+protonated string, and elemental sulfur came out keyed as hydrosulfide; every
+replaced row is listed in `_reports/marvin_<ver>_ph7_passthrough_<source>.tsv`),
+and
+`Run_Marvin_Protonations.py` now applies it as each row is written, with
+`passthrough_invariant` in the per-source stats and the InChIKey hashed from
+whichever InChI is actually written. Smoke-tested on the first 100 KEGG
+compounds: elemental sulfur (`C00087`) passes through in both rows.
+
+Rerunning the picker on the repaired bundle: the 69 impossible shipped
+changes become **0**, the 6,857 legitimate 26.1 protonation-state changes are
+untouched, and 14 previously shipped formulas that were already impossible
+against their source are corrected (elemental Se had been shipping as HSe⁻,
+phosphorus as PH₃, heptamolybdate as +12 where its InChI declares −6).
+
+### A second defect, in the parser rather than the engine
+
+Checking stored charges against what the InChI string itself declares found
+58 `inchi.tsv` rows that disagree with their own `/q` and `/p` layers. Two
+mechanisms: RDKit rejects hypervalent halogen oxides (chlorate,
+`InChI=1S/ClO3/c2-1(3)4/q-1`), the OpenBabel fallback warns "Charge(s): Do not
+match" and returns 0 -- nine anions stored as neutral radicals; and on
+multi-component strings with both `/q` and `/p` (the Mg porphyrins) RDKit
+keeps the pre-`/p` hydrogen count, so 49 rows stored one H and one charge unit
+too many. `parse_structure` now derives a standard InChI's formula and charge
+from its layers -- deterministic, and independent of parser version -- and the
+same fix moved 83 InChI rows in this bundle and 119 in 23.4. The stale values
+had propagated into every bundle refreshed through that function.
+
+While here: `Print_Structure_Formula_Charge.py` had never refreshed
+`inchi.tsv` or `smiles.tsv` at all since the layout migration -- it looked for
+a `structure` column the source files do not have -- and its OpenBabel path
+stripped the R group the run script had put on 8 wildcard rows. Both fixed.
+
 ## One engine, and why not the CLI
 
 Every compound goes through the Java plugin, including the ones `cxcalc majorms`
@@ -376,11 +446,13 @@ there is nothing left to permute.
 
 - Compound records are unchanged. `Update_Compound_Structures_Formulas_Charge.py`
   is the step that rewrites them.
-- `Print_Structure_Formula_Charge.py` has not been re-run over these files as a
-  whole — but it no longer needs to be for the formula and charge columns, which
-  are computed with its own `parse_structure` as the bundle is written. Running
-  it should be a no-op on those two columns; it was treating it as a deferred
-  follow-up that produced the R-group regression above.
+- `Print_Structure_Formula_Charge.py --types InChI` *has* now been re-run over
+  these files, and was not a no-op on the InChI rows: see "A second defect, in
+  the parser rather than the engine" above. A full refresh (SMILE rows too)
+  is left for a separate change; it fills 109 previously empty 23.4 rows the
+  current parsers can read, and, with the R-group fix, no longer strips R.
+  `_reports/Resolved_Structures.txt` and `Unresolved_Structures.txt` are from
+  an older version of that script and will be rewritten by it.
   Pyruvate (`C00022`) is representative: identical InChI
   (`InChI=1S/C3H4O3/...../p-1`), identical InChIKey
   (`LCTONWCANYUPML-UHFFFAOYSA-M`), identical formula and charge (`C3H3O3`, −1).
