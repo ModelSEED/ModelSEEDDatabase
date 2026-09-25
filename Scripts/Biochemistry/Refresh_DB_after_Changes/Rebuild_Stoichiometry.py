@@ -24,11 +24,27 @@ for rxn in reactions_dict:
 		continue
 	
 	for rgt in reactions_dict[rxn]['stoichiometry']:
-		if(rgt['formula'] != compounds_dict[rgt['compound']]['formula']):
-			print("Updating formula in stoichiometry for",rxn,"from",rgt['formula'],"to",compounds_dict[rgt['compound']]['formula'])
-			rgt['formula'] = compounds_dict[rgt['compound']]['formula']
-			if(rxn not in updated_reactions_list):
-				updated_reactions_list.append(rxn)
+		cpd = compounds_dict[rgt['compound']]
+		# Formula AND charge. This script refreshed only the formula, so a
+		# compound whose protonation state changed left its old charge behind
+		# in every reaction's stoichiometry; balanceReaction() reads that
+		# embedded pair, saw a phantom hydrogen imbalance with no charge
+		# imbalance, and Adjust_Reaction_Protons.py "fixed" it by adding a
+		# proton -- manufacturing a real charge imbalance on 5,935 reactions
+		# that were balanced against the records (OK -> CI:1), and rewriting
+		# proton coefficients on 17,457. It never showed before because no
+		# earlier refresh recharged 7,500 compounds at once.
+		changed = False
+		if(rgt['formula'] != cpd['formula']):
+			print("Updating formula in stoichiometry for",rxn,"from",rgt['formula'],"to",cpd['formula'])
+			rgt['formula'] = cpd['formula']
+			changed = True
+		if(rgt.get('charge') != cpd['charge']):
+			print("Updating charge in stoichiometry for",rxn,"from",rgt.get('charge'),"to",cpd['charge'])
+			rgt['charge'] = cpd['charge']
+			changed = True
+		if(changed and rxn not in updated_reactions_list):
+			updated_reactions_list.append(rxn)
 
 if(len(updated_reactions_list)>0):
     print("Saving rebuilt stoichiometries for "+str(len(updated_reactions_list))+" reactions")

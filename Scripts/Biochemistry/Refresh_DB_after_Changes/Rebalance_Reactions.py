@@ -8,8 +8,16 @@ if __name__ == "__main__":
     _p = _argparse.ArgumentParser(
         description=__doc__,
         formatter_class=_argparse.RawDescriptionHelpFormatter)
-    _p.add_argument("verbose", nargs="?", choices=("verbose",),
-                    help="print per-reaction detail")
+    # The body reads three flags out of argv -- "save" (write the new status
+    # back; a dry run otherwise), "print" (per-reaction charge detail) and
+    # "verbose" -- but the guard admitted only "verbose", so the documented
+    # `Rebalance_Reactions.py save` in Refresh_Reactions.sh was rejected with
+    # "invalid choice: 'save'" and the rebalance step of the refresh sequence
+    # silently never ran. Admit what the body actually consumes.
+    _p.add_argument("flags", nargs="*", choices=("verbose", "save", "print"),
+                    help="save: write the recomputed status back (dry run "
+                         "otherwise); print: per-reaction charge detail; "
+                         "verbose: per-reaction detail")
     _p.parse_args()
 
 
