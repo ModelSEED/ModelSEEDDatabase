@@ -15319,10 +15319,10 @@
         ],
         "code": "(1) cpd00017[0] + (1) cpd17535[0] <=> (1) cpd00019[0] + (1) cpd41433[0]",
         "compound_ids": "cpd00017;cpd00019;cpd00067;cpd17535;cpd41433",
-        "definition": "(1) S-Adenosyl-L-methionine[0] + (3) H+[0] + (1) Cobalt-factor III[0] <=> (1) S-Adenosyl-homocysteine[0] + (1) Co(II)-factor IV[0]",
+        "definition": "(1) S-Adenosyl-L-methionine[0] + (1) H+[0] + (1) Cobalt-factor III[0] <=> (1) S-Adenosyl-homocysteine[0] + (1) Co(II)-factor IV[0]",
         "direction": "=",
         "ec_numbers": null,
-        "equation": "(1) cpd00017[0] + (3) cpd00067[0] + (1) cpd17535[0] <=> (1) cpd00019[0] + (1) cpd41433[0]",
+        "equation": "(1) cpd00017[0] + (1) cpd00067[0] + (1) cpd17535[0] <=> (1) cpd00019[0] + (1) cpd41433[0]",
         "id": "rxn52166",
         "is_obsolete": 0,
         "is_transport": 0,
@@ -15347,7 +15347,7 @@
             },
             {
                 "charge": 1,
-                "coefficient": -3,
+                "coefficient": -1,
                 "compartment": 0,
                 "compound": "cpd00067",
                 "formula": "H",
@@ -15370,11 +15370,11 @@
                 "name": "S-Adenosyl-homocysteine"
             },
             {
-                "charge": -4,
+                "charge": -6,
                 "coefficient": 1,
                 "compartment": 0,
                 "compound": "cpd41433",
-                "formula": "C44H44CoN4O16",
+                "formula": "C44H42CoN4O16",
                 "name": "Co(II)-factor IV"
             }
         ],
@@ -61989,17 +61989,18 @@
         ],
         "code": "(1) cpd00003[0] + (1) cpd41707[0] <=> (1) cpd00004[0] + (1) cpd41709[0]",
         "compound_ids": "cpd00003;cpd00004;cpd00067;cpd41707;cpd41709",
-        "definition": "(1) NAD[0] + (1) 3-devinyl-3-(1-hydroxyethyl)chlorophyllide a[0] <=> (1) NADH[0] + (1) H+[0] + (1) 3-acetyl-3-devinylchlorophyllide a[0]",
+        "definition": "(1) NAD[0] + (1) 3-devinyl-3-(1-hydroxyethyl)chlorophyllide a[0] <=> (1) NADH[0] + (2) H+[0] + (1) 3-acetyl-3-devinylchlorophyllide a[0]",
         "direction": "=",
         "ec_numbers": null,
-        "equation": "(1) cpd00003[0] + (1) cpd41707[0] <=> (1) cpd00004[0] + (1) cpd00067[0] + (1) cpd41709[0]",
+        "equation": "(1) cpd00003[0] + (1) cpd41707[0] <=> (1) cpd00004[0] + (2) cpd00067[0] + (1) cpd41709[0]",
         "id": "rxn52686",
         "is_obsolete": 0,
         "is_transport": 0,
         "linked_reaction": null,
         "name": "48764",
         "notes": [
-            "EQP"
+            "EQP",
+            "HB"
         ],
         "pathways": null,
         "reversibility": "?",
@@ -62015,11 +62016,11 @@
                 "name": "NAD"
             },
             {
-                "charge": 1,
+                "charge": -1,
                 "coefficient": -1,
                 "compartment": 0,
                 "compound": "cpd41707",
-                "formula": "C35H37MgN4O6",
+                "formula": "C35H35MgN4O6",
                 "name": "3-devinyl-3-(1-hydroxyethyl)chlorophyllide a"
             },
             {
@@ -62032,18 +62033,18 @@
             },
             {
                 "charge": 1,
-                "coefficient": 1,
+                "coefficient": 2,
                 "compartment": 0,
                 "compound": "cpd00067",
                 "formula": "H",
                 "name": "H+"
             },
             {
-                "charge": 2,
+                "charge": -1,
                 "coefficient": 1,
                 "compartment": 0,
                 "compound": "cpd41709",
-                "formula": "C35H36MgN4O6",
+                "formula": "C35H33MgN4O6",
                 "name": "3-acetyl-3-devinylchlorophyllide a"
             }
         ],
@@ -62078,11 +62079,11 @@
             "Rhea: 48772; 48773; 48774; 48775"
         ],
         "code": "(1) cpd41706[0] <=> (1) cpd00001[0] + (1) cpd41198[0]",
-        "compound_ids": "cpd00001;cpd00067;cpd41198;cpd41706",
-        "definition": "(1) H+[0] + (1) 3-deacetyl-3-(1-hydroxyethyl)bacteriochlorophyllide a[0] => (1) H2O[0] + (1) 3-deacetyl-3-vinylbacteriochlorophyllide a[0]",
+        "compound_ids": "cpd00001;cpd41198;cpd41706",
+        "definition": "(1) 3-deacetyl-3-(1-hydroxyethyl)bacteriochlorophyllide a[0] => (1) H2O[0] + (1) 3-deacetyl-3-vinylbacteriochlorophyllide a[0]",
         "direction": "=",
         "ec_numbers": null,
-        "equation": "(1) cpd00067[0] + (1) cpd41706[0] => (1) cpd00001[0] + (1) cpd41198[0]",
+        "equation": "(1) cpd41706[0] => (1) cpd00001[0] + (1) cpd41198[0]",
         "id": "rxn52687",
         "is_obsolete": 0,
         "is_transport": 0,
@@ -62098,19 +62099,11 @@
         "status": "OK",
         "stoichiometry": [
             {
-                "charge": 1,
-                "coefficient": -1,
-                "compartment": 0,
-                "compound": "cpd00067",
-                "formula": "H",
-                "name": "H+"
-            },
-            {
-                "charge": 1,
+                "charge": -1,
                 "coefficient": -1,
                 "compartment": 0,
                 "compound": "cpd41706",
-                "formula": "C35H39MgN4O6",
+                "formula": "C35H37MgN4O6",
                 "name": "3-deacetyl-3-(1-hydroxyethyl)bacteriochlorophyllide a"
             },
             {
@@ -62122,11 +62115,11 @@
                 "name": "H2O"
             },
             {
-                "charge": 2,
+                "charge": -1,
                 "coefficient": 1,
                 "compartment": 0,
                 "compound": "cpd41198",
-                "formula": "C35H38MgN4O5",
+                "formula": "C35H35MgN4O5",
                 "name": "3-deacetyl-3-vinylbacteriochlorophyllide a"
             }
         ],
@@ -63997,11 +63990,11 @@
                 "name": "NADP"
             },
             {
-                "charge": 2,
+                "charge": -1,
                 "coefficient": -1,
                 "compartment": 0,
                 "compound": "cpd41193",
-                "formula": "C35H34MgN4O5",
+                "formula": "C35H31MgN4O5",
                 "name": "protochlorophyllide a"
             },
             {
@@ -64021,11 +64014,11 @@
                 "name": "H+"
             },
             {
-                "charge": 2,
+                "charge": -1,
                 "coefficient": 1,
                 "compartment": 0,
                 "compound": "cpd40033",
-                "formula": "C35H32MgN4O5",
+                "formula": "C35H29MgN4O5",
                 "name": "3,8-divinyl protochlorophyllide a"
             }
         ],
@@ -64286,11 +64279,11 @@
         "status": "CPDFORMERROR",
         "stoichiometry": [
             {
-                "charge": 2,
+                "charge": -1,
                 "coefficient": -1,
                 "compartment": 0,
                 "compound": "cpd41193",
-                "formula": "C35H34MgN4O5",
+                "formula": "C35H31MgN4O5",
                 "name": "protochlorophyllide a"
             },
             {
@@ -64310,11 +64303,11 @@
                 "name": "H+"
             },
             {
-                "charge": 2,
+                "charge": -1,
                 "coefficient": 1,
                 "compartment": 0,
                 "compound": "cpd40033",
-                "formula": "C35H32MgN4O5",
+                "formula": "C35H29MgN4O5",
                 "name": "3,8-divinyl protochlorophyllide a"
             },
             {
@@ -64360,11 +64353,11 @@
         "status": "CPDFORMERROR",
         "stoichiometry": [
             {
-                "charge": 2,
+                "charge": -1,
                 "coefficient": -1,
                 "compartment": 0,
                 "compound": "cpd41191",
-                "formula": "C35H36MgN4O5",
+                "formula": "C35H33MgN4O5",
                 "name": "chlorophyllide a"
             },
             {
@@ -64384,11 +64377,11 @@
                 "name": "H+"
             },
             {
-                "charge": 2,
+                "charge": -1,
                 "coefficient": 1,
                 "compartment": 0,
                 "compound": "cpd41192",
-                "formula": "C35H34MgN4O5",
+                "formula": "C35H31MgN4O5",
                 "name": "3,8-divinyl chlorophyllide a"
             },
             {
@@ -64742,11 +64735,11 @@
                 "name": "Phosphate"
             },
             {
-                "charge": 2,
+                "charge": -1,
                 "coefficient": -1,
                 "compartment": 0,
                 "compound": "cpd41730",
-                "formula": "C35H36MgN4O5",
+                "formula": "C35H33MgN4O5",
                 "name": "bacteriochlorophyllide g"
             },
             {
@@ -64782,11 +64775,11 @@
                 "name": "H+"
             },
             {
-                "charge": 2,
+                "charge": -1,
                 "coefficient": 1,
                 "compartment": 0,
                 "compound": "cpd41192",
-                "formula": "C35H34MgN4O5",
+                "formula": "C35H31MgN4O5",
                 "name": "3,8-divinyl chlorophyllide a"
             },
             {
@@ -65209,11 +65202,11 @@
                 "name": "Phosphate"
             },
             {
-                "charge": 2,
+                "charge": -1,
                 "coefficient": -1,
                 "compartment": 0,
                 "compound": "cpd41710",
-                "formula": "C35H38MgN4O6",
+                "formula": "C35H35MgN4O6",
                 "name": "bacteriochlorophyllide a"
             },
             {
@@ -65249,11 +65242,11 @@
                 "name": "H+"
             },
             {
-                "charge": 2,
+                "charge": -1,
                 "coefficient": 1,
                 "compartment": 0,
                 "compound": "cpd41709",
-                "formula": "C35H36MgN4O6",
+                "formula": "C35H33MgN4O6",
                 "name": "3-acetyl-3-devinylchlorophyllide a"
             },
             {
@@ -65315,11 +65308,11 @@
                 "name": "Phosphate"
             },
             {
-                "charge": 1,
+                "charge": -1,
                 "coefficient": -1,
                 "compartment": 0,
                 "compound": "cpd41706",
-                "formula": "C35H39MgN4O6",
+                "formula": "C35H37MgN4O6",
                 "name": "3-deacetyl-3-(1-hydroxyethyl)bacteriochlorophyllide a"
             },
             {
@@ -65355,11 +65348,11 @@
                 "name": "H+"
             },
             {
-                "charge": 1,
+                "charge": -1,
                 "coefficient": 1,
                 "compartment": 0,
                 "compound": "cpd41707",
-                "formula": "C35H37MgN4O6",
+                "formula": "C35H35MgN4O6",
                 "name": "3-devinyl-3-(1-hydroxyethyl)chlorophyllide a"
             },
             {
@@ -67854,10 +67847,10 @@
         ],
         "code": "(1) cpd00001[0] + (3) cpd00017[0] + (1) cpd40089[0] <=> (3) cpd00060[0] + (3) cpd03091[0] + (1) cpd40033[0]",
         "compound_ids": "cpd00001;cpd00017;cpd00060;cpd00067;cpd03091;cpd40033;cpd40089",
-        "definition": "(1) H2O[0] + (3) S-Adenosyl-L-methionine[0] + (1) Mg-protoporphyrin IX 13-monomethyl ester[0] <=> (3) L-Methionine[0] + (2) H+[0] + (3) 5'-Deoxyadenosine[0] + (1) 3,8-divinyl protochlorophyllide a[0]",
+        "definition": "(1) H2O[0] + (3) S-Adenosyl-L-methionine[0] + (1) Mg-protoporphyrin IX 13-monomethyl ester[0] <=> (3) L-Methionine[0] + (3) H+[0] + (3) 5'-Deoxyadenosine[0] + (1) 3,8-divinyl protochlorophyllide a[0]",
         "direction": "=",
         "ec_numbers": null,
-        "equation": "(1) cpd00001[0] + (3) cpd00017[0] + (1) cpd40089[0] <=> (3) cpd00060[0] + (2) cpd00067[0] + (3) cpd03091[0] + (1) cpd40033[0]",
+        "equation": "(1) cpd00001[0] + (3) cpd00017[0] + (1) cpd40089[0] <=> (3) cpd00060[0] + (3) cpd00067[0] + (3) cpd03091[0] + (1) cpd40033[0]",
         "id": "rxn52746",
         "is_obsolete": 0,
         "is_transport": 0,
@@ -67889,11 +67882,11 @@
                 "name": "S-Adenosyl-L-methionine"
             },
             {
-                "charge": 1,
+                "charge": -1,
                 "coefficient": -1,
                 "compartment": 0,
                 "compound": "cpd40089",
-                "formula": "C35H35MgN4O4",
+                "formula": "C35H33MgN4O4",
                 "name": "Mg-protoporphyrin IX 13-monomethyl ester"
             },
             {
@@ -67906,7 +67899,7 @@
             },
             {
                 "charge": 1,
-                "coefficient": 2,
+                "coefficient": 3,
                 "compartment": 0,
                 "compound": "cpd00067",
                 "formula": "H",
@@ -67921,11 +67914,11 @@
                 "name": "5'-Deoxyadenosine"
             },
             {
-                "charge": 2,
+                "charge": -1,
                 "coefficient": 1,
                 "compartment": 0,
                 "compound": "cpd40033",
-                "formula": "C35H32MgN4O5",
+                "formula": "C35H29MgN4O5",
                 "name": "3,8-divinyl protochlorophyllide a"
             }
         ],
@@ -67995,11 +67988,11 @@
                 "name": "S-Adenosyl-L-methionine"
             },
             {
-                "charge": 1,
+                "charge": -1,
                 "coefficient": -1,
                 "compartment": 0,
                 "compound": "cpd40089",
-                "formula": "C35H35MgN4O4",
+                "formula": "C35H33MgN4O4",
                 "name": "Mg-protoporphyrin IX 13-monomethyl ester"
             },
             {
@@ -68027,11 +68020,11 @@
                 "name": "5'-Deoxyadenosine"
             },
             {
-                "charge": 1,
+                "charge": -1,
                 "coefficient": 1,
                 "compartment": 0,
                 "compound": "cpd40087",
-                "formula": "C35H35MgN4O5",
+                "formula": "C35H33MgN4O5",
                 "name": "Mg-13(1)-hydroxyprotoporphyrin 13-monomethyl ester"
             }
         ],
@@ -68094,11 +68087,11 @@
                 "name": "S-Adenosyl-L-methionine"
             },
             {
-                "charge": 1,
+                "charge": -1,
                 "coefficient": -1,
                 "compartment": 0,
                 "compound": "cpd40087",
-                "formula": "C35H35MgN4O5",
+                "formula": "C35H33MgN4O5",
                 "name": "Mg-13(1)-hydroxyprotoporphyrin 13-monomethyl ester"
             },
             {
@@ -68126,11 +68119,11 @@
                 "name": "5'-Deoxyadenosine"
             },
             {
-                "charge": 1,
+                "charge": -1,
                 "coefficient": 1,
                 "compartment": 0,
                 "compound": "cpd40088",
-                "formula": "C35H33MgN4O5",
+                "formula": "C35H31MgN4O5",
                 "name": "Mg-13(1)-oxoprotoporphyrin 13-monomethyl ester"
             }
         ],
@@ -68165,11 +68158,11 @@
             "Rhea: 49108; 49109; 49110; 49111"
         ],
         "code": "(1) cpd00017[0] + (1) cpd40088[0] <=> (1) cpd00060[0] + (1) cpd03091[0] + (1) cpd40033[0]",
-        "compound_ids": "cpd00017;cpd00060;cpd03091;cpd40033;cpd40088",
-        "definition": "(1) S-Adenosyl-L-methionine[0] + (1) Mg-13(1)-oxoprotoporphyrin 13-monomethyl ester[0] <=> (1) L-Methionine[0] + (1) 5'-Deoxyadenosine[0] + (1) 3,8-divinyl protochlorophyllide a[0]",
+        "compound_ids": "cpd00017;cpd00060;cpd00067;cpd03091;cpd40033;cpd40088",
+        "definition": "(1) S-Adenosyl-L-methionine[0] + (1) Mg-13(1)-oxoprotoporphyrin 13-monomethyl ester[0] <=> (1) L-Methionine[0] + (1) H+[0] + (1) 5'-Deoxyadenosine[0] + (1) 3,8-divinyl protochlorophyllide a[0]",
         "direction": "=",
         "ec_numbers": null,
-        "equation": "(1) cpd00017[0] + (1) cpd40088[0] <=> (1) cpd00060[0] + (1) cpd03091[0] + (1) cpd40033[0]",
+        "equation": "(1) cpd00017[0] + (1) cpd40088[0] <=> (1) cpd00060[0] + (1) cpd00067[0] + (1) cpd03091[0] + (1) cpd40033[0]",
         "id": "rxn52749",
         "is_obsolete": 0,
         "is_transport": 0,
@@ -68193,11 +68186,11 @@
                 "name": "S-Adenosyl-L-methionine"
             },
             {
-                "charge": 1,
+                "charge": -1,
                 "coefficient": -1,
                 "compartment": 0,
                 "compound": "cpd40088",
-                "formula": "C35H33MgN4O5",
+                "formula": "C35H31MgN4O5",
                 "name": "Mg-13(1)-oxoprotoporphyrin 13-monomethyl ester"
             },
             {
@@ -68212,16 +68205,24 @@
                 "charge": 1,
                 "coefficient": 1,
                 "compartment": 0,
+                "compound": "cpd00067",
+                "formula": "H",
+                "name": "H+"
+            },
+            {
+                "charge": 1,
+                "coefficient": 1,
+                "compartment": 0,
                 "compound": "cpd03091",
                 "formula": "C10H14N5O3",
                 "name": "5'-Deoxyadenosine"
             },
             {
-                "charge": 2,
+                "charge": -1,
                 "coefficient": 1,
                 "compartment": 0,
                 "compound": "cpd40033",
-                "formula": "C35H32MgN4O5",
+                "formula": "C35H29MgN4O5",
                 "name": "3,8-divinyl protochlorophyllide a"
             }
         ],
@@ -68861,10 +68862,10 @@
         ],
         "code": "(1) cpd00017[0] + (1) cpd41740[0] <=> (1) cpd00019[0] + (1) cpd41741[0]",
         "compound_ids": "cpd00017;cpd00019;cpd00067;cpd41740;cpd41741",
-        "definition": "(1) S-Adenosyl-L-methionine[0] + (1) H+[0] + (1) 8-ethyl-12-methyl-3-vinylbacteriochlorophyllide d[0] <= (1) S-Adenosyl-homocysteine[0] + (1) 8,12-diethyl-3-vinylbacteriochlorophyllide d[0]",
+        "definition": "(1) S-Adenosyl-L-methionine[0] + (1) 8-ethyl-12-methyl-3-vinylbacteriochlorophyllide d[0] <= (1) S-Adenosyl-homocysteine[0] + (1) H+[0] + (1) 8,12-diethyl-3-vinylbacteriochlorophyllide d[0]",
         "direction": "=",
         "ec_numbers": null,
-        "equation": "(1) cpd00017[0] + (1) cpd00067[0] + (1) cpd41740[0] <= (1) cpd00019[0] + (1) cpd41741[0]",
+        "equation": "(1) cpd00017[0] + (1) cpd41740[0] <= (1) cpd00019[0] + (1) cpd00067[0] + (1) cpd41741[0]",
         "id": "rxn52756",
         "is_obsolete": 0,
         "is_transport": 0,
@@ -68888,19 +68889,11 @@
                 "name": "S-Adenosyl-L-methionine"
             },
             {
-                "charge": 1,
-                "coefficient": -1,
-                "compartment": 0,
-                "compound": "cpd00067",
-                "formula": "H",
-                "name": "H+"
-            },
-            {
-                "charge": 1,
+                "charge": -1,
                 "coefficient": -1,
                 "compartment": 0,
                 "compound": "cpd41740",
-                "formula": "C33H33MgN4O3",
+                "formula": "C33H31MgN4O3",
                 "name": "8-ethyl-12-methyl-3-vinylbacteriochlorophyllide d"
             },
             {
@@ -68912,11 +68905,19 @@
                 "name": "S-Adenosyl-homocysteine"
             },
             {
-                "charge": 3,
+                "charge": 1,
+                "coefficient": 1,
+                "compartment": 0,
+                "compound": "cpd00067",
+                "formula": "H",
+                "name": "H+"
+            },
+            {
+                "charge": -1,
                 "coefficient": 1,
                 "compartment": 0,
                 "compound": "cpd41741",
-                "formula": "C34H37MgN4O3",
+                "formula": "C34H33MgN4O3",
                 "name": "8,12-diethyl-3-vinylbacteriochlorophyllide d"
             }
         ],
@@ -68952,10 +68953,10 @@
         ],
         "code": "(1) cpd00017[0] + (1) cpd41741[0] <=> (1) cpd00019[0] + (1) cpd41743[0]",
         "compound_ids": "cpd00017;cpd00019;cpd00067;cpd41741;cpd41743",
-        "definition": "(1) S-Adenosyl-L-methionine[0] + (1) 8,12-diethyl-3-vinylbacteriochlorophyllide d[0] <= (1) S-Adenosyl-homocysteine[0] + (3) H+[0] + (1) 12-ethyl-8-propyl-3-vinylbacteriochlorophyllide d[0]",
+        "definition": "(1) S-Adenosyl-L-methionine[0] + (1) 8,12-diethyl-3-vinylbacteriochlorophyllide d[0] <= (1) S-Adenosyl-homocysteine[0] + (1) H+[0] + (1) 12-ethyl-8-propyl-3-vinylbacteriochlorophyllide d[0]",
         "direction": "=",
         "ec_numbers": null,
-        "equation": "(1) cpd00017[0] + (1) cpd41741[0] <= (1) cpd00019[0] + (3) cpd00067[0] + (1) cpd41743[0]",
+        "equation": "(1) cpd00017[0] + (1) cpd41741[0] <= (1) cpd00019[0] + (1) cpd00067[0] + (1) cpd41743[0]",
         "id": "rxn52757",
         "is_obsolete": 0,
         "is_transport": 0,
@@ -68979,11 +68980,11 @@
                 "name": "S-Adenosyl-L-methionine"
             },
             {
-                "charge": 3,
+                "charge": -1,
                 "coefficient": -1,
                 "compartment": 0,
                 "compound": "cpd41741",
-                "formula": "C34H37MgN4O3",
+                "formula": "C34H33MgN4O3",
                 "name": "8,12-diethyl-3-vinylbacteriochlorophyllide d"
             },
             {
@@ -68996,18 +68997,18 @@
             },
             {
                 "charge": 1,
-                "coefficient": 3,
+                "coefficient": 1,
                 "compartment": 0,
                 "compound": "cpd00067",
                 "formula": "H",
                 "name": "H+"
             },
             {
-                "charge": 1,
+                "charge": -1,
                 "coefficient": 1,
                 "compartment": 0,
                 "compound": "cpd41743",
-                "formula": "C35H37MgN4O3",
+                "formula": "C35H35MgN4O3",
                 "name": "12-ethyl-8-propyl-3-vinylbacteriochlorophyllide d"
             }
         ],
@@ -69069,11 +69070,11 @@
                 "name": "S-Adenosyl-L-methionine"
             },
             {
-                "charge": 1,
+                "charge": -1,
                 "coefficient": -1,
                 "compartment": 0,
                 "compound": "cpd41743",
-                "formula": "C35H37MgN4O3",
+                "formula": "C35H35MgN4O3",
                 "name": "12-ethyl-8-propyl-3-vinylbacteriochlorophyllide d"
             },
             {
@@ -69093,11 +69094,11 @@
                 "name": "H+"
             },
             {
-                "charge": 1,
+                "charge": -1,
                 "coefficient": 1,
                 "compartment": 0,
                 "compound": "cpd41744",
-                "formula": "C36H39MgN4O3",
+                "formula": "C36H37MgN4O3",
                 "name": "12-ethyl-8-isobutyl-3-vinylbacteriochlorophyllide d"
             }
         ],
@@ -69211,11 +69212,11 @@
             "Rhea: 49184; 49185; 49186; 49187"
         ],
         "code": "(1) cpd00001[0] + (1) cpd41191[0] <=> (1) cpd00011[0] + (1) cpd00116[0] + (1) cpd41740[0]",
-        "compound_ids": "cpd00001;cpd00011;cpd00067;cpd00116;cpd41191;cpd41740",
-        "definition": "(1) H2O[0] + (1) chlorophyllide a[0] <=> (1) CO2[0] + (1) H+[0] + (1) Methanol[0] + (1) 8-ethyl-12-methyl-3-vinylbacteriochlorophyllide d[0]",
+        "compound_ids": "cpd00001;cpd00011;cpd00116;cpd41191;cpd41740",
+        "definition": "(1) H2O[0] + (1) chlorophyllide a[0] <=> (1) CO2[0] + (1) Methanol[0] + (1) 8-ethyl-12-methyl-3-vinylbacteriochlorophyllide d[0]",
         "direction": "=",
         "ec_numbers": null,
-        "equation": "(1) cpd00001[0] + (1) cpd41191[0] <=> (1) cpd00011[0] + (1) cpd00067[0] + (1) cpd00116[0] + (1) cpd41740[0]",
+        "equation": "(1) cpd00001[0] + (1) cpd41191[0] <=> (1) cpd00011[0] + (1) cpd00116[0] + (1) cpd41740[0]",
         "id": "rxn52760",
         "is_obsolete": 0,
         "is_transport": 0,
@@ -69239,11 +69240,11 @@
                 "name": "H2O"
             },
             {
-                "charge": 2,
+                "charge": -1,
                 "coefficient": -1,
                 "compartment": 0,
                 "compound": "cpd41191",
-                "formula": "C35H36MgN4O5",
+                "formula": "C35H33MgN4O5",
                 "name": "chlorophyllide a"
             },
             {
@@ -69255,14 +69256,6 @@
                 "name": "CO2"
             },
             {
-                "charge": 1,
-                "coefficient": 1,
-                "compartment": 0,
-                "compound": "cpd00067",
-                "formula": "H",
-                "name": "H+"
-            },
-            {
                 "charge": 0,
                 "coefficient": 1,
                 "compartment": 0,
@@ -69271,11 +69264,11 @@
                 "name": "Methanol"
             },
             {
-                "charge": 1,
+                "charge": -1,
                 "coefficient": 1,
                 "compartment": 0,
                 "compound": "cpd41740",
-                "formula": "C33H33MgN4O3",
+                "formula": "C33H31MgN4O3",
                 "name": "8-ethyl-12-methyl-3-vinylbacteriochlorophyllide d"
             }
         ],
@@ -70189,11 +70182,11 @@
                 "name": "Geranylgeranyl diphosphate"
             },
             {
-                "charge": 2,
+                "charge": -1,
                 "coefficient": -1,
                 "compartment": 0,
                 "compound": "cpd41710",
-                "formula": "C35H38MgN4O6",
+                "formula": "C35H35MgN4O6",
                 "name": "bacteriochlorophyllide a"
             },
             {
@@ -70205,11 +70198,11 @@
                 "name": "PPi"
             },
             {
-                "charge": 3,
+                "charge": 0,
                 "coefficient": 1,
                 "compartment": 0,
                 "compound": "cpd41728",
-                "formula": "C55H71MgN4O6",
+                "formula": "C55H68MgN4O6",
                 "name": "geranylgeranyl-bacteriochlorophyllide a"
             }
         ],

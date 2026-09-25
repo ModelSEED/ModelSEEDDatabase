@@ -5221,10 +5221,10 @@
         ],
         "code": "(1) cpd00001[0] + (1) cpd33274[0] <=> (1) cpd03917[0] + (1) cpd47849[0]",
         "compound_ids": "cpd00001;cpd00067;cpd03917;cpd33274;cpd47849",
-        "definition": "(1) H2O[0] + (1) Coalpha-[alpha-(adenin-7-yl)]-Cobeta-adenosylcobamide[0] <= (1) H+[0] + (1) Adenosylcobyric acid[0] + (1) (<i>2R</i>)-2-[adenine-3'-phospho]-(1-aminopropane)[0]",
+        "definition": "(1) H2O[0] + (1) H+[0] + (1) Coalpha-[alpha-(adenin-7-yl)]-Cobeta-adenosylcobamide[0] <= (1) Adenosylcobyric acid[0] + (1) (<i>2R</i>)-2-[adenine-3'-phospho]-(1-aminopropane)[0]",
         "direction": "=",
         "ec_numbers": null,
-        "equation": "(1) cpd00001[0] + (1) cpd33274[0] <= (1) cpd00067[0] + (1) cpd03917[0] + (1) cpd47849[0]",
+        "equation": "(1) cpd00001[0] + (1) cpd00067[0] + (1) cpd33274[0] <= (1) cpd03917[0] + (1) cpd47849[0]",
         "id": "rxn60056",
         "is_obsolete": 0,
         "is_transport": 0,
@@ -5251,6 +5251,14 @@
                 "charge": 1,
                 "coefficient": -1,
                 "compartment": 0,
+                "compound": "cpd00067",
+                "formula": "H",
+                "name": "H+"
+            },
+            {
+                "charge": 1,
+                "coefficient": -1,
+                "compartment": 0,
                 "compound": "cpd33274",
                 "formula": "C68H96CoN21O17P",
                 "name": "Coalpha-[alpha-(adenin-7-yl)]-Cobeta-adenosylcobamide"
@@ -5259,16 +5267,8 @@
                 "charge": 1,
                 "coefficient": 1,
                 "compartment": 0,
-                "compound": "cpd00067",
-                "formula": "H",
-                "name": "H+"
-            },
-            {
-                "charge": -1,
-                "coefficient": 1,
-                "compartment": 0,
                 "compound": "cpd03917",
-                "formula": "C55H75CoN15O11",
+                "formula": "C55H77CoN15O11",
                 "name": "Adenosylcobyric acid"
             },
             {
@@ -13659,11 +13659,11 @@
             "MetaCyc: RXN-20011"
         ],
         "code": "(1) cpd00001[0] + (1) cpd38456[0] <=> (1) cpd02582[0] + (1) cpd46416[0]",
-        "compound_ids": "cpd00001;cpd02582;cpd38456;cpd46416",
-        "definition": "(1) H2O[0] + (1) Fe(III)-{N-(2,3-dihydroxybenzoyl)-L-seryl-[N-(C-5-[deoxy-beta-D-glucosyl]-2,3-dihydroxybenzoyl)-L-serine]2}[0] <=> (1) 2,3-Dihydroxy-N-benzoyl-L-serine[0] + (1) iron(III)-[diglucosyl-(2,3-dihydroxybenzoylserine)<sub>2</sub>] complex[0]",
+        "compound_ids": "cpd00001;cpd00067;cpd02582;cpd38456;cpd46416",
+        "definition": "(1) H2O[0] + (1) H+[0] + (1) Fe(III)-{N-(2,3-dihydroxybenzoyl)-L-seryl-[N-(C-5-[deoxy-beta-D-glucosyl]-2,3-dihydroxybenzoyl)-L-serine]2}[0] <=> (1) 2,3-Dihydroxy-N-benzoyl-L-serine[0] + (1) iron(III)-[diglucosyl-(2,3-dihydroxybenzoylserine)<sub>2</sub>] complex[0]",
         "direction": "=",
         "ec_numbers": null,
-        "equation": "(1) cpd00001[0] + (1) cpd38456[0] <=> (1) cpd02582[0] + (1) cpd46416[0]",
+        "equation": "(1) cpd00001[0] + (1) cpd00067[0] + (1) cpd38456[0] <=> (1) cpd02582[0] + (1) cpd46416[0]",
         "id": "rxn60147",
         "is_obsolete": 0,
         "is_transport": 0,
@@ -13687,11 +13687,19 @@
                 "name": "H2O"
             },
             {
-                "charge": 0,
+                "charge": 1,
+                "coefficient": -1,
+                "compartment": 0,
+                "compound": "cpd00067",
+                "formula": "H",
+                "name": "H+"
+            },
+            {
+                "charge": -4,
                 "coefficient": -1,
                 "compartment": 0,
                 "compound": "cpd38456",
-                "formula": "C42H46FeN3O26",
+                "formula": "C42H42FeN3O26",
                 "name": "Fe(III)-{N-(2,3-dihydroxybenzoyl)-L-seryl-[N-(C-5-[deoxy-beta-D-glucosyl]-2,3-dihydroxybenzoyl)-L-serine]2}"
             },
             {
@@ -13703,11 +13711,11 @@
                 "name": "2,3-Dihydroxy-N-benzoyl-L-serine"
             },
             {
-                "charge": 1,
+                "charge": -2,
                 "coefficient": 1,
                 "compartment": 0,
                 "compound": "cpd46416",
-                "formula": "C32H38FeN2O21",
+                "formula": "C32H35FeN2O21",
                 "name": "iron(III)-[diglucosyl-(2,3-dihydroxybenzoylserine)<sub>2</sub>] complex"
             }
         ],
@@ -41220,11 +41228,11 @@
         "status": "OK",
         "stoichiometry": [
             {
-                "charge": 0,
+                "charge": -2,
                 "coefficient": -1,
                 "compartment": 0,
                 "compound": "cpd46458",
-                "formula": "C54H66FeN4O5",
+                "formula": "C54H64FeN4O5",
                 "name": "ferroheme <i>o</i><sub>P2</sub>"
             },
             {
@@ -41236,11 +41244,11 @@
                 "name": "H2O"
             },
             {
-                "charge": 0,
+                "charge": -2,
                 "coefficient": 1,
                 "compartment": 0,
                 "compound": "cpd46456",
-                "formula": "C54H64FeN4O4",
+                "formula": "C54H62FeN4O4",
                 "name": "ferroheme <i>o</i><sub>P1</sub>"
             }
         ],
@@ -53224,11 +53232,11 @@
             "has_symmetry_groups": true
         },
         "code": "(1) cpd00006[0] + (2) cpd02582[0] + (2) cpd10515[0] <=> (1) cpd00005[0] + (2) cpd33092[0]",
-        "compound_ids": "cpd00005;cpd00006;cpd02582;cpd10515;cpd33092",
-        "definition": "(1) NADP[0] + (2) 2,3-Dihydroxy-N-benzoyl-L-serine[0] + (2) Fe+2[0] <=> (1) NADPH[0] + (2) dihydroxybenzoylserine-iron[0]",
+        "compound_ids": "cpd00005;cpd00006;cpd00067;cpd02582;cpd10515;cpd33092",
+        "definition": "(1) NADP[0] + (2) 2,3-Dihydroxy-N-benzoyl-L-serine[0] + (2) Fe+2[0] <=> (1) NADPH[0] + (4) H+[0] + (2) dihydroxybenzoylserine-iron[0]",
         "direction": "=",
         "ec_numbers": null,
-        "equation": "(1) cpd00006[0] + (2) cpd02582[0] + (2) cpd10515[0] <=> (1) cpd00005[0] + (2) cpd33092[0]",
+        "equation": "(1) cpd00006[0] + (2) cpd02582[0] + (2) cpd10515[0] <=> (1) cpd00005[0] + (4) cpd00067[0] + (2) cpd33092[0]",
         "id": "rxn60554",
         "is_obsolete": 0,
         "is_transport": 0,
@@ -53276,11 +53284,19 @@
                 "name": "NADPH"
             },
             {
-                "charge": 2,
+                "charge": 1,
+                "coefficient": 4,
+                "compartment": 0,
+                "compound": "cpd00067",
+                "formula": "H",
+                "name": "H+"
+            },
+            {
+                "charge": 0,
                 "coefficient": 2,
                 "compartment": 0,
                 "compound": "cpd33092",
-                "formula": "C10H10FeNO6",
+                "formula": "C10H8FeNO6",
                 "name": "dihydroxybenzoylserine-iron"
             }
         ],
@@ -54105,11 +54121,11 @@
             "MetaCyc: RXN-21288"
         ],
         "code": "(1) cpd00005[0] + (1) cpd00007[0] + (1) cpd08632[0] <=> (1) cpd00001[0] + (1) cpd00006[0] + (1) cpd46499[0]",
-        "compound_ids": "cpd00001;cpd00005;cpd00006;cpd00007;cpd08632;cpd46499",
-        "definition": "(1) NADPH[0] + (1) O2[0] + (1) Divinyl chlorophyllide a[0] <=> (1) H2O[0] + (1) NADP[0] + (1) 7<sup>1</sup>-hydroxychlorophyllide <i>a</i><sub>2</sub>[0]",
+        "compound_ids": "cpd00001;cpd00005;cpd00006;cpd00007;cpd00067;cpd08632;cpd46499",
+        "definition": "(1) NADPH[0] + (1) O2[0] + (2) H+[0] + (1) Divinyl chlorophyllide a[0] <=> (1) H2O[0] + (1) NADP[0] + (1) 7<sup>1</sup>-hydroxychlorophyllide <i>a</i><sub>2</sub>[0]",
         "direction": "=",
         "ec_numbers": null,
-        "equation": "(1) cpd00005[0] + (1) cpd00007[0] + (1) cpd08632[0] <=> (1) cpd00001[0] + (1) cpd00006[0] + (1) cpd46499[0]",
+        "equation": "(1) cpd00005[0] + (1) cpd00007[0] + (2) cpd00067[0] + (1) cpd08632[0] <=> (1) cpd00001[0] + (1) cpd00006[0] + (1) cpd46499[0]",
         "id": "rxn60563",
         "is_obsolete": 0,
         "is_transport": 0,
@@ -54142,10 +54158,18 @@
             },
             {
                 "charge": 1,
+                "coefficient": -2,
+                "compartment": 0,
+                "compound": "cpd00067",
+                "formula": "H",
+                "name": "H+"
+            },
+            {
+                "charge": -1,
                 "coefficient": -1,
                 "compartment": 0,
                 "compound": "cpd08632",
-                "formula": "C35H33MgN4O5",
+                "formula": "C35H31MgN4O5",
                 "name": "Divinyl chlorophyllide a"
             },
             {
@@ -59636,11 +59660,11 @@
             "has_symmetry_groups": true
         },
         "code": "(1) cpd03453[0] + (1) cpd10516[0] <=> (1) cpd27027[0]",
-        "compound_ids": "cpd03453;cpd10516;cpd27027",
-        "definition": "(1) Enterobactin[0] + (1) Fe+3[0] <=> (1) ferric enterobactin[0]",
+        "compound_ids": "cpd00067;cpd03453;cpd10516;cpd27027",
+        "definition": "(1) Enterobactin[0] + (1) Fe+3[0] <=> (4) H+[0] + (1) ferric enterobactin[0]",
         "direction": "=",
         "ec_numbers": null,
-        "equation": "(1) cpd03453[0] + (1) cpd10516[0] <=> (1) cpd27027[0]",
+        "equation": "(1) cpd03453[0] + (1) cpd10516[0] <=> (4) cpd00067[0] + (1) cpd27027[0]",
         "id": "rxn60620",
         "is_obsolete": 0,
         "is_transport": 0,
@@ -59673,10 +59697,18 @@
             },
             {
                 "charge": 1,
+                "coefficient": 4,
+                "compartment": 0,
+                "compound": "cpd00067",
+                "formula": "H",
+                "name": "H+"
+            },
+            {
+                "charge": -3,
                 "coefficient": 1,
                 "compartment": 0,
                 "compound": "cpd27027",
-                "formula": "C30H25FeN3O15",
+                "formula": "C30H21FeN3O15",
                 "name": "ferric enterobactin"
             }
         ],
@@ -68246,11 +68278,11 @@
             "MetaCyc: RXN-22328"
         ],
         "code": "(1) cpd26384[0] <=> (1) cpd11598[0]",
-        "compound_ids": "cpd00067;cpd11598;cpd26384",
-        "definition": "(1) H3SbO3[0] <=> (6) H+[0] + (1) Antimonite[0]",
+        "compound_ids": "cpd11598;cpd26384",
+        "definition": "(1) H3SbO3[0] <=> (1) Antimonite[0]",
         "direction": "=",
         "ec_numbers": null,
-        "equation": "(1) cpd26384[0] <=> (6) cpd00067[0] + (1) cpd11598[0]",
+        "equation": "(1) cpd26384[0] <=> (1) cpd11598[0]",
         "id": "rxn60714",
         "is_obsolete": 0,
         "is_transport": 0,
@@ -68266,27 +68298,19 @@
         "status": "OK",
         "stoichiometry": [
             {
-                "charge": 3,
+                "charge": 0,
                 "coefficient": -1,
                 "compartment": 0,
                 "compound": "cpd26384",
-                "formula": "H6O3Sb",
+                "formula": "H3O3Sb",
                 "name": "H3SbO3"
             },
             {
-                "charge": 1,
-                "coefficient": 6,
-                "compartment": 0,
-                "compound": "cpd00067",
-                "formula": "H",
-                "name": "H+"
-            },
-            {
-                "charge": -3,
+                "charge": 0,
                 "coefficient": 1,
                 "compartment": 0,
                 "compound": "cpd11598",
-                "formula": "O3Sb",
+                "formula": "H3O3Sb",
                 "name": "Antimonite"
             }
         ],
@@ -70881,11 +70905,11 @@
                 "name": "H+"
             },
             {
-                "charge": -2,
+                "charge": 0,
                 "coefficient": -1,
                 "compartment": 1,
                 "compound": "cpd03724",
-                "formula": "C27H40FeN9O12",
+                "formula": "C27H42FeN9O12",
                 "name": "Ferrichrome"
             },
             {
@@ -70897,11 +70921,11 @@
                 "name": "H+"
             },
             {
-                "charge": -2,
+                "charge": 0,
                 "coefficient": 1,
                 "compartment": 1,
                 "compound": "cpd03724",
-                "formula": "C27H40FeN9O12",
+                "formula": "C27H42FeN9O12",
                 "name": "Ferrichrome"
             }
         ],
@@ -71038,11 +71062,11 @@
                 "name": "H+"
             },
             {
-                "charge": 1,
+                "charge": -3,
                 "coefficient": -1,
                 "compartment": 1,
                 "compound": "cpd27027",
-                "formula": "C30H25FeN3O15",
+                "formula": "C30H21FeN3O15",
                 "name": "ferric enterobactin"
             },
             {
@@ -71054,11 +71078,11 @@
                 "name": "H+"
             },
             {
-                "charge": 1,
+                "charge": -3,
                 "coefficient": 1,
                 "compartment": 1,
                 "compound": "cpd27027",
-                "formula": "C30H25FeN3O15",
+                "formula": "C30H21FeN3O15",
                 "name": "ferric enterobactin"
             }
         ],
@@ -72490,11 +72514,11 @@
                 "name": "H+"
             },
             {
-                "charge": 0,
+                "charge": -4,
                 "coefficient": -1,
                 "compartment": 1,
                 "compound": "cpd15460",
-                "formula": "C30H26FeN3O16",
+                "formula": "C30H22FeN3O16",
                 "name": "ferric 2,3-dihydroxybenzoylserine"
             },
             {
@@ -72506,11 +72530,11 @@
                 "name": "H+"
             },
             {
-                "charge": 0,
+                "charge": -4,
                 "coefficient": 1,
                 "compartment": 1,
                 "compound": "cpd15460",
-                "formula": "C30H26FeN3O16",
+                "formula": "C30H22FeN3O16",
                 "name": "ferric 2,3-dihydroxybenzoylserine"
             }
         ],
@@ -72731,11 +72755,11 @@
                 "name": "H+"
             },
             {
-                "charge": -1,
+                "charge": 1,
                 "coefficient": -1,
                 "compartment": 1,
                 "compound": "cpd33817",
-                "formula": "C48H70CoN11O8",
+                "formula": "C48H72CoN11O8",
                 "name": "Cbi(II)"
             },
             {
@@ -72747,11 +72771,11 @@
                 "name": "H+"
             },
             {
-                "charge": -1,
+                "charge": 1,
                 "coefficient": 1,
                 "compartment": 1,
                 "compound": "cpd33817",
-                "formula": "C48H70CoN11O8",
+                "formula": "C48H72CoN11O8",
                 "name": "Cbi(II)"
             }
         ],

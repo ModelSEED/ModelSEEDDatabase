@@ -7399,11 +7399,11 @@
         },
         "code": "(1) cpd00017[0] + (1) cpd08370[0] <=> (1) cpd00019[0] + (1) cpd08371[0]",
         "compound_ids": "cpd00017;cpd00019;cpd00067;cpd08370;cpd08371",
-        "definition": "(1) S-Adenosyl-L-methionine[0] + (1) Cobalt-precorrin 4[0] <=> (1) S-Adenosyl-homocysteine[0] + (1) H+[0] + (1) Cobalt-precorrin 5[0]",
+        "definition": "(1) S-Adenosyl-L-methionine[0] + (1) H+[0] + (1) Cobalt-precorrin 4[0] <=> (1) S-Adenosyl-homocysteine[0] + (1) Cobalt-precorrin 5[0]",
         "ec_numbers": [
             "2.1.1.133"
         ],
-        "equation": "(1) cpd00017[0] + (1) cpd08370[0] <=> (1) cpd00019[0] + (1) cpd00067[0] + (1) cpd08371[0]",
+        "equation": "(1) cpd00017[0] + (1) cpd00067[0] + (1) cpd08370[0] <=> (1) cpd00019[0] + (1) cpd08371[0]",
         "id": "rxn30072",
         "is_obsolete": 1,
         "is_transport": 0,
@@ -7431,11 +7431,19 @@
                 "name": "S-Adenosyl-L-methionine"
             },
             {
-                "charge": -4,
+                "charge": 1,
+                "coefficient": -1,
+                "compartment": 0,
+                "compound": "cpd00067",
+                "formula": "H",
+                "name": "H+"
+            },
+            {
+                "charge": -8,
                 "coefficient": -1,
                 "compartment": 0,
                 "compound": "cpd08370",
-                "formula": "C44H46CoN4O16",
+                "formula": "C44H42CoN4O16",
                 "name": "Cobalt-precorrin 4"
             },
             {
@@ -7447,19 +7455,11 @@
                 "name": "S-Adenosyl-homocysteine"
             },
             {
-                "charge": 1,
-                "coefficient": 1,
-                "compartment": 0,
-                "compound": "cpd00067",
-                "formula": "H",
-                "name": "H+"
-            },
-            {
-                "charge": -4,
+                "charge": -6,
                 "coefficient": 1,
                 "compartment": 0,
                 "compound": "cpd08371",
-                "formula": "C45H48CoN4O16",
+                "formula": "C45H46CoN4O16",
                 "name": "Cobalt-precorrin 5"
             }
         ],
@@ -24590,11 +24590,11 @@
                 "name": "H2O"
             },
             {
-                "charge": -4,
+                "charge": -6,
                 "coefficient": -1,
                 "compartment": 0,
                 "compound": "cpd08371",
-                "formula": "C45H48CoN4O16",
+                "formula": "C45H46CoN4O16",
                 "name": "Cobalt-precorrin 5"
             },
             {
@@ -24606,11 +24606,11 @@
                 "name": "Acetaldehyde"
             },
             {
-                "charge": -4,
+                "charge": -6,
                 "coefficient": 1,
                 "compartment": 0,
                 "compound": "cpd14960",
-                "formula": "C43H46CoN4O16",
+                "formula": "C43H44CoN4O16",
                 "name": "Cobalt-precorrin 5B"
             }
         ],
@@ -47436,10 +47436,10 @@
             "Name: cob(I)yrinic acid a,c-diamide adenosyltransferase"
         ],
         "code": "(1) cpd00001[0] + (1) cpd00002[0] + (0.5) cpd00004[0] + (1) cpd03915[0] <=> (0.5) cpd00003[0] + (1) cpd00009[0] + (1) cpd00012[0] + (1) cpd03916[0]",
-        "compound_ids": "cpd00001;cpd00002;cpd00003;cpd00004;cpd00009;cpd00012;cpd03915;cpd03916",
-        "definition": "(1) H2O[0] + (1) ATP[0] + (0.5) NADH[0] + (1) Cob(I)yrinate diamide[0] <=> (0.5) NAD[0] + (1) Phosphate[0] + (1) PPi[0] + (1) Adenosyl cobyrinate diamide[0]",
+        "compound_ids": "cpd00001;cpd00002;cpd00003;cpd00004;cpd00009;cpd00012;cpd00067;cpd03915;cpd03916",
+        "definition": "(1) H2O[0] + (1) ATP[0] + (0.5) NADH[0] + (1) H+[0] + (1) Cob(I)yrinate diamide[0] <=> (0.5) NAD[0] + (1) Phosphate[0] + (1) PPi[0] + (1) Adenosyl cobyrinate diamide[0]",
         "ec_numbers": null,
-        "equation": "(1) cpd00001[0] + (1) cpd00002[0] + (0.5) cpd00004[0] + (1) cpd03915[0] <=> (0.5) cpd00003[0] + (1) cpd00009[0] + (1) cpd00012[0] + (1) cpd03916[0]",
+        "equation": "(1) cpd00001[0] + (1) cpd00002[0] + (0.5) cpd00004[0] + (1) cpd00067[0] + (1) cpd03915[0] <=> (0.5) cpd00003[0] + (1) cpd00009[0] + (1) cpd00012[0] + (1) cpd03916[0]",
         "id": "rxn30469",
         "is_obsolete": 0,
         "is_transport": 0,
@@ -47480,11 +47480,19 @@
                 "name": "NADH"
             },
             {
-                "charge": -3,
+                "charge": 1,
+                "coefficient": -1,
+                "compartment": 0,
+                "compound": "cpd00067",
+                "formula": "H",
+                "name": "H+"
+            },
+            {
+                "charge": -5,
                 "coefficient": -1,
                 "compartment": 0,
                 "compound": "cpd03915",
-                "formula": "C45H58CoN6O12",
+                "formula": "C45H56CoN6O12",
                 "name": "Cob(I)yrinate diamide"
             },
             {
@@ -47512,11 +47520,11 @@
                 "name": "PPi"
             },
             {
-                "charge": -1,
+                "charge": -2,
                 "coefficient": 1,
                 "compartment": 0,
                 "compound": "cpd03916",
-                "formula": "C55H71CoN11O15",
+                "formula": "C55H70CoN11O15",
                 "name": "Adenosyl cobyrinate diamide"
             }
         ],
@@ -65275,7 +65283,7 @@
         "pathways": null,
         "reversibility": "?",
         "source": "Published Model",
-        "status": "MI:C:1/H:6/O:1/R:-1|CI:1",
+        "status": "MI:C:1/H:4/O:1/R:-1|CI:-1",
         "stoichiometry": [
             {
                 "charge": 0,
@@ -65294,11 +65302,11 @@
                 "name": "Phytol"
             },
             {
-                "charge": 1,
+                "charge": -1,
                 "coefficient": 1,
                 "compartment": 0,
                 "compound": "cpd01449",
-                "formula": "C35H35MgN4O5",
+                "formula": "C35H33MgN4O5",
                 "name": "Chlorophyllide"
             }
         ],
@@ -72488,8 +72496,12 @@
         "abbreviation": "reac_412",
         "abstract_reaction": null,
         "aliases": [
-            "DF_Athaliana: reac_412",
-            "Name: HEMEOSYN-RXN"
+            "AraCyc: HEMEOSYN-RXN",
+            "BiGG: HEMEOS; HEMEOSm",
+            "BrachyCyc: HEMEOSYN-RXN",
+            "KEGG: R07411",
+            "MetaCyc: HEMEOSYN-RXN",
+            "Name: Heme O synthase; heme o biosynthesis; protoheme IX farnesyltransferase; protoheme ix farnesyltransferase"
         ],
         "atom_mapping": {
             "confidence": "salvaged",
@@ -72502,25 +72514,38 @@
             ],
             "has_symmetry_groups": true
         },
-        "code": "(1) cpd00028[0] + (1) cpd00350[0] <=> (1) cpd00012[0] + (1) cpd11313[0]",
-        "compound_ids": "cpd00012;cpd00028;cpd00350;cpd11313",
-        "definition": "(1) Heme[0] + (1) Farnesyldiphosphate[0] <=> (1) PPi[0] + (1) hemeO[0]",
-        "ec_numbers": null,
-        "equation": "(1) cpd00028[0] + (1) cpd00350[0] <=> (1) cpd00012[0] + (1) cpd11313[0]",
+        "code": "(1) cpd00001[0] + (1) cpd00028[0] + (1) cpd00350[0] <=> (1) cpd00012[0] + (1) cpd11313[0]",
+        "compound_ids": "cpd00001;cpd00012;cpd00028;cpd00350;cpd11313",
+        "definition": "(1) H2O[0] + (1) Heme[0] + (1) Farnesyldiphosphate[0] <=> (1) PPi[0] + (1) hemeO[0]",
+        "ec_numbers": [
+            "2.5.1.-"
+        ],
+        "equation": "(1) cpd00001[0] + (1) cpd00028[0] + (1) cpd00350[0] <=> (1) cpd00012[0] + (1) cpd11313[0]",
         "id": "rxn30695",
-        "is_obsolete": 0,
+        "is_obsolete": 1,
         "is_transport": 0,
-        "linked_reaction": null,
+        "linked_reaction": "rxn05120;rxn08707;rxn13932;rxn13942;rxn19887;rxn38143",
         "name": "HEMEOSYN-RXN",
         "notes": [
             "GCP",
-            "EQC"
+            "EQC",
+            "|",
+            "W",
+            "B"
         ],
         "pathways": null,
         "reversibility": "?",
         "source": "Published Model",
-        "status": "MI:H:4/O:1|CI:2",
+        "status": "OK",
         "stoichiometry": [
+            {
+                "charge": 0,
+                "coefficient": -1,
+                "compartment": 0,
+                "compound": "cpd00001",
+                "formula": "H2O",
+                "name": "H2O"
+            },
             {
                 "charge": -2,
                 "coefficient": -1,
@@ -72546,11 +72571,11 @@
                 "name": "PPi"
             },
             {
-                "charge": 0,
+                "charge": -2,
                 "coefficient": 1,
                 "compartment": 0,
                 "compound": "cpd11313",
-                "formula": "C49H58FeN4O5",
+                "formula": "C49H56FeN4O5",
                 "name": "hemeO"
             }
         ],
@@ -90422,11 +90447,11 @@
                 "name": "O2"
             },
             {
-                "charge": 1,
+                "charge": -1,
                 "coefficient": -1,
                 "compartment": 0,
                 "compound": "cpd02762",
-                "formula": "C35H35MgN4O4",
+                "formula": "C35H33MgN4O4",
                 "name": "Mg-Protoporphyrin IX 13-monomethyl ester"
             },
             {
@@ -90438,11 +90463,11 @@
                 "name": "NADP"
             },
             {
-                "charge": 1,
+                "charge": -1,
                 "coefficient": 1,
                 "compartment": 0,
                 "compound": "cpd08629",
-                "formula": "C35H35MgN4O5",
+                "formula": "C35H33MgN4O5",
                 "name": "13(1)-Hydroxy-Mg-protoporphyrin IX 13-monomethyl ester"
             }
         ],
@@ -90563,11 +90588,11 @@
                 "name": "O2"
             },
             {
-                "charge": 1,
+                "charge": -1,
                 "coefficient": -1,
                 "compartment": 0,
                 "compound": "cpd08629",
-                "formula": "C35H35MgN4O5",
+                "formula": "C35H33MgN4O5",
                 "name": "13(1)-Hydroxy-Mg-protoporphyrin IX 13-monomethyl ester"
             },
             {
@@ -90579,11 +90604,11 @@
                 "name": "NADP"
             },
             {
-                "charge": 1,
+                "charge": -1,
                 "coefficient": 1,
                 "compartment": 0,
                 "compound": "cpd08630",
-                "formula": "C35H33MgN4O5",
+                "formula": "C35H31MgN4O5",
                 "name": "13(1)-Oxo-Mg-protoporphyrin IX 13-monomethyl ester"
             }
         ],
@@ -90704,11 +90729,11 @@
                 "name": "O2"
             },
             {
-                "charge": 1,
+                "charge": -1,
                 "coefficient": -1,
                 "compartment": 0,
                 "compound": "cpd08630",
-                "formula": "C35H33MgN4O5",
+                "formula": "C35H31MgN4O5",
                 "name": "13(1)-Oxo-Mg-protoporphyrin IX 13-monomethyl ester"
             },
             {
@@ -90720,11 +90745,11 @@
                 "name": "NADP"
             },
             {
-                "charge": 1,
+                "charge": -1,
                 "coefficient": 1,
                 "compartment": 0,
                 "compound": "cpd08631",
-                "formula": "C35H31MgN4O5",
+                "formula": "C35H29MgN4O5",
                 "name": "Divinylprotochlorophyllide"
             }
         ],
@@ -97789,11 +97814,11 @@
                 "name": "O2"
             },
             {
-                "charge": 1,
+                "charge": -1,
                 "coefficient": -1,
                 "compartment": 0,
                 "compound": "cpd01449",
-                "formula": "C35H35MgN4O5",
+                "formula": "C35H33MgN4O5",
                 "name": "Chlorophyllide"
             },
             {
@@ -97805,11 +97830,11 @@
                 "name": "NADP"
             },
             {
-                "charge": 1,
+                "charge": -1,
                 "coefficient": 1,
                 "compartment": 0,
                 "compound": "cpd16354",
-                "formula": "C35H35MgN4O6",
+                "formula": "C35H33MgN4O6",
                 "name": "7-Hydroxychlorophyllide a"
             }
         ],
@@ -97973,11 +97998,11 @@
                 "name": "O2"
             },
             {
-                "charge": 1,
+                "charge": -1,
                 "coefficient": -1,
                 "compartment": 0,
                 "compound": "cpd16354",
-                "formula": "C35H35MgN4O6",
+                "formula": "C35H33MgN4O6",
                 "name": "7-Hydroxychlorophyllide a"
             },
             {
@@ -97989,11 +98014,11 @@
                 "name": "NADP"
             },
             {
-                "charge": 1,
+                "charge": -1,
                 "coefficient": 1,
                 "compartment": 0,
                 "compound": "cpd16355",
-                "formula": "C35H33MgN4O6",
+                "formula": "C35H31MgN4O6",
                 "name": "Chlorophyllide b"
             }
         ],
@@ -98158,7 +98183,7 @@
         "pathways": null,
         "reversibility": "?",
         "source": "Published Model",
-        "status": "MI:H:1/O:2|CI:-3",
+        "status": "MI:H:2/O:2|CI:-2",
         "stoichiometry": [
             {
                 "charge": -3,
@@ -98169,11 +98194,11 @@
                 "name": "NADP"
             },
             {
-                "charge": 3,
+                "charge": 0,
                 "coefficient": -1,
                 "compartment": 0,
                 "compound": "cpd03149",
-                "formula": "C55H73MgN4O6",
+                "formula": "C55H70MgN4O6",
                 "name": "Chlorophyll b"
             },
             {
@@ -98193,11 +98218,11 @@
                 "name": "O2"
             },
             {
-                "charge": 2,
+                "charge": 0,
                 "coefficient": 1,
                 "compartment": 0,
                 "compound": "cpd19421",
-                "formula": "C55H74MgN4O6",
+                "formula": "C55H72MgN4O6",
                 "name": "7(1)-Hydroxychlorophyll a"
             }
         ],
@@ -98348,9 +98373,9 @@
         },
         "code": "(1) cpd00001[0] + (1) cpd00006[0] + (1) cpd19421[0] <=> (1) cpd00005[0] + (1) cpd00007[0] + (1) cpd03148[0]",
         "compound_ids": "cpd00001;cpd00005;cpd00006;cpd00007;cpd00067;cpd03148;cpd19421",
-        "definition": "(1) H2O[0] + (1) NADP[0] + (1) 7(1)-Hydroxychlorophyll a[0] <= (1) NADPH[0] + (1) O2[0] + (3) H+[0] + (1) Chlorophyll a[0]",
+        "definition": "(1) H2O[0] + (1) NADP[0] + (1) 7(1)-Hydroxychlorophyll a[0] <= (1) NADPH[0] + (1) O2[0] + (1) H+[0] + (1) Chlorophyll a[0]",
         "ec_numbers": null,
-        "equation": "(1) cpd00001[0] + (1) cpd00006[0] + (1) cpd19421[0] <= (1) cpd00005[0] + (1) cpd00007[0] + (3) cpd00067[0] + (1) cpd03148[0]",
+        "equation": "(1) cpd00001[0] + (1) cpd00006[0] + (1) cpd19421[0] <= (1) cpd00005[0] + (1) cpd00007[0] + (1) cpd00067[0] + (1) cpd03148[0]",
         "id": "rxn30918",
         "is_obsolete": 0,
         "is_transport": 0,
@@ -98384,11 +98409,11 @@
                 "name": "NADP"
             },
             {
-                "charge": 2,
+                "charge": 0,
                 "coefficient": -1,
                 "compartment": 0,
                 "compound": "cpd19421",
-                "formula": "C55H74MgN4O6",
+                "formula": "C55H72MgN4O6",
                 "name": "7(1)-Hydroxychlorophyll a"
             },
             {
@@ -98409,7 +98434,7 @@
             },
             {
                 "charge": 1,
-                "coefficient": 3,
+                "coefficient": 1,
                 "compartment": 0,
                 "compound": "cpd00067",
                 "formula": "H",
@@ -99353,12 +99378,12 @@
             "has_symmetry_groups": true
         },
         "code": "(1) cpd00001[0] + (1) cpd03148[0] <=> (1) cpd00999[0] + (1) cpd01449[0]",
-        "compound_ids": "cpd00001;cpd00999;cpd01449;cpd03148",
-        "definition": "(1) H2O[0] + (1) Chlorophyll a[0] => (1) Phytol[0] + (1) Chlorophyllide[0]",
+        "compound_ids": "cpd00001;cpd00067;cpd00999;cpd01449;cpd03148",
+        "definition": "(1) H2O[0] + (1) Chlorophyll a[0] => (2) H+[0] + (1) Phytol[0] + (1) Chlorophyllide[0]",
         "ec_numbers": [
             "3.1.1.14"
         ],
-        "equation": "(1) cpd00001[0] + (1) cpd03148[0] => (1) cpd00999[0] + (1) cpd01449[0]",
+        "equation": "(1) cpd00001[0] + (1) cpd03148[0] => (2) cpd00067[0] + (1) cpd00999[0] + (1) cpd01449[0]",
         "id": "rxn30925",
         "is_obsolete": 1,
         "is_transport": 0,
@@ -99369,7 +99394,8 @@
             "EQP",
             "|",
             "W",
-            "B"
+            "B",
+            "HB"
         ],
         "pathways": null,
         "reversibility": ">",
@@ -99393,6 +99419,14 @@
                 "name": "Chlorophyll a"
             },
             {
+                "charge": 1,
+                "coefficient": 2,
+                "compartment": 0,
+                "compound": "cpd00067",
+                "formula": "H",
+                "name": "H+"
+            },
+            {
                 "charge": 0,
                 "coefficient": 1,
                 "compartment": 0,
@@ -99401,11 +99435,11 @@
                 "name": "Phytol"
             },
             {
-                "charge": 1,
+                "charge": -1,
                 "coefficient": 1,
                 "compartment": 0,
                 "compound": "cpd01449",
-                "formula": "C35H35MgN4O5",
+                "formula": "C35H33MgN4O5",
                 "name": "Chlorophyllide"
             }
         ],

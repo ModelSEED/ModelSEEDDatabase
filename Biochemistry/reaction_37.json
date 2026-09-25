@@ -44615,11 +44615,11 @@
         },
         "code": "(1) cpd00006[0] + (1) cpd19421[0] <=> (1) cpd00005[0] + (1) cpd03149[0]",
         "compound_ids": "cpd00005;cpd00006;cpd00067;cpd03149;cpd19421",
-        "definition": "(1) NADP[0] + (1) 7(1)-Hydroxychlorophyll a[0] <=> (1) NADPH[0] + (1) H+[0] + (1) Chlorophyll b[0]",
+        "definition": "(1) NADP[0] + (1) 7(1)-Hydroxychlorophyll a[0] <=> (1) NADPH[0] + (2) H+[0] + (1) Chlorophyll b[0]",
         "ec_numbers": [
             "1.1.1.294"
         ],
-        "equation": "(1) cpd00006[0] + (1) cpd19421[0] <=> (1) cpd00005[0] + (1) cpd00067[0] + (1) cpd03149[0]",
+        "equation": "(1) cpd00006[0] + (1) cpd19421[0] <=> (1) cpd00005[0] + (2) cpd00067[0] + (1) cpd03149[0]",
         "id": "rxn37283",
         "is_obsolete": 1,
         "is_transport": 0,
@@ -44647,11 +44647,11 @@
                 "name": "NADP"
             },
             {
-                "charge": 2,
+                "charge": 0,
                 "coefficient": -1,
                 "compartment": 0,
                 "compound": "cpd19421",
-                "formula": "C55H74MgN4O6",
+                "formula": "C55H72MgN4O6",
                 "name": "7(1)-Hydroxychlorophyll a"
             },
             {
@@ -44664,18 +44664,18 @@
             },
             {
                 "charge": 1,
-                "coefficient": 1,
+                "coefficient": 2,
                 "compartment": 0,
                 "compound": "cpd00067",
                 "formula": "H",
                 "name": "H+"
             },
             {
-                "charge": 3,
+                "charge": 0,
                 "coefficient": 1,
                 "compartment": 0,
                 "compound": "cpd03149",
-                "formula": "C55H73MgN4O6",
+                "formula": "C55H70MgN4O6",
                 "name": "Chlorophyll b"
             }
         ],
@@ -44822,11 +44822,11 @@
         },
         "code": "(1) cpd00003[0] + (1) cpd19421[0] <=> (1) cpd00004[0] + (1) cpd03149[0]",
         "compound_ids": "cpd00003;cpd00004;cpd00067;cpd03149;cpd19421",
-        "definition": "(1) NAD[0] + (1) 7(1)-Hydroxychlorophyll a[0] <=> (1) NADH[0] + (1) H+[0] + (1) Chlorophyll b[0]",
+        "definition": "(1) NAD[0] + (1) 7(1)-Hydroxychlorophyll a[0] <=> (1) NADH[0] + (2) H+[0] + (1) Chlorophyll b[0]",
         "ec_numbers": [
             "1.1.1.294"
         ],
-        "equation": "(1) cpd00003[0] + (1) cpd19421[0] <=> (1) cpd00004[0] + (1) cpd00067[0] + (1) cpd03149[0]",
+        "equation": "(1) cpd00003[0] + (1) cpd19421[0] <=> (1) cpd00004[0] + (2) cpd00067[0] + (1) cpd03149[0]",
         "id": "rxn37284",
         "is_obsolete": 1,
         "is_transport": 0,
@@ -44854,11 +44854,11 @@
                 "name": "NAD"
             },
             {
-                "charge": 2,
+                "charge": 0,
                 "coefficient": -1,
                 "compartment": 0,
                 "compound": "cpd19421",
-                "formula": "C55H74MgN4O6",
+                "formula": "C55H72MgN4O6",
                 "name": "7(1)-Hydroxychlorophyll a"
             },
             {
@@ -44871,18 +44871,18 @@
             },
             {
                 "charge": 1,
-                "coefficient": 1,
+                "coefficient": 2,
                 "compartment": 0,
                 "compound": "cpd00067",
                 "formula": "H",
                 "name": "H+"
             },
             {
-                "charge": 3,
+                "charge": 0,
                 "coefficient": 1,
                 "compartment": 0,
                 "compound": "cpd03149",
-                "formula": "C55H73MgN4O6",
+                "formula": "C55H70MgN4O6",
                 "name": "Chlorophyll b"
             }
         ],
@@ -121394,10 +121394,10 @@
             "Name: precorrin-2 cobaltochelatase"
         ],
         "code": "(1) cpd00149[0] + (1) cpd01620[0] <=> (1) cpd25539[0]",
-        "compound_ids": "cpd00149;cpd01620;cpd25539",
-        "definition": "(1) Co2+[0] + (1) Precorrin 2[0] <=> (1) cobalt-dihydrosirohydrochlorin[0]",
+        "compound_ids": "cpd00067;cpd00149;cpd01620;cpd25539",
+        "definition": "(1) Co2+[0] + (1) Precorrin 2[0] <=> (3) H+[0] + (1) cobalt-dihydrosirohydrochlorin[0]",
         "ec_numbers": null,
-        "equation": "(1) cpd00149[0] + (1) cpd01620[0] <=> (1) cpd25539[0]",
+        "equation": "(1) cpd00149[0] + (1) cpd01620[0] <=> (3) cpd00067[0] + (1) cpd25539[0]",
         "id": "rxn37794",
         "is_obsolete": 0,
         "is_transport": 0,
@@ -121430,11 +121430,19 @@
                 "name": "Precorrin 2"
             },
             {
-                "charge": -5,
+                "charge": 1,
+                "coefficient": 3,
+                "compartment": 0,
+                "compound": "cpd00067",
+                "formula": "H",
+                "name": "H+"
+            },
+            {
+                "charge": -8,
                 "coefficient": 1,
                 "compartment": 0,
                 "compound": "cpd25539",
-                "formula": "C42H41CoN4O16",
+                "formula": "C42H38CoN4O16",
                 "name": "cobalt-dihydrosirohydrochlorin"
             }
         ],

@@ -67870,10 +67870,10 @@
             "has_symmetry_groups": true
         },
         "code": "(2) cpd00001[0] + (1) cpd00028[0] <=> (1) cpd15607[0]",
-        "compound_ids": "cpd00001;cpd00028;cpd15607",
-        "definition": "(2) H2O[0] + (1) Heme[0] <= (1) Heme D[0]",
+        "compound_ids": "cpd00001;cpd00028;cpd00067;cpd15607",
+        "definition": "(2) H2O[0] + (1) Heme[0] <= (2) H+[0] + (1) Heme D[0]",
         "ec_numbers": null,
-        "equation": "(2) cpd00001[0] + (1) cpd00028[0] <= (1) cpd15607[0]",
+        "equation": "(2) cpd00001[0] + (1) cpd00028[0] <= (2) cpd00067[0] + (1) cpd15607[0]",
         "id": "rxn12824",
         "is_obsolete": 0,
         "is_transport": 0,
@@ -67906,11 +67906,19 @@
                 "name": "Heme"
             },
             {
-                "charge": 2,
+                "charge": 1,
+                "coefficient": 2,
+                "compartment": 0,
+                "compound": "cpd00067",
+                "formula": "H",
+                "name": "H+"
+            },
+            {
+                "charge": 0,
                 "coefficient": 1,
                 "compartment": 0,
                 "compound": "cpd15607",
-                "formula": "C34H34FeN4O6",
+                "formula": "C34H32FeN4O6",
                 "name": "Heme D"
             }
         ],
@@ -67950,9 +67958,9 @@
         ],
         "code": "(1) cpd00001[0] + (1) cpd11313[0] <=> (1) cpd11312[0]",
         "compound_ids": "cpd00001;cpd00067;cpd11312;cpd11313",
-        "definition": "(1) H2O[0] + (1) hemeO[0] <=> (3) H+[0] + (1) hemeA[0]",
+        "definition": "(1) H2O[0] + (1) hemeO[0] <=> (4) H+[0] + (1) hemeA[0]",
         "ec_numbers": null,
-        "equation": "(1) cpd00001[0] + (1) cpd11313[0] <=> (3) cpd00067[0] + (1) cpd11312[0]",
+        "equation": "(1) cpd00001[0] + (1) cpd11313[0] <=> (4) cpd00067[0] + (1) cpd11312[0]",
         "id": "rxn12825",
         "is_obsolete": 0,
         "is_transport": 0,
@@ -67977,27 +67985,27 @@
                 "name": "H2O"
             },
             {
-                "charge": 0,
+                "charge": -2,
                 "coefficient": -1,
                 "compartment": 0,
                 "compound": "cpd11313",
-                "formula": "C49H58FeN4O5",
+                "formula": "C49H56FeN4O5",
                 "name": "hemeO"
             },
             {
                 "charge": 1,
-                "coefficient": 3,
+                "coefficient": 4,
                 "compartment": 0,
                 "compound": "cpd00067",
                 "formula": "H",
                 "name": "H+"
             },
             {
-                "charge": 1,
+                "charge": -2,
                 "coefficient": 1,
                 "compartment": 0,
                 "compound": "cpd11312",
-                "formula": "C49H57FeN4O6",
+                "formula": "C49H54FeN4O6",
                 "name": "hemeA"
             }
         ],
