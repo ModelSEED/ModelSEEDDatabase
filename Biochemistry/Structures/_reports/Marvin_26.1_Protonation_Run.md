@@ -366,8 +366,12 @@ only because the 23.4 InChI row was unprotonated. This is the "protonate rather
 than pass through" decision above surfacing in the records, and it is a *pick*
 question, not a repair: take formula and charge from the SMILE row when the
 InChI is the more fragmented — the same fragment-count test this run already
-uses to choose its input. About 490 compounds take that route. Left as a
-follow-up rather than decided here.
+uses to choose its input. `List_ModelSEED_Structures.py` now applies exactly
+that: a compound whose InChI representation is the more fragmented takes its
+formula and charge from its least-fragmented SMILE structure. Every compound it
+touches is listed in `_reports/Formula_From_SMILE_Row.txt` and tagged
+`formula_from_smile:disconnected_inchi` in `Pick_Reasons.txt`. The InChI and
+InChIKey rows are unchanged -- they still carry what InChI can represent.
 
 ### A second defect, in the parser rather than the engine
 
@@ -505,10 +509,10 @@ there is nothing left to permute.
   is the proof. No attempt was made to re-canonicalise 53,127 SMILES strings to
   match the old writer's output.
 - The tautomer step, pending an Isomers Plugin Group licence.
-- The pick rule for disconnected InChIs (formula and charge from the SMILE
-  row when the InChI is the more fragmented) -- see "What the invariant
-  cannot see". 161 records ship with a formula from a detached-ligand
-  protonation until it is decided.
+- The InChI and InChIKey *rows* of a disconnected-InChI compound still
+  describe the disconnected form (that is what InChI can represent); only the
+  compound's formula and charge now come from the SMILE row. A reader of the
+  pick file who wants the connected molecule should take the SMILE row.
 - ChEBI keeps bare ids in this bundle, matching the 23.4 protonation file —
   note that the *pKa* bundles use a `CHEBI_` prefix. The id-format migration
   stays a separate, reviewable change.

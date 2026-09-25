@@ -46,6 +46,12 @@ priority:
 # honours the flag; a bundle without it is consumed, so older trees are
 # unaffected. A superseded bundle stays in the tree for provenance and is
 # still validated by Scripts/Tests/test_protonation_invariant.py.
+# One exception, applied by List_ModelSEED_Structures.py: when a compound's
+# InChI is the more fragmented of its two representations (InChI disconnects
+# metal-ligand bonds), the compound's formula and charge come from its
+# least-fragmented SMILE structure instead, because the protonated InChI row
+# describes detached ligands, not the molecule. Listed per compound in
+# _reports/Formula_From_SMILE_Row.txt.
 structure_pick_order:
   - InChI@Charged
   - InChI@Original

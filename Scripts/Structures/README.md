@@ -55,6 +55,16 @@ files in the same directory.  Its two key output files are
 The latter file is the structural heart, and our goal is to expand on
 it via curation of the conflicts and integration of more structures.
 
+EDIT 2026-09-24: the compound-level formula and charge written to
+`Unique_ModelSEED_Structures.txt` follow the InChI row (see
+`structure_pick_order` in `Biochemistry/Structures/sources.yaml`)
+unless the compound's InChI is the more fragmented of its two
+representations, in which case they come from the least-fragmented
+SMILE structure. InChI disconnects metal-ligand bonds, and a
+protonated, disconnected InChI describes detached ligands rather
+than the molecule. The compounds this touches are listed in
+`Biochemistry/Structures/_reports/Formula_From_SMILE_Row.txt`.
+
 * `Update_Compound_Structures_Formulas_Charge.py`
 
 This script takes the output of the previous two scripts, and uses
