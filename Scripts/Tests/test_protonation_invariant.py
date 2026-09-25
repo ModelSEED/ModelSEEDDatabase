@@ -31,8 +31,10 @@ sys.path.insert(0, os.path.join(HERE, "..", "..", "Libs", "Python"))
 import Validate_Protonations as V                          # noqa: E402
 from Print_Structure_Formula_Charge import inchi_layers    # noqa: E402
 
-# Bundles that feed the compound records. Both are globbed by
-# BiochemPy.loadStructures, so both must be clean.
+# 26.1 is the bundle sources.yaml marks consumed_by_production and is what
+# feeds the compound records. 23.4 is superseded and kept for provenance; it
+# is validated here as data hygiene, so a future flip of the flag cannot
+# bring an impossible row back.
 BUNDLES = ("marvin_26.1_ph7", "marvin_23.4_ph7")
 
 failures = []

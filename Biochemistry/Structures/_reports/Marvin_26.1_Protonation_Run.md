@@ -352,6 +352,23 @@ untouched, and 14 previously shipped formulas that were already impossible
 against their source are corrected (elemental Se had been shipping as HSe⁻,
 phosphorus as PH₃, heptamolybdate as +12 where its InChI declares −6).
 
+### What the invariant cannot see
+
+The rule only rejects rows that are not protonations. A row that *is* a
+protonation of the wrong molecule passes it: for ferricyanide, InChI detaches
+six cyanides from the iron, Marvin protonates some of them as free CN⁻ → HCN,
+and the result is charge-consistent (dH = dcharge) while describing a molecule
+that does not exist. 161 compounds are in this class, every one with an InChI
+more fragmented than its SMILES, and in the regenerated records each carries a
+formula from that InChI row (C6H3FeN6/0) beside a SMILES of the connected
+complex (C6FeN6/−3). 160 of the 161 were consistent in the shipped records
+only because the 23.4 InChI row was unprotonated. This is the "protonate rather
+than pass through" decision above surfacing in the records, and it is a *pick*
+question, not a repair: take formula and charge from the SMILE row when the
+InChI is the more fragmented — the same fragment-count test this run already
+uses to choose its input. About 490 compounds take that route. Left as a
+follow-up rather than decided here.
+
 ### A second defect, in the parser rather than the engine
 
 Checking stored charges against what the InChI string itself declares found
@@ -370,6 +387,31 @@ While here: `Print_Structure_Formula_Charge.py` had never refreshed
 `inchi.tsv` or `smiles.tsv` at all since the layout migration -- it looked for
 a `structure` column the source files do not have -- and its OpenBabel path
 stripped the R group the run script had put on 8 wildcard rows. Both fixed.
+
+### Four more things the rollout exposed, none of them in this bundle
+
+- **The picker never expected two bundles.** `List_ModelSEED_Structures.py`
+  resolves each structure type on its own, and `BiochemPy.loadStructures`
+  globbed every `protonations/*.tsv` into the Charged stage. With 23.4 and
+  26.1 both present it took the InChI from one vintage and the InChIKey or
+  SMILES from the other: 5,567 InChIKey rows that were not the key of their
+  InChI row, 2,006 compound records whose formula and SMILES disagreed by a
+  protonation. `sources.yaml` now marks exactly one bundle per source
+  `consumed_by_production` (26.1), and the loader honours it; 23.4 stays for
+  provenance and is still validated.
+- **`Rebuild_Stoichiometry.py` refreshed embedded formulas but never embedded
+  charges**, and `balanceReaction()` reads that pair. The first reaction
+  refresh after this bundle saw phantom hydrogen imbalances and
+  `Adjust_Reaction_Protons.py` "fixed" 17,457 of them by adding a proton,
+  turning 5,935 balanced reactions into `CI:1`. Fixed; with charges
+  refreshed the same step resolves paired imbalances and 5,288 reactions go
+  from charge-imbalanced to OK.
+- **`Rebalance_Reactions.py` rejected its own documented `save` argument**,
+  so the rebalance step of `Refresh_Reactions.sh` had silently not been
+  running. Fixed.
+- **`Print_Structure_Formula_Charge.py` never refreshed the source files**
+  (wrong column name) and stripped R groups on its OpenBabel path. Both fixed;
+  see above.
 
 ## One engine, and why not the CLI
 
@@ -463,6 +505,10 @@ there is nothing left to permute.
   is the proof. No attempt was made to re-canonicalise 53,127 SMILES strings to
   match the old writer's output.
 - The tautomer step, pending an Isomers Plugin Group licence.
+- The pick rule for disconnected InChIs (formula and charge from the SMILE
+  row when the InChI is the more fragmented) -- see "What the invariant
+  cannot see". 161 records ship with a formula from a detached-ligand
+  protonation until it is decided.
 - ChEBI keeps bare ids in this bundle, matching the 23.4 protonation file —
   note that the *pKa* bundles use a `CHEBI_` prefix. The id-format migration
   stays a separate, reviewable change.
