@@ -13,6 +13,18 @@ The changes described here are implemented across four pull requests against
 `dev`; each PR body names the comment it answers. Draft text in this document
 is the intent — the PR is the authority where they differ.
 
+**Re-measured 2026-09-25.** The manuscript text in the four PRs has since been
+re-measured against the protonation-invariant tree (freiburgermsu#7,
+`1ad34adc`, stacked on #296), which is the database the paper now describes.
+Its reaction refresh retires 19 more reactions (48,403 → 48,384 live;
+12,261 → 12,259 added since 2020) and repairs the refresh itself — embedded
+reagent charges were never refreshed and the proton-rebalance step never
+persisted — so 33,496 live reactions satisfy mass and charge balance (69%)
+where 28,096 (58%) did at `41b20c21` (the breakdown is in #297). The counts in this
+document are left as measured at `41b20c21`; where they differ from the
+manuscript, the manuscript is current, and each PR description lists what
+moved.
+
 ---
 
 ## Read this first: one problem the reviewers did not raise
