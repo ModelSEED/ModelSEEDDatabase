@@ -36,6 +36,16 @@ priority:
 # When a compound has structures of multiple types/stages, this is the
 # order Update_Compound_Structures_Formulas_Charge.py uses to populate
 # the canonical formula/charge/inchikey/smiles fields.
+#
+# Exactly ONE protonation bundle per source is consumed_by_production. The
+# picker resolves each structure type on its own, so with two bundles at
+# different protonation states loaded it took the InChI from one and the
+# InChIKey or SMILES from the other for thousands of compounds (5,567
+# InChIKey rows not matching their InChI row; 2,006 compound records whose
+# formula and SMILES disagreed by a protonation). BiochemPy.loadStructures
+# honours the flag; a bundle without it is consumed, so older trees are
+# unaffected. A superseded bundle stays in the tree for provenance and is
+# still validated by Scripts/Tests/test_protonation_invariant.py.
 structure_pick_order:
   - InChI@Charged
   - InChI@Original
@@ -51,6 +61,7 @@ sources:
         tool:    Marvin
         version: "23.4"
         ph:      7
+        consumed_by_production: false   # superseded by 26.1; kept for provenance
         invariant_gate: |
           22 rows were replaced by their unprotonated source row because the
           protonated row broke the invariant a protonation must obey, dH == dcharge
@@ -64,6 +75,7 @@ sources:
         tool:    Marvin
         version: "26.1"
         ph:      7
+        consumed_by_production: true
         generated_by: Scripts/Structures/Run_Marvin_Protonations.py
         invariant_gate: |
           34 rows were replaced by their unprotonated source row because the
@@ -147,6 +159,7 @@ sources:
         tool:    Marvin
         version: "23.4"
         ph:      7
+        consumed_by_production: false   # superseded by 26.1; kept for provenance
         invariant_gate: |
           13 rows were replaced by their unprotonated source row because the
           protonated row broke the invariant a protonation must obey, dH == dcharge
@@ -160,6 +173,7 @@ sources:
         tool:    Marvin
         version: "26.1"
         ph:      7
+        consumed_by_production: true
         generated_by: Scripts/Structures/Run_Marvin_Protonations.py
         invariant_gate: |
           77 rows were replaced by their unprotonated source row because the
@@ -229,6 +243,7 @@ sources:
         tool:    Marvin
         version: "23.4"
         ph:      7
+        consumed_by_production: false   # superseded by 26.1; kept for provenance
         invariant_gate: |
           3 rows were replaced by their unprotonated source row because the
           protonated row broke the invariant a protonation must obey, dH == dcharge
@@ -242,6 +257,7 @@ sources:
         tool:    Marvin
         version: "26.1"
         ph:      7
+        consumed_by_production: true
         generated_by: Scripts/Structures/Run_Marvin_Protonations.py
         invariant_gate: |
           19 rows were replaced by their unprotonated source row because the
@@ -326,12 +342,14 @@ sources:
         tool:    Marvin
         version: "23.4"
         ph:      7
+        consumed_by_production: false   # superseded by 26.1; kept for provenance
         invariant_gate: |
           0 rows broke the protonation invariant dH == dcharge (Validate_Protonations.py).
       - file:    protonations/marvin_26.1_ph7.tsv
         tool:    Marvin
         version: "26.1"
         ph:      7
+        consumed_by_production: true
         generated_by: Scripts/Structures/Run_Marvin_Protonations.py
         invariant_gate: |
           0 rows broke the protonation invariant dH == dcharge (Validate_Protonations.py).
