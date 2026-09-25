@@ -28,6 +28,29 @@ import grace_style as grace
 
 FIGDIR = Path(__file__).resolve().parent.parent / "figures"
 
+# ---- population -----------------------------------------------------------
+# Obsolete records are excluded from every figure. The 2026 draft mixed two
+# populations -- "34% growth in compounds" counted all records, "55% in
+# reactions" counted 2026 totals against a 2020 baseline with obsolete rows
+# stripped -- and the figures silently counted all records throughout. One
+# flag, threaded through every loader below, so a figure cannot disagree with
+# the text. Flip it to False to reproduce the all-records numbers.
+LIVE_ONLY = True
+
+
+def _live(records):
+    """Filter a list of loaded records to the reporting population."""
+    if not LIVE_ONLY:
+        return records
+    return [r for r in records if r.get("is_obsolete") not in (1, "1")]
+
+
+def _live_rows(rows, col="is_obsolete"):
+    """Same, for DictReader rows off a TSV."""
+    if not LIVE_ONLY:
+        return rows
+    return [r for r in rows if r.get(col) != "1"]
+
 
 def save(fig, name):
     """Write one figure to ../figures/<name>.pdf and report the path."""
@@ -54,6 +77,13 @@ def _pka_provenance():
     (written by Scripts/Thermodynamics/ProtonationEvidence/build_pka_provenance.py)
     and ModelSEED_Reaction_Energies.tsv. Both ship, so a reader can reproduce
     every percentage in the protonation paragraph.
+
+    COLOUR, 2026-09-22: "no ionizable site" was NEUTRAL grey, the same family
+    as "no structure", which merged a chemistry RESULT (Marvin ran and found no
+    dissociable proton between pH -2 and 16) with a curation GAP (there is no
+    structure to run on). Reviewer 1 asked for a different scheme for this
+    panel; the result now takes its own categorical slot and only the genuine
+    absence stays grey.
 
     REWRITTEN 2026-09-08 for the Marvin 26.1 rebuild. The split is no longer
     open-vs-proprietary -- every resolved ladder is ChemAxon-derived now -- but
@@ -138,7 +168,7 @@ def _ladder_vintage():
 
     allc, struct = set(), set()
     for f in sorted(_glob.glob(str(root / "Biochemistry/compound_*.json"))):
-        for c in _json.load(open(f)):
+        for c in _live(_json.load(open(f))):
             allc.add(c["id"])
             if c.get("smiles") or c.get("inchikey"): struct.add(c["id"])
 
@@ -161,12 +191,12 @@ def _ladder_vintage():
     # earning a fourth colour. The release split is a sentence in the text.
     by_cpd = [("Marvin", cc["26.1 InChI"] + cc["23.4 InChI"], BLUE, ""),
               ("from SMILES", cc["26.1 SMILES"] + cc["23.4 SMILES"], BLUE, "xxx"),
-              ("no ionizable site", cc["no site"], NEUTRAL, ""),
+              ("no ionizable site", cc["no site"], ORANGE, ""),
               ("no structure", cc["no structure"], GRID, "")]
 
     rx = _c.Counter()
     for f in sorted(_glob.glob(str(root / "Biochemistry/reaction_*.json"))):
-        for r in _json.load(open(f)):
+        for r in _live(_json.load(open(f))):
             st = r.get("stoichiometry")
             if not isinstance(st, list) or not st: continue
             v = {cls.get(x["compound"], "no structure") for x in st}
@@ -176,7 +206,7 @@ def _ladder_vintage():
             else: rx["none"] += 1
     by_rxn = [("Marvin", rx["inchi"], BLUE, ""),
               ("from SMILES", rx["smi"], BLUE, "xxx"),
-              ("no ionizable site", rx["none"], NEUTRAL, ""),
+              ("no ionizable site", rx["none"], ORANGE, ""),
               ("no structure", rx["inc"], GRID, "")]
     return by_cpd, by_rxn
 
@@ -185,17 +215,19 @@ def _growth():
     """Figure 1A: compounds carrying an alias from each structure source,
     2020 against 2026. DERIVED from the shipped alias file on both sides.
 
-    The 2020 column used to be transcribed from an untracked MANUSCRIPT.md and
-    was wrong for both sources that existed then -- MetaCyc 19,138 against a
-    true 19,172, KEGG 17,760 against 17,793. It is now read from
-    Unique_ModelSEED_Compound_Aliases.txt at the last commit of 2020
-    (fd6c7849, 2020-11-10), six weeks after the paper appeared online, so the
-    figure cannot drift from the repository again.
+    The 2020 column is read from Unique_ModelSEED_Compound_Aliases.txt at the
+    last commit of 2020 (fd6c7849, 2020-11-10), six weeks after the paper
+    appeared online, so the figure cannot drift from the repository. An
+    earlier note here called the transcribed values -- MetaCyc 19,138, KEGG
+    17,760 -- "wrong" against 19,172 and 17,793 read from the file. They were
+    not wrong; they were the same counts with the 34 obsolete 2020 compounds
+    removed, i.e. the live basis this function now uses. Both differences are
+    exactly that 34 (33 for KEGG, one obsolete compound having no KEGG alias).
 
     Rhea is absent by construction: its 207 InChIKeys alias to zero ModelSEED
     compounds, so it contributes reactions, not structures.
     """
-    import csv as _csv, io as _io, subprocess as _sp, collections as _c
+    import csv as _csv, io as _io, subprocess as _sp, collections as _c, glob as _glob
     root = Path(__file__).resolve().parents[3]
     C2020 = "fd6c7849891ef4bbeb6eac072f5a6f7adff05b0e"
     REL = "Biochemistry/Aliases/Unique_ModelSEED_Compound_Aliases.txt"
@@ -211,6 +243,22 @@ def _growth():
     old = tally(_sp.run(["git", "show", f"{C2020}:{REL}"], cwd=str(root),
                         capture_output=True, text=True, check=True).stdout)
     new = tally((root / REL).read_text())
+
+    # The alias files carry no is_obsolete column, so the population filter has
+    # to come from the records on each side. The effect is small -- 34 obsolete
+    # compounds in 2020, 46 now -- but leaving it out would put this panel on a
+    # different population from every other one.
+    if LIVE_ONLY:
+        import json as _js
+        live_new = set()
+        for f in sorted(_glob.glob(str(root / "Biochemistry/compound_*.json"))):
+            live_new |= {c["id"] for c in _live(_js.load(open(f)))}
+        live_old = {r["id"] for r in _csv.DictReader(_io.StringIO(_sp.run(
+            ["git", "show", f"{C2020}:Biochemistry/compounds.tsv"], cwd=str(root),
+            capture_output=True, text=True, check=True).stdout), delimiter="\t")
+            if r.get("is_obsolete") != "1"}
+        old = _c.defaultdict(set, {k: v & live_old for k, v in old.items()})
+        new = _c.defaultdict(set, {k: v & live_new for k, v in new.items()})
     return [(s, len(old[s]), len(new[s])) for s in ("MetaCyc", "KEGG", "ChEBI")]
 
 
@@ -231,7 +279,7 @@ def _reaction_sources():
     root = Path(__file__).resolve().parents[3]
     struct = set()
     for f in sorted(_glob.glob(str(root / "Biochemistry" / "compound_*.json"))):
-        for c in _json.load(open(f)):
+        for c in _live(_json.load(open(f))):
             if c.get("smiles") or c.get("inchikey"):
                 struct.add(c["id"])
     PRIMARY = ("KEGG", "MetaCyc", "Rhea")
@@ -243,7 +291,7 @@ def _reaction_sources():
                 src[row[0]].add(row[2])
     rx = {}
     for f in sorted(_glob.glob(str(root / "Biochemistry" / "reaction_*.json"))):
-        for x in _json.load(open(f)):
+        for x in _live(_json.load(open(f))):
             rx[x["id"]] = {s["compound"] for s in (x.get("stoichiometry") or [])}
     tot = _c.Counter(); uniq = _c.Counter(); ucomp = _c.Counter()
     for rid, ss in src.items():
@@ -259,35 +307,213 @@ def _reaction_sources():
     return [(s, tot[s], uniq[s], ucomp[s]) for s in PRIMARY]
 
 
+def _euler_regions():
+    """Figure 1B: the seven-region overlap of the three primary reaction sources.
+
+    The stacked unique/shared bar this replaces said that 67% of MetaCyc's
+    reactions are unique, but never said who the other 33% are shared WITH --
+    which is the question integrating Rhea actually raises. These are the
+    region counts an Euler diagram needs.
+
+    All records, obsolete included: that is the population the manuscript
+    counts everywhere else, and _reaction_sources() above applies no filter
+    either, so the two panels stay on one basis.
+    """
+    import csv as _csv, collections as _c, glob as _glob, json as _json
+    root = Path(__file__).resolve().parents[3]
+    ids = set()
+    for f in sorted(_glob.glob(str(root / "Biochemistry" / "reaction_[0-9][0-9].json"))):
+        for r in _live(_json.load(open(f))):
+            ids.add(r["id"])
+    mem = _c.defaultdict(set)
+    with (root / "Biochemistry/Aliases/Unique_ModelSEED_Reaction_Aliases.txt").open() as fh:
+        rd = _csv.reader(fh, delimiter="\t"); next(rd)
+        for row in rd:
+            if len(row) >= 3 and row[2] in ("MetaCyc", "KEGG", "Rhea") and row[0] in ids:
+                mem[row[0]].add(row[2])
+    M = {i for i, v in mem.items() if "MetaCyc" in v}
+    K = {i for i, v in mem.items() if "KEGG" in v}
+    H = {i for i, v in mem.items() if "Rhea" in v}
+    return {"M": len(M - K - H), "K": len(K - M - H), "H": len(H - M - K),
+            "MK": len((M & K) - H), "MH": len((M & H) - K), "KH": len((K & H) - M),
+            "MKH": len(M & K & H), "none": len(ids - (M | K | H)),
+            "totals": {"MetaCyc": len(M), "KEGG": len(K), "Rhea": len(H)}}
+
+
+def _pathway_classes(top=8):
+    """Figure 1D: where the growth landed, at MetaCyc class level.
+
+    Reviewer 1 asked where new information is still being gained. The released
+    pathway alias file cannot answer it -- it stops at rxn48568, below the 2020
+    boundary, so every post-2020 reaction reads as unannotated. This rebuilds
+    the mapping from the shipped source table instead:
+
+        ModelSEED id -> MetaCyc reaction id   (Unique_ModelSEED_Reaction_Aliases)
+        MetaCyc reaction -> pathway -> parent (Scripts/Provenance/MetaCyc)
+
+    BOTH eras go through that same join, so the two bars are comparable. Reading
+    the pre-2020 side out of the alias file instead would compare a full
+    ancestor closure against a one-level parent lookup.
+
+    Super-Pathways is dropped: it is an organisational class, not a biological
+    one, and it would otherwise top the chart.
+    """
+    import csv as _csv, collections as _c, io as _io, subprocess as _sp, glob as _glob, json as _json
+    root = Path(__file__).resolve().parents[3]
+    C2020 = "fd6c7849891ef4bbeb6eac072f5a6f7adff05b0e"
+    DROP = {"Super-Pathways"}
+
+    old_ids = {r["id"] for r in _csv.DictReader(_io.StringIO(_sp.run(
+        ["git", "show", f"{C2020}:Biochemistry/reactions.tsv"], cwd=str(root),
+        capture_output=True, text=True, check=True).stdout), delimiter="\t")}
+
+    rx2pwy, parent, names = _c.defaultdict(set), {}, {}
+    with (root / "Scripts/Provenance/MetaCyc/MetaCyc_pathways.tsv").open() as fh:
+        for r in _csv.DictReader(fh, delimiter="\t"):
+            names[r["id"]] = r["name"] or r["id"]
+            parent[r["id"]] = [x for x in (r.get("parent") or "").split("|") if x]
+            for rx in (r["reactions"] or "").split("|"):
+                if rx:
+                    rx2pwy[rx].add(r["id"])
+
+    s2m = _c.defaultdict(set)
+    with (root / "Biochemistry/Aliases/Unique_ModelSEED_Reaction_Aliases.txt").open() as fh:
+        rd = _csv.reader(fh, delimiter="\t"); next(rd)
+        for row in rd:
+            if len(row) >= 3 and row[2] == "MetaCyc":
+                s2m[row[0]].add(row[1])
+
+    # The population filter: this loader iterates the alias file, which has no
+    # is_obsolete column, so it was still counting obsolete reactions as
+    # "already held" (antibiotics 824 rather than 740) after every other
+    # loader had moved to the live basis.
+    live = set()
+    for f in sorted(_glob.glob(str(root / "Biochemistry" / "reaction_*.json"))):
+        live |= {r["id"] for r in _live(_json.load(open(f)))}
+
+    new_c, old_c = _c.Counter(), _c.Counter()
+    for sid, mcs in s2m.items():
+        if sid not in live:
+            continue
+        cls = {p for mc in mcs for pwy in rx2pwy.get(mc, ()) for p in parent.get(pwy, [])}
+        cls -= DROP
+        for c in cls:
+            (old_c if sid in old_ids else new_c)[c] += 1
+    rows = [(names.get(c, c), n, old_c.get(c, 0)) for c, n in new_c.most_common(top)]
+    return rows
+
+
+def _energy_coverage():
+    """Figure 2B: reactions carrying an energy from each source, and the
+    denominator.
+
+    Was a hardcoded triple, which is why it stayed on the all-records
+    population when everything else moved. Sentinels are excluded, as the
+    comment on the old constant said: group contribution writes dg = 1e7 when
+    it declines and eQuilibrator writes sigma >= 2500 kcal/mol, and counting
+    those reads as coverage that does not exist.
+    """
+    import json as _json, glob as _glob, collections as _c
+    root = Path(__file__).resolve().parents[3]
+    n = _c.Counter(); total = 0
+    for f in sorted(_glob.glob(str(root / "Biochemistry" / "reaction_*.json"))):
+        for r in _live(_json.load(open(f))):
+            total += 1
+            for src, t in (r.get("thermodynamics") or {}).items():
+                if src == "LLMs" or not t or t[0] in ("", None):
+                    continue
+                try:
+                    dg, sd = float(t[0]), abs(float(t[1]))
+                except (TypeError, ValueError):
+                    continue
+                if dg >= 1e7 or sd >= 2500:
+                    continue
+                n[src] += 1
+    order = sorted(n, key=lambda k: -n[k])
+    return [(k, n[k]) for k in order], total
+
+
+def _sigma_values():
+    """Figure 2C histograms: each source's reported sigma, sentinels excluded.
+
+    Was read from figure_data_sigma.json, a static cache with no generator
+    that had been built on ALL records (n = 21,789 / 29,447 / 29,617, medians
+    0.63 / 10.41 / 17.01) -- so after the text moved to the live population
+    the drawn median lines disagreed with M11's 0.62 / 10.83 / 17.56. Derived
+    here through the same population filter and the same sentinel rule as
+    _energy_coverage(), so the figure and the text cannot drift apart again.
+    Returns {source: sorted list of sigma}.
+    """
+    import json as _json, glob as _glob, collections as _c
+    root = Path(__file__).resolve().parents[3]
+    out = _c.defaultdict(list)
+    for f in sorted(_glob.glob(str(root / "Biochemistry" / "reaction_*.json"))):
+        for r in _live(_json.load(open(f))):
+            for src, t in (r.get("thermodynamics") or {}).items():
+                if src == "LLMs" or not t or t[0] in ("", None):
+                    continue
+                try:
+                    dg, sd = float(t[0]), abs(float(t[1]))
+                except (TypeError, ValueError):
+                    continue
+                if dg >= 1e7 or sd >= 2500:
+                    continue
+                out[src].append(sd)
+    return {k: sorted(v) for k, v in out.items()}
+
+
 def _silver_sigma_band():
     """Figure 2C shading: the sigma span of reactions graded SILVER, per source.
 
-    Reaction-level grade (best_grade in source_grades_wide.tsv) joined back to
-    each source's own reported sigma. Answers "what uncertainty does a silver
-    reaction actually carry?" -- and shows that the answer is only meaningful
-    for two of the three sources. eQuilibrator and dGPredictor separate their
-    tiers by sigma (medians 0.26/0.62/1.43 and 1.54/16.49/21.85 for
-    gold/silver/bronze); Group contribution does not (9.19/8.99/10.35), which is
-    the same flat-error-curve problem that stopped raw sigma being used to rank
-    sources in the first place. The band is p5-p95.
+    Answers "what uncertainty does a silver reaction actually carry?" -- and
+    shows that the answer is only meaningful for two of the three sources.
+    eQuilibrator and dGPredictor separate their tiers by sigma; Group
+    contribution does not, which is the same flat-error-curve problem that
+    stopped raw sigma being used to rank sources in the first place. The band
+    is p5-p95.
+
+    REWRITTEN to read only files that ship. It previously joined two
+    intermediates under results/thermo_grades/ -- source_grades_wide.tsv and
+    source_grades.tsv -- both of which are .gitignore'd (see
+    Biochemistry/Thermodynamics/SourceGrading/.gitignore line 12). Neither is
+    present in a clean checkout, so importing this module raised
+    FileNotFoundError and NO figure could be regenerated, this one included.
+    Regenerating them is not a way out either: grade_thermo_sources.py fails
+    under the pinned pandas.
+
+    The same two quantities are available from files that are committed:
+    best_grade from reaction_grades.tsv, and each source's reported sigma from
+    the released Biochemistry/reaction_*.json, which is where the published
+    uncertainty lives anyway. Same band, reproducible by a reader.
     """
-    import csv as _csv, collections as _c
+    import csv as _csv, collections as _c, glob as _glob, json as _json
     root = Path(__file__).resolve().parents[3]
-    g = root / "Biochemistry/Thermodynamics/SourceGrading/results/thermo_grades"
+    grades = root / ("Biochemistry/Thermodynamics/SourceGrading/results/"
+                     "thermo_grades/reaction_grades.tsv")
     best = {}
-    with (g / "source_grades_wide.tsv").open() as fh:
+    with grades.open() as fh:
         for x in _csv.DictReader(fh, delimiter="\t"):
-            if x["best_grade"]:
+            if x.get("best_grade"):
                 best[x["rxn"]] = x["best_grade"]
     sig = _c.defaultdict(list)
-    with (g / "source_grades.tsv").open() as fh:
-        for x in _csv.DictReader(fh, delimiter="\t"):
-            if x["source"] == "TECRDB" or best.get(x["rxn"]) != "SILVER":
+    for f in sorted(_glob.glob(str(root / "Biochemistry" / "reaction_[0-9][0-9].json"))):
+        for r in _live(_json.load(open(f))):
+            if best.get(r["id"]) != "SILVER":
                 continue
-            try:
-                sig[x["source"]].append(abs(float(x["sigma"])))
-            except (TypeError, ValueError):
-                pass
+            for name, triple in (r.get("thermodynamics") or {}).items():
+                if name == "LLMs" or not triple or len(triple) < 2:
+                    continue
+                try:
+                    dg, sd = float(triple[0]), abs(float(triple[1]))
+                except (TypeError, ValueError):
+                    continue
+                # Sentinels, not error bars. Same exclusions the Results
+                # section documents: group contribution writes dg = 1e7 when
+                # it declines, and eQuilibrator writes sigma >= 2500 kcal/mol.
+                # Leaving them in put eQuilibrator's p95 at 23,901.
+                if dg >= 1e7 or sd >= 2500:
+                    continue
+                sig[name].append(sd)
     out = {}
     for k, v in sig.items():
         v.sort()
@@ -307,7 +533,7 @@ def _grade_breakdown():
     root = Path(__file__).resolve().parents[3]
     A = _c.defaultdict(_c.Counter); X = _c.defaultdict(_c.Counter)
     for f in sorted(_glob.glob(str(root / "Biochemistry" / "reaction_*.json"))):
-        for r in _json.load(open(f)):
+        for r in _live(_json.load(open(f))):
             e = r.get("thermo-evidence")
             if not e:
                 continue
@@ -338,7 +564,7 @@ def _direction_counts():
     counts = {s: _c.Counter() for s in
               ("eQuilibrator", "Group contribution", "dGPredictor", "LLMs")}
     for f in sorted(_glob.glob(str(root / "Biochemistry" / "reaction_*.json"))):
-        for r in _json.load(open(f)):
+        for r in _live(_json.load(open(f))):
             for s, v in (r.get("thermodynamics") or {}).items():
                 if s in counts and isinstance(v, list) and len(v) > 2:
                     counts[s][v[2]] += 1
@@ -354,7 +580,7 @@ def _agreement_counts():
     root = Path(__file__).resolve().parents[3]
     agree = opp = eq_only = dg_only = neither = partial = 0
     for f in sorted(_glob.glob(str(root / "Biochemistry" / "reaction_*.json"))):
-        for r in _json.load(open(f)):
+        for r in _live(_json.load(open(f))):
             th = r.get("thermodynamics") or {}
             x, y = th.get("eQuilibrator"), th.get("dGPredictor")
             if not (isinstance(x, list) and len(x) > 2
@@ -404,9 +630,8 @@ NUMBERS = {
     # Group contribution stores an entry for essentially every reaction but
     # 26,555 of them are the 10000000.0 placeholder, so the raw entry count
     # reads as 100% coverage and is not coverage at all.
-    "energy_rxn": [("dGPredictor", 29617), ("Group contribution", 29447),
-                   ("eQuilibrator", 21789)],
-    "energy_total": 56012,
+    "energy_rxn": None,    # filled by _energy_coverage()
+    "energy_total": None,  # filled by _energy_coverage()
     # direction derived per source from the same dicts
     "direction": [("eQuilibrator", 8650, 10957, 1071),
                   ("Group contribution", 10514, 17510, 1423),
@@ -431,6 +656,8 @@ NUMBERS["grade_assess"], NUMBERS["grade_cross"] = _grade_breakdown()
 NUMBERS["growth"] = _growth()
 NUMBERS["rxn_sources"] = _reaction_sources()
 NUMBERS["ladder_cpd"], NUMBERS["ladder_rxn"] = _ladder_vintage()
+NUMBERS["energy_rxn"], NUMBERS["energy_total"] = _energy_coverage()
+NUMBERS["sigma"] = _sigma_values()
 
 
 def strip(ax, keep_x=True, value_axis="x"):
