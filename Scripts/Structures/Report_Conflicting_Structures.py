@@ -1,4 +1,13 @@
 #!/usr/bin/env python
+
+if __name__ == "__main__":
+    # Argument guard -- see "The argument guard" in Scripts/README.md.
+    import argparse as _argparse
+    _argparse.ArgumentParser(
+        description=__doc__,
+        formatter_class=_argparse.RawDescriptionHelpFormatter).parse_args()
+
+
 import os
 import sys
 import json
@@ -15,7 +24,7 @@ Reactions_Dict = ReactionsHelper.loadReactions()
 # Load ACPs
 Overridden_Fields=dict()
 header=list()
-with open(os.path.dirname(__file__)+'/ACPs_Master_Formula_Charge.txt') as fh:
+with open(os.path.dirname(__file__)+'/../../Biochemistry/Curation/overrides/acps_formula_charge.tsv') as fh:
     for line in fh.readlines():
         line=line.strip()
         array=line.split('\t')
@@ -43,7 +52,7 @@ for rxn in Reactions_Dict:
 
 # Reactions Compound KEGG MetaCyc Name Formula Charge
 cpd_conflicts=dict()
-with open('Formula_Conflicts.txt') as file_handle:
+with open(os.path.dirname(__file__)+'/../../Biochemistry/Structures/_reports/Formula_Conflicts.txt') as file_handle:
     for line in file_handle.readlines():
         line=line.strip()
         array=line.split('\t')

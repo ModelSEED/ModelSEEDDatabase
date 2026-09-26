@@ -1,9 +1,22 @@
 #!/usr/bin/env python
+
+if __name__ == "__main__":
+    # Two compound ids. The hand-rolled check below still runs; this adds
+    # --help and a usage line, neither of which existed.
+    import argparse as _argparse
+    _p = _argparse.ArgumentParser(
+        description=__doc__,
+        formatter_class=_argparse.RawDescriptionHelpFormatter)
+    _p.add_argument("kept", help="compound id to keep, e.g. cpd00001")
+    _p.add_argument("merged", help="compound id to merge away")
+    _p.parse_args()
+
+
 import os, sys
 temp=list();
 header=1;
 
-sys.path.append('../../Libs/Python')
+sys.path.append('../../../Libs/Python')
 from BiochemPy import Reactions, Compounds
 
 arguments = list(sys.argv)
@@ -49,6 +62,10 @@ compounds_helper.saveCompounds(compounds_dict)
 
 print("You must run these commands afterwards:")
 print("\t../../Biochemistry/Maintain/Update_Obsolete_Compounds_in_Reactions.py")
-print("\t../../Biochemistry/Refresh/Refresh_Database.sh")
+print("\t../../Biochemistry/Refresh/Refresh_Aliases.sh")
+print("\t../../Biochemistry/Refresh/Refresh_Reactions.sh")
 print("\t../../Biochemistry/Update/Remove_Newly_Obsolescent_Reactions.py")
 print("\t../../Biochemistry/Update/Remove_Newly_Obsolescent_Compounds.py")
+print("\t../../Biochemistry/Reprint_Biochemistry.py")
+print("\t../Structures/List_ModelSEED_Structures.py")
+print("\t../Structures/Update_Compound_Structures_Formulas_Charge.py")

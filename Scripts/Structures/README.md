@@ -10,7 +10,11 @@ states You should only have to do this whenever you update the
 structures themselves, but, you might get changes occuring if you
 install updated versions of RDKit and/or OpenBabel in your conda
 environment, so double-check. At time of submission we used RDKit
-2020.03.1.0 and OpenBabel 2.4.1
+2020.03.1.0 and OpenBabel 2.4.1. I have an outline of what I need to 
+do to get these working on a new mac below.
+
+EDIT: As of 09/15/22 we used RDKit 2022.03.5 and OpenBabel 3.1.1
+EDIT: This the same as of 01/23/24
 
 * `List_ModelSEED_Structures.py` 
 
@@ -30,7 +34,7 @@ it via curation of the conflicts and integration of more structures.
 This script takes the output of the previous two scripts, and uses
 them to update the ModelSEED database.
 
-* `Update_Compound_Structures_Formulas_Charge.py`
+* `Update_Compound_pKas.py`
 
 This script takes the pKa files found in
 `../../Biochemistry/Structures`, and uses them to update the ModelSEED
@@ -59,4 +63,21 @@ the charge of the phosphopantetheine prosthetic group as well as the
 attached fatty acyl chain can be overlooked and leads to reaction
 imbalance. Here we attempt to manually curate the formula and charge
 that would maintain the mass-balance of the fatty acid biosynthetic
-pathways, and others, in the `ACPs_Master_Formula_Charge.txt` file.
+pathways, and others, in the
+`Biochemistry/Curation/overrides/acps_formula_charge.tsv` file.
+
+# Installing RDKit and OpenBabel
+
+You might need swig and its python bindings but the conda packages may 
+install fine:
+
+`port install swig`
+`port install swig-python`
+
+You'll want to install anaconda and follow this process for creating
+a specific environment for the chemoinformatics packages. This was
+the approach with the least pain:
+
+`conda create -c conda-forge -n msd-env rdkit`
+`conda activate msd-env`
+`conda install openbabel -c conda-forge`

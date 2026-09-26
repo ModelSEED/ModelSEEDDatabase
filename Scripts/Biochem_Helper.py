@@ -80,16 +80,10 @@ class BiochemHelper(BaseHelper):
                     if fields[fieldNames['linked_compound']] != 'null':
                         cpd['linked_compound'] = fields[fieldNames['linked_compound']]
                     cpd['is_cofactor'] = int(fields[fieldNames['is_cofactor']])
-                    if fields[fieldNames['deltag']] != 'null':
-                        cpd['deltag'] = float(fields[fieldNames['deltag']])
-                    else:
-                        cpd['deltag'] = float(10000000)
-                    if fields[fieldNames['deltagerr']] != 'null':
-                        cpd['deltagerr'] = float(fields[fieldNames['deltagerr']])
-                    else:
-                        cpd['deltagerr'] = float(10000000)
-                    cpd['pka'] = fields[fieldNames['pka']]
-                    cpd['pkb'] = fields[fieldNames['pkb']]
+                    # deltag/deltagerr/pka/pkb are no longer TSV columns
+                    # (retired 2026-09-11). Energies are per source under
+                    # `thermodynamics` and protonation per tool under `pkas`,
+                    # both JSON-only, so this TSV reader no longer carries them.
                     if fields[fieldNames['abstract_compound']] != 'null':
                         cpd['abstract_compound'] = fields[fieldNames['abstract_compound']]
                     if fields[fieldNames['comprised_of']] != 'null':
@@ -165,14 +159,7 @@ class BiochemHelper(BaseHelper):
                     rxn['pathways'] = fields[fieldNames['pathways']]
                     rxn['aliases'] = fields[fieldNames['aliases']]
                     rxn['ec_numbers'] = fields[fieldNames['ec_numbers']]
-                    if fields[fieldNames['deltag']] != 'null':
-                        rxn['deltag'] = float(fields[fieldNames['deltag']])
-                    else:
-                        rxn['deltag'] = float(10000000)
-                    if fields[fieldNames['deltagerr']] != 'null':
-                        rxn['deltagerr'] = float(fields[fieldNames['deltagerr']])
-                    else:
-                        rxn['deltagerr'] = float(10000000)
+                    # deltag/deltagerr retired 2026-09-11; see the note above.
                     rxn['compound_ids'] = fields[fieldNames['compound_ids']]
                     rxn['status'] = fields[fieldNames['status']]
                     if 'is_obsolete' in fieldNames:

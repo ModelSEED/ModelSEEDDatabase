@@ -1,98 +1,170 @@
 #!/usr/bin/env python
-import os, sys, re
-temp=list();
-header=1;
+"""
+Refresh formula and charge columns in the per-source structure files
+by re-parsing each structure with RDKit (preferred) or OpenBabel.
 
-from BiochemPy import Compounds
+Reads/writes (in-place) the post-A1 layout:
 
-import pybel
-from rdkit.Chem import AllChem
-from rdkit import RDLogger
-lg = RDLogger.logger()
-lg.setLevel(RDLogger.ERROR)
+  Biochemistry/Structures/<source>/inchi.tsv
+                                  /smiles.tsv
+                                  /protonations/<tool>_<ver>_ph<n>.tsv
 
-#Load Structures and Aliases
-CompoundsHelper = Compounds()
-Structures_Dict = CompoundsHelper.loadStructures(["SMILE","InChI"],["KEGG","MetaCyc"])
+inchikey.tsv is left alone (an InChIKey is a hash, no formula/charge to
+derive). The protonations file holds rows for InChI, SMILE, and
+InChIKey — only the first two have their formula/charge refreshed; the
+InChIKey rows are passed through unchanged.
 
-Structures_Root=os.path.dirname(__file__)+"/../../Biochemistry/Structures/"
-file_handle_dict=dict()
-for source in "KEGG","MetaCyc":
-    for struct_type in "InChI","SMILE":
-        for struct_stage in "Charged","Original":
-            file_string="_".join((source,struct_type,struct_stage))
-            file_name=Structures_Root+source+"/"+struct_type+"_"+struct_stage+"_Formulas_Charges.txt"
-            file_handle_dict[file_string]=open(file_name,"w")
+You should re-run this script whenever a structure changes (new KEGG
+release, curator edit, new Marvin protonation), or when RDKit/OpenBabel
+is upgraded — different parser versions can produce slightly different
+formulas/charges. At time of writing we use RDKit 2022.03.5 and
+OpenBabel 3.1.1 (same as in the previous script generation).
 
-resolved_structures=open('Resolved_Structures.txt','w')
-unresolved_structures=open('Unresolved_Structures.txt','w')
-for struct_type in sorted(Structures_Dict.keys()):
+Outputs diagnostic reports to Biochemistry/Structures/_reports/.
+"""
 
-#    if(struct_type != 'InChI'):
-#        continue
+if __name__ == "__main__":
+    # Argument guard -- see "The argument guard" in Scripts/README.md.
+    import argparse as _argparse
+    _argparse.ArgumentParser(
+        description=__doc__,
+        formatter_class=_argparse.RawDescriptionHelpFormatter).parse_args()
 
-    for external_id in sorted(Structures_Dict[struct_type]):
 
-#        if(external_id != 'FAD'):
-#            continue
+import csv
+import glob
+import os
+import re
+import sys
 
-        source="MetaCyc"
-        if(re.search("^[CR]\d{5}$",external_id)):
-            source="KEGG"
-        for struct_stage in sorted(Structures_Dict[struct_type][external_id].keys()):
-            file_string="_".join((source,struct_type,struct_stage))
-            for structure in sorted(Structures_Dict[struct_type][external_id][struct_stage].keys()):
-                mol=None
-                mol_source=""
-                try:
-                    if(struct_type == 'InChI'):
-                        mol = AllChem.MolFromInchi(structure)
-                        if(mol is None or external_id=='FAD'):
-                            mol=pybel.readstring("inchi",structure)
-                            if(mol):
-                                mol_source="OpenBabel"
-                        else:
-                            mol_source="RDKit"
-                    elif(struct_type == 'SMILE'):
-                        mol = AllChem.MolFromSmiles(structure)
-                        if(mol==None):
-                            mol=pybel.readstring("smiles",structure)
-                            if(mol):
-                                mol_source="OpenBabel"
-                        else:
-                            mol_source="RDKit"
-                except Exception as e:
-                    pass
+sys.path.append('../../Libs/Python')
+from BiochemPy import Compounds  # noqa: E402
 
-                if(mol is None):
-                    unresolved_structures.write(external_id+"\t"+struct_stage+"\t"+structure+"\n")
-                    continue
+from openbabel import pybel  # noqa: E402
+from rdkit.Chem import AllChem  # noqa: E402
+from rdkit import RDLogger  # noqa: E402
 
-                new_formula=""
-                if(mol_source=="RDKit"):
-                    new_formula = AllChem.CalcMolFormula(mol)
-                elif(mol_source=="OpenBabel"):
-                    new_formula=mol.formula
+RDLogger.logger().setLevel(RDLogger.ERROR)
 
-                new_charge=0
-                if(mol_source=="RDKit"):
-                    new_charge = AllChem.GetFormalCharge(mol)
-                    match = re.search('([-+]\d?)$',new_formula)
-                    if(match):
-                        new_formula = new_formula.replace(match.group(),'')
-                elif(mol_source=="OpenBabel"):
-                    new_charge = mol.charge
-                    match = re.search('([-+]+)$',new_formula)
-                    if(match):
-                        new_formula = new_formula.replace(match.group(),'')
+SCRIPT_DIR  = os.path.dirname(os.path.abspath(__file__))
+STRUCT_ROOT = os.path.normpath(os.path.join(SCRIPT_DIR, '..', '..',
+                                            'Biochemistry', 'Structures'))
+REPORT_DIR  = os.path.join(STRUCT_ROOT, '_reports')
 
-                #For SMILES, generic groups are given a '*' character
-                #We're normalizing these as 'R' groups in MSD
-                norm_formula = re.sub('\*','R',new_formula)
+SOURCES = ['KEGG', 'MetaCyc', 'ChEBI', 'Rhea']
 
-                #normalizing formula my own way, so I can be consistent
-                #these are hill-sorted, and merges molecular fragments
-                norm_formula = Compounds.mergeFormula(norm_formula)[0]
 
-                resolved_structures.write("\t".join([external_id,struct_stage,structure,norm_formula,str(new_charge),mol_source])+"\n")
-                file_handle_dict[file_string].write("\t".join((external_id,norm_formula,str(new_charge)))+"\n")
+def parse_structure(struct_type, structure):
+    """Return (formula, charge, mol_source) or (None, None, None) if neither
+    parser succeeds. mol_source is 'RDKit' or 'OpenBabel' depending on
+    which one produced the result (RDKit preferred).
+    """
+    mol_rdkit  = None
+    mol_obabel = None
+    try:
+        if struct_type == 'InChI':
+            mol_rdkit  = AllChem.MolFromInchi(structure)
+            mol_obabel = pybel.readstring('inchi', structure)
+        elif struct_type == 'SMILE':
+            mol_rdkit  = AllChem.MolFromSmiles(structure)
+            mol_obabel = pybel.readstring('smiles', structure)
+    except Exception:
+        pass
+
+    if mol_rdkit is None and mol_obabel is None:
+        return None, None, None
+
+    if mol_rdkit is not None:
+        formula = AllChem.CalcMolFormula(mol_rdkit)
+        charge  = AllChem.GetFormalCharge(mol_rdkit)
+        mol_src = 'RDKit'
+        m = re.search(r'([-+]\d?)$', formula)
+        if m:
+            formula = formula.replace(m.group(), '')
+    else:
+        formula = mol_obabel.formula
+        charge  = mol_obabel.charge
+        mol_src = 'OpenBabel'
+        m = re.search(r'([-+]+)$', formula)
+        if m:
+            formula = formula.replace(m.group(), '')
+
+    formula = re.sub(r'\*', 'R', formula)
+    formula = Compounds.mergeFormula(formula)[0]
+    return formula, str(charge), mol_src
+
+
+def refresh_file(path, struct_type_for_all=None, type_column='type',
+                 structure_column='structure', report_resolved=None,
+                 report_unresolved=None, source_label=''):
+    """Refresh formula/charge columns in path, in-place.
+
+    - If struct_type_for_all is set (e.g. 'InChI' or 'SMILE'), every row's
+      structure_column is parsed as that type. Used for inchi.tsv and
+      smiles.tsv where each file is single-type.
+    - Otherwise, the row's type_column tells us how to parse. Used for
+      protonations/*.tsv where each row carries its own type.
+    """
+    if not os.path.isfile(path):
+        return
+
+    with open(path) as fh:
+        reader     = csv.DictReader(fh, dialect='excel-tab')
+        fieldnames = reader.fieldnames
+        rows       = list(reader)
+
+    for row in rows:
+        struct = row.get(structure_column, '')
+        stype  = struct_type_for_all if struct_type_for_all else row.get(type_column)
+        ext_id = row.get('external_id') or row.get('ID') or ''
+        if stype == 'InChIKey' or not struct or not stype:
+            continue
+
+        formula, charge, mol_src = parse_structure(stype, struct)
+        if formula is None:
+            if report_unresolved is not None:
+                report_unresolved.write('\t'.join([source_label, ext_id, stype, struct]) + '\n')
+            continue
+
+        row['formula'] = formula
+        row['charge']  = charge
+        if report_resolved is not None:
+            report_resolved.write('\t'.join([source_label, ext_id, stype, struct, formula, charge, mol_src]) + '\n')
+
+    # Write back in the same plain-tab/LF format Migrate_To_New_Layout
+    # used. csv.DictWriter('excel-tab') writes \r\n which would diverge
+    # from the rest of the repo, so format manually.
+    with open(path, 'w') as fh:
+        fh.write('\t'.join(fieldnames) + '\n')
+        for row in rows:
+            fh.write('\t'.join(str(row.get(f, '') or '') for f in fieldnames) + '\n')
+
+
+def main():
+    os.makedirs(REPORT_DIR, exist_ok=True)
+    resolved   = open(os.path.join(REPORT_DIR, 'Resolved_Structures.txt'),   'w')
+    unresolved = open(os.path.join(REPORT_DIR, 'Unresolved_Structures.txt'), 'w')
+    try:
+        for source in SOURCES:
+            src_dir = os.path.join(STRUCT_ROOT, source)
+            print(f'Refreshing {source}...')
+            refresh_file(os.path.join(src_dir, 'inchi.tsv'),  struct_type_for_all='InChI',
+                         report_resolved=resolved, report_unresolved=unresolved,
+                         source_label=source)
+            refresh_file(os.path.join(src_dir, 'smiles.tsv'), struct_type_for_all='SMILE',
+                         report_resolved=resolved, report_unresolved=unresolved,
+                         source_label=source)
+
+            proto_dir = os.path.join(src_dir, 'protonations')
+            if os.path.isdir(proto_dir):
+                for proto_file in sorted(glob.glob(os.path.join(proto_dir, '*.tsv'))):
+                    refresh_file(proto_file,
+                                 report_resolved=resolved, report_unresolved=unresolved,
+                                 source_label=source)
+    finally:
+        resolved.close()
+        unresolved.close()
+
+
+if __name__ == '__main__':
+    main()
