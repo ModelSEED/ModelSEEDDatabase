@@ -13,6 +13,7 @@ import sys
 import csv
 import json
 import glob
+import re
 
 #################################################################
 ## Load Compound Objects into memory
@@ -230,6 +231,83 @@ Structures_Root=os.path.dirname(__file__)+"/../../Biochemistry/Structures/"
 Formulas_Dict = CompoundsHelper.loadPerSourceFormulasCharges(['InChI','SMILE'], ['KEGG','MetaCyc','ChEBI','Rhea'])
 
 #################################################################
+## The fragment-count rule.
+##
+## InChI disconnects metal-ligand bonds by design, and Marvin protonates the
+## detached ligands as free ions. That protonation is charge-consistent, so
+## the InChI row's formula passes every invariant while describing a molecule
+## that does not exist: ferricyanide's InChI row reads C6H3FeN6/0 beside a
+## SMILES of the connected C6FeN6/-3. The InChI row stays the default source
+## of a compound's formula and charge (sources.yaml structure_pick_order)
+## UNLESS the InChI is the more fragmented of the two representations, in
+## which case the least-fragmented SMILE structure's formula and charge are
+## used. Same test Run_Marvin_Protonations.py applies to choose its input.
+## Every compound this touches is listed in _reports/Formula_From_SMILE_Row.txt
+## and tagged formula_from_smile:disconnected_inchi in Pick_Reasons.txt.
+#################################################################
+
+def inchi_fragments(inchi):
+    """Component instances in a standard InChI's formula layer: '4Fe.4S' is 8,
+    '3C6H5.ClH.Sn' is 5, a connected molecule is 1."""
+    m = re.match(r'InChI=1S?/([^/]+)', inchi or '')
+    if not m:
+        return 1
+    return sum(int(re.match(r'(\d*)', c).group(1) or 1) for c in m.group(1).split('.'))
+
+def smiles_fragments(smiles):
+    """Disconnected components of a SMILES: one more than its dots."""
+    return (smiles or '').count('.') + 1
+
+def formula_from_least_fragmented_smile(Structs, struct_stage):
+    """(formula_charge_dict, inchi_fragments, smiles_fragments) when the
+    compound's InChI representation is the more fragmented, else None."""
+    if 'InChI' not in Structs or 'SMILE' not in Structs:
+        return None
+    if struct_stage not in Structs['InChI'] or struct_stage not in Structs['SMILE']:
+        return None
+    inchi_frag = min(inchi_fragments(x) for x in Structs['InChI'][struct_stage])
+    smiles = sorted(Structs['SMILE'][struct_stage].keys(), key=lambda x: (smiles_fragments(x), x))
+    smile_frag = smiles_fragments(smiles[0])
+    if not (inchi_frag > 1 and smile_frag < inchi_frag):
+        return None
+    for x in smiles:
+        if smiles_fragments(x) != smile_frag:
+            break
+        for external_id, source in sorted(Structs['SMILE'][struct_stage][x].items()):
+            fc = Formulas_Dict.get(source, {}).get('SMILE', {}).get(struct_stage, {}).get(external_id)
+            if not fc or fc.get('formula') in (None, '', 'null'):
+                continue
+            # THE GUARD. Only switch when the two SOURCE representations agree
+            # up to a protonation (same heavy atoms, dH == dcharge). Where they
+            # do not -- MetaCyc writes [SH] on the bridging sulfides of Fe4S4,
+            # so its smiles.tsv says H4Fe4S4 against its inchi.tsv's Fe4S4 --
+            # the SMILE row is no more trustworthy than the InChI row, and
+            # switching would trade a detached-ligand formula for a source
+            # quirk. Those compounds keep the InChI-derived formula and are
+            # the `source` findings of Validate_Protonations.py: curation.
+            s_orig = Formulas_Dict.get(source, {}).get('SMILE', {}).get('Original', {}).get(external_id)
+            i_orig = Formulas_Dict.get(source, {}).get('InChI', {}).get('Original', {}).get(external_id)
+            if s_orig and i_orig and _protonation_consistent(i_orig, s_orig):
+                return dict(fc), inchi_frag, smile_frag
+    return None
+
+def _protonation_consistent(a, b):
+    """dH == dcharge with heavy atoms conserved, between two formula/charge dicts."""
+    def counts(f):
+        d = {}
+        for el, n in re.findall(r'([A-Z][a-z]?|R)(\d*)', f or ''):
+            d[el] = d.get(el, 0) + (int(n) if n else 1)
+        return d
+    try:
+        qa, qb = int(float(a.get('charge'))), int(float(b.get('charge')))
+    except (TypeError, ValueError):
+        return False
+    A, B = counts(a.get('formula')), counts(b.get('formula'))
+    if any(A.get(e, 0) != B.get(e, 0) for e in set(A) | set(B) if e not in ('H', 'R')):
+        return False
+    return (B.get('H', 0) - A.get('H', 0)) == (qb - qa)
+
+#################################################################
 ## Load Curated Picks for Structures
 #################################################################
 
@@ -260,6 +338,8 @@ structure_conflicts_file = open(os.path.dirname(__file__)+"/../../Biochemistry/S
 formula_conflicts_file = open(os.path.dirname(__file__)+"/../../Biochemistry/Structures/_reports/Formula_Conflicts.txt",'w')
 pick_reasons_file = open(Structures_Root+"Pick_Reasons.txt",'w')
 pick_reasons_file.write("ID\tType\tStage\tReason\tChosen_Structure\tChosen_Aliases\n")
+formula_from_smile_file = open(os.path.dirname(__file__)+"/../../Biochemistry/Structures/_reports/Formula_From_SMILE_Row.txt",'w')
+formula_from_smile_file.write("ID\tInChI_formula\tInChI_charge\tformula\tcharge\tInChI_fragments\tSMILES_fragments\n")
 
 #################################################################
 ## Iterate through ModelSEED identifiers
@@ -524,6 +604,20 @@ for msid in sorted(MS_Aliases_Dict.keys()):
 
         #Only one formula/charge combination possible here
         formula_charge_dict=json.loads(list(Formulas[struct_type][struct_stage].keys())[0])
+
+        # The fragment-count rule (see the helper above): a disconnected InChI
+        # does not describe the molecule, so its formula and charge give way
+        # to the least-fragmented SMILE's.
+        formula_source_note = ""
+        if(struct_type == "InChI"):
+            _alt = formula_from_least_fragmented_smile(Structs, struct_stage)
+            if(_alt is not None):
+                _fc, _fi, _fs = _alt
+                formula_from_smile_file.write("\t".join((msid,
+                    str(formula_charge_dict['formula']), str(formula_charge_dict['charge']),
+                    str(_fc['formula']), str(_fc['charge']), str(_fi), str(_fs)))+"\n")
+                formula_charge_dict = {'formula': _fc['formula'], 'charge': _fc['charge']}
+                formula_source_note = "|formula_from_smile:disconnected_inchi"
         
         #################################################################
         ## If there are no structural conflicts then all the structures
@@ -885,7 +979,7 @@ for msid in sorted(MS_Aliases_Dict.keys()):
             pass
         if(not chosen_struct_str and struct_conflict==0):
             chosen_struct_str = list(Structs[struct_type][struct_stage].keys())[0]
-        pick_reasons_file.write("\t".join((msid,struct_type,struct_stage,pick_reason,
+        pick_reasons_file.write("\t".join((msid,struct_type,struct_stage,str(pick_reason)+formula_source_note,
                                            chosen_struct_str,
                                            ";".join(sorted(set(chosen_aliases_list)))))+"\n")
     elif(formula_conflict==1):

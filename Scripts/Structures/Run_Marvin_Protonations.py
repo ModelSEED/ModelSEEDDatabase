@@ -259,6 +259,14 @@ sys.path.insert(0, os.path.join(
 # see FORMULA AND CHARGE.
 from Print_Structure_Formula_Charge import parse_structure    # noqa: E402
 from BiochemPy import Compounds                              # noqa: E402
+# THE GATE. A protonation moves protons, so a protonated row must satisfy
+# dH == dcharge against its source with heavy atoms conserved. A row that does
+# not is not a protonation state -- InChI disconnected a metal cluster and the
+# freed ligands were protonated as ions, or a bare S/Se/P/O atom came back as
+# its hydride -- and it is replaced by its own source row. Same function the
+# post-hoc Repair_Protonation_Rows.py applies, so a bundle repaired after the
+# fact and one gated at generation are identical by construction.
+import Validate_Protonations as _inv                         # noqa: E402
 
 # What Marvin calls a wildcard atom, across the notations it accepts. `R#` is
 # the one that matters and the one easiest to miss: a molblock R atom -- which
@@ -494,7 +502,30 @@ def process(source, version, ph, limit=0, cxcalc="cxcalc"):
     stats = {"in": len(compounds), "ok": 0, "unparseable": 0,
              "plugin_error": 0, "empty": 0, "nonstandard_inchi": 0,
              "formula_from_marvin": 0, "wildcard_r_added": 0,
-             "smiles_preferred_disconnected_inchi": 0, "inchi_from_inchi_form": 0}
+             "smiles_preferred_disconnected_inchi": 0, "inchi_from_inchi_form": 0,
+             "passthrough_invariant": 0}
+    # Source formula/charge per (external_id, type), the reference every
+    # protonated row is gated against. inchi.tsv/smiles.tsv, already on disk.
+    _inv.STRUCT = STRUCT_ROOT
+    source_rows = _inv.load_source(source)
+    passed_through = []
+
+    def gate(struct_type, structure, formula, charge):
+        """Return (structure, formula, charge) to write for this row: the
+        protonated triple when it obeys the invariant, the SOURCE triple when
+        it does not. INFO kinds (no source formula to compare against, or a
+        wildcard structure whose H count is convention-dependent) are never
+        replaced -- the rule only touches rows the invariant rejects."""
+        src = source_rows.get((ext_id, struct_type))
+        if not src:
+            return structure, formula, charge
+        kind, dH, dq = _inv.compare(src[0], src[1], formula, charge)
+        if kind == "ok" or kind in _inv.INFO_KINDS:
+            return structure, formula, charge
+        stats["passthrough_invariant"] += 1
+        passed_through.append((ext_id, struct_type, kind, dH, dq,
+                               structure, formula, charge, src[2], src[0], src[1]))
+        return src[2], src[0], src[1]
 
     for ext_id, smiles in compounds:
         # InChI first, the compound's own SMILES as the fallback rung -- unless
@@ -584,6 +615,8 @@ def process(source, version, ph, limit=0, cxcalc="cxcalc"):
 
         stats["ok"] += 1
         smile_formula, smile_charge = columns("SMILE", smile_out)
+        smile_out, smile_formula, smile_charge = gate(
+            "SMILE", smile_out, smile_formula, smile_charge)
         out_rows.append((ext_id, "SMILE", smile_out, smile_formula, smile_charge,
                          TOOL, version, ph_out, generated_on))
 
@@ -635,11 +668,15 @@ def process(source, version, ph, limit=0, cxcalc="cxcalc"):
                     stats["nonstandard_inchi"] += 1
                 else:
                     inchi_formula, inchi_charge = columns("InChI", inchi_out)
+                    inchi_out, inchi_formula, inchi_charge = gate(
+                        "InChI", inchi_out, inchi_formula, inchi_charge)
                     out_rows.append((ext_id, "InChI", inchi_out,
                                      inchi_formula, inchi_charge,
                                      TOOL, version, ph_out, generated_on))
                     # Hash the string just written, never a second export -- see
                     # EXPORT for why Marvin's own inchikey disagrees with it.
+                    # After the gate that string may be the SOURCE InChI, and
+                    # the key must follow it.
                     key_out = prot.inchikey(inchi_out)
                     if key_out:
                         out_rows.append((ext_id, "InChIKey", key_out, "", "",
@@ -655,13 +692,26 @@ def process(source, version, ph, limit=0, cxcalc="cxcalc"):
         for row in out_rows:
             fh.write("\t".join(str(c) for c in row) + "\n")
 
+    # Every row the gate replaced, with what it replaced -- next to the other
+    # run reports, NOT under protonations/, which BiochemPy globs as bundles.
+    if passed_through:
+        rep_dir = os.path.join(STRUCT_ROOT, "_reports")
+        os.makedirs(rep_dir, exist_ok=True)
+        side = os.path.join(rep_dir, f"marvin_{version}_{ph_tag}_passthrough_{source}.tsv")
+        with open(side, "w") as fh:
+            fh.write("external_id\ttype\tkind\tdH\tdq\twas_structure\twas_formula\t"
+                     "was_charge\tnow_structure\tnow_formula\tnow_charge\n")
+            for row in passed_through:
+                fh.write("\t".join(str(c) for c in row) + "\n")
+
     print(f"{source:<8} in={stats['in']:<6} protonated={stats['ok']:<6} "
           f"unparseable={stats['unparseable']:<4} plugin_error={stats['plugin_error']:<4} "
           f"empty={stats['empty']:<4} nonstandard_inchi={stats['nonstandard_inchi']:<4} "
           f"formula_from_marvin={stats['formula_from_marvin']:<4} "
           f"wildcard_r_added={stats['wildcard_r_added']:<4} "
           f"smiles_preferred={stats['smiles_preferred_disconnected_inchi']:<4} "
-          f"inchi_from_inchi_form={stats['inchi_from_inchi_form']}")
+          f"inchi_from_inchi_form={stats['inchi_from_inchi_form']:<4} "
+          f"passthrough_invariant={stats['passthrough_invariant']}")
     print(f"{'':<8} rows={len(out_rows):<7} -> {os.path.relpath(out_path, STRUCT_ROOT)}")
     return out_path, stats
 

@@ -132,6 +132,43 @@ class Compounds:
 
         return names_dict
 
+
+    def _consumed_bundle(self, db, proto_file):
+        """Whether a protonation bundle feeds the structure pick.
+
+        sources.yaml lists each source's bundles; an entry with
+        consumed_by_production: false is kept for provenance but not loaded
+        into the Charged stage. Absent flag, absent entry or absent manifest
+        all mean consumed, so a tree without the manifest behaves as before.
+
+        Why this exists: the picker resolves each structure TYPE on its own.
+        With two bundles at different protonation states both loaded (Marvin
+        23.4 and 26.1), it took the InChI from one and the InChIKey or SMILES
+        from the other for thousands of compounds -- 5,567 InChIKey rows that
+        were not the key of their InChI row, and 2,006 compound records whose
+        formula and SMILES disagreed by a protonation. One consumed bundle per
+        source keeps the three representations from one run.
+        """
+        if not hasattr(self, "_consumed_cache"):
+            self._consumed_cache = None
+            manifest = os.path.join(self.StructRoot, "sources.yaml")
+            if os.path.isfile(manifest):
+                try:
+                    import yaml
+                    with open(manifest) as fh:
+                        data = yaml.safe_load(fh) or {}
+                    cache = {}
+                    for src, entry in (data.get("sources") or {}).items():
+                        for b in (entry or {}).get("protonations") or []:
+                            name = os.path.basename(b.get("file", ""))
+                            cache[(src, name)] = b.get("consumed_by_production", True) is not False
+                    self._consumed_cache = cache
+                except Exception:
+                    self._consumed_cache = None
+        if not self._consumed_cache:
+            return True
+        return self._consumed_cache.get((db, os.path.basename(proto_file)), True)
+
     def loadStructures(self,sources_array=[],db_array=[],unique=True):
         if(len(sources_array)==0):
             sources_array=["SMILE","InChIKey","InChI"]
@@ -195,6 +232,8 @@ class Compounds:
                 proto_dir = self.StructRoot + db + "/protonations"
                 if os.path.isdir(proto_dir):
                     for proto_file in sorted(glob.glob(proto_dir + "/*.tsv")):
+                        if not self._consumed_bundle(db, proto_file):
+                            continue
                         with open(proto_file) as fh:
                             reader = DictReader(fh, dialect='excel-tab')
                             for line in reader:
@@ -249,6 +288,8 @@ class Compounds:
                 proto_dir = self.StructRoot + db + '/protonations'
                 if os.path.isdir(proto_dir):
                     for proto_file in sorted(glob.glob(proto_dir + '/*.tsv')):
+                        if not self._consumed_bundle(db, proto_file):
+                            continue
                         with open(proto_file) as fh:
                             reader = DictReader(fh, dialect='excel-tab')
                             for line in reader:
