@@ -84,14 +84,14 @@ database") and `M09_results_growth.tex`, which reports growth only by source
 database and by structural completeness — never by biology.
 
 **This is a fair and answerable request, and the answer is a good one for us.**
-It is also currently blocked by a data gap that we should fix rather than
-explain away.
+The released alias files cannot supply it for the new reactions, for a
+reason explained next.
 
-### The blocker
+### Why the panel joins the source table
 
-Of the 12,261 reactions added since 2020 (`rxn48576`–`rxn60859`), **not one
-carries a pathway or an EC annotation** — neither in the per-reaction record
-nor in the released alias files:
+Of the 12,261 reactions added since 2020 (`rxn48576`–`rxn60859`), none carries
+a pathway or an EC annotation — neither in the per-reaction record nor in the
+released alias files:
 
 | | pre-2020 reactions (36,142, live) | new since 2020 (12,261) |
 |---|---:|---:|
@@ -101,10 +101,12 @@ nor in the released alias files:
 `Unique_ModelSEED_Reaction_Pathways.txt` stops at `rxn48568` and
 `Unique_ModelSEED_Reaction_ECs.txt` at `rxn48573`, both immediately below the
 2020 boundary at `rxn48575`. `Unique_ModelSEED_Reaction_Aliases.txt` and
-`..._Names.txt` do run to `rxn60859`, so this is the pathway/EC annotation step
-never having been re-run over the MetaCyc and Rhea intake — not a source-data
-problem. A user asking "what pathway is this new reaction in?" gets nothing
-today, which is worth fixing on its own merits.
+`..._Names.txt` do run to `rxn60859`. This is not a defect to repair: pathway
+membership is not a database attribute — `Biochemistry/REACTIONS.md` documents
+`pathways` as null, and the maintainers have said pathways are not being
+included in the database — so the pre-2020 values are a legacy of the 2020
+provenance compile, and the panel does not read them. EC numbers are a separate
+matter, not addressed here.
 
 ### It is reconstructable, and the answer is clear
 
@@ -165,11 +167,10 @@ analysis first:
 
 ### Proposed change
 
-1. **Re-run the pathway and EC annotation over the post-2020 intake** and ship
-   it. This is the substantive fix; the figure is a by-product. For the 8,409
-   Rhea-sourced reactions, Rhea carries EC cross-references directly and ChEBI
-   carries no pathway concept, so expect EC coverage to be good and MetaCyc-class
-   coverage to stay poor there — report that gap rather than hiding it.
+1. **Build the panel from the MetaCyc source table**, not from the alias file,
+   for both eras. For the 8,409 Rhea-sourced reactions ChEBI carries no pathway
+   concept, so they cannot be placed; the caption says so rather than counting
+   them as unannotated.
 2. **Add one panel** showing new-vs-carried-over reaction counts per MetaCyc
    class, sorted by the new count. Cheapest home is Figure 1 (see comment 4 —
    this replaces a bar panel rather than adding a fourth figure, which also
@@ -184,20 +185,13 @@ analysis first:
    > the 12,261 reactions added. Central metabolism was already saturated in
    > 2020; what a 2026 reconstruction gains is the periphery.
 
-**What to run.** `grep -rl` finds the pathway and EC alias files written by
-`Scripts/Biochemistry/Reset_Biochemistry_in_Git.sh` and, historically, by
-`Scripts/Archived_Perl_Scripts/Compile_External_Pathways.pl` and
-`Find_Unique_ModelSEED_Reaction_ECs.pl` — both archived Perl, which is
-consistent with the annotation step having been dropped when the pipeline moved
-to Python. There is no live Python equivalent, so this is a small port, not a
-re-run. `Scripts/Provenance/{MetaCyc,KEGG}/Refactor_*_Pathway_Table.py` are the
-modern parsers for the source tables and are the natural place to hang it.
+**What to run.** `analysis/pathway_distribution_of_growth.py`; it reads only
+`Biochemistry/` and the committed provenance tables.
 
-**Author decision.** Whether to hold the revision for the annotation rebuild,
-or submit the figure built from the MetaCyc join alone (2,282 reactions) and
-state the coverage limit. Recommend the rebuild — the gap is a real defect a
-later user would hit, and it is a port of two archived scripts rather than new
-work.
+**Decision.** The figure is built from the MetaCyc join alone (2,282 of the
+new reactions) and the caption states the coverage limit. An annotation
+rebuild was proposed separately as #300 and withdrawn: pathways are not a
+database attribute.
 
 **Budget.** +1 panel, +3 sentences. Offset: `M09`'s per-source reaction
 sentence is long and partly duplicates Figure 1B; it can lose a clause.
