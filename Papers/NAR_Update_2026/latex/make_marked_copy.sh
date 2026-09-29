@@ -50,6 +50,31 @@ latexdiff --flatten \
   "$WORK/new/Papers/NAR_Update_2026/latex/main.tex" \
   > "$HERE/main_diff.tex"
 
+# NAR requires that text changed in response to referee comments be shown in
+# red. latexdiff's default UNDERLINE style colors additions blue and
+# deletions red -- the opposite of what NAR wants. Swap the two auto-generated
+# preamble macros in place: additions (\DIFadd) become red, deletions
+# (\DIFdel) stay struck-through but become blue.
+python3 - "$HERE/main_diff.tex" <<'PYEOF'
+import re, sys
+path = sys.argv[1]
+with open(path) as f:
+    text = f.read()
+
+add_old = r"\providecommand{\DIFadd}[1]{{\protect\color{blue}\uwave{#1}}} %DIF PREAMBLE"
+add_new = r"\providecommand{\DIFadd}[1]{{\protect\color{red}\uwave{#1}}} %DIF PREAMBLE"
+del_old = r"\providecommand{\DIFdel}[1]{{\protect\color{red}\sout{#1}}} %DIF PREAMBLE"
+del_new = r"\providecommand{\DIFdel}[1]{{\protect\color{blue}\sout{#1}}} %DIF PREAMBLE"
+
+if add_old not in text or del_old not in text:
+    sys.exit("make_marked_copy.sh: expected DIFadd/DIFdel preamble lines not found -- "
+             "latexdiff output format may have changed, update the swap in this script.")
+
+text = text.replace(add_old, add_new).replace(del_old, del_new)
+with open(path, "w") as f:
+    f.write(text)
+PYEOF
+
 cd "$HERE"
 pdflatex -interaction=nonstopmode main_diff.tex >/dev/null
 bibtex main_diff >/dev/null || true
