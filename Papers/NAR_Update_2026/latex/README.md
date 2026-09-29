@@ -73,6 +73,27 @@ submission PDF. Grep for remaining work with:
 grep -rn 'TBD\|DRAFTPENDING\|NUMBERSPENDING' sections/
 ```
 
+## Referee-facing "marked" (tracked-changes) copy
+
+For NAR revisions, referees expect a word-level tracked-changes PDF, not a
+whole-paragraph highlight. Generate it with `latexdiff` rather than any
+in-source markup macro:
+
+```bash
+./make_marked_copy.sh [BASE_REF]   # BASE_REF defaults to origin/dev
+```
+
+This diffs the *entire assembled document* (old `main.tex` + old `sections/`
+against the current working tree) with `latexdiff --flatten`, which expands
+every `\input` and injects the `\DIFadd{}`/`\DIFdel{}` preamble macros once,
+then compiles the result to `main_diff.tex` / `main_diff.pdf` next to
+`main.tex` (so its `../figures/...` paths still resolve). New, wholly-added
+paragraphs render as pure `\DIFadd{}` with nothing struck through; edited
+sentences show word-level strikethrough (deletion) beside colored/underlined
+insertion. `main_diff.pdf` is informational only — it is not the submission
+PDF and its page count does not count against the journal limit (struck-out
+deletions still take up visual space).
+
 ## Not carried over
 
 The "Manuscript-shape health check" table at the end of `MANUSCRIPT.md` (untracked; local to the author's tree, not in the repository) is a
