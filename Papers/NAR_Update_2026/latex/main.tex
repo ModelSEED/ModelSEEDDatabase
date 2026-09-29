@@ -79,6 +79,21 @@
 %\onecolumn  % uncomment for a wide single-column reading/review draft
 
 %%-----------------------------------------------------------------------------
+%%  NAR revision markup toggle.
+%%  main_marked.tex defines \REDLINEMODE before \input-ing this file, which
+%%  makes \rev{...} render red for the referee-facing "marked" copy.
+%%  main_clean.tex leaves \REDLINEMODE undefined, so \rev{...} is a no-op and
+%%  the same source produces the plain submission copy. The class already
+%%  loads xcolor (see oup-authoring-template.cls), so \textcolor is available
+%%  here without an extra \usepackage.
+%%-----------------------------------------------------------------------------
+\ifdefined\REDLINEMODE
+  \newcommand{\rev}[1]{\textcolor{red}{#1}}
+\else
+  \newcommand{\rev}[1]{#1}
+\fi
+
+%%-----------------------------------------------------------------------------
 %%  Packages. The class already loads: amsmath, amssymb, graphicx, hyperref,
 %%  natbib, array, multirow, xcolor, tikz, url, caption, rotating, listings.
 %%  It also defines \toprule / \midrule / \botrule itself -- do NOT load
