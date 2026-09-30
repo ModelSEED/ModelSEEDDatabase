@@ -52,9 +52,24 @@ def figure2():
                        fontsize=6.0, color=fg, fontweight="bold", zorder=5, bbox=box)
             x += pct
         a.text(-AMAX * 0.015, row, label, ha="right", va="center", fontsize=7.0, color=INK)
-    a.set_xlim(0, AMAX); a.set_ylim(-0.62, 1.62); a.set_yticks([])
-    a.set_xticks([0, 20000, 40000, 56002]); a.set_xticklabels(["0", "20k", "40k", "56k"])
+    a.set_xlim(0, AMAX); a.set_ylim(-0.62, 2.42); a.set_yticks([])
+    _end = NUMBERS["energy_total"]
+    a.set_xticks([0, 20000, 40000, _end])
+    a.set_xticklabels(["0", "20k", "40k", f"{_end//1000}k"])
     strip(a)
+    # Four segments, two of them previously identified only in the caption.
+    # The key names all four; hatch is reproduced in its own swatch so the
+    # SMILES route is not left to be inferred from the fill.
+    from matplotlib.patches import Patch
+    a.legend(handles=[
+        Patch(facecolor=BLUE, edgecolor=FRAME, lw=0.45, label="Marvin"),
+        Patch(facecolor=BLUE, edgecolor=SURFACE, lw=0.45, hatch="xxx",
+              label="Marvin, from SMILES"),
+        Patch(facecolor=ORANGE, edgecolor=FRAME, lw=0.45, label="no ionizable site"),
+        Patch(facecolor=GRID, edgecolor=FRAME, lw=0.45, label="no structure")],
+        loc="upper left", frameon=False, fontsize=5.9, ncol=4, handlelength=1.1,
+        handleheight=0.85, handletextpad=0.4, columnspacing=0.9, borderpad=0.1,
+        borderaxespad=0.15, labelcolor=INK2)
     tag(a, "A")
 
     rows = NUMBERS["energy_rxn"]; tot = NUMBERS["energy_total"]
@@ -63,13 +78,14 @@ def figure2():
     for i, (lab, v) in zip(ys, rows):
         b.barh(i, v, height=0.70, color=BLUE, zorder=3)
         # grey remainder removed 2026-09-14: the count axis already shows the
-        # shortfall against 56k, so the bar was drawing the same fact twice
+        # shortfall against the total, so the bar drew the same fact twice
         b.text(v - 700, i, f"{100*v/tot:.0f}%", va="center", ha="right",
                fontsize=6.4, color="white", fontweight="bold")
         b.text(-900, i, SHORT.get(lab, lab), va="center", ha="right",
                fontsize=7.0, color=INK)
     b.set_yticks([]); b.set_xlim(0, tot * 1.02); b.set_ylim(-0.62, len(rows) - 0.38)
-    b.set_xticks([0, 20000, 40000, 56012]); b.set_xticklabels(["0", "20k", "40k", "56k"])
+    b.set_xticks([0, 20000, 40000, _end])
+    b.set_xticklabels(["0", "20k", "40k", f"{_end//1000}k"])
     strip(b)
     tag(b, "B")
 
@@ -78,13 +94,12 @@ def figure2():
     # scales, and a common axis would flatten two into a spike against
     # eQuilibrator's tail. Source names sit inside the frame; three stacked
     # titles would cost more height than the panels themselves.
-    sig = json.loads((Path(__file__).resolve().parent
-                      / "figure_data_sigma.json").read_text())
+    sig = NUMBERS["sigma"]   # derived, live basis; see _sigma_values()
     order = [("eQuilibrator", BLUE), ("Group contribution", AQUA), ("dGPredictor", VIOLET)]
     SHORT_C = {}
     for j, (name, col) in enumerate(order):
         ax = fig.add_subplot(right[j])
-        v = sig[name]["vals"]
+        v = sig[name]
         hi = sorted(v)[int(0.97 * len(v))]      # clip the tail, then bin INSIDE
         ax.hist([x for x in v if x <= hi], bins=30, range=(0, hi),
                 color=col, zorder=3, linewidth=0)
