@@ -651,6 +651,20 @@ def _check_stereo_compatibility(stored_struct, pubchem_struct):
     s_b, p_b = s_layers.get('b', ''), p_layers.get('b', '')
     if not s_t and not s_b:
         return True, "compatible (stored has no InChI stereo layers)"
+    # Info-preserving guard: if the canonical InChI specifies a stereo layer
+    # and PubChem's InChI omits it entirely, that is a strict information
+    # loss, not a correction. The existing inversion check below only
+    # iterates over SHARED stereocenters, so a fully-dropped layer
+    # silently passes through. (Example: cpd35693 coniferyl alcohol radical
+    # -- canonical had /b8-3+ specifying E geometry, PubChem returned no
+    # /b layer at all, current check found 0 inversions on the empty
+    # shared-bond set and accepted the loss.)
+    if s_t and not p_t:
+        return False, ("stereo_loss: canonical InChI has tetrahedral /t "
+                       "stereo layer, PubChem InChI has none")
+    if s_b and not p_b:
+        return False, ("stereo_loss: canonical InChI has bond /b "
+                       "(E/Z) stereo layer, PubChem InChI has none")
     inversions, checked = 0, 0
     if s_t and p_t:
         s_centers = {m.group(1): m.group(2)
@@ -675,6 +689,22 @@ def _check_stereo_compatibility(stored_struct, pubchem_struct):
     if inversions > 0:
         return False, (f"stereo_inversion: {inversions} of {checked} "
                        f"shared stereocenters have different configuration")
+    # Spec-loss guard: catch shared /t centers where canonical has specified
+    # config (+/-) and PubChem has unspecified (?). The existing inversion
+    # check uses regex r'(\d+)([+-])' which excludes ?-marked centers, so a
+    # partial spec loss silently passes the inversion check.
+    if s_t and p_t:
+        s_partial = {m.group(1): m.group(2)
+                     for m in re.finditer(r'(\d+)([+\-?])', s_t)}
+        p_partial = {m.group(1): m.group(2)
+                     for m in re.finditer(r'(\d+)([+\-?])', p_t)}
+        spec_losses = sum(1 for k in s_partial
+                          if s_partial[k] in ('+', '-')
+                          and p_partial.get(k) == '?')
+        if spec_losses:
+            return False, (f"stereo_loss: {spec_losses} shared /t "
+                           f"stereocenter(s) lost specificity (+/- to ?) "
+                           f"in PubChem InChI")
     # Enantiomer guard: InChI encodes relative configuration in the /t layer
     # and absolute configuration in the /m layer. A full enantiomer has an
     # IDENTICAL /t but a flipped /m, so the per-center /t comparison above sees
