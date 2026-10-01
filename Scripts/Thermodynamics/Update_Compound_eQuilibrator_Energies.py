@@ -1,121 +1,37 @@
 #!/usr/bin/env python
-import os,sys
+"""Write compound formation energies from the regenerated eQuilibrator run.
+
+Source: ``Biochemistry/Thermodynamics/eQuilibrator/ModelSEED_Compound_Energies.tsv``
+-- same cache, same parameters and same conditions as the reaction table; see
+``Update_Reaction_eQuilibrator_Energies.py`` for the provenance.
+
+The lookup is now by ModelSEED compound id, because the cache resolves
+``seed:cpd#####`` to the structure ModelSEED holds for it. The previous script
+had to work backwards: deprotonate the stored InChIKey to two segments, look
+that up in a MetaNetX index, and take the lowest energy among the MetaNetX
+records that matched. Every step of that was a guess about which molecule the
+accession meant, which is the thing this regeneration exists to remove.
+
+Coverage drops 30,607 -> 16,372. The compound side loses proportionally more
+than the reaction side because 43.7% of ModelSEED compounds fall outside the
+component-contribution span and another 20.5% are absent from the cache -- both
+previously papered over by the loosening-InChIKey fallback. Compounds with no
+energy have the key REMOVED rather than left holding a superseded number.
+
+Compounds store ``[dg, dge]``: a formation energy has no direction."""
+import sys
+sys.path.append('../../Libs/Python/')
 from BiochemPy import Compounds
+import _thermo_helpers as th
 
-compounds_helper = Compounds()
-compounds_dict = compounds_helper.loadCompounds()
-structures_dict = compounds_helper.loadStructures(["SMILE","InChIKey"],["ModelSEED"])
+LABEL = 'eQuilibrator'
 
-############################################################################
-##
-## We apply/overwrite with eQuilibrator Energies
-##
-############################################################################
+eq_compounds = th.parse_modelseed_energy_table(
+    th.thermo_path('eQuilibrator', 'ModelSEED_Compound_Energies.tsv'),
+    id_col='compound_id',
+    dg_col='dgf_prime_kcal_per_mol',
+    err_col='uncertainty_kcal_per_mol')
 
-thermodynamics_root=os.path.dirname(__file__)+"/../../Biochemistry/Thermodynamics/"
-file_name=thermodynamics_root+'eQuilibrator/MetaNetX_Compound_Energies.tbl'
-eq_compounds=dict()
-with open(file_name) as file_handle:
-    for line in file_handle.readlines():
-        line = line.strip()
-        array= line.split('\t')
+print("%d compounds with an eQuilibrator formation energy" % len(eq_compounds))
 
-        if('energy' in array[1] or array[1] == 'nan'):
-            continue
-
-        eq_compounds[array[0]]={'dg':"{0:.2f}".format(float(array[1])),'dge':"{0:.2f}".format(float(array[2]))}
-
-file_handle.close()
-
-# print(len(eq_compounds))
-# 19,432/22,391 (87%) MetaNetX records for which we can retrieve a compound formation energy
-
-structures_root=os.path.dirname(__file__)+"/../../Biochemistry/Structures/"
-file_name=structures_root+'MetaNetX/Structures_in_ModelSEED_and_eQuilibrator.txt'
-struct_mnx_dict=dict()
-with open(file_name) as file_handle:
-    for line in file_handle.readlines():
-        line=line.strip()
-        (mnx,inchikey)=line.split('\t')
-        
-        #This check makes sure that we use MetaNetX IDs for which we know we
-        #can retrieve energies
-        if(mnx not in eq_compounds):
-            continue
-
-        if('struct' not in eq_compounds[mnx]):
-            eq_compounds[mnx]['struct']=inchikey
-
-            #For searching purposes we lose the protonation indicator
-            inchikey="-".join(inchikey.split('-')[0:2])
-            struct_mnx_dict[inchikey]=mnx
-
-file_handle.close()
-
-# print(len(struct_mnx_dict))
-# 18,206/19,432 (94%) MetaNetX records for which there is a unique structure
-
-seed_mnx_map=dict()
-for cpd in structures_dict:
-    structure_type='InChIKey'
-    if(structure_type not in structures_dict[cpd]):
-        continue
-
-    structure = list(structures_dict[cpd][structure_type].keys())[0]
-    dp_struct="-".join(structure.split('-')[0:2])
-
-    if(dp_struct not in struct_mnx_dict):
-        continue
-
-    seed_mnx_map[cpd]=eq_compounds[struct_mnx_dict[dp_struct]]
-
-# print(len(seed_mnx_map))
-# 17,863 ModelSEED compounds assigned eQuilibrator energies
-
-file_handle = open('Compounds_GroupContribution_eQuilibrator_Comparison.txt', 'w')
-file_handle.write('ID\tGC\tEQ\n')
-for cpd in sorted (compounds_dict.keys()):
-
-    cpd_gf='nan'
-    cpd_eq='nan'
-
-    if("GC" in compounds_dict[cpd]['notes']):
-        cpd_gf='|'.join([str(compounds_dict[cpd]['deltag']),str(compounds_dict[cpd]['deltagerr'])])
-
-    if(cpd in seed_mnx_map):
-        cpd_eq='|'.join([seed_mnx_map[cpd]['dg'],seed_mnx_map[cpd]['dge']])
-
-    #Write the values to file. I'm not making exception, but I'm
-    #including this `if` statement as a comment to remind me of ways in which
-    #they can't be directly compared
-    #if(compounds_dict[cpd]['deltag']!=10000000 and cpd_gf != 'nan' and cpd_eq != 'nan'):
-    file_handle.write('\t'.join([cpd,cpd_gf,cpd_eq])+'\n')
-
-    #Having printed to file, we skip where there is no eQuilibrator estimate
-    if(cpd not in seed_mnx_map):
-        continue
-
-    notes_list=compounds_dict[cpd]['notes']
-    if(not isinstance(notes_list,list)):
-        notes_list=list()
-
-    #We indicate that an estimate is available
-    if('EQ' not in notes_list):
-        notes_list.append('EQ')
-
-    #Here we establish an arbitrary threshold of 50 for the error, if the error
-    #is too big, we don't use it
-    if(float(seed_mnx_map[cpd]['dge']) > 50):
-        continue
-
-    compounds_dict[cpd]['deltag']=float(seed_mnx_map[cpd]['dg'])
-    compounds_dict[cpd]['deltagerr']=float(seed_mnx_map[cpd]['dge'])
-
-    #Here we indicate that we use the equilibrator value
-    if('EQU' not in notes_list):
-        notes_list.append('EQU')
-    compounds_dict[cpd]['notes']=notes_list
-
-file_handle.close()
-print("Saving compounds")
-compounds_helper.saveCompounds(compounds_dict)
+th.run_compound_table_update(Compounds(), LABEL, eq_compounds)

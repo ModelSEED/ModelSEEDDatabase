@@ -1,0 +1,39 @@
+%% preprint.tex -- single-PDF build for bioRxiv.
+%%
+%% NOT a new manuscript. It concatenates the two PDFs the submission itself
+%% uses, so there is exactly one source of truth for the text:
+%%
+%%     main.pdf           built from main.tex          (OUP NAR class)
+%%     supplementary.pdf  built from supplementary.tex (article class)
+%%
+%% The two use different document classes and cannot be \input into one file,
+%% so they are merged as finished pages with pdfpages. Build order matters:
+%%
+%%     pdflatex main; bibtex main; pdflatex main x2
+%%     pdflatex -jobname=main_preprint "\def\PREPRINTBUILD{}\input{main}" x3
+%%     pdflatex supplementary x3
+%%     pdflatex preprint
+%%
+%% Edit the manuscript in main.tex / supplement/, never here.
+
+\documentclass[11pt]{article}
+\usepackage{pdfpages}
+\usepackage[margin=1in]{geometry}
+\usepackage[colorlinks=true,allcolors=blue]{hyperref}
+\pagestyle{empty}
+
+\begin{document}
+
+%% ---- the manuscript, as submitted --------------------------------------
+%% main_preprint.pdf, NOT main.pdf: same source, compiled with \PREPRINTBUILD
+%% so it carries no journal identity. See the conditional in main.tex.
+\includepdf[pages=-]{main_preprint.pdf}
+
+%% ---- divider page removed 2026-09-15: supplementary.tex now carries the
+%% title, author list and correspondence on its own first page, so the
+%% divider duplicated it. Restore from git if the separator is wanted.
+
+%% ---- the supplement, as submitted ---------------------------------------
+\includepdf[pages=-]{supplementary.pdf}
+
+\end{document}

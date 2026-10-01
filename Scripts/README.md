@@ -60,3 +60,33 @@ git status -s
 ```
 (The script should run without throwing any errors and there should be
 no change in the biochemistry data)
+
+## The argument guard
+
+Most scripts here open with this, above the imports:
+
+```python
+if __name__ == "__main__":
+    # Argument guard -- see "The argument guard" in Scripts/README.md.
+    import argparse as _argparse
+    _argparse.ArgumentParser(
+        description=__doc__,
+        formatter_class=_argparse.RawDescriptionHelpFormatter).parse_args()
+```
+
+**Why it exists.** These scripts mutate the database. Without the guard an
+unknown flag or a mistyped mode was silently ignored and the script ran with its
+defaults: asking `Estimate_Reaction_Reversibility.py` for `--help` rewrote 122
+files. The guard turns that into an `argparse` error before anything is read or
+written.
+
+**Why it sits above the imports.** So `--help` still works on a machine where one
+of the script's dependencies is missing from the path. Move it below the imports
+and `--help` fails with an ImportError instead of printing the docstring.
+
+**Keep it first.** Anything placed before it -- an import with a side effect, a
+module-level path lookup, a database open -- runs before the arguments have been
+checked, which is the failure the guard exists to prevent.
+
+Scripts that take real arguments extend the same block with their own
+`add_argument` calls; `Scripts/Structures/Run_Marvin_pKas.py` is an example.

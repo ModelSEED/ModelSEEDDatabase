@@ -1,0 +1,6 @@
+%% Consolidates the former methods_{collation,integration,provenance,transport,
+\subsection{Construction and Curation}\label{sec:methods-construction}
+
+We collated additional compounds and reactions from MetaCyc~\cite{caspi2020}, Rhea~\cite{bansal2022}, and ChEBI~\cite{hastings2016}. The compounds are reconciled into single ModelSEED compounds using available structures where possible and the reactions are reconciled based on the identity of the compounds. The procedure follows the 2020 release~\cite{seaver2020}. Mass and charge balance is enforced and flagged.
+
+For the 2020 release, a conflict between structures from multiple sources was either manually reviewed or dropped silently. The updated pipeline classifies each structural conflict and routes it to one of three outcomes: an automatic pick from the source variant matching the historical formula, a curator-authored override with recorded rationale, or an entry in a mass-balance exclusion registry for compounds where no source formula is defensible. Every outcome is attributed to its curator and its evidence. We retained every structure we collect, so conflict resolution can be inspected within the data in the repository. An outline of how a researcher can contribute is given in Supplementary Methods~S1 and expanded in the repository.

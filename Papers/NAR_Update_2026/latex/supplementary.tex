@@ -1,0 +1,51 @@
+%% Supplementary Material -- ModelSEED Biochemistry Database 2026 update.
+%% Separate upload: NAR takes supplementary data as its own file(s), and it does
+%% NOT count against the 4-6 typeset page budget of the main article.
+%% ("Please upload supplementary data as separate file(s)"; page budget covers
+%% "the main text, references, tables, and figures".)
+%%
+%% NUMBERING IS FIXED BY THE MAIN TEXT. Do not renumber without grepping
+%% sections/*.tex first:
+%%   S1 construction    <- methods_construction.tex
+%%   S2 structure curation, conflict taxonomy, per-round record
+%%                      <- methods_structure_curation.tex
+%%   S3 thermodynamic conditions (pH 7.0 / I 0.25 M / pMg 3.0 / 298.15 K)
+%%                      <- methods_thermodynamics.tex
+%%   S4 reaction similarity and atom mapping
+%%                      <- methods_similarity_mapping.tex
+%%   S5 evidence grading  (this file is the first section actually written)
+\documentclass[11pt]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath,graphicx,booktabs,url}
+\usepackage[colorlinks=true,allcolors=blue]{hyperref}
+\renewcommand{\theequation}{S\arabic{equation}}
+\renewcommand{\thesection}{S\arabic{section}}
+\newcommand{\TBD}[1][]{\textcolor{red}{\textbf{[TBD}\ifx\relax#1\relax\else\ #1\fi\textbf{]}}}
+%% Mirrors main.tex:117-118. The supplement is a separate document, so a
+%% macro defined only there is undefined here -- S04 uses \drG and built
+%% with an undefined control sequence until this was added.
+\newcommand{\drG}{$\Delta_{\mathrm{r}}G'$}
+\newcommand{\drGo}{$\Delta_{\mathrm{r}}G'^{\circ}$}
+\title{Supplementary Information\\[0.35em]
+\large The ModelSEED Biochemistry Database, 2026 update:\\
+grading multi-source thermodynamics}
+\author{\begin{minipage}{0.86\textwidth}\centering\normalsize
+Andrew Freiburger, Jos\'e P. Faria, Janaka N. Edirisinghe,
+Filipe Liu, Cooper Taylor, Vibhav Setlur, Robert T. Giessmann, Moritz E. Beber,
+Elad Noor, Vikas Upadhyay, Mohit Anand, Costas D. Maranas, Sebastian Hu{\ss},
+Zoran Nikoloski, Adam P. Arkin, Robert W. Cottingham, Elisha M. Wood-Charlson,
+Christopher S. Henry, Samuel M. D. Seaver
+\end{minipage}\\[0.9em]
+\small Correspondence: \href{mailto:seaver@anl.gov}{seaver@anl.gov},
+\href{mailto:chenry@anl.gov}{chenry@anl.gov}\\[0.35em]
+\small\itshape Supplementary Methods S1--S4 and Supplementary Table~1}
+\date{}
+\begin{document}
+\maketitle
+
+\input{supplement/S01_structure_curation}
+\input{supplement/S02_thermodynamic_conditions}
+\input{supplement/S03_evidence_grading}
+\input{supplement/S04_direction_from_chemistry}
+
+\end{document}
