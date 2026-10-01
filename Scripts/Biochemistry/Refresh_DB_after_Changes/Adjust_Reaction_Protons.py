@@ -72,6 +72,7 @@ for rxn in sorted(Reactions_Dict.keys()):
 
         #Recompute new status and stoichiometry
         new_status = ReactionsHelper.balanceReaction(rgts_array,all_structures)
+        new_status = ReactionsHelper.preserveCK(new_status, Reactions_Dict[rxn]['status'])
         new_stoichiometry = ReactionsHelper.buildStoich(rgts_array)
 
         if(new_status != Reactions_Dict[rxn]['status']):

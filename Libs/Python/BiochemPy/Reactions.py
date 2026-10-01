@@ -313,6 +313,27 @@ class Reactions:
 
         return new_rgts_array
 
+    @staticmethod
+    def preserveCK(new_status, old_status):
+        """Re-insert the CK marker when overwriting a recomputed status.
+
+        CK lives inside the status string itself (OK|CK|CI:1), so any script
+        that assigns a freshly computed status erases the curator-checked flag
+        along with the stale verdict. Keep it where it already sits: after a
+        leading OK, before the imbalance blocks. Idempotent -- re-running
+        against an already-marked status returns it unchanged.
+
+        Added when Rebalance_Reactions, Adjust_Reaction_Protons and
+        Adjust_Reaction_Water all began acting on CK reactions instead of
+        skipping them.
+        """
+        if "CK" not in old_status.split("|"):
+            return new_status
+        parts = new_status.split("|")
+        if parts and parts[0] == "OK":
+            return "|".join([parts[0], "CK"] + parts[1:])
+        return "|".join(["CK"] + parts)
+
     def balanceReaction(self, rgts_array, all_structures=False):
         if (len(rgts_array) == 0):
             return "EMPTY"
