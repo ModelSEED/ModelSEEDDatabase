@@ -328,6 +328,26 @@ Structures_Dict = CompoundsHelper.loadStructures(["SMILE","InChIKey","InChI"],["
 MS_Aliases_Dict =  CompoundsHelper.loadMSAliases(["KEGG","MetaCyc","ChEBI","Rhea"])
 
 #################################################################
+## Incumbent structures, read BEFORE Unique_ModelSEED_Structures.txt
+## is truncated below for this run's output. Used by the no-downgrade
+## guard on the formula_conflict branch further down: a compound that
+## already had a picked structure must not silently end up with none
+## just because sources newly disagree on its formula.
+#################################################################
+
+INCUMBENT_STRUCTURES = dict()
+_incumbent_path = Structures_Root+"Unique_ModelSEED_Structures.txt"
+if(os.path.isfile(_incumbent_path)):
+    with open(_incumbent_path) as _incumbent_fh:
+        for _line_num, _line in enumerate(_incumbent_fh):
+            if(_line_num == 0):
+                continue  # header
+            _fields = _line.rstrip("\n").split("\t")
+            if(len(_fields) >= 6):
+                INCUMBENT_STRUCTURES.setdefault(_fields[0], []).append(_fields[1:])
+print("Loaded incumbent structures for "+str(len(INCUMBENT_STRUCTURES))+" compounds")
+
+#################################################################
 ## Open filehandles for writing
 #################################################################
 
@@ -983,4 +1003,19 @@ for msid in sorted(MS_Aliases_Dict.keys()):
                                            chosen_struct_str,
                                            ";".join(sorted(set(chosen_aliases_list)))))+"\n")
     elif(formula_conflict==1):
-        pick_reasons_file.write("\t".join((msid,struct_type,struct_stage,"formula_conflict_no_pick","",""))+"\n")
+        #############################################################
+        ## No-downgrade guard. Sources newly disagreeing on a formula
+        ## is not a reason to take away a structure the compound
+        ## already had -- that silently drops it from atom mapping,
+        ## thermodynamics and every structural check downstream, and
+        ## the loss is invisible in any coverage count that only ever
+        ## goes up. Fall back to the incumbent record (read before
+        ## Unique_ModelSEED_Structures.txt was truncated for this run)
+        ## and say so in the reason, rather than writing nothing.
+        #############################################################
+        if(msid in INCUMBENT_STRUCTURES):
+            for _row in INCUMBENT_STRUCTURES[msid]:
+                unique_structs_file.write("\t".join([msid]+_row)+"\n")
+            pick_reasons_file.write("\t".join((msid,struct_type,struct_stage,"formula_conflict_kept_incumbent","",""))+"\n")
+        else:
+            pick_reasons_file.write("\t".join((msid,struct_type,struct_stage,"formula_conflict_no_pick","",""))+"\n")
