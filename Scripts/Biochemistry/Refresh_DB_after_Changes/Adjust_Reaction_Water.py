@@ -60,11 +60,13 @@ for rxn in sorted(Reactions_Dict.keys()):
         print("Rebuilding reaction :",rxn)
         ReactionsHelper.rebuildReaction(Reactions_Dict[rxn],rgts_array)
         Reactions_Dict[rxn]["status"]=new_status
+        # notes is a LIST in every reaction record. The previous code did
+        # notes += "|WB", which on a list extends it character by character
+        # and produced ['G','C','C',...,'|','W','B'] instead of appending the
+        # single element "WB". Append, as Adjust_Reaction_Protons.py already
+        # does for its own HB marker.
         if("WB" not in Reactions_Dict[rxn]["notes"]):
-            if(Reactions_Dict[rxn]["notes"]=="" or Reactions_Dict[rxn]["notes"]=="null"):
-                Reactions_Dict[rxn]["notes"]="WB"
-            else:
-                Reactions_Dict[rxn]["notes"]+="|WB"
+            Reactions_Dict[rxn]["notes"].append("WB")
         Update_Reactions+=1
 
 if(len(status_lines)>0):
