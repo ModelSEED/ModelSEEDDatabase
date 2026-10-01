@@ -909,6 +909,12 @@ ACIDIC_SMARTS = [
     (Chem.MolFromSmarts('[SX3](=O)[OX2H1]'), 'sulfinic_acid'),
     (Chem.MolFromSmarts('[#16X2H1]'), 'thiol'),
     (Chem.MolFromSmarts('[OX2H1][#15]'), 'phosphate_oh_generic'),
+    # Phenolic -OH (aromatic-ring hydroxyl, e.g. flavonoid/catechol/tyrosine-
+    # type rings). Missing here left pH-7 renormalization silently falling
+    # back to PubChem's raw neutral SMILES instead of deprotonating to match
+    # the stored charge -- discovered 2026-10-01 via cpd25005/cpd31674, both
+    # flavonoid glycosides where this was the ONLY acidic group present.
+    (Chem.MolFromSmarts('[c][OX2H1]'), 'phenol'),
 ]
 
 BASIC_SMARTS = [
