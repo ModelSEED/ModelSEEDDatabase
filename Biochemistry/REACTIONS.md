@@ -28,6 +28,25 @@ files. They are described here:
 
 ### Format of stoichiometry field
 
+### Compartment indices
+
+The compartment index `m` that appears in the formats below is **relative, not
+absolute**. `0` is the inside of the cell relative to the reaction and `1` is
+the outside; neither names a particular compartment. The reaction
+`(1) cpd00002[0] + (1) cpd00009[1] => ...` therefore describes "hydrolyse ATP
+on the inside and move phosphate in from the outside" without committing to
+which membrane that is, and the same record can be instantiated against a
+bacterial plasma membrane, a mitochondrial inner membrane or a plastid
+envelope. A model template resolves the indices to named compartments (`c0`,
+`e0`, and organelles) when it builds a model.
+
+This is what Rhea expresses as `in`/`out` and maps onto the two indices
+directly. It also means a reaction record carries no membrane potential and no
+pH gradient, since both are properties of an organism and a condition rather
+than of the reaction; thermodynamic values distributed with the database are
+computed from stoichiometry and energy alone, and transport reactions are
+flagged so that this can be accounted for downstream.
+
 ### Format of reaction definition using compound IDs 
 Each compound participating in the reaction is in this format:
 
