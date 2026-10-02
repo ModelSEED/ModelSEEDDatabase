@@ -36,6 +36,7 @@ Both stayed in `Scripts/Thermodynamics/ProtonationEvidence/`.
 | `review_lost_reactions.py` | reactions upstream eQuilibrator can compute and our build cannot |
 | `figure_common.py` | shared palette, derived `NUMBERS` and panel helpers |
 | `make_figure1_growth.py` | Figure 1, `../figures/figure1_growth.pdf` |
+| `make_figureS1_pathway_classes.py` | Supplementary Figure S1, `../figures/figureS1_pathway_classes.pdf` — the pathway-class panel that was Figure 1D |
 | `make_figure2_thermodynamics.py` | Figure 2, `../figures/figure2_thermodynamics.pdf` |
 | `make_figure3_direction.py` | Figure 3, `../figures/figure3_direction.pdf` |
 | `grace_style.py` | shared Grace/xmgrace visual style used by both |
