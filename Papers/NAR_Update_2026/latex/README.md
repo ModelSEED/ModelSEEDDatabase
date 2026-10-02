@@ -80,19 +80,28 @@ whole-paragraph highlight. Generate it with `latexdiff` rather than any
 in-source markup macro:
 
 ```bash
-./make_marked_copy.sh [BASE_REF]   # BASE_REF defaults to origin/dev
+./make_marked_copy.sh [BASE_REF] [DOC]   # BASE_REF defaults to origin/dev, DOC to main
 ```
 
-This diffs the *entire assembled document* (old `main.tex` + old `sections/`
+This diffs the *entire assembled document* (old `DOC.tex` + old `sections/`
 against the current working tree) with `latexdiff --flatten`, which expands
 every `\input` and injects the `\DIFadd{}`/`\DIFdel{}` preamble macros once,
-then compiles the result to `main_diff.tex` / `main_diff.pdf` next to
-`main.tex` (so its `../figures/...` paths still resolve). New, wholly-added
-paragraphs render as pure `\DIFadd{}` with nothing struck through; edited
-sentences show word-level strikethrough (deletion) beside colored/underlined
-insertion. `main_diff.pdf` is informational only — it is not the submission
-PDF and its page count does not count against the journal limit (struck-out
-deletions still take up visual space).
+then compiles the result to `DOC_diff.tex` / `DOC_diff.pdf` next to `DOC.tex`
+(so its `../figures/...` paths still resolve). New, wholly-added paragraphs
+render as pure `\DIFadd{}` with nothing struck through; edited sentences show
+word-level strikethrough (deletion) beside colored/underlined insertion.
+`DOC_diff.pdf` is informational only — it is not the submission PDF and its
+page count does not count against the journal limit (struck-out deletions
+still take up visual space).
+
+This PR touches both `main.tex` (via `sections/`) and `supplementary.tex` (via
+`supplement/S03_evidence_grading.tex`), so both `main_diff.pdf` and
+`supplementary_diff.pdf` are built:
+
+```bash
+./make_marked_copy.sh origin/dev main
+./make_marked_copy.sh origin/dev supplementary
+```
 
 ## Not carried over
 

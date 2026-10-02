@@ -39,6 +39,9 @@ Both stayed in `Scripts/Thermodynamics/ProtonationEvidence/`.
 | `make_figure2_thermodynamics.py` | Figure 2, `../figures/figure2_thermodynamics.pdf` |
 | `make_figure3_direction.py` | Figure 3, `../figures/figure3_direction.pdf` |
 | `grace_style.py` | shared Grace/xmgrace visual style used by both |
+| `pathway_distribution_of_growth.py` | where the 2020→2026 growth landed at MetaCyc class level — reviewer 1 comment 1 |
+| `review_transport_and_llm.py` | what the transport caveat costs, and what the LLM ensemble is worth — reviewer 1 comment 2, reviewer 2 comment 2 |
+| `population_basis_table.py` | every count the manuscript quotes, on both populations, side by side — the audit trail for the live-basis conversion |
 
 The graphical abstract is submitted as a **separate file** and is deliberately
 never `\includegraphics`'d into `main.tex` — NAR requires it uploaded on its
@@ -48,7 +51,11 @@ Findings written up from these live in `../data/`, dated -- untracked, local to 
 
 ## Running them
 
-They read caches and fitted parameters from the eQuilibrator working tree, which
+The two reviewer-response scripts are the exception to the paragraph below:
+they read only `Biochemistry/` and the git history of this repository, so they
+run anywhere with no `EQUILIBRATOR_DIR`.
+
+The rest read caches and fitted parameters from the eQuilibrator working tree, which
 is far too large to commit — `data/` there is several gigabytes. That location is
 `$EQUILIBRATOR_DIR`, defaulting to the analysis host's path. Paths into this
 repository derive from the file location and need no configuration.
