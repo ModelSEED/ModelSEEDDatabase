@@ -1,0 +1,23 @@
+# Python dependencies for the structure/reaction pipeline, pinned to exact
+# versions captured from the `equilibrator` micromamba env on 2026-10-01.
+#
+# Scope: List_ModelSEED_Structures.py, Validate_PubChem_Structures.py,
+# Print_Structure_Formula_Charge.py, Recanonicalize_SMILES.py,
+# Update_Compound_Structures_Formulas_Charge.py,
+# Scripts/Biochemistry/Refresh_DB_after_Changes/*.py, Libs/Python/BiochemPy/*.py
+#
+# NON-PYTHON dependency (cannot be pinned here -- see environment.yml instead):
+#   OpenBabel 3.1.1 (system/conda package providing the `obabel` CLI and the
+#   `openbabel` Python bindings' native library; `openbabel-wheel` below only
+#   covers the Python wheel, not the CLI used by some structure scripts)
+#
+# SMILES canonicalization has been found to drift across RDKit versions (and
+# even across builds of the same version) with zero effect on formula,
+# charge, InChI, reaction balance, or thermodynamics -- see
+# Scripts/Structures/README.md and the 2026-10-01 investigation notes. Pinning
+# here is about forward reproducibility, not resolving that drift.
+
+rdkit==2025.9.5
+openbabel-wheel==3.1.1.23
+requests==2.34.2
+PyYAML==6.0.3
