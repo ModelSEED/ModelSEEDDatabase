@@ -341,7 +341,8 @@ def _euler_regions():
 
 
 def _pathway_classes(top=8):
-    """Figure 1D: where the growth landed, at MetaCyc class level.
+    """Supplementary Figure S1 (Figure 1D until 2026-10-02): where the growth
+    landed, at MetaCyc class level.
 
     Reviewer 1 asked where new information is still being gained. The released
     pathway alias file cannot answer it -- it stops at rxn48568, below the 2020

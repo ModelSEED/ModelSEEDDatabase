@@ -175,6 +175,10 @@ analysis first:
    class, sorted by the new count. Cheapest home is Figure 1 (see comment 4 —
    this replaces a bar panel rather than adding a fourth figure, which also
    answers the "barplot abuse" complaint).
+   *2026-10-02: at the corresponding author's request the panel is
+   Supplementary Figure S1, with its own section S5, rather than Figure 1D;
+   Figure 1 is three panels at full text width with larger type, and the
+   "from other sources" note is dropped from the Euler diagram.*
 3. **Two or three sentences in `M09`** after the completeness sentence. Draft:
 
    > The new biochemistry is not distributed like the old. Mapping reactions
