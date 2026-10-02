@@ -1,7 +1,7 @@
 %% Supplementary Material -- ModelSEED Biochemistry Database 2026 update.
 %DIF LATEXDIFF DIFFERENCE FILE
-%DIF DEL /scratch/seaver/tmp/tmp.vWOHzBEDQG/old/Papers/NAR_Update_2026/latex/supplementary.tex   Thu Oct  1 20:01:45 2026
-%DIF ADD /scratch/seaver/tmp/tmp.vWOHzBEDQG/new/Papers/NAR_Update_2026/latex/supplementary.tex   Fri Oct  2 00:37:22 2026
+%DIF DEL /scratch/seaver/tmp/tmp.E1xwNXcwu3/old/Papers/NAR_Update_2026/latex/supplementary.tex   Thu Oct  1 20:01:45 2026
+%DIF ADD /scratch/seaver/tmp/tmp.E1xwNXcwu3/new/Papers/NAR_Update_2026/latex/supplementary.tex   Fri Oct  2 11:21:41 2026
 %% Separate upload: NAR takes supplementary data as its own file(s), and it does
 %% NOT count against the 4-6 typeset page budget of the main article.
 %% ("Please upload supplementary data as separate file(s)"; page budget covers
@@ -9,20 +9,38 @@
 %%
 %% NUMBERING IS FIXED BY THE MAIN TEXT. Do not renumber without grepping
 %% sections/*.tex first:
-%%   S1 construction    <- methods_construction.tex
-%%   S2 structure curation, conflict taxonomy, per-round record
-%%                      <- methods_structure_curation.tex
-%%   S3 thermodynamic conditions (pH 7.0 / I 0.25 M / pMg 3.0 / 298.15 K)
-%%                      <- methods_thermodynamics.tex
-%%   S4 reaction similarity and atom mapping
-%%                      <- methods_similarity_mapping.tex
-%%   S5 evidence grading  (this file is the first section actually written)
+%DIF 9-16c9-15
+%DIF < %%   S1 construction    <- methods_construction.tex
+%DIF < %%   S2 structure curation, conflict taxonomy, per-round record
+%DIF < %%                      <- methods_structure_curation.tex
+%DIF < %%   S3 thermodynamic conditions (pH 7.0 / I 0.25 M / pMg 3.0 / 298.15 K)
+%DIF < %%                      <- methods_thermodynamics.tex
+%DIF < %%   S4 reaction similarity and atom mapping
+%DIF < %%                      <- methods_similarity_mapping.tex
+%DIF < %%   S5 evidence grading  (this file is the first section actually written)
+%DIF -------
+%%   S1 structure curation          <- M03 (Supplementary Methods S1) %DIF > 
+%%   S2 thermodynamic conditions    <- M05 (Supplementary Methods S2) %DIF > 
+%%   S3 evidence grading            <- M06, M12 (Supplementary Methods S3, %DIF > 
+%%                                     Supplementary Table 1) %DIF > 
+%%   S4 direction from chemistry    <- M06 (Supplementary Methods S4) %DIF > 
+%%   S5 growth by pathway class     <- M09 (Supplementary Figure S1; was %DIF > 
+%%                                     Figure 1D until 2026-10-02) %DIF > 
+%DIF -------
 \documentclass[11pt]{article}
 \usepackage[margin=1in]{geometry}
 \usepackage{amsmath,graphicx,booktabs,url}
+%DIF 20a19
+\usepackage{float}   % [H] for Supplementary Figure S1, so it cannot split a paragraph %DIF > 
+%DIF -------
 \usepackage[colorlinks=true,allcolors=blue]{hyperref}
 \renewcommand{\theequation}{S\arabic{equation}}
 \renewcommand{\thesection}{S\arabic{section}}
+%DIF 23a23-25
+%% Figures are S-numbered so the main text can say "Supplementary Figure S1"; %DIF > 
+%% the table keeps its plain number, which M12 cites as Supplementary Table 1. %DIF > 
+\renewcommand{\thefigure}{S\arabic{figure}} %DIF > 
+%DIF -------
 \newcommand{\TBD}[1][]{\textcolor{red}{\textbf{[TBD}\ifx\relax#1\relax\else\ #1\fi\textbf{]}}}
 %% Mirrors main.tex:117-118. The supplement is a separate document, so a
 %% macro defined only there is undefined here -- S04 uses \drG and built
@@ -41,7 +59,7 @@ Christopher S. Henry, Samuel M. D. Seaver
 \end{minipage}\\[0.9em]
 \small Correspondence: \href{mailto:seaver@anl.gov}{seaver@anl.gov},
 \href{mailto:chenry@anl.gov}{chenry@anl.gov}\\[0.35em]
-\small\itshape Supplementary Methods S1--S4 and Supplementary Table~1}
+\small\itshape Supplementary Methods \DIFdelbegin \DIFdel{S1--S4 and }\DIFdelend \DIFaddbegin \DIFadd{S1--S5, }\DIFaddend Supplementary Table~1 \DIFaddbegin \DIFadd{and Supplementary Figure~S1}\DIFaddend }
 \date{}
 %DIF PREAMBLE EXTENSION ADDED BY LATEXDIFF
 %DIF UNDERLINE PREAMBLE %DIF PREAMBLE
@@ -231,7 +249,18 @@ The assignment of a reaction direction from thermodynamics means that nearly hal
 \paragraph{\DIFadd{Accuracy against measurement.}} \DIFaddend The confidence that the ensemble returns does not appear to distinguish correct calls when compared to the thermodynamics, and is not appropriate to use as a downstream filter when integrating reactions. \DIFdelbegin \DIFdel{Nevertheless, with the far wider coverage, researchers may find the results useful }\DIFdelend \DIFaddbegin \DIFadd{The direction itself requires the same care. We score it against the measured energies in }\texttt{\DIFadd{opentecr\_comparison.csv}}\DIFadd{, taking a reaction to be measured-irreversible where $|\Delta_{\mathrm{r}}G'^{\circ}|$ exceeds $\tau = 2.0$\,kcal\,mol$^{-1}$, the same tolerance the evidence grading uses (Supplementary Methods~S3). On that basis the ensemble agrees with measurement on 165 of the 215 reactions where both commit (76.7\%, Cohen's $\kappa = 0.50$), against 54 of 55 for eQuilibrator (98.2\%, $\kappa = 0.92$). The result is not sensitive to the threshold: between a bare sign test and $RT\ln 1000$ the ensemble's agreement ranges from 65\% to 77\% and its $\kappa$ from 0.33 to 0.50, while eQuilibrator's stays above 96\%. Agreement with eQuilibrator across the whole database is 94.7\% of 8,084 reactions, but that figure should not be read as accuracy: the chance baseline is 88.3\% and $\kappa$ is 0.55, because both sources overwhelmingly report the forward direction.
 }
 
-\DIFadd{The reason is visible in the call distribution. 85.3\% of the ensemble's calls are the direction the equation is written in ($>$), against 5.2\% reverse and 7.8\% reversible, and the errors are almost entirely one-sided: of the 215 reactions above, it is correct on 119 of the 120 that are measured forward and on 46 of the 95 measured reverse. The ensemble has learned the convention that reaction equations are written in the physiological direction, which is a real and useful prior, but it is not reading thermodynamics. This is why the calls are released as their own layer and take no part in the evidence grading, and why a reverse call --- the case where the model contradicts its own prior --- is the more informative of the two}\DIFaddend .
+\DIFadd{The reason is visible in the call distribution. 85.3\% of the ensemble's calls are the direction the equation is written in ($>$), against 5.2\% reverse and 7.8\% reversible, and the errors are almost entirely one-sided: of the 215 reactions above, it is correct on 119 of the 120 that are measured forward and on 46 of the 95 measured reverse. The ensemble has learned the convention that reaction equations are written in the physiological direction, which is a real and useful prior, but it is not reading thermodynamics. This is why the calls are released as their own layer and take no part in the evidence grading, and why a reverse call --- the case where the model contradicts its own prior --- is the more informative of the two.
+}
+
+\section{\DIFadd{Where the growth since 2020 landed}}\label{sec:s5}
+
+\DIFadd{Central metabolism has been characterised for decades, so the question is where a 2026 reconstruction still gains information. Supplementary Figure~\ref{fig:s1} places the 12,261 reactions added since the 2020 release by MetaCyc pathway class against the 36,142 carried over, counting non-obsolete reactions on both sides. The join is the same for both eras: ModelSEED identifier $\rightarrow$ MetaCyc reaction, through the released alias file, $\rightarrow$ pathway $\rightarrow$ parent class, one level up, through the MetaCyc pathway table shipped with the database; the organisational class }\emph{\DIFadd{Super-Pathways}} \DIFadd{is excluded. Reading the pre-2020 side from the released pathway annotation instead would compare a full ancestor closure against a one-level join, so it is not done. The join places 2,282 of the additions and 12,518 of the carried-over reactions; the 8,409 reactions that arrived through Rhea have no pathway ontology to be placed in and are absent rather than counted as unannotated.
+}
+
+\begin{figure}[H] \centering \includegraphics[width=0.85\textwidth]{../figures/figureS1_pathway_classes.pdf}
+\caption{\textbf{\DIFaddFL{Where the growth since 2020 landed.}} \DIFaddFL{Reactions added since 2020 against those already held, by MetaCyc pathway class, for the eight classes that gained most. Both bars are built through the same join from the MetaCyc source table, so they are comparable; the organisational class }\emph{\DIFaddFL{Super-Pathways}} \DIFaddFL{is excluded. Only additions with a MetaCyc pathway assignment can be placed --- 2,282 of the 12,261; the 8,409 reactions that arrived through Rhea carry no pathway ontology and are absent rather than counted as unannotated. Growth is concentrated in specialised metabolism and cell-envelope biosynthesis: 41 of the 12,261 reactions added fall in a central-carbon or energy-metabolism class.}}\label{fig:s1} \end{figure}
+
+\DIFadd{The classes that grew are those of specialised metabolism. O-antigen biosynthesis gained 218 reactions against 29 already held, branched-chain fatty-acid biosynthesis 98 against 8 and lipid IV-A biosynthesis 37 against 6, while antibiotic biosynthesis (265 against 740), polyketides (169 against 214), toxins (142 against 192) and lipids (140 against 281) are enriched two- to four-fold among the additions relative to their share of what was already held. The individual pathways that gained most are the mycolate biosynthesis superpathway (57 reactions), arachidonate metabolite biosynthesis (37), colibactin biosynthesis (34) and the three branched-chain fatty-acid pathways (32 each). Central carbon and energy metabolism --- energy metabolism, chemoautotrophic energy metabolism, electron transfer, fermentation, the TCA variants, glycolysis, the pentose phosphate cycle, photosynthesis, respiration and methanogenesis --- account for 41 of the 12,261 additions, against 328 of the 36,142 reactions already held. Central metabolism was already saturated in 2020; what a 2026 reconstruction gains is the periphery. The counts are produced by }\texttt{\DIFadd{analysis/pathway\_distribution\_of\_growth.py}} \DIFadd{under }\texttt{\DIFadd{Papers/NAR\_Update\_2026}}\DIFadd{, which reads only the released files and the repository's history}\DIFaddend .
 
 
 \end{document}
