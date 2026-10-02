@@ -62,23 +62,28 @@ def split_reason(rs):
 
 
 def main():
+    live_only = os.environ.get("LIVE_ONLY", "1") != "0"
     rg = {r["rxn"]: r for r in csv.DictReader(open(G / "reaction_grades.tsv"), delimiter="\t")}
     sg = collections.defaultdict(dict)
     for r in csv.DictReader(open(G / "source_grades.tsv"), delimiter="\t"):
         sg[r["rxn"]][r["source"]] = r
 
     direction = {}
+    is_obsolete = {}
     for f in sorted(glob.glob(str(ROOT / "Biochemistry/reaction_*.json"))):
         for x in json.load(open(f)):
             t = x.get("thermodynamics") or {}
             direction[x["id"]] = (t.get("eQuilibrator", ["", "", ""])[2],
                                   t.get("dGPredictor", ["", "", ""])[2])
+            is_obsolete[x["id"]] = x.get("is_obsolete") in (1, "1")
 
     n = collections.Counter()
     conflict = collections.Counter()
     for rx, r in rg.items():
         grade = r["best_grade"]
         if not grade:
+            continue
+        if live_only and is_obsolete.get(rx, True):
             continue
         row = sg[rx].get(FULL.get(r["best_source"], r["best_source"]))
         if row is None:
