@@ -60,15 +60,21 @@ for rxn in sorted(reactions_dict.keys()):
     new_status = reactions_helper.balanceReaction(rxn_cpds_array, all_structures)
     old_status=reactions_dict[rxn]["status"]
 
-    if("CK" in old_status and new_status not in old_status):
-        print("Warning: previously checked (CK) reaction may have different status: ",rxn,new_status,old_status)
-    
     #Need to handle reactions with polymers
     if(new_status=="Duplicate reagents"):
         new_status = "NB"
         continue
 
-    if(new_status != old_status and "CK" not in old_status):
+    # CK reactions are rewritten too, not merely warned about. A disagreement
+    # on a curator-checked reaction used to print a warning and leave the
+    # stale verdict in place, so the field kept asserting OK for reactions
+    # that no longer balanced. The CK marker is carried across by preserveCK
+    # so the curator record survives the rewrite.
+    new_status = reactions_helper.preserveCK(new_status, old_status)
+
+    if(new_status != old_status):
+        if("CK" in old_status):
+            print("Updating previously checked (CK) reaction "+rxn+": "+old_status+" -> "+new_status)
         print("Changing Status for "+rxn+" from "+old_status+" to "+new_status)
         status_lines.append(rxn+"\t"+old_status+"\t"+new_status+"\n")
         reactions_dict[rxn]["status"]=new_status

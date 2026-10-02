@@ -15,6 +15,10 @@ do to get these working on a new mac below.
 
 EDIT: As of 09/15/22 we used RDKit 2022.03.5 and OpenBabel 3.1.1
 EDIT: This the same as of 01/23/24
+EDIT 2026-10-01: as of today the pipeline's exact dependency versions
+(RDKit 2025.09.5, OpenBabel 3.1.1, plus requests/PyYAML) are pinned in
+`requirements.txt`/`environment.yml` in this directory -- see the
+"Pinned dependencies" section near the end of this file.
 EDIT 2026-09-24: InChI rows no longer depend on either parser. A
 standard InChI declares its formula, /p and /q layers, and
 `parse_structure` reads those directly (`inchi_layers`); RDKit and
@@ -117,3 +121,33 @@ the approach with the least pain:
 `conda create -c conda-forge -n msd-env rdkit`
 `conda activate msd-env`
 `conda install openbabel -c conda-forge`
+
+# Pinned dependencies (2026-10-01)
+
+The pipeline's exact dependency versions are now pinned in this
+directory: `requirements.txt` for the Python packages (pip-installable),
+`environment.yml` for a full conda/micromamba reproduction that also
+covers OpenBabel, which is a system package and can't go in a
+`requirements.txt`. Both were captured from the `equilibrator`
+micromamba env: RDKit 2025.09.5, OpenBabel 3.1.1, requests 2.34.2,
+PyYAML 6.0.3.
+
+Why move off the RDKit version used at submission (2022.03.5) instead of
+chasing it: SMILES canonicalization has been found to drift not just
+across RDKit *versions* but across different *builds* of the same
+version -- different, but chemically equivalent, ring-closure and
+atom-traversal order for the same molecule. This was investigated and
+confirmed to have **no effect whatsoever** on formula, charge, InChI,
+reaction balance (`balanceReaction()` never reads the SMILES field), or
+any of the three thermodynamics sources (Group Contribution, eQuilibrator,
+dGPredictor -- none of which take SMILES as a live computational input;
+see `Biochemistry/Thermodynamics/README.md`). A full regeneration does,
+however, produce a large, cosmetic-only diff in the `Structure` column of
+`Unique_ModelSEED_Structures.txt`.
+
+Because the drift is build-level and not just version-level, pinning the
+RDKit *version* here does not guarantee a byte-identical regeneration --
+some residual SMILES-only diff on a future run is expected and harmless
+even with the pin followed. The pin's purpose is to cut down the noise
+and make the environment reproducible going forward, not to recover
+byte-for-byte reproduction of the 2020-era baseline.
