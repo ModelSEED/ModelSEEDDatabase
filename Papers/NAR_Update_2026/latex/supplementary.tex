@@ -13,6 +13,10 @@
 %%   S4 direction from chemistry    <- M06 (Supplementary Methods S4)
 %%   S5 growth by pathway class     <- M09 (Supplementary Figure S1; was
 %%                                     Figure 1D until 2026-10-02)
+%%   S6 relationship to ModelSEED   <- M10 (transport + reconstruction scope,
+%%                                     cites the ModelSEED/PlantSEED pipeline
+%%                                     papers; first \cite in the supplement,
+%%                                     hence this document's bibliography)
 \documentclass[11pt]{article}
 \usepackage[margin=1in]{geometry}
 \usepackage{amsmath,graphicx,booktabs,url}
@@ -33,15 +37,15 @@
 \large The ModelSEED Biochemistry Database, 2026 update:\\
 grading multi-source thermodynamics}
 \author{\begin{minipage}{0.86\textwidth}\centering\normalsize
-Andrew Freiburger, Jos\'e P. Faria, Janaka N. Edirisinghe,
+Andrew Freiburger, Jos\'e P. Faria, Ray Zhu, Janaka N. Edirisinghe,
 Filipe Liu, Cooper Taylor, Vibhav Setlur, Robert T. Giessmann, Moritz E. Beber,
 Elad Noor, Vikas Upadhyay, Mohit Anand, Costas D. Maranas, Sebastian Hu{\ss},
 Zoran Nikoloski, Adam P. Arkin, Robert W. Cottingham, Elisha M. Wood-Charlson,
-Christopher S. Henry, Samuel M. D. Seaver
+Arvind Ramanathan, Christopher S. Henry, Samuel M. D. Seaver
 \end{minipage}\\[0.9em]
 \small Correspondence: \href{mailto:seaver@anl.gov}{seaver@anl.gov},
 \href{mailto:chenry@anl.gov}{chenry@anl.gov}\\[0.35em]
-\small\itshape Supplementary Methods S1--S5, Supplementary Table~1 and Supplementary Figure~S1}
+\small\itshape Supplementary Methods S1--S6, Supplementary Table~S1 and Supplementary Figure~S1}
 \date{}
 \begin{document}
 \maketitle
@@ -51,5 +55,12 @@ Christopher S. Henry, Samuel M. D. Seaver
 \input{supplement/S03_evidence_grading}
 \input{supplement/S04_direction_from_chemistry}
 \input{supplement/S05_growth_by_pathway_class}
+\input{supplement/S06_relationship_to_modelseed}
+
+%% Shares main.tex's references.bib so citation keys stay in sync between
+%% the two documents; NAR style for the supplement too, matching the main
+%% text (see main.tex's own \bibliographystyle{nar}).
+\bibliographystyle{nar}
+\bibliography{references}
 
 \end{document}
