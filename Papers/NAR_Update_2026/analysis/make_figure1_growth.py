@@ -25,9 +25,9 @@ def figure1():
     is the size on the page, and nothing is set below 7 pt. Every count is
     read from the released files through figure_common; none is transcribed.
     """
-    fig = plt.figure(figsize=(7.0, 2.55))
+    fig = plt.figure(figsize=(7.0, 2.65))
     gs = fig.add_gridspec(1, 3, wspace=0.34, left=0.100, right=0.985,
-                          top=0.955, bottom=0.150)
+                          top=0.958, bottom=0.170)
     a, b, c = (fig.add_subplot(gs[0, i]) for i in range(3))
     for ax in (a, c):
         ax.tick_params(labelsize=7.4)
@@ -73,6 +73,7 @@ def figure1():
            color=SURFACE, fontweight="bold", zorder=5)
     a.set_yticks([]); a.set_xlim(0, 30500); a.set_ylim(-0.6, len(rows) - 0.05)
     a.set_xticks([0, 10000, 20000, 30000]); a.set_xticklabels(["0", "10k", "20k", "30k"])
+    a.set_xlabel("Compounds", fontsize=7.4, labelpad=2)
     strip(a); tag(a, "A")
 
     # -- B: three-set Euler over reactions. Circle areas are not solvable
@@ -99,7 +100,8 @@ def figure1():
         c.text(-2.8, i, lab, va="center", ha="right", fontsize=7.8, color=INK)
     key(c, [("complete", BLUE), ("incomplete", NEUTRAL)])
     c.set_yticks([]); c.set_xlim(0, 100); c.set_ylim(-0.6, len(rows) - 0.05)
-    c.set_xticks([0, 50, 100]); c.set_xticklabels(["0", "50", "100%"])
+    c.set_xticks([0, 50, 100]); c.set_xticklabels(["0", "50", "100"])
+    c.set_xlabel("Complete unique reactions (%)", fontsize=7.4, labelpad=2)
     strip(c); tag(c, "C")
     return fig
 
@@ -126,21 +128,27 @@ def _euler_panel(ax):
                             edgecolor="none", zorder=2))
         ax.add_patch(Circle(cen[k], R, facecolor="none", edgecolor=col[k],
                             linewidth=0.9, zorder=4))
-    # Region counts, at the visual centroid of each lens.
-    at = {"M": (0.200, 0.690), "K": (0.800, 0.690), "H": (0.500, 0.170),
-          "MK": (0.500, 0.755), "MH": (0.320, 0.395), "KH": (0.680, 0.395),
-          "MKH": (0.500, 0.530)}
+    # Region counts, at each region's point of greatest clearance from every
+    # outline (found on a grid, not the centroid): the centroids of MK, MH and
+    # KH sit within half a label-width of an arc, so their counts touched it.
+    at = {"M": (0.190, 0.718), "K": (0.810, 0.718), "H": (0.500, 0.169),
+          "MK": (0.500, 0.813), "MH": (0.258, 0.390), "KH": (0.742, 0.390),
+          "MKH": (0.500, 0.533)}
     for k, (x, y) in at.items():
         ax.text(x, y, f"{r[k]:,}", ha="center", va="center", fontsize=7.3,
                 color=INK, zorder=5,
                 fontweight="bold" if k in ("M", "K", "H") else "normal")
-    # Set names ride outside their own circle, in the set's colour.
-    for k, (x, y, ha) in {"M": (0.295, 0.978, "center"),
-                          "K": (0.855, 0.978, "center"),
-                          "H": (0.475, 0.018, "center")}.items():
-        ax.text(x, y, f"{full[k]}  {tot[full[k]]:,}", ha=ha, va="center",
+    # Set names ride outside their own circle, in the set's colour, anchored by
+    # the edge nearest the circle so the gap to the outline is fixed (0.04)
+    # whatever the label's width. The panel is width-bound under equal aspect,
+    # so the extra y range costs nothing: it is height the axes had spare.
+    top, bot = cen["M"][1] + R + 0.04, cen["H"][1] - R - 0.04
+    for k, (x, y, va) in {"M": (0.295, top, "bottom"),
+                          "K": (0.855, top, "bottom"),
+                          "H": (0.500, bot, "top")}.items():
+        ax.text(x, y, f"{full[k]}  {tot[full[k]]:,}", ha="center", va=va,
                 fontsize=7.6, color=col[k], fontweight="bold")
-    ax.set_xlim(0, 1); ax.set_ylim(0, 1)
+    ax.set_xlim(0, 1); ax.set_ylim(-0.08, 1.08)
     ax.set_xticks([]); ax.set_yticks([]); ax.set_aspect("equal")
     for sp in ax.spines.values():
         sp.set_visible(False)

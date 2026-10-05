@@ -15,11 +15,11 @@ def figure2():
     rows, which made the figure tall; side by side it spans the page instead and
     costs roughly a quarter of the vertical space."""
     import json
-    fig = plt.figure(figsize=(7.0, 3.05))
+    fig = plt.figure(figsize=(7.0, 3.30))
     outer = fig.add_gridspec(1, 2, width_ratios=[1.78, 1.0],
-                             left=0.093, right=0.988, top=0.986, bottom=0.088,
+                             left=0.093, right=0.988, top=0.987, bottom=0.115,
                              wspace=0.105)
-    left = outer[0, 0].subgridspec(2, 1, hspace=0.318, height_ratios=[1.0, 1.34])
+    left = outer[0, 0].subgridspec(2, 1, hspace=0.420, height_ratios=[1.0, 1.34])
     right = outer[0, 1].subgridspec(3, 1, hspace=0.392)
     a = fig.add_subplot(left[0]); b = fig.add_subplot(left[1])
 
@@ -56,6 +56,7 @@ def figure2():
     _end = NUMBERS["energy_total"]
     a.set_xticks([0, 20000, 40000, _end])
     a.set_xticklabels(["0", "20k", "40k", f"{_end//1000}k"])
+    a.set_xlabel("Compounds or reactions", fontsize=7.0, labelpad=2)
     strip(a)
     # Four segments, two of them previously identified only in the caption.
     # The key names all four; hatch is reproduced in its own swatch so the
@@ -86,6 +87,7 @@ def figure2():
     b.set_yticks([]); b.set_xlim(0, tot * 1.02); b.set_ylim(-0.62, len(rows) - 0.38)
     b.set_xticks([0, 20000, 40000, _end])
     b.set_xticklabels(["0", "20k", "40k", f"{_end//1000}k"])
+    b.set_xlabel("Reactions with an energy estimate", fontsize=7.0, labelpad=2)
     strip(b)
     tag(b, "B")
 
@@ -123,6 +125,11 @@ def figure2():
         strip(ax, keep_x=True)
         if j == 0:
             tag(ax, "C")
+        if j == len(order) - 1:
+            # one label for the column: the three share a quantity and unit,
+            # only the range differs
+            ax.set_xlabel("Reported uncertainty (kcal mol$^{-1}$)", fontsize=7.0,
+                          labelpad=2)
     return fig
 
 
