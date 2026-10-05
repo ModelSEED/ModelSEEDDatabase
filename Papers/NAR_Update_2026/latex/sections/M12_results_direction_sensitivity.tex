@@ -1,10 +1,3 @@
-\begin{figure*}[!t]
-\centerline{\includegraphics[width=\textwidth]{../figures/figure3_direction.pdf}}
-\caption{
-        \textbf{Direction, agreement, and evidence.} (\textbf{A}) Direction assigned by each source independently: \emph{eQ} eQuilibrator, \emph{dG} dGPredictor, \emph{GC} group contribution, and \emph{LLMs} the large language model ensemble that predicts direction but not energy and are not considered in the evidence grading. Bar length is the number of reactions the source covers, facilitating comparison. (\textbf{B}) What each evidence grade rests on by the deciding source's own calibrated confidence, and (\textbf{C}) by what the other sources made of it. The two panels share a scale but not a palette, so each carries its own key; categories are ranked as in Supplementary Table~1.
-    } \label{fig:direction}
-\end{figure*}
-
 \subsection{Direction assignment and evidence grading}\label{sec:results-direction}
 
 %% All direction counts re-measured 2026-10-02 from Biochemistry/reaction_*.json
@@ -24,3 +17,6 @@ Each source now generates its own prediction for the direction each reaction pro
 \paragraph{Grading.} Of 27,338 graded reactions, 4,073 are gold, 14,475 silver and 8,790 bronze (Figure~\ref{fig:direction}B,C; see classification scheme in Supplementary Methods~S3). The tiers separate on what supports them: gold is 91\% self-certain and 85\% corroborated, while bronze is 99\% unconfident and split between reactions no second source could check (48\%) and reactions the other sources contradict (29\%). Because a measured reaction is always graded gold, the grades must be recomputed with openTECR withheld before they can be tested against it. Re-graded on the predictors alone, the 363 distinct anchored reactions split into 172 gold, 186 silver and 5 bronze; the gold subset falls within 2\,kcal\,mol$^{-1}$ of measurement 93.0\% of the time, against 89.2\% for silver (Supplementary Methods~S3). Both tiers therefore track measurement closely enough that we recommend either for inclusion in a metabolic model, and reserve bronze for review rather than use.
 
 \paragraph{Recommendation.} Evidently where the sources agree on reaction direction, this becomes our recommendation, but because the sources can disagree, we prioritize the source from which we take the recommended reaction direction, so the priority order is eQuilibrator, dGPredictor, group contribution. eQuilibrator supplies 16,985 recommended reaction directions, dGPredictor 7,935 and group contribution 2,055; these numbers include the ones where there is agreement also. We record the source used to make the recommendation, so researchers may apply a different precedence.
+
+\subsection{Ensemble LLMs predictions}\label{sec:llm-grading-rslts}
+The ensemble processed $\sim46,000$ reactions, generating calls for reaction direction for almost all of them (Figure~\ref{fig:direction}), including a direction for $\sim23,000$ of the reactions no thermodynamic source will commit on. However, 85\% of its calls are simply the direction the equation is written in: see Supplementary Methods~S4. We therefore release these calls as a separate, clearly-labelled layer, excluded from the evidence grading: for reactions that would otherwise be reversible by default. Neither the thermodynamics or the ensemble approaches model the pathway context that can drive a reaction against its own standard-state energy as metabolite concentrations shift downstream~\cite{mavrovouniotis1993,xu2008,noor2014}.
