@@ -15,11 +15,14 @@ latex/
 ├── main.tex                     # ONLY file with journal formatting; \input's everything
 ├── references.bib               # numeric (NAR) style; entries marked [VERIFY] need checking
 ├── oup-authoring-template.cls   # vendored from CTAN v1.5 (LPPL) so this builds anywhere
-├── oup-plain.bst                # numeric bibliography style (NAR)
-├── oup-abbrvnat.bst             # author-year alternative, unused
 ├── figures/                     # figure sources; empty until the direction-study figure lands
 └── sections/                    # one file per manuscript section — all prose lives here
 ```
+
+Bibliography style is `\bibliographystyle{nar}`, resolved from TeX Live's
+installed `nar.bst` (not vendored here) -- see
+[`NAR_REQUIREMENTS.md`](NAR_REQUIREMENTS.md#11-known-conflict-bibliography-ordering)
+for why `oup-plain.bst`'s alphabetical sort was dropped in favour of it.
 
 `main.tex` carries the document class, the NAR requirements checklist, the draft
 markers, and the ordered list of `\input` lines. **Do not put prose in
