@@ -1,0 +1,16 @@
+%% Figure 1 is declared here (moved from M06, 2026-10) so that LaTeX places it
+%% at the top of page 2. A float cannot move backwards past its declaration,
+%% so the position of this block IS the page choice -- Figures 2 and 3 are
+%% positioned the same way, in M11 and M12 respectively, for pages 3 and 4.
+%% \ref{fig:growth} still resolves from M09, where the figure is discussed.
+\begin{figure*}[!t] \centerline{\includegraphics[width=\textwidth]{../figures/figure1_growth.pdf}} \caption{\textbf{Sources of compounds and reactions.} (\textbf{A}) compounds contributed by each source that also supplied molecular structures, 2020 against 2026: we did not introduce any new biochemistry from KEGG. The third row is ChEBI, which supplies structures but no reactions. (\textbf{B}) how the three primary reaction sources overlap, every region labelled with its reaction count. Circle areas are not proportional. Rhea identifies its compounds through ChEBI. (\textbf{C}) the share of each source's unique reactions that are complete, meaning every reagent is assigned a complete structure, so the reaction can be balanced and decomposed.} \label{fig:growth} \end{figure*}
+
+\section{Introduction}
+
+
+The ModelSEED Biochemistry Database provides mass- and charge-balanced reaction networks reconciled across major biochemical resources for metabolic reconstructions~\cite{seaver2020}.
+Since its 2020 release, the database has been widely adopted for curating genome-scale metabolic models (GEMs): e.g. GEMsembler utilizes it for cross-mapping between resources~\cite{gemsembler2025} and Yeast9 sources Gibbs energies from it for constraining the core GEM~\cite{yeast9}.
+This update reports an expansion of the database, a tiered integration of thermodynamic sources spanning heuristic methods to large language models, and graded confidence scores for reaction directionality based on supporting evidence.
+While $>70\%$ of sources agree on reaction directionality, disagreements are displayed for investigators to interpret.
+Atom-mapping data is further integrated to enable metabolic flux analysis (MFA), and a structure-curation pipeline is built to resolve conflicts between structures from different databases.
+Finally, we expanded our search interface at https://modelseed.org/biochem to facilitate user queries of the resource.

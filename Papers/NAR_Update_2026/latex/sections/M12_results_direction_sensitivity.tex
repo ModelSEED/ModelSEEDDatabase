@@ -1,0 +1,33 @@
+\subsection{Direction assignment and evidence grading}\label{sec:results-direction}
+
+%% All direction counts re-measured 2026-10-02 from Biochemistry/reaction_*.json
+%% on the live (non-obsolete) population, after promoting the ab33a878 thermo
+%% rerun's reaction_grades.tsv into thermo-evidence/reversibility (previously
+%% unpromoted for 3 days) and re-running grade_thermo_sources.py --cv to drop
+%% 5 reactions physically deleted by 3ac769c1 after ab33a878's snapshot.
+%% Anchors: 363 distinct live reactions (801 stereo-exact records exist, but
+%% 438 are obsolete duplicates of a live entry -- see S03 -- so the
+%% predictors-alone re-grading below is computed over the 363 distinct ones).
+%% The grade tiers are under active revision; the rates below are for the
+%% scheme as it currently ships.
+Each source now generates its own prediction for the direction each reaction proceeds, and the three sources differ more in what they will commit to than in what they say (Figure~\ref{fig:direction}A).
+eQuilibrator resolves 97.4\% of the reactions it covers, group contribution 59.7\%, and dGPredictor 40.1\%.
+Across the database, 24,594 reactions receive a direction or a positive statement of reversibility from at least one source and 23,790 receive none.
+
+\paragraph{eQuilibrator vs dGPredictor} dGPredictor is able to generate a predicted energy for more reactions ($\sim25,100$, against eQuilibrator's $\sim17,900$) and converts the least of that coverage into a usable reaction direction.
+For a typical reaction, the error bar from dGPredictor alone exceeds the decision threshold in the reversibility index, so 59.9\% of its reactions are returned undetermined versus 2.6\% from eQuilibrator.
+These sources agree 94.8\% when they commit to a direction, although eQuilibrator provides more unique predictions (11,237) than dGPredictor provides (3,877) because dGPredictor often abstains rather than contradicting.
+
+\paragraph{Grading.} Of 27,338 graded reactions, 4,073 are gold, 14,475 silver and 8,790 bronze (Figure~\ref{fig:direction}B,C; see classification scheme in Supplementary Methods~S3).
+The tiers separate on what supports them: gold is 91\% self-certain and 85\% corroborated while bronze is 99\% unconfident, either uncorroborated (48\%) or contradicted (29\%) by other sources.
+Because a measured reaction is always graded gold, the grades must be recomputed with openTECR withheld before they can be tested against it.
+Re-graded on the predictors alone, the 363 distinct anchored reactions split into 172 gold, 186 silver and 5 bronze.
+The gold and silver reactions fall within 2\,kcal\,mol$^{-1}$ of measurement 93.0\% and 89.2\% of the time (Supplementary Methods~S3), hence we recommend these tiers for inclusion in a metabolic model and reserve bronze for review rather than use in models.
+
+\paragraph{Recommendation.} We recommend the consensus among sources, but when sources disagree on reaction direction, we prioritize eQuilibrator followed by dGPredictor and then group contribution.
+Following this tiered approach, eQuilibrator supplies 16,985 recommended reaction directions, dGPredictor provides 7,935, and group contribution provides 2,055, the source for each recommendation being recorded.
+
+\subsection{Ensemble LLMs predictions}\label{sec:llm-grading-rslts}
+The ensemble generated calls for $\sim46,000$ reactions (Figure~\ref{fig:direction}) and $\sim23,000$ directions for reactions that no thermodynamic source committed on.
+However, 85\% of its calls are simply the direction the equation is written in (Supplementary Methods~S4), so we exclude these calls from evidence grading and report them as a separate, clearly-labelled layer.
+Neither the thermodynamics nor the ensemble approaches capture the context of metabolic pathways that can drive a reaction against its own standard-state energy as metabolite concentrations shift downstream~\cite{noor2014}.
