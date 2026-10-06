@@ -44,7 +44,12 @@ def figureS1():
     type is at or above 8 pt on the page.
     """
     fig = plt.figure(figsize=(5.5, 3.0))
-    gs = fig.add_gridspec(1, 1, left=0.235, right=0.975, top=0.965, bottom=0.170)
+    # Left margin is wide (room for "branched fatty acids" etc. at the bar
+    # labels); right margin is mirrored to match it exactly, so the axes box
+    # itself -- not just the figure canvas -- is centered on the page once
+    # \includegraphics centers the whole PDF in S05's \figure environment.
+    LEFT = 0.235
+    gs = fig.add_gridspec(1, 1, left=LEFT, right=1 - LEFT, top=0.965, bottom=0.170)
     ax = fig.add_subplot(gs[0, 0])
     rows = _pathway_classes(top=8)
     ys = range(len(rows))[::-1]
