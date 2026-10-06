@@ -55,8 +55,6 @@ def figureS1():
         ax.barh(i - h / 2 - 0.02, new_, height=h, color=BLUE, zorder=3)
         ax.text(-xmax * 0.012, i, _short(name), va="center", ha="right",
                 fontsize=8.4, color=INK)
-        ax.text(max(new_, old_) + xmax * 0.012, i, f"{new_:,} new", va="center",
-                ha="left", fontsize=8.0, color=INK2, fontweight="bold")
     ax.set_yticks([]); ax.set_ylim(-0.62, len(rows) - 0.38)
     ax.set_xlim(0, xmax)
     ax.tick_params(labelsize=8.0)
@@ -69,6 +67,10 @@ def figureS1():
               columnspacing=0.85, borderpad=0.1, borderaxespad=0.75,
               labelcolor=INK2)
     strip(ax)
+    # Outward x-ticks, overriding the shared Grace style's inward default for
+    # this figure only (per corresponding-author request, 2026-10) -- the
+    # y-axis carries no ticks (set_yticks([]) above), so only x needs it.
+    ax.tick_params(axis="x", which="both", direction="out")
     return fig
 
 
