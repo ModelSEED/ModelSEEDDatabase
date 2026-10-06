@@ -2,8 +2,14 @@
 %% top of page 3; see M02's comment on Figure 1 for the scheme. (Declaring it
 %% any earlier, e.g. in M03, lets it stack onto page 2 alongside Figure 1
 %% instead.)
-\begin{figure*}[!t] \centerline{\includegraphics[width=\textwidth]{../figures/figure2_thermodynamics.pdf}} \caption{\textbf{Thermodynamic sources.} (\textbf{A}) Provenance of every pK$_\mathrm{a}$ ladder shipped in the database, across all 45,662 compounds and 48,384 reactions. ChemAxon Marvin supplies 79.4\% of compounds and 79.8\% of reactions. \emph{Hatching} marks the share reached through a second route: the calculator refuses polymers and organometallics as query molecules, so those are computed from SMILES instead. \emph{No ionizable site} is a chemistry result returned by Marvin where it reported no dissociable proton between pH $-2$ and $16$, for 1,237 compounds. (\textbf{B}) Reactions that carry an energy computed from the source heuristic. (\textbf{C}) Reported uncertainty in kcal\,mol$^{-1}$, one axis per source because the three differ by more than an order of magnitude. The shaded band spans the 5th to 95th percentile, which is used in our classification scheme.} \label{fig:thermo} \end{figure*}
-
+\begin{figure*}[!t]
+    \centerline{\includegraphics[width=\textwidth]{../figures/figure2_thermodynamics.pdf}}
+    \caption{
+        \textbf{Thermodynamic sources.} (\textbf{A}) Provenance of every pK$_\mathrm{a}$ ladder shipped in the database, across all 45,662 compounds and 48,384 reactions. ChemAxon Marvin supplies 79.4\% of compounds and 79.8\% of reactions. \emph{Hatching} marks the share computed from SMILES because Marvin refuses polymers and organometallics as query molecules. \emph{No ionizable site} edscribes 1,237 compounds that lacked a dissociable proton from Marvin between pH $-2$ and $16$. (\textbf{B}) Reactions that carry an energy computed from the source heuristic. (\textbf{C}) Reported uncertainties (kcal\,mol$^{-1}$) for each source, where the shaded band spans the 5th to 95th percentile range used in our classification scheme.
+        }
+    \label{fig:thermo}
+\end{figure*}
+    
 %% Rewritten 2026-09-08 after the Marvin 26.1 regeneration and the reversibility
 %% overhaul. Every number here is measured against the shipped files; see the
 %% inline comments for the command that reproduces each. Detail in
@@ -12,7 +18,7 @@
 
 The 2020 release combined two thermodynamics sources: eQuilibrator~\cite{flamholz2012} and the group contribution method~\cite{jankowski2008}.
 This ModelSEED Database update incorporates the most recent eQuilibrator~3.0~\cite{beber2022} and introduces two new thermodynamics sources: dGPredictor~\cite{wang2021} and experimental values.
-Each of the four distinct thermodynamics sources are reported separately, where available.
+Each of these four distinct thermodynamics sources are reported separately where available.
 All values are reported at pH~7.0, ionic strength 0.25\,M, pMg~3.0 and 298.15\,K; the basis for each condition and its effect on the released energies are given in Supplementary Methods~S2.
 
 \paragraph{Protonation.} eQuilibrator's Legendre transform requires a \emph{macroscopic} pKa ladder per compound: an ordered list in which consecutive species differ by one proton.
@@ -24,5 +30,5 @@ There were structural conflicts in compounds mapped to ModelSEED from the KEGG I
 We further investigated openTECR, a communal re-curation of TECR available at \url{https://github.com/opentecr}, to extend the thermodynamic anchors.
 
 \paragraph{Direction.} To conserve precedence, we use the same 2020 heuristics to derive reaction directions from the Group contribution approach~\cite{jankowski2008}, so that series stays comparable across releases.
-For eQuilibrator and dGPredictor, we use one rule set built on the reversibility index from Noor \textit{et al.}~\cite{noor2012}: a reaction is called irreversible when $|\ln\Gamma|$ exceeds $\ln(1000)$ by more than one propagated standard deviation~\cite{beber2022}, $\Gamma$ being the fold-change of reactant concentration required to change reaction direction.
-However, we extend the rule to require that the uncertainty clears the threshold as well. The different thermodynamic sources estimate uncertainties differently, and consequently the impact of uncertainty on reaction direction is not directly comparable (Figure~\ref{fig:thermo}C)).
+For eQuilibrator and dGPredictor, we use one rule set built on the reversibility index from Noor \textit{et al.}~\cite{noor2012}: irreversible when $|\ln\Gamma|$ exceeds $\ln(1000)$ by more than one propagated standard deviation~\cite{beber2022}, where $\Gamma$ is the fold-change of reactant concentration required to change reaction direction.
+We extend the rule to require that the uncertainty clears this $\Gamma$ threshold as well; however, differences in how each source estimates its uncertainty prevent direct comparisons (Figure~\ref{fig:thermo}C)).

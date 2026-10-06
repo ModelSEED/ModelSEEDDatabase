@@ -19,17 +19,17 @@ def figure3():
     corroborated there), so a shared key was never safe. Separate panels give
     each its own.
     """
-    fig = plt.figure(figsize=(7.0, 2.30))
+    fig = plt.figure(figsize=(7.0, 2.38))
     # B and C carry no y labels and A's are abbreviated, so the panels run to
     # the page edges; wspace is the only furniture left between them.
-    gs = fig.add_gridspec(1, 3, left=0.052, right=0.998, top=0.955,
-                          bottom=0.150, wspace=0.155)
+    gs = fig.add_gridspec(1, 3, left=0.052, right=0.988, top=0.957,
+                          bottom=0.180, wspace=0.155)
     a = fig.add_subplot(gs[0, 0])
     c = fig.add_subplot(gs[0, 1]); d = fig.add_subplot(gs[0, 2])
     # Gaps are asymmetric and gridspec wspace is not, so place by hand: B needs
     # room on its left for the gold/silver/bronze labels it carries for both
     # itself and C; C needs none, so it sits tight against B.
-    L, R, GAP_AB, GAP_BC = 0.052, 0.998, 0.058, 0.016
+    L, R, GAP_AB, GAP_BC = 0.052, 0.988, 0.058, 0.026
     W = (R - L - GAP_AB - GAP_BC) / 3.0
     for _ax, _x0 in ((a, L), (c, L + W + GAP_AB), (d, L + 2 * W + GAP_AB + GAP_BC)):
         _b = _ax.get_position()
@@ -58,6 +58,7 @@ def figure3():
                va="center", ha="right", fontsize=7.2, color=INK)
     a.set_xlim(0, AMAX); a.set_ylim(-0.60, len(rows) - 0.02); a.set_yticks([])
     a.set_xticks([0, 20000, 40000]); a.set_xticklabels(["0", "20k", "40k"])
+    a.set_xlabel("Reactions", fontsize=7.0, labelpad=2)
     strip(a)
     # key as a COLUMN in the white space right of the shortest row (eQuilibrator,
     # 25k against an axis running to 46k), not a four-across strip in the
@@ -80,8 +81,7 @@ def figure3():
                               "neither way"]}
     DMAX = max(sum(v for _, v, _ in NUMBERS[k].get(g, [])) or 1
                for k in ("grade_assess", "grade_cross") for g in GR)
-    for ax, key, letter, title in ((c, "grade_assess", "B", "by self-assessment"),
-                                   (d, "grade_cross", "C", "by cross-source")):
+    for ax, key, letter in ((c, "grade_assess", "B"), (d, "grade_cross", "C")):
         lanes = [(g, NUMBERS[key].get(g, [])) for g in GR]
         yy = range(len(lanes))[::-1]
         seen = []   # filled in encounter order, then sorted to Table 1's below
@@ -110,9 +110,15 @@ def figure3():
                   fontsize=5.8, ncol=1, handlelength=0.9, handleheight=0.8,
                   handletextpad=0.32, labelspacing=0.30, borderpad=0.1,
                   borderaxespad=0.35, labelcolor=INK2)
-        ax.text(0.5, -0.20, title, transform=ax.transAxes, ha="center",
-                va="top", fontsize=6.4, color=MUTED)
         tag(ax, letter)
+    # B and C share one axis (same quantity, same scale), so one label spans
+    # both. It replaces the per-panel "by self-assessment" / "by cross-source"
+    # captions, which sat below the figure's bottom edge and never printed.
+    _l, _r = c.get_position(), d.get_position()
+    fig.canvas.draw()
+    _y = a.xaxis.label.get_window_extent().y1 / fig.bbox.height
+    fig.text((_l.x0 + _r.x1) / 2, _y, "Reactions per evidence grade", ha="center",
+             va="top", fontsize=7.0, color=INK)
     return fig
 
 
