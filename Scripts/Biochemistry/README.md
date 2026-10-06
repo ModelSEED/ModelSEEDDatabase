@@ -28,7 +28,10 @@ The categories in which we sort the other scripts are:
 * `Merge_Formulas.py`
 * `Merge_Obsolete_Aliases.py`
 * `Merge_Reactions.py`
-* `Rebalance_Reactions.py`
+* `Rebalance_Reactions.py` (pass `save` to write the recomputed statuses
+  back; without it the script is a dry run. Its argument guard rejected
+  `save` until 2026-09-24, so the rebalance step of `Refresh_Reactions.sh`
+  had not been running.)
 * `Rebuild_Reactions.py`
 * `Update_Compound_Aliases.py`
 * `Update_Reaction_Aliases.py`

@@ -1,4 +1,13 @@
 #!/usr/bin/env python
+
+if __name__ == "__main__":
+    # Argument guard -- see "The argument guard" in Scripts/README.md.
+    import argparse as _argparse
+    _argparse.ArgumentParser(
+        description=__doc__,
+        formatter_class=_argparse.RawDescriptionHelpFormatter).parse_args()
+
+
 from BiochemPy import Compounds
 
 structs_check=['FKNQFGJONOIPTF-UHFFFAOYSA-N','AQLMHYSWFMLWBS-UHFFFAOYSA-N']

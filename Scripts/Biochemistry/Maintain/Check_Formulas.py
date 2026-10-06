@@ -1,16 +1,24 @@
 #!/usr/bin/env python
+
+if __name__ == "__main__":
+    # Argument guard -- see "The argument guard" in Scripts/README.md.
+    import argparse as _argparse
+    _argparse.ArgumentParser(
+        description=__doc__,
+        formatter_class=_argparse.RawDescriptionHelpFormatter).parse_args()
+
+
 import os, sys
 temp=list();
 header=1;
 
-sys.path.append('../../Libs/Python')
+sys.path.append('../../../Libs/Python')
 from BiochemPy import Reactions, Compounds, InChIs
 
 CompoundsHelper = Compounds()
 Compounds_Dict = CompoundsHelper.loadCompounds()
 Structures_Dict = CompoundsHelper.loadStructures(["InChI"],["ModelSEED"])
 
-sys.exit()
 diff_file = open("Compound_Formula_Differences.txt", 'w')
 for cpd in sorted(Compounds_Dict.keys()):
     if(cpd not in Structures_Dict):
@@ -52,7 +60,7 @@ for cpd in sorted(Compounds_Dict.keys()):
             different_atoms=dict()
             for atom in old_atoms.keys():
                 if(atom not in new_atoms):
-                    missing_atoms.update(atom)
+                    missing_atoms.add(atom)
                 elif(old_atoms[atom] != new_atoms[atom]):
                     different_atoms[atom]=old_atoms[atom]-new_atoms[atom]
 
@@ -67,3 +75,17 @@ for cpd in sorted(Compounds_Dict.keys()):
                 diff_file.write("Missing atoms for "+cpd+": "+str(list(missing_atoms))+"\n")
             if(len(different_atoms.keys())>0):
                 diff_file.write("Differing atoms for "+cpd+": "+str(different_atoms)+"\n")
+
+diff_file.close()
+
+# Summarise to stdout. Writing a file and printing nothing meant a caller could
+# not tell a clean run from the six years this script spent exiting early.
+counts = {}
+with open("Compound_Formula_Differences.txt") as fh:
+    for line in fh:
+        counts[line.split(" for ")[0]] = counts.get(line.split(" for ")[0], 0) + 1
+total = sum(counts.values())
+print("Compared {} compounds against their ModelSEED InChI.".format(len(Compounds_Dict)))
+print("{} findings written to Compound_Formula_Differences.txt".format(total))
+for kind in sorted(counts, key=lambda k: -counts[k]):
+    print("  {:<34} {}".format(kind, counts[kind]))
