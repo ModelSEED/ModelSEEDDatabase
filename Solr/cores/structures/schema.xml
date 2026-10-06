@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!-- Schema for ModelSEED Biochemistry: Structures
+     Solr 9.x, ClassicIndexSchemaFactory.
+
+     One document per compound_id. Fields are optional (nullable) —
+     compounds without SMILES / InChI simply have those fields absent.
+     Existence filters use `smiles:[* TO *]` and negation
+     `-smiles:[* TO *]`.
+
+     The `svg` field carries a pre-rendered RDKit SVG of the compound's
+     2D structure (300x300 default). Pre-generation moves the CPU cost
+     from UI-serve time to compile-time. Compounds whose SMILES is
+     missing, contains a wildcard (`*`), or would produce an SVG
+     larger than 100 KB have `svg` absent — the UI can render on the
+     fly for those (rare) cases.
+-->
+
+<schema name="structures" version="1.6">
+	<fields>
+		<field name="id"        type="string"     indexed="true"  stored="true"  required="true"/>
+		<field name="smiles"    type="string"     indexed="true"  stored="true"/>
+		<field name="inchi"     type="string"     indexed="true"  stored="true"/>
+		<field name="inchikey"  type="string"     indexed="true"  stored="true"/>
+		<!-- Not indexed — SVG text is retrieval-only, no reason to
+		     search inside it. -->
+		<field name="svg"       type="string"     indexed="false" stored="true"/>
+
+		<field name="date_inserted"  type="tdate"  indexed="true"  stored="true"  default="NOW"/>
+		<field name="date_modified"  type="tdate"  indexed="true"  stored="true"  default="NOW"/>
+		<field name="_version_"      type="long"   indexed="true"  stored="true"/>
+	</fields>
+
+	<uniqueKey>id</uniqueKey>
+
+	<xi:include href="schema_types.xml" xmlns:xi="http://www.w3.org/2001/XInclude">
+		<xi:fallback></xi:fallback>
+	</xi:include>
+</schema>
