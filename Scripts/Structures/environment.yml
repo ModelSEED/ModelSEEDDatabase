@@ -1,0 +1,22 @@
+# Conda/micromamba environment for the structure/reaction pipeline.
+#
+# Covers both the Python layer (requirements.txt) and the system-level
+# OpenBabel dependency (the `obabel` CLI + native bindings) in one spec,
+# captured from the `equilibrator` micromamba env on 2026-10-01.
+#
+# Build with:
+#   micromamba create -n msd-structures -f environment.yml
+#
+# SMILES canonicalization drifts across RDKit versions/builds with zero
+# effect on formula, charge, InChI, reaction balance, or thermodynamics --
+# see Scripts/Structures/README.md. This pins the environment going forward
+# to minimize that drift's cosmetic footprint, not to reverse it.
+name: msd-structures
+channels:
+  - conda-forge
+dependencies:
+  - python=3.10.20
+  - rdkit=2025.09.5
+  - openbabel=3.1.1
+  - requests=2.34.2
+  - pyyaml=6.0.3

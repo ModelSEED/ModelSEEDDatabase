@@ -1,10 +1,19 @@
 #!/usr/bin/env python
+
+if __name__ == "__main__":
+    # Argument guard -- see "The argument guard" in Scripts/README.md.
+    import argparse as _argparse
+    _argparse.ArgumentParser(
+        description=__doc__,
+        formatter_class=_argparse.RawDescriptionHelpFormatter).parse_args()
+
+
 import os,sys
 from BiochemPy import Compounds, Reactions
 
 Overridden_Compounds=dict()
 header=list()
-with open(os.path.dirname(__file__)+'/ACPs_Master_Formula_Charge.txt') as fh:
+with open(os.path.dirname(__file__)+'/../../Biochemistry/Curation/overrides/acps_formula_charge.tsv') as fh:
     for line in fh.readlines():
         line=line.strip()
         array=line.split('\t')

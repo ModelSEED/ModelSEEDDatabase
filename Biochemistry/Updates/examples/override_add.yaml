@@ -1,0 +1,32 @@
+# Example manifest: register a manual ACP override.
+#
+# ACP overrides bypass the structure-based formula/charge derivation
+# because acyl-carrier proteins have no fixed structure. Each row in
+# Biochemistry/Curation/overrides/acps_formula_charge.tsv pins the
+# formula and charge for one compound id.
+
+type: override_add
+title: Add cpd49500 (oleoyl-ACP) to ACP override table
+author: andrewfreiburger
+date: 2026-05-06
+reason: |
+  This ACP variant was added to the database in commit a1b2c3d4 but
+  was missing from the override table, leaving its formula/charge as
+  null. Manually pin to maintain mass-balance for the fatty acid
+  biosynthesis pathway.
+
+target:
+  file: Curation/overrides/acps_formula_charge.tsv
+
+change:
+  add_row:
+    ID:      cpd49500
+    name:    oleoyl-ACP
+    formula: C29H50N2O8PRS
+    charge:  -2
+
+expected_effects:
+  affected_compounds: 1
+  fields_changed:
+    - formula
+    - charge
