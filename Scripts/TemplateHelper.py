@@ -1,3 +1,19 @@
+# deltag/deltagerr were removed from the records on 2026-09-11; energies now
+# live per source under `thermodynamics`. Same precedence as the recommended
+# direction. Sources with no energy are skipped: the LLMs entry carries a
+# direction call and no number.
+def _pick_energy(rec, missing=10000000):
+    thermo = rec.get('thermodynamics')
+    if isinstance(thermo, dict):
+        for src in ('eQuilibrator', 'dGPredictor', 'Group contribution'):
+            v = thermo.get(src)
+            if isinstance(v, list) and len(v) >= 2:
+                try:
+                    return float(v[0]), float(v[1])
+                except (TypeError, ValueError):
+                    continue
+    return float(missing), float(missing)
+
 
 import json
 import os
@@ -486,8 +502,7 @@ class TemplateHelper(BaseHelper):
                     # Build the TemplateReaction.        
                     reaction['id'] = '%s_%s' %(reactionId, idcomp) # Use first compartment for suffix
                     reaction['name'] = masterReaction['name']
-                    reaction['deltaG'] = masterReaction['deltag']
-                    reaction['deltaGErr'] = masterReaction['deltagerr']
+                    reaction['deltaG'], reaction['deltaGErr'] = _pick_energy(masterReaction)
                     reaction['status'] = masterReaction['status']
                     reaction['reversibility'] = masterReaction['reversibility']
                     reaction['direction'] = fields[fieldNames['direction']]
@@ -615,8 +630,7 @@ class TemplateHelper(BaseHelper):
                 compound['aliases'] = masterCompound['aliases']
                 compound['defaultCharge'] = masterCompound['charge']
                 compound['mass'] = masterCompound['mass']
-                compound['deltaG'] = masterCompound['deltag']
-                compound['deltaGErr'] = masterCompound['deltagerr']
+                compound['deltaG'], compound['deltaGErr'] = _pick_energy(masterCompound)
                 if compound['mass'] == 'null':
                     compound['mass'] = 0
                 if compound['aliases'] == 'null':

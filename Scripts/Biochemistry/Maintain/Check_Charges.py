@@ -1,9 +1,18 @@
 #!/usr/bin/env python
+
+if __name__ == "__main__":
+    # Argument guard -- see "The argument guard" in Scripts/README.md.
+    import argparse as _argparse
+    _argparse.ArgumentParser(
+        description=__doc__,
+        formatter_class=_argparse.RawDescriptionHelpFormatter).parse_args()
+
+
 import os, sys
 temp=list();
 header=1;
 
-sys.path.append('../../Libs/Python')
+sys.path.append('../../../Libs/Python')
 from BiochemPy import Reactions, Compounds, InChIs
 
 CompoundsHelper = Compounds()
