@@ -45,19 +45,19 @@ Table~\ref{tab:grades} shows how many reactions were graded as such, based on th
 \toprule
 Grade & Self-assessment & Cross-source & Parameters & Reactions & Conflict \\
 \midrule
-gold   & measured       & ---          & stereo-exact anchor & 806 & 0 \\
-gold   & self-certain   & ---          & $p_{\text{ok}} \ge 0.90$ & 2{,}628 & 0 \\
+gold   & measured       & ---          & stereo-exact anchor & 363 & 0 \\
+gold   & self-certain   & ---          & $p_{\text{ok}} \ge 0.90$ & 3{,}710 & 14 \\
 \midrule
-silver & self-certain   & disputed     & $p_{\text{ok}} \ge 0.90$; $R > 2$; $z > 2$ & 30 & 0 \\
-silver & self-certain   & unpaired     & $p_{\text{ok}} \ge 0.90$; $n_{\text{src}} = 1$ & 598 & 0 \\
-silver & self-confident & ---          & $0.70 \le p_{\text{ok}} < 0.90$ & 9{,}477 & 39 \\
-silver & unconfident    & corroborated & $p_{\text{ok}} < 0.70$; $R \le 2$; $z \le 2$ & 8{,}283 & 4 \\
+silver & self-certain   & disputed     & $p_{\text{ok}} \ge 0.90$; $R > 2$; $z > 2$ & 31 & 0 \\
+silver & self-certain   & unpaired     & $p_{\text{ok}} \ge 0.90$; $n_{\text{src}} = 1$ & 370 & 0 \\
+silver & self-confident & ---          & $0.70 \le p_{\text{ok}} < 0.90$ & 6{,}361 & 22 \\
+silver & unconfident    & corroborated & $p_{\text{ok}} < 0.70$; $R \le 2$; $z \le 2$ & 7{,}713 & 0 \\
 \midrule
-bronze & self-confident & disputed     & $0.70 \le p_{\text{ok}} < 0.90$; $R > 2$; $z > 2$ & 161 & 0 \\
-bronze & unconfident    & disputed     & $p_{\text{ok}} < 0.70$; $R > 2$; $z > 2$ & 3{,}799 & 51 \\
-bronze & unconfident    & ---          & $p_{\text{ok}} < 0.70$ & 7{,}317 & 104 \\
+bronze & self-confident & disputed     & $0.70 \le p_{\text{ok}} < 0.90$; $R > 2$; $z > 2$ & 79 & 0 \\
+bronze & unconfident    & disputed     & $p_{\text{ok}} < 0.70$; $R > 2$; $z > 2$ & 2{,}563 & 27 \\
+bronze & unconfident    & ---          & $p_{\text{ok}} < 0.70$ & 6{,}148 & 100 \\
 \midrule
-\multicolumn{4}{l}{\textbf{Total}} & \textbf{33{,}099} & \textbf{198} \\
+\multicolumn{4}{l}{\textbf{Total}} & \textbf{27{,}338} & \textbf{163} \\
 \bottomrule
 \end{tabular}
-\caption{Reaction grades. A reaction takes the best grade any single source earns; ties are broken by the recommendation precedence (measurement, eQuilibrator, dGPredictor, group contribution), so the labels describe the strongest source rather than an arbitrary column order. \emph{Conflict} counts reactions where eQuilibrator and dGPredictor both commit to an irreversible direction and those directions are opposed.  Only 598 of the 6{,}089 single-source reactions appear as \texttt{unpaired}, as their grade is first defined by $p_{ok}$}\label{tab:grades} \end{table}
+\caption{Reaction grades. A reaction takes the best grade any single source earns; ties are broken by the recommendation precedence (measurement, eQuilibrator, dGPredictor, group contribution), so the labels describe the strongest source rather than an arbitrary column order. \emph{Conflict} counts reactions where eQuilibrator and dGPredictor both commit to an irreversible direction and those directions are opposed.  Only 370 of the 4{,}686 reactions tagged \texttt{unpaired} appear in that row, as their grade is first defined by $p_{ok}$. Counts are over non-obsolete reactions}\label{tab:grades} \end{table}
