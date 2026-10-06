@@ -1,278 +1,247 @@
 #!/usr/bin/env python
-from BiochemPy import Reactions
-from math import log
+"""Estimate reaction reversibility (``>``, ``<``, ``=``, or ``?``) from the
+stored thermodynamic energies and write it back into the reactions JSON.
+
+The cascade is **composable and source-specific**: heuristics and energy sources
+live in ``reversibility_heuristics`` as plug-in pieces, and the rule set is
+chosen per thermodynamic data source, because the sources do not fail the same
+way.
+
+    ./Estimate_Reaction_Reversibility.py            # top-level deltag, GC rules
+    ./Estimate_Reaction_Reversibility.py GC         # Group contribution, GC rules
+    ./Estimate_Reaction_Reversibility.py EQ         # eQuilibrator, EQ rules
+    ./Estimate_Reaction_Reversibility.py EQ --heuristics GC    # old behaviour
+    ./Estimate_Reaction_Reversibility.py DGP        # dGPredictor, reversibility index
+
+``GC`` is the default rule set: it is what every level other than ``EQ``
+selects, and what any unrecognised source falls back to. The GC cascade itself
+is unchanged, so ``GC`` and unfiltered runs still reproduce the historical
+report byte-for-byte.
+
+``EQ`` selects the eQuilibrator rule set (Beber 2022 uncertainty handling over
+the Noor 2012 / Flamholz 2012 reversibility index) *and* switches the energy
+source to ``thermodynamics['eQuilibrator']`` — see
+``reversibility_heuristics.energy_source_for_level`` for why the top-level
+``deltag`` was the wrong input here.
+
+To assemble something else, call ``run_reversibility`` directly::
+
+    from reversibility_heuristics import (
+        run_reversibility, get_heuristics, per_source_energy)
+    status, op, label = run_reversibility(
+        rxn_entry, per_source_energy("eQuilibrator"), get_heuristics("EQ"))
+
+The per-source ``GCC``/``EQU`` notes are no longer consulted; ``GC`` and ``EQ``
+runs read directly from ``thermodynamics['Group contribution']`` and
+``thermodynamics['eQuilibrator']``. After estimation, the computed direction is
+appended to whichever Thermodynamics sublist supplied the energy."""
+
+# ---------------------------------------------------------------------------
+# SUPERSEDED 2026-09-15 as the writer of the canonical `reversibility` field.
+#
+# Use Promote_Graded_Direction_to_Canonical.py instead. This script chose a
+# source by fixed precedence (eQuilibrator's energy first) regardless of the
+# grading, so on the 3,386 reactions where eQuilibrator disclaims it computed
+# the canonical field from a source the grading had already vetoed -- leaving
+# a reaction `silver, dGPredictor, forward` in thermo-evidence and `?` in
+# reversibility at the same time.
+#
+# reversibility_from_energy() MOVED to reversibility_heuristics.py on
+# 2026-09-16, so nothing imports this module any more. It is now a CLI only.
+#
+# The file REMAINS solely because Apply_2020_Reversibility_Policy.py invokes it
+# as a subprocess, and that script is the documented way to undo the graded
+# canonical direction. Delete the two together, or make Apply_2020 self
+# contained first; deleting this alone silently breaks the rollback path.
+#
+# Running it as a script to write the canonical field will undo the graded
+# recommendation.
+# ---------------------------------------------------------------------------
+import argparse
 import sys
-reactions_helper = Reactions()
-reactions_dict = reactions_helper.loadReactions()
+sys.path.append('../../Libs/Python/')
+from BiochemPy import Reactions
 
-DB_Level = ''
-if(len(sys.argv)>1 and (sys.argv[1] == 'EQ' or sys.argv[1] == 'GC')):
-    DB_Level = sys.argv[1]
+# Composable cascade core. Re-imported here so the historical public surface of
+# this module (constants + ``_*`` building blocks + ``estimate_one`` /
+# ``estimate_one``) keeps working for the CLI
+# (Update_Reaction_dGPredictor_Energies.py, _thermo_helpers, the tests).
+from reversibility_heuristics import (
+    # constants
+    TEMPERATURE, GAS_CONSTANT, RT_CONST, FARADAY,
+    CELL_MAX, CELL_MIN, CELL_CONC, PROTON, WATER, CO2, PROTON_WATER,
+    LOW_LOCAL_CONC, ATPS_REAGENTS, ATP, PHOSPHATE_IDS, LOW_ENERGY_CPDS,
+    DB_LEVEL_LABEL, DB_LEVEL_NOTE, DB_LEVEL_PRIORITY,
+    # building-block helpers (re-exported for back-compat importers)
+    _thermo_pair, _is_source_eligible, _energy_for, _has_gc_data,
+    _incomplete_decision, _walk_stoichiometry, _stored_bounds,
+    _is_atp_synthase, _abc_transporter_decision, _low_energy_points,
+    # composable framework
+    Context, run_reversibility, DEFAULT_HEURISTICS,
+    top_level_energy, per_source_energy, explicit_energy,
+    stored_bounds_heuristic, atp_synthase_heuristic, abc_transporter_heuristic,
+    mmdeltag_band_heuristic, low_energy_heuristic, default_heuristic,
+    make_ln_reversibility_index_heuristic,
+    # source-specific rule sets
+    GC_HEURISTICS, EQ_HEURISTICS,
+    DGP_HEURISTICS, make_ri_heuristics, HEURISTIC_SETS,
+    DEFAULT_HEURISTIC_SET, get_heuristics, heuristics_for_source,
+    heuristic_set_for_source,
+    energy_source_for_level,
+)
 
-#Constants
-TEMPERATURE=298.15
-GAS_CONSTANT=0.0019858775
-RT_CONST=TEMPERATURE*GAS_CONSTANT
-FARADAY = 0.023061 # kcal/vol gram divided by 1000?
 
-# max and min values refer to range of intracellular concentrations
-(cell_max,cell_min,cell_conc)=(0.02,0.00001,0.001)
+# ---------------------------------------------------------------------------
+# Cascade entry points (thin wrappers over the composable core)
+# ---------------------------------------------------------------------------
+def _cascade(rxn_entry, rxn_dg, rxn_dge, heuristics=None):
+    """Run a heuristic cascade against an explicit ``(rxn_dg, rxn_dge)`` pair and
+    return ``(status_label, operator)``. Kept for callers that import it
+    directly; equivalent to ``run_reversibility`` with ``explicit_energy``.
+    ``heuristics`` defaults to the GC rule set."""
+    status, operator, _ = run_reversibility(
+        rxn_entry, explicit_energy(rxn_dg, rxn_dge), heuristics or GC_HEURISTICS)
+    return status, operator
 
-#Phosphates
-phosphate_ids=("cpd00002", #ATP
-               "cpd00008", #ADP
-               "cpd00018", #AMP
-               "cpd00009", #Pi
-               "cpd00012") #PPi
 
-#Low energy compounds
-#taken from MFAToolkit/Parameters/Defaults.txt
-low_energy_cpds=("cpd00011", #CO2
-                 "cpd00013", #NH3
-                 "cpd11493", #ACP
-                 "cpd00009", #Pi
-                 "cpd00012", #Ppi
-                 "cpd00010", #CoA
-                 "cpd00449", #Dihydrolipoamide
-                 "cpd00242") #HCO3
+def estimate_one(rxn_entry, db_level, heuristics=None, energy_source=None):
+    """Returns ``(status_label, thermoreversibility, source_label)`` for one
+    reaction.
 
-reversibility_report=dict()
-for rxn in sorted(reactions_dict.keys()):
-    
-    #defaults
-    thermoreversibility = "?"
+    ``heuristics`` defaults to the rule set that matches ``db_level`` (GC for
+    everything except ``EQ``), and ``energy_source`` to the energy that rule set
+    expects. Pass either explicitly to override.
 
-    if(reactions_dict[rxn]['status'] == "EMPTY"):
+    ``source_label`` is the Thermodynamics subkey whose energy fed the estimate
+    (or ``None`` for empty/incomplete, or when the unfiltered run's top-level
+    energy did not match a sublist exactly)."""
+    if rxn_entry['status'] == "EMPTY":
+        return "Empty", "?", None
 
-        thermoreversibility = "?"
-        reversibility_report[rxn]=["Empty",reactions_dict[rxn]["reversibility"],thermoreversibility]
-        reactions_dict[rxn]['reversibility']=thermoreversibility
+    if heuristics is None:
+        heuristics = get_heuristics(db_level)   # '' / 'DGP' / unknown -> GC
+    if energy_source is None:
+        energy_source = energy_source_for_level(db_level)
 
-        continue
+    status, thermoreversibility, source_label = run_reversibility(
+        rxn_entry, energy_source, heuristics)
+    if status is None:  # no usable energy -> incomplete fallback
+        status, thermoreversibility = _incomplete_decision(rxn_entry, db_level)
+        return status, thermoreversibility, None
+    return status, thermoreversibility, source_label
 
-    rxn_dg = reactions_dict[rxn]['deltag']
-    rxn_dge = reactions_dict[rxn]['deltagerr']
 
-    # Here, if I'm specifying either GC or EQ,
-    # Then I want to check that I should estimate for this reaction
-    # (I.e. either "GCC" or "EQC")
-    # Otherwise its labeled as incomplete
-    DB_Rxn=True
-    if(len(DB_Level)>0):
-        DB_Rxn=False
-        for entry in reactions_dict[rxn]["notes"]:
-            if(DB_Level in entry and (entry == "GCC" or entry == "EQU")):
-                DB_Rxn=True
+# ---------------------------------------------------------------------------
+# Report writer
+# ---------------------------------------------------------------------------
+def _write_report(db_level, report):
+    """Format matches the original: GC runs drop the original-reversibility
+    column from the report, EQ and unfiltered runs keep it."""
+    name = "Estimated_Reaction_Reversibility_Report"
+    if db_level:
+        name += "_" + db_level
+    name += ".txt"
+    with open(name, "w") as fh:
+        for rxn in sorted(report):
+            row = list(report[rxn])
+            if db_level == "GC":
+                del row[1]
+            fh.write(rxn + "\t" + "\t".join(row) + "\n")
 
-    if(rxn_dg == 10000000 or rxn_dg is None or DB_Rxn is False):
 
-        thermoreversibility = "?"
-        status="Incomplete"
+# ---------------------------------------------------------------------------
+# Main
+# ---------------------------------------------------------------------------
+DB_LEVELS = ('EQ', 'GC', 'DGP')
 
-        #Here, if using EQ, but incomplete/not-updated reaction
-        #Can still fall back onto GC if complete by GC standards
 
-        if(DB_Level == "EQ" and "GCC" in reactions_dict[rxn]['notes']):
-            thermoreversibility=reactions_dict[rxn]["reversibility"]
-            status+=" (GCC)"
+def _build_parser():
+    """Real argument parsing.
 
-        reversibility_report[rxn]=[status,reactions_dict[rxn]["reversibility"],thermoreversibility]
-        reactions_dict[rxn]['reversibility']=thermoreversibility
+    This used to scan argv for one of the four level strings and IGNORE
+    everything else, so an unknown flag -- or a mistyped level such as
+    lowercase 'eq' -- fell through to the default (top-level deltag, GC rules)
+    and the script rewrote all 56,012 reactions. Asking it for --help did
+    exactly that. ``--heuristics`` already rejected unknown names on the
+    grounds that a silent fallback "would be easy to miss in a pipeline log";
+    the same reasoning applies here and did not used to.
+    """
+    ap = argparse.ArgumentParser(
+        description=__doc__,
+        formatter_class=argparse.RawDescriptionHelpFormatter)
+    ap.add_argument("db_level", nargs="?", default="", choices=("",) + DB_LEVELS,
+                    help="thermodynamic source. Omit for the top-level deltag.")
+    ap.add_argument("--heuristics", default=None,
+                    help="override the rule set the source would select")
+    ap.add_argument("--dry-run", action="store_true",
+                    help="report what would change and write nothing")
+    return ap
 
-        continue
 
-    #Calculate MdeltaG
-    (rct_min,rct_max)=(0.0,0.0)
-    (pdt_min,pdt_max)=(0.0,0.0)
+def _parse_db_level(argv):
+    for arg in argv[1:]:
+        if arg in DB_LEVELS:
+            return arg
+    return ''
 
-    #Calculate mMdeltaG
-    rgt_sum=0.0
 
-    #Capture specific compounds for heuristics
-    proton_cpt_dict = dict()
-    phosphates = dict()
-    for rgt in reactions_dict[rxn]['stoichiometry'].split(';'):
-        (coeff,cpd,cpt,idx,name)=rgt.split(":", maxsplit=4)
-        coeff=float(coeff)
-
-        if(cpd == 'cpd00067'):
-            proton_cpt_dict[cpt]=1
-
-        #Find phosphates
-        for cpd in phosphate_ids:
-            if(cpd in rgt):
-                if(cpd not in phosphates):
-                    phosphates[cpd]=0.0
-                phosphates[cpd]+=coeff
-
-        #ignore protons and water for following computation
-        if(cpd == 'cpd00067' or cpd == 'cpd00001'):
+def _parse_heuristics(argv):
+    """``--heuristics NAME`` / ``--heuristics=NAME`` override, or ``None`` to
+    let the db_level pick. Rejects unknown names rather than silently
+    falling back to GC, which would be easy to miss in a pipeline log."""
+    for index, arg in enumerate(argv[1:], start=1):
+        name = None
+        if arg == '--heuristics' and index + 1 < len(argv):
+            name = argv[index + 1]
+        elif arg.startswith('--heuristics='):
+            name = arg.split('=', 1)[1]
+        if name is None:
             continue
+        if name not in HEURISTIC_SETS:
+            sys.exit("ERROR: unknown heuristic set %r; choose from %s"
+                     % (name, ', '.join(sorted(HEURISTIC_SETS))))
+        return name
+    return None
 
-        #Here we can change accordingly to compartments
-        #This section for MdeltaG under concentration range
-        (cpt_max,cpt_min)=(cell_max,cell_min)
-        if(coeff<0):
-            rct_min += (coeff*log(cpt_min))
-            rct_max += (coeff*log(cpt_max))
-        else:
-            pdt_min += (coeff*log(cpt_min))
-            pdt_max += (coeff*log(cpt_max))
 
-        #This section for mMdeltaG under fixed concentration
-        local_conc=cell_conc
-        if(cpd == 'cpd00011'): #CO2
-            local_conc=0.0001
-        elif(cpd == 'cpd00007' or cpd == 'cpd11640'): #O2 && H2
-            local_conc=0.000001;
-        rgt_sum += (coeff*log(local_conc))
+def main():
+    args = _build_parser().parse_args()
+    db_level = args.db_level
+    heuristics_name = args.heuristics
+    if heuristics_name is not None and heuristics_name not in HEURISTIC_SETS:
+        sys.exit("ERROR: unknown heuristic set %r; choose from %s"
+                 % (heuristics_name, ', '.join(sorted(HEURISTIC_SETS))))
+    heuristics = get_heuristics(heuristics_name) if heuristics_name else None
 
-    #for future reference
-    rxn_dg_transport = 0.0
-    
-    stored_max=rxn_dg+rxn_dg_transport+rxn_dge
-    stored_min=rxn_dg+rxn_dg_transport-rxn_dge
+    effective = heuristics_name or (db_level if db_level in HEURISTIC_SETS
+                                    else DEFAULT_HEURISTIC_SET)
+    print("Energy source: %s | heuristics: %s"
+          % (db_level or 'top-level deltag', effective))
 
-    stored_max+=(RT_CONST*pdt_max)+(RT_CONST*rct_min)
-    stored_min+=(RT_CONST*pdt_min)+(RT_CONST*rct_max)
+    helper = Reactions()
+    reactions_dict = helper.loadReactions()
 
-    if(stored_max < 0):
+    report = {}
+    for rxn in sorted(reactions_dict.keys()):
+        rxn_entry = reactions_dict[rxn]
+        # The cascade-winner source label is intentionally ignored here:
+        # per-source operators are written at energy-table time by
+        # ``_thermo_helpers`` (each using THAT source's own dG). This step
+        # only updates the canonical top-level reversibility.
+        status, thermoreversibility, _ = estimate_one(
+            rxn_entry, db_level, heuristics=heuristics)
+        report[rxn] = [status, rxn_entry["reversibility"], thermoreversibility]
+        rxn_entry['reversibility'] = thermoreversibility
 
-        thermoreversibility = ">"
-        reversibility_report[rxn]=["MdeltaG(Max): {0:.2f}".format(stored_max),reactions_dict[rxn]["reversibility"],thermoreversibility]
-        reactions_dict[rxn]['reversibility']=thermoreversibility
+    _write_report(db_level, report)
+    changed = sum(1 for v in report.values() if v[1] != v[2])
+    if args.dry_run:
+        print("DRY RUN: %d of %d reactions would change; nothing written"
+              % (changed, len(report)))
+        return
+    print("Saving reactions (%d of %d change)" % (changed, len(report)))
+    helper.saveReactions(reactions_dict)
 
-        continue
 
-    if(stored_min > 0):
-
-        thermoreversibility = "<"
-        reversibility_report[rxn]=["MdeltaG(Min): {0:.2f}".format(stored_min),reactions_dict[rxn]["reversibility"],thermoreversibility]
-        reactions_dict[rxn]['reversibility']=thermoreversibility
-
-        continue
-
-    #Do heuristics
-    #1: ATP hydrolysis transport
-    #1a: ATP Synthase is reversible, but cannot involve any other compound, and can only transport protons
-    is_atp_synthase=False
-    if(reactions_dict[rxn]['is_transport']==1 and len(proton_cpt_dict.keys())>1):
-        cpds_cpts_dict=dict()
-        #Collect compound compartments
-        for rgt in reactions_dict[rxn]['stoichiometry'].split(';'):
-            (coeff,cpd,cpt,idx,name)=rgt.split(":",maxsplit=4)
-            coeff=float(coeff)
-        
-            if(cpd not in cpds_cpts_dict):
-                cpds_cpts_dict[cpd]=list()
-            cpds_cpts_dict[cpd].append(cpt)
-
-        #defaults
-        is_atp_synthase=True
-        for cpd in cpds_cpts_dict.keys():
-            #Must not contain reactants not in ATP Synthase
-            if(cpd != 'cpd00002' and cpd != 'cpd00008' and cpd != 'cpd00009' and cpd != 'cpd00001' and cpd != 'cpd00067'):
-                is_atp_synthase = False
-
-        #Must contain _all_ five reactants in ATP Synthase
-        if(len(cpds_cpts_dict.keys())!=5):
-            is_atp_synthase = False
-
-        #Only protons are transported
-        for cpd in cpds_cpts_dict.keys():
-            if(len(cpds_cpts_dict[cpd])==2 and cpd != 'cpd00067'):
-                is_atp_synthase = False
-
-    if(is_atp_synthase is True):
-
-        thermoreversibility = "="
-        reversibility_report[rxn]=["ATPS",reactions_dict[rxn]["reversibility"],thermoreversibility]
-        reactions_dict[rxn]['reversibility']=thermoreversibility
-
-        continue
-
-    #1b: Find ABC Transporters (but not ATP Synthase)
-    if(reactions_dict[rxn]['is_transport']==1 and 'cpd00002' in phosphates):
-
-        thermoreversibility="="
-
-        if(phosphates['cpd00002']<0):
-            thermoreversibility=">"
-        elif(phosphates['cpd00002']>0):
-            thermoreversibility="<"
-        else:
-            #If zero, then itself ATP is transported
-            #I manually reviewed these, these are not chemical reactions
-            pass
-        
-        reversibility_report[rxn]=["ABCT: "+str(phosphates['cpd00002']),reactions_dict[rxn]["reversibility"],thermoreversibility]
-        reactions_dict[rxn]['reversibility']=thermoreversibility
-
-        continue
-
-    #2: Calculate and evaluate mMdeltaG
-    mMdeltaG=rxn_dg+(RT_CONST*rgt_sum);
-    if(mMdeltaG >= -2.0 and mMdeltaG <= 2.0):
-
-        thermoreversibility = "="
-        reversibility_report[rxn]=["mMdeltaG: {0:.2f}".format(mMdeltaG),reactions_dict[rxn]["reversibility"],thermoreversibility]
-        reactions_dict[rxn]['reversibility']=thermoreversibility
-
-        continue
-
-    #3: Calculate low energy points
-    low_energy_points = 0
-
-    #3a: Find minimum phosphate-related coefficient
-    min_coeff = 10000000
-    if('cpd00002' in phosphates and len(phosphates.keys())>2):
-        for pho in phosphates.keys():
-            if(phosphates[pho]<min_coeff):
-                min_coeff = phosphates[pho]
-
-    if(min_coeff != 10000000):
-        low_energy_points-=(abs(min_coeff))
-    
-    #3b:Find other low energy compounds
-    for rgt in reactions_dict[rxn]['stoichiometry'].split(';'):
-        (coeff,cpd,cpt,idx,name)=rgt.split(":",maxsplit=4)
-        coeff=float(coeff)
-        
-        if(cpd in low_energy_cpds):
-            low_energy_points-=coeff
-
-    #Evaluate low energy
-    if((low_energy_points*mMdeltaG) > 2 and mMdeltaG < 0):
-
-        thermoreversibility = ">"
-        reversibility_report[rxn]=["lowE: {0:.2f}".format(mMdeltaG)+":"+str(low_energy_points),reactions_dict[rxn]["reversibility"],thermoreversibility]
-        reactions_dict[rxn]['reversibility']=thermoreversibility
-
-        continue
-
-    elif((low_energy_points*mMdeltaG) > 2 and mMdeltaG > 0):
-
-        thermoreversibility = "<"
-        reversibility_report[rxn]=["lowE: {0:.2f}".format(mMdeltaG)+":"+str(low_energy_points),reactions_dict[rxn]["reversibility"],thermoreversibility]
-        reactions_dict[rxn]['reversibility']=thermoreversibility
-
-        continue
-
-    thermoreversibility = "="
-    reversibility_report[rxn]=["default",reactions_dict[rxn]["reversibility"],thermoreversibility]
-    reactions_dict[rxn]['reversibility']=thermoreversibility
-
-file_name="Estimated_Reaction_Reversibility_Report"
-if(len(DB_Level)>0):
-    file_name+="_"+DB_Level
-file_name+=".txt"
-with open(file_name,"w") as fh:
-    for rxn in sorted(reversibility_report):
-        report_array=list(reversibility_report[rxn])
-        if(DB_Level == "GC"):
-            del(report_array[1])
-        fh.write(rxn+"\t"+"\t".join(report_array)+"\n")
-fh.close()
-
-print("Saving reactions")
-reactions_helper.saveReactions(reactions_dict)
+if __name__ == "__main__":
+    main()
