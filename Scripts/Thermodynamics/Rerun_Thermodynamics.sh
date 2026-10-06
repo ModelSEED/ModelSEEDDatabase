@@ -1,7 +1,78 @@
 #!/bin/bash
+# Full thermodynamics regeneration, in dependency order.
+#
+# Every step reads a committed input under Biochemistry/Thermodynamics/ and is
+# idempotent: run it twice against unchanged inputs and the second run produces
+# no diff. That property is the check -- a non-empty diff on a second run means
+# an input moved or a script is non-deterministic.
+set -euo pipefail
+
+# --- Group contribution -----------------------------------------------------
+# Jankowski 2008 group energies via MFAToolkit, under Chris Henry's Convention A
+# (H+ = -9.5 kcal/mol, H included in compound dGf). Inputs are the four
+# MolAnalysis tables in Biochemistry/Thermodynamics/ModelSEED/.
 ./Update_Compound_GroupContribution_Energies.py
 ./Update_Reaction_GroupContribution_Energies.py
-./Estimate_Reaction_Reversibility.py GC
+
+# NOTE: this script is the INGEST stage. It reads committed tables under
+# Biochemistry/Thermodynamics/ and writes them into the JSON. It does NOT
+# regenerate those tables from structures -- that is Pipeline/regenerate.sh,
+# which needs the eQuilibrator working tree and takes about an hour. Run it only
+# when the structures, the pKa layer or the training data have changed.
+
+# --- eQuilibrator -----------------------------------------------------------
+# Component contribution computed from ModelSEED's own structures. Inputs are
+# ModelSEED_{Compound,Reaction}_Energies.tsv, which superseded the
+# MetaNetX-mediated retrieval; see Biochemistry/Thermodynamics/eQuilibrator/README.md.
 ./Update_Compound_eQuilibrator_Energies.py
 ./Update_Reaction_eQuilibrator_Energies.py
-./Estimate_Reaction_Reversibility.py EQ
+
+# --- dGPredictor ------------------------------------------------------------
+# Retrained on the de-duplicated openTECR, the same measurements
+# component-contribution is fitted to. Every prediction is installed with its
+# own uncertainty; there is no coverage floor. See
+# Biochemistry/Thermodynamics/dGPredictor/README.md.
+./Update_Reaction_dGPredictor_Energies.py
+./Update_Compound_dGPredictor_Energies.py
+
+# --- Per-source direction operators -----------------------------------------
+# Each updater already computes its own operator at write time, using that
+# source's rule set. This is a consistency backfill: on a clean run it reports
+# "Entries refreshed/added: 0". A non-zero count means some record was written
+# with the wrong rule set.
+./Add_Reaction_Thermodynamics_Operators.py
+
+# --- LLM ensemble directions ------------------------------------------------
+# MUST run after the operator backfill above, and this is not optional.
+#
+# Add_Reaction_Thermodynamics_Operators.py refreshes the operator on EVERY
+# entry in a reaction's thermodynamics dict by recomputing it from that
+# entry's stored energy. The LLM ensemble carries a direction and NO energy by
+# design, so the refresh recomputes it from nothing and writes '?' -- all
+# 45,644 of them, silently, on every pipeline run.
+#
+# Omitting this line is how the calls were lost twice in Sept 2026: once
+# unnoticed until Figure 3A rendered as 100% undetermined, and again simply by
+# running Scripts/Tests/test_reaction_direction.py, which executes this
+# pipeline against the working tree.
+./Add_LLM_Direction_Calls.py
+
+# --- Canonical fields (deltag / deltagerr / reversibility) ------------------
+# NOT run above, deliberately. These write the top-level canonical fields,
+# which are slated for removal in favour of the additive per-source dict. They
+# are listed here so the full pipeline stays documented:
+#
+#   ./Promote_Reaction_Thermodynamics_to_Canonical.py
+#
+# Promotion must run LAST if it runs at all -- it weighs reversibility when
+# choosing which source to promote, so running it between source updates
+# promotes a half-regenerated picture. Note also that it never overwrites an
+# existing canonical deltag, so on a database that already has one it is close
+# to a no-op.
+
+# --- Canonical reversibility from the graded recommendation -----------------
+# Requires grade_thermo_sources.py to have run first: it reads best_source per
+# reaction from results/thermo_grades/. Supersedes the two
+# Estimate_Reaction_Reversibility.py passes, which picked a source by fixed
+# precedence and so could contradict the grading.
+./Promote_Graded_Direction_to_Canonical.py
