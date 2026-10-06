@@ -21,7 +21,12 @@
 \usepackage[margin=1in]{geometry}
 \usepackage{amsmath,graphicx,booktabs,url}
 \usepackage{float}   % [H] for Supplementary Figure S1, so it cannot split a paragraph
-\usepackage[colorlinks=true,allcolors=blue]{hyperref}
+%% allcolors was blue; changed to black per NAR's tracked-changes instruction
+%% ("Type your revised text in red font, please DO NOT use red highlight") --
+%% a blue mailto: link in the marked copy reads as a second markup colour
+%% alongside the red revision text, so links are now plain black (still
+%% underlined and clickable via colorlinks).
+\usepackage[colorlinks=true,allcolors=black]{hyperref}
 \renewcommand{\theequation}{S\arabic{equation}}
 \renewcommand{\thesection}{S\arabic{section}}
 %% Figures are S-numbered so the main text can say "Supplementary Figure S1";

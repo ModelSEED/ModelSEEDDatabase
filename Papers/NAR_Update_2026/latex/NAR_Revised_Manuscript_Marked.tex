@@ -138,8 +138,8 @@
 %DIF UNDERLINE PREAMBLE %DIF PREAMBLE
 \RequirePackage[normalem]{ulem} %DIF PREAMBLE
 \RequirePackage{color}\definecolor{RED}{rgb}{1,0,0}\definecolor{BLUE}{rgb}{0,0,1} %DIF PREAMBLE
-\providecommand{\DIFadd}[1]{{\protect\color{red}\uwave{#1}}} %DIF PREAMBLE
-\providecommand{\DIFdel}[1]{{\protect\color{blue}\sout{#1}}} %DIF PREAMBLE
+\providecommand{\DIFadd}[1]{{\protect\color{red}{#1}}} %DIF PREAMBLE
+\providecommand{\DIFdel}[1]{{\protect\color{red}\sout{#1}}} %DIF PREAMBLE
 %DIF SAFE PREAMBLE %DIF PREAMBLE
 \providecommand{\DIFaddbegin}{} %DIF PREAMBLE
 \providecommand{\DIFaddend}{} %DIF PREAMBLE
@@ -304,9 +304,7 @@ Database, 2026 update: grading multi-source thermodynamics}
 %% told us so himself, which is the standing reason to treat a lab-mate's
 %% published affiliation as a starting point rather than an answer.
 %%
-%DIF < % Numbering below runs in order of first appearance.
-\DIFdelbegin %DIFDELCMD < \author[1]{%%%
-\DIFdelend %DIF > % Numbering below runs in order of first appearance, except [14], [15] and
+ %DIF > % Numbering below runs in order of first appearance, except [14], [15] and
 %DIF > % [16], added 2026-10 for Zhu, Ramanathan and Freiburger's second
 %DIF > % affiliation after the original list was fixed -- appending rather than
 %DIF > % renumbering 1-13 to avoid touching every other author's citation.
@@ -428,19 +426,7 @@ Database, 2026 update: grading multi-source thermodynamics}
 %%  Abstracts must stand alone: no citations to the reference list, no
 %%  equations, no cross-references.
 %%-----------------------------------------------------------------------------
-\DIFdelbegin %DIFDELCMD < \abstract{%% NAR: must contain a working URL; must stand alone (no citations, no
-%DIFDELCMD < %% equations, no cross-references); keep as a SINGLE paragraph -- it is
-%DIFDELCMD < %% \input into the \abstract{} argument in main.tex.
-%DIFDELCMD < %%
-%DIFDELCMD < %% Rewritten 2026-09-05 to the 6-page shape. Every number here is measured and
-%DIFDELCMD < %% appears in the Results. Deliberately omitted, because the sections that
-%DIFDELCMD < %% carried them are now Supplementary: PubChem validation, protein-carrier
-%DIFDELCMD < %% cofactor standardisation, the reaction-similarity foundation model, and the
-%DIFDELCMD < %% v2 draft-model direction-sensitivity study, which is not yet run.
-%DIFDELCMD < The ModelSEED Biochemistry Database (\modelseedurl) supplies foundational mass- and charge-balanced reaction networks for metabolic reconstructions. Here we present an update on the biochemistry where the database has been expanded to $\sim46,000$ compounds, and $\sim48,000$ reactions, featuring $\sim37,000$ metabolic structures. We have expanded our approach for handling thermodynamic data, enabling multiple sources of data to be derived, integrated, and presented to the wider research community. We now publish predictions of pKa, reaction energy (and respective uncertainties), and estimates of reaction direction from multiple independent sources. Each reaction is graded gold, silver or bronze according to the strength of the evidence behind it, so that users can weigh its reliability directly. We also release reaction directions predicted by an ensemble of large language models. This multi-source approach exposes agreements and discrepancies between sources for $\sim27,000$ reactions. Finally, to ensure data integrity, a new conflict-resolution pipeline reconciles structures across sources, documenting input from curators. Our work is publicly available at \url{https://github.com/ModelSEED/ModelSEEDDatabase}.
-%DIFDELCMD < }
-%DIFDELCMD < %%%
-\DIFdelend \DIFaddbegin \abstract{%% NAR: must contain a working URL; must stand alone (no citations, no
+ \DIFaddbegin \abstract{%% NAR: must contain a working URL; must stand alone (no citations, no
 %% equations, no cross-references); keep as a SINGLE paragraph -- it is
 %% \input into the \abstract{} argument in main.tex.
 %%
@@ -482,39 +468,24 @@ reaction reversibility, ModelSEED}
 
 
 The ModelSEED Biochemistry Database provides mass- and charge-balanced reaction networks reconciled across major biochemical resources for metabolic reconstructions~\cite{seaver2020}.
-Since its 2020 release, the database has been widely adopted for \DIFaddbegin \DIFadd{curating }\DIFaddend genome-scale metabolic \DIFdelbegin \DIFdel{modeling and integration. For example, GEMsembler utilizes the shared ModelSEED namespace to resolve cross-tool identifier mappings~\mbox{%DIFAUXCMD
+Since its 2020 release, the database has been widely adopted for \DIFaddbegin \DIFadd{curating }\DIFaddend genome-scale metabolic  \DIFaddbegin \DIFadd{models (GEMs): e.g. GEMsembler utilizes it for cross-mapping between resources~\mbox{%DIFAUXCMD
 \cite{gemsembler2025} }\hskip0pt%DIFAUXCMD
-, }\DIFdelend \DIFaddbegin \DIFadd{models (GEMs): e.g. GEMsembler utilizes it for cross-mapping between resources~\mbox{%DIFAUXCMD
-\cite{gemsembler2025} }\hskip0pt%DIFAUXCMD
-}\DIFaddend and Yeast9 \DIFdelbegin \DIFdel{incorporates its metabolite values to parameterize reaction Gibbs energies across the network}\DIFdelend \DIFaddbegin \DIFadd{sources Gibbs energies from it for constraining the core GEM}\DIFaddend ~\cite{yeast9}.
-\DIFdelbegin %DIFDELCMD < 
-
-%DIFDELCMD < %%%
-\DIFdelend This update reports \DIFdelbegin \DIFdel{the growth }\DIFdelend \DIFaddbegin \DIFadd{an expansion }\DIFaddend of the database, \DIFdelbegin \DIFdel{and an expanded approach in handling the layer of thermodynamics data allowing us to publish every source with its own uncertainty rather than promoting one.
-While over $70\%$ of the reactions with multiple sources of data }\DIFdelend \DIFaddbegin \DIFadd{a tiered integration of thermodynamic sources spanning heuristic methods to large language models, and graded confidence scores for reaction directionality based on supporting evidence.
-While $>70\%$ of sources }\DIFaddend agree on reaction \DIFdelbegin \DIFdel{direction, any disagreement is published for review by researchers to decide which numbers and approach carry weight.
-}%DIFDELCMD < 
-
-%DIFDELCMD < %%%
-\DIFdel{Here we also describe a grading approach incorporating the uncertainties of the data across different sources, an integration of atom-mapping data to enable MFA analyses}\DIFdelend \DIFaddbegin \DIFadd{directionality, disagreements are displayed for investigators to interpret.
-Atom-mapping data is further integrated to enable metabolic flux analysis (MFA)}\DIFaddend , and a structure-curation pipeline \DIFaddbegin \DIFadd{is }\DIFaddend built to resolve conflict\DIFaddbegin \DIFadd{s}\DIFaddend  between structures from different databases.
-Finally, we expanded our search interface at https://modelseed.org\DIFdelbegin \DIFdel{for dissemination of the results}\DIFdelend \DIFaddbegin \DIFadd{/biochem to facilitate user queries of the resource}\DIFaddend .
+}\DIFaddend and Yeast9  \DIFaddbegin \DIFadd{sources Gibbs energies from it for constraining the core GEM}\DIFaddend ~\cite{yeast9}.
+ This update reports  \DIFaddbegin \DIFadd{an expansion }\DIFaddend of the database,  \DIFaddbegin \DIFadd{a tiered integration of thermodynamic sources spanning heuristic methods to large language models, and graded confidence scores for reaction directionality based on supporting evidence.
+While $>70\%$ of sources }\DIFaddend agree on reaction  \DIFaddbegin \DIFadd{directionality, disagreements are displayed for investigators to interpret.
+Atom-mapping data is further integrated to enable metabolic flux analysis (MFA)}\DIFaddend , and a structure-curation pipeline \DIFaddbegin \DIFadd{is }\DIFaddend built to resolve  \DIFaddbegin \DIFadd{conflicts }\DIFaddend between structures from different databases.
+Finally, we expanded our search interface at https://modelseed.org \DIFaddbegin \DIFadd{/biochem to facilitate user queries of the resource}\DIFaddend .
 
 \section{Materials and Methods}
 %% Consolidates the former methods_{collation,integration,provenance,transport,
 \subsection{Construction and Curation}\label{sec:methods-construction}
 
-We collated additional compounds and reactions from MetaCyc~\cite{caspi2020}, Rhea~\cite{bansal2022}, and ChEBI~\cite{hastings2016}\DIFdelbegin \DIFdel{. The compounds are reconciled into single ModelSEED compounds using available }\DIFdelend \DIFaddbegin \DIFadd{, merging compounds via }\DIFaddend structures where possible and \DIFdelbegin \DIFdel{the reactions are reconciled based on the identity of the compounds. The procedure follows the }\DIFdelend \DIFaddbegin \DIFadd{matching reactions by compound identities, similar to the }\DIFaddend 2020 release~\cite{seaver2020}.
-Mass and charge \DIFdelbegin \DIFdel{balance is }\DIFdelend \DIFaddbegin \DIFadd{balances are }\DIFaddend enforced and flagged.
-\DIFdelbegin %DIFDELCMD < 
-
-%DIFDELCMD < %%%
-\DIFdel{For }\DIFdelend \DIFaddbegin \DIFadd{Unlike }\DIFaddend the 2020 release, \DIFdelbegin \DIFdel{a conflict between structures from multiple sources was }\DIFdelend \DIFaddbegin \DIFadd{where compounds with conflicting sourced structures were }\DIFaddend either manually reviewed or \DIFdelbegin \DIFdel{dropped silently . The }\DIFdelend \DIFaddbegin \DIFadd{silently dropped, the }\DIFaddend updated pipeline classifies \DIFdelbegin \DIFdel{each structural conflict and routes it to one of three outcomes: an automatic pick }\DIFdelend \DIFaddbegin \DIFadd{structural conflicts and either 1) automatically picks }\DIFaddend from the source \DIFdelbegin \DIFdel{variant matching }\DIFdelend \DIFaddbegin \DIFadd{that matches }\DIFaddend the historical formula, \DIFdelbegin \DIFdel{a curator-authored override with recorded rationale, or an entry in a mass-balance exclusion registry for compounds where no source formulais defensible.
-Every }\DIFdelend \DIFaddbegin \DIFadd{2) prioritizes curator authored and justified content, or 3) excludes (with logged justification) compounds without a defensible source formula.
-This enforces that every }\DIFaddend outcome is attributed to its curator and \DIFdelbegin \DIFdel{its evidence.
-We retained every structure we collect, so conflict resolution can be inspected within the data }\DIFdelend \DIFaddbegin \DIFadd{evidence.
-Every structure is retained }\DIFaddend in the repository \DIFdelbegin \DIFdel{. An outline of how a researcher can contribute is given }\DIFdelend \DIFaddbegin \DIFadd{to facilitate conflict resolution.
-Investigators can contribute to the ModelSEED Database through the procedure }\DIFaddend in Supplementary Methods~S1\DIFdelbegin \DIFdel{and }\DIFdelend \DIFaddbegin \DIFadd{, which is }\DIFaddend expanded in the repository.
+We collated additional compounds and reactions from MetaCyc~\cite{caspi2020}, Rhea~\cite{bansal2022}, and ChEBI~\cite{hastings2016} \DIFaddbegin \DIFadd{, merging compounds via }\DIFaddend structures where possible and  \DIFaddbegin \DIFadd{matching reactions by compound identities, similar to the }\DIFaddend 2020 release~\cite{seaver2020}.
+Mass and charge  \DIFaddbegin \DIFadd{balances are }\DIFaddend enforced and flagged.
+ \DIFaddbegin \DIFadd{Unlike }\DIFaddend the 2020 release,  \DIFaddbegin \DIFadd{where compounds with conflicting sourced structures were }\DIFaddend either manually reviewed or  \DIFaddbegin \DIFadd{silently dropped, the }\DIFaddend updated pipeline classifies  \DIFaddbegin \DIFadd{structural conflicts and either 1) automatically picks }\DIFaddend from the source  \DIFaddbegin \DIFadd{that matches }\DIFaddend the historical formula,  \DIFaddbegin \DIFadd{2) prioritizes curator authored and justified content, or 3) excludes (with logged justification) compounds without a defensible source formula.
+This enforces that every }\DIFaddend outcome is attributed to its curator and  \DIFaddbegin \DIFadd{evidence.
+Every structure is retained }\DIFaddend in the repository  \DIFaddbegin \DIFadd{to facilitate conflict resolution.
+Investigators can contribute to the ModelSEED Database through the procedure }\DIFaddend in Supplementary Methods~S1 \DIFaddbegin \DIFadd{, which is }\DIFaddend expanded in the repository.
 %DIF > % Figure 2 is declared here (moved 2026-10) so that LaTeX places it at the
 %DIF > % top of page 3; see M02's comment on Figure 1 for the scheme. (Declaring it
 %DIF > % any earlier, e.g. in M03, lets it stack onto page 2 alongside Figure 1
@@ -533,79 +504,30 @@ Investigators can contribute to the ModelSEED Database through the procedure }\D
 %% Supplementary Methods S2.
 \subsection{Multi-source thermodynamics}\label{sec:methods-thermo}
 
-The 2020 release combined two \DIFdelbegin \DIFdel{sources: the historical group contribution approach~\mbox{%DIFAUXCMD
-\cite{jankowski2008}}\hskip0pt%DIFAUXCMD
-and eQuilibrator~\mbox{%DIFAUXCMD
-\cite{flamholz2012}}\hskip0pt%DIFAUXCMD
-.
-This update carries four sources, each stored as its own record: group contribution, }\DIFdelend \DIFaddbegin \DIFadd{thermodynamics sources: eQuilibrator~\mbox{%DIFAUXCMD
+The 2020 release combined two  \DIFaddbegin \DIFadd{thermodynamics sources: eQuilibrator~\mbox{%DIFAUXCMD
 \cite{flamholz2012} }\hskip0pt%DIFAUXCMD
 and the group contribution method~\mbox{%DIFAUXCMD
 \cite{jankowski2008}}\hskip0pt%DIFAUXCMD
 .
-This ModelSEED Database update incorporates the most recent }\DIFaddend eQuilibrator~3.0~\cite{beber2022} \DIFdelbegin \DIFdel{, }\DIFdelend \DIFaddbegin \DIFadd{and introduces two new thermodynamics sources: }\DIFaddend dGPredictor~\cite{wang2021} \DIFdelbegin \DIFdel{, }\DIFdelend and experimental values\DIFdelbegin \DIFdel{where they exist.
-Only the experimental values carry a published direction. The three predictors were released as energy estimators, so every direction reported here is an inference from their energies}\DIFdelend .
+This ModelSEED Database update incorporates the most recent }\DIFaddend eQuilibrator~3.0~\cite{beber2022}  \DIFaddbegin \DIFadd{and introduces two new thermodynamics sources: }\DIFaddend dGPredictor~\cite{wang2021}  and experimental values .
 \DIFaddbegin \DIFadd{Each of these four distinct thermodynamics sources are reported separately where available.
 }\DIFaddend All values are reported at pH~7.0, ionic strength 0.25\,M, pMg~3.0 and 298.15\,K; the basis for each condition and its effect on the released energies are given in Supplementary Methods~S2.
 
 \paragraph{Protonation.} eQuilibrator's Legendre transform requires a \emph{macroscopic} pKa ladder per compound: an ordered list in which consecutive species differ by one proton.
 The count of entries around the desired pH sets the proton count of the major microspecies, so the composition of the ladder changes the transformed energy directly.
-We generate the pKa ladders \DIFdelbegin \DIFdel{using ChemAxon Marvin~\mbox{%DIFAUXCMD
-\cite{marvin} }\hskip0pt%DIFAUXCMD
-for use with eQuilibrator, but we're conscious that these data cannot be regenerated without a license, so we also include the pKas generated by an open-source alternative, MolGpKa~\mbox{%DIFAUXCMD
-\cite{pan2021}}\hskip0pt%DIFAUXCMD
-, for }\DIFdelend \DIFaddbegin \DIFadd{for }\DIFaddend every compound with a structure \DIFaddbegin \DIFadd{(source prevenance preserved)}\DIFaddend , and the measured ladders of Alberty~\cite{alberty2003}, \DIFdelbegin \DIFdel{versioned per structure source in an extended pKa dictionary}\DIFdelend \DIFaddbegin \DIFadd{using licensed ChemAxon Marvin 26.1~\mbox{%DIFAUXCMD
+We generate the pKa ladders  \DIFaddbegin \DIFadd{for }\DIFaddend every compound with a structure \DIFaddbegin \DIFadd{(source prevenance preserved)}\DIFaddend , and the measured ladders of Alberty~\cite{alberty2003},  \DIFaddbegin \DIFadd{using licensed ChemAxon Marvin 26.1~\mbox{%DIFAUXCMD
 \cite{marvin} }\hskip0pt%DIFAUXCMD
 for use with eQuilibrator and also via open-source MolGpKa~\mbox{%DIFAUXCMD
 \cite{pan2021} }\hskip0pt%DIFAUXCMD
 for unlicensed use}\DIFaddend . 
 
-\paragraph{Experimental anchors.} eQuilibrator and dGPredictor draw on the same set of experimental values derived from the NIST Thermodynamics of Enzyme-catalyzed Reactions (TECR) Database~\cite{goldberg2004}\DIFdelbegin \DIFdel{, keyed to KEGG; eQuilibrator's MetaNetX mappings to other resources conflict structurally with ModelSEED identifiers. We }\DIFdelend \DIFaddbegin \DIFadd{.
-There were structural conflicts in compounds mapped to ModelSEED from the KEGG IDs of TECR and the MetaNetX IDs of eQuilibrator, so to facilitate direct comparisons between thermodynamic predictions of ModelSEED reactions, we }\DIFaddend re-built the experimental anchors of TECR values \DIFdelbegin \DIFdel{, curating conflicts to ensure a direct mapping between TECR values and ModelSEEDreactions, and evaluated }\DIFdelend \DIFaddbegin \DIFadd{and curated conflicts to map TECR directly to ModelSEED.
-We further investigated }\DIFaddend openTECR, a communal re-curation of \DIFdelbegin \DIFdel{the same source (}\DIFdelend \DIFaddbegin \DIFadd{TECR available at }\DIFaddend \url{https://github.com/opentecr}\DIFdelbegin \DIFdel{)}\DIFdelend , to extend the \DIFdelbegin \DIFdel{set of }\DIFdelend \DIFaddbegin \DIFadd{thermodynamic }\DIFaddend anchors.
+\paragraph{Experimental anchors.} eQuilibrator and dGPredictor draw on the same set of experimental values derived from the NIST Thermodynamics of Enzyme-catalyzed Reactions (TECR) Database~\cite{goldberg2004} \DIFaddbegin \DIFadd{.
+There were structural conflicts in compounds mapped to ModelSEED from the KEGG IDs of TECR and the MetaNetX IDs of eQuilibrator, so to facilitate direct comparisons between thermodynamic predictions of ModelSEED reactions, we }\DIFaddend re-built the experimental anchors of TECR values  \DIFaddbegin \DIFadd{and curated conflicts to map TECR directly to ModelSEED.
+We further investigated }\DIFaddend openTECR, a communal re-curation of  \DIFaddbegin \DIFadd{TECR available at }\DIFaddend \url{https://github.com/opentecr} , to extend the  \DIFaddbegin \DIFadd{thermodynamic }\DIFaddend anchors.
 
-\DIFdelbegin \paragraph{\DIFdel{Uncertainty.}} %DIFAUXCMD
-\addtocounter{paragraph}{-1}%DIFAUXCMD
-\DIFdel{The three sources each adopt a different approach for estimating the uncertainty surrounding the predicted energy of reaction, so the scale of uncertainty is not directly comparable (Figure~\ref{fig:thermo}C); the median values are reported with the results in Section~\ref{sec:results-thermo}. Comparing against the experimentally-anchored reactions, we find that group contribution overstates its error and eQuilibrator understates it.
-}%DIFDELCMD < 
-
-%DIFDELCMD < %%%
-\DIFdelend \paragraph{Direction.} \DIFdelbegin \DIFdel{For historical reasons}\DIFdelend \DIFaddbegin \DIFadd{To conserve precedence}\DIFaddend , we use the same \DIFdelbegin \DIFdel{heuristics for deriving reaction direction }\DIFdelend \DIFaddbegin \DIFadd{2020 heuristics to derive reaction directions }\DIFaddend from the Group contribution approach~\cite{jankowski2008}\DIFdelbegin \DIFdel{unchanged from 2020}\DIFdelend , so that series stays comparable across releases.
-For eQuilibrator and dGPredictor\DIFaddbegin \DIFadd{, }\DIFaddend we use one rule set built on the reversibility index from Noor \textit{et al.}~\cite{noor2012}: \DIFdelbegin \DIFdel{a reaction is called }\DIFdelend irreversible when $|\ln\Gamma|$ exceeds $\ln(1000)$ by more than one propagated standard deviation~\cite{beber2022}, \DIFaddbegin \DIFadd{where }\DIFaddend $\Gamma$ \DIFdelbegin \DIFdel{being }\DIFdelend \DIFaddbegin \DIFadd{is }\DIFaddend the fold-change of reactant concentration required to change reaction direction\DIFdelbegin \DIFdel{).
-However, we extend the work by Noor }\textit{\DIFdel{et al.}} %DIFAUXCMD
-\DIFdel{to require the uncertainty to clear the }\DIFdelend \DIFaddbegin \DIFadd{.
-We extend the rule to require that the uncertainty clears this $\Gamma$ }\DIFaddend threshold as well\DIFdelbegin \DIFdel{. We report fewer directions than the published index would on the same energies, and we separate }\emph{\DIFdel{reversible}} %DIFAUXCMD
-\DIFdel{reactions from }\emph{\DIFdel{undetermined}} %DIFAUXCMD
-\DIFdel{cases. An exception we implement is for reactions whose uncertainty is small relative to the threshold and yet still straddles it: meaning the estimate lies within one standard deviation of the threshold, and these we report as reversible.
-}%DIFDELCMD < 
-
-%DIFDELCMD < %%%
-\paragraph{\DIFdel{Transport.}} %DIFAUXCMD
-\addtocounter{paragraph}{-1}%DIFAUXCMD
-\DIFdel{Compartments are }\emph{\DIFdel{relative}} %DIFAUXCMD
-\DIFdel{indices --- 0 inside, 1 outside --- not named compartments, so one reaction can be instantiated against a bacterial membrane, a mitochondrion or a plastid envelope when a template builds a model. Because the database is not committed to a cell type, transport reactions are scored from stoichiometry and energy alone: neither membrane potential nor pH gradient enters the estimate. The consequence is specific. A primary active transporter carries ATP hydrolysis in its stoichiometry, every predictor estimates that tightly, and the reaction earns a confident grade from chemistry that was never in question --- 96\% of gold-graded transport reactions are ATP-coupled and only 2.7\% translocate a proton.
-Such grades measure confidence in the coupled chemistry, not evidence that the transporter runs that way in a given organism; every reaction carries an }\texttt{\DIFdel{is\_transport}} %DIFAUXCMD
-\DIFdel{field so that this can be accounted for downstream. Reactions whose only change is of compartment carry no net chemistry and none is graded gold. dGPredictor commits on 1.4\% of transport reactions against 17.3\% elsewhere, so transport grades also rest on fewer independent sources.
-%DIF < % Figure 1 is declared here, not in M09 where it is discussed, so that LaTeX
-%DIF < % can place it at the top of page 3, where Sam wants it. A float cannot move
-%DIF < % backwards past its declaration, so the position of this block IS the page
-%DIF < % choice: M05/M06/M07 all give page 3, M08 gives page 4, M02/M03 give page 2.
-%DIF < % \ref{fig:growth} still resolves from M09, where the figure is discussed.
-}%DIFDELCMD < \begin{figure*}[!t] \centerline{\includegraphics[width=0.88\textwidth]{../figures/figure1_growth.pdf}} %%%
-%DIFDELCMD < \caption{%
-{%DIFAUXCMD
-\textbf{\DIFdelFL{Sources of compounds and reactions, and where the growth landed.}} %DIFAUXCMD
-\DIFdelFL{(}\textbf{\DIFdelFL{A}}%DIFAUXCMD
-\DIFdelFL{) compounds contributed by each source that also supplied molecular structures, 2020 against 2026: we did not introduce any new biochemistry from KEGG. The third row is ChEBI, which supplies structures but no reactions. (}\textbf{\DIFdelFL{B}}%DIFAUXCMD
-\DIFdelFL{) how the three primary reaction sources overlap, every region labelled with its reaction count. Circle areas are not proportional --- three-set areas cannot be solved exactly --- so the counts carry the quantities and the circles only carry membership. Rhea identifies its compounds through ChEBI. (}\textbf{\DIFdelFL{C}}%DIFAUXCMD
-\DIFdelFL{) the share of each source's unique reactions that are complete, meaning every reagent is assigned a complete structure, so the reaction can be balanced and decomposed. (}\textbf{\DIFdelFL{D}}%DIFAUXCMD
-\DIFdelFL{) reactions added since 2020 against those already held, by MetaCyc pathway class, for the eight classes that gained most. Both bars are built through the same join from the MetaCyc source table, so they are comparable; the organisational class }\emph{\DIFdelFL{Super-Pathways}} %DIFAUXCMD
-\DIFdelFL{is excluded. Only additions with a MetaCyc pathway assignment can be placed --- 2,282 of the 12,259; the 8,409 reactions that arrived through Rhea carry no pathway ontology and are absent from the panel rather than counted as unannotated. Growth is concentrated in specialised metabolism and cell-envelope biosynthesis: 41 of the 12,259 reactions added fall in a central-carbon or energy-metabolism class.}} %DIFAUXCMD
-%DIFDELCMD < \label{fig:growth} \end{figure*}
-%DIFDELCMD < 
-
-%DIFDELCMD < %%%
-\DIFdelend \DIFaddbegin \DIFadd{; however, differences in how each source estimates its uncertainty prevent direct comparisons (Figure~\ref{fig:thermo}C)).
+ \paragraph{Direction.}  \DIFaddbegin \DIFadd{To conserve precedence}\DIFaddend , we use the same  \DIFaddbegin \DIFadd{2020 heuristics to derive reaction directions }\DIFaddend from the Group contribution approach~\cite{jankowski2008} , so that series stays comparable across releases.
+For eQuilibrator and dGPredictor\DIFaddbegin \DIFadd{, }\DIFaddend we use one rule set built on the reversibility index from Noor \textit{et al.}~\cite{noor2012}:  irreversible when $|\ln\Gamma|$ exceeds $\ln(1000)$ by more than one propagated standard deviation~\cite{beber2022}, \DIFaddbegin \DIFadd{where }\DIFaddend $\Gamma$  \DIFaddbegin \DIFadd{is }\DIFaddend the fold-change of reactant concentration required to change reaction direction \DIFaddbegin \DIFadd{.
+We extend the rule to require that the uncertainty clears this $\Gamma$ }\DIFaddend threshold as well \DIFaddbegin \DIFadd{; however, differences in how each source estimates its uncertainty prevent direct comparisons (Figure~\ref{fig:thermo}C)).
 %DIF > % Figure 1 moved to M02 (2026-10) to pull it onto page 2; see M02's own
 %DIF > % comment for the current page-placement scheme.
 }\DIFaddend %% Compact Methods statement for BOTH routes to a direction claim. The full
@@ -617,27 +539,19 @@ Such grades measure confidence in the coupled chemistry, not evidence that the t
 \subsection{Grading reaction direction}\label{sec:methods-grading}
 
 We apply a classification approach with which we grade the predicted reaction direction based on the \DIFaddbegin \DIFadd{quality of }\DIFaddend available evidence.
-\DIFdelbegin \DIFdel{Very often sources and heuristics disagree, as is the case here, and we qualify what the reaction direction would be, and how reliable the evidence is using several tiers for ease of interpretation: gold }\DIFdelend \DIFaddbegin \DIFadd{The selected tiers are intuitively described as gold (highest), silver (intermediate)}\DIFaddend , \DIFdelbegin \DIFdel{silver, }\DIFdelend or bronze \DIFaddbegin \DIFadd{(lowest)}\DIFaddend .
-Our evaluation splits two ways\DIFdelbegin \DIFdel{, on the }\DIFdelend \DIFaddbegin \DIFadd{: 1) }\DIFaddend confidence of a source's own claim \DIFdelbegin \DIFdel{, fitted }\DIFdelend \DIFaddbegin \DIFadd{fit }\DIFaddend as a probability against the experimental anchors \DIFdelbegin \DIFdel{, and what the other sources make of it, by }\DIFdelend \DIFaddbegin \DIFadd{and 2) }\DIFaddend a weighted comparison \DIFaddbegin \DIFadd{of other sources }\DIFaddend on the same scale.
-Grades, self-assessments, and cross-source verdicts are stored in the biochemistry database \DIFdelbegin \DIFdel{, and can be viewed in the UI.
-The process of grading reactions is described fully }\DIFdelend \DIFaddbegin \DIFadd{and exposed on the website for users inspection.
+ \DIFaddbegin \DIFadd{The selected tiers are intuitively described as gold (highest), silver (intermediate)}\DIFaddend ,  or bronze \DIFaddbegin \DIFadd{(lowest)}\DIFaddend .
+Our evaluation splits two ways \DIFaddbegin \DIFadd{: 1) }\DIFaddend confidence of a source's own claim  \DIFaddbegin \DIFadd{fit }\DIFaddend as a probability against the experimental anchors  \DIFaddbegin \DIFadd{and 2) }\DIFaddend a weighted comparison \DIFaddbegin \DIFadd{of other sources }\DIFaddend on the same scale.
+Grades, self-assessments, and cross-source verdicts are stored in the biochemistry database  \DIFaddbegin \DIFadd{and exposed on the website for users inspection.
 The grading methodology is thoroughly described }\DIFaddend in Supplementary Methods~S3.
 
 \subsection{Ensemble LLMs predictions}\label{sec:llm-grading}
-Thermodynamic assignment is bounded by estimate coverage\DIFdelbegin \DIFdel{: energies }\DIFdelend \DIFaddbegin \DIFadd{, which means that energies and therefore directions }\DIFaddend cannot be computed for \DIFdelbegin \DIFdel{an incomplete reaction in terms of structures, leaving }\DIFdelend 23,790 \DIFdelbegin \DIFdel{reactions with no direction from any predictor.
-We }\DIFdelend \DIFaddbegin \DIFadd{structurally incomplete reactions.
-We therefore }\DIFaddend run a complementary approach using an ensemble \DIFdelbegin \DIFdel{, a ``council'' }\DIFdelend \DIFaddbegin \DIFadd{or "council" }\DIFaddend of large language models (LLMs) to \DIFdelbegin \DIFdel{interpret the reaction based on its }\DIFdelend \DIFaddbegin \DIFadd{estimate directionality from only reaction }\DIFaddend name and stoichiometry\DIFdelbegin \DIFdel{alone. Three LLMs independently make their predictions}\DIFdelend \DIFaddbegin \DIFadd{, where three LLM agents independently predict a direction}\DIFaddend , a fourth audits, and a fifth adjudicates.
-We provide the prompts in the repository, and describe the process and its limit\DIFaddbegin \DIFadd{ation}\DIFaddend s in Supplementary Methods~S4.
-\DIFdelbegin %DIFDELCMD < 
-
-%DIFDELCMD < %%%
-\DIFdel{The ensemble directs 22,963 of the reactions no thermodynamic source will commit on, roughly doubling the fraction of the database that carries a direction. Its accuracy is not that of an energy calculation: scored against measurement it recovers the direction 77\% of the time against 98\% for eQuilibrator, and 85\% of its calls are simply the direction the equation is written in, so its errors fall almost entirely on reactions that run in reverse (Supplementary Methods~S4). We therefore release these calls as a separate, clearly-labelled layer, excluded from the evidence grading: they are for reactions a reconstruction would otherwise leave reversible by default, and should be reviewed before use rather than treated as evidence. Neither approach models the pathway context that can drive a reaction against its own standard-state energy as metabolite concentrations shift downstream~\mbox{%DIFAUXCMD
-\cite{mavrovouniotis1993,xu2008,noor2014}}\hskip0pt%DIFAUXCMD
-; that remains a property of a model rather than of a reference database.
-}\DIFdelend %% Consolidates the former methods_{reaction_similarity,atom_mapping} sections.
+Thermodynamic assignment is bounded by estimate coverage \DIFaddbegin \DIFadd{, which means that energies and therefore directions }\DIFaddend cannot be computed for  23,790  \DIFaddbegin \DIFadd{structurally incomplete reactions.
+We therefore }\DIFaddend run a complementary approach using an ensemble  \DIFaddbegin \DIFadd{or "council" }\DIFaddend of large language models (LLMs) to  \DIFaddbegin \DIFadd{estimate directionality from only reaction }\DIFaddend name and stoichiometry \DIFaddbegin \DIFadd{, where three LLM agents independently predict a direction}\DIFaddend , a fourth audits, and a fifth adjudicates.
+We provide the prompts in the repository, and describe the process and its  \DIFaddbegin \DIFadd{limitations }\DIFaddend in Supplementary Methods~S4.
+ %% Consolidates the former methods_{reaction_similarity,atom_mapping} sections.
 \subsection{Atom mapping}\label{sec:methods-mapping}
 
-Atom mappings are generated from the workflow of Hu{\ss} \textit{et al.}~\cite{huss2022} where they refine the per-reaction output of the Reaction Decoder Tool~\cite{rahman2016} into mappings that \DIFdelbegin \DIFdel{can be used to span a metabolic reconstruction}\DIFdelend \DIFaddbegin \DIFadd{are comprehensive enough for reconstructing a metabolic model}\DIFaddend .
+Atom mappings are generated from the workflow of Hu{\ss} \textit{et al.}~\cite{huss2022} where they refine the per-reaction output of the Reaction Decoder Tool~\cite{rahman2016} into mappings that  \DIFaddbegin \DIFadd{are comprehensive enough for reconstructing a metabolic model}\DIFaddend .
 The approach also resolves chemically equivalent atoms into symmetry groups, such as the two oxygens of CO$_2$ and the six equivalent terminal oxygens of pyrophosphate, so the ambiguity is apparent.
 The output is formatted and stored in the database, and can also be visualized in the UI.
 
@@ -650,9 +564,8 @@ The output is formatted and stored in the database, and can also be visualized i
 %% does not bundle the biochemistry -- it clones this repository and reads it
 %% from a local path. Do not reinstate the PyPI claim unless one is published.
 The database is distributed as versioned flat files and JSON from the public repository, queried programmatically through a SOLR endpoint, and browsed through the web interface at \modelseedurl.
-Every merge runs continuous integration that rebuilds the database from source records and fails on any regression in balance, structure coverage\DIFaddbegin \DIFadd{, }\DIFaddend or schema conformance \DIFdelbegin \DIFdel{, so a curation change that breaks an invariant cannot be merged.
-Researchers }\DIFdelend \DIFaddbegin \DIFadd{to prevent curation changes from breaking the database.
-Anyone }\DIFaddend can contribute by adding and curating structures and reactions, \DIFdelbegin \DIFdel{the repository has a guide for doing so, and new data can be merged }\DIFdelend \DIFaddbegin \DIFadd{following guidance in the repository }\DIFaddend via pull requests.
+Every merge runs continuous integration that rebuilds the database from source records and fails on any regression in balance, structure coverage\DIFaddbegin \DIFadd{, }\DIFaddend or schema conformance  \DIFaddbegin \DIFadd{to prevent curation changes from breaking the database.
+Anyone }\DIFaddend can contribute by adding and curating structures and reactions,  \DIFaddbegin \DIFadd{following guidance in the repository }\DIFaddend via pull requests.
 
 \section{Results}
 %DIF > % Figure 3 is declared here (moved from M12, 2026-10) so that LaTeX places
@@ -668,36 +581,19 @@ Anyone }\DIFaddend can contribute by adding and curating structures and reaction
 %% Table 3 in 2020 moves to Supplementary Table S1.
 \subsection{Growth and coverage}\label{sec:results-growth}
 
-The database has grown 34\% in \DIFdelbegin \DIFdel{compounds and 34\% in }\DIFdelend \DIFaddbegin \DIFadd{non-obsolete compounds and }\DIFaddend reactions since 2020, \DIFdelbegin \DIFdel{counting only non-obsolete entries at both time points, }\DIFdelend driven mainly by MetaCyc and the BioCyc family.
-Reaction growth is now split across three primary databases (Figure~\ref{fig:growth}B): MetaCyc carries 26,140 reactions of which 18,893 are \DIFdelbegin \DIFdel{supplied by no other primary source}\DIFdelend \DIFaddbegin \DIFadd{unique among the primary sources}\DIFaddend , KEGG 10,840 of which 5,291 are unique, and the newly-integrated Rhea 14,511 of which 8,210 are unique\DIFdelbegin \DIFdel{: reactions the database would not otherwise hold.
-Completeness of reactionsdiffers }\DIFdelend \DIFaddbegin \DIFadd{.
-The completeness of reactions, meaning whether all involved compounds are structurally defined, differs among }\DIFaddend (Figure~\ref{fig:growth}C)\DIFdelbegin \DIFdel{. We classify a complete reaction where every reagent can be assigned a complete molecular structure}\DIFdelend : 90\% \DIFdelbegin \DIFdel{of MetaCyc's and }\DIFdelend \DIFaddbegin \DIFadd{for MetaCyc, }\DIFaddend 75\% \DIFdelbegin \DIFdel{of KEGG's reactions against }\DIFdelend \DIFaddbegin \DIFadd{for KEGG, }\DIFaddend 65\% \DIFdelbegin \DIFdel{of Rhea's}\DIFdelend \DIFaddbegin \DIFadd{for Rhea}\DIFaddend .
-Overall structure coverage rose from 28,087 to 36,907 compounds\DIFdelbegin \DIFdel{. The new biochemistry is not distributed like the old (Figure~\ref{fig:growth}D): the MetaCyc classes that grew are those of specialised metabolism --- antibiotic and polyketide biosynthesis, O-antigen and cell-envelope assembly, branched and acylated lipids, alkaloids --- while central carbon and energy metabolism account for 41 of the 12}\DIFdelend , \DIFdelbegin \DIFdel{259 reactions added. Central metabolism was already saturated in 2020; what a 2026 reconstruction gains is the periphery. The comparison covers the MetaCyc-sourced additions; Rhea, which supplied 8,409 of the new reactions, has no pathway ontology to place them in }\DIFdelend \DIFaddbegin \DIFadd{with the distribution of this new biochemistry described in Supplementary Methods~S5 and Supplementary Figure~S1}\DIFaddend .
+The database has grown 34\% in  \DIFaddbegin \DIFadd{non-obsolete compounds and }\DIFaddend reactions since 2020,  driven mainly by MetaCyc and the BioCyc family.
+Reaction growth is now split across three primary databases (Figure~\ref{fig:growth}B): MetaCyc carries 26,140 reactions of which 18,893 are  \DIFaddbegin \DIFadd{unique among the primary sources}\DIFaddend , KEGG 10,840 of which 5,291 are unique, and the newly-integrated Rhea 14,511 of which 8,210 are unique \DIFaddbegin \DIFadd{.
+The completeness of reactions, meaning whether all involved compounds are structurally defined, differs among }\DIFaddend (Figure~\ref{fig:growth}C) : 90\%  \DIFaddbegin \DIFadd{for MetaCyc, }\DIFaddend 75\%  \DIFaddbegin \DIFadd{for KEGG, }\DIFaddend 65\%  \DIFaddbegin \DIFadd{for Rhea}\DIFaddend .
+Overall structure coverage rose from 28,087 to 36,907 compounds ,  \DIFaddbegin \DIFadd{with the distribution of this new biochemistry described in Supplementary Methods~S5 and Supplementary Figure~S1}\DIFaddend .
 \subsection{Structure curation}\label{sec:results-structure}
 
-We built and ran our curation pipeline on all structures that would impact \DIFdelbegin \DIFdel{the }\DIFdelend \DIFaddbegin \DIFadd{a prioritized }\DIFaddend set of roughly 9,000 reactions used in \DIFdelbegin \DIFdel{the ModelSEEDand PlantSEED reconstruction templates, since an error in one of those propagates into every model built from them}\DIFdelend \DIFaddbegin \DIFadd{ModelSEED~\mbox{%DIFAUXCMD
+We built and ran our curation pipeline on all structures that would impact  \DIFaddbegin \DIFadd{a prioritized }\DIFaddend set of roughly 9,000 reactions used in  \DIFaddbegin \DIFadd{ModelSEED~\mbox{%DIFAUXCMD
 \cite{henry2010,faria2023} }\hskip0pt%DIFAUXCMD
 and PlantSEED~\mbox{%DIFAUXCMD
 \cite{seaver2014,seaver2018}}\hskip0pt%DIFAUXCMD
 }\DIFaddend .
-This scope \DIFdelbegin \DIFdel{reflects a curation priority, }\DIFdelend \DIFaddbegin \DIFadd{is }\DIFaddend not a statement about how much of the database is usable\DIFdelbegin \DIFdel{: the templates are discussed in Section~\ref{sec:results-mapping}}\DIFdelend .
-The conflict pipeline resolved every previously conflicting compound in \DIFdelbegin \DIFdel{three curationrounds. i) Instances where the conflict existed at the level of mobile hydrogens were resolved automatically using historical formula ii) instances where the structures were structurally different were resolved manually iii) instances where resolution was not straight-forward were entered in the }\DIFdelend \DIFaddbegin \DIFadd{a three-staged curation: i) historical formula were used to automatically resolve conflicts in mobile hydrogens, affecting 60 compounds and 550 reactions; ii) manual curation resolved conflicts in molecular structures, affecting 46 compounds and 59 reactions; and iii) where steps i-ii fail because of an absence in defensible source formula, reactions were added to a }\DIFaddend mass-balance exclusion registry where we fix an arbitrarily chosen formula\DIFdelbegin \DIFdel{because no source formula was defensible.
-}%DIFDELCMD < \begin{figure*}[!t] \centerline{\includegraphics[width=\textwidth]{../figures/figure2_thermodynamics.pdf}} %%%
-%DIFDELCMD < \caption{%
-{%DIFAUXCMD
-\textbf{\DIFdelFL{Thermodynamic sources.}} %DIFAUXCMD
-\DIFdelFL{(}\textbf{\DIFdelFL{A}}%DIFAUXCMD
-\DIFdelFL{) Provenance of every pK$_\mathrm{a}$ ladder shipped in the database, across all 45,662 compounds and 48,384 reactions. ChemAxon Marvin supplies 79.4\% of compounds and 79.8\% of reactions. Segments are identified by the key. }\emph{\DIFdelFL{Hatching}} %DIFAUXCMD
-\DIFdelFL{marks the share reached through a second route: the calculator refuses polymers and organometallics as query molecules, so those are computed from SMILES instead. }\emph{\DIFdelFL{No ionizable site}} %DIFAUXCMD
-\DIFdelFL{is a chemistry result --- Marvin ran and reported no dissociable proton between pH $-2$ and $16$, for 1,237 compounds --- and is coloured apart from }\emph{\DIFdelFL{no structure}}%DIFAUXCMD
-\DIFdelFL{, which is a curation gap rather than a protonation one. (}\textbf{\DIFdelFL{B}}%DIFAUXCMD
-\DIFdelFL{) Reactions that carry an energy computed from the source heuristic. (}\textbf{\DIFdelFL{C}}%DIFAUXCMD
-\DIFdelFL{) Reported uncertainty in kcal\,mol$^{-1}$, one axis per source because the three differ by more than an order of magnitude. The shaded band spans the 5th to 95th percentile, which is used in our classification scheme.}} %DIFAUXCMD
-%DIFDELCMD < \label{fig:thermo} \end{figure*}
-%DIFDELCMD < 
-
-%DIFDELCMD < %%%
-\DIFdelend \DIFaddbegin \DIFadd{, affecting 4 compounds and 61 reactions.
+This scope  \DIFaddbegin \DIFadd{is }\DIFaddend not a statement about how much of the database is usable .
+The conflict pipeline resolved every previously conflicting compound in  \DIFaddbegin \DIFadd{a three-staged curation: i) historical formula were used to automatically resolve conflicts in mobile hydrogens, affecting 60 compounds and 550 reactions; ii) manual curation resolved conflicts in molecular structures, affecting 46 compounds and 59 reactions; and iii) where steps i-ii fail because of an absence in defensible source formula, reactions were added to a }\DIFaddend mass-balance exclusion registry where we fix an arbitrarily chosen formula \DIFaddbegin \DIFadd{, affecting 4 compounds and 61 reactions.
 %DIF > % Figure 2 moved to M09 (2026-10) to pull it onto page 3; see M02's comment
 %DIF > % on Figure 1 for the page-placement scheme this follows.
 }\DIFaddend \subsection{Thermodynamics}\label{sec:results-thermo}
@@ -706,41 +602,22 @@ The conflict pipeline resolved every previously conflicting compound in \DIFdelb
 %% Marvin 26.1 rebuild. Placeholders excluded per source: group contribution
 %% dg = 1e7 (26,555 records); eQuilibrator sigma >= 2500 kcal/mol (3,386),
 %% which is that source's refusal marker rather than an error bar.
-The three predictors cover comparable fractions of the database and disagree substantially about how well they do it (Figure~\ref{fig:thermo}B). Uncertainty is reported on scales differing by more than an order of magnitude (Figure~\ref{fig:thermo}C): \DIFdelbegin \DIFdel{a median of 0.62\,}\DIFdelend \DIFaddbegin \DIFadd{median errors (}\DIFaddend kcal\,mol$^{-1}$\DIFdelbegin \DIFdel{for eQuilibrator against }\DIFdelend \DIFaddbegin \DIFadd{) of 0.62 for eQuilibrator, }\DIFaddend 10.83 \DIFdelbegin \DIFdel{\,kcal\,mol$^{-1}$ }\DIFdelend for group contribution\DIFaddbegin \DIFadd{, }\DIFaddend and 17.57 \DIFdelbegin \DIFdel{\,kcal\,mol$^{-1}$ }\DIFdelend for dGPredictor.
+The three predictors cover comparable fractions of the database and disagree substantially about how well they do it (Figure~\ref{fig:thermo}B). Uncertainty is reported on scales differing by more than an order of magnitude (Figure~\ref{fig:thermo}C):  \DIFaddbegin \DIFadd{median errors (}\DIFaddend kcal\,mol$^{-1}$ \DIFaddbegin \DIFadd{) of 0.62 for eQuilibrator, }\DIFaddend 10.83  for group contribution\DIFaddbegin \DIFadd{, }\DIFaddend and 17.57  for dGPredictor.
 
 \paragraph{Calibrating the reported errors against measurement.} We use the experimental anchors to evaluate the error estimates.
 For each source\DIFaddbegin \DIFadd{, }\DIFaddend we collect one held-out prediction per anchored reaction, together with the uncertainty that source reports for it, and divide the residual against the measured \drGo{} by that uncertainty.
-Measured this way, eQuilibrator has a root mean square of 8.06 and a median of 2.27, with only 28.7\% of reactions within one reported standard deviation and 46.3\% within two, so \DIFdelbegin \DIFdel{it }\DIFdelend \DIFaddbegin \DIFadd{eQuilibrator }\DIFaddend understates its error.
-Group contribution\DIFdelbegin \DIFdel{runs the other way, with }\DIFdelend \DIFaddbegin \DIFadd{, by contrast, has }\DIFaddend a median of 0.32 and 73.6\% within one standard deviation, and dGPredictor \DIFdelbegin \DIFdel{is the best scaled of the three, }\DIFdelend \DIFaddbegin \DIFadd{performs even better }\DIFaddend with a root mean square of 1.15 and 87.9\% within one \DIFdelbegin \DIFdel{. A researcher choosing by smallest reported error would systematically choose the source that understates it, which is the argument against promoting any single source. }\DIFdelend \DIFaddbegin \DIFadd{standard deviation.
+Measured this way, eQuilibrator has a root mean square of 8.06 and a median of 2.27, with only 28.7\% of reactions within one reported standard deviation and 46.3\% within two, so  \DIFaddbegin \DIFadd{eQuilibrator }\DIFaddend understates its error.
+Group contribution \DIFaddbegin \DIFadd{, by contrast, has }\DIFaddend a median of 0.32 and 73.6\% within one standard deviation, and dGPredictor  \DIFaddbegin \DIFadd{performs even better }\DIFaddend with a root mean square of 1.15 and 87.9\% within one  \DIFaddbegin \DIFadd{standard deviation.
 %DIF >  A researcher choosing by smallest reported error would systematically choose the source that understates it, which is the argument against promoting any single source. 
 }\DIFaddend The grading in the next section calibrates each source's confidence against measurement rather than taking its uncertainty at face value.
 
-\DIFdelbegin %DIFDELCMD < \begin{figure*}[!t] \centerline{\includegraphics[width=\textwidth]{../figures/figure3_direction.pdf}} %%%
-%DIFDELCMD < \caption{%
-{%DIFAUXCMD
-\textbf{\DIFdelFL{Direction, agreement and evidence.}} %DIFAUXCMD
-\DIFdelFL{(}\textbf{\DIFdelFL{A}}%DIFAUXCMD
-\DIFdelFL{) Direction assigned by each source independently: }\emph{\DIFdelFL{eQ}} %DIFAUXCMD
-\DIFdelFL{eQuilibrator, }\emph{\DIFdelFL{dG}} %DIFAUXCMD
-\DIFdelFL{dGPredictor, }\emph{\DIFdelFL{GC}} %DIFAUXCMD
-\DIFdelFL{group contribution, and }\emph{\DIFdelFL{LLMs}} %DIFAUXCMD
-\DIFdelFL{the large language model ensemble, which supplies a direction and no energy; its calls are released with the database and take no part in the evidence grading. Bar length is the number of reactions the source covers, so the rows are directly comparable. (}\textbf{\DIFdelFL{B}}%DIFAUXCMD
-\DIFdelFL{) What each evidence grade rests on by the deciding source's own calibrated confidence, and (}\textbf{\DIFdelFL{C}}%DIFAUXCMD
-\DIFdelFL{) by what the other sources made of it. The two panels share a scale but not a palette, so each carries its own key; categories are ranked as in Supplementary Table~1. }\emph{\DIFdelFL{Neither way}} %DIFAUXCMD
-\DIFdelFL{is the case that table writes }\texttt{\DIFdelFL{---}}%DIFAUXCMD
-\DIFdelFL{: a cross-check ran and settled neither way, so it neither helped nor penalised.}} %DIFAUXCMD
-%DIFDELCMD < \label{fig:direction} \end{figure*}
-%DIFDELCMD < 
-
-%DIFDELCMD < %%%
-\DIFdelend \subsection{Direction assignment and evidence grading}\label{sec:results-direction}
+ \subsection{Direction assignment and evidence grading}\label{sec:results-direction}
 
 %% All direction counts re-measured 2026-10-02 from Biochemistry/reaction_*.json
 %% on the live (non-obsolete) population, after promoting the ab33a878 thermo
 %% rerun's reaction_grades.tsv into thermo-evidence/reversibility (previously
 %% unpromoted for 3 days) and re-running grade_thermo_sources.py --cv to drop
 %% 5 reactions physically deleted by 3ac769c1 after ab33a878's snapshot.
-%DIF < % Anchors: 801 stereo-exact (438 obsolete duplicates, 363 distinct live).
 %DIF > % Anchors: 363 distinct live reactions (801 stereo-exact records exist, but
 %DIF > % 438 are obsolete duplicates of a live entry -- see S03 -- so the
 %DIF > % predictors-alone re-grading below is computed over the 363 distinct ones).
@@ -751,19 +628,17 @@ eQuilibrator resolves 97.4\% of the reactions it covers, group contribution 59.7
 Across the database, 24,594 reactions receive a direction or a positive statement of reversibility from at least one source and 23,790 receive none.
 
 \paragraph{eQuilibrator vs dGPredictor} dGPredictor is able to generate a predicted energy for more reactions ($\sim25,100$, against eQuilibrator's $\sim17,900$) and converts the least of that coverage into a usable reaction direction.
-For a typical \DIFdelbegin \DIFdel{dGPredictor reaction}\DIFdelend \DIFaddbegin \DIFadd{reaction, }\DIFaddend the error bar \DIFaddbegin \DIFadd{from dGPredictor }\DIFaddend alone exceeds the decision threshold in the reversibility index, so 59.9\% of its reactions are returned undetermined \DIFdelbegin \DIFdel{against eQuilibrator's }\DIFdelend \DIFaddbegin \DIFadd{versus }\DIFaddend 2.6\% \DIFdelbegin \DIFdel{. Where both sources }\DIFdelend \DIFaddbegin \DIFadd{from eQuilibrator.
-These sources agree 94.8\% when they }\DIFaddend commit to a direction\DIFdelbegin \DIFdel{they agree 94.8\% of the time. dGPredictor is abstaining rather than contradicting, and it resolves 3}\DIFdelend , \DIFdelbegin \DIFdel{877 reactions eQuilibrator cannot, against }\DIFdelend \DIFaddbegin \DIFadd{although eQuilibrator provides more unique predictions (}\DIFaddend 11,237\DIFdelbegin \DIFdel{the other way}\DIFdelend \DIFaddbegin \DIFadd{) than dGPredictor provides (3,877) because dGPredictor often abstains rather than contradicting}\DIFaddend .
+For a typical  \DIFaddbegin \DIFadd{reaction, }\DIFaddend the error bar \DIFaddbegin \DIFadd{from dGPredictor }\DIFaddend alone exceeds the decision threshold in the reversibility index, so 59.9\% of its reactions are returned undetermined  \DIFaddbegin \DIFadd{versus }\DIFaddend 2.6\%  \DIFaddbegin \DIFadd{from eQuilibrator.
+These sources agree 94.8\% when they }\DIFaddend commit to a direction ,  \DIFaddbegin \DIFadd{although eQuilibrator provides more unique predictions (}\DIFaddend 11,237 \DIFaddbegin \DIFadd{) than dGPredictor provides (3,877) because dGPredictor often abstains rather than contradicting}\DIFaddend .
 
 \paragraph{Grading.} Of 27,338 graded reactions, 4,073 are gold, 14,475 silver and 8,790 bronze (Figure~\ref{fig:direction}B,C; see classification scheme in Supplementary Methods~S3).
-The tiers separate on what supports them: gold is 91\% self-certain and 85\% corroborated \DIFdelbegin \DIFdel{, }\DIFdelend while bronze is 99\% unconfident\DIFdelbegin \DIFdel{and split between reactions no second source could check }\DIFdelend \DIFaddbegin \DIFadd{, either uncorroborated }\DIFaddend (48\%) \DIFdelbegin \DIFdel{and reactions the other sources contradict }\DIFdelend \DIFaddbegin \DIFadd{or contradicted }\DIFaddend (29\%) \DIFaddbegin \DIFadd{by other sources}\DIFaddend .
+The tiers separate on what supports them: gold is 91\% self-certain and 85\% corroborated  while bronze is 99\% unconfident \DIFaddbegin \DIFadd{, either uncorroborated }\DIFaddend (48\%)  \DIFaddbegin \DIFadd{or contradicted }\DIFaddend (29\%) \DIFaddbegin \DIFadd{by other sources}\DIFaddend .
 Because a measured reaction is always graded gold, the grades must be recomputed with openTECR withheld before they can be tested against it.
-Re-graded on the predictors alone, the \DIFdelbegin \DIFdel{801 anchored records split into 439 gold, 349 silver and 13 bronze; the gold subset falls }\DIFdelend \DIFaddbegin \DIFadd{363 distinct anchored reactions split into 172 gold, 186 silver and 5 bronze.
-The gold and silver reactions fall }\DIFaddend within 2\,kcal\,mol$^{-1}$ of measurement \DIFdelbegin \DIFdel{93.8\% of the time, against 89.4\% for silver. This validation counts records rather than distinct reactions: 438 of the 801 are obsolete duplicates of a live entry, so the effective number of anchored reactions is 363 and these rates rest on fewer independent measurements than the counts imply }\DIFdelend \DIFaddbegin \DIFadd{93.0\% and 89.2\% of the time }\DIFaddend (Supplementary Methods~S3)\DIFdelbegin \DIFdel{. Both tiers therefore track measurement closely enough that we recommend either }\DIFdelend \DIFaddbegin \DIFadd{, hence we recommend these tiers }\DIFaddend for inclusion in a metabolic model \DIFdelbegin \DIFdel{, }\DIFdelend and reserve bronze for review rather than use \DIFaddbegin \DIFadd{in models}\DIFaddend .
+Re-graded on the predictors alone, the  \DIFaddbegin \DIFadd{363 distinct anchored reactions split into 172 gold, 186 silver and 5 bronze.
+The gold and silver reactions fall }\DIFaddend within 2\,kcal\,mol$^{-1}$ of measurement  \DIFaddbegin \DIFadd{93.0\% and 89.2\% of the time }\DIFaddend (Supplementary Methods~S3) \DIFaddbegin \DIFadd{, hence we recommend these tiers }\DIFaddend for inclusion in a metabolic model  and reserve bronze for review rather than use \DIFaddbegin \DIFadd{in models}\DIFaddend .
 
-\paragraph{Recommendation.} \DIFdelbegin \DIFdel{Evidently where the sources agree on reaction direction, this becomes our recommendation, but because the sources can disagree , we prioritize the source from which we take the recommended }\DIFdelend \DIFaddbegin \DIFadd{We recommend the consensus among sources, but when sources disagree on }\DIFaddend reaction direction, \DIFdelbegin \DIFdel{so the priority order is eQuilibrator , dGPredictor , }\DIFdelend \DIFaddbegin \DIFadd{we prioritize eQuilibrator followed by dGPredictor and then }\DIFaddend group contribution.
-\DIFaddbegin \DIFadd{Following this tiered approach, }\DIFaddend eQuilibrator supplies 16,985 recommended reaction directions, dGPredictor \DIFaddbegin \DIFadd{provides }\DIFaddend 7,935\DIFaddbegin \DIFadd{, }\DIFaddend and group contribution \DIFaddbegin \DIFadd{provides }\DIFaddend 2,055\DIFdelbegin \DIFdel{; these numbers include the ones where there is agreement also.
-We record the source used to make the recommendation, so researchers may apply a different precedence.
-}\DIFdelend \DIFaddbegin \DIFadd{, the source for each recommendation being recorded.
+\paragraph{Recommendation.}  \DIFaddbegin \DIFadd{We recommend the consensus among sources, but when sources disagree on }\DIFaddend reaction direction,  \DIFaddbegin \DIFadd{we prioritize eQuilibrator followed by dGPredictor and then }\DIFaddend group contribution.
+\DIFaddbegin \DIFadd{Following this tiered approach, }\DIFaddend eQuilibrator supplies 16,985 recommended reaction directions, dGPredictor \DIFaddbegin \DIFadd{provides }\DIFaddend 7,935\DIFaddbegin \DIFadd{, }\DIFaddend and group contribution \DIFaddbegin \DIFadd{provides }\DIFaddend 2,055 \DIFaddbegin \DIFadd{, the source for each recommendation being recorded.
 }\DIFaddend 
 
 \DIFaddbegin \subsection{\DIFadd{Ensemble LLMs predictions}}\label{sec:llm-grading-rslts}
@@ -779,22 +654,13 @@ Neither the thermodynamics nor the ensemble approaches capture the context of me
 Atom mappings are published for 26,242 reactions, 54\% of the database: 19,809 clean, and 6,433 that required salvage (which are tagged). As the mappings can be used to span a metabolic reconstruction, reactions needing one repair are likely to carry others.
 
 
-\DIFdelbegin \paragraph{\DIFdel{Reconstruction scope.}} %DIFAUXCMD
-\addtocounter{paragraph}{-1}%DIFAUXCMD
-\DIFdel{A template carries far fewer reactions than the database holds --- the v7.0 ModelSEED templates span 8,597 in union, about 9,000 with PlantSEED\_v3 roles --- but that gap does not mean the remainder is unusable. The database is a reference namespace across all kingdoms and includes biochemistry from secondary databases and published models that no single template targets. Promotion into a template is limited by mass and charge balance, which 69\% of reactions satisfy, and by association to an annotated functional role, which 41\% carry. Gene association is not the constraint: 2,258 of the 8,584 reactions in the Gram-negative template are typed as gapfilling and require no gene. 15,106 reactions now satisfy both balance and role annotation, 8,815 of them outside every current template.
-}%DIFDELCMD < 
+ \section{Discussion}
 
-%DIFDELCMD < %%%
-\DIFdelend \section{Discussion}
-
-Unlike the 2020 release, this update adopts a multi-source \DIFdelbegin \DIFdel{policy }\DIFdelend \DIFaddbegin \DIFadd{approach }\DIFaddend rather than promoting a single thermodynamic value, publishing four sources \DIFdelbegin \DIFdel{, each with }\DIFdelend \DIFaddbegin \DIFadd{that each have }\DIFaddend their own uncertainty and estimated direction, \DIFdelbegin \DIFdel{because the sources may disagree in ways a single value conceals}\DIFdelend \DIFaddbegin \DIFadd{to capture source diversity}\DIFaddend .
-Grading against experiment enables us to validate the approach: A researcher can take the highest-graded source and know\DIFdelbegin \DIFdel{s}\DIFdelend  what the grade means.
-\DIFdelbegin \DIFdel{Two limits are worth naming. Transport reactions are scored without a membrane potential or a pH gradient, because both are properties of an organism and a condition rather than of a reference reaction; a compartment-aware scoring layer is the natural next release, and it needs the organism context a model supplies and a database cannot.
-And }\DIFdelend \DIFaddbegin \DIFadd{As this is a generalized reference database, we intentionally exclude organism-specific data; a choice affecting transport reactions and metabolic reconstruction that we discuss in Supplementary Methods~S6.
-A current limitation is that }\DIFaddend roughly half the database \DIFdelbegin \DIFdel{still carries no thermodynamic direction at all, bounded by the structuresneeded to compute one.
-In being explicit about disagreement between }\DIFdelend \DIFaddbegin \DIFadd{lacks thermodynamic values, constrained by missing or incomplete chemical structures.
-For the remaining reactions, by explicitly reporting discrepancies among thermodynamic }\DIFaddend sources, we \DIFdelbegin \DIFdel{expect this release to serve the widening range of communities that build on shared biochemistry : }\DIFdelend \DIFaddbegin \DIFadd{aim to better serve researchers who rely on standardized biochemistry for }\DIFaddend genome-scale reconstruction, flux analysis, pathway design\DIFdelbegin \DIFdel{and the training of predictive models.
-}\DIFdelend \DIFaddbegin \DIFadd{, and predictive modeling.
+Unlike the 2020 release, this update adopts a multi-source  \DIFaddbegin \DIFadd{approach }\DIFaddend rather than promoting a single thermodynamic value, publishing four sources  \DIFaddbegin \DIFadd{that each have }\DIFaddend their own uncertainty and estimated direction,  \DIFaddbegin \DIFadd{to capture source diversity}\DIFaddend .
+Grading against experiment enables us to validate the approach: A researcher can take the highest-graded source and  \DIFaddbegin \DIFadd{know }\DIFaddend what the grade means.
+ \DIFaddbegin \DIFadd{As this is a generalized reference database, we intentionally exclude organism-specific data; a choice affecting transport reactions and metabolic reconstruction that we discuss in Supplementary Methods~S6.
+A current limitation is that }\DIFaddend roughly half the database  \DIFaddbegin \DIFadd{lacks thermodynamic values, constrained by missing or incomplete chemical structures.
+For the remaining reactions, by explicitly reporting discrepancies among thermodynamic }\DIFaddend sources, we  \DIFaddbegin \DIFadd{aim to better serve researchers who rely on standardized biochemistry for }\DIFaddend genome-scale reconstruction, flux analysis, pathway design \DIFaddbegin \DIFadd{, and predictive modeling.
 }
 
 \DIFaddend \section{Data availability}
@@ -874,16 +740,16 @@ Hastings, J., Owen, G., Dekker, A., et al. (2016)
 {ChEBI} in 2016: Improved services and an expanding collection of metabolites.
 {\em Nucleic Acids Research,} {\bf 44}(D1), D1214--D1219.
 
+\bibitem{flamholz2012}
+Flamholz, A., Noor, E., Bar-Even, A., and Milo, R. (2012)
+{eQuilibrator} --- the biochemical thermodynamics calculator.
+{\em Nucleic Acids Research,} {\bf 40}(D1), D770--D775.
+
 \bibitem{jankowski2008}
 Jankowski, M.~D., Henry, C.~S., Broadbelt, L.~J., and Hatzimanikatis, V. (2008)
 Group contribution method for thermodynamic analysis of complex metabolic
   networks.
 {\em Biophysical Journal,} {\bf 95}(3), 1487--1499.
-
-\bibitem{flamholz2012}
-Flamholz, A., Noor, E., Bar-Even, A., and Milo, R. (2012)
-{eQuilibrator} --- the biochemical thermodynamics calculator.
-{\em Nucleic Acids Research,} {\bf 40}(D1), D770--D775.
 
 \bibitem{beber2022}
 Beber, M.~E., Gollub, M.~G., Mozaffari, D., et al. (2022)
@@ -895,6 +761,11 @@ Wang, L., Upadhyay, V., and Maranas, C.~D. (2021)
 {dGPredictor}: Automated fragmentation method for metabolic reaction free
   energy prediction and de novo pathway design.
 {\em PLOS Computational Biology,} {\bf 17}(9), e1009448.
+
+\bibitem{alberty2003}
+Alberty, R.~A. (2003)
+Thermodynamics of Biochemical Reactions,
+Wiley-Interscience, Hoboken, NJ.
 
 \bibitem{marvin}
 {ChemAxon}
@@ -908,11 +779,6 @@ Pan, X., Wang, H., Li, C., Zhang, J. Z.~H., and Ji, C. (2021)
   Graph-Convolutional Neural Network.
 {\em Journal of Chemical Information and Modeling,} {\bf 61}(7), 3159--3165.
 
-\bibitem{alberty2003}
-Alberty, R.~A. (2003)
-Thermodynamics of Biochemical Reactions,
-Wiley-Interscience, Hoboken, NJ.
-
 \bibitem{goldberg2004}
 Goldberg, R.~N., Tewari, Y.~B., and Bhat, T.~N. (2004)
 Thermodynamics of enzyme-catalyzed reactions --- a database for quantitative
@@ -924,11 +790,6 @@ Noor, E., Bar-Even, A., Flamholz, A., et al. (2012)
 An integrated open framework for thermodynamics of reactions that combines
   accuracy and coverage.
 {\em Bioinformatics,} {\bf 28}(15), 2037--2044.
-
-\bibitem{noor2014}
-Noor, E., Bar-Even, A., Flamholz, A., et al. (2014)
-Pathway thermodynamics highlights kinetic obstacles in central metabolism.
-{\em PLoS Computational Biology,} {\bf 10}(2), e1003483.
 
 \bibitem{huss2022}
 Hu{\ss}, S., Judd, R.~S., Koper, K., Maeda, H.~A., and Nikoloski, Z. (2022)
@@ -973,6 +834,11 @@ Seaver, S. M.~D., Lerma-Ortiz, C., Conrad, N., Mikaili, A., Sreedasyam, A.,
 {PlantSEED} enables automated annotation and reconstruction of plant primary
   metabolism with improved compartmentalization and comparative consistency.
 {\em The Plant Journal,} {\bf 95}(6), 1102--1113.
+
+\bibitem{noor2014}
+Noor, E., Bar-Even, A., Flamholz, A., et al. (2014)
+Pathway thermodynamics highlights kinetic obstacles in central metabolism.
+{\em PLoS Computational Biology,} {\bf 10}(2), e1003483.
 
 \end{thebibliography}
 

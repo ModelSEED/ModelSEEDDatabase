@@ -24,8 +24,11 @@
 #
 # Requires latexdiff (TeX Live 2026: /scratch/seaver/texlive/2026/bin/x86_64-linux).
 # Output: DOC_diff.pdf (word-level track-changes copy, NOT counted against
-# the journal page limit -- deletions still take up visual space as
-# strikethrough text, so this PDF is typically longer than either version).
+# the journal page limit). Per NAR's own instruction ("Type your revised
+# text in red font, please DO NOT use red highlight") the marked copy shows
+# ONLY additions, in plain red with no underline -- deletions are
+# completely omitted (--no-del below), not struck-through, so there is no
+# blue text anywhere in the output.
 #
 # The plain submission copy is unaffected by this script: build it with
 # `pdflatex main_clean.tex` (see README.md) as before.
@@ -52,49 +55,92 @@ find "$WORK/new/Papers/NAR_Update_2026/latex" \
 
 export PATH="/scratch/seaver/texlive/2026/bin/x86_64-linux:$PATH"
 
-latexdiff --flatten \
+latexdiff --flatten --no-del \
   "$WORK/old/Papers/NAR_Update_2026/latex/$DOC.tex" \
   "$WORK/new/Papers/NAR_Update_2026/latex/$DOC.tex" \
   > "$HERE/${DOC}_diff.tex"
 
-# NAR requires that text changed in response to referee comments be shown in
-# red. latexdiff's default UNDERLINE style colors additions blue and
-# deletions red -- the opposite of what NAR wants. Swap the two auto-generated
-# preamble macros in place: additions (\DIFadd) become red, deletions
-# (\DIFdel) stay struck-through but become blue.
+# NAR: "Type your revised text in red font, please DO NOT use red
+# highlight" -- plain red text, no underline/wave/strikethrough decoration.
+# --no-del above already drops deleted text entirely (no blue anywhere).
+# Swap latexdiff's default \DIFadd (blue, wavy-underlined via \uwave) for
+# plain \color{red} with no decoration.
 python3 - "$HERE/${DOC}_diff.tex" <<'PYEOF'
 import re, sys
 path = sys.argv[1]
 with open(path) as f:
     text = f.read()
 
-# latexdiff emits \DIFadd/\DIFdel directly in most document classes, but for
-# classes it detects as hyperref-wrapped (e.g. this repo's supplementary.tex,
-# which loads hyperref before latexdiff's preamble) it instead defines
-# \DIFaddtex/\DIFdeltex and routes \DIFadd/\DIFdel through \texorpdfstring.
-# Try the direct pair first, then the *tex pair, so this one script handles
-# both main.tex and supplementary.tex.
+# latexdiff emits \DIFadd directly in most document classes, but for classes
+# it detects as hyperref-wrapped (e.g. this repo's supplementary.tex, which
+# loads hyperref before latexdiff's preamble) it instead defines \DIFaddtex
+# and routes \DIFadd through \texorpdfstring. Try the direct macro first,
+# then the *tex variant, so this one script handles both main.tex and
+# supplementary.tex.
 pairs = [
     (r"\providecommand{\DIFadd}[1]{{\protect\color{blue}\uwave{#1}}} %DIF PREAMBLE",
-     r"\providecommand{\DIFadd}[1]{{\protect\color{red}\uwave{#1}}} %DIF PREAMBLE",
-     r"\providecommand{\DIFdel}[1]{{\protect\color{red}\sout{#1}}} %DIF PREAMBLE",
-     r"\providecommand{\DIFdel}[1]{{\protect\color{blue}\sout{#1}}} %DIF PREAMBLE"),
+     r"\providecommand{\DIFadd}[1]{{\protect\color{red}{#1}}} %DIF PREAMBLE"),
     (r"\providecommand{\DIFaddtex}[1]{{\protect\color{blue}\uwave{#1}}} %DIF PREAMBLE",
-     r"\providecommand{\DIFaddtex}[1]{{\protect\color{red}\uwave{#1}}} %DIF PREAMBLE",
-     r"\providecommand{\DIFdeltex}[1]{{\protect\color{red}\sout{#1}}} %DIF PREAMBLE",
-     r"\providecommand{\DIFdeltex}[1]{{\protect\color{blue}\sout{#1}}} %DIF PREAMBLE"),
+     r"\providecommand{\DIFaddtex}[1]{{\protect\color{red}{#1}}} %DIF PREAMBLE"),
 ]
 
 applied = False
-for add_old, add_new, del_old, del_new in pairs:
-    if add_old in text and del_old in text:
-        text = text.replace(add_old, add_new).replace(del_old, del_new)
+for add_old, add_new in pairs:
+    if add_old in text:
+        text = text.replace(add_old, add_new)
         applied = True
         break
 
 if not applied:
-    sys.exit("make_marked_copy.sh: expected DIFadd/DIFdel preamble lines not found -- "
+    sys.exit("make_marked_copy.sh: expected DIFadd preamble line not found -- "
              "latexdiff output format may have changed, update the swap in this script.")
+
+# Safety net: --no-del is supposed to drop every deleted block, but a
+# deletion word-adjacent to an addition on the same line (e.g. a title-block
+# edit mixing \DIFdelbegin...\DIFdelend with \DIFaddbegin...\DIFaddend) has
+# been observed to survive it. Scoped to the body only (after \begin{document})
+# so the preamble's own \providecommand{\DIFdel}... definitions are never
+# touched. \DIFdel{...} is removed with a brace-depth counter, not a regex --
+# its argument can itself contain braced groups (\textbf{...} etc.), which a
+# naive regex mishandles and corrupts the file.
+def strip_body_deletions(body):
+    # \DIFdelbegin ... \DIFdelend spans, non-nesting (latexdiff never nests
+    # these), so a simple non-greedy match across the whole body is safe.
+    body = re.sub(r"\\DIFdelbegin\b.*?\\DIFdelend\b", "", body, flags=re.S)
+
+    # Bare \DIFdel{...} calls (left outside a begin/end span): find each
+    # occurrence and consume balanced braces by hand.
+    out = []
+    i = 0
+    marker = r"\DIFdel{"
+    while True:
+        j = body.find(marker, i)
+        if j == -1:
+            out.append(body[i:])
+            break
+        out.append(body[i:j])
+        k = j + len(marker)
+        depth = 1
+        while depth > 0:
+            if body[k] == "{":
+                depth += 1
+            elif body[k] == "}":
+                depth -= 1
+            k += 1
+        i = k  # drop body[j:k] entirely -- the whole \DIFdel{...} call
+    return "".join(out)
+
+# Match \begin{document} only at the start of a (whitespace-trimmed) line, so
+# a comment mentioning "\begin{document}" earlier in the preamble (main.tex
+# has one, documenting \draftmodefalse) is not mistaken for the real one --
+# that mistake fed the preamble's own \DIFdel macro definitions into the
+# stripper above and corrupted them.
+m = re.search(r"^[ \t]*\\begin\{document\}", text, flags=re.M)
+if not m:
+    sys.exit("make_marked_copy.sh: \\begin{document} not found -- "
+             "refusing to touch the preamble's \\DIFdel definitions.")
+doc_start = m.start()
+text = text[:doc_start] + strip_body_deletions(text[doc_start:])
 
 with open(path, "w") as f:
     f.write(text)
