@@ -54,7 +54,7 @@ def figureS1():
     rows = _pathway_classes(top=8)
     ys = range(len(rows))[::-1]
     h = 0.40
-    xmax = max(max(n, o) for _, n, o in rows) * 1.22
+    xmax = max(max(n, o) for _, n, o in rows) * 1.08
     for i, (name, new_, old_) in zip(ys, rows):
         ax.barh(i + h / 2 + 0.02, old_, height=h, color=BLUE_200, zorder=3)
         ax.barh(i - h / 2 - 0.02, new_, height=h, color=BLUE, zorder=3)
@@ -67,9 +67,9 @@ def figureS1():
     from matplotlib.patches import Patch
     ax.legend(handles=[Patch(facecolor=BLUE_200, edgecolor="none", label="already held in 2020"),
                        Patch(facecolor=BLUE, edgecolor="none", label="added since 2020")],
-              loc="lower right", frameon=False, fontsize=7.8, ncol=2,
+              loc="lower right", frameon=False, fontsize=7.8, ncol=1,
               handlelength=1.0, handleheight=0.85, handletextpad=0.4,
-              columnspacing=0.85, borderpad=0.1, borderaxespad=0.75,
+              labelspacing=0.3, borderpad=0.1, borderaxespad=0.75,
               labelcolor=INK2)
     strip(ax)
     # Outward x-ticks, overriding the shared Grace style's inward default for
