@@ -1,7 +1,7 @@
 # Thermodynamics pipeline: dependencies that are not redistributed
 
-Two inputs the thermodynamics pipeline consumes are **not shipped in this
-repository**. Both are reachable by citation, but neither can be regenerated
+Three inputs the thermodynamics pipeline consumes are **not shipped in this
+repository**. All are reachable by citation, but none can be regenerated
 from what is released here. This file exists so that a reader reconciling the
 released tables against their deposited sources knows why a referenced input is
 absent.
@@ -24,6 +24,21 @@ layer.
 The cache is a **pinned public release** rather than an artefact rebuilt here.
 This makes the protonation layer reproducible by citation but not regenerable
 without a licensed tool.
+
+## 3. dGbyG code and model weights
+
+Fan, W. *et al.* Unraveling principles of thermodynamics for genome-scale
+metabolic networks using graph neural networks. *Cell Systems* (2025).
+<https://doi.org/10.1016/j.cels.2025.101393>. Code and weights:
+<https://github.com/f-wc/dGbyG> (MIT), at the commit recorded in the header
+line of `Biochemistry/Thermodynamics/dGbyG/ModelSEED_*_Energies.tsv`.
+
+`Generate_dGbyG_Energies.py` runs that checkout's shipped ensemble
+(`models/mpnn_A139_B23_E300_L2_v2`, 100 heads) over ModelSEED's structures to
+produce the two staged tables. The checkout and its weights are not copied
+here; the staged tables are, so the database can be rebuilt from them without
+dGbyG, and regenerating them needs the checkout and its Python dependencies
+(dGbyG's `environment.yml`).
 
 ---
 

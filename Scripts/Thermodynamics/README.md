@@ -32,9 +32,9 @@ Record shape differs by kind and by source:
 
 | kind | source | record |
 |---|---|---|
-| reaction | Group contribution, eQuilibrator | `[dg, err, operator]` |
+| reaction | Group contribution, eQuilibrator, dGbyG | `[dg, err, operator]` |
 | reaction | dGPredictor | `[dg, err, operator, coverage]` |
-| compound | Group contribution, eQuilibrator | `[dg, err]` |
+| compound | Group contribution, eQuilibrator, dGbyG | `[dg, err]` |
 | compound | dGPredictor | `[dg, err, coverage]` |
 
 kcal/mol throughout. Compounds carry no operator — a formation energy has no
@@ -256,6 +256,23 @@ Measured 2026-09-08 on the shipped `Biochemistry/reaction_*.json`:
 Build the set directly with `make_ri_heuristics(z=0.0)` to see the
 point-estimate answer for either source.
 
+### Applying the index to dGbyG
+
+`dGbyG` is routed to `DGB`, its own constant built by the same factory with the
+same arguments as `EQ` and `DGP`, so the three sources score direction
+identically while keeping a seam per source. Its σ is the spread of a 100-head
+ensemble; on its 27,066 shipped records, live and obsolete (measured 2026-10-10):
+
+| source | σ median | σ max | `?` from the margin |
+|---|---:|---:|---:|
+| `dGbyG` | 2.79 | 341.70 | 7,623 / 27,066 |
+
+Reactions whose heads all agree exactly (σ 0.00 — the two sides are the same
+graph to dGbyG, which has no chirality feature and a 2-bond receptive field)
+never reach the index: `Generate_dGbyG_Energies.py` withholds them as
+`degenerate`, because the index rule would call a 0 ± 0 reaction reversible
+(`=`) with certainty when the zero is a blind spot.
+
 ### Comparing rule sets on one set of energies
 
 `Compare_Reversibility_Heuristics.py` hands two or more rule sets the *same*
@@ -357,6 +374,7 @@ README recording provenance:
 | `ModelSEED/` | Group contribution — MFAToolkit MolAnalysis tables | — |
 | `eQuilibrator/` | component contribution from ModelSEED structures | yes |
 | `dGPredictor/` | retrained fragment model + staged predictions | yes |
+| `dGbyG/` | graph-neural-network ensemble run over ModelSEED structures (`Generate_dGbyG_Energies.py`) | yes |
 
 `Retrieve_eQuilibrator_{Compound,Reactions}_Energies.py` built the superseded
 MetaNetX-mediated tables and are kept for reference only; they no longer feed

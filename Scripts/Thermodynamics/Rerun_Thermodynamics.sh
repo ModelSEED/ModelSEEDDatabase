@@ -35,6 +35,14 @@ set -euo pipefail
 ./Update_Reaction_dGPredictor_Energies.py
 ./Update_Compound_dGPredictor_Energies.py
 
+# --- dGbyG ------------------------------------------------------------------
+# Graph-neural-network estimates (Fan et al. 2025, Cell Systems) from ModelSEED's
+# own structures, staged by Generate_dGbyG_Energies.py (needs a dGbyG checkout;
+# not rerun here). See Biochemistry/Thermodynamics/dGbyG/README.md. Operators use
+# the DGB rule set, so 'dGbyG' must stay registered in SOURCE_HEURISTIC_SET.
+./Update_Compound_dGbyG_Energies.py
+./Update_Reaction_dGbyG_Energies.py
+
 # --- Per-source direction operators -----------------------------------------
 # Each updater already computes its own operator at write time, using that
 # source's rule set. This is a consistency backfill: on a clean run it reports
