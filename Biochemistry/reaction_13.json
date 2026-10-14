@@ -48008,13 +48008,13 @@
             "metanetx.reaction: MNXR137644",
             "Name: dihydro or otate dehydrogenase"
         ],
-        "code": "(1) cpd00282[0] + (1) cpd11606[0] <=> (1) cpd00247[0] + (1) cpd11451[0]",
-        "compound_ids": "cpd00247;cpd00282;cpd11451;cpd11606",
-        "definition": "(1) S-Dihydroorotate[0] + (1) Menaquinone 7[0] <=> (1) Orotate[0] + (1) mql7[0]",
+        "code": "(1) cpd00282[0] + (1) cpd11606[0] <=> (1) cpd00247[0] + (1) cpd23255[0]",
+        "compound_ids": "cpd00067;cpd00247;cpd00282;cpd11606;cpd23255",
+        "definition": "(1) H+[0] + (1) S-Dihydroorotate[0] + (1) Menaquinone 7[0] <=> (1) Orotate[0] + (1) MKH2-7[0]",
         "ec_numbers": [
             "1.3.99.11"
         ],
-        "equation": "(1) cpd00282[0] + (1) cpd11606[0] <=> (1) cpd00247[0] + (1) cpd11451[0]",
+        "equation": "(1) cpd00067[0] + (1) cpd00282[0] + (1) cpd11606[0] <=> (1) cpd00247[0] + (1) cpd23255[0]",
         "id": "rxn13690",
         "is_obsolete": 0,
         "is_transport": 0,
@@ -48028,8 +48028,16 @@
         "pathways": null,
         "reversibility": "?",
         "source": "Secondary Database",
-        "status": "MI:C:-25/H:-41|CI:1",
+        "status": "OK",
         "stoichiometry": [
+            {
+                "charge": 1,
+                "coefficient": -1,
+                "compartment": 0,
+                "compound": "cpd00067",
+                "formula": "H",
+                "name": "H+"
+            },
             {
                 "charge": -2,
                 "coefficient": -1,
@@ -48058,9 +48066,9 @@
                 "charge": 0,
                 "coefficient": 1,
                 "compartment": 0,
-                "compound": "cpd11451",
-                "formula": "C21H24O2",
-                "name": "mql7"
+                "compound": "cpd23255",
+                "formula": "C46H66O2",
+                "name": "MKH2-7"
             }
         ],
         "thermodynamics": {
@@ -51406,13 +51414,13 @@
             "metanetx.reaction: MNXR137676",
             "Name: NADH dehydrogenase (menaquinone-7 & 4 protons)"
         ],
-        "code": "(1) cpd00004[0] + (1) cpd11606[0] <=> (1) cpd00003[0] + (1) cpd11451[0]",
-        "compound_ids": "cpd00003;cpd00004;cpd00067;cpd11451;cpd11606",
-        "definition": "(1) NADH[0] + (5) H+[0] + (1) Menaquinone 7[0] <=> (1) NAD[0] + (4) H+[1] + (1) mql7[0]",
+        "code": "(1) cpd00004[0] + (1) cpd11606[0] <=> (1) cpd00003[0] + (1) cpd23255[0]",
+        "compound_ids": "cpd00003;cpd00004;cpd00067;cpd11606;cpd23255",
+        "definition": "(1) NADH[0] + (6) H+[0] + (1) Menaquinone 7[0] <=> (1) NAD[0] + (4) H+[1] + (1) MKH2-7[0]",
         "ec_numbers": [
             "1.6.5.3"
         ],
-        "equation": "(1) cpd00004[0] + (5) cpd00067[0] + (1) cpd11606[0] <=> (1) cpd00003[0] + (4) cpd00067[1] + (1) cpd11451[0]",
+        "equation": "(1) cpd00004[0] + (6) cpd00067[0] + (1) cpd11606[0] <=> (1) cpd00003[0] + (4) cpd00067[1] + (1) cpd23255[0]",
         "id": "rxn13727",
         "is_obsolete": 0,
         "is_transport": 1,
@@ -51426,7 +51434,7 @@
         "pathways": null,
         "reversibility": "?",
         "source": "Secondary Database",
-        "status": "MI:C:-25/H:-41|CI:1",
+        "status": "OK",
         "stoichiometry": [
             {
                 "charge": -3,
@@ -51438,7 +51446,7 @@
             },
             {
                 "charge": 1,
-                "coefficient": -5,
+                "coefficient": -6,
                 "compartment": 0,
                 "compound": "cpd00067",
                 "formula": "H",
@@ -51472,9 +51480,9 @@
                 "charge": 0,
                 "coefficient": 1,
                 "compartment": 0,
-                "compound": "cpd11451",
-                "formula": "C21H24O2",
-                "name": "mql7"
+                "compound": "cpd23255",
+                "formula": "C46H66O2",
+                "name": "MKH2-7"
             }
         ],
         "thermodynamics": {
@@ -61928,11 +61936,11 @@
             "iMO1056: HDMAT7",
             "metanetx.reaction: MNXR137755"
         ],
-        "code": "(1) cpd00003[0] + (1) cpd15277[0] <=> (1) cpd00004[0] + (1) cpd15239[0]",
-        "compound_ids": "cpd00003;cpd00004;cpd00067;cpd15239;cpd15277",
-        "definition": "(1) NAD[0] + (1) Palmitoyl-ACP[0] <=> (1) NADH[0] + (2) H+[0] + (1) Hexadecenoyl-ACP[0]",
+        "code": "(1) cpd00003[0] + (1) cpd15277[0] <=> (1) cpd00004[0] + (1) cpd11477[0]",
+        "compound_ids": "cpd00003;cpd00004;cpd00067;cpd11477;cpd15277",
+        "definition": "(1) NAD[0] + (1) Palmitoyl-ACP[0] <=> (1) NADH[0] + (2) H+[0] + (1) (2E)-Hexadecenoyl-[acp][0]",
         "ec_numbers": null,
-        "equation": "(1) cpd00003[0] + (1) cpd15277[0] <=> (1) cpd00004[0] + (2) cpd00067[0] + (1) cpd15239[0]",
+        "equation": "(1) cpd00003[0] + (1) cpd15277[0] <=> (1) cpd00004[0] + (2) cpd00067[0] + (1) cpd11477[0]",
         "id": "rxn13838",
         "is_obsolete": 0,
         "is_transport": 0,
@@ -61946,7 +61954,7 @@
         "pathways": null,
         "reversibility": "?",
         "source": "Secondary Database",
-        "status": "CI:1",
+        "status": "OK",
         "stoichiometry": [
             {
                 "charge": -1,
@@ -61981,12 +61989,12 @@
                 "name": "H+"
             },
             {
-                "charge": -1,
+                "charge": -2,
                 "coefficient": 1,
                 "compartment": 0,
-                "compound": "cpd15239",
+                "compound": "cpd11477",
                 "formula": "C27H49N2O8PRS",
-                "name": "Hexadecenoyl-ACP"
+                "name": "(2E)-Hexadecenoyl-[acp]"
             }
         ],
         "thermodynamics": {
@@ -72208,11 +72216,11 @@
         },
         "code": "(1) cpd00001[0] + (1) cpd18033[0] <=> (1) cpd00009[0] + (1) cpd18050[0]",
         "compound_ids": "cpd00001;cpd00009;cpd18033;cpd18050",
-        "definition": "(1) H2O[0] + (1) Mannosylfructose 6-phosphate[0] <=> (1) Phosphate[0] + (1) Mannosylfructose[0]",
+        "definition": "(1) H2O[0] + (1) Mannosylfructose 6-phosphate[0] => (1) Phosphate[0] + (1) Mannosylfructose[0]",
         "ec_numbers": [
             "3.1.3.79"
         ],
-        "equation": "(1) cpd00001[0] + (1) cpd18033[0] <=> (1) cpd00009[0] + (1) cpd18050[0]",
+        "equation": "(1) cpd00001[0] + (1) cpd18033[0] => (1) cpd00009[0] + (1) cpd18050[0]",
         "id": "rxn13949",
         "is_obsolete": 0,
         "is_transport": 0,
@@ -75623,14 +75631,14 @@
             "metanetx.reaction: MNXR103066",
             "Name: pyruvate synthase; pyruvate:ferredoxin 2-oxidoreductase (CoA-acetylating)"
         ],
-        "code": "(1) cpd00011[0] + (1) cpd00022[0] + (2) cpd11620[0] <=> (1) cpd00010[0] + (1) cpd00020[0] + (2) cpd11621[0]",
+        "code": "(1) cpd00011[0] + (1) cpd00022[0] + (1) cpd11620[0] <=> (1) cpd00010[0] + (1) cpd00020[0] + (1) cpd11621[0]",
         "compound_ids": "cpd00010;cpd00011;cpd00020;cpd00022;cpd00067;cpd11620;cpd11621",
-        "definition": "(1) CO2[0] + (1) Acetyl-CoA[0] + (1) H+[0] + (2) Reducedferredoxin[0] <=> (1) CoA[0] + (1) Pyruvate[0] + (2) Oxidizedferredoxin[0]",
+        "definition": "(1) CO2[0] + (1) Acetyl-CoA[0] + (1) H+[0] + (1) Reducedferredoxin[0] <=> (1) CoA[0] + (1) Pyruvate[0] + (1) Oxidizedferredoxin[0]",
         "ec_numbers": [
             "1.2.7.-",
             "1.2.7.1"
         ],
-        "equation": "(1) cpd00011[0] + (1) cpd00022[0] + (1) cpd00067[0] + (2) cpd11620[0] <=> (1) cpd00010[0] + (1) cpd00020[0] + (2) cpd11621[0]",
+        "equation": "(1) cpd00011[0] + (1) cpd00022[0] + (1) cpd00067[0] + (1) cpd11620[0] <=> (1) cpd00010[0] + (1) cpd00020[0] + (1) cpd11621[0]",
         "id": "rxn13974",
         "is_obsolete": 0,
         "is_transport": 0,
@@ -75646,7 +75654,7 @@
         ],
         "reversibility": "?",
         "source": "Primary Database",
-        "status": "CI:2",
+        "status": "OK",
         "stoichiometry": [
             {
                 "charge": 0,
@@ -75674,7 +75682,7 @@
             },
             {
                 "charge": 4,
-                "coefficient": -2,
+                "coefficient": -1,
                 "compartment": 0,
                 "compound": "cpd11620",
                 "formula": "Fe2R4S6",
@@ -75698,7 +75706,7 @@
             },
             {
                 "charge": 6,
-                "coefficient": 2,
+                "coefficient": 1,
                 "compartment": 0,
                 "compound": "cpd11621",
                 "formula": "Fe2R4S6",
