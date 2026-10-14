@@ -2180,13 +2180,13 @@
             "metanetx.reaction: MNXR107132; MNXR142166",
             "Name: (2-methylpropanoyl)transferase] lipoyllysine 2-oxidoreductase; (decarboxylating, acceptor-2-methylpropanoylating); 4-methyl-2-oxopentanoate:[dihydrolipoyllysine-residue; 4-methyl-2-oxopentanoate:[dihydrolipoyllysine-residue (2-methylpropanoyl)transferase] lipoyllysine 2-oxidoreductase (decarboxylating, acceptor-2-methylpropanoylating)"
         ],
-        "code": "(1) cpd00200[0] + (1) cpd00213[0] <=> (1) cpd00011[0] + (1) cpd14699[0]",
-        "compound_ids": "cpd00011;cpd00200;cpd00213;cpd14699",
-        "definition": "(1) 4MOP[0] + (1) Lipoamide[0] <=> (1) CO2[0] + (1) S-(3-Methylbutanoyl)-dihydrolipoamide-E[0]",
+        "code": "(1) cpd00200[0] + (1) cpd19171[0] <=> (1) cpd00011[0] + (1) cpd14699[0]",
+        "compound_ids": "cpd00011;cpd00067;cpd00200;cpd14699;cpd19171",
+        "definition": "(1) H+[0] + (1) 4MOP[0] + (1) Enzyme N6-(lipoyl)lysine[0] <=> (1) CO2[0] + (1) S-(3-Methylbutanoyl)-dihydrolipoamide-E[0]",
         "ec_numbers": [
             "1.2.4.4"
         ],
-        "equation": "(1) cpd00200[0] + (1) cpd00213[0] <=> (1) cpd00011[0] + (1) cpd14699[0]",
+        "equation": "(1) cpd00067[0] + (1) cpd00200[0] + (1) cpd19171[0] <=> (1) cpd00011[0] + (1) cpd14699[0]",
         "id": "rxn06031",
         "is_obsolete": 0,
         "is_transport": 0,
@@ -2200,8 +2200,16 @@
         "pathways": null,
         "reversibility": "?",
         "source": "Primary Database",
-        "status": "MI:H:1/R:1|CI:2",
+        "status": "OK",
         "stoichiometry": [
+            {
+                "charge": 1,
+                "coefficient": -1,
+                "compartment": 0,
+                "compound": "cpd00067",
+                "formula": "H",
+                "name": "H+"
+            },
             {
                 "charge": -1,
                 "coefficient": -1,
@@ -2211,12 +2219,12 @@
                 "name": "4MOP"
             },
             {
-                "charge": -1,
+                "charge": 0,
                 "coefficient": -1,
                 "compartment": 0,
-                "compound": "cpd00213",
-                "formula": "C8H14NOS2",
-                "name": "Lipoamide"
+                "compound": "cpd19171",
+                "formula": "C8H14NORS2",
+                "name": "Enzyme N6-(lipoyl)lysine"
             },
             {
                 "charge": 0,
@@ -28172,13 +28180,13 @@
             ],
             "has_symmetry_groups": true
         },
-        "code": "(1) cpd00449[0] + (1) cpd00760[0] <=> (1) cpd00010[0] + (1) cpd14703[0]",
-        "compound_ids": "cpd00010;cpd00067;cpd00449;cpd00760;cpd14703",
-        "definition": "(1) Dihydrolipoamide[0] + (1) 2-Methylbutyryl-CoA[0] <=> (1) CoA[0] + (1) H+[0] + (1) S-(2-Methylbutanoyl)-dihydrolipoamide-E[0]",
+        "code": "(1) cpd00760[0] + (1) cpd19172[0] <=> (1) cpd00010[0] + (1) cpd14703[0]",
+        "compound_ids": "cpd00010;cpd00760;cpd14703;cpd19172",
+        "definition": "(1) 2-Methylbutyryl-CoA[0] + (1) Enzyme N6-(dihydrolipoyl)lysine[0] <=> (1) CoA[0] + (1) S-(2-Methylbutanoyl)-dihydrolipoamide-E[0]",
         "ec_numbers": [
             "2.3.1.168"
         ],
-        "equation": "(1) cpd00449[0] + (1) cpd00760[0] <=> (1) cpd00010[0] + (1) cpd00067[0] + (1) cpd14703[0]",
+        "equation": "(1) cpd00760[0] + (1) cpd19172[0] <=> (1) cpd00010[0] + (1) cpd14703[0]",
         "id": "rxn06335",
         "is_obsolete": 0,
         "is_transport": 0,
@@ -28194,16 +28202,8 @@
         ],
         "reversibility": "?",
         "source": "Primary Database",
-        "status": "MI:R:1|CI:1",
+        "status": "OK",
         "stoichiometry": [
-            {
-                "charge": 0,
-                "coefficient": -1,
-                "compartment": 0,
-                "compound": "cpd00449",
-                "formula": "C8H17NOS2",
-                "name": "Dihydrolipoamide"
-            },
             {
                 "charge": -5,
                 "coefficient": -1,
@@ -28213,20 +28213,20 @@
                 "name": "2-Methylbutyryl-CoA"
             },
             {
+                "charge": 0,
+                "coefficient": -1,
+                "compartment": 0,
+                "compound": "cpd19172",
+                "formula": "C8H16NORS2",
+                "name": "Enzyme N6-(dihydrolipoyl)lysine"
+            },
+            {
                 "charge": -5,
                 "coefficient": 1,
                 "compartment": 0,
                 "compound": "cpd00010",
                 "formula": "C21H31N7O16P3S",
                 "name": "CoA"
-            },
-            {
-                "charge": 1,
-                "coefficient": 1,
-                "compartment": 0,
-                "compound": "cpd00067",
-                "formula": "H",
-                "name": "H+"
             },
             {
                 "charge": 0,
@@ -50716,13 +50716,13 @@
             ],
             "has_symmetry_groups": true
         },
-        "code": "(1) cpd00449[0] + (1) cpd01882[0] <=> (1) cpd00010[0] + (1) cpd14699[0]",
-        "compound_ids": "cpd00010;cpd00067;cpd00449;cpd01882;cpd14699",
-        "definition": "(1) Dihydrolipoamide[0] + (1) Isovaleryl-CoA[0] <=> (1) CoA[0] + (1) H+[0] + (1) S-(3-Methylbutanoyl)-dihydrolipoamide-E[0]",
+        "code": "(1) cpd01882[0] + (1) cpd19172[0] <=> (1) cpd00010[0] + (1) cpd14699[0]",
+        "compound_ids": "cpd00010;cpd01882;cpd14699;cpd19172",
+        "definition": "(1) Isovaleryl-CoA[0] + (1) Enzyme N6-(dihydrolipoyl)lysine[0] <=> (1) CoA[0] + (1) S-(3-Methylbutanoyl)-dihydrolipoamide-E[0]",
         "ec_numbers": [
             "2.3.1.168"
         ],
-        "equation": "(1) cpd00449[0] + (1) cpd01882[0] <=> (1) cpd00010[0] + (1) cpd00067[0] + (1) cpd14699[0]",
+        "equation": "(1) cpd01882[0] + (1) cpd19172[0] <=> (1) cpd00010[0] + (1) cpd14699[0]",
         "id": "rxn06586",
         "is_obsolete": 0,
         "is_transport": 0,
@@ -50738,16 +50738,8 @@
         ],
         "reversibility": "?",
         "source": "Primary Database",
-        "status": "MI:R:1|CI:1",
+        "status": "OK",
         "stoichiometry": [
-            {
-                "charge": 0,
-                "coefficient": -1,
-                "compartment": 0,
-                "compound": "cpd00449",
-                "formula": "C8H17NOS2",
-                "name": "Dihydrolipoamide"
-            },
             {
                 "charge": -5,
                 "coefficient": -1,
@@ -50757,20 +50749,20 @@
                 "name": "Isovaleryl-CoA"
             },
             {
+                "charge": 0,
+                "coefficient": -1,
+                "compartment": 0,
+                "compound": "cpd19172",
+                "formula": "C8H16NORS2",
+                "name": "Enzyme N6-(dihydrolipoyl)lysine"
+            },
+            {
                 "charge": -5,
                 "coefficient": 1,
                 "compartment": 0,
                 "compound": "cpd00010",
                 "formula": "C21H31N7O16P3S",
                 "name": "CoA"
-            },
-            {
-                "charge": 1,
-                "coefficient": 1,
-                "compartment": 0,
-                "compound": "cpd00067",
-                "formula": "H",
-                "name": "H+"
             },
             {
                 "charge": 0,
@@ -53625,13 +53617,13 @@
             "metanetx.reaction: MNXR108745; MNXR135305",
             "Name: (2-methylpropanoyl)transferase] lipoyllysine 2-oxidoreductase; (S)-3-Methyl-2-oxopentanoate:[dihydrolipoyllysine-residue; (S)-3-Methyl-2-oxopentanoate:[dihydrolipoyllysine-residue (2-methylpropanoyl)transferase] lipoyllysine 2-oxidoreductase (decarboxylating, acceptor-2-methylpropanoylating); (decarboxylating, acceptor-2-methylpropanoylating)"
         ],
-        "code": "(1) cpd00213[0] + (1) cpd00508[0] <=> (1) cpd00011[0] + (1) cpd14703[0]",
-        "compound_ids": "cpd00011;cpd00213;cpd00508;cpd14703",
-        "definition": "(1) Lipoamide[0] + (1) 3MOP[0] <=> (1) CO2[0] + (1) S-(2-Methylbutanoyl)-dihydrolipoamide-E[0]",
+        "code": "(1) cpd00508[0] + (1) cpd19171[0] <=> (1) cpd00011[0] + (1) cpd14703[0]",
+        "compound_ids": "cpd00011;cpd00067;cpd00508;cpd14703;cpd19171",
+        "definition": "(1) H+[0] + (1) 3MOP[0] + (1) Enzyme N6-(lipoyl)lysine[0] <=> (1) CO2[0] + (1) S-(2-Methylbutanoyl)-dihydrolipoamide-E[0]",
         "ec_numbers": [
             "1.2.4.4"
         ],
-        "equation": "(1) cpd00213[0] + (1) cpd00508[0] <=> (1) cpd00011[0] + (1) cpd14703[0]",
+        "equation": "(1) cpd00067[0] + (1) cpd00508[0] + (1) cpd19171[0] <=> (1) cpd00011[0] + (1) cpd14703[0]",
         "id": "rxn06621",
         "is_obsolete": 0,
         "is_transport": 0,
@@ -53645,15 +53637,15 @@
         "pathways": null,
         "reversibility": "?",
         "source": "Primary Database",
-        "status": "MI:H:1/R:1|CI:2",
+        "status": "OK",
         "stoichiometry": [
             {
-                "charge": -1,
+                "charge": 1,
                 "coefficient": -1,
                 "compartment": 0,
-                "compound": "cpd00213",
-                "formula": "C8H14NOS2",
-                "name": "Lipoamide"
+                "compound": "cpd00067",
+                "formula": "H",
+                "name": "H+"
             },
             {
                 "charge": -1,
@@ -53662,6 +53654,14 @@
                 "compound": "cpd00508",
                 "formula": "C6H9O3",
                 "name": "3MOP"
+            },
+            {
+                "charge": 0,
+                "coefficient": -1,
+                "compartment": 0,
+                "compound": "cpd19171",
+                "formula": "C8H14NORS2",
+                "name": "Enzyme N6-(lipoyl)lysine"
             },
             {
                 "charge": 0,
