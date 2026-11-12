@@ -5,7 +5,7 @@
 \begin{figure*}[!t]
     \centerline{\includegraphics[width=\textwidth]{../figures/figure2_thermodynamics.pdf}}
     \caption{
-        \textbf{Thermodynamic sources.} (\textbf{A}) Provenance of every pK$_\mathrm{a}$ ladder shipped in the database, across all 45,662 compounds and 48,384 reactions. ChemAxon Marvin supplies 79.4\% of compounds and 79.8\% of reactions. \emph{Hatching} marks the share computed from SMILES because Marvin refuses polymers and organometallics as query molecules. \emph{No ionizable site} edscribes 1,237 compounds that lacked a dissociable proton from Marvin between pH $-2$ and $16$. (\textbf{B}) Reactions that carry an energy computed from the source heuristic. (\textbf{C}) Reported uncertainties (kcal\,mol$^{-1}$) for each source, where the shaded band spans the 5th to 95th percentile range used in our classification scheme.
+        \textbf{Thermodynamic sources.} (\textbf{A}) Provenance of every pK$_\mathrm{a}$ ladder shipped in the database, across all 45,662 compounds and 48,384 reactions. ChemAxon Marvin supplies 79.4\% of compounds and 79.8\% of reactions. \emph{Hatching} marks the share computed from SMILES because Marvin refuses polymers and organometallics as query molecules. \emph{No ionizable site} describes 1,237 compounds that lacked a dissociable proton from Marvin between pH $-2$ and $16$. (\textbf{B}) Reactions that carry an energy computed from the source heuristic. (\textbf{C}) Reported uncertainties (kcal\,mol$^{-1}$) for each source, where the shaded band spans the 5th to 95th percentile range used in our classification scheme.
         }
     \label{fig:thermo}
 \end{figure*}
@@ -23,10 +23,10 @@ All values are reported at pH~7.0, ionic strength 0.25\,M, pMg~3.0 and 298.15\,K
 
 \paragraph{Protonation.} eQuilibrator's Legendre transform requires a \emph{macroscopic} pKa ladder per compound: an ordered list in which consecutive species differ by one proton.
 The count of entries around the desired pH sets the proton count of the major microspecies, so the composition of the ladder changes the transformed energy directly.
-We generate the pKa ladders for every compound with a structure (source prevenance preserved), and the measured ladders of Alberty~\cite{alberty2003}, using licensed ChemAxon Marvin 26.1~\cite{marvin} for use with eQuilibrator and also via open-source MolGpKa~\cite{pan2021} for unlicensed use. 
+We generate the pKa ladders for every compound with a structure (source prevenance preserved; Figure~\ref{fig:thermo}A), and the measured ladders of Alberty~\cite{alberty2003}, using licensed ChemAxon Marvin 26.1~\cite{marvin} for use with eQuilibrator and also via open-source MolGpKa~\cite{pan2021} for unlicensed use. 
 
 \paragraph{Experimental anchors.} eQuilibrator and dGPredictor draw on the same set of experimental values derived from the NIST Thermodynamics of Enzyme-catalyzed Reactions (TECR) Database~\cite{goldberg2004}.
-There were structural conflicts in compounds mapped to ModelSEED from the KEGG IDs of TECR and the MetaNetX IDs of eQuilibrator, so to facilitate direct comparisons between thermodynamic predictions of ModelSEED reactions, we re-built the experimental anchors of TECR values and curated conflicts to map TECR directly to ModelSEED.
+There were structural conflicts in compounds mapped to ModelSEED from the KEGG~\cite{kanehisa2023} IDs of TECR and the MetaNetX~\cite{moretti2021} IDs of eQuilibrator, so to facilitate direct comparisons between thermodynamic predictions of ModelSEED reactions, we re-built the experimental anchors of TECR values and curated conflicts to map TECR directly to ModelSEED.
 We further investigated openTECR, a communal re-curation of TECR available at \url{https://github.com/opentecr}, to extend the thermodynamic anchors.
 
 \paragraph{Direction.} To conserve precedence, we use the same 2020 heuristics to derive reaction directions from the Group contribution approach~\cite{jankowski2008}, so that series stays comparable across releases.
