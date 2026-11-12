@@ -403,8 +403,7 @@ We now publish predictions of pKa, reaction energy (and respective uncertainties
 Reaction directions are graded gold, silver, or bronze according to the strength of supporting evidence, which is complemented by the prediction from an ensemble of large language models.
 These diverse sources empower users to understand agreements or discrepancies in directionality for $\sim27,000$ reactions.
 Finally, to ensure data integrity, a new conflict-resolution pipeline reconciles structures across sources, documenting input from curators.
-Our work is publicly available at \url{https://github.com/ModelSEED/ModelSEEDDatabase}.
-}
+Our work is publicly available at \url{https://github.com/ModelSEED/ModelSEEDDatabase}.}
 
 \keywords{biochemistry database, metabolic modelling, thermodynamics,
 reaction reversibility, ModelSEED}
@@ -422,7 +421,7 @@ reaction reversibility, ModelSEED}
 %% so the position of this block IS the page choice -- Figures 2 and 3 are
 %% positioned the same way, in M11 and M12 respectively, for pages 3 and 4.
 %% \ref{fig:growth} still resolves from M09, where the figure is discussed.
-\begin{figure*}[!t] \centerline{\includegraphics[width=\textwidth]{../figures/figure1_growth.pdf}} \caption{\textbf{Sources of compounds and reactions.} (\textbf{A}) compounds contributed by each source that also supplied molecular structures, 2020 against 2026: we did not introduce any new biochemistry from KEGG. The third row is ChEBI, which supplies structures but no reactions. (\textbf{B}) how the three primary reaction sources overlap, every region labelled with its reaction count. Circle areas are not proportional. Rhea identifies its compounds through ChEBI. (\textbf{C}) the share of each source's unique reactions that are complete, meaning every reagent is assigned a complete structure, so the reaction can be balanced and decomposed.} \label{fig:growth} \end{figure*}
+\begin{figure*}[!t] \centerline{\includegraphics[width=\textwidth]{../figures/figure1_growth.pdf}} \caption{\textbf{Sources of compounds and reactions.} (\textbf{A}) compounds contributed by each source that also supplied molecular structures, 2020 against 2026: we did not introduce any new biochemistry from KEGG~\cite{kanehisa2023}. The third row is ChEBI~\cite{hastings2016}, which supplies structures but no reactions. (\textbf{B}) how the three primary reaction sources overlap, every region labelled with its reaction count. Circle areas are not proportional. Rhea~\cite{bansal2022} identifies its compounds through ChEBI. (\textbf{C}) the share of each source's unique reactions that are complete, meaning every reagent is assigned a complete structure, so the reaction can be balanced and decomposed.} \label{fig:growth} \end{figure*}
 
 \section{Introduction}
 
@@ -451,11 +450,11 @@ Investigators can contribute to the ModelSEED Database through the procedure in 
 \begin{figure*}[!t]
     \centerline{\includegraphics[width=\textwidth]{../figures/figure2_thermodynamics.pdf}}
     \caption{
-        \textbf{Thermodynamic sources.} (\textbf{A}) Provenance of every pK$_\mathrm{a}$ ladder shipped in the database, across all 45,662 compounds and 48,384 reactions. ChemAxon Marvin supplies 79.4\% of compounds and 79.8\% of reactions. \emph{Hatching} marks the share computed from SMILES because Marvin refuses polymers and organometallics as query molecules. \emph{No ionizable site} edscribes 1,237 compounds that lacked a dissociable proton from Marvin between pH $-2$ and $16$. (\textbf{B}) Reactions that carry an energy computed from the source heuristic. (\textbf{C}) Reported uncertainties (kcal\,mol$^{-1}$) for each source, where the shaded band spans the 5th to 95th percentile range used in our classification scheme.
+        \textbf{Thermodynamic sources.} (\textbf{A}) Provenance of every pK$_\mathrm{a}$ ladder shipped in the database, across all 45,662 compounds and 48,384 reactions. ChemAxon Marvin supplies 79.4\% of compounds and 79.8\% of reactions. \emph{Hatching} marks the share computed from SMILES because Marvin refuses polymers and organometallics as query molecules. \emph{No ionizable site} describes 1,237 compounds that lacked a dissociable proton from Marvin between pH $-2$ and $16$. (\textbf{B}) Reactions that carry an energy computed from the source heuristic. (\textbf{C}) Reported uncertainties (kcal\,mol$^{-1}$) for each source, where the shaded band spans the 5th to 95th percentile range used in our classification scheme.
         }
     \label{fig:thermo}
 \end{figure*}
-
+    
 %% Rewritten 2026-09-08 after the Marvin 26.1 regeneration and the reversibility
 %% overhaul. Every number here is measured against the shipped files; see the
 %% inline comments for the command that reproduces each. Detail in
@@ -469,10 +468,10 @@ All values are reported at pH~7.0, ionic strength 0.25\,M, pMg~3.0 and 298.15\,K
 
 \paragraph{Protonation.} eQuilibrator's Legendre transform requires a \emph{macroscopic} pKa ladder per compound: an ordered list in which consecutive species differ by one proton.
 The count of entries around the desired pH sets the proton count of the major microspecies, so the composition of the ladder changes the transformed energy directly.
-We generate the pKa ladders for every compound with a structure (source prevenance preserved), and the measured ladders of Alberty~\cite{alberty2003}, using licensed ChemAxon Marvin 26.1~\cite{marvin} for use with eQuilibrator and also via open-source MolGpKa~\cite{pan2021} for unlicensed use. 
+We generate the pKa ladders for every compound with a structure (source prevenance preserved; Figure~\ref{fig:thermo}A), and the measured ladders of Alberty~\cite{alberty2003}, using licensed ChemAxon Marvin 26.1~\cite{marvin} for use with eQuilibrator and also via open-source MolGpKa~\cite{pan2021} for unlicensed use. 
 
 \paragraph{Experimental anchors.} eQuilibrator and dGPredictor draw on the same set of experimental values derived from the NIST Thermodynamics of Enzyme-catalyzed Reactions (TECR) Database~\cite{goldberg2004}.
-There were structural conflicts in compounds mapped to ModelSEED from the KEGG IDs of TECR and the MetaNetX IDs of eQuilibrator, so to facilitate direct comparisons between thermodynamic predictions of ModelSEED reactions, we re-built the experimental anchors of TECR values and curated conflicts to map TECR directly to ModelSEED.
+There were structural conflicts in compounds mapped to ModelSEED from the KEGG~\cite{kanehisa2023} IDs of TECR and the MetaNetX~\cite{moretti2021} IDs of eQuilibrator, so to facilitate direct comparisons between thermodynamic predictions of ModelSEED reactions, we re-built the experimental anchors of TECR values and curated conflicts to map TECR directly to ModelSEED.
 We further investigated openTECR, a communal re-curation of TECR available at \url{https://github.com/opentecr}, to extend the thermodynamic anchors.
 
 \paragraph{Direction.} To conserve precedence, we use the same 2020 heuristics to derive reaction directions from the Group contribution approach~\cite{jankowski2008}, so that series stays comparable across releases.
@@ -504,7 +503,6 @@ We provide the prompts in the repository, and describe the process and its limit
 Atom mappings are generated from the workflow of Hu{\ss} \textit{et al.}~\cite{huss2022} where they refine the per-reaction output of the Reaction Decoder Tool~\cite{rahman2016} into mappings that are comprehensive enough for reconstructing a metabolic model.
 The approach also resolves chemically equivalent atoms into symmetry groups, such as the two oxygens of CO$_2$ and the six equivalent terminal oxygens of pyrophosphate, so the ambiguity is apparent.
 The output is formatted and stored in the database, and can also be visualized in the UI.
-
 %% Consolidates the former methods_{community_ci,distribution} sections.
 \subsection{Distribution and community process}\label{sec:methods-distribution}
 
@@ -531,8 +529,8 @@ Anyone can contribute by adding and curating structures and reactions, following
 %% Table 3 in 2020 moves to Supplementary Table S1.
 \subsection{Growth and coverage}\label{sec:results-growth}
 
-The database has grown 34\% in non-obsolete compounds and reactions since 2020, driven mainly by MetaCyc and the BioCyc family.
-Reaction growth is now split across three primary databases (Figure~\ref{fig:growth}B): MetaCyc carries 26,140 reactions of which 18,893 are unique among the primary sources, KEGG 10,840 of which 5,291 are unique, and the newly-integrated Rhea 14,511 of which 8,210 are unique.
+The database has grown 34\% in non-obsolete compounds and reactions since 2020, driven mainly by MetaCyc~\cite{caspi2020} and the BioCyc family~\cite{karp2019} (Figure~\ref{fig:growth}A).
+Reaction growth is now split across three primary databases (Figure~\ref{fig:growth}B): MetaCyc~\cite{caspi2020} carries 26,140 reactions of which 18,893 are unique among the primary sources, KEGG~\cite{kanehisa2023} 10,840 of which 5,291 are unique, and the newly-integrated Rhea~\cite{bansal2022} 14,511 of which 8,210 are unique.
 The completeness of reactions, meaning whether all involved compounds are structurally defined, differs among (Figure~\ref{fig:growth}C): 90\% for MetaCyc, 75\% for KEGG, 65\% for Rhea.
 Overall structure coverage rose from 28,087 to 36,907 compounds, with the distribution of this new biochemistry described in Supplementary Methods~S5 and Supplementary Figure~S1.
 \subsection{Structure curation}\label{sec:results-structure}
@@ -556,7 +554,6 @@ Measured this way, eQuilibrator has a root mean square of 8.06 and a median of 2
 Group contribution, by contrast, has a median of 0.32 and 73.6\% within one standard deviation, and dGPredictor performs even better with a root mean square of 1.15 and 87.9\% within one standard deviation.
 % A researcher choosing by smallest reported error would systematically choose the source that understates it, which is the argument against promoting any single source. 
 The grading in the next section calibrates each source's confidence against measurement rather than taking its uncertainty at face value.
-
 \subsection{Direction assignment and evidence grading}\label{sec:results-direction}
 
 %% All direction counts re-measured 2026-10-02 from Biochemistry/reaction_*.json
@@ -596,7 +593,6 @@ Neither the thermodynamics nor the ensemble approaches capture the context of me
 
 Atom mappings are published for 26,242 reactions, 54\% of the database: 19,809 clean, and 6,433 that required salvage (which are tagged). As the mappings can be used to span a metabolic reconstruction, reactions needing one repair are likely to carry others.
 
-
 \section{Discussion}
 
 Unlike the 2020 release, this update adopts a multi-source approach rather than promoting a single thermodynamic value, publishing four sources that each have their own uncertainty and estimated direction, to capture source diversity.
@@ -604,11 +600,9 @@ Grading against experiment enables us to validate the approach: A researcher can
 As this is a generalized reference database, we intentionally exclude organism-specific data; a choice affecting transport reactions and metabolic reconstruction that we discuss in Supplementary Methods~S6.
 A current limitation is that roughly half the database lacks thermodynamic values, constrained by missing or incomplete chemical structures.
 For the remaining reactions, by explicitly reporting discrepancies among thermodynamic sources, we aim to better serve researchers who rely on standardized biochemistry for genome-scale reconstruction, flux analysis, pathway design, and predictive modeling.
-
 \section{Data availability}
 
 The ModelSEED Biochemistry Database is available at \url{https://github.com/ModelSEED/ModelSEEDDatabase} under the Creative Commons Attribution License, as versioned flat files and JSON, and archived at Zenodo (\url{https://doi.org/10.5281/zenodo.22782602}). Data directly derived from KEGG and MetaCyc remain subject to the licences of those resources. It is also queryable through a Solr endpoint and browsable at \modelseedurl. Released structures, thermodynamic values with per-source uncertainty, evidence grades, atom mappings and the low-confidence reaction flags are all in that repository. The scripts that regenerate every published value, including the eQuilibrator cache rebuild, are under \file{Scripts/Thermodynamics/}.
-
 %% Supplied by Robert Giessmann (2026-09-14), his own wording. Only change:
 %% ``wants to acknowledge'' -> ``acknowledges'' for journal register. NAR's
 %% Article structure list places Acknowledgements before Author Contributions.
@@ -643,9 +637,23 @@ This work was supported by the U.S. Department of Energy, Office of Science, Bio
 
 \section{Notice of copyright} The submitted manuscript has been created by UChicago Argonne, LLC, Operator of Argonne National Laboratory (``Argonne''). Argonne, a U.S. Department of Energy Office of Science laboratory, is operated under Contract No.~DE-AC02-06CH11357. The U.S. Government retains for itself, and others acting on its behalf, a paid-up nonexclusive, irrevocable worldwide license in said article to reproduce, prepare derivative works, distribute copies to the public, and perform publicly and display publicly, by or on behalf of the Government. The Department of Energy will provide public access to these results of federally sponsored research in accordance with the DOE Public Access Plan. \url{http://energy.gov/downloads/doe-public-access-plan}
 
-
-\bibliographystyle{nar}
 \begin{thebibliography}{10}
+
+\bibitem{kanehisa2023}
+Kanehisa, M., Furumichi, M., Sato, Y., Kawashima, M., and Ishiguro-Watanabe, M.
+  (2023)
+{KEGG} for taxonomy-based analysis of pathways and genomes.
+{\em Nucleic Acids Research,} {\bf 51}(D1), D587--D592.
+
+\bibitem{hastings2016}
+Hastings, J., Owen, G., Dekker, A., et al. (2016)
+{ChEBI} in 2016: Improved services and an expanding collection of metabolites.
+{\em Nucleic Acids Research,} {\bf 44}(D1), D1214--D1219.
+
+\bibitem{bansal2022}
+Bansal, P., Morgat, A., Axelsen, K.~B., et al. (2022)
+{Rhea}, the reaction knowledgebase in 2022.
+{\em Nucleic Acids Research,} {\bf 50}(D1), D693--D700.
 
 \bibitem{seaver2020}
 Seaver, S. M.~D., Liu, F., Zhang, Q., et al. (2021)
@@ -671,16 +679,6 @@ Zhang, C., S{\'a}nchez, B.~J., Li, F., et al. (2024)
 Caspi, R., Billington, R., Keseler, I.~M., et al. (2020)
 The {MetaCyc} database of metabolic pathways and enzymes --- a 2019 update.
 {\em Nucleic Acids Research,} {\bf 48}(D1), D445--D453.
-
-\bibitem{bansal2022}
-Bansal, P., Morgat, A., Axelsen, K.~B., et al. (2022)
-{Rhea}, the reaction knowledgebase in 2022.
-{\em Nucleic Acids Research,} {\bf 50}(D1), D693--D700.
-
-\bibitem{hastings2016}
-Hastings, J., Owen, G., Dekker, A., et al. (2016)
-{ChEBI} in 2016: Improved services and an expanding collection of metabolites.
-{\em Nucleic Acids Research,} {\bf 44}(D1), D1214--D1219.
 
 \bibitem{flamholz2012}
 Flamholz, A., Noor, E., Bar-Even, A., and Milo, R. (2012)
@@ -727,6 +725,12 @@ Thermodynamics of enzyme-catalyzed reactions --- a database for quantitative
   biochemistry.
 {\em Bioinformatics,} {\bf 20}(16), 2874--2877.
 
+\bibitem{moretti2021}
+Moretti, S., Tran, V. D.~T., Mehl, F., Ibberson, M., and Pagni, M. (2021)
+{MetaNetX/MNXref}: unified namespace for metabolites and biochemical reactions
+  in the context of metabolic models.
+{\em Nucleic Acids Research,} {\bf 49}(D1), D570--D574.
+
 \bibitem{noor2012}
 Noor, E., Bar-Even, A., Flamholz, A., et al. (2012)
 An integrated open framework for thermodynamics of reactions that combines
@@ -743,6 +747,13 @@ An automated workflow that generates atom mappings for large-scale metabolic
 Rahman, S.~A., Torrance, G., Baldacci, L., et al. (2016)
 Reaction Decoder Tool ({RDT}): extracting features from chemical reactions.
 {\em Bioinformatics,} {\bf 32}(13), 2065--2066.
+
+\bibitem{karp2019}
+Karp, P.~D., Billington, R., Caspi, R., Fulcher, C.~A., Latendresse, M.,
+  Kothari, A., Keseler, I.~M., Krummenacker, M., Midford, P.~E., Ong, Q., Ong,
+  W.~K., Paley, S.~M., and Subhraveti, P. (2019)
+The {BioCyc} collection of microbial genomes and metabolic pathways.
+{\em Briefings in Bioinformatics,} {\bf 20}(4), 1085--1093.
 
 \bibitem{henry2010}
 Henry, C.~S., DeJongh, M., Best, A.~A., Frybarger, P.~M., Linsay, B., and
@@ -783,6 +794,5 @@ Pathway thermodynamics highlights kinetic obstacles in central metabolism.
 {\em PLoS Computational Biology,} {\bf 10}(2), e1003483.
 
 \end{thebibliography}
-
 
 \end{document}
