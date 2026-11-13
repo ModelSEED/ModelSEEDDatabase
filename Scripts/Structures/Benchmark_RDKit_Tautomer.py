@@ -1,36 +1,51 @@
 #!/usr/bin/env python
-"""Benchmark RDKit canonical tautomer against Marvin 23.4 vs 26.1 (stereo-inclusive).
+"""Benchmark the shipped RDKit tautomer step (iii-RDKit) against Marvin 23.4.
 
-Compares neutral-source InChI canonicalization (RDKit TautomerEnumerator
-with SetRemoveSp3Stereo/SetRemoveBondStereo=False) against the two Marvin
-protonation bundles on 23.4 (tautomer-aware, correct) and 26.1 without
-Isomers licence (tautomer step missing, wrong microspecies: ~20% charge
-shift, imidate/amide errors).
+Focus set: compounds where the 26.1 bundle generated WITHOUT step (iii)
+disagrees with 23.4 on charge/formula or on the imidate/protonated-ring-N
+motifs.  For each, runs the SAME tautomer_canonical() that
+Run_Marvin_Protonations.py ships (uncharged first, capped canonical kept,
+stereo guard) on the source InChI, and measures parity of the structure
+handed to Marvin with 23.4's shipped protonated SMILES:
 
-Metrics are stereo-inclusive: InChI /t,/m,/s,/b layers are compared via
-MolToInchi, not just SMILES substring or formula/charge.  Reports parity
-with 23.4 vs 26.1 on tagged motifs (protonated_ring_N, imidate) and
-InChI connectivity/stereo preservation.
+  - conn_match_src / conn_match_234: InChI connectivity of the tautomer
+    vs the source, and vs 23.4's protonated output
+  - motif parity: amide vs imidate of the tautomer vs 23.4's protonated
+    motif; the imidate target table (fixed / still imidate) is the
+    headline metric for the defect step (iii) was restored to fix
+  - stereo: /t,/m,/s,/b layers of source (stereo_src), of 23.4's output
+    (stereo_234), and of the tautomer (stereo_rdk); losses are counted
+    and reported both as a share of all rows and of stereo-bearing rows
+
+This does NOT run Marvin 26.1 (no Isomers/Protonation licence here): it
+compares the input handed to MajorMicrospeciesPlugin, which performs no
+tautomer shifts, so an amide handed in stays an amide.  Final-charge
+parity against 23.4 requires a licensed run of Run_Marvin_Protonations.py
+over the sample; nothing here claims otherwise.
 
 Usage:
-    PYTHONPATH=Libs/Python /scratch/seaver/micromamba/envs/equilibrator/bin/python \\
+    PYTHONPATH=Libs/Python /scratch/seaver/micromamba/envs/equilibrator/bin/python \
         Scripts/Structures/Benchmark_RDKit_Tautomer.py [--sample 3000] [--seed 42]
     Output: _reports/benchmark_rdkit_tautomer.tsv + stdout summary
 """
 
 import argparse
 import csv
+import os
 import random
-import re
 import sys
 import time
+from collections import Counter
 from pathlib import Path
 
 MSD = Path(__file__).resolve().parents[2]
 STRUCT_ROOT = MSD / "Biochemistry" / "Structures"
+sys.path.insert(0, str(MSD / "Scripts" / "Structures"))
 
 from rdkit import Chem, RDLogger
 from rdkit.Chem.MolStandardize import rdMolStandardize
+
+from Run_Marvin_Protonations import tautomer_canonical
 
 RDLogger.DisableLog("rdApp.*")
 
@@ -48,11 +63,26 @@ def conn_layer(inchi):
 
 
 def tc_protonated(smi):
+    """Motif tags of a PROTONATED SMILES (23.4/26.1 bundle rows)."""
     tags = set()
     if smi and "[nH+]" in smi:
         tags.add("protonated_ring_N")
     if smi and ("C([O-])=N" in smi or "N=C([O-])" in smi):
         tags.add("imidate")
+    return tags
+
+
+def tc_neutral(smi):
+    """Motif tags of a NEUTRAL tautomer SMILES (what RDKit hands Marvin)."""
+    tags = set()
+    if smi and ("C(=O)N" in smi or "C(N)=O" in smi or "NC(=O)" in smi):
+        tags.add("amide")
+    if smi and ("N=C(O)" in smi or "C(O)=N" in smi):
+        tags.add("imidic_acid")
+    if smi and ("N=C([O-])" in smi or "C([O-])=N" in smi):
+        tags.add("imidate_anion")
+    if smi and "[nH+]" in smi:
+        tags.add("protonated_ring_N")
     return tags
 
 
@@ -105,17 +135,17 @@ def main():
         sample = random.sample(bench, args.sample)
     print(f"Sample {len(sample)} (seed {args.seed})")
 
-    # Enumerator with stereo-preserving flags
+    # Same enumerator/uncharger configuration as Protonator.__init__
     te = rdMolStandardize.TautomerEnumerator()
     te.SetMaxTautomers(50)
     te.SetMaxTransforms(1000)
     te.SetRemoveSp3Stereo(False)
     te.SetRemoveBondStereo(False)
+    uncharger = rdMolStandardize.Uncharger()
 
-    # Per-sample measurement
     rows = []
     t0 = time.time()
-    for src, eid, inchi, r234, r261 in sample:
+    for i, (src, eid, inchi, r234, r261) in enumerate(sample):
         entry = {
             "source": src,
             "id": eid,
@@ -128,73 +158,78 @@ def main():
         }
         mol = Chem.MolFromInchi(inchi) if inchi.startswith("InChI=") else None
         if mol is None:
-            entry.update(status="parse_fail", stereo_234="?", stereo_rdk="?", conn_match="?")
+            entry.update(status="parse_fail", cap_hit="False", stereo_src="?",
+                         stereo_234="?", stereo_rdk="?", conn_match_src="?",
+                         conn_match_234="?", motif_rdk="?", rdk_smi="")
             rows.append(entry)
             continue
 
-        # InChI stereo of neutral source vs RDKit canonical
         try:
             inchi_src = Chem.MolToInchi(mol)
             stereo_src = stereo_layer(inchi_src)
             conn_src = conn_layer(inchi_src)
         except Exception:
-            inchi_src = ""
-            stereo_src = ""
-            conn_src = ""
+            inchi_src, stereo_src, conn_src = "", "", ""
 
+        # 23.4's shipped protonated output: its stereo and connectivity
+        p234 = r234.get("structure", "")
+        pm = Chem.MolFromSmiles(p234) if p234 else None
         try:
-            res = te.Enumerate(mol)
-            # status property, not getStatus()
-            cap_hit = False
-            try:
-                if getattr(res, "status", None) is not None:
-                    from rdkit.Chem.MolStandardize.rdMolStandardize import TautomerEnumeratorStatus
+            stereo_234 = stereo_layer(Chem.MolToInchi(pm)) if pm is not None else ""
+            conn_234 = conn_layer(Chem.MolToInchi(pm)) if pm is not None else ""
+        except Exception:
+            stereo_234, conn_234 = "", ""
 
-                    if res.status != TautomerEnumeratorStatus.Completed:
-                        cap_hit = True
-            except Exception:
-                pass
-            canon = te.PickCanonical(res)
-            if canon is None:
-                entry.update(status="fallback", stereo_rdk="", conn_match="", cap_hit=str(cap_hit))
-                rows.append(entry)
-                continue
-            inchi_rdk = Chem.MolToInchi(canon)
+        # The shipped step: uncharge -> enumerate -> capped canonical kept
+        out_mol, info = tautomer_canonical(mol, te, uncharger, Chem)
+        cap_hit = info == "tautomer_cap"
+        try:
+            inchi_rdk = Chem.MolToInchi(out_mol) if out_mol is not None else ""
             stereo_rdk = stereo_layer(inchi_rdk)
             conn_rdk = conn_layer(inchi_rdk)
-            entry.update(
-                status="stereo_loss" if stereo_src and stereo_rdk != stereo_src else ("cap_hit" if cap_hit else "ok"),
-                stereo_234=stereo_src,
-                stereo_rdk=stereo_rdk,
-                conn_match=str(conn_src == conn_rdk) if conn_src and conn_rdk else "?",
-                cap_hit=str(cap_hit),
-                rdk_smi=Chem.MolToSmiles(canon)[:500],
-            )
-        except Exception as e:
-            entry.update(status=f"err:{e}", stereo_rdk="", conn_match="")
+            rdk_smi = Chem.MolToSmiles(out_mol)[:500] if out_mol is not None else ""
+        except Exception:
+            stereo_rdk, conn_rdk, rdk_smi = "", "", ""
+        entry.update(
+            status=info,
+            cap_hit=str(cap_hit),
+            stereo_src=stereo_src,
+            stereo_234=stereo_234,
+            stereo_rdk=stereo_rdk,
+            conn_match_src=str(conn_src == conn_rdk) if conn_src and conn_rdk else "?",
+            conn_match_234=str(conn_rdk == conn_234) if conn_rdk and conn_234 else "?",
+            motif_rdk=",".join(sorted(tc_neutral(rdk_smi))),
+            rdk_smi=rdk_smi,
+        )
         rows.append(entry)
+        if i % 500 == 0:
+            print(f"  {i}/{len(sample)} ({time.time()-t0:.0f}s)", flush=True)
 
     elapsed = time.time() - t0
     print(f"Done {len(rows)} in {elapsed:.1f}s ({1000*elapsed/len(rows):.1f}ms each)")
 
     # Summaries
-    from collections import Counter
-
     c_status = Counter(r["status"] for r in rows)
     print(f"Status: {dict(c_status)}")
-    n_stereo_src = sum(1 for r in rows if r.get("stereo_234"))
-    n_loss = sum(1 for r in rows if r.get("status") == "stereo_loss")
-    print(f"Stereo preservation: {n_stereo_src} with stereo, {n_loss} lost ({100*n_loss/max(n_stereo_src,1):.1f}% of stereo-bearing)")
     n_cap = sum(1 for r in rows if r.get("cap_hit") == "True")
-    print(f"Cap hits: {n_cap} ({100*n_cap/len(rows):.1f}%)")
+    print(f"Cap hits (counted, canonical still used): {n_cap} ({100*n_cap/len(rows):.1f}%)")
+    n_stereo_src = sum(1 for r in rows if r.get("stereo_src"))
+    n_loss = sum(1 for r in rows if r.get("status") == "stereo_loss")
+    print(f"Stereo loss: {n_loss}/{len(rows)} = {100*n_loss/len(rows):.1f}% of all rows, "
+          f"{100*n_loss/max(n_stereo_src,1):.1f}% of the {n_stereo_src} stereo-bearing rows")
+    for col in ("conn_match_src", "conn_match_234"):
+        c = Counter(r[col] for r in rows)
+        print(f"{col}: {dict(c)}")
 
-    # Tagged motif parity (protonated SMILES level is the right comparison)
-    for tag in ["protonated_ring_N", "imidate"]:
-        disagree = [r for r in rows if (tag in r["tc_234"]) != (tag in r["tc_261"])]
-        print(f"{tag}: 23.4 vs 26.1 differ in {len(disagree)} of sample")
-        # For these, RDKit neutral canonical C(=O)N matching 23.4 C(=O)N is the correct outcome
-        # Report via status: stereo_loss compounds are the only ones not matching 23.4's stereo
-        print(f"  (neutral C(=O)N parity: see connectivity/stereo above)")
+    # Headline parity vs 23.4: the imidate defect this step exists to fix
+    targets = [r for r in rows
+               if "imidate" in r["tc_261"].split(",") and "imidate" not in r["tc_234"].split(",")]
+    fixed = [r for r in targets
+             if "amide" in r["motif_rdk"].split(",") and "imidate_anion" not in r["motif_rdk"].split(",")]
+    still = len(targets) - len(fixed)
+    print(f"Imidate targets (26.1 wrote imidate, 23.4 wrote amide): {len(targets)}")
+    print(f"  fixed by (iii-RDKit): {len(fixed)} ({100*len(fixed)/max(len(targets),1):.1f}%)")
+    print(f"  still imidate:        {still} ({100*still/max(len(targets),1):.1f}%)")
 
     # Write TSV
     out = args.out or (STRUCT_ROOT / "_reports" / "benchmark_rdkit_tautomer.tsv")
@@ -206,12 +241,12 @@ def main():
             w.writerow(r)
     print(f"Wrote {out} ({len(rows)} rows)")
 
-    # Also print a few stereo-loss examples
     losses = [r for r in rows if r.get("status") == "stereo_loss"]
     if losses:
-        print(f"\nStereo-loss examples (/{len(losses)}):")
+        print(f"\nStereo-loss examples ({len(losses)}; the UNCHARGED INPUT is handed to Marvin,")
+        print("so stereo_rdk below equals stereo_src by construction):")
         for r in losses[:8]:
-            print(f"  {r['source']}:{r['id']}  234={r['tc_234']} 261={r['tc_261']}  stereo_src={r['stereo_234']} -> rdk={r['stereo_rdk']}")
+            print(f"  {r['source']}:{r['id']}  stereo_src={r['stereo_src'][:60]}")
 
 
 if __name__ == "__main__":

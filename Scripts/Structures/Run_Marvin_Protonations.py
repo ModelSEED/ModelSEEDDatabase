@@ -32,15 +32,27 @@ Marvin_26.1_Protonation_Run.md for the 20.3% net-charge impact.  This script
 now restores (iii) via RDKit's canonical tautomer
 (rdkit.Chem.MolStandardize.rdMolStandardize.TautomerEnumerator,
 Sitzmann et al. 2010, SetRemoveSp3Stereo/SetRemoveBondStereo=False to
-preserve chiral centres adjacent to tautomerizable bonds).  It is NOT a
-pH-7 dominant-tautomer in the Marvin sense — RDKit's scoring is a fixed
-aromaticity/carbonyl rule, not pKa-aware — but on the motifs that drove
-the bug (adenine N1, carboxamide→imidate, UTP/CTP base deprotonation)
-benchmark parity with Marvin 23.4 is 97-100%, and InChI connectivity is
-preserved in 99.7% (failures: pterins where both tautomers are pH-7
-plausible).  The tautomer step is now (iii-RDKit) between aromatize and
-microspecies; nothing else changes.  Bundle provenance records both tool
-versions (Marvin 26.1 + RDKit) and tautomer method.
+preserve chiral centres adjacent to tautomerizable bonds) — see the
+module-level tautomer_canonical() for the full contract.  Two review
+fixes are baked in: the input is first neutralized with
+rdMolStandardize.Uncharger, because MetaCyc/ChEBI/Rhea store charged
+species whose InChIs RDKit parses as imidate ANIONS N=C([O-]), and
+tautomer enumeration never moves charge, so without uncharging the
+imidate defect survives; this is safe because the Marvin microspecies
+step recomputes the pH-7 charge and the formula/charge gate still checks
+the final row against the source.  And when the enumerator hits its
+MaxTautomers/MaxTransforms cap (the only wall-clock bound that can
+interrupt the C++ enumeration) the partial canonical pick is STILL used
+and the cap counted as tautomer_cap_hit, rather than abandoning the
+compound.  RDKit's scoring is a fixed aromaticity/carbonyl rule, not
+pKa-aware, so this is NOT a pH-7 dominant-tautomer in the Marvin sense;
+parity against Marvin 23.4's shipped output is measured by
+Scripts/Structures/Benchmark_RDKit_Tautomer.py (report:
+Biochemistry/Structures/_reports/benchmark_rdkit_tautomer.tsv) on the
+compounds where 26.1-without-(iii) disagreed with 23.4.  The tautomer
+step is now (iii-RDKit) between aromatize and microspecies; nothing else
+changes.  Bundle provenance records both tool versions (Marvin 26.1 +
+RDKit) and tautomer method.
 
 INPUT SELECTION follows Run_Marvin_pKas.py: `smiles.tsv` is a strict superset
 of `inchi.tsv`, and InChI wins wherever it exists, because a charged SMILES is
@@ -329,6 +341,86 @@ def _marvin_lib(cxcalc="cxcalc"):
         "cannot locate the Marvin jars; set MARVIN_LIB to <marvinsuite>/lib")
 
 
+def _inchi_stereo_layer(inchi):
+    """Stereo layers (/t, /m, /s, /b) of an InChI, or '' if none."""
+    if not inchi or not inchi.startswith("InChI="):
+        return ""
+    parts = []
+    for seg in inchi.split("/")[1:]:
+        if seg and seg[0] in ("t", "m", "s", "b"):
+            parts.append("/" + seg)
+    return "".join(parts)
+
+
+def tautomer_canonical(rdmol, taut_enumerator, uncharger, Chem):
+    """RDKit canonical tautomer of an RDKit Mol -- the (iii-RDKit) step.
+
+    Replaces the Marvin Isomers Plugin Group TautomerizationPlugin
+    (Step iii of ChargeMol.java), which requires a licence this
+    regeneration does not hold.
+
+    CHARGED SOURCES FIRST: MetaCyc/ChEBI/Rhea store charged species, and
+    RDKit's InChI reader puts the negative charge on the oxygen, giving an
+    imidate ANION N=C([O-]).  Tautomer enumeration never moves charge, so
+    without neutralizing first the imidate defect survives untouched.  The
+    input is therefore uncharged with rdMolStandardize.Uncharger before
+    enumerating.  This is safe: Marvin's microspecies step recomputes the
+    pH-7 charge afterwards, and the formula/charge gate still compares the
+    final row against the source.
+
+    CAP POLICY: the enumerator's MaxTautomers/MaxTransforms cap is the only
+    wall-clock bound that works (a signal-based timeout cannot interrupt
+    the C++ enumeration).  When the cap is hit the (partial) canonical pick
+    is STILL USED and the cap counted as "tautomer_cap" -- abandoning the
+    compound leaves the defect in place; peptides and CoA esters are
+    exactly the molecules that hit the cap.
+
+    STEREO GUARD: the InChI stereo layers of input vs output are compared;
+    a loss of any /t,/m,/s,/b layer returns the (uncharged) input instead
+    -- stereochemistry takes precedence over tautomer normalization, and the
+    downstream gate() only checks formula/charge and would not catch it.
+
+    Returns (mol, info) where info is one of "ok", "tautomer_cap",
+    "stereo_loss", "fallback".
+    """
+    if taut_enumerator is None:
+        return rdmol, "fallback"
+
+    try:
+        inchi_before = Chem.MolToInchi(rdmol) if rdmol else ""
+    except Exception:
+        inchi_before = ""
+    stereo_before = _inchi_stereo_layer(inchi_before)
+
+    rdmol_n = uncharger.uncharge(rdmol) if uncharger is not None else rdmol
+
+    try:
+        res = taut_enumerator.Enumerate(rdmol_n)
+        capped = False
+        try:
+            if getattr(res, "status", None) is not None:
+                from rdkit.Chem.MolStandardize.rdMolStandardize import (
+                    TautomerEnumeratorStatus)
+                capped = res.status != TautomerEnumeratorStatus.Completed
+        except Exception:
+            pass
+        canon = taut_enumerator.PickCanonical(res)
+        if canon is None:
+            return rdmol_n, "fallback"
+    except Exception:
+        return rdmol_n, "fallback"
+
+    if stereo_before:
+        try:
+            stereo_after = _inchi_stereo_layer(Chem.MolToInchi(canon) if canon else "")
+            if stereo_before != stereo_after:
+                return rdmol_n, "stereo_loss"
+        except Exception:
+            pass
+
+    return canon, ("tautomer_cap" if capped else "ok")
+
+
 class Protonator:
     """MajorMicrospeciesPlugin at a fixed pH, one fragment at a time.
 
@@ -353,9 +445,11 @@ class Protonator:
             _te.SetRemoveSp3Stereo(False)
             _te.SetRemoveBondStereo(False)
             self._taut_enumerator = _te
+            self._uncharger = _rms.Uncharger()
             self._rdMolStandardize = _rms
         except Exception:
             self._taut_enumerator = None
+            self._uncharger = None
             self._rdMolStandardize = None
         if not jpype.isJVMStarted():
             jpype.startJVM(classpath=glob.glob(os.path.join(_marvin_lib(cxcalc), "*.jar")))
@@ -368,82 +462,19 @@ class Protonator:
 
     @staticmethod
     def _inchi_stereo_layer(inchi):
-        """Stereo layers (/t, /m, /s) of an InChI, or '' if none."""
-        if not inchi or not inchi.startswith("InChI="):
-            return ""
-        # Collect /t, /m, /s (and /b for older InChIs) in order
-        parts = []
-        for seg in inchi.split("/")[1:]:
-            if seg and seg[0] in ("t", "m", "s", "b"):
-                parts.append("/" + seg)
-        return "".join(parts)
+        return _inchi_stereo_layer(inchi)
 
     def _tautomer_canonical(self, rdmol):
-        """RDKit canonical tautomer of an RDKit Mol.
+        """See the module-level tautomer_canonical() for the full contract.
 
-        Replaces the Marvin Isomers Plugin Group TautomerizationPlugin
-        (Step iii of ChargeMol.java) which requires a licence this
-        regeneration does not hold.  Benchmark on 10,129 focus compounds
-        (tautomer/charge differs 23.4 vs 26.1): 97% parity on
-        protonated-ring motifs; InChI connectivity preserved in 99.7%
-        (failures: pterins where both tautomers are pH-7 plausible).
-
-        Enumerator is built in __init__ with
-        SetRemoveSp3Stereo(False) / SetRemoveBondStereo(False) so that
-        stereocentres adjacent to tautomerizable bonds are retained
-        (L-alanine, sugars, pantoate/CoA).  This flag change alone
-        accounts for the 56-compound tautomer-choice shift; building
-        the enumerator once is a performance fix, not a chemical one.
-
-        On output the InChI stereo layers of input vs output are
-        compared; a loss of any /t,/m,/s,/b layer causes the input
-        mol to be returned instead (stereochemistry takes precedence
-        over tautomer normalization; downstream gate() only checks
-        formula/charge and would not catch it).  RDKit's enumerator
-        may cap at MaxTautomers/MaxTransforms — status is counted as
-        tautomer_cap_hit so the run report reflects it.
-
-        Returns (canon_mol, info) where info is one of
-        "ok", "stereo_loss", "tautomer_cap", "fallback".
+        Uncharges first (charged source InChIs parse as imidate anions,
+        which tautomer enumeration cannot repair), uses the canonical
+        pick even when the enumerator cap is hit (counted as
+        "tautomer_cap", not abandoned), and falls back to the uncharged
+        input on stereo loss.
         """
-        Chem = self._Chem
-        if self._taut_enumerator is None:
-            return rdmol, "fallback"
-
-        # Stereo guard: record input InChI stereo before tautomerization
-        try:
-            inchi_before = Chem.MolToInchi(rdmol) if rdmol else ""
-        except Exception:
-            inchi_before = ""
-        stereo_before = self._inchi_stereo_layer(inchi_before)
-
-        try:
-            res = self._taut_enumerator.Enumerate(rdmol)
-            # RDKit status is a property `res.status`, not a method.
-            try:
-                if getattr(res, "status", None) is not None:
-                    from rdkit.Chem.MolStandardize.rdMolStandardize import TautomerEnumeratorStatus
-                    if res.status != TautomerEnumeratorStatus.Completed:
-                        return rdmol, "tautomer_cap"
-            except Exception:
-                pass
-            canon = self._taut_enumerator.PickCanonical(res)
-            if canon is None:
-                return rdmol, "fallback"
-        except Exception:
-            return rdmol, "fallback"
-
-        # Stereo verification: compare InChI stereo layers
-        if stereo_before:
-            try:
-                inchi_after = Chem.MolToInchi(canon) if canon else ""
-                stereo_after = self._inchi_stereo_layer(inchi_after)
-                if stereo_before != stereo_after:
-                    return rdmol, "stereo_loss"
-            except Exception:
-                pass
-
-        return canon, "ok"
+        return tautomer_canonical(
+            rdmol, self._taut_enumerator, self._uncharger, self._Chem)
 
     # Per-compound tautomer state: dedup counter inflation from
     # multiple calls (aromatized/unaromatized × InChI/SMILES ×
@@ -455,12 +486,14 @@ class Protonator:
 
         Marvin's own InChI and SMILES importers drop stereochemistry (61% and
         39% round-trip fidelity); its molblock importer does not (99.6%). So
-        RDKit parses the string, canonicalizes to its dominant tautomer
-        (replacing Marvin's Isomers-licensed step iii), and hands Marvin a
-        molblock instead. Falls back to a direct import only when RDKit cannot
-        read the structure at all, so that an odd structure still gets a chance
-        rather than being dropped.  stats, if given, collects tautomer
-        counters (cap hits, stereo loss, fallbacks) once per compound.
+        RDKit parses the string, uncharges it (charged sources parse as
+        imidate anions, which tautomer enumeration cannot repair), picks
+        its canonical tautomer (replacing Marvin's Isomers-licensed step
+        iii), and hands Marvin a molblock instead. Falls back to a direct
+        import only when RDKit cannot read the structure at all, so that an
+        odd structure still gets a chance rather than being dropped.
+        stats, if given, collects tautomer counters (cap hits, stereo
+        loss, fallbacks) once per compound.
         """
         Chem = self._Chem
         rdmol = (Chem.MolFromInchi(struct) if struct.startswith("InChI=")
