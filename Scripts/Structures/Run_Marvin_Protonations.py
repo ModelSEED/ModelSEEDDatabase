@@ -54,6 +54,19 @@ step is now (iii-RDKit) between aromatize and microspecies; nothing else
 changes.  Bundle provenance records both tool versions (Marvin 26.1 +
 RDKit) and tautomer method.
 
+ADENINE N1 is the one site where the 26.1 engine itself, not the missing
+tautomer step, disagrees with 23.4. 26.1 puts its basic pKa at 7.0-7.3
+(23.4: 2.2-2.5; measured ~3.5-4.2), so the microspecies protonates N1 in
+2,560 of 2,914 adenine rows (23.4: 4 of 2,951) and every adenine nucleotide,
+NAD(P), FAD and CoA ester is one unit too positive. RDKit already hands Marvin
+the standard amino tautomer, so step (iii) cannot help. After the microspecies
+step an adenine N1-H(+) is returned to neutral N1 -- 23.4's value applied at
+pH 7 -- and counted as adenine_n1_override. dH == dcharge == -1, so the
+invariant gate is unaffected. The pKa ladders get the same correction from
+Override_Adenine_N1_pKas.py. See Adenine_N1.py. Measured end-to-end through
+Marvin 26.1 on the 3,000-compound benchmark sample: charge parity with 23.4
+51.9% -> 72.8%; all 394 CoA thioesters match 23.4.
+
 INPUT SELECTION follows Run_Marvin_pKas.py: `smiles.tsv` is a strict superset
 of `inchi.tsv`, and InChI wins wherever it exists, because a charged SMILES is
 an already-deprotonated species and Marvin would be answering a different
@@ -287,6 +300,8 @@ def _rdk_ver_str(version):
 # post-hoc Repair_Protonation_Rows.py applies, so a bundle repaired after the
 # fact and one gated at generation are identical by construction.
 import Validate_Protonations as _inv                         # noqa: E402
+# Adenine N1 override (26.1 pKb ~7.0 vs 23.4 ~2.4) -- see ADENINE N1.
+import Adenine_N1                                            # noqa: E402
 
 # What Marvin calls a wildcard atom, across the notations it accepts. `R#` is
 # the one that matters and the one easiest to miss: a molblock R atom -- which
@@ -352,7 +367,145 @@ def _inchi_stereo_layer(inchi):
     return "".join(parts)
 
 
-def tautomer_canonical(rdmol, taut_enumerator, uncharger, Chem):
+# Imidic acid / lactim O-H on a carbon double-bonded to nitrogen, matched on the
+# Kekule form so that aromatic lactims (2-hydroxypyridine, the 4-hydroxy form of
+# uracil, the 6-hydroxy form of guanine) are caught as well as acyclic ones.
+_IMIDIC = None
+
+
+def normalize_amide_lactam(rdmol, Chem):
+    """Move H from an imidic-acid/lactim O to its N: -C(OH)=N-  ->  -C(=O)-NH-.
+
+    WHY. RDKit's InChI reader draws many amides as imidic acids and many
+    lactams as lactims, because InChI stores those H atoms as mobile. The
+    canonical-tautomer pick repairs most of them, but not where the
+    enumeration hits its cap (peptides, CoA esters) or where the stereo guard
+    hands back the input. Measured on the bundles generated without this
+    step: 686 compounds kept an amide N deprotonated as an imidate and 434 a
+    lactam/guanine-type ring N-H, against amide N-H pKa ~15 and uridine N3
+    9.25 / guanosine N1 9.25 measured (IUPAC). The same tautomers fed to the
+    pKa run produce spurious pKas (uridine N3 6.28 from the InChI vs 9.15
+    from the lactam).
+
+    SAFETY. Applied only if the standard InChI of the result is IDENTICAL to
+    the input's. Standard InChI treats these H as mobile, so an identical
+    InChI proves the change is a pure tautomer move: no formula, charge,
+    connectivity or stereo layer can change. Returns (mol, n_sites).
+    """
+    global _IMIDIC, _AMINO_OXO
+    if _IMIDIC is None:
+        _IMIDIC = Chem.MolFromSmarts("[O;X2;H1;+0]-[#6;X3;+0]=[#7;X2;+0]")
+        # 2-amino-pyrimidin-4-one drawn with the ring H on the N away from the
+        # C=O (RDKit's canonical pick for guanine and pterins). Guanine N1-H and
+        # pterin N3-H -- the N flanked by C-NH2 and C=O -- is the measured form;
+        # Marvin 26.1 gives guanosine 7.44 on RDKit's form vs 10.16 on N1-H
+        # (measured 9.25).
+        _AMINO_OXO = Chem.MolFromSmarts(
+            "[NX3;!R]-c1:[nX2;H0;+0:1]:c(=O):c:c:[nX3;H1;+0:2]:1")
+    try:
+        inchi_in = Chem.MolToInchi(rdmol)
+    except Exception:
+        return rdmol, 0
+    # Pass 1: 2-amino-pyrimidin-4-one ring H to the N between C-NH2 and C=O.
+    n_ring = 0
+    try:
+        moved = Chem.RWMol(rdmol)
+        for _ in range(20):
+            hits = moved.GetSubstructMatches(_AMINO_OXO)
+            if not hits:
+                break
+            m = hits[0]                        # [N, c2, n:1, c=, O, c, c, nH:2]
+            to_n, from_n = moved.GetAtomWithIdx(m[2]), moved.GetAtomWithIdx(m[7])
+            to_n.SetNumExplicitHs(1); to_n.SetNoImplicit(True)
+            from_n.SetNumExplicitHs(0); from_n.SetNoImplicit(True)
+            Chem.SanitizeMol(moved)
+            n_ring += 1
+        if n_ring:
+            cand = moved.GetMol()
+            if Chem.MolToInchi(cand) == inchi_in:
+                rdmol = cand
+            else:
+                n_ring = 0
+    except Exception:
+        n_ring = 0
+
+    # Pass 2: imidic acid / lactim O-H to N, on the Kekule form.
+    n_imidic = 0
+    try:
+        work = Chem.RWMol(rdmol)
+        Chem.Kekulize(work, clearAromaticFlags=True)
+        for _ in range(200):                  # one site per pass; conjugation can expose more
+            hits = work.GetSubstructMatches(_IMIDIC)
+            if not hits:
+                break
+            o, c, nn = hits[0]
+            work.GetBondBetweenAtoms(o, c).SetBondType(Chem.BondType.DOUBLE)
+            work.GetBondBetweenAtoms(c, nn).SetBondType(Chem.BondType.SINGLE)
+            ao, an = work.GetAtomWithIdx(o), work.GetAtomWithIdx(nn)
+            h_n = an.GetTotalNumHs()
+            ao.SetNumExplicitHs(0); ao.SetNoImplicit(True)
+            an.SetNumExplicitHs(h_n + 1); an.SetNoImplicit(True)
+            work.UpdatePropertyCache(strict=False)
+            n_imidic += 1
+        if n_imidic:
+            out = work.GetMol()
+            Chem.SanitizeMol(out)             # re-aromatizes lactam rings
+            if Chem.MolToInchi(out) == inchi_in:
+                return out, n_ring + n_imidic
+    except Exception:
+        pass
+    return rdmol, n_ring
+
+
+def make_tautomer_tools():
+    """(TautomerEnumerator, Uncharger) configured as the shipped step uses them."""
+    from rdkit.Chem.MolStandardize import rdMolStandardize as _rms
+    te = _rms.TautomerEnumerator()
+    te.SetMaxTautomers(50)
+    te.SetMaxTransforms(1000)
+    te.SetRemoveSp3Stereo(False)
+    te.SetRemoveBondStereo(False)
+    return te, _rms.Uncharger()
+
+
+_PKA_TOOLS = None
+
+
+def pka_input(struct):
+    """Structure string Run_Marvin_pKas.py feeds Marvin: the same neutral,
+    canonical, amide/lactam-normalized tautomer the protonation step uses,
+    written as isomeric SMILES. None when RDKit cannot read the structure
+    (the caller then feeds the original string). Override_Adenine_N1_pKas.py
+    calls this too, so both see the identical atom order."""
+    global _PKA_TOOLS
+    from rdkit import Chem
+    if _PKA_TOOLS is None:
+        _PKA_TOOLS = make_tautomer_tools()
+    try:
+        mol = (Chem.MolFromInchi(struct) if struct.startswith("InChI=")
+               else Chem.MolFromSmiles(struct))
+        if mol is None:
+            return None
+        out, _ = tautomer_canonical(mol, _PKA_TOOLS[0], _PKA_TOOLS[1], Chem)
+        smi = Chem.MolToSmiles(out)
+        return smi or None
+    except Exception:
+        return None
+
+
+def tautomer_canonical(rdmol, taut_enumerator, uncharger, Chem, notes=None):
+    """Canonical tautomer, then amide/lactam normalization -- see _tautomer_core.
+
+    notes, if a dict, receives notes["normalized"] = number of imidic-acid /
+    lactim sites moved to amide / lactam by normalize_amide_lactam()."""
+    mol, info = _tautomer_core(rdmol, taut_enumerator, uncharger, Chem)
+    mol, n = normalize_amide_lactam(mol, Chem)
+    if notes is not None:
+        notes["normalized"] = n
+    return mol, info
+
+
+def _tautomer_core(rdmol, taut_enumerator, uncharger, Chem):
     """RDKit canonical tautomer of an RDKit Mol -- the (iii-RDKit) step.
 
     Replaces the Marvin Isomers Plugin Group TautomerizationPlugin
@@ -439,13 +592,7 @@ class Protonator:
         # (Step iii of ChargeMol.java).  See _tautomer_canonical.
         try:
             from rdkit.Chem.MolStandardize import rdMolStandardize as _rms
-            _te = _rms.TautomerEnumerator()
-            _te.SetMaxTautomers(50)
-            _te.SetMaxTransforms(1000)
-            _te.SetRemoveSp3Stereo(False)
-            _te.SetRemoveBondStereo(False)
-            self._taut_enumerator = _te
-            self._uncharger = _rms.Uncharger()
+            self._taut_enumerator, self._uncharger = make_tautomer_tools()
             self._rdMolStandardize = _rms
         except Exception:
             self._taut_enumerator = None
@@ -464,7 +611,7 @@ class Protonator:
     def _inchi_stereo_layer(inchi):
         return _inchi_stereo_layer(inchi)
 
-    def _tautomer_canonical(self, rdmol):
+    def _tautomer_canonical(self, rdmol, notes=None):
         """See the module-level tautomer_canonical() for the full contract.
 
         Uncharges first (charged source InChIs parse as imidate anions,
@@ -474,7 +621,7 @@ class Protonator:
         input on stereo loss.
         """
         return tautomer_canonical(
-            rdmol, self._taut_enumerator, self._uncharger, self._Chem)
+            rdmol, self._taut_enumerator, self._uncharger, self._Chem, notes=notes)
 
     # Per-compound tautomer state: dedup counter inflation from
     # multiple calls (aromatized/unaromatized × InChI/SMILES ×
@@ -499,7 +646,16 @@ class Protonator:
         rdmol = (Chem.MolFromInchi(struct) if struct.startswith("InChI=")
                  else Chem.MolFromSmiles(struct))
         if rdmol is not None:
-            rdmol, info = self._tautomer_canonical(rdmol)
+            notes = {}
+            rdmol, info = self._tautomer_canonical(rdmol, notes=notes)
+            if stats is not None and notes.get("normalized"):
+                seen = self._seen_tautomer_ids
+                if seen is None:
+                    seen = self._seen_tautomer_ids = set()
+                key = (stats.get("_current_id"), "amide_lactam")
+                if key not in seen:
+                    seen.add(key)
+                    stats["amide_lactam_normalized"] = stats.get("amide_lactam_normalized", 0) + 1
             # stats dedup: one (external_id, struct) may be tried up to
             # four times (aromatized/unaromatized × candidates); count
             # each external_id once per non-ok outcome.
@@ -546,6 +702,16 @@ class Protonator:
             fused.fuse(self.plugin.getMajorMicrospecies(), False)
         if fused.getAtomCount() == 0:
             return None
+        # Adenine N1: 26.1 puts its pKb at ~7.0 and protonates it; 23.4 put
+        # it at ~2.4. Use 23.4's -- see Adenine_N1.py and ADENINE N1 above.
+        if Adenine_N1.deprotonate_n1(fused, self.MolExporter) and stats is not None:
+            seen = self._seen_tautomer_ids
+            if seen is None:
+                seen = self._seen_tautomer_ids = set()
+            key = (stats.get("_current_id"), "adenine_n1")
+            if key not in seen:
+                seen.add(key)
+                stats["adenine_n1_override"] = stats.get("adenine_n1_override", 0) + 1
         return fused
 
     def protonate_best(self, candidates, stats=None):
@@ -664,7 +830,8 @@ def process(source, version, ph, limit=0, cxcalc="cxcalc"):
              "smiles_preferred_disconnected_inchi": 0, "inchi_from_inchi_form": 0,
              "passthrough_invariant": 0,
              "tautomer_fallback": 0, "tautomer_cap_hit": 0,
-             "tautomer_stereo_loss": 0}
+             "tautomer_stereo_loss": 0, "adenine_n1_override": 0,
+             "amide_lactam_normalized": 0}
     # Source formula/charge per (external_id, type), the reference every
     # protonated row is gated against. inchi.tsv/smiles.tsv, already on disk.
     _inv.STRUCT = STRUCT_ROOT
@@ -880,7 +1047,9 @@ def process(source, version, ph, limit=0, cxcalc="cxcalc"):
           f"passthrough_invariant={stats['passthrough_invariant']} "
           f"tautomer_fallback={stats['tautomer_fallback']:<4} "
           f"tautomer_cap={stats['tautomer_cap_hit']:<4} "
-          f"tautomer_stereo_loss={stats['tautomer_stereo_loss']:<4}")
+          f"tautomer_stereo_loss={stats['tautomer_stereo_loss']:<4} "
+          f"adenine_n1_override={stats['adenine_n1_override']:<4} "
+          f"amide_lactam_normalized={stats['amide_lactam_normalized']:<4}")
     print(f"{'':<8} rows={len(out_rows):<7} -> {os.path.relpath(out_path, STRUCT_ROOT)}")
     return out_path, stats
 
@@ -893,7 +1062,8 @@ def main():
     except Exception:
         _rdk_ver = "unknown"
     print(f"Marvin {version} MajorMicrospeciesPlugin + RDKit {_rdk_ver} "
-          f"TautomerEnumerator (tautomer step iii-RDKit), pH {_ARGS.ph}\n")
+          f"TautomerEnumerator (tautomer step iii-RDKit) + adenine N1 at 23.4's pKa, "
+          f"pH {_ARGS.ph}\n")
     for source in (_ARGS.sources or SOURCES):
         process(source, version, _ARGS.ph, limit=_ARGS.limit, cxcalc=cxcalc)
 
