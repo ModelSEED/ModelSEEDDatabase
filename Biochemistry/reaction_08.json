@@ -40464,13 +40464,13 @@
             "metanetx.reaction: MNXR135800",
             "Name: fatty-acyl-ACP hydrolase; fatty-acyl-ACP hydrolase ((9Z)-n-C16:1)"
         ],
-        "code": "(1) cpd00001[0] + (1) cpd15239[0] <=> (1) cpd11493[0] + (1) cpd15237[0]",
-        "compound_ids": "cpd00001;cpd11493;cpd15237;cpd15239",
-        "definition": "(1) H2O[0] + (1) Hexadecenoyl-ACP[0] <=> (1) ACP[0] + (1) hexadecenoate[0]",
+        "code": "(1) cpd00001[0] + (1) cpd27830[0] <=> (1) cpd11493[0] + (1) cpd15237[0]",
+        "compound_ids": "cpd00001;cpd00067;cpd11493;cpd15237;cpd27830",
+        "definition": "(1) H2O[0] + (1) Palmitoleoyl-ACPs[0] <=> (1) H+[0] + (1) ACP[0] + (1) hexadecenoate[0]",
         "ec_numbers": [
             "3.1.2.14"
         ],
-        "equation": "(1) cpd00001[0] + (1) cpd15239[0] <=> (1) cpd11493[0] + (1) cpd15237[0]",
+        "equation": "(1) cpd00001[0] + (1) cpd27830[0] <=> (1) cpd00067[0] + (1) cpd11493[0] + (1) cpd15237[0]",
         "id": "rxn08437",
         "is_obsolete": 0,
         "is_transport": 0,
@@ -40484,7 +40484,7 @@
         "pathways": null,
         "reversibility": "?",
         "source": "Secondary Database",
-        "status": "CI:-2",
+        "status": "OK",
         "stoichiometry": [
             {
                 "charge": 0,
@@ -40495,12 +40495,20 @@
                 "name": "H2O"
             },
             {
-                "charge": -1,
+                "charge": -2,
                 "coefficient": -1,
                 "compartment": 0,
-                "compound": "cpd15239",
-                "formula": "C27H49N2O8PRS",
-                "name": "Hexadecenoyl-ACP"
+                "compound": "cpd27830",
+                "formula": "C27H50N2O8PRS",
+                "name": "Palmitoleoyl-ACPs"
+            },
+            {
+                "charge": 1,
+                "coefficient": 1,
+                "compartment": 0,
+                "compound": "cpd00067",
+                "formula": "H",
+                "name": "H+"
             },
             {
                 "charge": -2,
@@ -46357,11 +46365,11 @@
             "metanetx.reaction: MNXR99510",
             "Name: release of Fe(III) from ferric 2,3-dihydroxybenzoylserine"
         ],
-        "code": "(1) cpd15460[0] <=> (1) cpd10516[0] + (1) cpd15332[0]",
-        "compound_ids": "cpd10516;cpd15332;cpd15460",
-        "definition": "(1) ferric 2,3-dihydroxybenzoylserine[0] <=> (1) Fe+3[0] + (1) 2,3-dihydroxybenzoylserine[0]",
+        "code": "(1) cpd15460[0] <=> (1) cpd10516[0] + (1) cpd26520[0]",
+        "compound_ids": "cpd00067;cpd10516;cpd15460;cpd26520",
+        "definition": "(4) H+[0] + (1) ferric 2,3-dihydroxybenzoylserine[0] <=> (1) Fe+3[0] + (1) (2,3-dihydroxybenzoylserine)3[0]",
         "ec_numbers": null,
-        "equation": "(1) cpd15460[0] <=> (1) cpd10516[0] + (1) cpd15332[0]",
+        "equation": "(4) cpd00067[0] + (1) cpd15460[0] <=> (1) cpd10516[0] + (1) cpd26520[0]",
         "id": "rxn08480",
         "is_obsolete": 0,
         "is_transport": 0,
@@ -46374,8 +46382,16 @@
         "pathways": null,
         "reversibility": "?",
         "source": "Secondary Database",
-        "status": "MI:C:-20/H:-12/N:-2/O:-10|CI:6",
+        "status": "OK",
         "stoichiometry": [
+            {
+                "charge": 1,
+                "coefficient": -4,
+                "compartment": 0,
+                "compound": "cpd00067",
+                "formula": "H",
+                "name": "H+"
+            },
             {
                 "charge": -4,
                 "coefficient": -1,
@@ -46390,15 +46406,15 @@
                 "compartment": 0,
                 "compound": "cpd10516",
                 "formula": "Fe",
-                "name": "fe3"
+                "name": "Fe+3"
             },
             {
-                "charge": -1,
+                "charge": -3,
                 "coefficient": 1,
                 "compartment": 0,
-                "compound": "cpd15332",
-                "formula": "C10H10NO6",
-                "name": "2,3-dihydroxybenzoylserine"
+                "compound": "cpd26520",
+                "formula": "C30H26N3O16",
+                "name": "(2,3-dihydroxybenzoylserine)3"
             }
         ],
         "thermodynamics": {
@@ -51647,9 +51663,9 @@
         },
         "code": "(1) cpd00061[0] + (1) cpd00082[1] <=> (1) cpd00020[0] + (1) cpd00072[0]",
         "compound_ids": "cpd00020;cpd00061;cpd00072;cpd00082",
-        "definition": "(1) Phosphoenolpyruvate[0] + (1) D-Fructose[1] <=> (1) Pyruvate[0] + (1) D-fructose-6-phosphate[0]",
+        "definition": "(1) Phosphoenolpyruvate[0] + (1) D-Fructose[1] => (1) Pyruvate[0] + (1) D-fructose-6-phosphate[0]",
         "ec_numbers": null,
-        "equation": "(1) cpd00061[0] + (1) cpd00082[1] <=> (1) cpd00020[0] + (1) cpd00072[0]",
+        "equation": "(1) cpd00061[0] + (1) cpd00082[1] => (1) cpd00020[0] + (1) cpd00072[0]",
         "id": "rxn08535",
         "is_obsolete": 0,
         "is_transport": 1,
@@ -52913,13 +52929,13 @@
             "metanetx.reaction: MNXR135828",
             "Name: glycerol-3-phosphate acyltransferase (C16:1)"
         ],
-        "code": "(1) cpd00080[0] + (1) cpd15239[0] <=> (1) cpd11493[0] + (1) cpd15326[0]",
-        "compound_ids": "cpd00067;cpd00080;cpd11493;cpd15239;cpd15326",
-        "definition": "(2) H+[0] + (1) Glycerol-3-phosphate[0] + (1) Hexadecenoyl-ACP[0] <=> (1) ACP[0] + (1) 1-hexadec-9-enoyl-sn-glycerol 3-phosphate[0]",
+        "code": "(1) cpd00080[0] + (1) cpd27830[0] <=> (1) cpd11493[0] + (1) cpd44604[0]",
+        "compound_ids": "cpd00080;cpd11493;cpd27830;cpd44604",
+        "definition": "(1) Glycerol-3-phosphate[0] + (1) Palmitoleoyl-ACPs[0] <=> (1) ACP[0] + (1) a 1-hexadec-9-enoyl-sn-glycerol 3-phosphate[0]",
         "ec_numbers": [
             "2.3.1.15"
         ],
-        "equation": "(2) cpd00067[0] + (1) cpd00080[0] + (1) cpd15239[0] <=> (1) cpd11493[0] + (1) cpd15326[0]",
+        "equation": "(1) cpd00080[0] + (1) cpd27830[0] <=> (1) cpd11493[0] + (1) cpd44604[0]",
         "id": "rxn08550",
         "is_obsolete": 0,
         "is_transport": 0,
@@ -52933,16 +52949,8 @@
         "pathways": null,
         "reversibility": "?",
         "source": "Secondary Database",
-        "status": "CI:-2",
+        "status": "OK",
         "stoichiometry": [
-            {
-                "charge": 1,
-                "coefficient": -2,
-                "compartment": 0,
-                "compound": "cpd00067",
-                "formula": "H",
-                "name": "H+"
-            },
             {
                 "charge": -2,
                 "coefficient": -1,
@@ -52952,12 +52960,12 @@
                 "name": "Glycerol-3-phosphate"
             },
             {
-                "charge": -1,
+                "charge": -2,
                 "coefficient": -1,
                 "compartment": 0,
-                "compound": "cpd15239",
-                "formula": "C27H49N2O8PRS",
-                "name": "Hexadecenoyl-ACP"
+                "compound": "cpd27830",
+                "formula": "C27H50N2O8PRS",
+                "name": "Palmitoleoyl-ACPs"
             },
             {
                 "charge": -2,
@@ -52968,12 +52976,12 @@
                 "name": "ACP"
             },
             {
-                "charge": -1,
+                "charge": -2,
                 "coefficient": 1,
                 "compartment": 0,
-                "compound": "cpd15326",
-                "formula": "C19H36O7P",
-                "name": "1-hexadec-9-enoyl-sn-glycerol 3-phosphate"
+                "compound": "cpd44604",
+                "formula": "C19H35O7P",
+                "name": "a 1-hexadec-9-enoyl-sn-glycerol 3-phosphate"
             }
         ],
         "thermodynamics": {
@@ -59063,9 +59071,9 @@
         },
         "code": "(1) cpd00027[1] + (1) cpd00061[0] <=> (1) cpd00020[0] + (1) cpd00079[0]",
         "compound_ids": "cpd00020;cpd00027;cpd00061;cpd00079",
-        "definition": "(1) D-Glucose[1] + (1) Phosphoenolpyruvate[0] <=> (1) Pyruvate[0] + (1) D-glucose-6-phosphate[0]",
+        "definition": "(1) D-Glucose[1] + (1) Phosphoenolpyruvate[0] => (1) Pyruvate[0] + (1) D-glucose-6-phosphate[0]",
         "ec_numbers": null,
-        "equation": "(1) cpd00027[1] + (1) cpd00061[0] <=> (1) cpd00020[0] + (1) cpd00079[0]",
+        "equation": "(1) cpd00027[1] + (1) cpd00061[0] => (1) cpd00020[0] + (1) cpd00079[0]",
         "id": "rxn08612",
         "is_obsolete": 1,
         "is_transport": 1,
