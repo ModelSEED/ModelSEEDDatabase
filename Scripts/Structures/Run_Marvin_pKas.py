@@ -369,6 +369,11 @@ def main():
     print(f"Marvin {version} via {cxcalc}  (structures={_ARGS.structures})\n")
     for source in (_ARGS.sources or SOURCES):
         process(source, version, structures=_ARGS.structures, cxcalc=cxcalc)
+    # Adenine N1: 26.1 puts it at ~7.0, 23.4 at ~2.4 (measured ~3.5-4.2).
+    # Replace it with 23.4's value -- see Adenine_N1.py.
+    if _ARGS.structures == "both":
+        import Override_Adenine_N1_pKas
+        Override_Adenine_N1_pKas.run(_ARGS.sources or SOURCES, version)
 
 
 if __name__ == "__main__":
