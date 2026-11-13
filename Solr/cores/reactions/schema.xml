@@ -22,12 +22,12 @@
                               doc_type=thermo_evidence)
               fields: grade, assessment, cross_source, source
 
-     Four sources appear under thermodynamics: eQuilibrator, Group
-     contribution, dGPredictor, and LLMs. The LLMs child carries an `operator`
-     and NO energy or error — the ensemble reasons from the reaction rather
-     than from a number, so there is nothing to report. Consumers averaging or
-     sorting on `energy` therefore see three sources, not four, which is
-     intended: the LLM call ships in the index but is excluded from the
+     Five sources appear under thermodynamics: eQuilibrator, Group
+     contribution, dGPredictor, dGbyG, and LLMs. The LLMs child carries an
+     `operator` and NO energy or error — the ensemble reasons from the reaction
+     rather than from a number, so there is nothing to report. Consumers
+     averaging or sorting on `energy` therefore see four sources, not five,
+     which is intended: the LLM call ships in the index but is excluded from the
      evidence grading and cannot become the recommended direction.
 
      thermo_evidence duplicates the reaction-level grade that is also flat on

@@ -7,12 +7,13 @@ Steps:
    into `Scripts/Tests/dev_baseline/`. Cached; re-extracted only on demand.
 2. Run the Thermodynamics pipeline (same commands as `Rerun_Thermodynamics.sh`).
    This mutates `Biochemistry/*.json` in place — expected behavior.
-3. Compare the current tree against the baseline. Checks four things per
+3. Compare the current tree against the baseline. Checks five things per
    shared reaction:
       * top-level `reversibility`
       * `thermodynamics['Group contribution'][2]` (GC operator)
       * `thermodynamics['eQuilibrator'][2]`       (EQ operator)
       * `thermodynamics['dGPredictor'][2]`        (DGP operator)
+      * `thermodynamics['dGbyG'][2]`              (DGB operator)
    Print a concise summary and exit 0 on PASS, 1 on FAIL.
 
 Usage:
@@ -47,6 +48,7 @@ SOURCES = [
     ('GC',  'Group contribution'),
     ('EQ',  'eQuilibrator'),
     ('DGP', 'dGPredictor'),
+    ('DGB', 'dGbyG'),
 ]
 
 # Sources whose per-method operator must stay byte-identical to the baseline.
@@ -68,8 +70,11 @@ INVARIANT_SOURCES = ['Group contribution']
 # set was introduced; the two dGPredictor sources moved when the Noor 2012
 # reversibility index replaced the GC concentration-bounds fallback for them.
 # Group contribution is deliberately NOT here -- it is the byte-compare anchor,
-# and any drift in it is a real regression.
-EXPECTED_CHANGE_SOURCES = ['eQuilibrator', 'dGPredictor',
+# and any drift in it is a real regression. dGbyG is here because it is new:
+# a baseline from before it was added has no dGbyG entries, so the comparison
+# (which only scores reactions carrying the source on both sides) is empty for
+# it until the baseline itself includes dGbyG.
+EXPECTED_CHANGE_SOURCES = ['eQuilibrator', 'dGPredictor', 'dGbyG',
                            ]
 
 PIPELINE = [
@@ -80,6 +85,9 @@ PIPELINE = [
     ['./Update_Reaction_eQuilibrator_Energies.py'],
 
     ['./Update_Reaction_dGPredictor_Energies.py'],
+
+    ['./Update_Compound_dGbyG_Energies.py'],
+    ['./Update_Reaction_dGbyG_Energies.py'],
     ['./Add_Reaction_Thermodynamics_Operators.py'],
     # Must follow the operator backfill: that step refreshes every source's
     # operator from its stored energy, and the LLM ensemble has none by design,

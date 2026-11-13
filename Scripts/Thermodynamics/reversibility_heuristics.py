@@ -616,11 +616,19 @@ def make_ri_heuristics(z=0.0, threshold=LN_RI_THRESHOLD,
     return rules
 
 
-# eQuilibrator and both dGPredictor sources now build from ONE factory with
-# IDENTICAL arguments. Keeping two constants preserves the registry seam (and the
+# eQuilibrator, dGPredictor and dGbyG all build from ONE factory with IDENTICAL
+# arguments. Keeping a constant per source preserves the registry seam (and the
 # EQ/DGP report levels) should they ever need to diverge again; today they
-# do not, and any change must be made to both deliberately rather than to one by
+# do not, and any change must be made to each deliberately rather than to one by
 # accident.
+#
+# dGbyG (Fan et al. 2025, Cell Systems; Biochemistry/Thermodynamics/dGbyG/)
+# publishes dG + sigma like the other two, so it gets the same index rule. Its
+# sigma is the spread of a 100-head ensemble -- median 2.79 kcal/mol, max 341.70
+# over its 27,066 records -- so the 2,500 gate never fires on it. Reactions whose
+# heads all agree exactly (sigma 0.00: sides dGbyG cannot tell apart, which the
+# index rule would call reversible with certainty) are withheld upstream by
+# Generate_dGbyG_Energies.py, not here.
 #
 # THE SIGMA GATE IS NOW SHARED, and the separation is clean. dGPredictor has no
 # "could not decompose" marker -- an unseen fragment contributes nothing to the
@@ -674,6 +682,8 @@ EQ_HEURISTICS = make_ri_heuristics(z=EQ_CONFIDENCE_Z,
                                    sigma_gate=EQ_UNDECOMPOSABLE_SIGMA)
 DGP_HEURISTICS = make_ri_heuristics(z=EQ_CONFIDENCE_Z,
                                     sigma_gate=EQ_UNDECOMPOSABLE_SIGMA)
+DGB_HEURISTICS = make_ri_heuristics(z=EQ_CONFIDENCE_Z,
+                                    sigma_gate=EQ_UNDECOMPOSABLE_SIGMA)
 
 
 # --- Rule-set registry ----------------------------------------------------
@@ -685,6 +695,7 @@ HEURISTIC_SETS = {
     'GC_CANONICAL': GC_CANONICAL_HEURISTICS,
     'EQ': EQ_HEURISTICS,
     'DGP': DGP_HEURISTICS,
+    'DGB': DGB_HEURISTICS,
 }
 
 DEFAULT_HEURISTIC_SET = 'GC'
@@ -696,6 +707,7 @@ DEFAULT_HEURISTIC_SET = 'GC'
 SOURCE_HEURISTIC_SET = {
     'eQuilibrator': 'EQ',
     'dGPredictor': 'DGP',
+    'dGbyG': 'DGB',
 }
 
 

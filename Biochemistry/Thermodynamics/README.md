@@ -13,6 +13,9 @@ The estimates come from four sources today:
 - **dGPredictor** — Wang et al. 2021 (<a href="https://doi.org/10.1371/journal.pcbi.1009448">10.1371/journal.pcbi.1009448</a>);
   a group-decomposition + ML model, retrained here on the current ModelSEED
   compound corpus rather than using the Wang lab's shipped weights.
+- **dGbyG** — Fan et al. 2025 (<a href="https://doi.org/10.1016/j.cels.2025.101393">10.1016/j.cels.2025.101393</a>);
+  a graph-neural-network ensemble, its shipped model run over ModelSEED's own
+  structures at pH 7, I 0.25 M, pMg 14 (see `dGbyG/README.md`).
 
 Values are kept as per-source dicts under the `thermodynamics` key on
 every compound and reaction JSON record. The dict shape is:
@@ -21,7 +24,8 @@ every compound and reaction JSON record. The dict shape is:
 "thermodynamics": {
     "Group contribution":    [4.15, 1.22, "="],
     "eQuilibrator":          [-3.46, 0.05, ">"],
-    "dGPredictor":           [-3.82, 0.02, ">"]
+    "dGPredictor":           [-3.82, 0.02, ">"],
+    "dGbyG":                 [-3.61, 0.33, ">"]
 }
 ```
 
@@ -118,8 +122,8 @@ for the mean-across-aliases resolver).
 
 ## Non-GC sources still ship in Convention B
 
-`thermodynamics["eQuilibrator"]` and `thermodynamics["dGPredictor"]`
-currently ship in **Convention B**
+`thermodynamics["eQuilibrator"]`, `thermodynamics["dGPredictor"]` and
+`thermodynamics["dGbyG"]` currently ship in **Convention B**
 (what those tools emit). Bringing them into Convention A is a separate
 follow-up PR that requires per-compound n<sub>H</sub> lookup and a
 uniform transform pass.

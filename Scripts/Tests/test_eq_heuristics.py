@@ -141,6 +141,10 @@ def test_registry():
     # falling back to the GC concentration bounds.
     check('dGPredictor -> DGP',
           rh.heuristics_for_source('dGPredictor') is rh.DGP_HEURISTICS)
+    # dGbyG publishes dG + sigma like dGPredictor and runs the same index rule;
+    # unregistered it would silently fall back to GC (7,587 operators differ).
+    check('dGbyG -> DGB',
+          rh.heuristics_for_source('dGbyG') is rh.DGB_HEURISTICS)
     # The retired predecessor label is now UNKNOWN and must fall back to GC
     # like any other, not silently resolve to DGP as if the source still existed.
     check('retired predecessor label falls back to GC',
