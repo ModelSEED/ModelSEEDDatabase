@@ -254,6 +254,19 @@ sys.path.insert(0, os.path.join(
 # see FORMULA AND CHARGE.
 from Print_Structure_Formula_Charge import parse_structure    # noqa: E402
 from BiochemPy import Compounds                              # noqa: E402
+
+_RDKIT_VER_STR = None
+
+def _rdk_ver_str(version):
+    """tool_version string with RDKit provenance, computed once."""
+    global _RDKIT_VER_STR
+    if _RDKIT_VER_STR is None:
+        try:
+            from rdkit import __version__ as _v
+        except Exception:
+            _v = ""
+        _RDKIT_VER_STR = f"{version}+rdkit{_v}" if _v else version
+    return _RDKIT_VER_STR
 # THE GATE. A protonation moves protons, so a protonated row must satisfy
 # dH == dcharge against its source with heavy atoms conserved. A row that does
 # not is not a protonation state -- InChI disconnected a metal cluster and the
@@ -274,7 +287,6 @@ WILDCARD_SYMBOLS = {"*", "A", "R", "R#"}
 HAS_R_GROUP = re.compile(r"R(?![a-z])")
 
 TOOL = "Marvin+RDKit"
-TOOL_TAUTOMER = "RDKit"
 
 STRUCT_ROOT = os.path.join(
     os.path.dirname(os.path.abspath(__file__)), "..", "..", "Biochemistry", "Structures"
@@ -366,32 +378,36 @@ class Protonator:
                 parts.append("/" + seg)
         return "".join(parts)
 
-    def _tautomer_canonical(self, rdmol, stats=None):
+    def _tautomer_canonical(self, rdmol):
         """RDKit canonical tautomer of an RDKit Mol.
 
         Replaces the Marvin Isomers Plugin Group TautomerizationPlugin
         (Step iii of ChargeMol.java) which requires a licence this
         regeneration does not hold.  Benchmark on 10,129 focus compounds
         (tautomer/charge differs 23.4 vs 26.1): 97% parity on
-        protonated-ring motifs with status-quo settings; InChI
-        connectivity preserved in 99.7% (failures: pterins where both
-        tautomers are pH-7 plausible).
+        protonated-ring motifs; InChI connectivity preserved in 99.7%
+        (failures: pterins where both tautomers are pH-7 plausible).
 
-        Uses the enumerator built in __init__ with
+        Enumerator is built in __init__ with
         SetRemoveSp3Stereo(False) / SetRemoveBondStereo(False) so that
         stereocentres adjacent to tautomerizable bonds are retained
-        (L-alanine, sugars, pantoate/CoA).  After canonicalization the
-        InChI stereo layers of input vs output are compared; a loss is
-        counted and the input stereo is restored where possible.
+        (L-alanine, sugars, pantoate/CoA).  This flag change alone
+        accounts for the 56-compound tautomer-choice shift; building
+        the enumerator once is a performance fix, not a chemical one.
+
+        On output the InChI stereo layers of input vs output are
+        compared; a loss of any /t,/m,/s,/b layer causes the input
+        mol to be returned instead (stereochemistry takes precedence
+        over tautomer normalization; downstream gate() only checks
+        formula/charge and would not catch it).  RDKit's enumerator
+        may cap at MaxTautomers/MaxTransforms — status is counted as
+        tautomer_cap_hit so the run report reflects it.
 
         Returns (canon_mol, info) where info is one of
         "ok", "stereo_loss", "tautomer_cap", "fallback".
-        Never drops a compound — on any failure the input is returned
-        as a fallback.
         """
-        if self._taut_enumerator is None or self._rdMolStandardize is None:
-            if stats is not None:
-                stats["tautomer_fallback"] = stats.get("tautomer_fallback", 0) + 1
+        Chem = self._Chem
+        if self._taut_enumerator is None:
             return rdmol, "fallback"
 
         # Stereo guard: record input InChI stereo before tautomerization
@@ -403,28 +419,18 @@ class Protonator:
 
         try:
             res = self._taut_enumerator.Enumerate(rdmol)
-            # RDKit caps the enumeration; count it
+            # RDKit status is a property `res.status`, not a method.
             try:
-                n_tauts = len(list(res)) if hasattr(res, "__len__") else 0
-            except Exception:
-                n_tauts = 0
-            # getStatus() is available on TautomerEnumeratorResult in newer RDKit
-            try:
-                from rdkit.Chem.MolStandardize.rdMolStandardize import TautomerEnumeratorStatus
-                if hasattr(res, "getStatus"):
-                    if res.getStatus() != TautomerEnumeratorStatus.Completed:
-                        if stats is not None:
-                            stats["tautomer_cap_hit"] = stats.get("tautomer_cap_hit", 0) + 1
+                if getattr(res, "status", None) is not None:
+                    from rdkit.Chem.MolStandardize.rdMolStandardize import TautomerEnumeratorStatus
+                    if res.status != TautomerEnumeratorStatus.Completed:
+                        return rdmol, "tautomer_cap"
             except Exception:
                 pass
             canon = self._taut_enumerator.PickCanonical(res)
             if canon is None:
-                if stats is not None:
-                    stats["tautomer_fallback"] = stats.get("tautomer_fallback", 0) + 1
                 return rdmol, "fallback"
         except Exception:
-            if stats is not None:
-                stats["tautomer_fallback"] = stats.get("tautomer_fallback", 0) + 1
             return rdmol, "fallback"
 
         # Stereo verification: compare InChI stereo layers
@@ -433,21 +439,16 @@ class Protonator:
                 inchi_after = Chem.MolToInchi(canon) if canon else ""
                 stereo_after = self._inchi_stereo_layer(inchi_after)
                 if stereo_before != stereo_after:
-                    if stats is not None:
-                        stats["tautomer_stereo_loss"] = stats.get("tautomer_stereo_loss", 0) + 1
-                    # Restore stereo via AssignStereochemistryFrom3D is not
-                    # applicable; best we can do is return input for
-                    # compounds where stereo was demonstrably lost, since
-                    # tautomer preservation is secondary to stereochemistry.
-                    # For now count the loss and still return canon — the
-                    # molblock bridge preserves /t,/m better than InChI
-                    # round-tripping suggests; downstream validation will
-                    # catch any real regression (see Marvin_26.1_Protonation_Run.md
-                    # 99.6% InChI reproduction check).
+                    return rdmol, "stereo_loss"
             except Exception:
                 pass
 
         return canon, "ok"
+
+    # Per-compound tautomer state: dedup counter inflation from
+    # multiple calls (aromatized/unaromatized × InChI/SMILES ×
+    # disconnected-InChI row).  process() clears this each compound.
+    _seen_tautomer_ids = None
 
     def _import(self, struct, stats=None):
         """Marvin Molecule for a structure string, bridged through RDKit.
@@ -459,13 +460,29 @@ class Protonator:
         molblock instead. Falls back to a direct import only when RDKit cannot
         read the structure at all, so that an odd structure still gets a chance
         rather than being dropped.  stats, if given, collects tautomer
-        counters (cap hits, stereo loss, fallbacks).
+        counters (cap hits, stereo loss, fallbacks) once per compound.
         """
         Chem = self._Chem
         rdmol = (Chem.MolFromInchi(struct) if struct.startswith("InChI=")
                  else Chem.MolFromSmiles(struct))
         if rdmol is not None:
-            rdmol, _ = self._tautomer_canonical(rdmol, stats=stats)
+            rdmol, info = self._tautomer_canonical(rdmol)
+            # stats dedup: one (external_id, struct) may be tried up to
+            # four times (aromatized/unaromatized × candidates); count
+            # each external_id once per non-ok outcome.
+            if stats is not None and info != "ok":
+                seen = self._seen_tautomer_ids
+                if seen is None:
+                    seen = self._seen_tautomer_ids = set()
+                key = (stats.get("_current_id"), info)
+                if key not in seen:
+                    seen.add(key)
+                    if info == "tautomer_cap":
+                        stats["tautomer_cap_hit"] = stats.get("tautomer_cap_hit", 0) + 1
+                    elif info == "stereo_loss":
+                        stats["tautomer_stereo_loss"] = stats.get("tautomer_stereo_loss", 0) + 1
+                    elif info == "fallback":
+                        stats["tautomer_fallback"] = stats.get("tautomer_fallback", 0) + 1
             block = Chem.MolToMolBlock(rdmol, kekulize=True)
             if block:
                 return self.MolImporter.importMol(block)
@@ -639,6 +656,8 @@ def process(source, version, ph, limit=0, cxcalc="cxcalc"):
         return src[2], src[0], src[1]
 
     for ext_id, smiles in compounds:
+        stats["_current_id"] = ext_id
+        prot._seen_tautomer_ids = set()
         # InChI first, the compound's own SMILES as the fallback rung -- unless
         # the InChI is the MORE fragmented of the two, which means it has
         # disconnected something the SMILES keeps bonded. See INPUT SELECTION.
@@ -728,11 +747,7 @@ def process(source, version, ph, limit=0, cxcalc="cxcalc"):
         smile_formula, smile_charge = columns("SMILE", smile_out)
         smile_out, smile_formula, smile_charge = gate(
             "SMILE", smile_out, smile_formula, smile_charge)
-        try:
-            from rdkit import __version__ as _rdk_ver2
-        except Exception:
-            _rdk_ver2 = ""
-        ver_str = f"{version}+rdkit{_rdk_ver2}" if _rdk_ver2 else version
+        ver_str = _rdk_ver_str(version)
         out_rows.append((ext_id, "SMILE", smile_out, smile_formula, smile_charge,
                          TOOL, ver_str, ph_out, generated_on))
 
@@ -820,6 +835,8 @@ def process(source, version, ph, limit=0, cxcalc="cxcalc"):
             for row in passed_through:
                 fh.write("\t".join(str(c) for c in row) + "\n")
 
+    # _current_id is internal loop state, not a reported stat
+    stats.pop("_current_id", None)
     print(f"{source:<8} in={stats['in']:<6} protonated={stats['ok']:<6} "
           f"unparseable={stats['unparseable']:<4} plugin_error={stats['plugin_error']:<4} "
           f"empty={stats['empty']:<4} nonstandard_inchi={stats['nonstandard_inchi']:<4} "
