@@ -12,9 +12,10 @@ leaving 26.1's value there would make them disagree with the protonation
 bundles, which Run_Marvin_Protonations.py already corrects.
 
 ATOM SPACE. The ladder's atom slot is Marvin's own import order of the
-structure Run_Marvin_pKas.py fed it: the InChI where one exists (cxcalc CLI,
-fragment always 1), else the SMILES (PkaPlugin, one fragment number per
-convertToFrags() piece). This script imports the same string the same way and
+structure Run_Marvin_pKas.py fed it: for a compound with an InChI, the
+canonical-tautomer SMILES Run_Marvin_Protonations.pka_input() derives from it
+(cxcalc CLI, fragment always 1; the raw InChI if RDKit cannot read it), else
+the source SMILES (PkaPlugin, one fragment number per convertToFrags() piece). This script imports the same string the same way and
 locates N1 in that order, so the token it rewrites is the one on N1. The
 23.4 ladders were produced in a different atom space, so their N1 is found by
 value instead: the single basic value in Adenine_N1.N1_234_RANGE. Where 23.4
@@ -104,6 +105,11 @@ def _has_adenine(struct):
 
 def n1_tokens(struct, path, MolImporter, MolExporter):
     """[(fragment, atom)] ladder slots of every adenine N1, as strings."""
+    if path == "cxcalc":
+        # Run_Marvin_pKas.py feeds cxcalc the canonical-tautomer SMILES, not
+        # the InChI; import the identical string so the atom order matches.
+        from Run_Marvin_Protonations import pka_input
+        struct = pka_input(struct) or struct
     mol = MolImporter.importMol(struct)
     if path == "cxcalc":
         return [("1", str(i + 1)) for i in Adenine_N1.n1_atoms(mol, MolExporter)]
