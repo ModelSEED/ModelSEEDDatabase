@@ -17,11 +17,19 @@ handed to Marvin with 23.4's shipped protonated SMILES:
     (stereo_234), and of the tautomer (stereo_rdk); losses are counted
     and reported both as a share of all rows and of stereo-bearing rows
 
-This does NOT run Marvin 26.1 (no Isomers/Protonation licence here): it
-compares the input handed to MajorMicrospeciesPlugin, which performs no
-tautomer shifts, so an amide handed in stays an amide.  Final-charge
-parity against 23.4 requires a licensed run of Run_Marvin_Protonations.py
-over the sample; nothing here claims otherwise.
+SCOPE OF THE HEADLINE METRIC: the fixed/still-imidate table measures the
+imidate defect only.  The protonated-ring-N half of the focus set (mostly
+adenine N1) is NOT fixed by this step and is not expected to be: it is
+a Marvin 26.1 pKa-prediction problem (N1 base pKa predicted ~6.9-7.0 at
+pH 7 vs literature ~3.5-4.2), not a tautomer problem -- see the KNOWN
+LIMIT note in Run_Marvin_Protonations.py.
+
+This script does NOT run Marvin: it compares the input handed to
+MajorMicrospeciesPlugin, which performs no tautomer shifts, so an amide
+handed in stays an amide.  Final-charge parity against 23.4 requires a
+licensed end-to-end run of Run_Marvin_Protonations.py over the sample
+(Marvin 26.1 plus a Protonation-licensed seat); nothing here claims
+otherwise.
 
 Usage:
     PYTHONPATH=Libs/Python /scratch/seaver/micromamba/envs/equilibrator/bin/python \
@@ -224,11 +232,16 @@ def main():
     # Headline parity vs 23.4: the imidate defect this step exists to fix
     targets = [r for r in rows
                if "imidate" in r["tc_261"].split(",") and "imidate" not in r["tc_234"].split(",")]
+    # Strict rule: an amide is present AND no imidic acid or imidate
+    # anion remains anywhere in the tautomer.
     fixed = [r for r in targets
-             if "amide" in r["motif_rdk"].split(",") and "imidate_anion" not in r["motif_rdk"].split(",")]
+             if "amide" in r["motif_rdk"].split(",")
+             and "imidic_acid" not in r["motif_rdk"].split(",")
+             and "imidate_anion" not in r["motif_rdk"].split(",")]
     still = len(targets) - len(fixed)
     print(f"Imidate targets (26.1 wrote imidate, 23.4 wrote amide): {len(targets)}")
-    print(f"  fixed by (iii-RDKit): {len(fixed)} ({100*len(fixed)/max(len(targets),1):.1f}%)")
+    print(f"  fixed by (iii-RDKit), strict (amide and no imidic acid/imidate anion left): "
+          f"{len(fixed)} ({100*len(fixed)/max(len(targets),1):.1f}%)")
     print(f"  still imidate:        {still} ({100*still/max(len(targets),1):.1f}%)")
 
     # Write TSV

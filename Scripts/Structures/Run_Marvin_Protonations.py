@@ -54,6 +54,24 @@ step is now (iii-RDKit) between aromatize and microspecies; nothing else
 changes.  Bundle provenance records both tool versions (Marvin 26.1 +
 RDKit) and tautomer method.
 
+KNOWN LIMIT -- ADENINE N1 IS NOT A TAUTOMER PROBLEM.  This step fixes
+the imidate motif (N=C([O-]) -> amide); it does NOT fix protonated
+ring nitrogens.  Marvin 26.1's pKa prediction puts adenine's N1 base
+pKa at ~6.9-7.0, right at the run pH (literature ~3.5-4.2), so 26.1
+protonates N1 in adenosine (predicted 7.02) but not in ATP (6.87), and
+any adenine-bearing compound can carry a spurious +1 that 23.4 does not
+have -- e.g. CoA esters come out -3 here against 23.4's -4.  RDKit
+already hands Marvin the standard amino tautomer of adenine, so no
+tautomer step can fix this; it needs a separate decision (a pKa
+override for adenine N1, or disclosure).  Do NOT regenerate the
+bundles until that is settled: about a third of the disagreement focus
+set would still carry the +1.
+
+CAP DIVERGENCE NOTE: when the enumerator cap cuts the tautomer list
+short (tautomer_cap_hit), the partial canonical pick is still used, so
+the InChI and SMILES rows of the SAME compound can land on different
+tautomers.  The cap is counted, never used to skip the compound.
+
 INPUT SELECTION follows Run_Marvin_pKas.py: `smiles.tsv` is a strict superset
 of `inchi.tsv`, and InChI wins wherever it exists, because a charged SMILES is
 an already-deprotonated species and Marvin would be answering a different
@@ -392,9 +410,10 @@ def tautomer_canonical(rdmol, taut_enumerator, uncharger, Chem):
         inchi_before = ""
     stereo_before = _inchi_stereo_layer(inchi_before)
 
-    rdmol_n = uncharger.uncharge(rdmol) if uncharger is not None else rdmol
-
+    rdmol_n = rdmol
     try:
+        if uncharger is not None:
+            rdmol_n = uncharger.uncharge(rdmol)
         res = taut_enumerator.Enumerate(rdmol_n)
         capped = False
         try:
