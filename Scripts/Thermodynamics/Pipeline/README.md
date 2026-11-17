@@ -28,7 +28,7 @@ corrections existed only as loose files on a single filesystem.
                        path, which is almost certainly wrong for you)
 
 That tree holds the compound caches, the fitted parameter files and the pinned
-`msd_dev` structure export. None of it is committed here — the caches alone are
+`msd_structures` structure export. None of it is committed here — the caches alone are
 gigabytes. Paths *into this repository* are derived from the script location and
 need no configuration.
 
