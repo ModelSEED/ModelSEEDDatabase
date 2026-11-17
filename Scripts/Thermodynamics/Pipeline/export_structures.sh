@@ -20,10 +20,10 @@ for s in KEGG ChEBI MetaCyc Rhea; do
     # them, newest version winning per id). Protonation bundles: the consumed
     # one per sources.yaml (marvin_26.1_ph7.tsv today).
     mkdir -p "$OUT/$s/pkas" "$OUT/$s/protonations"
-    git ls-tree --name-only "$SHA" "Biochemistry/Structures/$s/pkas/" | sed "s|.*|Biochemistry/Structures/$s/pkas/&|" | while read -r f; do
+    git ls-tree --name-only "$SHA" -- "Biochemistry/Structures/$s/pkas/" | while read -r f; do
         git show "$SHA:$f" > "$OUT/$s/pkas/$(basename "$f")"
     done
-    git ls-tree --name-only "$SHA" "Biochemistry/Structures/$s/protonations/" | sed "s|.*|Biochemistry/Structures/$s/protonations/&|" | while read -r f; do
+    git ls-tree --name-only "$SHA" -- "Biochemistry/Structures/$s/protonations/" | while read -r f; do
         git show "$SHA:$f" > "$OUT/$s/protonations/$(basename "$f")"
     done
     for f in smiles.tsv inchikey.tsv; do
@@ -32,7 +32,7 @@ for s in KEGG ChEBI MetaCyc Rhea; do
 done
 
 mkdir -p "$OUT/ModelSEED/pkas"
-git ls-tree --name-only "$SHA" "Biochemistry/Structures/ModelSEED/pkas/" | sed "s|.*|Biochemistry/Structures/ModelSEED/pkas/&|" | while read -r f; do
+git ls-tree --name-only "$SHA" -- "Biochemistry/Structures/ModelSEED/pkas/" | while read -r f; do
     git show "$SHA:$f" > "$OUT/ModelSEED/pkas/$(basename "$f")"
 done
 git show "$SHA:Biochemistry/Structures/sources.yaml" > "$OUT/sources.yaml"
