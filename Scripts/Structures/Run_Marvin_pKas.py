@@ -331,11 +331,29 @@ def process(source, version, structures="both", cxcalc="cxcalc"):
     # PkaPlugin, which accepts the query molecules and organometallics the CLI
     # refuses. Same engine either way -- see INPUT SELECTION.
     if inchi_rows:
-        results = run_cxcalc([s for _, s in inchi_rows], ".inchi", cxcalc=cxcalc)
-        got = emit(inchi_rows, results, prefix, version)
+        # TAUTOMER. Marvin reads many InChIs as the lactim / imidic-acid
+        # tautomer and then reports pKas for groups the molecule does not have
+        # (uridine N3 6.28 from the InChI vs 9.15 from the lactam, measured
+        # 9.25). Each InChI is therefore handed to Marvin as the same neutral,
+        # canonical, amide/lactam-normalized tautomer the protonation step
+        # uses (Run_Marvin_Protonations.pka_input), as isomeric SMILES. RDKit
+        # failures keep their InChI and run in a batch of their own.
+        from Run_Marvin_Protonations import pka_input
+        conv, keep = [], []
+        for e, s in inchi_rows:
+            smi = pka_input(s)
+            (conv if smi else keep).append((e, smi or s))
+        got = []
+        for batch, suffix in ((conv, ".smi"), (keep, ".inchi")):
+            results = run_cxcalc([s for _, s in batch], suffix, cxcalc=cxcalc)
+            got += emit(batch, results, prefix, version)
+        order = {prefix + e: i for i, (e, _) in enumerate(inchi_rows)}
+        got.sort(key=lambda r: (order.get(r[0], 0), r[1]))
         out_rows += got
-        stats["inchi (cxcalc)"] = (
-            len(inchi_rows), len(inchi_rows) - len(results), len({r[0] for r in got}))
+        stats["inchi (cxcalc, canonical tautomer)"] = (
+            len(inchi_rows), len(inchi_rows) - len({r[0] for r in got}),
+            len({r[0] for r in got}))
+        stats["  of which RDKit-unreadable, fed as InChI"] = (len(keep), 0, 0)
 
     if smiles_rows:
         results = run_plugin([s for _, s in smiles_rows], cxcalc=cxcalc)
@@ -369,6 +387,11 @@ def main():
     print(f"Marvin {version} via {cxcalc}  (structures={_ARGS.structures})\n")
     for source in (_ARGS.sources or SOURCES):
         process(source, version, structures=_ARGS.structures, cxcalc=cxcalc)
+    # Adenine N1: 26.1 puts it at ~7.0, 23.4 at ~2.4 (measured ~3.5-4.2).
+    # Replace it with 23.4's value -- see Adenine_N1.py.
+    if _ARGS.structures == "both":
+        import Override_Adenine_N1_pKas
+        Override_Adenine_N1_pKas.run(_ARGS.sources or SOURCES, version)
 
 
 if __name__ == "__main__":

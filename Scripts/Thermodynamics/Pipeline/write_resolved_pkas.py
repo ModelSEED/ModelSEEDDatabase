@@ -51,7 +51,7 @@ def main():
 
     import modelseed_pkas as msp
 
-    structures = msp.load_structures(msp.DEV_DIR)
+    structures = msp.load_structures(msp.STRUCTURES_DIR)
     ref_cache = a.cache or msp.UPSTREAM_CACHE
     cache_ladders = msp.load_cache_ladders(cache=ref_cache)
     guard = None if a.no_guard else msp.magnesium_guard(ref_cache)
@@ -63,8 +63,8 @@ def main():
     # only where MolGpKa degenerates.
     resolved = msp.resolve_pkas(
         structures,
-        msp.load_marvin_pkas(msp.DEV_DIR) if "marvin" in pref else {s: {} for s in msp.MARVIN_SOURCES},
-        msp.load_molgpka_pkas(msp.DEV_DIR) if "molgpka" in pref else {},
+        msp.load_marvin_pkas(msp.STRUCTURES_DIR) if "marvin" in pref else {s: {} for s in msp.MARVIN_SOURCES},
+        msp.load_molgpka_pkas(msp.STRUCTURES_DIR) if "molgpka" in pref else {},
         preference=pref,
         alberty=msp.load_alberty_pkas() if "alberty" in pref else {},
         iupac=msp.load_iupac_pkas() if "iupac" in pref else {},
