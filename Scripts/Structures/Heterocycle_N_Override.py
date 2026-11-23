@@ -34,6 +34,7 @@ RDLogger.DisableLog("rdApp.*")
 STRUCT_ROOT = os.path.join(os.path.dirname(os.path.abspath(__file__)),
                            "..", "..", "Biochemistry", "Structures")
 SOURCES = ["ChEBI", "KEGG", "MetaCyc", "Rhea"]
+ID_PREFIX = {"ChEBI": "CHEBI_"}
 AUDIT = "/tmp/near7_261only.tsv"   # set by caller; ext ids with 26.1-only near-7 pKb
 PKb_LO, PKb_HI = 6.0, 8.0
 
@@ -61,7 +62,7 @@ def load_pkb(src, ver):
                 p = tok.split(":")
                 if len(p) == 3:
                     try:
-                        d[r["external_id"]].append(float(p[2]))
+                        d[r["external_id"]].append(float(p[2]))  # pKa files already carry the source prefix (e.g. CHEBI_57595)
                     except ValueError:
                         pass
     return d
@@ -76,7 +77,9 @@ def audit_targets(sources):
         b6 = load_bundle_smiles(src, "26.1")
         p4 = load_pkb(src, "23.4")
         p6 = load_pkb(src, "26.1")
+        pka_prefix = ID_PREFIX.get(src, "")
         for eid in set(b4) & set(b6):
+            pka_id = pka_prefix + eid
             if b4[eid]["charge"] == b6[eid]["charge"]:
                 continue
             # only the direction 26.1 adds a proton (more positive charge)
@@ -86,9 +89,13 @@ def audit_targets(sources):
                 continue
             if c6 <= c4:
                 continue
-            kb4 = [v for v in p4.get(eid, []) if PKb_LO <= v <= PKb_HI]
-            kb6 = [v for v in p6.get(eid, []) if PKb_LO <= v <= PKb_HI]
-            if kb6 and not kb4:
+            kb4 = [v for v in p4.get(pka_id, []) if PKb_LO <= v <= PKb_HI]
+            kb6 = [v for v in p6.get(pka_id, []) if PKb_LO <= v <= PKb_HI]
+            # target if 26.1 has a near-7 basic site that 23.4 lacks, OR
+            # the two engines disagree on a near-7 basic site by > 1 pKa unit
+            def close(a, b):
+                return any(abs(x - y) <= 1.0 for x in a for y in b)
+            if (kb6 and not kb4) or (kb6 and kb4 and not close(kb6, kb4)):
                 targets[src].add(eid)
     return targets
 
