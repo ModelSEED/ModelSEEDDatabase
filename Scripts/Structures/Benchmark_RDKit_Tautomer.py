@@ -21,8 +21,8 @@ SCOPE OF THE HEADLINE METRIC: the fixed/still-imidate table measures the
 imidate defect only.  The protonated-ring-N half of the focus set (mostly
 adenine N1) is NOT fixed by this step and is not expected to be: it is
 a Marvin 26.1 pKa-prediction problem (N1 base pKa predicted ~6.9-7.0 at
-pH 7 vs literature ~3.5-4.2), not a tautomer problem -- see the KNOWN
-LIMIT note in Run_Marvin_Protonations.py.
+pH 7 vs literature ~3.5-4.2), not a tautomer problem -- see the SCOPE
+paragraph in Run_Marvin_Protonations.py and Site_pKa_Overrides.py.
 
 This script does NOT run Marvin: it compares the input handed to
 MajorMicrospeciesPlugin, which performs no tautomer shifts, so an amide
