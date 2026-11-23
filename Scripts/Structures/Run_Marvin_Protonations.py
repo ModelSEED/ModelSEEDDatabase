@@ -61,14 +61,26 @@ with 23.4. 26.1 puts its basic pKa at 7.0-7.3 (23.4: 2.2-2.5; measured
 ~3.5-4.2), so the microspecies protonates N1 in 2,560 of 2,914 adenine
 rows (23.4: 4 of 2,951) and every adenine nucleotide, NAD(P), FAD and
 CoA ester is one unit too positive. RDKit already hands Marvin the
-standard amino tautomer, so step (iii) cannot help. After the
-microspecies step an adenine N1-H(+) is returned to neutral N1 -- 23.4's
-value applied at pH 7 -- and counted as adenine_n1_override. dH ==
-dcharge == -1, so the invariant gate is unaffected. The pKa ladders get
-the same correction from Override_Adenine_N1_pKas.py. See Adenine_N1.py.
-Measured end-to-end through Marvin 26.1 on the 3,000-compound benchmark
-sample: charge parity with 23.4 51.9% -> 72.8%; all 394 CoA thioesters
-match 23.4.
+standard amino tautomer, so step (iii) cannot help. The same holds for
+histidine-type imidazoles (26.1 7.20/7.30 for histidine/histamine against
+IUPAC-measured 6.04/6.05). For a fragment containing either site class,
+Marvin's microspecies distribution is reweighted by the class pKa shift,
+summed per net charge, and the most populated charge's best microstate is
+taken; this MOVES the proton Marvin had parked on the site to wherever its
+own distribution puts it next (ATP: the terminal phosphate, giving -3)
+instead of dropping it, as the first version of this override did (ATP -4).
+Counted as site_override_<class>. See Site_pKa_Overrides.py; the pKa ladders
+get the matching correction from Override_Site_pKas.py.
+
+CANONICAL ATOM ORDER. Marvin 26.1's pKa and microspecies results depend on
+the atom order of its input: the same ATP gives a terminal-phosphate pKa of
+6.67 from the InChI-ordered molblock and 7.57 from the canonical-SMILES one.
+Every structure is therefore re-parsed into RDKit's canonical atom order
+(canonical_order()) before it is handed to Marvin, here and in pka_input(),
+so the pH-7 structures and the pKa ladders are computed on the same input.
+Non-override fragments still take Marvin's own major MICROspecies; where a
+protonated group splits across equivalent oxygens the major microstate can
+differ from the major macrostate -- a known limitation, not changed here.
 
 CAP DIVERGENCE NOTE: when the enumerator cap cuts the tautomer list
 short (tautomer_cap_hit), the partial canonical pick is still used, so
@@ -308,8 +320,8 @@ def _rdk_ver_str(version):
 # post-hoc Repair_Protonation_Rows.py applies, so a bundle repaired after the
 # fact and one gated at generation are identical by construction.
 import Validate_Protonations as _inv                         # noqa: E402
-# Adenine N1 override (26.1 pKb ~7.0 vs 23.4 ~2.4) -- see ADENINE N1.
-import Adenine_N1                                            # noqa: E402
+# Site pKa overrides (adenine N1, histidine imidazole) -- see ADENINE N1.
+import Site_pKa_Overrides                                    # noqa: E402
 
 # What Marvin calls a wildcard atom, across the notations it accepts. `R#` is
 # the one that matters and the one easiest to miss: a molblock R atom -- which
@@ -479,11 +491,28 @@ def make_tautomer_tools():
 _PKA_TOOLS = None
 
 
+def canonical_order(rdmol, Chem):
+    """Re-parse into RDKit's canonical atom order (stereo kept via isomeric SMILES).
+
+    Marvin's pKa/microspecies results depend on input atom order (ATP's
+    terminal phosphate: 6.67 InChI-ordered vs 7.57 canonical). Both the
+    protonation step and the pKa run go through this, so they see the same
+    order. Returns (mol, True) or (input mol, False) if the re-parse fails."""
+    try:
+        smi = Chem.MolToSmiles(rdmol)
+        out = Chem.MolFromSmiles(smi) if smi else None
+        if out is not None and out.GetNumAtoms() == rdmol.GetNumAtoms():
+            return out, True
+    except Exception:
+        pass
+    return rdmol, False
+
+
 def pka_input(struct):
     """Structure string Run_Marvin_pKas.py feeds Marvin: the same neutral,
     canonical, amide/lactam-normalized tautomer the protonation step uses,
     written as isomeric SMILES. None when RDKit cannot read the structure
-    (the caller then feeds the original string). Override_Adenine_N1_pKas.py
+    (the caller then feeds the original string). Override_Site_pKas.py
     calls this too, so both see the identical atom order."""
     global _PKA_TOOLS
     from rdkit import Chem
@@ -495,6 +524,7 @@ def pka_input(struct):
         if mol is None:
             return None
         out, _ = tautomer_canonical(mol, _PKA_TOOLS[0], _PKA_TOOLS[1], Chem)
+        out, _ = canonical_order(out, Chem)
         smi = Chem.MolToSmiles(out)
         return smi or None
     except Exception:
@@ -681,6 +711,9 @@ class Protonator:
                         stats["tautomer_stereo_loss"] = stats.get("tautomer_stereo_loss", 0) + 1
                     elif info == "fallback":
                         stats["tautomer_fallback"] = stats.get("tautomer_fallback", 0) + 1
+            rdmol, ok = canonical_order(rdmol, Chem)
+            if not ok and stats is not None:
+                stats["canonical_order_fallback"] = stats.get("canonical_order_fallback", 0) + 1
             block = Chem.MolToMolBlock(rdmol, kekulize=True)
             if block:
                 return self.MolImporter.importMol(block)
@@ -708,19 +741,26 @@ class Protonator:
                 frag.aromatize()
             self.plugin.setMolecule(frag)
             self.plugin.run()
-            fused.fuse(self.plugin.getMajorMicrospecies(), False)
+            major = self.plugin.getMajorMicrospecies()
+            # Site classes 26.1 gets wrong (adenine N1, histidine imidazole):
+            # reweight the distribution instead of editing the pick -- see
+            # Site_pKa_Overrides.py and ADENINE N1 above.
+            sites = Site_pKa_Overrides.find_sites(
+                Site_pKa_Overrides.rdkit_view(frag, self.MolExporter))
+            if sites:
+                major, changed = Site_pKa_Overrides.reweighted_major(self.plugin, sites)
+                if stats is not None:
+                    seen = self._seen_tautomer_ids
+                    if seen is None:
+                        seen = self._seen_tautomer_ids = set()
+                    for name, did in changed.items():
+                        key = (stats.get("_current_id"), "site_" + name)
+                        if did and key not in seen:
+                            seen.add(key)
+                            stats["site_override_" + name] = stats.get("site_override_" + name, 0) + 1
+            fused.fuse(major, False)
         if fused.getAtomCount() == 0:
             return None
-        # Adenine N1: 26.1 puts its pKb at ~7.0 and protonates it; 23.4 put
-        # it at ~2.4. Use 23.4's -- see Adenine_N1.py and ADENINE N1 above.
-        if Adenine_N1.deprotonate_n1(fused, self.MolExporter) and stats is not None:
-            seen = self._seen_tautomer_ids
-            if seen is None:
-                seen = self._seen_tautomer_ids = set()
-            key = (stats.get("_current_id"), "adenine_n1")
-            if key not in seen:
-                seen.add(key)
-                stats["adenine_n1_override"] = stats.get("adenine_n1_override", 0) + 1
         return fused
 
     def protonate_best(self, candidates, stats=None):
@@ -839,8 +879,9 @@ def process(source, version, ph, limit=0, cxcalc="cxcalc"):
              "smiles_preferred_disconnected_inchi": 0, "inchi_from_inchi_form": 0,
              "passthrough_invariant": 0,
              "tautomer_fallback": 0, "tautomer_cap_hit": 0,
-             "tautomer_stereo_loss": 0, "adenine_n1_override": 0,
-             "amide_lactam_normalized": 0}
+             "tautomer_stereo_loss": 0, "site_override_adenine_n1": 0,
+             "site_override_his_imidazole": 0, "amide_lactam_normalized": 0,
+             "canonical_order_fallback": 0}
     # Source formula/charge per (external_id, type), the reference every
     # protonated row is gated against. inchi.tsv/smiles.tsv, already on disk.
     _inv.STRUCT = STRUCT_ROOT
@@ -1057,8 +1098,10 @@ def process(source, version, ph, limit=0, cxcalc="cxcalc"):
           f"tautomer_fallback={stats['tautomer_fallback']:<4} "
           f"tautomer_cap={stats['tautomer_cap_hit']:<4} "
           f"tautomer_stereo_loss={stats['tautomer_stereo_loss']:<4} "
-          f"adenine_n1_override={stats['adenine_n1_override']:<4} "
-          f"amide_lactam_normalized={stats['amide_lactam_normalized']:<4}")
+          f"site_override_adenine_n1={stats['site_override_adenine_n1']:<4} "
+          f"site_override_his_imidazole={stats['site_override_his_imidazole']:<4} "
+          f"amide_lactam_normalized={stats['amide_lactam_normalized']:<4} "
+          f"canonical_order_fallback={stats['canonical_order_fallback']:<4}")
     print(f"{'':<8} rows={len(out_rows):<7} -> {os.path.relpath(out_path, STRUCT_ROOT)}")
     return out_path, stats
 
@@ -1071,7 +1114,7 @@ def main():
     except Exception:
         _rdk_ver = "unknown"
     print(f"Marvin {version} MajorMicrospeciesPlugin + RDKit {_rdk_ver} "
-          f"TautomerEnumerator (tautomer step iii-RDKit) + adenine N1 at 23.4's pKa, "
+          f"TautomerEnumerator (tautomer step iii-RDKit) + site pKa overrides (adenine N1, His imidazole), canonical atom order, "
           f"pH {_ARGS.ph}\n")
     for source in (_ARGS.sources or SOURCES):
         process(source, version, _ARGS.ph, limit=_ARGS.limit, cxcalc=cxcalc)
