@@ -748,7 +748,9 @@ class Protonator:
             sites = Site_pKa_Overrides.find_sites(
                 Site_pKa_Overrides.rdkit_view(frag, self.MolExporter))
             if sites:
-                major, changed = Site_pKa_Overrides.reweighted_major(self.plugin, sites)
+                major, changed = Site_pKa_Overrides.reweighted_major(
+                    self.plugin, sites,
+                    site_targets=Site_pKa_Overrides.site_targets_234(self._current_struct))
                 if stats is not None:
                     seen = self._seen_tautomer_ids
                     if seen is None:

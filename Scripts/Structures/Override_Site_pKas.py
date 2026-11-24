@@ -109,10 +109,16 @@ def site_slots(struct, path, MolImporter, MolExporter):
     mol = MolImporter.importMol(struct)
     frags = [mol] if path == "cxcalc" else list(mol.convertToFrags())
     out = {}
+    # most specific class wins a slot: adenine_n1 > his_imidazole >
+    # metal_macrocycle > heterocycle_n (later generic classes must not
+    # overwrite the specific ones)
+    precedence = {"adenine_n1": 0, "his_imidazole": 1, "metal_macrocycle": 2, "heterocycle_n": 3}
     for fi, frag in enumerate(frags, start=1):
         for name, site in SPO.find_sites(SPO.rdkit_view(frag, MolExporter)):
             for i in site:
-                out[(str(fi), str(i + 1))] = name
+                key = (str(fi), str(i + 1))
+                if key not in out or precedence.get(name, 9) < precedence.get(out[key], 9):
+                    out[key] = name
     return out
 
 
@@ -152,6 +158,10 @@ def apply(source, version, fallbacks, MolImporter, MolExporter, work):
             name = slots.get((f, a))
             if name is None or v < CLASSES[name]["threshold_261"]:
                 continue
+            if v >= 8.0:
+                continue  # clearly basic ring N (proline/nicotine/cobalamin); never clobber
+            if name in ("metal_macrocycle", "heterocycle_n") and value_234(name, old.get(eid, "")) is None:
+                continue  # no 23.4 window hit: leave the token alone rather than a pooled median
             v234 = value_234(name, old.get(eid, ""))
             new_val, basis = ((v234, "23.4_same_compound") if v234 is not None
                               else (fallbacks[name], "23.4_median"))

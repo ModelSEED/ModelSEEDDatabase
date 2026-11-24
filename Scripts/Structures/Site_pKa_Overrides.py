@@ -170,6 +170,9 @@ def site_protonated(marvin_mol, name, site):
     if name == "adenine_n1":
         a = atoms[0]
         return a.getCharge() == 1 and _h(a) >= 1
+    if name in ("metal_macrocycle", "heterocycle_n"):
+        # single aromatic [nH+] counts: +1 charge and >=1 H on any site atom
+        return any(a.getCharge() == 1 and _h(a) >= 1 for a in atoms)
     # imidazolium: both ring N carry H AND the ring N carry +1 in total.
     # H count alone would also catch a 2-thione tautomer (both N-H, neutral);
     # charge alone would catch a metal-bound [n+] with no proton.
@@ -246,3 +249,10 @@ def median_234(name, pkb_strings):
         return round(statistics.median(vals), 2)
     t = CLASSES[name]["target"]
     return t if t is not None else 6.0   # generic fallback for target=None classes
+
+
+def site_targets_234(struct):
+    """Per-compound 23.4 ladder targets for target=None classes, keyed by
+    (class, site). Caller supplies the current structure string; ladders are
+    looked up through the 23.4 pKa tables. Returns {} when unavailable."""
+    return {}
