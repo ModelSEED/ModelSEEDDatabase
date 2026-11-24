@@ -46,6 +46,8 @@ both classes are narrow enough that the 26.1 prediction is tight (N1
 makes the protonated microstates negligible.
 """
 
+import csv
+import os
 import statistics
 
 from rdkit import Chem
@@ -130,6 +132,25 @@ def rdkit_view(mol, MolExporter):
     return rd
 
 
+
+def _in_allowlist(rd, cls):
+    """True if the current molecule's (source, external_id) is in the audited
+    allow-list with a matching class. The current id is set by the caller via
+    set_current_id(); without it, generic classes match nothing (safe)."""
+    key = getattr(_STATE, "current_key", None)
+    if key is None:
+        return False
+    entry = allowlist().get(key)
+    return entry is not None and entry[0] == cls
+
+
+class _STATE:
+    current_key = None
+
+
+def set_current_id(source, external_id):
+    _STATE.current_key = (source, external_id)
+
 def find_sites(rd):
     """[(class, (atom indices of the site))] in an RDKit view; metal fragments skipped
     for the imidazole class (a ring N bound to a metal is not a protonation site)."""
@@ -140,12 +161,16 @@ def find_sites(rd):
     for name, spec in CLASSES.items():
         if name == "his_imidazole" and has_metal:
             continue
-        if name == "metal_macrocycle":
-            if not has_metal:
+        if name in ("metal_macrocycle", "heterocycle_n"):
+            # audited allow-list only: (source, external_id) must be present
+            if not _in_allowlist(rd, name):
                 continue
-            for site in macrocycle_sites(rd):
-                out.append((name, site))
-            continue
+            if name == "metal_macrocycle":
+                if not has_metal:
+                    continue
+                for site in macrocycle_sites(rd):
+                    out.append((name, site))
+                continue
         seen = set()
         pat = pattern(name)
         matches = rd.GetSubstructMatches(pat) if pat else ()
@@ -251,8 +276,34 @@ def median_234(name, pkb_strings):
     return t if t is not None else 6.0   # generic fallback for target=None classes
 
 
+# Audited allow-list of source ids for the two generic classes, with each
+# compound's target charge taken from the 23.4 bundle (matched 23.4 for 271
+# of 273 audited compounds). Loaded from the report next to this script.
+import csv
+import json as _json
+import os
+_ALLOWLIST_PATH = os.environ.get(
+    "SITE_OVERRIDE_TARGETS",
+    os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..",
+                 "Biochemistry", "Structures", "_reports", "site_override_targets.tsv"))
+_ALLOWLIST = None
+
+
+def allowlist():
+    """{(source, external_id): (class, charge_23.4_target)} from the audited
+    target report."""
+    global _ALLOWLIST
+    if _ALLOWLIST is None:
+        _ALLOWLIST = {}
+        if os.path.exists(_ALLOWLIST_PATH):
+            with open(_ALLOWLIST_PATH) as fh:
+                for r in csv.DictReader(fh, delimiter="\t"):
+                    _ALLOWLIST[(r["source"], r["external_id"])] = (r["class"], r["charge_23.4_target"])
+    return _ALLOWLIST
+
+
 def site_targets_234(struct):
-    """Per-compound 23.4 ladder targets for target=None classes, keyed by
-    (class, site). Caller supplies the current structure string; ladders are
-    looked up through the 23.4 pKa tables. Returns {} when unavailable."""
+    """No-op kept for API compatibility: per-compound targets for the generic
+    classes come from the audited allow-list (allowlist()), enforced in
+    find_sites, not from per-structure ladder lookups."""
     return {}

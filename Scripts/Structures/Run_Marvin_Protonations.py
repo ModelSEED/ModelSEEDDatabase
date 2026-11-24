@@ -734,6 +734,10 @@ class Protonator:
 
     def protonate(self, struct, aromatize=True, stats=None):
         """Protonated Molecule for one structure string, or None if unusable."""
+        self._current_struct = struct   # for site_targets_234 at the reweight call
+        # allow-list key for the generic site classes (set from ext id by caller)
+        Site_pKa_Overrides.set_current_id(
+            getattr(self, "_current_source", ""), getattr(self, "_current_ext_id", ""))
         mol = self._import(struct, stats=stats)
         fused = self.Molecule()
         for frag in mol.convertToFrags():
@@ -909,6 +913,8 @@ def process(source, version, ph, limit=0, cxcalc="cxcalc"):
 
     for ext_id, smiles in compounds:
         stats["_current_id"] = ext_id
+        prot._current_source = source
+        prot._current_ext_id = ext_id
         prot._seen_tautomer_ids = set()
         # InChI first, the compound's own SMILES as the fallback rung -- unless
         # the InChI is the MORE fragmented of the two, which means it has

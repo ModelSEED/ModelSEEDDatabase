@@ -158,6 +158,8 @@ def apply(source, version, fallbacks, MolImporter, MolExporter, work):
             name = slots.get((f, a))
             if name is None or v < CLASSES[name]["threshold_261"]:
                 continue
+            if name in ("metal_macrocycle", "heterocycle_n") and (source, eid) not in SPO.allowlist():
+                continue  # generic classes restricted to the audited allow-list
             if v >= 8.0:
                 continue  # clearly basic ring N (proline/nicotine/cobalamin); never clobber
             if name in ("metal_macrocycle", "heterocycle_n") and value_234(name, old.get(eid, "")) is None:
