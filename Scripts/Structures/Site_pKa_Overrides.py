@@ -61,6 +61,29 @@ CLASSES = {
         window_234=(0.5, 5.0),  # 23.4's N1 value is the single basic value in here
         threshold_261=5.0,      # a 26.1 ladder token at or above this is replaced
     ),
+    "metal_macrocycle": dict(
+        # Corrin / porphyrin / chlorophyll: a metal (Co/Mg/Fe/...) anywhere in the
+        # molecule plus a macrocyclic ring (>=12 atoms, >=3 N). Sites are the
+        # ring N atoms; the protonated one carries the H/+1. Target taken from
+        # 23.4's ladder via window_234, NOT a class constant, because corrin vs
+        # porphyrin N differ.
+        smarts=None,            # matched programmatically in find_sites (metal + big ring)
+        sites=None,
+        target=None, typical_261=7.6,
+        window_234=(5.0, 8.5),
+        threshold_261=6.9,
+        macrocycle=True,
+    ),
+    "heterocycle_n": dict(
+        # Any aromatic ring N (5- or 6-membered) not covered by the two classes
+        # above: purines other than adenine N1, pteridines, benzimidazoles,
+        # drug heterocycles. Sites = all aromatic ring N atoms.
+        smarts="[n,N;R]",              # any ring N, aromatic or aliphatic (covers alkaloid N+ too)
+        sites=None,             # all matches
+        target=None, typical_261=7.2,
+        window_234=(4.0, 6.9),
+        threshold_261=6.9,
+    ),
     "his_imidazole": dict(
         # ring C(arm) : C : N : C2 : N, arm CH2-C-N with N not acylated/sulfonylated.
         # C2 must be an unsubstituted CH (D2): 2-thio/2-oxo/2-amino imidazoles
@@ -79,8 +102,21 @@ _PATTERNS = {}
 
 def pattern(name):
     if name not in _PATTERNS:
-        _PATTERNS[name] = Chem.MolFromSmarts(CLASSES[name]["smarts"])
+        _PATTERNS[name] = (Chem.MolFromSmarts(CLASSES[name]["smarts"])
+                           if CLASSES[name]["smarts"] else None)
     return _PATTERNS[name]
+
+
+def macrocycle_sites(rd):
+    """Ring N atoms of a metal-bound macrocycle (>=12-membered ring with >=3 N,
+    metal anywhere in the molecule). Corrin/porphyrin/chlorophyll central N."""
+    out = []
+    for ri in rd.GetRingInfo().AtomRings():
+        if len(ri) >= 12:
+            ns = tuple(sorted(i for i in ri if rd.GetAtomWithIdx(i).GetSymbol() == "N"))
+            if len(ns) >= 3:
+                out.append(ns)
+    return out
 
 
 def rdkit_view(mol, MolExporter):
@@ -104,9 +140,20 @@ def find_sites(rd):
     for name, spec in CLASSES.items():
         if name == "his_imidazole" and has_metal:
             continue
+        if name == "metal_macrocycle":
+            if not has_metal:
+                continue
+            for site in macrocycle_sites(rd):
+                out.append((name, site))
+            continue
         seen = set()
-        for m in rd.GetSubstructMatches(pattern(name)):
-            site = tuple(sorted(m[i] for i in spec["sites"]))
+        pat = pattern(name)
+        matches = rd.GetSubstructMatches(pat) if pat else ()
+        for m in matches:
+            if spec["sites"]:
+                site = tuple(sorted(m[i] for i in spec["sites"]))
+            else:
+                site = tuple(sorted(m))
             if site not in seen:
                 seen.add(site)
                 out.append((name, site))
@@ -130,10 +177,15 @@ def site_protonated(marvin_mol, name, site):
             and sum(a.getCharge() for a in atoms) == 1)
 
 
-def reweighted_major(plugin, sites):
+def reweighted_major(plugin, sites, site_targets=None):
     """Major microspecies after the class reweighting. Assumes plugin.run() was
     called on the fragment the sites were found in (microspecies keep its atom
-    order). Returns (molecule, {class: bool changed vs Marvin's own pick})."""
+    order). Returns (molecule, {class: bool changed vs Marvin's own pick}).
+
+    site_targets maps (class, site) -> per-compound target pKa for classes whose
+    CLASSES target is None (metal macrocycles, generic heterocycles); it is
+    derived from 23.4's ladder by the caller."""
+    site_targets = site_targets or {}
     n = plugin.getMicrospeciesCount()
     rows = []
     for i in range(n):
@@ -144,7 +196,12 @@ def reweighted_major(plugin, sites):
         for name, site in sites:
             if site_protonated(m, name, site):
                 spec = CLASSES[name]
-                f *= 10 ** (spec["target"] - spec["typical_261"])
+                target = spec["target"]
+                if target is None:
+                    # per-compound target from 23.4's ladder (set by the caller
+                    # via site_targets); fall back to typical_261 shift of -1
+                    target = site_targets.get((name, site), spec["typical_261"] - 1.0)
+                f *= 10 ** (target - spec["typical_261"])
                 hit.add(name)
         q = sum(m.getAtom(j).getCharge() for j in range(m.getAtomCount()))
         rows.append((w * f, q, m, hit))
@@ -185,4 +242,7 @@ def value_234(name, pkb_value):
 
 def median_234(name, pkb_strings):
     vals = [v for v in (value_234(name, s) for s in pkb_strings) if v is not None]
-    return round(statistics.median(vals), 2) if vals else CLASSES[name]["target"]
+    if vals:
+        return round(statistics.median(vals), 2)
+    t = CLASSES[name]["target"]
+    return t if t is not None else 6.0   # generic fallback for target=None classes
