@@ -69,6 +69,13 @@ CLASSES = {
         # ring N atoms; the protonated one carries the H/+1. Target taken from
         # 23.4's ladder via window_234, NOT a class constant, because corrin vs
         # porphyrin N differ.
+        # NO ALLOW-LISTED COMPOUNDS (2026-11-25): every audited macrocycle row
+        # differed from 23.4 because 23.4 had REMOVED a ring C-H (a carbanion,
+        # e.g. cyanocobalamin ChEBI 16304 -1, methylcobalamin 16379 -2) or was a
+        # protein placeholder; 26.1 equals the source structure and the neutral
+        # cobalamins are right. Those rows moved to
+        # _reports/site_override_targets_removed.tsv. The class stays so a future
+        # audited row can use it.
         smarts=None,            # matched programmatically in find_sites (metal + big ring)
         sites=None,
         target=None, typical_261=7.6,
