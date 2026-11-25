@@ -887,6 +887,7 @@ def process(source, version, ph, limit=0, cxcalc="cxcalc"):
              "tautomer_fallback": 0, "tautomer_cap_hit": 0,
              "tautomer_stereo_loss": 0, "site_override_adenine_n1": 0,
              "site_override_his_imidazole": 0, "amide_lactam_normalized": 0,
+             "allowlist_charge_ok": 0, "allowlist_charge_mismatch": 0,
              "canonical_order_fallback": 0}
     # Source formula/charge per (external_id, type), the reference every
     # protonated row is gated against. inchi.tsv/smiles.tsv, already on disk.
@@ -1081,6 +1082,34 @@ def process(source, version, ph, limit=0, cxcalc="cxcalc"):
         for row in out_rows:
             fh.write("\t".join(str(c) for c in row) + "\n")
 
+    # Post-run charge audit of the audited allow-list rows: each compound's
+    # written SMILE-row charge must equal its charge_23.4_target (the audited
+    # 23.4 bundle charge). Modeled on the gate() invariant above. Report sits
+    # next to the other run reports, NOT under protonations/.
+    audited = {eid: (cls, tgt) for (src, eid), (cls, tgt) in Site_pKa_Overrides.allowlist().items()
+               if src == source}
+    if audited:
+        written = {r[0]: r[4] for r in out_rows if r[1] == "SMILE"}
+        audit, mismatches = [], 0
+        for eid, (cls, tgt) in sorted(audited.items()):
+            got = written.get(eid)
+            ok = got is not None and str(got) == str(tgt)
+            if not ok:
+                mismatches += 1
+            audit.append((eid, cls, tgt, got if got is not None else "NO_ROW",
+                          "ok" if ok else "MISMATCH"))
+        rep_dir = os.path.join(STRUCT_ROOT, "_reports")
+        os.makedirs(rep_dir, exist_ok=True)
+        audit_path = os.path.join(rep_dir, f"site_override_charge_audit_{version}_{ph_tag}_{source}.tsv")
+        with open(audit_path, "w") as fh:
+            fh.write("external_id\tclass\tcharge_23.4_target\tcharge_written\tstatus\n")
+            for row in audit:
+                fh.write("\t".join(str(c) for c in row) + "\n")
+        stats["allowlist_charge_ok"] = len(audit) - mismatches
+        stats["allowlist_charge_mismatch"] = mismatches
+        print(f"{'':<8} allow-list charge audit: {len(audit) - mismatches}/{len(audit)} "
+              f"match charge_23.4_target -> {os.path.relpath(audit_path, STRUCT_ROOT)}")
+
     # Every row the gate replaced, with what it replaced -- next to the other
     # run reports, NOT under protonations/, which BiochemPy globs as bundles.
     if passed_through:
@@ -1108,6 +1137,7 @@ def process(source, version, ph, limit=0, cxcalc="cxcalc"):
           f"tautomer_stereo_loss={stats['tautomer_stereo_loss']:<4} "
           f"site_override_adenine_n1={stats['site_override_adenine_n1']:<4} "
           f"site_override_his_imidazole={stats['site_override_his_imidazole']:<4} "
+          f"allowlist_charge_mismatch={stats.get('allowlist_charge_mismatch', 0):<4} "
           f"amide_lactam_normalized={stats['amide_lactam_normalized']:<4} "
           f"canonical_order_fallback={stats['canonical_order_fallback']:<4}")
     print(f"{'':<8} rows={len(out_rows):<7} -> {os.path.relpath(out_path, STRUCT_ROOT)}")

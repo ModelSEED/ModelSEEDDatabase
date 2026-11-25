@@ -88,6 +88,12 @@ def _structures(source):
     return out
 
 
+def _unprefixed(source, eid):
+    """Ladder ids carry the source prefix (CHEBI_...); the allow-list keys don't."""
+    p = ID_PREFIX.get(source, "")
+    return eid[len(p):] if p and eid.startswith(p) else eid
+
+
 def _classes_in(struct):
     """Site classes a structure string contains (RDKit, no Marvin)."""
     m = (Chem.MolFromInchi(struct) if struct.startswith("InChI=")
@@ -137,9 +143,14 @@ def collect(source, version):
             continue
         s = structs.get(r["external_id"])
         if s:
+            # set_current_id before find_sites: the generic classes
+            # (metal_macrocycle, heterocycle_n) only match the audited
+            # allow-list compound, and the allow-list keys are unprefixed.
+            SPO.set_current_id(source, _unprefixed(source, r["external_id"]))
             cl = _classes_in(s[0])
             if cl:
                 members[r["external_id"]] = (s, cl)
+    SPO.set_current_id(None, None)
     return new_path, rows, old, members
 
 
@@ -151,14 +162,18 @@ def apply(source, version, fallbacks, MolImporter, MolExporter, work):
         if r["kind"] != "pKb" or eid not in members:
             continue
         (struct, path), _ = members[eid]
+        # Gate the generic classes exactly as the protonation run does: the
+        # allow-list keys are unprefixed (source, external_id).
+        SPO.set_current_id(source, _unprefixed(source, eid))
         slots = site_slots(struct, path, MolImporter, MolExporter)
+        SPO.set_current_id(None, None)
         toks = parse_tokens(r["value"])
         changed = False
         for k, (f, a, v) in enumerate(toks):
             name = slots.get((f, a))
             if name is None or v < CLASSES[name]["threshold_261"]:
                 continue
-            if name in ("metal_macrocycle", "heterocycle_n") and (source, eid) not in SPO.allowlist():
+            if name in ("metal_macrocycle", "heterocycle_n") and (source, _unprefixed(source, eid)) not in SPO.allowlist():
                 continue  # generic classes restricted to the audited allow-list
             if v >= 8.0:
                 continue  # clearly basic ring N (proline/nicotine/cobalamin); never clobber
