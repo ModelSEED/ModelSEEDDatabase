@@ -578,11 +578,11 @@
                 "name": "Homogentisate"
             },
             {
-                "charge": -3,
+                "charge": -2,
                 "coefficient": -1,
                 "compartment": 0,
                 "compound": "cpd03214",
-                "formula": "C20H39O7P2",
+                "formula": "C20H40O7P2",
                 "name": "Phytyl diphosphate"
             },
             {
@@ -1783,11 +1783,11 @@
         },
         "code": "(1) cpd00044[0] + (1) cpd00313[0] <=> (1) cpd00045[0] + (1) cpd00471[0]",
         "compound_ids": "cpd00044;cpd00045;cpd00067;cpd00313;cpd00471",
-        "definition": "(1) 3-phosphoadenylylsulfate[0] + (1) Quercetin[0] <= (1) Adenosine 3-5-bisphosphate[0] + (2) H+[0] + (1) Quercetin 3-sulfate[0]",
+        "definition": "(1) 3-phosphoadenylylsulfate[0] + (1) Quercetin[0] <= (1) Adenosine 3-5-bisphosphate[0] + (3) H+[0] + (1) Quercetin 3-sulfate[0]",
         "ec_numbers": [
             "2.8.2.25"
         ],
-        "equation": "(1) cpd00044[0] + (1) cpd00313[0] <= (1) cpd00045[0] + (2) cpd00067[0] + (1) cpd00471[0]",
+        "equation": "(1) cpd00044[0] + (1) cpd00313[0] <= (1) cpd00045[0] + (3) cpd00067[0] + (1) cpd00471[0]",
         "id": "rxn33019",
         "is_obsolete": 1,
         "is_transport": 0,
@@ -1832,18 +1832,18 @@
             },
             {
                 "charge": 1,
-                "coefficient": 2,
+                "coefficient": 3,
                 "compartment": 0,
                 "compound": "cpd00067",
                 "formula": "H",
                 "name": "H+"
             },
             {
-                "charge": -2,
+                "charge": -3,
                 "coefficient": 1,
                 "compartment": 0,
                 "compound": "cpd00471",
-                "formula": "C15H8O10S",
+                "formula": "C15H7O10S",
                 "name": "Quercetin 3-sulfate"
             }
         ],
@@ -2276,35 +2276,35 @@
         "status": "OK",
         "stoichiometry": [
             {
-                "charge": -4,
+                "charge": -3,
                 "coefficient": -1,
                 "compartment": 0,
                 "compound": "cpd00002",
-                "formula": "C10H12N5O13P3",
+                "formula": "C10H13N5O13P3",
                 "name": "ATP"
             },
             {
-                "charge": -3,
+                "charge": -2,
                 "coefficient": -1,
                 "compartment": 0,
                 "compound": "cpd00031",
-                "formula": "C10H12N5O11P2",
+                "formula": "C10H13N5O11P2",
                 "name": "GDP"
+            },
+            {
+                "charge": -2,
+                "coefficient": 1,
+                "compartment": 0,
+                "compound": "cpd00008",
+                "formula": "C10H13N5O10P2",
+                "name": "ADP"
             },
             {
                 "charge": -3,
                 "coefficient": 1,
                 "compartment": 0,
-                "compound": "cpd00008",
-                "formula": "C10H12N5O10P2",
-                "name": "ADP"
-            },
-            {
-                "charge": -4,
-                "coefficient": 1,
-                "compartment": 0,
                 "compound": "cpd00038",
-                "formula": "C10H12N5O14P3",
+                "formula": "C10H13N5O14P3",
                 "name": "GTP"
             }
         ],
@@ -2796,13 +2796,13 @@
             "has_symmetry_groups": true
         },
         "code": "(1) cpd00012[0] + (1) cpd03560[0] <=> (1) cpd00002[0] + (1) cpd00141[0]",
-        "compound_ids": "cpd00002;cpd00012;cpd00067;cpd00141;cpd03560",
-        "definition": "(1) PPi[0] + (1) Propionyladenylate[0] => (1) ATP[0] + (1) H+[0] + (1) Propionate[0]",
+        "compound_ids": "cpd00002;cpd00012;cpd00141;cpd03560",
+        "definition": "(1) PPi[0] + (1) Propionyladenylate[0] => (1) ATP[0] + (1) Propionate[0]",
         "ec_numbers": [
             "6.2.1.1",
             "6.2.1.17"
         ],
-        "equation": "(1) cpd00012[0] + (1) cpd03560[0] => (1) cpd00002[0] + (1) cpd00067[0] + (1) cpd00141[0]",
+        "equation": "(1) cpd00012[0] + (1) cpd03560[0] => (1) cpd00002[0] + (1) cpd00141[0]",
         "id": "rxn33029",
         "is_obsolete": 1,
         "is_transport": 0,
@@ -2837,20 +2837,12 @@
                 "name": "Propionyladenylate"
             },
             {
-                "charge": -4,
+                "charge": -3,
                 "coefficient": 1,
                 "compartment": 0,
                 "compound": "cpd00002",
-                "formula": "C10H12N5O13P3",
+                "formula": "C10H13N5O13P3",
                 "name": "ATP"
-            },
-            {
-                "charge": 1,
-                "coefficient": 1,
-                "compartment": 0,
-                "compound": "cpd00067",
-                "formula": "H",
-                "name": "H+"
             },
             {
                 "charge": -1,
@@ -3659,13 +3651,13 @@
             "has_symmetry_groups": true
         },
         "code": "(1) cpd00113[0] + (1) cpd02591[0] <=> (1) cpd00012[0] + (1) cpd00906[0]",
-        "compound_ids": "cpd00012;cpd00113;cpd00906;cpd02591",
-        "definition": "(1) Isopentenyldiphosphate[0] + (1) pendp[0] => (1) PPi[0] + (1) all-trans-Hexaprenyl diphosphate[0]",
+        "compound_ids": "cpd00012;cpd00067;cpd00113;cpd00906;cpd02591",
+        "definition": "(1) Isopentenyldiphosphate[0] + (1) pendp[0] => (1) PPi[0] + (1) H+[0] + (1) all-trans-Hexaprenyl diphosphate[0]",
         "ec_numbers": [
             "2.5.1.-",
             "2.5.1.33"
         ],
-        "equation": "(1) cpd00113[0] + (1) cpd02591[0] => (1) cpd00012[0] + (1) cpd00906[0]",
+        "equation": "(1) cpd00113[0] + (1) cpd02591[0] => (1) cpd00012[0] + (1) cpd00067[0] + (1) cpd00906[0]",
         "id": "rxn33038",
         "is_obsolete": 1,
         "is_transport": 0,
@@ -3683,19 +3675,19 @@
         "status": "OK",
         "stoichiometry": [
             {
-                "charge": -3,
+                "charge": -2,
                 "coefficient": -1,
                 "compartment": 0,
                 "compound": "cpd00113",
-                "formula": "C5H9O7P2",
+                "formula": "C5H10O7P2",
                 "name": "Isopentenyldiphosphate"
             },
             {
-                "charge": -3,
+                "charge": -2,
                 "coefficient": -1,
                 "compartment": 0,
                 "compound": "cpd02591",
-                "formula": "C25H41O7P2",
+                "formula": "C25H42O7P2",
                 "name": "pendp"
             },
             {
@@ -3707,11 +3699,19 @@
                 "name": "PPi"
             },
             {
-                "charge": -3,
+                "charge": 1,
+                "coefficient": 1,
+                "compartment": 0,
+                "compound": "cpd00067",
+                "formula": "H",
+                "name": "H+"
+            },
+            {
+                "charge": -2,
                 "coefficient": 1,
                 "compartment": 0,
                 "compound": "cpd00906",
-                "formula": "C30H49O7P2",
+                "formula": "C30H50O7P2",
                 "name": "all-trans-Hexaprenyl diphosphate"
             }
         ],
@@ -3940,13 +3940,13 @@
             "has_symmetry_groups": true
         },
         "code": "(1) cpd00113[0] + (1) cpd02591[0] <=> (1) cpd00012[0] + (1) cpd00906[0]",
-        "compound_ids": "cpd00012;cpd00113;cpd00906;cpd02591",
-        "definition": "(1) Isopentenyldiphosphate[0] + (1) pendp[0] => (1) PPi[0] + (1) all-trans-Hexaprenyl diphosphate[0]",
+        "compound_ids": "cpd00012;cpd00067;cpd00113;cpd00906;cpd02591",
+        "definition": "(1) Isopentenyldiphosphate[0] + (1) pendp[0] => (1) PPi[0] + (1) H+[0] + (1) all-trans-Hexaprenyl diphosphate[0]",
         "ec_numbers": [
             "2.5.1.-",
             "2.5.1.33"
         ],
-        "equation": "(1) cpd00113[0] + (1) cpd02591[0] => (1) cpd00012[0] + (1) cpd00906[0]",
+        "equation": "(1) cpd00113[0] + (1) cpd02591[0] => (1) cpd00012[0] + (1) cpd00067[0] + (1) cpd00906[0]",
         "id": "rxn33040",
         "is_obsolete": 1,
         "is_transport": 0,
@@ -3964,19 +3964,19 @@
         "status": "OK",
         "stoichiometry": [
             {
-                "charge": -3,
+                "charge": -2,
                 "coefficient": -1,
                 "compartment": 0,
                 "compound": "cpd00113",
-                "formula": "C5H9O7P2",
+                "formula": "C5H10O7P2",
                 "name": "Isopentenyldiphosphate"
             },
             {
-                "charge": -3,
+                "charge": -2,
                 "coefficient": -1,
                 "compartment": 0,
                 "compound": "cpd02591",
-                "formula": "C25H41O7P2",
+                "formula": "C25H42O7P2",
                 "name": "pendp"
             },
             {
@@ -3988,11 +3988,19 @@
                 "name": "PPi"
             },
             {
-                "charge": -3,
+                "charge": 1,
+                "coefficient": 1,
+                "compartment": 0,
+                "compound": "cpd00067",
+                "formula": "H",
+                "name": "H+"
+            },
+            {
+                "charge": -2,
                 "coefficient": 1,
                 "compartment": 0,
                 "compound": "cpd00906",
-                "formula": "C30H49O7P2",
+                "formula": "C30H50O7P2",
                 "name": "all-trans-Hexaprenyl diphosphate"
             }
         ],
@@ -4770,13 +4778,13 @@
             "has_symmetry_groups": true
         },
         "code": "(1) cpd00113[0] + (1) cpd17566[0] <=> (1) cpd00012[0] + (1) cpd17567[0]",
-        "compound_ids": "cpd00012;cpd00113;cpd17566;cpd17567",
-        "definition": "(1) Isopentenyldiphosphate[0] + (1) ditrans,tetracis-Heptaprenyl diphosphate[0] => (1) PPi[0] + (1) ditrans,pentacis-Octaprenyl diphosphate[0]",
+        "compound_ids": "cpd00012;cpd00067;cpd00113;cpd17566;cpd17567",
+        "definition": "(1) Isopentenyldiphosphate[0] + (1) ditrans,tetracis-Heptaprenyl diphosphate[0] => (1) PPi[0] + (1) H+[0] + (1) ditrans,pentacis-Octaprenyl diphosphate[0]",
         "ec_numbers": [
             "2.5.1.-",
             "2.5.1.31"
         ],
-        "equation": "(1) cpd00113[0] + (1) cpd17566[0] => (1) cpd00012[0] + (1) cpd17567[0]",
+        "equation": "(1) cpd00113[0] + (1) cpd17566[0] => (1) cpd00012[0] + (1) cpd00067[0] + (1) cpd17567[0]",
         "id": "rxn33047",
         "is_obsolete": 1,
         "is_transport": 0,
@@ -4794,19 +4802,19 @@
         "status": "OK",
         "stoichiometry": [
             {
-                "charge": -3,
+                "charge": -2,
                 "coefficient": -1,
                 "compartment": 0,
                 "compound": "cpd00113",
-                "formula": "C5H9O7P2",
+                "formula": "C5H10O7P2",
                 "name": "Isopentenyldiphosphate"
             },
             {
-                "charge": -3,
+                "charge": -2,
                 "coefficient": -1,
                 "compartment": 0,
                 "compound": "cpd17566",
-                "formula": "C35H57O7P2",
+                "formula": "C35H58O7P2",
                 "name": "ditrans,tetracis-Heptaprenyl diphosphate"
             },
             {
@@ -4818,11 +4826,19 @@
                 "name": "PPi"
             },
             {
-                "charge": -3,
+                "charge": 1,
+                "coefficient": 1,
+                "compartment": 0,
+                "compound": "cpd00067",
+                "formula": "H",
+                "name": "H+"
+            },
+            {
+                "charge": -2,
                 "coefficient": 1,
                 "compartment": 0,
                 "compound": "cpd17567",
-                "formula": "C40H65O7P2",
+                "formula": "C40H66O7P2",
                 "name": "ditrans,pentacis-Octaprenyl diphosphate"
             }
         ],
@@ -6098,12 +6114,12 @@
             "has_symmetry_groups": true
         },
         "code": "(1) cpd00008[0] + (1) cpd00101[0] <=> (1) cpd00009[0] + (1) cpd00251[0]",
-        "compound_ids": "cpd00008;cpd00009;cpd00067;cpd00101;cpd00251",
-        "definition": "(1) ADP[0] + (1) H+[0] + (1) ribose-5-phosphate[0] <=> (1) Phosphate[0] + (1) ADPribose[0]",
+        "compound_ids": "cpd00008;cpd00009;cpd00101;cpd00251",
+        "definition": "(1) ADP[0] + (1) ribose-5-phosphate[0] <=> (1) Phosphate[0] + (1) ADPribose[0]",
         "ec_numbers": [
             "2.7.7.35"
         ],
-        "equation": "(1) cpd00008[0] + (1) cpd00067[0] + (1) cpd00101[0] <=> (1) cpd00009[0] + (1) cpd00251[0]",
+        "equation": "(1) cpd00008[0] + (1) cpd00101[0] <=> (1) cpd00009[0] + (1) cpd00251[0]",
         "id": "rxn33061",
         "is_obsolete": 1,
         "is_transport": 0,
@@ -6121,20 +6137,12 @@
         "status": "OK",
         "stoichiometry": [
             {
-                "charge": -3,
+                "charge": -2,
                 "coefficient": -1,
                 "compartment": 0,
                 "compound": "cpd00008",
-                "formula": "C10H12N5O10P2",
+                "formula": "C10H13N5O10P2",
                 "name": "ADP"
-            },
-            {
-                "charge": 1,
-                "coefficient": -1,
-                "compartment": 0,
-                "compound": "cpd00067",
-                "formula": "H",
-                "name": "H+"
             },
             {
                 "charge": -2,
@@ -6217,12 +6225,12 @@
             "has_symmetry_groups": true
         },
         "code": "(1) cpd00001[0] + (1) cpd00905[0] <=> (1) cpd00012[0] + (1) cpd00031[0]",
-        "compound_ids": "cpd00001;cpd00012;cpd00031;cpd00067;cpd00905",
-        "definition": "(1) H2O[0] + (1) Guanosine 3',5'-bis(diphosphate)[0] => (1) PPi[0] + (1) GDP[0] + (1) H+[0]",
+        "compound_ids": "cpd00001;cpd00012;cpd00031;cpd00905",
+        "definition": "(1) H2O[0] + (1) Guanosine 3',5'-bis(diphosphate)[0] => (1) PPi[0] + (1) GDP[0]",
         "ec_numbers": [
             "3.1.7.2"
         ],
-        "equation": "(1) cpd00001[0] + (1) cpd00905[0] => (1) cpd00012[0] + (1) cpd00031[0] + (1) cpd00067[0]",
+        "equation": "(1) cpd00001[0] + (1) cpd00905[0] => (1) cpd00012[0] + (1) cpd00031[0]",
         "id": "rxn33062",
         "is_obsolete": 1,
         "is_transport": 0,
@@ -6267,20 +6275,12 @@
                 "name": "PPi"
             },
             {
-                "charge": -3,
+                "charge": -2,
                 "coefficient": 1,
                 "compartment": 0,
                 "compound": "cpd00031",
-                "formula": "C10H12N5O11P2",
+                "formula": "C10H13N5O11P2",
                 "name": "GDP"
-            },
-            {
-                "charge": 1,
-                "coefficient": 1,
-                "compartment": 0,
-                "compound": "cpd00067",
-                "formula": "H",
-                "name": "H+"
             }
         ],
         "thermo-evidence": {
@@ -6885,11 +6885,11 @@
         "status": "OK",
         "stoichiometry": [
             {
-                "charge": -4,
+                "charge": -3,
                 "coefficient": -1,
                 "compartment": 0,
                 "compound": "cpd00002",
-                "formula": "C10H12N5O13P3",
+                "formula": "C10H13N5O13P3",
                 "name": "ATP"
             },
             {
@@ -6901,11 +6901,11 @@
                 "name": "Dephospho-CoA"
             },
             {
-                "charge": -3,
+                "charge": -2,
                 "coefficient": 1,
                 "compartment": 0,
                 "compound": "cpd00008",
-                "formula": "C10H12N5O10P2",
+                "formula": "C10H13N5O10P2",
                 "name": "ADP"
             },
             {
@@ -8426,11 +8426,11 @@
         "status": "OK",
         "stoichiometry": [
             {
-                "charge": -3,
+                "charge": -2,
                 "coefficient": -1,
                 "compartment": 0,
                 "compound": "cpd00008",
-                "formula": "C10H12N5O10P2",
+                "formula": "C10H13N5O10P2",
                 "name": "ADP"
             },
             {
@@ -8450,11 +8450,11 @@
                 "name": "H2O"
             },
             {
-                "charge": -3,
+                "charge": -2,
                 "coefficient": 1,
                 "compartment": 0,
                 "compound": "cpd00177",
-                "formula": "C10H12N5O9P2",
+                "formula": "C10H13N5O9P2",
                 "name": "dADP"
             },
             {
@@ -8679,11 +8679,11 @@
         },
         "code": "(1) cpd00001[0] + (1) cpd00002[0] + (1) cpd00053[0] + (1) cpd00638[0] <=> (1) cpd00003[0] + (1) cpd00012[0] + (1) cpd00018[0] + (1) cpd00023[0]",
         "compound_ids": "cpd00001;cpd00002;cpd00003;cpd00012;cpd00018;cpd00023;cpd00053;cpd00067;cpd00638",
-        "definition": "(1) H2O[0] + (1) ATP[0] + (1) L-Glutamine[0] + (1) Deamido-NAD[0] <=> (1) NAD[0] + (1) PPi[0] + (1) AMP[0] + (1) L-Glutamate[0] + (1) H+[0]",
+        "definition": "(1) H2O[0] + (1) ATP[0] + (1) L-Glutamine[0] + (1) Deamido-NAD[0] <=> (1) NAD[0] + (1) PPi[0] + (1) AMP[0] + (1) L-Glutamate[0] + (2) H+[0]",
         "ec_numbers": [
             "6.3.5.1"
         ],
-        "equation": "(1) cpd00001[0] + (1) cpd00002[0] + (1) cpd00053[0] + (1) cpd00638[0] <=> (1) cpd00003[0] + (1) cpd00012[0] + (1) cpd00018[0] + (1) cpd00023[0] + (1) cpd00067[0]",
+        "equation": "(1) cpd00001[0] + (1) cpd00002[0] + (1) cpd00053[0] + (1) cpd00638[0] <=> (1) cpd00003[0] + (1) cpd00012[0] + (1) cpd00018[0] + (1) cpd00023[0] + (2) cpd00067[0]",
         "id": "rxn33083",
         "is_obsolete": 1,
         "is_transport": 0,
@@ -8712,11 +8712,11 @@
                 "name": "H2O"
             },
             {
-                "charge": -4,
+                "charge": -3,
                 "coefficient": -1,
                 "compartment": 0,
                 "compound": "cpd00002",
-                "formula": "C10H12N5O13P3",
+                "formula": "C10H13N5O13P3",
                 "name": "ATP"
             },
             {
@@ -8769,7 +8769,7 @@
             },
             {
                 "charge": 1,
-                "coefficient": 1,
+                "coefficient": 2,
                 "compartment": 0,
                 "compound": "cpd00067",
                 "formula": "H",
@@ -8837,11 +8837,11 @@
         "status": "OK",
         "stoichiometry": [
             {
-                "charge": -3,
+                "charge": -2,
                 "coefficient": -1,
                 "compartment": 0,
                 "compound": "cpd00008",
-                "formula": "C10H12N5O10P2",
+                "formula": "C10H13N5O10P2",
                 "name": "ADP"
             },
             {
@@ -8861,11 +8861,11 @@
                 "name": "H2O"
             },
             {
-                "charge": -3,
+                "charge": -2,
                 "coefficient": 1,
                 "compartment": 0,
                 "compound": "cpd00177",
-                "formula": "C10H12N5O9P2",
+                "formula": "C10H13N5O9P2",
                 "name": "dADP"
             },
             {
@@ -9207,11 +9207,11 @@
         "status": "OK",
         "stoichiometry": [
             {
-                "charge": -4,
+                "charge": -3,
                 "coefficient": -1,
                 "compartment": 0,
                 "compound": "cpd00002",
-                "formula": "C10H12N5O13P3",
+                "formula": "C10H13N5O13P3",
                 "name": "ATP"
             },
             {
@@ -9223,11 +9223,11 @@
                 "name": "D-Tagatose 6-phosphate"
             },
             {
-                "charge": -3,
+                "charge": -2,
                 "coefficient": 1,
                 "compartment": 0,
                 "compound": "cpd00008",
-                "formula": "C10H12N5O10P2",
+                "formula": "C10H13N5O10P2",
                 "name": "ADP"
             },
             {
@@ -9308,11 +9308,11 @@
         "status": "OK",
         "stoichiometry": [
             {
-                "charge": -3,
+                "charge": -2,
                 "coefficient": -1,
                 "compartment": 0,
                 "compound": "cpd00008",
-                "formula": "C10H12N5O10P2",
+                "formula": "C10H13N5O10P2",
                 "name": "ADP"
             },
             {
@@ -9332,11 +9332,11 @@
                 "name": "H2O"
             },
             {
-                "charge": -3,
+                "charge": -2,
                 "coefficient": 1,
                 "compartment": 0,
                 "compound": "cpd00177",
-                "formula": "C10H12N5O9P2",
+                "formula": "C10H13N5O9P2",
                 "name": "dADP"
             },
             {
@@ -9643,11 +9643,11 @@
         "status": "OK",
         "stoichiometry": [
             {
-                "charge": -4,
+                "charge": -3,
                 "coefficient": -1,
                 "compartment": 0,
                 "compound": "cpd00002",
-                "formula": "C10H12N5O13P3",
+                "formula": "C10H13N5O13P3",
                 "name": "ATP"
             },
             {
@@ -9667,11 +9667,11 @@
                 "name": "Citrate"
             },
             {
-                "charge": -3,
+                "charge": -2,
                 "coefficient": 1,
                 "compartment": 0,
                 "compound": "cpd00008",
-                "formula": "C10H12N5O10P2",
+                "formula": "C10H13N5O10P2",
                 "name": "ADP"
             },
             {
@@ -9810,11 +9810,11 @@
         "status": "OK",
         "stoichiometry": [
             {
-                "charge": -4,
+                "charge": -3,
                 "coefficient": -1,
                 "compartment": 0,
                 "compound": "cpd00002",
-                "formula": "C10H12N5O13P3",
+                "formula": "C10H13N5O13P3",
                 "name": "ATP"
             },
             {
@@ -9834,11 +9834,11 @@
                 "name": "Citrate"
             },
             {
-                "charge": -3,
+                "charge": -2,
                 "coefficient": 1,
                 "compartment": 0,
                 "compound": "cpd00008",
-                "formula": "C10H12N5O10P2",
+                "formula": "C10H13N5O10P2",
                 "name": "ADP"
             },
             {
@@ -11118,11 +11118,11 @@
         "status": "OK",
         "stoichiometry": [
             {
-                "charge": -4,
+                "charge": -3,
                 "coefficient": -1,
                 "compartment": 0,
                 "compound": "cpd00002",
-                "formula": "C10H12N5O13P3",
+                "formula": "C10H13N5O13P3",
                 "name": "ATP"
             },
             {
@@ -11134,11 +11134,11 @@
                 "name": "Phosphatidylinositol-4,5-bisphosphate"
             },
             {
-                "charge": -3,
+                "charge": -2,
                 "coefficient": 1,
                 "compartment": 0,
                 "compound": "cpd00008",
-                "formula": "C10H12N5O10P2",
+                "formula": "C10H13N5O10P2",
                 "name": "ADP"
             },
             {
@@ -11201,11 +11201,11 @@
         "status": "OK",
         "stoichiometry": [
             {
-                "charge": -4,
+                "charge": -3,
                 "coefficient": -1,
                 "compartment": 0,
                 "compound": "cpd00002",
-                "formula": "C10H12N5O13P3",
+                "formula": "C10H13N5O13P3",
                 "name": "ATP"
             },
             {
@@ -11217,11 +11217,11 @@
                 "name": "Phosphatidylinositol-4,5-bisphosphate"
             },
             {
-                "charge": -3,
+                "charge": -2,
                 "coefficient": 1,
                 "compartment": 0,
                 "compound": "cpd00008",
-                "formula": "C10H12N5O10P2",
+                "formula": "C10H13N5O10P2",
                 "name": "ADP"
             },
             {
@@ -13180,12 +13180,12 @@
             "has_symmetry_groups": true
         },
         "code": "(1) cpd00002[0] + (1) cpd00050[0] <=> (1) cpd00012[0] + (1) cpd00015[0]",
-        "compound_ids": "cpd00002;cpd00012;cpd00015;cpd00050;cpd00067",
-        "definition": "(1) ATP[0] + (1) FMN[0] + (1) H+[0] <=> (1) PPi[0] + (1) FAD[0]",
+        "compound_ids": "cpd00002;cpd00012;cpd00015;cpd00050",
+        "definition": "(1) ATP[0] + (1) FMN[0] <=> (1) PPi[0] + (1) FAD[0]",
         "ec_numbers": [
             "2.7.7.2"
         ],
-        "equation": "(1) cpd00002[0] + (1) cpd00050[0] + (1) cpd00067[0] <=> (1) cpd00012[0] + (1) cpd00015[0]",
+        "equation": "(1) cpd00002[0] + (1) cpd00050[0] <=> (1) cpd00012[0] + (1) cpd00015[0]",
         "id": "rxn33129",
         "is_obsolete": 1,
         "is_transport": 0,
@@ -13206,11 +13206,11 @@
         "status": "OK",
         "stoichiometry": [
             {
-                "charge": -4,
+                "charge": -3,
                 "coefficient": -1,
                 "compartment": 0,
                 "compound": "cpd00002",
-                "formula": "C10H12N5O13P3",
+                "formula": "C10H13N5O13P3",
                 "name": "ATP"
             },
             {
@@ -13220,14 +13220,6 @@
                 "compound": "cpd00050",
                 "formula": "C17H19N4O9P",
                 "name": "FMN"
-            },
-            {
-                "charge": 1,
-                "coefficient": -1,
-                "compartment": 0,
-                "compound": "cpd00067",
-                "formula": "H",
-                "name": "H+"
             },
             {
                 "charge": -3,
@@ -14245,19 +14237,19 @@
         "status": "OK",
         "stoichiometry": [
             {
-                "charge": -4,
+                "charge": -3,
                 "coefficient": -1,
                 "compartment": 0,
                 "compound": "cpd00357",
-                "formula": "C10H13N2O14P3",
+                "formula": "C10H14N2O14P3",
                 "name": "TTP"
             },
             {
-                "charge": -4,
+                "charge": -3,
                 "coefficient": 1,
                 "compartment": 1,
                 "compound": "cpd00357",
-                "formula": "C10H13N2O14P3",
+                "formula": "C10H14N2O14P3",
                 "name": "TTP"
             }
         ],
@@ -14493,19 +14485,19 @@
         "status": "OK",
         "stoichiometry": [
             {
-                "charge": -4,
+                "charge": -3,
                 "coefficient": -1,
                 "compartment": 0,
                 "compound": "cpd00357",
-                "formula": "C10H13N2O14P3",
+                "formula": "C10H14N2O14P3",
                 "name": "TTP"
             },
             {
-                "charge": -4,
+                "charge": -3,
                 "coefficient": 1,
                 "compartment": 1,
                 "compound": "cpd00357",
-                "formula": "C10H13N2O14P3",
+                "formula": "C10H14N2O14P3",
                 "name": "TTP"
             }
         ],
@@ -15381,11 +15373,11 @@
         },
         "code": "(2) cpd00038[0] <=> (1) cpd00012[0] + (1) cpd00925[0]",
         "compound_ids": "cpd00012;cpd00038;cpd00067;cpd00925",
-        "definition": "(2) GTP[0] + (1) H+[0] <=> (1) PPi[0] + (1) GppppG[0]",
+        "definition": "(2) GTP[0] <=> (1) PPi[0] + (1) H+[0] + (1) GppppG[0]",
         "ec_numbers": [
             "2.7.7.45"
         ],
-        "equation": "(2) cpd00038[0] + (1) cpd00067[0] <=> (1) cpd00012[0] + (1) cpd00925[0]",
+        "equation": "(2) cpd00038[0] <=> (1) cpd00012[0] + (1) cpd00067[0] + (1) cpd00925[0]",
         "id": "rxn33150",
         "is_obsolete": 1,
         "is_transport": 0,
@@ -15403,20 +15395,12 @@
         "status": "OK",
         "stoichiometry": [
             {
-                "charge": -4,
+                "charge": -3,
                 "coefficient": -2,
                 "compartment": 0,
                 "compound": "cpd00038",
-                "formula": "C10H12N5O14P3",
+                "formula": "C10H13N5O14P3",
                 "name": "GTP"
-            },
-            {
-                "charge": 1,
-                "coefficient": -1,
-                "compartment": 0,
-                "compound": "cpd00067",
-                "formula": "H",
-                "name": "H+"
             },
             {
                 "charge": -3,
@@ -15425,6 +15409,14 @@
                 "compound": "cpd00012",
                 "formula": "HO7P2",
                 "name": "PPi"
+            },
+            {
+                "charge": 1,
+                "coefficient": 1,
+                "compartment": 0,
+                "compound": "cpd00067",
+                "formula": "H",
+                "name": "H+"
             },
             {
                 "charge": -4,
@@ -15628,11 +15620,11 @@
         },
         "code": "(2) cpd00038[0] <=> (1) cpd00012[0] + (1) cpd00925[0]",
         "compound_ids": "cpd00012;cpd00038;cpd00067;cpd00925",
-        "definition": "(2) GTP[0] + (1) H+[0] <=> (1) PPi[0] + (1) GppppG[0]",
+        "definition": "(2) GTP[0] <=> (1) PPi[0] + (1) H+[0] + (1) GppppG[0]",
         "ec_numbers": [
             "2.7.7.45"
         ],
-        "equation": "(2) cpd00038[0] + (1) cpd00067[0] <=> (1) cpd00012[0] + (1) cpd00925[0]",
+        "equation": "(2) cpd00038[0] <=> (1) cpd00012[0] + (1) cpd00067[0] + (1) cpd00925[0]",
         "id": "rxn33152",
         "is_obsolete": 1,
         "is_transport": 0,
@@ -15650,20 +15642,12 @@
         "status": "OK",
         "stoichiometry": [
             {
-                "charge": -4,
+                "charge": -3,
                 "coefficient": -2,
                 "compartment": 0,
                 "compound": "cpd00038",
-                "formula": "C10H12N5O14P3",
+                "formula": "C10H13N5O14P3",
                 "name": "GTP"
-            },
-            {
-                "charge": 1,
-                "coefficient": -1,
-                "compartment": 0,
-                "compound": "cpd00067",
-                "formula": "H",
-                "name": "H+"
             },
             {
                 "charge": -3,
@@ -15672,6 +15656,14 @@
                 "compound": "cpd00012",
                 "formula": "HO7P2",
                 "name": "PPi"
+            },
+            {
+                "charge": 1,
+                "coefficient": 1,
+                "compartment": 0,
+                "compound": "cpd00067",
+                "formula": "H",
+                "name": "H+"
             },
             {
                 "charge": -4,
@@ -18261,11 +18253,11 @@
         "status": "OK",
         "stoichiometry": [
             {
-                "charge": -4,
+                "charge": -3,
                 "coefficient": -1,
                 "compartment": 0,
                 "compound": "cpd00002",
-                "formula": "C10H12N5O13P3",
+                "formula": "C10H13N5O13P3",
                 "name": "ATP"
             },
             {
@@ -18277,11 +18269,11 @@
                 "name": "Uridine"
             },
             {
-                "charge": -3,
+                "charge": -2,
                 "coefficient": 1,
                 "compartment": 0,
                 "compound": "cpd00008",
-                "formula": "C10H12N5O10P2",
+                "formula": "C10H13N5O10P2",
                 "name": "ADP"
             },
             {
@@ -19199,12 +19191,12 @@
             "has_symmetry_groups": true
         },
         "code": "(1) cpd00002[0] + (1) cpd00038[0] <=> (1) cpd00018[0] + (1) cpd02740[0]",
-        "compound_ids": "cpd00002;cpd00018;cpd00038;cpd02740",
-        "definition": "(1) ATP[0] + (1) GTP[0] <=> (1) AMP[0] + (1) Guanosine 5'-triphosphate,3'-diphosphate[0]",
+        "compound_ids": "cpd00002;cpd00018;cpd00038;cpd00067;cpd02740",
+        "definition": "(1) ATP[0] + (1) GTP[0] <=> (1) AMP[0] + (2) H+[0] + (1) Guanosine 5'-triphosphate,3'-diphosphate[0]",
         "ec_numbers": [
             "2.7.6.5"
         ],
-        "equation": "(1) cpd00002[0] + (1) cpd00038[0] <=> (1) cpd00018[0] + (1) cpd02740[0]",
+        "equation": "(1) cpd00002[0] + (1) cpd00038[0] <=> (1) cpd00018[0] + (2) cpd00067[0] + (1) cpd02740[0]",
         "id": "rxn33193",
         "is_obsolete": 1,
         "is_transport": 0,
@@ -19225,19 +19217,19 @@
         "status": "OK",
         "stoichiometry": [
             {
-                "charge": -4,
+                "charge": -3,
                 "coefficient": -1,
                 "compartment": 0,
                 "compound": "cpd00002",
-                "formula": "C10H12N5O13P3",
+                "formula": "C10H13N5O13P3",
                 "name": "ATP"
             },
             {
-                "charge": -4,
+                "charge": -3,
                 "coefficient": -1,
                 "compartment": 0,
                 "compound": "cpd00038",
-                "formula": "C10H12N5O14P3",
+                "formula": "C10H13N5O14P3",
                 "name": "GTP"
             },
             {
@@ -19247,6 +19239,14 @@
                 "compound": "cpd00018",
                 "formula": "C10H12N5O7P",
                 "name": "AMP"
+            },
+            {
+                "charge": 1,
+                "coefficient": 2,
+                "compartment": 0,
+                "compound": "cpd00067",
+                "formula": "H",
+                "name": "H+"
             },
             {
                 "charge": -6,
@@ -19320,12 +19320,12 @@
             "has_symmetry_groups": true
         },
         "code": "(1) cpd00043[0] + (1) cpd00121[0] <=> (1) cpd00014[0] + (1) cpd00910[0]",
-        "compound_ids": "cpd00014;cpd00043;cpd00067;cpd00121;cpd00910",
-        "definition": "(1) UDP-galactose[0] + (1) L-Inositol[0] <=> (1) UDP[0] + (1) H+[0] + (1) Galactinol[0]",
+        "compound_ids": "cpd00014;cpd00043;cpd00121;cpd00910",
+        "definition": "(1) UDP-galactose[0] + (1) L-Inositol[0] <=> (1) UDP[0] + (1) Galactinol[0]",
         "ec_numbers": [
             "2.4.1.123"
         ],
-        "equation": "(1) cpd00043[0] + (1) cpd00121[0] <=> (1) cpd00014[0] + (1) cpd00067[0] + (1) cpd00910[0]",
+        "equation": "(1) cpd00043[0] + (1) cpd00121[0] <=> (1) cpd00014[0] + (1) cpd00910[0]",
         "id": "rxn33194",
         "is_obsolete": 1,
         "is_transport": 0,
@@ -19362,20 +19362,12 @@
                 "name": "L-Inositol"
             },
             {
-                "charge": -3,
+                "charge": -2,
                 "coefficient": 1,
                 "compartment": 0,
                 "compound": "cpd00014",
-                "formula": "C9H11N2O12P2",
+                "formula": "C9H12N2O12P2",
                 "name": "UDP"
-            },
-            {
-                "charge": 1,
-                "coefficient": 1,
-                "compartment": 0,
-                "compound": "cpd00067",
-                "formula": "H",
-                "name": "H+"
             },
             {
                 "charge": 0,
@@ -19449,12 +19441,12 @@
             "has_symmetry_groups": true
         },
         "code": "(1) cpd00043[0] + (1) cpd00121[0] <=> (1) cpd00014[0] + (1) cpd00910[0]",
-        "compound_ids": "cpd00014;cpd00043;cpd00067;cpd00121;cpd00910",
-        "definition": "(1) UDP-galactose[0] + (1) L-Inositol[0] <=> (1) UDP[0] + (1) H+[0] + (1) Galactinol[0]",
+        "compound_ids": "cpd00014;cpd00043;cpd00121;cpd00910",
+        "definition": "(1) UDP-galactose[0] + (1) L-Inositol[0] <=> (1) UDP[0] + (1) Galactinol[0]",
         "ec_numbers": [
             "2.4.1.123"
         ],
-        "equation": "(1) cpd00043[0] + (1) cpd00121[0] <=> (1) cpd00014[0] + (1) cpd00067[0] + (1) cpd00910[0]",
+        "equation": "(1) cpd00043[0] + (1) cpd00121[0] <=> (1) cpd00014[0] + (1) cpd00910[0]",
         "id": "rxn33195",
         "is_obsolete": 1,
         "is_transport": 0,
@@ -19491,20 +19483,12 @@
                 "name": "L-Inositol"
             },
             {
-                "charge": -3,
+                "charge": -2,
                 "coefficient": 1,
                 "compartment": 0,
                 "compound": "cpd00014",
-                "formula": "C9H11N2O12P2",
+                "formula": "C9H12N2O12P2",
                 "name": "UDP"
-            },
-            {
-                "charge": 1,
-                "coefficient": 1,
-                "compartment": 0,
-                "compound": "cpd00067",
-                "formula": "H",
-                "name": "H+"
             },
             {
                 "charge": 0,
@@ -19774,12 +19758,12 @@
             "has_symmetry_groups": true
         },
         "code": "(1) cpd00043[0] + (1) cpd00121[0] <=> (1) cpd00014[0] + (1) cpd00910[0]",
-        "compound_ids": "cpd00014;cpd00043;cpd00067;cpd00121;cpd00910",
-        "definition": "(1) UDP-galactose[0] + (1) L-Inositol[0] <=> (1) UDP[0] + (1) H+[0] + (1) Galactinol[0]",
+        "compound_ids": "cpd00014;cpd00043;cpd00121;cpd00910",
+        "definition": "(1) UDP-galactose[0] + (1) L-Inositol[0] <=> (1) UDP[0] + (1) Galactinol[0]",
         "ec_numbers": [
             "2.4.1.123"
         ],
-        "equation": "(1) cpd00043[0] + (1) cpd00121[0] <=> (1) cpd00014[0] + (1) cpd00067[0] + (1) cpd00910[0]",
+        "equation": "(1) cpd00043[0] + (1) cpd00121[0] <=> (1) cpd00014[0] + (1) cpd00910[0]",
         "id": "rxn33199",
         "is_obsolete": 1,
         "is_transport": 0,
@@ -19816,20 +19800,12 @@
                 "name": "L-Inositol"
             },
             {
-                "charge": -3,
+                "charge": -2,
                 "coefficient": 1,
                 "compartment": 0,
                 "compound": "cpd00014",
-                "formula": "C9H11N2O12P2",
+                "formula": "C9H12N2O12P2",
                 "name": "UDP"
-            },
-            {
-                "charge": 1,
-                "coefficient": 1,
-                "compartment": 0,
-                "compound": "cpd00067",
-                "formula": "H",
-                "name": "H+"
             },
             {
                 "charge": 0,
@@ -19970,11 +19946,11 @@
         "status": "OK",
         "stoichiometry": [
             {
-                "charge": -4,
+                "charge": -3,
                 "coefficient": -1,
                 "compartment": 0,
                 "compound": "cpd00038",
-                "formula": "C10H12N5O14P3",
+                "formula": "C10H13N5O14P3",
                 "name": "GTP"
             },
             {
@@ -19986,11 +19962,11 @@
                 "name": "Uridine"
             },
             {
-                "charge": -3,
+                "charge": -2,
                 "coefficient": 1,
                 "compartment": 0,
                 "compound": "cpd00031",
-                "formula": "C10H12N5O11P2",
+                "formula": "C10H13N5O11P2",
                 "name": "GDP"
             },
             {
@@ -21630,11 +21606,11 @@
         "status": "OK",
         "stoichiometry": [
             {
-                "charge": -4,
+                "charge": -3,
                 "coefficient": -1,
                 "compartment": 0,
                 "compound": "cpd00002",
-                "formula": "C10H12N5O13P3",
+                "formula": "C10H13N5O13P3",
                 "name": "ATP"
             },
             {
@@ -21646,11 +21622,11 @@
                 "name": "Inositol 3-phosphate"
             },
             {
-                "charge": -3,
+                "charge": -2,
                 "coefficient": 1,
                 "compartment": 0,
                 "compound": "cpd00008",
-                "formula": "C10H12N5O10P2",
+                "formula": "C10H13N5O10P2",
                 "name": "ADP"
             },
             {
@@ -23957,11 +23933,11 @@
         },
         "code": "(1) cpd00001[0] + (1) cpd00002[0] + (1) cpd00053[0] + (1) cpd00062[0] <=> (1) cpd00008[0] + (1) cpd00009[0] + (1) cpd00023[0] + (1) cpd00052[0]",
         "compound_ids": "cpd00001;cpd00002;cpd00008;cpd00009;cpd00023;cpd00052;cpd00053;cpd00062;cpd00067",
-        "definition": "(1) H2O[0] + (1) ATP[0] + (1) L-Glutamine[0] + (1) UTP[0] <=> (1) ADP[0] + (1) Phosphate[0] + (1) L-Glutamate[0] + (1) CTP[0] + (2) H+[0]",
+        "definition": "(1) H2O[0] + (1) ATP[0] + (1) L-Glutamine[0] + (1) UTP[0] <=> (1) ADP[0] + (1) Phosphate[0] + (1) L-Glutamate[0] + (1) CTP[0] + (3) H+[0]",
         "ec_numbers": [
             "6.3.4.2"
         ],
-        "equation": "(1) cpd00001[0] + (1) cpd00002[0] + (1) cpd00053[0] + (1) cpd00062[0] <=> (1) cpd00008[0] + (1) cpd00009[0] + (1) cpd00023[0] + (1) cpd00052[0] + (2) cpd00067[0]",
+        "equation": "(1) cpd00001[0] + (1) cpd00002[0] + (1) cpd00053[0] + (1) cpd00062[0] <=> (1) cpd00008[0] + (1) cpd00009[0] + (1) cpd00023[0] + (1) cpd00052[0] + (3) cpd00067[0]",
         "id": "rxn33242",
         "is_obsolete": 1,
         "is_transport": 0,
@@ -23990,11 +23966,11 @@
                 "name": "H2O"
             },
             {
-                "charge": -4,
+                "charge": -3,
                 "coefficient": -1,
                 "compartment": 0,
                 "compound": "cpd00002",
-                "formula": "C10H12N5O13P3",
+                "formula": "C10H13N5O13P3",
                 "name": "ATP"
             },
             {
@@ -24006,19 +23982,19 @@
                 "name": "L-Glutamine"
             },
             {
-                "charge": -4,
+                "charge": -3,
                 "coefficient": -1,
                 "compartment": 0,
                 "compound": "cpd00062",
-                "formula": "C9H11N2O15P3",
+                "formula": "C9H12N2O15P3",
                 "name": "UTP"
             },
             {
-                "charge": -3,
+                "charge": -2,
                 "coefficient": 1,
                 "compartment": 0,
                 "compound": "cpd00008",
-                "formula": "C10H12N5O10P2",
+                "formula": "C10H13N5O10P2",
                 "name": "ADP"
             },
             {
@@ -24047,7 +24023,7 @@
             },
             {
                 "charge": 1,
-                "coefficient": 2,
+                "coefficient": 3,
                 "compartment": 0,
                 "compound": "cpd00067",
                 "formula": "H",
@@ -26109,11 +26085,11 @@
         "status": "OK",
         "stoichiometry": [
             {
-                "charge": -4,
+                "charge": -3,
                 "coefficient": -1,
                 "compartment": 0,
                 "compound": "cpd00002",
-                "formula": "C10H12N5O13P3",
+                "formula": "C10H13N5O13P3",
                 "name": "ATP"
             },
             {
@@ -26125,11 +26101,11 @@
                 "name": "Sphingoid"
             },
             {
-                "charge": -3,
+                "charge": -2,
                 "coefficient": 1,
                 "compartment": 0,
                 "compound": "cpd00008",
-                "formula": "C10H12N5O10P2",
+                "formula": "C10H13N5O10P2",
                 "name": "ADP"
             },
             {
@@ -26283,11 +26259,11 @@
         },
         "code": "(1) cpd00001[0] + (1) cpd00002[0] + (1) cpd00020[0] <=> (1) cpd00009[0] + (1) cpd00018[0] + (1) cpd00061[0]",
         "compound_ids": "cpd00001;cpd00002;cpd00009;cpd00018;cpd00020;cpd00061;cpd00067",
-        "definition": "(1) H2O[0] + (1) ATP[0] + (1) Pyruvate[0] <=> (1) Phosphate[0] + (1) AMP[0] + (1) Phosphoenolpyruvate[0] + (2) H+[0]",
+        "definition": "(1) H2O[0] + (1) ATP[0] + (1) Pyruvate[0] <=> (1) Phosphate[0] + (1) AMP[0] + (1) Phosphoenolpyruvate[0] + (3) H+[0]",
         "ec_numbers": [
             "2.7.9.2"
         ],
-        "equation": "(1) cpd00001[0] + (1) cpd00002[0] + (1) cpd00020[0] <=> (1) cpd00009[0] + (1) cpd00018[0] + (1) cpd00061[0] + (2) cpd00067[0]",
+        "equation": "(1) cpd00001[0] + (1) cpd00002[0] + (1) cpd00020[0] <=> (1) cpd00009[0] + (1) cpd00018[0] + (1) cpd00061[0] + (3) cpd00067[0]",
         "id": "rxn33266",
         "is_obsolete": 1,
         "is_transport": 0,
@@ -26316,11 +26292,11 @@
                 "name": "H2O"
             },
             {
-                "charge": -4,
+                "charge": -3,
                 "coefficient": -1,
                 "compartment": 0,
                 "compound": "cpd00002",
-                "formula": "C10H12N5O13P3",
+                "formula": "C10H13N5O13P3",
                 "name": "ATP"
             },
             {
@@ -26357,7 +26333,7 @@
             },
             {
                 "charge": 1,
-                "coefficient": 2,
+                "coefficient": 3,
                 "compartment": 0,
                 "compound": "cpd00067",
                 "formula": "H",
@@ -26455,11 +26431,11 @@
         "status": "OK",
         "stoichiometry": [
             {
-                "charge": -4,
+                "charge": -3,
                 "coefficient": -1,
                 "compartment": 0,
                 "compound": "cpd00002",
-                "formula": "C10H12N5O13P3",
+                "formula": "C10H13N5O13P3",
                 "name": "ATP"
             },
             {
@@ -26471,11 +26447,11 @@
                 "name": "alpha-D-Glucose"
             },
             {
-                "charge": -3,
+                "charge": -2,
                 "coefficient": 1,
                 "compartment": 0,
                 "compound": "cpd00008",
-                "formula": "C10H12N5O10P2",
+                "formula": "C10H13N5O10P2",
                 "name": "ADP"
             },
             {
@@ -28097,12 +28073,12 @@
             "has_symmetry_groups": true
         },
         "code": "(1) cpd00023[0] + (1) cpd00930[0] <=> (1) cpd00024[0] + (1) cpd00807[0]",
-        "compound_ids": "cpd00023;cpd00024;cpd00807;cpd00930",
-        "definition": "(1) L-Glutamate[0] + (1) imidazole acetol-phosphate[0] <=> (1) 2-Oxoglutarate[0] + (1) L-histidinol-phosphate[0]",
+        "compound_ids": "cpd00023;cpd00024;cpd00067;cpd00807;cpd00930",
+        "definition": "(1) L-Glutamate[0] + (1) imidazole acetol-phosphate[0] <=> (1) 2-Oxoglutarate[0] + (1) H+[0] + (1) L-histidinol-phosphate[0]",
         "ec_numbers": [
             "2.6.1.9"
         ],
-        "equation": "(1) cpd00023[0] + (1) cpd00930[0] <=> (1) cpd00024[0] + (1) cpd00807[0]",
+        "equation": "(1) cpd00023[0] + (1) cpd00930[0] <=> (1) cpd00024[0] + (1) cpd00067[0] + (1) cpd00807[0]",
         "id": "rxn33284",
         "is_obsolete": 1,
         "is_transport": 0,
@@ -28111,7 +28087,8 @@
         "notes": [
             "GCC",
             "EQC",
-            "EQU"
+            "EQU",
+            "HB"
         ],
         "pathways": [
             "MetaCyc: Amino-Acid-Biosynthesis (Amino Acid Biosynthesis); HISTIDINE-SYN (L-histidine Biosynthesis); HISTSYN-PWY (L-histidine biosynthesis); IND-AMINO-ACID-SYN (Proteinogenic Amino Acid Biosynthesis); PRPP-PWY (superpathway of histidine, purine, and pyrimidine biosynthesis)",
@@ -28119,7 +28096,7 @@
         ],
         "reversibility": "=",
         "source": "Primary Database",
-        "status": "MI:-:1/H:-1|CI:-1",
+        "status": "OK",
         "stoichiometry": [
             {
                 "charge": -1,
@@ -28146,11 +28123,19 @@
                 "name": "2-Oxoglutarate"
             },
             {
+                "charge": 1,
+                "coefficient": 1,
+                "compartment": 0,
+                "compound": "cpd00067",
+                "formula": "H",
+                "name": "H+"
+            },
+            {
                 "charge": -1,
                 "coefficient": 1,
                 "compartment": 0,
                 "compound": "cpd00807",
-                "formula": "C6H11N3O4P-",
+                "formula": "C6H11N3O4P",
                 "name": "L-histidinol-phosphate"
             }
         ],
@@ -30891,11 +30876,11 @@
         "status": "OK",
         "stoichiometry": [
             {
-                "charge": -4,
+                "charge": -3,
                 "coefficient": -1,
                 "compartment": 0,
                 "compound": "cpd00002",
-                "formula": "C10H12N5O13P3",
+                "formula": "C10H13N5O13P3",
                 "name": "ATP"
             },
             {
@@ -30907,11 +30892,11 @@
                 "name": "Inositol 3-phosphate"
             },
             {
-                "charge": -3,
+                "charge": -2,
                 "coefficient": 1,
                 "compartment": 0,
                 "compound": "cpd00008",
-                "formula": "C10H12N5O10P2",
+                "formula": "C10H13N5O10P2",
                 "name": "ADP"
             },
             {
@@ -31545,13 +31530,13 @@
             "has_symmetry_groups": true
         },
         "code": "(1) cpd00113[0] + (1) cpd17564[0] <=> (1) cpd00012[0] + (1) cpd17566[0]",
-        "compound_ids": "cpd00012;cpd00113;cpd17564;cpd17566",
-        "definition": "(1) Isopentenyldiphosphate[0] + (1) ditrans,tricis-Hexaprenyl diphosphate[0] => (1) PPi[0] + (1) ditrans,tetracis-Heptaprenyl diphosphate[0]",
+        "compound_ids": "cpd00012;cpd00067;cpd00113;cpd17564;cpd17566",
+        "definition": "(1) Isopentenyldiphosphate[0] + (1) ditrans,tricis-Hexaprenyl diphosphate[0] => (1) PPi[0] + (1) H+[0] + (1) ditrans,tetracis-Heptaprenyl diphosphate[0]",
         "ec_numbers": [
             "2.5.1.-",
             "2.5.1.31"
         ],
-        "equation": "(1) cpd00113[0] + (1) cpd17564[0] => (1) cpd00012[0] + (1) cpd17566[0]",
+        "equation": "(1) cpd00113[0] + (1) cpd17564[0] => (1) cpd00012[0] + (1) cpd00067[0] + (1) cpd17566[0]",
         "id": "rxn33320",
         "is_obsolete": 1,
         "is_transport": 0,
@@ -31569,19 +31554,19 @@
         "status": "OK",
         "stoichiometry": [
             {
-                "charge": -3,
+                "charge": -2,
                 "coefficient": -1,
                 "compartment": 0,
                 "compound": "cpd00113",
-                "formula": "C5H9O7P2",
+                "formula": "C5H10O7P2",
                 "name": "Isopentenyldiphosphate"
             },
             {
-                "charge": -3,
+                "charge": -2,
                 "coefficient": -1,
                 "compartment": 0,
                 "compound": "cpd17564",
-                "formula": "C30H49O7P2",
+                "formula": "C30H50O7P2",
                 "name": "ditrans,tricis-Hexaprenyl diphosphate"
             },
             {
@@ -31593,11 +31578,19 @@
                 "name": "PPi"
             },
             {
-                "charge": -3,
+                "charge": 1,
+                "coefficient": 1,
+                "compartment": 0,
+                "compound": "cpd00067",
+                "formula": "H",
+                "name": "H+"
+            },
+            {
+                "charge": -2,
                 "coefficient": 1,
                 "compartment": 0,
                 "compound": "cpd17566",
-                "formula": "C35H57O7P2",
+                "formula": "C35H58O7P2",
                 "name": "ditrans,tetracis-Heptaprenyl diphosphate"
             }
         ],
@@ -33130,11 +33123,11 @@
         "status": "OK",
         "stoichiometry": [
             {
-                "charge": -3,
+                "charge": -2,
                 "coefficient": -1,
                 "compartment": 0,
                 "compound": "cpd00031",
-                "formula": "C10H12N5O11P2",
+                "formula": "C10H13N5O11P2",
                 "name": "GDP"
             },
             {
@@ -33154,11 +33147,11 @@
                 "name": "H2O"
             },
             {
-                "charge": -3,
+                "charge": -2,
                 "coefficient": 1,
                 "compartment": 0,
                 "compound": "cpd00295",
-                "formula": "C10H12N5O10P2",
+                "formula": "C10H13N5O10P2",
                 "name": "dGDP"
             },
             {
@@ -33386,11 +33379,11 @@
         },
         "code": "(1) cpd00001[0] + (1) cpd00008[0] <=> (1) cpd00009[0] + (1) cpd00018[0]",
         "compound_ids": "cpd00001;cpd00008;cpd00009;cpd00018;cpd00067",
-        "definition": "(1) H2O[0] + (1) ADP[0] => (1) Phosphate[0] + (1) AMP[0] + (1) H+[0]",
+        "definition": "(1) H2O[0] + (1) ADP[0] => (1) Phosphate[0] + (1) AMP[0] + (2) H+[0]",
         "ec_numbers": [
             "3.6.1.5"
         ],
-        "equation": "(1) cpd00001[0] + (1) cpd00008[0] => (1) cpd00009[0] + (1) cpd00018[0] + (1) cpd00067[0]",
+        "equation": "(1) cpd00001[0] + (1) cpd00008[0] => (1) cpd00009[0] + (1) cpd00018[0] + (2) cpd00067[0]",
         "id": "rxn33337",
         "is_obsolete": 1,
         "is_transport": 0,
@@ -33418,11 +33411,11 @@
                 "name": "H2O"
             },
             {
-                "charge": -3,
+                "charge": -2,
                 "coefficient": -1,
                 "compartment": 0,
                 "compound": "cpd00008",
-                "formula": "C10H12N5O10P2",
+                "formula": "C10H13N5O10P2",
                 "name": "ADP"
             },
             {
@@ -33443,7 +33436,7 @@
             },
             {
                 "charge": 1,
-                "coefficient": 1,
+                "coefficient": 2,
                 "compartment": 0,
                 "compound": "cpd00067",
                 "formula": "H",
@@ -33724,35 +33717,35 @@
         "status": "OK",
         "stoichiometry": [
             {
-                "charge": -4,
+                "charge": -3,
                 "coefficient": -1,
                 "compartment": 0,
                 "compound": "cpd00002",
-                "formula": "C10H12N5O13P3",
+                "formula": "C10H13N5O13P3",
                 "name": "ATP"
             },
             {
-                "charge": -3,
+                "charge": -2,
                 "coefficient": -1,
                 "compartment": 0,
                 "compound": "cpd00978",
-                "formula": "C9H11N2O11P2",
+                "formula": "C9H12N2O11P2",
                 "name": "dUDP"
+            },
+            {
+                "charge": -2,
+                "coefficient": 1,
+                "compartment": 0,
+                "compound": "cpd00008",
+                "formula": "C10H13N5O10P2",
+                "name": "ADP"
             },
             {
                 "charge": -3,
                 "coefficient": 1,
                 "compartment": 0,
-                "compound": "cpd00008",
-                "formula": "C10H12N5O10P2",
-                "name": "ADP"
-            },
-            {
-                "charge": -4,
-                "coefficient": 1,
-                "compartment": 0,
                 "compound": "cpd00358",
-                "formula": "C9H11N2O14P3",
+                "formula": "C9H12N2O14P3",
                 "name": "dUTP"
             }
         ],
@@ -36564,13 +36557,13 @@
             "has_symmetry_groups": true
         },
         "code": "(1) cpd00103[0] + (1) cpd00309[0] <=> (1) cpd00012[0] + (1) cpd00497[0]",
-        "compound_ids": "cpd00012;cpd00103;cpd00309;cpd00497",
-        "definition": "(1) PRPP[0] + (1) XAN[0] <=> (1) PPi[0] + (1) XMP[0]",
+        "compound_ids": "cpd00012;cpd00067;cpd00103;cpd00309;cpd00497",
+        "definition": "(1) PRPP[0] + (1) XAN[0] <=> (1) PPi[0] + (1) H+[0] + (1) XMP[0]",
         "ec_numbers": [
             "2.4.2.22",
             "2.4.2.8"
         ],
-        "equation": "(1) cpd00103[0] + (1) cpd00309[0] <=> (1) cpd00012[0] + (1) cpd00497[0]",
+        "equation": "(1) cpd00103[0] + (1) cpd00309[0] <=> (1) cpd00012[0] + (1) cpd00067[0] + (1) cpd00497[0]",
         "id": "rxn33365",
         "is_obsolete": 1,
         "is_transport": 0,
@@ -36591,11 +36584,11 @@
         "status": "OK",
         "stoichiometry": [
             {
-                "charge": -5,
+                "charge": -4,
                 "coefficient": -1,
                 "compartment": 0,
                 "compound": "cpd00103",
-                "formula": "C5H8O14P3",
+                "formula": "C5H9O14P3",
                 "name": "PRPP"
             },
             {
@@ -36613,6 +36606,14 @@
                 "compound": "cpd00012",
                 "formula": "HO7P2",
                 "name": "PPi"
+            },
+            {
+                "charge": 1,
+                "coefficient": 1,
+                "compartment": 0,
+                "compound": "cpd00067",
+                "formula": "H",
+                "name": "H+"
             },
             {
                 "charge": -2,
@@ -38227,35 +38228,35 @@
         "status": "OK",
         "stoichiometry": [
             {
-                "charge": -4,
+                "charge": -3,
                 "coefficient": -1,
                 "compartment": 0,
                 "compound": "cpd00002",
-                "formula": "C10H12N5O13P3",
+                "formula": "C10H13N5O13P3",
                 "name": "ATP"
             },
             {
-                "charge": -3,
+                "charge": -2,
                 "coefficient": -1,
                 "compartment": 0,
                 "compound": "cpd00295",
-                "formula": "C10H12N5O10P2",
+                "formula": "C10H13N5O10P2",
                 "name": "dGDP"
+            },
+            {
+                "charge": -2,
+                "coefficient": 1,
+                "compartment": 0,
+                "compound": "cpd00008",
+                "formula": "C10H13N5O10P2",
+                "name": "ADP"
             },
             {
                 "charge": -3,
                 "coefficient": 1,
                 "compartment": 0,
-                "compound": "cpd00008",
-                "formula": "C10H12N5O10P2",
-                "name": "ADP"
-            },
-            {
-                "charge": -4,
-                "coefficient": 1,
-                "compartment": 0,
                 "compound": "cpd00241",
-                "formula": "C10H12N5O13P3",
+                "formula": "C10H13N5O13P3",
                 "name": "dGTP"
             }
         ],
@@ -39978,11 +39979,11 @@
         "status": "OK",
         "stoichiometry": [
             {
-                "charge": -4,
+                "charge": -3,
                 "coefficient": -1,
                 "compartment": 0,
                 "compound": "cpd00002",
-                "formula": "C10H12N5O13P3",
+                "formula": "C10H13N5O13P3",
                 "name": "ATP"
             },
             {
@@ -39994,11 +39995,11 @@
                 "name": "beta-D-Glucose"
             },
             {
-                "charge": -3,
+                "charge": -2,
                 "coefficient": 1,
                 "compartment": 0,
                 "compound": "cpd00008",
-                "formula": "C10H12N5O10P2",
+                "formula": "C10H13N5O10P2",
                 "name": "ADP"
             },
             {
@@ -40235,12 +40236,12 @@
             "has_symmetry_groups": true
         },
         "code": "(1) cpd00002[0] + (1) cpd00010[0] + (1) cpd01122[0] <=> (1) cpd00012[0] + (1) cpd00018[0] + (1) cpd01398[0]",
-        "compound_ids": "cpd00002;cpd00010;cpd00012;cpd00018;cpd01122;cpd01398",
-        "definition": "(1) ATP[0] + (1) CoA[0] + (1) Linoleate[0] <=> (1) PPi[0] + (1) AMP[0] + (1) Linoleoyl-CoA[0]",
+        "compound_ids": "cpd00002;cpd00010;cpd00012;cpd00018;cpd00067;cpd01122;cpd01398",
+        "definition": "(1) ATP[0] + (1) CoA[0] + (1) Linoleate[0] <=> (1) PPi[0] + (1) AMP[0] + (1) H+[0] + (1) Linoleoyl-CoA[0]",
         "ec_numbers": [
             "6.2.1.3"
         ],
-        "equation": "(1) cpd00002[0] + (1) cpd00010[0] + (1) cpd01122[0] <=> (1) cpd00012[0] + (1) cpd00018[0] + (1) cpd01398[0]",
+        "equation": "(1) cpd00002[0] + (1) cpd00010[0] + (1) cpd01122[0] <=> (1) cpd00012[0] + (1) cpd00018[0] + (1) cpd00067[0] + (1) cpd01398[0]",
         "id": "rxn33403",
         "is_obsolete": 1,
         "is_transport": 0,
@@ -40260,11 +40261,11 @@
         "status": "OK",
         "stoichiometry": [
             {
-                "charge": -4,
+                "charge": -3,
                 "coefficient": -1,
                 "compartment": 0,
                 "compound": "cpd00002",
-                "formula": "C10H12N5O13P3",
+                "formula": "C10H13N5O13P3",
                 "name": "ATP"
             },
             {
@@ -40298,6 +40299,14 @@
                 "compound": "cpd00018",
                 "formula": "C10H12N5O7P",
                 "name": "AMP"
+            },
+            {
+                "charge": 1,
+                "coefficient": 1,
+                "compartment": 0,
+                "compound": "cpd00067",
+                "formula": "H",
+                "name": "H+"
             },
             {
                 "charge": -4,
@@ -40401,11 +40410,11 @@
         "status": "OK",
         "stoichiometry": [
             {
-                "charge": -4,
+                "charge": -3,
                 "coefficient": -1,
                 "compartment": 0,
                 "compound": "cpd00002",
-                "formula": "C10H12N5O13P3",
+                "formula": "C10H13N5O13P3",
                 "name": "ATP"
             },
             {
@@ -40417,11 +40426,11 @@
                 "name": "beta-D-Glucose"
             },
             {
-                "charge": -3,
+                "charge": -2,
                 "coefficient": 1,
                 "compartment": 0,
                 "compound": "cpd00008",
-                "formula": "C10H12N5O10P2",
+                "formula": "C10H13N5O10P2",
                 "name": "ADP"
             },
             {
@@ -40532,12 +40541,12 @@
             "has_symmetry_groups": true
         },
         "code": "(1) cpd00002[0] + (1) cpd00010[0] + (1) cpd01122[0] <=> (1) cpd00012[0] + (1) cpd00018[0] + (1) cpd01398[0]",
-        "compound_ids": "cpd00002;cpd00010;cpd00012;cpd00018;cpd01122;cpd01398",
-        "definition": "(1) ATP[0] + (1) CoA[0] + (1) Linoleate[0] <=> (1) PPi[0] + (1) AMP[0] + (1) Linoleoyl-CoA[0]",
+        "compound_ids": "cpd00002;cpd00010;cpd00012;cpd00018;cpd00067;cpd01122;cpd01398",
+        "definition": "(1) ATP[0] + (1) CoA[0] + (1) Linoleate[0] <=> (1) PPi[0] + (1) AMP[0] + (1) H+[0] + (1) Linoleoyl-CoA[0]",
         "ec_numbers": [
             "6.2.1.3"
         ],
-        "equation": "(1) cpd00002[0] + (1) cpd00010[0] + (1) cpd01122[0] <=> (1) cpd00012[0] + (1) cpd00018[0] + (1) cpd01398[0]",
+        "equation": "(1) cpd00002[0] + (1) cpd00010[0] + (1) cpd01122[0] <=> (1) cpd00012[0] + (1) cpd00018[0] + (1) cpd00067[0] + (1) cpd01398[0]",
         "id": "rxn33405",
         "is_obsolete": 1,
         "is_transport": 0,
@@ -40557,11 +40566,11 @@
         "status": "OK",
         "stoichiometry": [
             {
-                "charge": -4,
+                "charge": -3,
                 "coefficient": -1,
                 "compartment": 0,
                 "compound": "cpd00002",
-                "formula": "C10H12N5O13P3",
+                "formula": "C10H13N5O13P3",
                 "name": "ATP"
             },
             {
@@ -40595,6 +40604,14 @@
                 "compound": "cpd00018",
                 "formula": "C10H12N5O7P",
                 "name": "AMP"
+            },
+            {
+                "charge": 1,
+                "coefficient": 1,
+                "compartment": 0,
+                "compound": "cpd00067",
+                "formula": "H",
+                "name": "H+"
             },
             {
                 "charge": -4,
@@ -40665,11 +40682,11 @@
         "status": "OK",
         "stoichiometry": [
             {
-                "charge": -3,
+                "charge": -2,
                 "coefficient": -1,
                 "compartment": 0,
                 "compound": "cpd00014",
-                "formula": "C9H11N2O12P2",
+                "formula": "C9H12N2O12P2",
                 "name": "UDP"
             },
             {
@@ -40689,11 +40706,11 @@
                 "name": "H2O"
             },
             {
-                "charge": -3,
+                "charge": -2,
                 "coefficient": 1,
                 "compartment": 0,
                 "compound": "cpd00978",
-                "formula": "C9H11N2O11P2",
+                "formula": "C9H12N2O11P2",
                 "name": "dUDP"
             },
             {
@@ -41547,11 +41564,11 @@
         "status": "OK",
         "stoichiometry": [
             {
-                "charge": -3,
+                "charge": -2,
                 "coefficient": -1,
                 "compartment": 0,
                 "compound": "cpd00014",
-                "formula": "C9H11N2O12P2",
+                "formula": "C9H12N2O12P2",
                 "name": "UDP"
             },
             {
@@ -41571,11 +41588,11 @@
                 "name": "H2O"
             },
             {
-                "charge": -3,
+                "charge": -2,
                 "coefficient": 1,
                 "compartment": 0,
                 "compound": "cpd00978",
-                "formula": "C9H11N2O11P2",
+                "formula": "C9H12N2O11P2",
                 "name": "dUDP"
             },
             {
@@ -41739,11 +41756,11 @@
         "status": "OK",
         "stoichiometry": [
             {
-                "charge": -3,
+                "charge": -2,
                 "coefficient": -1,
                 "compartment": 0,
                 "compound": "cpd00014",
-                "formula": "C9H11N2O12P2",
+                "formula": "C9H12N2O12P2",
                 "name": "UDP"
             },
             {
@@ -41763,11 +41780,11 @@
                 "name": "H2O"
             },
             {
-                "charge": -3,
+                "charge": -2,
                 "coefficient": 1,
                 "compartment": 0,
                 "compound": "cpd00978",
-                "formula": "C9H11N2O11P2",
+                "formula": "C9H12N2O11P2",
                 "name": "dUDP"
             },
             {
@@ -43146,12 +43163,12 @@
             "has_symmetry_groups": true
         },
         "code": "(1) cpd00002[0] + (1) cpd00010[0] + (1) cpd01122[0] <=> (1) cpd00012[0] + (1) cpd00018[0] + (1) cpd01398[0]",
-        "compound_ids": "cpd00002;cpd00010;cpd00012;cpd00018;cpd01122;cpd01398",
-        "definition": "(1) ATP[0] + (1) CoA[0] + (1) Linoleate[0] <=> (1) PPi[0] + (1) AMP[0] + (1) Linoleoyl-CoA[0]",
+        "compound_ids": "cpd00002;cpd00010;cpd00012;cpd00018;cpd00067;cpd01122;cpd01398",
+        "definition": "(1) ATP[0] + (1) CoA[0] + (1) Linoleate[0] <=> (1) PPi[0] + (1) AMP[0] + (1) H+[0] + (1) Linoleoyl-CoA[0]",
         "ec_numbers": [
             "6.2.1.3"
         ],
-        "equation": "(1) cpd00002[0] + (1) cpd00010[0] + (1) cpd01122[0] <=> (1) cpd00012[0] + (1) cpd00018[0] + (1) cpd01398[0]",
+        "equation": "(1) cpd00002[0] + (1) cpd00010[0] + (1) cpd01122[0] <=> (1) cpd00012[0] + (1) cpd00018[0] + (1) cpd00067[0] + (1) cpd01398[0]",
         "id": "rxn33433",
         "is_obsolete": 1,
         "is_transport": 0,
@@ -43171,11 +43188,11 @@
         "status": "OK",
         "stoichiometry": [
             {
-                "charge": -4,
+                "charge": -3,
                 "coefficient": -1,
                 "compartment": 0,
                 "compound": "cpd00002",
-                "formula": "C10H12N5O13P3",
+                "formula": "C10H13N5O13P3",
                 "name": "ATP"
             },
             {
@@ -43209,6 +43226,14 @@
                 "compound": "cpd00018",
                 "formula": "C10H12N5O7P",
                 "name": "AMP"
+            },
+            {
+                "charge": 1,
+                "coefficient": 1,
+                "compartment": 0,
+                "compound": "cpd00067",
+                "formula": "H",
+                "name": "H+"
             },
             {
                 "charge": -4,
@@ -44565,12 +44590,12 @@
             "has_symmetry_groups": false
         },
         "code": "(1) cpd00026[0] + (1) cpd00082[0] <=> (1) cpd00014[0] + (1) cpd00076[0]",
-        "compound_ids": "cpd00014;cpd00026;cpd00067;cpd00076;cpd00082",
-        "definition": "(1) UDP-glucose[0] + (1) D-Fructose[0] <=> (1) UDP[0] + (1) H+[0] + (1) Sucrose[0]",
+        "compound_ids": "cpd00014;cpd00026;cpd00076;cpd00082",
+        "definition": "(1) UDP-glucose[0] + (1) D-Fructose[0] <=> (1) UDP[0] + (1) Sucrose[0]",
         "ec_numbers": [
             "2.4.1.13"
         ],
-        "equation": "(1) cpd00026[0] + (1) cpd00082[0] <=> (1) cpd00014[0] + (1) cpd00067[0] + (1) cpd00076[0]",
+        "equation": "(1) cpd00026[0] + (1) cpd00082[0] <=> (1) cpd00014[0] + (1) cpd00076[0]",
         "id": "rxn33446",
         "is_obsolete": 1,
         "is_transport": 0,
@@ -44606,20 +44631,12 @@
                 "name": "D-Fructose"
             },
             {
-                "charge": -3,
+                "charge": -2,
                 "coefficient": 1,
                 "compartment": 0,
                 "compound": "cpd00014",
-                "formula": "C9H11N2O12P2",
+                "formula": "C9H12N2O12P2",
                 "name": "UDP"
-            },
-            {
-                "charge": 1,
-                "coefficient": 1,
-                "compartment": 0,
-                "compound": "cpd00067",
-                "formula": "H",
-                "name": "H+"
             },
             {
                 "charge": 0,
@@ -46744,11 +46761,11 @@
         "status": "OK",
         "stoichiometry": [
             {
-                "charge": -4,
+                "charge": -3,
                 "coefficient": -1,
                 "compartment": 0,
                 "compound": "cpd00002",
-                "formula": "C10H12N5O13P3",
+                "formula": "C10H13N5O13P3",
                 "name": "ATP"
             },
             {
@@ -46760,11 +46777,11 @@
                 "name": "D-Ribose"
             },
             {
-                "charge": -3,
+                "charge": -2,
                 "coefficient": 1,
                 "compartment": 0,
                 "compound": "cpd00008",
-                "formula": "C10H12N5O10P2",
+                "formula": "C10H13N5O10P2",
                 "name": "ADP"
             },
             {
@@ -48873,12 +48890,12 @@
             "has_symmetry_groups": true
         },
         "code": "(1) cpd00002[0] + (1) cpd00048[0] <=> (1) cpd00012[0] + (1) cpd00193[0]",
-        "compound_ids": "cpd00002;cpd00012;cpd00048;cpd00067;cpd00193",
-        "definition": "(1) ATP[0] + (1) Sulfate[0] + (1) H+[0] <= (1) PPi[0] + (1) APS[0]",
+        "compound_ids": "cpd00002;cpd00012;cpd00048;cpd00193",
+        "definition": "(1) ATP[0] + (1) Sulfate[0] <= (1) PPi[0] + (1) APS[0]",
         "ec_numbers": [
             "2.7.7.4"
         ],
-        "equation": "(1) cpd00002[0] + (1) cpd00048[0] + (1) cpd00067[0] <= (1) cpd00012[0] + (1) cpd00193[0]",
+        "equation": "(1) cpd00002[0] + (1) cpd00048[0] <= (1) cpd00012[0] + (1) cpd00193[0]",
         "id": "rxn33490",
         "is_obsolete": 1,
         "is_transport": 0,
@@ -48899,11 +48916,11 @@
         "status": "OK",
         "stoichiometry": [
             {
-                "charge": -4,
+                "charge": -3,
                 "coefficient": -1,
                 "compartment": 0,
                 "compound": "cpd00002",
-                "formula": "C10H12N5O13P3",
+                "formula": "C10H13N5O13P3",
                 "name": "ATP"
             },
             {
@@ -48913,14 +48930,6 @@
                 "compound": "cpd00048",
                 "formula": "O4S",
                 "name": "Sulfate"
-            },
-            {
-                "charge": 1,
-                "coefficient": -1,
-                "compartment": 0,
-                "compound": "cpd00067",
-                "formula": "H",
-                "name": "H+"
             },
             {
                 "charge": -3,
@@ -49426,11 +49435,11 @@
         "status": "OK",
         "stoichiometry": [
             {
-                "charge": -4,
+                "charge": -3,
                 "coefficient": -1,
                 "compartment": 0,
                 "compound": "cpd00002",
-                "formula": "C10H12N5O13P3",
+                "formula": "C10H13N5O13P3",
                 "name": "ATP"
             },
             {
@@ -49442,11 +49451,11 @@
                 "name": "D-Fructose"
             },
             {
-                "charge": -3,
+                "charge": -2,
                 "coefficient": 1,
                 "compartment": 0,
                 "compound": "cpd00008",
-                "formula": "C10H12N5O10P2",
+                "formula": "C10H13N5O10P2",
                 "name": "ADP"
             },
             {
@@ -49698,11 +49707,11 @@
         "status": "OK",
         "stoichiometry": [
             {
-                "charge": -4,
+                "charge": -3,
                 "coefficient": -1,
                 "compartment": 0,
                 "compound": "cpd00002",
-                "formula": "C10H12N5O13P3",
+                "formula": "C10H13N5O13P3",
                 "name": "ATP"
             },
             {
@@ -49714,11 +49723,11 @@
                 "name": "D-Fructose"
             },
             {
-                "charge": -3,
+                "charge": -2,
                 "coefficient": 1,
                 "compartment": 0,
                 "compound": "cpd00008",
-                "formula": "C10H12N5O10P2",
+                "formula": "C10H13N5O10P2",
                 "name": "ADP"
             },
             {
@@ -50382,11 +50391,11 @@
         "status": "CPDFORMERROR",
         "stoichiometry": [
             {
-                "charge": -4,
+                "charge": -3,
                 "coefficient": -1,
                 "compartment": 0,
                 "compound": "cpd00002",
-                "formula": "C10H12N5O13P3",
+                "formula": "C10H13N5O13P3",
                 "name": "ATP"
             },
             {
@@ -50398,11 +50407,11 @@
                 "name": "Toxopyrimidine"
             },
             {
-                "charge": -3,
+                "charge": -2,
                 "coefficient": 1,
                 "compartment": 0,
                 "compound": "cpd00008",
-                "formula": "C10H12N5O10P2",
+                "formula": "C10H13N5O10P2",
                 "name": "ADP"
             },
             {
@@ -53400,12 +53409,12 @@
             "has_symmetry_groups": true
         },
         "code": "(1) cpd00002[0] + (1) cpd00010[0] + (1) cpd00604[0] <=> (1) cpd00012[0] + (1) cpd00018[0] + (1) cpd00192[0]",
-        "compound_ids": "cpd00002;cpd00010;cpd00012;cpd00018;cpd00192;cpd00604",
-        "definition": "(1) ATP[0] + (1) CoA[0] + (1) 4-Coumarate[0] <=> (1) PPi[0] + (1) AMP[0] + (1) 4-Coumaroyl-CoA[0]",
+        "compound_ids": "cpd00002;cpd00010;cpd00012;cpd00018;cpd00067;cpd00192;cpd00604",
+        "definition": "(1) ATP[0] + (1) CoA[0] + (1) 4-Coumarate[0] <=> (1) PPi[0] + (1) AMP[0] + (1) H+[0] + (1) 4-Coumaroyl-CoA[0]",
         "ec_numbers": [
             "6.2.1.12"
         ],
-        "equation": "(1) cpd00002[0] + (1) cpd00010[0] + (1) cpd00604[0] <=> (1) cpd00012[0] + (1) cpd00018[0] + (1) cpd00192[0]",
+        "equation": "(1) cpd00002[0] + (1) cpd00010[0] + (1) cpd00604[0] <=> (1) cpd00012[0] + (1) cpd00018[0] + (1) cpd00067[0] + (1) cpd00192[0]",
         "id": "rxn33539",
         "is_obsolete": 1,
         "is_transport": 0,
@@ -53426,11 +53435,11 @@
         "status": "OK",
         "stoichiometry": [
             {
-                "charge": -4,
+                "charge": -3,
                 "coefficient": -1,
                 "compartment": 0,
                 "compound": "cpd00002",
-                "formula": "C10H12N5O13P3",
+                "formula": "C10H13N5O13P3",
                 "name": "ATP"
             },
             {
@@ -53464,6 +53473,14 @@
                 "compound": "cpd00018",
                 "formula": "C10H12N5O7P",
                 "name": "AMP"
+            },
+            {
+                "charge": 1,
+                "coefficient": 1,
+                "compartment": 0,
+                "compound": "cpd00067",
+                "formula": "H",
+                "name": "H+"
             },
             {
                 "charge": -4,
@@ -54448,35 +54465,35 @@
         "status": "OK",
         "stoichiometry": [
             {
-                "charge": -4,
+                "charge": -3,
                 "coefficient": -1,
                 "compartment": 0,
                 "compound": "cpd00002",
-                "formula": "C10H12N5O13P3",
+                "formula": "C10H13N5O13P3",
                 "name": "ATP"
             },
             {
-                "charge": -3,
+                "charge": -2,
                 "coefficient": -1,
                 "compartment": 0,
                 "compound": "cpd00014",
-                "formula": "C9H11N2O12P2",
+                "formula": "C9H12N2O12P2",
                 "name": "UDP"
+            },
+            {
+                "charge": -2,
+                "coefficient": 1,
+                "compartment": 0,
+                "compound": "cpd00008",
+                "formula": "C10H13N5O10P2",
+                "name": "ADP"
             },
             {
                 "charge": -3,
                 "coefficient": 1,
                 "compartment": 0,
-                "compound": "cpd00008",
-                "formula": "C10H12N5O10P2",
-                "name": "ADP"
-            },
-            {
-                "charge": -4,
-                "coefficient": 1,
-                "compartment": 0,
                 "compound": "cpd00062",
-                "formula": "C9H11N2O15P3",
+                "formula": "C9H12N2O15P3",
                 "name": "UTP"
             }
         ],
@@ -55145,12 +55162,12 @@
             "has_symmetry_groups": true
         },
         "code": "(1) cpd00002[0] + (1) cpd00010[0] + (1) cpd00373[0] <=> (1) cpd00012[0] + (1) cpd00018[0] + (1) cpd00326[0]",
-        "compound_ids": "cpd00002;cpd00010;cpd00012;cpd00018;cpd00326;cpd00373",
-        "definition": "(1) ATP[0] + (1) CoA[0] + (1) Sinapate[0] <=> (1) PPi[0] + (1) AMP[0] + (1) Sinapoyl-CoA[0]",
+        "compound_ids": "cpd00002;cpd00010;cpd00012;cpd00018;cpd00067;cpd00326;cpd00373",
+        "definition": "(1) ATP[0] + (1) CoA[0] + (1) Sinapate[0] <=> (1) PPi[0] + (1) AMP[0] + (1) H+[0] + (1) Sinapoyl-CoA[0]",
         "ec_numbers": [
             "6.2.1.12"
         ],
-        "equation": "(1) cpd00002[0] + (1) cpd00010[0] + (1) cpd00373[0] <=> (1) cpd00012[0] + (1) cpd00018[0] + (1) cpd00326[0]",
+        "equation": "(1) cpd00002[0] + (1) cpd00010[0] + (1) cpd00373[0] <=> (1) cpd00012[0] + (1) cpd00018[0] + (1) cpd00067[0] + (1) cpd00326[0]",
         "id": "rxn33556",
         "is_obsolete": 1,
         "is_transport": 0,
@@ -55170,11 +55187,11 @@
         "status": "OK",
         "stoichiometry": [
             {
-                "charge": -4,
+                "charge": -3,
                 "coefficient": -1,
                 "compartment": 0,
                 "compound": "cpd00002",
-                "formula": "C10H12N5O13P3",
+                "formula": "C10H13N5O13P3",
                 "name": "ATP"
             },
             {
@@ -55208,6 +55225,14 @@
                 "compound": "cpd00018",
                 "formula": "C10H12N5O7P",
                 "name": "AMP"
+            },
+            {
+                "charge": 1,
+                "coefficient": 1,
+                "compartment": 0,
+                "compound": "cpd00067",
+                "formula": "H",
+                "name": "H+"
             },
             {
                 "charge": -4,
@@ -56365,12 +56390,12 @@
         },
         "code": "(1) cpd00001[0] + (1) cpd00038[0] <=> (1) cpd00012[0] + (1) cpd00126[0]",
         "compound_ids": "cpd00001;cpd00012;cpd00038;cpd00067;cpd00126",
-        "definition": "(1) H2O[0] + (1) GTP[0] => (1) PPi[0] + (1) H+[0] + (1) GMP[0]",
+        "definition": "(1) H2O[0] + (1) GTP[0] => (1) PPi[0] + (2) H+[0] + (1) GMP[0]",
         "ec_numbers": [
             "3.6.1.19",
             "3.6.1.8"
         ],
-        "equation": "(1) cpd00001[0] + (1) cpd00038[0] => (1) cpd00012[0] + (1) cpd00067[0] + (1) cpd00126[0]",
+        "equation": "(1) cpd00001[0] + (1) cpd00038[0] => (1) cpd00012[0] + (2) cpd00067[0] + (1) cpd00126[0]",
         "id": "rxn33568",
         "is_obsolete": 1,
         "is_transport": 0,
@@ -56398,11 +56423,11 @@
                 "name": "H2O"
             },
             {
-                "charge": -4,
+                "charge": -3,
                 "coefficient": -1,
                 "compartment": 0,
                 "compound": "cpd00038",
-                "formula": "C10H12N5O14P3",
+                "formula": "C10H13N5O14P3",
                 "name": "GTP"
             },
             {
@@ -56415,7 +56440,7 @@
             },
             {
                 "charge": 1,
-                "coefficient": 1,
+                "coefficient": 2,
                 "compartment": 0,
                 "compound": "cpd00067",
                 "formula": "H",
@@ -56610,12 +56635,12 @@
             "has_symmetry_groups": true
         },
         "code": "(1) cpd00002[0] + (1) cpd00090[0] <=> (1) cpd00008[0] + (1) cpd00068[0]",
-        "compound_ids": "cpd00002;cpd00008;cpd00068;cpd00090",
-        "definition": "(1) ATP[0] + (1) IDP[0] <=> (1) ADP[0] + (1) ITP[0]",
+        "compound_ids": "cpd00002;cpd00008;cpd00067;cpd00068;cpd00090",
+        "definition": "(1) ATP[0] + (1) IDP[0] <=> (1) ADP[0] + (1) H+[0] + (1) ITP[0]",
         "ec_numbers": [
             "2.7.4.6"
         ],
-        "equation": "(1) cpd00002[0] + (1) cpd00090[0] <=> (1) cpd00008[0] + (1) cpd00068[0]",
+        "equation": "(1) cpd00002[0] + (1) cpd00090[0] <=> (1) cpd00008[0] + (1) cpd00067[0] + (1) cpd00068[0]",
         "id": "rxn33570",
         "is_obsolete": 1,
         "is_transport": 0,
@@ -56624,7 +56649,8 @@
         "notes": [
             "GCC",
             "EQC",
-            "EQU"
+            "EQU",
+            "HB"
         ],
         "pathways": [
             "KEGG: rn00230 (Purine metabolism)"
@@ -56634,28 +56660,36 @@
         "status": "OK",
         "stoichiometry": [
             {
-                "charge": -4,
+                "charge": -3,
                 "coefficient": -1,
                 "compartment": 0,
                 "compound": "cpd00002",
-                "formula": "C10H12N5O13P3",
+                "formula": "C10H13N5O13P3",
                 "name": "ATP"
             },
             {
-                "charge": -3,
+                "charge": -2,
                 "coefficient": -1,
                 "compartment": 0,
                 "compound": "cpd00090",
-                "formula": "C10H11N4O11P2",
+                "formula": "C10H12N4O11P2",
                 "name": "IDP"
             },
             {
-                "charge": -3,
+                "charge": -2,
                 "coefficient": 1,
                 "compartment": 0,
                 "compound": "cpd00008",
-                "formula": "C10H12N5O10P2",
+                "formula": "C10H13N5O10P2",
                 "name": "ADP"
+            },
+            {
+                "charge": 1,
+                "coefficient": 1,
+                "compartment": 0,
+                "compound": "cpd00067",
+                "formula": "H",
+                "name": "H+"
             },
             {
                 "charge": -4,
@@ -56894,12 +56928,12 @@
             "has_symmetry_groups": true
         },
         "code": "(1) cpd00002[0] + (1) cpd00090[0] <=> (1) cpd00008[0] + (1) cpd00068[0]",
-        "compound_ids": "cpd00002;cpd00008;cpd00068;cpd00090",
-        "definition": "(1) ATP[0] + (1) IDP[0] <=> (1) ADP[0] + (1) ITP[0]",
+        "compound_ids": "cpd00002;cpd00008;cpd00067;cpd00068;cpd00090",
+        "definition": "(1) ATP[0] + (1) IDP[0] <=> (1) ADP[0] + (1) H+[0] + (1) ITP[0]",
         "ec_numbers": [
             "2.7.4.6"
         ],
-        "equation": "(1) cpd00002[0] + (1) cpd00090[0] <=> (1) cpd00008[0] + (1) cpd00068[0]",
+        "equation": "(1) cpd00002[0] + (1) cpd00090[0] <=> (1) cpd00008[0] + (1) cpd00067[0] + (1) cpd00068[0]",
         "id": "rxn33573",
         "is_obsolete": 1,
         "is_transport": 0,
@@ -56908,7 +56942,8 @@
         "notes": [
             "GCC",
             "EQC",
-            "EQU"
+            "EQU",
+            "HB"
         ],
         "pathways": [
             "KEGG: rn00230 (Purine metabolism)"
@@ -56918,28 +56953,36 @@
         "status": "OK",
         "stoichiometry": [
             {
-                "charge": -4,
+                "charge": -3,
                 "coefficient": -1,
                 "compartment": 0,
                 "compound": "cpd00002",
-                "formula": "C10H12N5O13P3",
+                "formula": "C10H13N5O13P3",
                 "name": "ATP"
             },
             {
-                "charge": -3,
+                "charge": -2,
                 "coefficient": -1,
                 "compartment": 0,
                 "compound": "cpd00090",
-                "formula": "C10H11N4O11P2",
+                "formula": "C10H12N4O11P2",
                 "name": "IDP"
             },
             {
-                "charge": -3,
+                "charge": -2,
                 "coefficient": 1,
                 "compartment": 0,
                 "compound": "cpd00008",
-                "formula": "C10H12N5O10P2",
+                "formula": "C10H13N5O10P2",
                 "name": "ADP"
+            },
+            {
+                "charge": 1,
+                "coefficient": 1,
+                "compartment": 0,
+                "compound": "cpd00067",
+                "formula": "H",
+                "name": "H+"
             },
             {
                 "charge": -4,
@@ -57190,13 +57233,13 @@
             "has_symmetry_groups": true
         },
         "code": "(1) cpd00113[0] + (1) cpd17565[0] <=> (1) cpd00012[0] + (1) cpd17564[0]",
-        "compound_ids": "cpd00012;cpd00113;cpd17564;cpd17565",
-        "definition": "(1) Isopentenyldiphosphate[0] + (1) ditrans,dicis-Pentaprenyl diphosphate[0] => (1) PPi[0] + (1) ditrans,tricis-Hexaprenyl diphosphate[0]",
+        "compound_ids": "cpd00012;cpd00067;cpd00113;cpd17564;cpd17565",
+        "definition": "(1) Isopentenyldiphosphate[0] + (1) ditrans,dicis-Pentaprenyl diphosphate[0] => (1) PPi[0] + (1) H+[0] + (1) ditrans,tricis-Hexaprenyl diphosphate[0]",
         "ec_numbers": [
             "2.5.1.-",
             "2.5.1.31"
         ],
-        "equation": "(1) cpd00113[0] + (1) cpd17565[0] => (1) cpd00012[0] + (1) cpd17564[0]",
+        "equation": "(1) cpd00113[0] + (1) cpd17565[0] => (1) cpd00012[0] + (1) cpd00067[0] + (1) cpd17564[0]",
         "id": "rxn33576",
         "is_obsolete": 1,
         "is_transport": 0,
@@ -57214,19 +57257,19 @@
         "status": "OK",
         "stoichiometry": [
             {
-                "charge": -3,
+                "charge": -2,
                 "coefficient": -1,
                 "compartment": 0,
                 "compound": "cpd00113",
-                "formula": "C5H9O7P2",
+                "formula": "C5H10O7P2",
                 "name": "Isopentenyldiphosphate"
             },
             {
-                "charge": -3,
+                "charge": -2,
                 "coefficient": -1,
                 "compartment": 0,
                 "compound": "cpd17565",
-                "formula": "C25H41O7P2",
+                "formula": "C25H42O7P2",
                 "name": "ditrans,dicis-Pentaprenyl diphosphate"
             },
             {
@@ -57238,11 +57281,19 @@
                 "name": "PPi"
             },
             {
-                "charge": -3,
+                "charge": 1,
+                "coefficient": 1,
+                "compartment": 0,
+                "compound": "cpd00067",
+                "formula": "H",
+                "name": "H+"
+            },
+            {
+                "charge": -2,
                 "coefficient": 1,
                 "compartment": 0,
                 "compound": "cpd17564",
-                "formula": "C30H49O7P2",
+                "formula": "C30H50O7P2",
                 "name": "ditrans,tricis-Hexaprenyl diphosphate"
             }
         ],
@@ -59233,11 +59284,11 @@
         "status": "OK",
         "stoichiometry": [
             {
-                "charge": -4,
+                "charge": -3,
                 "coefficient": -1,
                 "compartment": 0,
                 "compound": "cpd00002",
-                "formula": "C10H12N5O13P3",
+                "formula": "C10H13N5O13P3",
                 "name": "ATP"
             },
             {
@@ -59257,11 +59308,11 @@
                 "name": "NADPH"
             },
             {
-                "charge": -3,
+                "charge": -2,
                 "coefficient": 1,
                 "compartment": 0,
                 "compound": "cpd00008",
-                "formula": "C10H12N5O10P2",
+                "formula": "C10H13N5O10P2",
                 "name": "ADP"
             },
             {
@@ -59763,11 +59814,11 @@
                 "name": "H+"
             },
             {
-                "charge": -3,
+                "charge": -2,
                 "coefficient": -1,
                 "compartment": 0,
                 "compound": "cpd00096",
-                "formula": "C9H12N3O11P2",
+                "formula": "C9H13N3O11P2",
                 "name": "CDP"
             },
             {
@@ -59787,11 +59838,11 @@
                 "name": "H2O"
             },
             {
-                "charge": -3,
+                "charge": -2,
                 "coefficient": 1,
                 "compartment": 0,
                 "compound": "cpd00533",
-                "formula": "C9H12N3O10P2",
+                "formula": "C9H13N3O10P2",
                 "name": "dCDP"
             },
             {
@@ -59923,11 +59974,11 @@
                 "name": "H+"
             },
             {
-                "charge": -3,
+                "charge": -2,
                 "coefficient": -1,
                 "compartment": 0,
                 "compound": "cpd00096",
-                "formula": "C9H12N3O11P2",
+                "formula": "C9H13N3O11P2",
                 "name": "CDP"
             },
             {
@@ -59947,11 +59998,11 @@
                 "name": "H2O"
             },
             {
-                "charge": -3,
+                "charge": -2,
                 "coefficient": 1,
                 "compartment": 0,
                 "compound": "cpd00533",
-                "formula": "C9H12N3O10P2",
+                "formula": "C9H13N3O10P2",
                 "name": "dCDP"
             },
             {
@@ -61191,11 +61242,11 @@
         "status": "OK",
         "stoichiometry": [
             {
-                "charge": -4,
+                "charge": -3,
                 "coefficient": -1,
                 "compartment": 0,
                 "compound": "cpd00002",
-                "formula": "C10H12N5O13P3",
+                "formula": "C10H13N5O13P3",
                 "name": "ATP"
             },
             {
@@ -61207,11 +61258,11 @@
                 "name": "Inositol 1,3,4-trisphosphate"
             },
             {
-                "charge": -3,
+                "charge": -2,
                 "coefficient": 1,
                 "compartment": 0,
                 "compound": "cpd00008",
-                "formula": "C10H12N5O10P2",
+                "formula": "C10H13N5O10P2",
                 "name": "ADP"
             },
             {
@@ -61456,13 +61507,13 @@
             "has_symmetry_groups": true
         },
         "code": "(1) cpd00002[0] + (1) cpd00010[0] + (1) cpd01059[0] <=> (1) cpd00012[0] + (1) cpd00018[0] + (1) cpd00321[0]",
-        "compound_ids": "cpd00002;cpd00010;cpd00012;cpd00018;cpd00321;cpd01059",
-        "definition": "(1) ATP[0] + (1) CoA[0] + (1) Ferulate[0] <=> (1) PPi[0] + (1) AMP[0] + (1) Feruloyl-CoA[0]",
+        "compound_ids": "cpd00002;cpd00010;cpd00012;cpd00018;cpd00067;cpd00321;cpd01059",
+        "definition": "(1) ATP[0] + (1) CoA[0] + (1) Ferulate[0] <=> (1) PPi[0] + (1) AMP[0] + (1) H+[0] + (1) Feruloyl-CoA[0]",
         "ec_numbers": [
             "6.2.1.12",
             "6.2.1.34"
         ],
-        "equation": "(1) cpd00002[0] + (1) cpd00010[0] + (1) cpd01059[0] <=> (1) cpd00012[0] + (1) cpd00018[0] + (1) cpd00321[0]",
+        "equation": "(1) cpd00002[0] + (1) cpd00010[0] + (1) cpd01059[0] <=> (1) cpd00012[0] + (1) cpd00018[0] + (1) cpd00067[0] + (1) cpd00321[0]",
         "id": "rxn33619",
         "is_obsolete": 1,
         "is_transport": 0,
@@ -61483,11 +61534,11 @@
         "status": "OK",
         "stoichiometry": [
             {
-                "charge": -4,
+                "charge": -3,
                 "coefficient": -1,
                 "compartment": 0,
                 "compound": "cpd00002",
-                "formula": "C10H12N5O13P3",
+                "formula": "C10H13N5O13P3",
                 "name": "ATP"
             },
             {
@@ -61521,6 +61572,14 @@
                 "compound": "cpd00018",
                 "formula": "C10H12N5O7P",
                 "name": "AMP"
+            },
+            {
+                "charge": 1,
+                "coefficient": 1,
+                "compartment": 0,
+                "compound": "cpd00067",
+                "formula": "H",
+                "name": "H+"
             },
             {
                 "charge": -4,
@@ -61618,12 +61677,12 @@
             "has_symmetry_groups": false
         },
         "code": "(1) cpd00043[0] + (1) cpd25024[0] <=> (1) cpd00014[0] + (1) cpd25070[0]",
-        "compound_ids": "cpd00014;cpd00043;cpd00067;cpd25024;cpd25070",
-        "definition": "(1) UDP-galactose[0] + (1) 1-(9Z,12Z-octadecadienoyl)-2-hexadecanoyl-3-O-beta-D-galactosyl-sn-glycerol[0] <=> (1) UDP[0] + (1) H+[0] + (1) 1-18:2-2-16:0-digalactosyldiacylglycerol[0]",
+        "compound_ids": "cpd00014;cpd00043;cpd25024;cpd25070",
+        "definition": "(1) UDP-galactose[0] + (1) 1-(9Z,12Z-octadecadienoyl)-2-hexadecanoyl-3-O-beta-D-galactosyl-sn-glycerol[0] <=> (1) UDP[0] + (1) 1-18:2-2-16:0-digalactosyldiacylglycerol[0]",
         "ec_numbers": [
             "2.4.1.241"
         ],
-        "equation": "(1) cpd00043[0] + (1) cpd25024[0] <=> (1) cpd00014[0] + (1) cpd00067[0] + (1) cpd25070[0]",
+        "equation": "(1) cpd00043[0] + (1) cpd25024[0] <=> (1) cpd00014[0] + (1) cpd25070[0]",
         "id": "rxn33620",
         "is_obsolete": 1,
         "is_transport": 0,
@@ -61659,20 +61718,12 @@
                 "name": "1-(9Z,12Z-octadecadienoyl)-2-hexadecanoyl-3-O-beta-D-galactosyl-sn-glycerol"
             },
             {
-                "charge": -3,
+                "charge": -2,
                 "coefficient": 1,
                 "compartment": 0,
                 "compound": "cpd00014",
-                "formula": "C9H11N2O12P2",
+                "formula": "C9H12N2O12P2",
                 "name": "UDP"
-            },
-            {
-                "charge": 1,
-                "coefficient": 1,
-                "compartment": 0,
-                "compound": "cpd00067",
-                "formula": "H",
-                "name": "H+"
             },
             {
                 "charge": 0,
@@ -61770,12 +61821,12 @@
             "has_symmetry_groups": false
         },
         "code": "(1) cpd00043[0] + (1) cpd25024[0] <=> (1) cpd00014[0] + (1) cpd25070[0]",
-        "compound_ids": "cpd00014;cpd00043;cpd00067;cpd25024;cpd25070",
-        "definition": "(1) UDP-galactose[0] + (1) 1-(9Z,12Z-octadecadienoyl)-2-hexadecanoyl-3-O-beta-D-galactosyl-sn-glycerol[0] <=> (1) UDP[0] + (1) H+[0] + (1) 1-18:2-2-16:0-digalactosyldiacylglycerol[0]",
+        "compound_ids": "cpd00014;cpd00043;cpd25024;cpd25070",
+        "definition": "(1) UDP-galactose[0] + (1) 1-(9Z,12Z-octadecadienoyl)-2-hexadecanoyl-3-O-beta-D-galactosyl-sn-glycerol[0] <=> (1) UDP[0] + (1) 1-18:2-2-16:0-digalactosyldiacylglycerol[0]",
         "ec_numbers": [
             "2.4.1.241"
         ],
-        "equation": "(1) cpd00043[0] + (1) cpd25024[0] <=> (1) cpd00014[0] + (1) cpd00067[0] + (1) cpd25070[0]",
+        "equation": "(1) cpd00043[0] + (1) cpd25024[0] <=> (1) cpd00014[0] + (1) cpd25070[0]",
         "id": "rxn33621",
         "is_obsolete": 1,
         "is_transport": 0,
@@ -61811,20 +61862,12 @@
                 "name": "1-(9Z,12Z-octadecadienoyl)-2-hexadecanoyl-3-O-beta-D-galactosyl-sn-glycerol"
             },
             {
-                "charge": -3,
+                "charge": -2,
                 "coefficient": 1,
                 "compartment": 0,
                 "compound": "cpd00014",
-                "formula": "C9H11N2O12P2",
+                "formula": "C9H12N2O12P2",
                 "name": "UDP"
-            },
-            {
-                "charge": 1,
-                "coefficient": 1,
-                "compartment": 0,
-                "compound": "cpd00067",
-                "formula": "H",
-                "name": "H+"
             },
             {
                 "charge": 0,
@@ -61885,12 +61928,12 @@
             "has_symmetry_groups": true
         },
         "code": "(1) cpd00001[0] + (1) cpd00007[0] + (1) cpd00312[0] <=> (1) cpd00013[0] + (1) cpd00025[0] + (1) cpd03052[0]",
-        "compound_ids": "cpd00001;cpd00007;cpd00013;cpd00025;cpd00067;cpd00312;cpd03052",
-        "definition": "(1) H2O[0] + (1) O2[0] + (1) Histamine[0] => (1) NH3[0] + (1) H2O2[0] + (1) H+[0] + (1) Imidazole acetaldehyde[0]",
+        "compound_ids": "cpd00001;cpd00007;cpd00013;cpd00025;cpd00312;cpd03052",
+        "definition": "(1) H2O[0] + (1) O2[0] + (1) Histamine[0] => (1) NH3[0] + (1) H2O2[0] + (1) Imidazole acetaldehyde[0]",
         "ec_numbers": [
             "1.4.3.22"
         ],
-        "equation": "(1) cpd00001[0] + (1) cpd00007[0] + (1) cpd00312[0] => (1) cpd00013[0] + (1) cpd00025[0] + (1) cpd00067[0] + (1) cpd03052[0]",
+        "equation": "(1) cpd00001[0] + (1) cpd00007[0] + (1) cpd00312[0] => (1) cpd00013[0] + (1) cpd00025[0] + (1) cpd03052[0]",
         "id": "rxn33622",
         "is_obsolete": 1,
         "is_transport": 0,
@@ -61908,7 +61951,7 @@
         ],
         "reversibility": ">",
         "source": "Primary Database",
-        "status": "MI:+:-1/H:1|CI:1",
+        "status": "OK",
         "stoichiometry": [
             {
                 "charge": 0,
@@ -61931,7 +61974,7 @@
                 "coefficient": -1,
                 "compartment": 0,
                 "compound": "cpd00312",
-                "formula": "C5H10N3+",
+                "formula": "C5H10N3",
                 "name": "Histamine"
             },
             {
@@ -61949,14 +61992,6 @@
                 "compound": "cpd00025",
                 "formula": "H2O2",
                 "name": "H2O2"
-            },
-            {
-                "charge": 1,
-                "coefficient": 1,
-                "compartment": 0,
-                "compound": "cpd00067",
-                "formula": "H",
-                "name": "H+"
             },
             {
                 "charge": 0,
@@ -62940,12 +62975,12 @@
             "has_symmetry_groups": true
         },
         "code": "(1) cpd00038[0] + (1) cpd00485[0] <=> (1) cpd00012[0] + (1) cpd00083[0]",
-        "compound_ids": "cpd00012;cpd00038;cpd00067;cpd00083;cpd00485",
-        "definition": "(1) GTP[0] + (1) H+[0] + (1) D-Mannose1-phosphate[0] <=> (1) PPi[0] + (1) GDP-mannose[0]",
+        "compound_ids": "cpd00012;cpd00038;cpd00083;cpd00485",
+        "definition": "(1) GTP[0] + (1) D-Mannose1-phosphate[0] <=> (1) PPi[0] + (1) GDP-mannose[0]",
         "ec_numbers": [
             "2.7.7.13"
         ],
-        "equation": "(1) cpd00038[0] + (1) cpd00067[0] + (1) cpd00485[0] <=> (1) cpd00012[0] + (1) cpd00083[0]",
+        "equation": "(1) cpd00038[0] + (1) cpd00485[0] <=> (1) cpd00012[0] + (1) cpd00083[0]",
         "id": "rxn33633",
         "is_obsolete": 1,
         "is_transport": 0,
@@ -62966,20 +63001,12 @@
         "status": "OK",
         "stoichiometry": [
             {
-                "charge": -4,
+                "charge": -3,
                 "coefficient": -1,
                 "compartment": 0,
                 "compound": "cpd00038",
-                "formula": "C10H12N5O14P3",
+                "formula": "C10H13N5O14P3",
                 "name": "GTP"
-            },
-            {
-                "charge": 1,
-                "coefficient": -1,
-                "compartment": 0,
-                "compound": "cpd00067",
-                "formula": "H",
-                "name": "H+"
             },
             {
                 "charge": -2,
@@ -63138,11 +63165,11 @@
                 "name": "H2O"
             },
             {
-                "charge": -4,
+                "charge": -3,
                 "coefficient": 1,
                 "compartment": 0,
                 "compound": "cpd00356",
-                "formula": "C9H12N3O13P3",
+                "formula": "C9H13N3O13P3",
                 "name": "dCTP"
             },
             {
@@ -63221,11 +63248,11 @@
                 "name": "H2O"
             },
             {
-                "charge": -4,
+                "charge": -3,
                 "coefficient": 1,
                 "compartment": 0,
                 "compound": "cpd00356",
-                "formula": "C9H12N3O13P3",
+                "formula": "C9H13N3O13P3",
                 "name": "dCTP"
             },
             {
@@ -63425,11 +63452,11 @@
                 "name": "H2O"
             },
             {
-                "charge": -4,
+                "charge": -3,
                 "coefficient": 1,
                 "compartment": 0,
                 "compound": "cpd00356",
-                "formula": "C9H12N3O13P3",
+                "formula": "C9H13N3O13P3",
                 "name": "dCTP"
             },
             {
@@ -64094,19 +64121,19 @@
         "status": "OK",
         "stoichiometry": [
             {
-                "charge": -3,
+                "charge": -2,
                 "coefficient": -1,
                 "compartment": 0,
                 "compound": "cpd02557",
-                "formula": "C40H65O7P2",
+                "formula": "C40H66O7P2",
                 "name": "Farnesylfarnesylgeraniol"
             },
             {
-                "charge": -3,
+                "charge": -2,
                 "coefficient": 1,
                 "compartment": 1,
                 "compound": "cpd02557",
-                "formula": "C40H65O7P2",
+                "formula": "C40H66O7P2",
                 "name": "Farnesylfarnesylgeraniol"
             }
         ],
@@ -64201,19 +64228,19 @@
         "status": "OK",
         "stoichiometry": [
             {
-                "charge": -3,
+                "charge": -2,
                 "coefficient": -1,
                 "compartment": 0,
                 "compound": "cpd02557",
-                "formula": "C40H65O7P2",
+                "formula": "C40H66O7P2",
                 "name": "Farnesylfarnesylgeraniol"
             },
             {
-                "charge": -3,
+                "charge": -2,
                 "coefficient": 1,
                 "compartment": 1,
                 "compound": "cpd02557",
-                "formula": "C40H65O7P2",
+                "formula": "C40H66O7P2",
                 "name": "Farnesylfarnesylgeraniol"
             }
         ],
@@ -64364,11 +64391,11 @@
                 "name": "H2O"
             },
             {
-                "charge": -4,
+                "charge": -3,
                 "coefficient": 1,
                 "compartment": 0,
                 "compound": "cpd00356",
-                "formula": "C9H12N3O13P3",
+                "formula": "C9H13N3O13P3",
                 "name": "dCTP"
             },
             {
@@ -64441,11 +64468,11 @@
                 "name": "H2O"
             },
             {
-                "charge": -4,
+                "charge": -3,
                 "coefficient": 1,
                 "compartment": 0,
                 "compound": "cpd00356",
-                "formula": "C9H12N3O13P3",
+                "formula": "C9H13N3O13P3",
                 "name": "dCTP"
             },
             {
@@ -64489,11 +64516,11 @@
         "status": "OK",
         "stoichiometry": [
             {
-                "charge": -4,
+                "charge": -3,
                 "coefficient": -1,
                 "compartment": 0,
                 "compound": "cpd00002",
-                "formula": "C10H12N5O13P3",
+                "formula": "C10H13N5O13P3",
                 "name": "ATP"
             },
             {
@@ -64505,11 +64532,11 @@
                 "name": "1,2-Diacyl-sn-glycerol"
             },
             {
-                "charge": -3,
+                "charge": -2,
                 "coefficient": 1,
                 "compartment": 0,
                 "compound": "cpd00008",
-                "formula": "C10H12N5O10P2",
+                "formula": "C10H13N5O10P2",
                 "name": "ADP"
             },
             {
@@ -64820,12 +64847,12 @@
             "has_symmetry_groups": true
         },
         "code": "(1) cpd00004[0] + (1) cpd02169[0] <=> (1) cpd00003[0] + (1) cpd00012[0] + (1) cpd00559[0]",
-        "compound_ids": "cpd00003;cpd00004;cpd00012;cpd00067;cpd00559;cpd02169",
-        "definition": "(1) NADH[0] + (1) H+[0] + (1) Presqualene diphosphate[0] => (1) NAD[0] + (1) PPi[0] + (1) Supraene[0]",
+        "compound_ids": "cpd00003;cpd00004;cpd00012;cpd00559;cpd02169",
+        "definition": "(1) NADH[0] + (1) Presqualene diphosphate[0] => (1) NAD[0] + (1) PPi[0] + (1) Supraene[0]",
         "ec_numbers": [
             "2.5.1.21"
         ],
-        "equation": "(1) cpd00004[0] + (1) cpd00067[0] + (1) cpd02169[0] => (1) cpd00003[0] + (1) cpd00012[0] + (1) cpd00559[0]",
+        "equation": "(1) cpd00004[0] + (1) cpd02169[0] => (1) cpd00003[0] + (1) cpd00012[0] + (1) cpd00559[0]",
         "id": "rxn33654",
         "is_obsolete": 1,
         "is_transport": 0,
@@ -64850,19 +64877,11 @@
                 "name": "NADH"
             },
             {
-                "charge": 1,
-                "coefficient": -1,
-                "compartment": 0,
-                "compound": "cpd00067",
-                "formula": "H",
-                "name": "H+"
-            },
-            {
-                "charge": -3,
+                "charge": -2,
                 "coefficient": -1,
                 "compartment": 0,
                 "compound": "cpd02169",
-                "formula": "C30H49O7P2",
+                "formula": "C30H50O7P2",
                 "name": "Presqualene diphosphate"
             },
             {
@@ -65028,11 +65047,11 @@
         "status": "OK",
         "stoichiometry": [
             {
-                "charge": -4,
+                "charge": -3,
                 "coefficient": -1,
                 "compartment": 0,
                 "compound": "cpd00002",
-                "formula": "C10H12N5O13P3",
+                "formula": "C10H13N5O13P3",
                 "name": "ATP"
             },
             {
@@ -65044,11 +65063,11 @@
                 "name": "1,2-Diacyl-sn-glycerol"
             },
             {
-                "charge": -3,
+                "charge": -2,
                 "coefficient": 1,
                 "compartment": 0,
                 "compound": "cpd00008",
-                "formula": "C10H12N5O10P2",
+                "formula": "C10H13N5O10P2",
                 "name": "ADP"
             },
             {
@@ -65358,12 +65377,12 @@
             "has_symmetry_groups": true
         },
         "code": "(1) cpd00002[0] + (1) cpd00010[0] + (1) cpd03337[0] <=> (1) cpd00012[0] + (1) cpd00018[0] + (1) cpd08983[0]",
-        "compound_ids": "cpd00002;cpd00010;cpd00012;cpd00018;cpd03337;cpd08983",
-        "definition": "(1) ATP[0] + (1) CoA[0] + (1) 5-Hydroxyferulate[0] <=> (1) PPi[0] + (1) AMP[0] + (1) 5-Hydroxyferuloyl-CoA[0]",
+        "compound_ids": "cpd00002;cpd00010;cpd00012;cpd00018;cpd00067;cpd03337;cpd08983",
+        "definition": "(1) ATP[0] + (1) CoA[0] + (1) 5-Hydroxyferulate[0] <=> (1) PPi[0] + (1) AMP[0] + (1) H+[0] + (1) 5-Hydroxyferuloyl-CoA[0]",
         "ec_numbers": [
             "6.2.1.12"
         ],
-        "equation": "(1) cpd00002[0] + (1) cpd00010[0] + (1) cpd03337[0] <=> (1) cpd00012[0] + (1) cpd00018[0] + (1) cpd08983[0]",
+        "equation": "(1) cpd00002[0] + (1) cpd00010[0] + (1) cpd03337[0] <=> (1) cpd00012[0] + (1) cpd00018[0] + (1) cpd00067[0] + (1) cpd08983[0]",
         "id": "rxn33659",
         "is_obsolete": 1,
         "is_transport": 0,
@@ -65383,11 +65402,11 @@
         "status": "OK",
         "stoichiometry": [
             {
-                "charge": -4,
+                "charge": -3,
                 "coefficient": -1,
                 "compartment": 0,
                 "compound": "cpd00002",
-                "formula": "C10H12N5O13P3",
+                "formula": "C10H13N5O13P3",
                 "name": "ATP"
             },
             {
@@ -65421,6 +65440,14 @@
                 "compound": "cpd00018",
                 "formula": "C10H12N5O7P",
                 "name": "AMP"
+            },
+            {
+                "charge": 1,
+                "coefficient": 1,
+                "compartment": 0,
+                "compound": "cpd00067",
+                "formula": "H",
+                "name": "H+"
             },
             {
                 "charge": -4,
@@ -65624,13 +65651,13 @@
         },
         "code": "(1) cpd00001[0] + (1) cpd00090[0] <=> (1) cpd00009[0] + (1) cpd00114[0]",
         "compound_ids": "cpd00001;cpd00009;cpd00067;cpd00090;cpd00114",
-        "definition": "(1) H2O[0] + (1) IDP[0] <=> (1) Phosphate[0] + (1) H+[0] + (1) IMP[0]",
+        "definition": "(1) H2O[0] + (1) IDP[0] <=> (1) Phosphate[0] + (2) H+[0] + (1) IMP[0]",
         "ec_numbers": [
             "3.6.1.5",
             "3.6.1.6",
             "3.6.1.64"
         ],
-        "equation": "(1) cpd00001[0] + (1) cpd00090[0] <=> (1) cpd00009[0] + (1) cpd00067[0] + (1) cpd00114[0]",
+        "equation": "(1) cpd00001[0] + (1) cpd00090[0] <=> (1) cpd00009[0] + (2) cpd00067[0] + (1) cpd00114[0]",
         "id": "rxn33662",
         "is_obsolete": 1,
         "is_transport": 0,
@@ -65658,11 +65685,11 @@
                 "name": "H2O"
             },
             {
-                "charge": -3,
+                "charge": -2,
                 "coefficient": -1,
                 "compartment": 0,
                 "compound": "cpd00090",
-                "formula": "C10H11N4O11P2",
+                "formula": "C10H12N4O11P2",
                 "name": "IDP"
             },
             {
@@ -65675,7 +65702,7 @@
             },
             {
                 "charge": 1,
-                "coefficient": 1,
+                "coefficient": 2,
                 "compartment": 0,
                 "compound": "cpd00067",
                 "formula": "H",
@@ -65744,13 +65771,13 @@
         },
         "code": "(1) cpd00001[0] + (1) cpd00090[0] <=> (1) cpd00009[0] + (1) cpd00114[0]",
         "compound_ids": "cpd00001;cpd00009;cpd00067;cpd00090;cpd00114",
-        "definition": "(1) H2O[0] + (1) IDP[0] <=> (1) Phosphate[0] + (1) H+[0] + (1) IMP[0]",
+        "definition": "(1) H2O[0] + (1) IDP[0] <=> (1) Phosphate[0] + (2) H+[0] + (1) IMP[0]",
         "ec_numbers": [
             "3.6.1.5",
             "3.6.1.6",
             "3.6.1.64"
         ],
-        "equation": "(1) cpd00001[0] + (1) cpd00090[0] <=> (1) cpd00009[0] + (1) cpd00067[0] + (1) cpd00114[0]",
+        "equation": "(1) cpd00001[0] + (1) cpd00090[0] <=> (1) cpd00009[0] + (2) cpd00067[0] + (1) cpd00114[0]",
         "id": "rxn33663",
         "is_obsolete": 1,
         "is_transport": 0,
@@ -65778,11 +65805,11 @@
                 "name": "H2O"
             },
             {
-                "charge": -3,
+                "charge": -2,
                 "coefficient": -1,
                 "compartment": 0,
                 "compound": "cpd00090",
-                "formula": "C10H11N4O11P2",
+                "formula": "C10H12N4O11P2",
                 "name": "IDP"
             },
             {
@@ -65795,7 +65822,7 @@
             },
             {
                 "charge": 1,
-                "coefficient": 1,
+                "coefficient": 2,
                 "compartment": 0,
                 "compound": "cpd00067",
                 "formula": "H",
@@ -66174,11 +66201,11 @@
                 "name": "H+"
             },
             {
-                "charge": -3,
+                "charge": -2,
                 "coefficient": -1,
                 "compartment": 0,
                 "compound": "cpd00096",
-                "formula": "C9H12N3O11P2",
+                "formula": "C9H13N3O11P2",
                 "name": "CDP"
             },
             {
@@ -66198,11 +66225,11 @@
                 "name": "H2O"
             },
             {
-                "charge": -3,
+                "charge": -2,
                 "coefficient": 1,
                 "compartment": 0,
                 "compound": "cpd00533",
-                "formula": "C9H12N3O10P2",
+                "formula": "C9H13N3O10P2",
                 "name": "dCDP"
             },
             {
@@ -66705,14 +66732,14 @@
             "has_symmetry_groups": true
         },
         "code": "(1) cpd00002[0] + (1) cpd00298[0] <=> (1) cpd00008[0] + (1) cpd00297[0]",
-        "compound_ids": "cpd00002;cpd00008;cpd00297;cpd00298",
-        "definition": "(1) ATP[0] + (1) dTMP[0] <=> (1) ADP[0] + (1) dTDP[0]",
+        "compound_ids": "cpd00002;cpd00008;cpd00067;cpd00297;cpd00298",
+        "definition": "(1) ATP[0] + (1) H+[0] + (1) dTMP[0] <=> (1) ADP[0] + (1) dTDP[0]",
         "ec_numbers": [
             "2.7.4.12",
             "2.7.4.13",
             "2.7.4.9"
         ],
-        "equation": "(1) cpd00002[0] + (1) cpd00298[0] <=> (1) cpd00008[0] + (1) cpd00297[0]",
+        "equation": "(1) cpd00002[0] + (1) cpd00067[0] + (1) cpd00298[0] <=> (1) cpd00008[0] + (1) cpd00297[0]",
         "id": "rxn33672",
         "is_obsolete": 1,
         "is_transport": 0,
@@ -66733,12 +66760,20 @@
         "status": "OK",
         "stoichiometry": [
             {
-                "charge": -4,
+                "charge": -3,
                 "coefficient": -1,
                 "compartment": 0,
                 "compound": "cpd00002",
-                "formula": "C10H12N5O13P3",
+                "formula": "C10H13N5O13P3",
                 "name": "ATP"
+            },
+            {
+                "charge": 1,
+                "coefficient": -1,
+                "compartment": 0,
+                "compound": "cpd00067",
+                "formula": "H",
+                "name": "H+"
             },
             {
                 "charge": -2,
@@ -66749,19 +66784,19 @@
                 "name": "dTMP"
             },
             {
-                "charge": -3,
+                "charge": -2,
                 "coefficient": 1,
                 "compartment": 0,
                 "compound": "cpd00008",
-                "formula": "C10H12N5O10P2",
+                "formula": "C10H13N5O10P2",
                 "name": "ADP"
             },
             {
-                "charge": -3,
+                "charge": -2,
                 "coefficient": 1,
                 "compartment": 0,
                 "compound": "cpd00297",
-                "formula": "C10H13N2O11P2",
+                "formula": "C10H14N2O11P2",
                 "name": "dTDP"
             }
         ],
@@ -66961,13 +66996,13 @@
             "has_symmetry_groups": true
         },
         "code": "(1) cpd00113[0] + (1) cpd02746[0] <=> (1) cpd00012[0] + (1) cpd02229[0]",
-        "compound_ids": "cpd00012;cpd00113;cpd02229;cpd02746",
-        "definition": "(1) Isopentenyldiphosphate[0] + (1) all trans Decaprenyl diphosphate[0] => (1) PPi[0] + (1) Bactoprenyl diphosphate[0]",
+        "compound_ids": "cpd00012;cpd00067;cpd00113;cpd02229;cpd02746",
+        "definition": "(1) Isopentenyldiphosphate[0] + (1) all trans Decaprenyl diphosphate[0] => (1) PPi[0] + (1) H+[0] + (1) Bactoprenyl diphosphate[0]",
         "ec_numbers": [
             "2.5.1.-",
             "2.5.1.31"
         ],
-        "equation": "(1) cpd00113[0] + (1) cpd02746[0] => (1) cpd00012[0] + (1) cpd02229[0]",
+        "equation": "(1) cpd00113[0] + (1) cpd02746[0] => (1) cpd00012[0] + (1) cpd00067[0] + (1) cpd02229[0]",
         "id": "rxn33674",
         "is_obsolete": 1,
         "is_transport": 0,
@@ -66985,19 +67020,19 @@
         "status": "OK",
         "stoichiometry": [
             {
-                "charge": -3,
+                "charge": -2,
                 "coefficient": -1,
                 "compartment": 0,
                 "compound": "cpd00113",
-                "formula": "C5H9O7P2",
+                "formula": "C5H10O7P2",
                 "name": "Isopentenyldiphosphate"
             },
             {
-                "charge": -3,
+                "charge": -2,
                 "coefficient": -1,
                 "compartment": 0,
                 "compound": "cpd02746",
-                "formula": "C50H81O7P2",
+                "formula": "C50H82O7P2",
                 "name": "all trans Decaprenyl diphosphate"
             },
             {
@@ -67009,11 +67044,19 @@
                 "name": "PPi"
             },
             {
-                "charge": -3,
+                "charge": 1,
+                "coefficient": 1,
+                "compartment": 0,
+                "compound": "cpd00067",
+                "formula": "H",
+                "name": "H+"
+            },
+            {
+                "charge": -2,
                 "coefficient": 1,
                 "compartment": 0,
                 "compound": "cpd02229",
-                "formula": "C55H89O7P2",
+                "formula": "C55H90O7P2",
                 "name": "Bactoprenyl diphosphate"
             }
         ],
@@ -67522,11 +67565,11 @@
                 "name": "O2"
             },
             {
-                "charge": -3,
+                "charge": -2,
                 "coefficient": -1,
                 "compartment": 0,
                 "compound": "cpd00008",
-                "formula": "C10H12N5O10P2",
+                "formula": "C10H13N5O10P2",
                 "name": "ADP"
             },
             {
@@ -67554,11 +67597,11 @@
                 "name": "H2O"
             },
             {
-                "charge": -4,
+                "charge": -3,
                 "coefficient": 1,
                 "compartment": 0,
                 "compound": "cpd00002",
-                "formula": "C10H12N5O13P3",
+                "formula": "C10H13N5O13P3",
                 "name": "ATP"
             },
             {
@@ -68967,12 +69010,12 @@
             "Name: "
         ],
         "code": "(1) cpd00043[0] + (1) cpd01743[0] <=> (1) cpd00014[0] + (1) cpd03652[0]",
-        "compound_ids": "cpd00014;cpd00043;cpd00067;cpd01743;cpd03652",
-        "definition": "(1) UDP-galactose[0] + (1) Cerebroside[0] <=> (1) UDP[0] + (1) H+[0] + (1) Digalactosylceramide[0]",
+        "compound_ids": "cpd00014;cpd00043;cpd01743;cpd03652",
+        "definition": "(1) UDP-galactose[0] + (1) Cerebroside[0] <=> (1) UDP[0] + (1) Digalactosylceramide[0]",
         "ec_numbers": [
             "2.4.1.-"
         ],
-        "equation": "(1) cpd00043[0] + (1) cpd01743[0] <=> (1) cpd00014[0] + (1) cpd00067[0] + (1) cpd03652[0]",
+        "equation": "(1) cpd00043[0] + (1) cpd01743[0] <=> (1) cpd00014[0] + (1) cpd03652[0]",
         "id": "rxn33694",
         "is_obsolete": 1,
         "is_transport": 0,
@@ -69007,20 +69050,12 @@
                 "name": "Cerebroside"
             },
             {
-                "charge": -3,
+                "charge": -2,
                 "coefficient": 1,
                 "compartment": 0,
                 "compound": "cpd00014",
-                "formula": "C9H11N2O12P2",
+                "formula": "C9H12N2O12P2",
                 "name": "UDP"
-            },
-            {
-                "charge": 1,
-                "coefficient": 1,
-                "compartment": 0,
-                "compound": "cpd00067",
-                "formula": "H",
-                "name": "H+"
             },
             {
                 "charge": 0,
@@ -69402,11 +69437,11 @@
         "status": "OK",
         "stoichiometry": [
             {
-                "charge": -4,
+                "charge": -3,
                 "coefficient": -1,
                 "compartment": 0,
                 "compound": "cpd00002",
-                "formula": "C10H12N5O13P3",
+                "formula": "C10H13N5O13P3",
                 "name": "ATP"
             },
             {
@@ -69418,11 +69453,11 @@
                 "name": "D-fructose-1-phosphate"
             },
             {
-                "charge": -3,
+                "charge": -2,
                 "coefficient": 1,
                 "compartment": 0,
                 "compound": "cpd00008",
-                "formula": "C10H12N5O10P2",
+                "formula": "C10H13N5O10P2",
                 "name": "ADP"
             },
             {
@@ -69541,11 +69576,11 @@
         "status": "OK",
         "stoichiometry": [
             {
-                "charge": -4,
+                "charge": -3,
                 "coefficient": -1,
                 "compartment": 0,
                 "compound": "cpd00002",
-                "formula": "C10H12N5O13P3",
+                "formula": "C10H13N5O13P3",
                 "name": "ATP"
             },
             {
@@ -69557,11 +69592,11 @@
                 "name": "D-fructose-1-phosphate"
             },
             {
-                "charge": -3,
+                "charge": -2,
                 "coefficient": 1,
                 "compartment": 0,
                 "compound": "cpd00008",
-                "formula": "C10H12N5O10P2",
+                "formula": "C10H13N5O10P2",
                 "name": "ADP"
             },
             {
@@ -70628,11 +70663,11 @@
         "status": "OK",
         "stoichiometry": [
             {
-                "charge": -4,
+                "charge": -3,
                 "coefficient": -1,
                 "compartment": 0,
                 "compound": "cpd00002",
-                "formula": "C10H12N5O13P3",
+                "formula": "C10H13N5O13P3",
                 "name": "ATP"
             },
             {
@@ -70644,11 +70679,11 @@
                 "name": "galacturonate"
             },
             {
-                "charge": -3,
+                "charge": -2,
                 "coefficient": 1,
                 "compartment": 0,
                 "compound": "cpd00008",
-                "formula": "C10H12N5O10P2",
+                "formula": "C10H13N5O10P2",
                 "name": "ADP"
             },
             {
@@ -70737,12 +70772,12 @@
             "has_symmetry_groups": true
         },
         "code": "(1) cpd00089[0] + (1) cpd00357[0] <=> (1) cpd00012[0] + (1) cpd00626[0]",
-        "compound_ids": "cpd00012;cpd00067;cpd00089;cpd00357;cpd00626",
-        "definition": "(1) H+[0] + (1) Glucose-1-phosphate[0] + (1) TTP[0] <=> (1) PPi[0] + (1) dTDPglucose[0]",
+        "compound_ids": "cpd00012;cpd00089;cpd00357;cpd00626",
+        "definition": "(1) Glucose-1-phosphate[0] + (1) TTP[0] <=> (1) PPi[0] + (1) dTDPglucose[0]",
         "ec_numbers": [
             "2.7.7.24"
         ],
-        "equation": "(1) cpd00067[0] + (1) cpd00089[0] + (1) cpd00357[0] <=> (1) cpd00012[0] + (1) cpd00626[0]",
+        "equation": "(1) cpd00089[0] + (1) cpd00357[0] <=> (1) cpd00012[0] + (1) cpd00626[0]",
         "id": "rxn33709",
         "is_obsolete": 1,
         "is_transport": 0,
@@ -70763,14 +70798,6 @@
         "status": "OK",
         "stoichiometry": [
             {
-                "charge": 1,
-                "coefficient": -1,
-                "compartment": 0,
-                "compound": "cpd00067",
-                "formula": "H",
-                "name": "H+"
-            },
-            {
                 "charge": -2,
                 "coefficient": -1,
                 "compartment": 0,
@@ -70779,11 +70806,11 @@
                 "name": "Glucose-1-phosphate"
             },
             {
-                "charge": -4,
+                "charge": -3,
                 "coefficient": -1,
                 "compartment": 0,
                 "compound": "cpd00357",
-                "formula": "C10H13N2O14P3",
+                "formula": "C10H14N2O14P3",
                 "name": "TTP"
             },
             {
@@ -70871,12 +70898,12 @@
             "has_symmetry_groups": true
         },
         "code": "(1) cpd00089[0] + (1) cpd00357[0] <=> (1) cpd00012[0] + (1) cpd00626[0]",
-        "compound_ids": "cpd00012;cpd00067;cpd00089;cpd00357;cpd00626",
-        "definition": "(1) H+[0] + (1) Glucose-1-phosphate[0] + (1) TTP[0] <=> (1) PPi[0] + (1) dTDPglucose[0]",
+        "compound_ids": "cpd00012;cpd00089;cpd00357;cpd00626",
+        "definition": "(1) Glucose-1-phosphate[0] + (1) TTP[0] <=> (1) PPi[0] + (1) dTDPglucose[0]",
         "ec_numbers": [
             "2.7.7.24"
         ],
-        "equation": "(1) cpd00067[0] + (1) cpd00089[0] + (1) cpd00357[0] <=> (1) cpd00012[0] + (1) cpd00626[0]",
+        "equation": "(1) cpd00089[0] + (1) cpd00357[0] <=> (1) cpd00012[0] + (1) cpd00626[0]",
         "id": "rxn33710",
         "is_obsolete": 1,
         "is_transport": 0,
@@ -70897,14 +70924,6 @@
         "status": "OK",
         "stoichiometry": [
             {
-                "charge": 1,
-                "coefficient": -1,
-                "compartment": 0,
-                "compound": "cpd00067",
-                "formula": "H",
-                "name": "H+"
-            },
-            {
                 "charge": -2,
                 "coefficient": -1,
                 "compartment": 0,
@@ -70913,11 +70932,11 @@
                 "name": "Glucose-1-phosphate"
             },
             {
-                "charge": -4,
+                "charge": -3,
                 "coefficient": -1,
                 "compartment": 0,
                 "compound": "cpd00357",
-                "formula": "C10H13N2O14P3",
+                "formula": "C10H14N2O14P3",
                 "name": "TTP"
             },
             {
@@ -71255,12 +71274,12 @@
             "has_symmetry_groups": true
         },
         "code": "(1) cpd00089[0] + (1) cpd00357[0] <=> (1) cpd00012[0] + (1) cpd00626[0]",
-        "compound_ids": "cpd00012;cpd00067;cpd00089;cpd00357;cpd00626",
-        "definition": "(1) H+[0] + (1) Glucose-1-phosphate[0] + (1) TTP[0] <=> (1) PPi[0] + (1) dTDPglucose[0]",
+        "compound_ids": "cpd00012;cpd00089;cpd00357;cpd00626",
+        "definition": "(1) Glucose-1-phosphate[0] + (1) TTP[0] <=> (1) PPi[0] + (1) dTDPglucose[0]",
         "ec_numbers": [
             "2.7.7.24"
         ],
-        "equation": "(1) cpd00067[0] + (1) cpd00089[0] + (1) cpd00357[0] <=> (1) cpd00012[0] + (1) cpd00626[0]",
+        "equation": "(1) cpd00089[0] + (1) cpd00357[0] <=> (1) cpd00012[0] + (1) cpd00626[0]",
         "id": "rxn33714",
         "is_obsolete": 1,
         "is_transport": 0,
@@ -71281,14 +71300,6 @@
         "status": "OK",
         "stoichiometry": [
             {
-                "charge": 1,
-                "coefficient": -1,
-                "compartment": 0,
-                "compound": "cpd00067",
-                "formula": "H",
-                "name": "H+"
-            },
-            {
                 "charge": -2,
                 "coefficient": -1,
                 "compartment": 0,
@@ -71297,11 +71308,11 @@
                 "name": "Glucose-1-phosphate"
             },
             {
-                "charge": -4,
+                "charge": -3,
                 "coefficient": -1,
                 "compartment": 0,
                 "compound": "cpd00357",
-                "formula": "C10H13N2O14P3",
+                "formula": "C10H14N2O14P3",
                 "name": "TTP"
             },
             {
@@ -71389,12 +71400,12 @@
             "has_symmetry_groups": true
         },
         "code": "(1) cpd00089[0] + (1) cpd00357[0] <=> (1) cpd00012[0] + (1) cpd00626[0]",
-        "compound_ids": "cpd00012;cpd00067;cpd00089;cpd00357;cpd00626",
-        "definition": "(1) H+[0] + (1) Glucose-1-phosphate[0] + (1) TTP[0] <=> (1) PPi[0] + (1) dTDPglucose[0]",
+        "compound_ids": "cpd00012;cpd00089;cpd00357;cpd00626",
+        "definition": "(1) Glucose-1-phosphate[0] + (1) TTP[0] <=> (1) PPi[0] + (1) dTDPglucose[0]",
         "ec_numbers": [
             "2.7.7.24"
         ],
-        "equation": "(1) cpd00067[0] + (1) cpd00089[0] + (1) cpd00357[0] <=> (1) cpd00012[0] + (1) cpd00626[0]",
+        "equation": "(1) cpd00089[0] + (1) cpd00357[0] <=> (1) cpd00012[0] + (1) cpd00626[0]",
         "id": "rxn33715",
         "is_obsolete": 1,
         "is_transport": 0,
@@ -71415,14 +71426,6 @@
         "status": "OK",
         "stoichiometry": [
             {
-                "charge": 1,
-                "coefficient": -1,
-                "compartment": 0,
-                "compound": "cpd00067",
-                "formula": "H",
-                "name": "H+"
-            },
-            {
                 "charge": -2,
                 "coefficient": -1,
                 "compartment": 0,
@@ -71431,11 +71434,11 @@
                 "name": "Glucose-1-phosphate"
             },
             {
-                "charge": -4,
+                "charge": -3,
                 "coefficient": -1,
                 "compartment": 0,
                 "compound": "cpd00357",
-                "formula": "C10H13N2O14P3",
+                "formula": "C10H14N2O14P3",
                 "name": "TTP"
             },
             {
@@ -72493,19 +72496,19 @@
         "status": "OK",
         "stoichiometry": [
             {
-                "charge": -4,
+                "charge": -3,
                 "coefficient": -1,
                 "compartment": 0,
                 "compound": "cpd00062",
-                "formula": "C9H11N2O15P3",
+                "formula": "C9H12N2O15P3",
                 "name": "UTP"
             },
             {
-                "charge": -4,
+                "charge": -3,
                 "coefficient": 1,
                 "compartment": 1,
                 "compound": "cpd00062",
-                "formula": "C9H11N2O15P3",
+                "formula": "C9H12N2O15P3",
                 "name": "UTP"
             }
         ],
@@ -72790,19 +72793,19 @@
         "status": "OK",
         "stoichiometry": [
             {
-                "charge": -4,
+                "charge": -3,
                 "coefficient": -1,
                 "compartment": 0,
                 "compound": "cpd00062",
-                "formula": "C9H11N2O15P3",
+                "formula": "C9H12N2O15P3",
                 "name": "UTP"
             },
             {
-                "charge": -4,
+                "charge": -3,
                 "coefficient": 1,
                 "compartment": 1,
                 "compound": "cpd00062",
-                "formula": "C9H11N2O15P3",
+                "formula": "C9H12N2O15P3",
                 "name": "UTP"
             }
         ],
@@ -73068,19 +73071,19 @@
         "status": "OK",
         "stoichiometry": [
             {
-                "charge": -4,
+                "charge": -3,
                 "coefficient": -1,
                 "compartment": 0,
                 "compound": "cpd00062",
-                "formula": "C9H11N2O15P3",
+                "formula": "C9H12N2O15P3",
                 "name": "UTP"
             },
             {
-                "charge": -4,
+                "charge": -3,
                 "coefficient": 1,
                 "compartment": 1,
                 "compound": "cpd00062",
-                "formula": "C9H11N2O15P3",
+                "formula": "C9H12N2O15P3",
                 "name": "UTP"
             }
         ],
@@ -75181,11 +75184,11 @@
         "status": "OK",
         "stoichiometry": [
             {
-                "charge": -4,
+                "charge": -3,
                 "coefficient": -1,
                 "compartment": 0,
                 "compound": "cpd00002",
-                "formula": "C10H12N5O13P3",
+                "formula": "C10H13N5O13P3",
                 "name": "ATP"
             },
             {
@@ -75197,11 +75200,11 @@
                 "name": "D-fructose-6-phosphate"
             },
             {
-                "charge": -3,
+                "charge": -2,
                 "coefficient": 1,
                 "compartment": 0,
                 "compound": "cpd00008",
-                "formula": "C10H12N5O10P2",
+                "formula": "C10H13N5O10P2",
                 "name": "ADP"
             },
             {
@@ -75570,12 +75573,12 @@
             "has_symmetry_groups": true
         },
         "code": "(1) cpd00002[0] + (1) cpd00031[0] <=> (1) cpd00018[0] + (1) cpd00905[0]",
-        "compound_ids": "cpd00002;cpd00018;cpd00031;cpd00905",
-        "definition": "(1) ATP[0] + (1) GDP[0] <=> (1) AMP[0] + (1) Guanosine 3',5'-bis(diphosphate)[0]",
+        "compound_ids": "cpd00002;cpd00018;cpd00031;cpd00067;cpd00905",
+        "definition": "(1) ATP[0] + (1) GDP[0] <=> (1) AMP[0] + (2) H+[0] + (1) Guanosine 3',5'-bis(diphosphate)[0]",
         "ec_numbers": [
             "2.7.6.5"
         ],
-        "equation": "(1) cpd00002[0] + (1) cpd00031[0] <=> (1) cpd00018[0] + (1) cpd00905[0]",
+        "equation": "(1) cpd00002[0] + (1) cpd00031[0] <=> (1) cpd00018[0] + (2) cpd00067[0] + (1) cpd00905[0]",
         "id": "rxn33758",
         "is_obsolete": 1,
         "is_transport": 0,
@@ -75595,19 +75598,19 @@
         "status": "OK",
         "stoichiometry": [
             {
-                "charge": -4,
-                "coefficient": -1,
-                "compartment": 0,
-                "compound": "cpd00002",
-                "formula": "C10H12N5O13P3",
-                "name": "ATP"
-            },
-            {
                 "charge": -3,
                 "coefficient": -1,
                 "compartment": 0,
+                "compound": "cpd00002",
+                "formula": "C10H13N5O13P3",
+                "name": "ATP"
+            },
+            {
+                "charge": -2,
+                "coefficient": -1,
+                "compartment": 0,
                 "compound": "cpd00031",
-                "formula": "C10H12N5O11P2",
+                "formula": "C10H13N5O11P2",
                 "name": "GDP"
             },
             {
@@ -75617,6 +75620,14 @@
                 "compound": "cpd00018",
                 "formula": "C10H12N5O7P",
                 "name": "AMP"
+            },
+            {
+                "charge": 1,
+                "coefficient": 2,
+                "compartment": 0,
+                "compound": "cpd00067",
+                "formula": "H",
+                "name": "H+"
             },
             {
                 "charge": -5,
@@ -78129,12 +78140,12 @@
             "has_symmetry_groups": true
         },
         "code": "(1) cpd00010[0] + (1) cpd00036[0] + (1) cpd00068[0] <=> (1) cpd00009[0] + (1) cpd00078[0] + (1) cpd00090[0]",
-        "compound_ids": "cpd00009;cpd00010;cpd00036;cpd00068;cpd00078;cpd00090",
-        "definition": "(1) CoA[0] + (1) Succinate[0] + (1) ITP[0] <=> (1) Phosphate[0] + (1) Succinyl-CoA[0] + (1) IDP[0]",
+        "compound_ids": "cpd00009;cpd00010;cpd00036;cpd00067;cpd00068;cpd00078;cpd00090",
+        "definition": "(1) CoA[0] + (1) Succinate[0] + (1) H+[0] + (1) ITP[0] <=> (1) Phosphate[0] + (1) Succinyl-CoA[0] + (1) IDP[0]",
         "ec_numbers": [
             "6.2.1.4"
         ],
-        "equation": "(1) cpd00010[0] + (1) cpd00036[0] + (1) cpd00068[0] <=> (1) cpd00009[0] + (1) cpd00078[0] + (1) cpd00090[0]",
+        "equation": "(1) cpd00010[0] + (1) cpd00036[0] + (1) cpd00067[0] + (1) cpd00068[0] <=> (1) cpd00009[0] + (1) cpd00078[0] + (1) cpd00090[0]",
         "id": "rxn33785",
         "is_obsolete": 1,
         "is_transport": 0,
@@ -78143,7 +78154,8 @@
         "notes": [
             "GCC",
             "EQC",
-            "EQU"
+            "EQU",
+            "HB"
         ],
         "pathways": [
             "KEGG: rn00020 (Citrate cycle (TCA cycle)); rn01110 (Biosynthesis of secondary metabolites); rn01200 (Carbon metabolism)"
@@ -78167,6 +78179,14 @@
                 "compound": "cpd00036",
                 "formula": "C4H4O4",
                 "name": "Succinate"
+            },
+            {
+                "charge": 1,
+                "coefficient": -1,
+                "compartment": 0,
+                "compound": "cpd00067",
+                "formula": "H",
+                "name": "H+"
             },
             {
                 "charge": -4,
@@ -78193,11 +78213,11 @@
                 "name": "Succinyl-CoA"
             },
             {
-                "charge": -3,
+                "charge": -2,
                 "coefficient": 1,
                 "compartment": 0,
                 "compound": "cpd00090",
-                "formula": "C10H11N4O11P2",
+                "formula": "C10H12N4O11P2",
                 "name": "IDP"
             }
         ],
@@ -81641,12 +81661,12 @@
             "has_symmetry_groups": true
         },
         "code": "(1) cpd00002[0] + (1) cpd00010[0] + (1) cpd00188[0] <=> (1) cpd00012[0] + (1) cpd00018[0] + (1) cpd01519[0]",
-        "compound_ids": "cpd00002;cpd00010;cpd00012;cpd00018;cpd00188;cpd01519",
-        "definition": "(1) ATP[0] + (1) CoA[0] + (1) Arachidonate[0] <=> (1) PPi[0] + (1) AMP[0] + (1) Arachidonyl-CoA[0]",
+        "compound_ids": "cpd00002;cpd00010;cpd00012;cpd00018;cpd00067;cpd00188;cpd01519",
+        "definition": "(1) ATP[0] + (1) CoA[0] + (1) Arachidonate[0] <=> (1) PPi[0] + (1) AMP[0] + (1) H+[0] + (1) Arachidonyl-CoA[0]",
         "ec_numbers": [
             "6.2.1.15"
         ],
-        "equation": "(1) cpd00002[0] + (1) cpd00010[0] + (1) cpd00188[0] <=> (1) cpd00012[0] + (1) cpd00018[0] + (1) cpd01519[0]",
+        "equation": "(1) cpd00002[0] + (1) cpd00010[0] + (1) cpd00188[0] <=> (1) cpd00012[0] + (1) cpd00018[0] + (1) cpd00067[0] + (1) cpd01519[0]",
         "id": "rxn33826",
         "is_obsolete": 1,
         "is_transport": 0,
@@ -81664,11 +81684,11 @@
         "status": "OK",
         "stoichiometry": [
             {
-                "charge": -4,
+                "charge": -3,
                 "coefficient": -1,
                 "compartment": 0,
                 "compound": "cpd00002",
-                "formula": "C10H12N5O13P3",
+                "formula": "C10H13N5O13P3",
                 "name": "ATP"
             },
             {
@@ -81702,6 +81722,14 @@
                 "compound": "cpd00018",
                 "formula": "C10H12N5O7P",
                 "name": "AMP"
+            },
+            {
+                "charge": 1,
+                "coefficient": 1,
+                "compartment": 0,
+                "compound": "cpd00067",
+                "formula": "H",
+                "name": "H+"
             },
             {
                 "charge": -4,
@@ -82389,11 +82417,11 @@
         "status": "OK",
         "stoichiometry": [
             {
-                "charge": -4,
+                "charge": -3,
                 "coefficient": -1,
                 "compartment": 0,
                 "compound": "cpd00002",
-                "formula": "C10H12N5O13P3",
+                "formula": "C10H13N5O13P3",
                 "name": "ATP"
             },
             {
@@ -82405,11 +82433,11 @@
                 "name": "galacturonate"
             },
             {
-                "charge": -3,
+                "charge": -2,
                 "coefficient": 1,
                 "compartment": 0,
                 "compound": "cpd00008",
-                "formula": "C10H12N5O10P2",
+                "formula": "C10H13N5O10P2",
                 "name": "ADP"
             },
             {
@@ -82500,13 +82528,13 @@
             "has_symmetry_groups": true
         },
         "code": "(1) cpd00113[0] + (1) cpd08211[0] <=> (1) cpd00012[0] + (1) cpd17565[0]",
-        "compound_ids": "cpd00012;cpd00113;cpd08211;cpd17565",
-        "definition": "(1) Isopentenyldiphosphate[0] + (1) trans,trans,cis-Geranylgeranyl diphosphate[0] => (1) PPi[0] + (1) ditrans,dicis-Pentaprenyl diphosphate[0]",
+        "compound_ids": "cpd00012;cpd00067;cpd00113;cpd08211;cpd17565",
+        "definition": "(1) Isopentenyldiphosphate[0] + (1) trans,trans,cis-Geranylgeranyl diphosphate[0] => (1) PPi[0] + (1) H+[0] + (1) ditrans,dicis-Pentaprenyl diphosphate[0]",
         "ec_numbers": [
             "2.5.1.-",
             "2.5.1.31"
         ],
-        "equation": "(1) cpd00113[0] + (1) cpd08211[0] => (1) cpd00012[0] + (1) cpd17565[0]",
+        "equation": "(1) cpd00113[0] + (1) cpd08211[0] => (1) cpd00012[0] + (1) cpd00067[0] + (1) cpd17565[0]",
         "id": "rxn33834",
         "is_obsolete": 1,
         "is_transport": 0,
@@ -82524,19 +82552,19 @@
         "status": "OK",
         "stoichiometry": [
             {
-                "charge": -3,
+                "charge": -2,
                 "coefficient": -1,
                 "compartment": 0,
                 "compound": "cpd00113",
-                "formula": "C5H9O7P2",
+                "formula": "C5H10O7P2",
                 "name": "Isopentenyldiphosphate"
             },
             {
-                "charge": -3,
+                "charge": -2,
                 "coefficient": -1,
                 "compartment": 0,
                 "compound": "cpd08211",
-                "formula": "C20H33O7P2",
+                "formula": "C20H34O7P2",
                 "name": "trans,trans,cis-Geranylgeranyl diphosphate"
             },
             {
@@ -82548,11 +82576,19 @@
                 "name": "PPi"
             },
             {
-                "charge": -3,
+                "charge": 1,
+                "coefficient": 1,
+                "compartment": 0,
+                "compound": "cpd00067",
+                "formula": "H",
+                "name": "H+"
+            },
+            {
+                "charge": -2,
                 "coefficient": 1,
                 "compartment": 0,
                 "compound": "cpd17565",
-                "formula": "C25H41O7P2",
+                "formula": "C25H42O7P2",
                 "name": "ditrans,dicis-Pentaprenyl diphosphate"
             }
         ],
@@ -82710,11 +82746,11 @@
         "status": "OK",
         "stoichiometry": [
             {
-                "charge": -4,
+                "charge": -3,
                 "coefficient": -1,
                 "compartment": 0,
                 "compound": "cpd00002",
-                "formula": "C10H12N5O13P3",
+                "formula": "C10H13N5O13P3",
                 "name": "ATP"
             },
             {
@@ -82726,11 +82762,11 @@
                 "name": "galacturonate"
             },
             {
-                "charge": -3,
+                "charge": -2,
                 "coefficient": 1,
                 "compartment": 0,
                 "compound": "cpd00008",
-                "formula": "C10H12N5O10P2",
+                "formula": "C10H13N5O10P2",
                 "name": "ADP"
             },
             {
@@ -82836,11 +82872,11 @@
         "status": "OK",
         "stoichiometry": [
             {
-                "charge": -4,
+                "charge": -3,
                 "coefficient": -1,
                 "compartment": 0,
                 "compound": "cpd00002",
-                "formula": "C10H12N5O13P3",
+                "formula": "C10H13N5O13P3",
                 "name": "ATP"
             },
             {
@@ -82852,11 +82888,11 @@
                 "name": "galacturonate"
             },
             {
-                "charge": -3,
+                "charge": -2,
                 "coefficient": 1,
                 "compartment": 0,
                 "compound": "cpd00008",
-                "formula": "C10H12N5O10P2",
+                "formula": "C10H13N5O10P2",
                 "name": "ADP"
             },
             {
@@ -83022,11 +83058,11 @@
         "status": "CPDFORMERROR",
         "stoichiometry": [
             {
-                "charge": -4,
+                "charge": -3,
                 "coefficient": -1,
                 "compartment": 0,
                 "compound": "cpd00002",
-                "formula": "C10H12N5O13P3",
+                "formula": "C10H13N5O13P3",
                 "name": "ATP"
             },
             {
@@ -83038,11 +83074,11 @@
                 "name": "beta-D-Fructose 6-phosphate"
             },
             {
-                "charge": -3,
+                "charge": -2,
                 "coefficient": 1,
                 "compartment": 0,
                 "compound": "cpd00008",
-                "formula": "C10H12N5O10P2",
+                "formula": "C10H13N5O10P2",
                 "name": "ADP"
             },
             {
@@ -83464,11 +83500,11 @@
         "status": "CPDFORMERROR",
         "stoichiometry": [
             {
-                "charge": -4,
+                "charge": -3,
                 "coefficient": -1,
                 "compartment": 0,
                 "compound": "cpd00002",
-                "formula": "C10H12N5O13P3",
+                "formula": "C10H13N5O13P3",
                 "name": "ATP"
             },
             {
@@ -83480,11 +83516,11 @@
                 "name": "3-Phosphoglycerate"
             },
             {
-                "charge": -3,
+                "charge": -2,
                 "coefficient": 1,
                 "compartment": 0,
                 "compound": "cpd00008",
-                "formula": "C10H12N5O10P2",
+                "formula": "C10H13N5O10P2",
                 "name": "ADP"
             },
             {
@@ -83533,11 +83569,11 @@
         "status": "CPDFORMERROR",
         "stoichiometry": [
             {
-                "charge": -4,
+                "charge": -3,
                 "coefficient": -1,
                 "compartment": 0,
                 "compound": "cpd00002",
-                "formula": "C10H12N5O13P3",
+                "formula": "C10H13N5O13P3",
                 "name": "ATP"
             },
             {
@@ -83549,11 +83585,11 @@
                 "name": "3-Phosphoglycerate"
             },
             {
-                "charge": -3,
+                "charge": -2,
                 "coefficient": 1,
                 "compartment": 0,
                 "compound": "cpd00008",
-                "formula": "C10H12N5O10P2",
+                "formula": "C10H13N5O10P2",
                 "name": "ADP"
             },
             {
@@ -83780,11 +83816,11 @@
         "status": "MI:H:-2/O:-4/P:-1|CI:1",
         "stoichiometry": [
             {
-                "charge": -4,
+                "charge": -3,
                 "coefficient": -1,
                 "compartment": 0,
                 "compound": "cpd00002",
-                "formula": "C10H12N5O13P3",
+                "formula": "C10H13N5O13P3",
                 "name": "ATP"
             },
             {
@@ -83804,11 +83840,11 @@
                 "name": "H2CO3"
             },
             {
-                "charge": -3,
+                "charge": -2,
                 "coefficient": 1,
                 "compartment": 0,
                 "compound": "cpd00008",
-                "formula": "C10H12N5O10P2",
+                "formula": "C10H13N5O10P2",
                 "name": "ADP"
             },
             {
@@ -84308,11 +84344,11 @@
         "status": "MI:H:-1/O:-4/P:-1|CI:2",
         "stoichiometry": [
             {
-                "charge": -4,
+                "charge": -3,
                 "coefficient": -1,
                 "compartment": 0,
                 "compound": "cpd00002",
-                "formula": "C10H12N5O13P3",
+                "formula": "C10H13N5O13P3",
                 "name": "ATP"
             },
             {
@@ -84332,11 +84368,11 @@
                 "name": "Succinate"
             },
             {
-                "charge": -3,
+                "charge": -2,
                 "coefficient": 1,
                 "compartment": 0,
                 "compound": "cpd00008",
-                "formula": "C10H12N5O10P2",
+                "formula": "C10H13N5O10P2",
                 "name": "ADP"
             },
             {
@@ -84449,19 +84485,19 @@
                 "name": "Succinate"
             },
             {
-                "charge": -4,
+                "charge": -3,
                 "coefficient": -1,
                 "compartment": 0,
                 "compound": "cpd00038",
-                "formula": "C10H12N5O14P3",
+                "formula": "C10H13N5O14P3",
                 "name": "GTP"
             },
             {
-                "charge": -3,
+                "charge": -2,
                 "coefficient": 1,
                 "compartment": 0,
                 "compound": "cpd00031",
-                "formula": "C10H12N5O11P2",
+                "formula": "C10H13N5O11P2",
                 "name": "GDP"
             },
             {
@@ -85637,11 +85673,11 @@
         "status": "OK",
         "stoichiometry": [
             {
-                "charge": -4,
+                "charge": -3,
                 "coefficient": -1,
                 "compartment": 0,
                 "compound": "cpd00002",
-                "formula": "C10H12N5O13P3",
+                "formula": "C10H13N5O13P3",
                 "name": "ATP"
             },
             {
@@ -85653,11 +85689,11 @@
                 "name": "Ribulose"
             },
             {
-                "charge": -3,
+                "charge": -2,
                 "coefficient": 1,
                 "compartment": 0,
                 "compound": "cpd00008",
-                "formula": "C10H12N5O10P2",
+                "formula": "C10H13N5O10P2",
                 "name": "ADP"
             },
             {
@@ -85769,11 +85805,11 @@
         "status": "OK",
         "stoichiometry": [
             {
-                "charge": -4,
+                "charge": -3,
                 "coefficient": -1,
                 "compartment": 0,
                 "compound": "cpd00002",
-                "formula": "C10H12N5O13P3",
+                "formula": "C10H13N5O13P3",
                 "name": "ATP"
             },
             {
@@ -85785,11 +85821,11 @@
                 "name": "Ribose"
             },
             {
-                "charge": -3,
+                "charge": -2,
                 "coefficient": 1,
                 "compartment": 0,
                 "compound": "cpd00008",
-                "formula": "C10H12N5O10P2",
+                "formula": "C10H13N5O10P2",
                 "name": "ADP"
             },
             {
@@ -85895,11 +85931,11 @@
         "status": "OK",
         "stoichiometry": [
             {
-                "charge": -4,
+                "charge": -3,
                 "coefficient": -1,
                 "compartment": 0,
                 "compound": "cpd00002",
-                "formula": "C10H12N5O13P3",
+                "formula": "C10H13N5O13P3",
                 "name": "ATP"
             },
             {
@@ -85911,11 +85947,11 @@
                 "name": "Ribose"
             },
             {
-                "charge": -3,
+                "charge": -2,
                 "coefficient": 1,
                 "compartment": 0,
                 "compound": "cpd00008",
-                "formula": "C10H12N5O10P2",
+                "formula": "C10H13N5O10P2",
                 "name": "ADP"
             },
             {
@@ -86018,11 +86054,11 @@
         "status": "MI:H:-1/O:3/P:1|CI:-2",
         "stoichiometry": [
             {
-                "charge": -4,
+                "charge": -3,
                 "coefficient": -1,
                 "compartment": 0,
                 "compound": "cpd00002",
-                "formula": "C10H12N5O13P3",
+                "formula": "C10H13N5O13P3",
                 "name": "ATP"
             },
             {
@@ -86042,11 +86078,11 @@
                 "name": "Pyruvate"
             },
             {
-                "charge": -3,
+                "charge": -2,
                 "coefficient": 1,
                 "compartment": 0,
                 "compound": "cpd00008",
-                "formula": "C10H12N5O10P2",
+                "formula": "C10H13N5O10P2",
                 "name": "ADP"
             },
             {
@@ -86150,11 +86186,11 @@
         "status": "MI:H:-1/O:3/P:1|CI:-2",
         "stoichiometry": [
             {
-                "charge": -4,
+                "charge": -3,
                 "coefficient": -1,
                 "compartment": 0,
                 "compound": "cpd00002",
-                "formula": "C10H12N5O13P3",
+                "formula": "C10H13N5O13P3",
                 "name": "ATP"
             },
             {
@@ -86174,11 +86210,11 @@
                 "name": "Pyruvate"
             },
             {
-                "charge": -3,
+                "charge": -2,
                 "coefficient": 1,
                 "compartment": 0,
                 "compound": "cpd00008",
-                "formula": "C10H12N5O10P2",
+                "formula": "C10H13N5O10P2",
                 "name": "ADP"
             },
             {
@@ -86610,11 +86646,11 @@
         "status": "OK",
         "stoichiometry": [
             {
-                "charge": -4,
+                "charge": -3,
                 "coefficient": -1,
                 "compartment": 0,
                 "compound": "cpd00002",
-                "formula": "C10H12N5O13P3",
+                "formula": "C10H13N5O13P3",
                 "name": "ATP"
             },
             {
@@ -86626,11 +86662,11 @@
                 "name": "L-ribulose-5-phosphate"
             },
             {
-                "charge": -3,
+                "charge": -2,
                 "coefficient": 1,
                 "compartment": 0,
                 "compound": "cpd00008",
-                "formula": "C10H12N5O10P2",
+                "formula": "C10H13N5O10P2",
                 "name": "ADP"
             },
             {
@@ -86777,12 +86813,12 @@
             "Name: Acetate--CoA Ligase"
         ],
         "code": "(1) cpd00002[0] + (1) cpd00010[0] + (1) cpd00029[0] <=> (1) cpd00012[0] + (1) cpd00018[1] + (1) cpd00022[0]",
-        "compound_ids": "cpd00002;cpd00010;cpd00012;cpd00018;cpd00022;cpd00029",
-        "definition": "(1) ATP[0] + (1) CoA[0] + (1) Acetate[0] <=> (1) PPi[0] + (1) AMP[1] + (1) Acetyl-CoA[0]",
+        "compound_ids": "cpd00002;cpd00010;cpd00012;cpd00018;cpd00022;cpd00029;cpd00067",
+        "definition": "(1) ATP[0] + (1) CoA[0] + (1) Acetate[0] <=> (1) PPi[0] + (1) AMP[1] + (1) Acetyl-CoA[0] + (1) H+[0]",
         "ec_numbers": [
             "6.2.1.1"
         ],
-        "equation": "(1) cpd00002[0] + (1) cpd00010[0] + (1) cpd00029[0] <=> (1) cpd00012[0] + (1) cpd00018[1] + (1) cpd00022[0]",
+        "equation": "(1) cpd00002[0] + (1) cpd00010[0] + (1) cpd00029[0] <=> (1) cpd00012[0] + (1) cpd00018[1] + (1) cpd00022[0] + (1) cpd00067[0]",
         "id": "rxn33879",
         "is_obsolete": 0,
         "is_transport": 1,
@@ -86800,11 +86836,11 @@
         "status": "OK",
         "stoichiometry": [
             {
-                "charge": -4,
+                "charge": -3,
                 "coefficient": -1,
                 "compartment": 0,
                 "compound": "cpd00002",
-                "formula": "C10H12N5O13P3",
+                "formula": "C10H13N5O13P3",
                 "name": "ATP"
             },
             {
@@ -86846,6 +86882,14 @@
                 "compound": "cpd00022",
                 "formula": "C23H34N7O17P3S",
                 "name": "Acetyl-CoA"
+            },
+            {
+                "charge": 1,
+                "coefficient": 1,
+                "compartment": 0,
+                "compound": "cpd00067",
+                "formula": "H",
+                "name": "H+"
             }
         ],
         "thermo-evidence": {
@@ -87162,11 +87206,11 @@
         "status": "OK",
         "stoichiometry": [
             {
-                "charge": -3,
+                "charge": -2,
                 "coefficient": -1,
                 "compartment": 1,
                 "compound": "cpd00008",
-                "formula": "C10H12N5O10P2",
+                "formula": "C10H13N5O10P2",
                 "name": "ADP"
             },
             {
@@ -87194,11 +87238,11 @@
                 "name": "H2O"
             },
             {
-                "charge": -4,
+                "charge": -3,
                 "coefficient": 1,
                 "compartment": 1,
                 "compound": "cpd00002",
-                "formula": "C10H12N5O13P3",
+                "formula": "C10H13N5O13P3",
                 "name": "ATP"
             }
         ],
@@ -87644,11 +87688,11 @@
         "status": "MI:H:-4.670/O:3/P:1|CI:-5.670",
         "stoichiometry": [
             {
-                "charge": -3,
+                "charge": -2,
                 "coefficient": -1,
                 "compartment": 0,
                 "compound": "cpd00008",
-                "formula": "C10H12N5O10P2",
+                "formula": "C10H13N5O10P2",
                 "name": "ADP"
             },
             {
@@ -87660,11 +87704,11 @@
                 "name": "H+"
             },
             {
-                "charge": -4,
+                "charge": -3,
                 "coefficient": 1,
                 "compartment": 0,
                 "compound": "cpd00002",
-                "formula": "C10H12N5O13P3",
+                "formula": "C10H13N5O13P3",
                 "name": "ATP"
             }
         ],
@@ -87866,11 +87910,11 @@
         },
         "code": "(1) cpd00001[0] + (1) cpd00002[0] <=> (1) cpd00012[0] + (1) cpd00018[0]",
         "compound_ids": "cpd00001;cpd00002;cpd00012;cpd00018;cpd00067",
-        "definition": "(1) H2O[0] + (1) ATP[0] => (1) PPi[0] + (1) AMP[0] + (1) H+[0]",
+        "definition": "(1) H2O[0] + (1) ATP[0] => (1) PPi[0] + (1) AMP[0] + (2) H+[0]",
         "ec_numbers": [
             "3.6.1.8"
         ],
-        "equation": "(1) cpd00001[0] + (1) cpd00002[0] => (1) cpd00012[0] + (1) cpd00018[0] + (1) cpd00067[0]",
+        "equation": "(1) cpd00001[0] + (1) cpd00002[0] => (1) cpd00012[0] + (1) cpd00018[0] + (2) cpd00067[0]",
         "id": "rxn33891",
         "is_obsolete": 1,
         "is_transport": 0,
@@ -87898,11 +87942,11 @@
                 "name": "H2O"
             },
             {
-                "charge": -4,
+                "charge": -3,
                 "coefficient": -1,
                 "compartment": 0,
                 "compound": "cpd00002",
-                "formula": "C10H12N5O13P3",
+                "formula": "C10H13N5O13P3",
                 "name": "ATP"
             },
             {
@@ -87923,7 +87967,7 @@
             },
             {
                 "charge": 1,
-                "coefficient": 1,
+                "coefficient": 2,
                 "compartment": 0,
                 "compound": "cpd00067",
                 "formula": "H",
@@ -88003,7 +88047,7 @@
         "pathways": null,
         "reversibility": ">",
         "source": "Published Model",
-        "status": "MI:H:-2/O:6/P:2|CI:-4",
+        "status": "MI:H:-3/O:6/P:2|CI:-5",
         "stoichiometry": [
             {
                 "charge": 0,
@@ -88014,11 +88058,11 @@
                 "name": "H2O"
             },
             {
-                "charge": -4,
+                "charge": -3,
                 "coefficient": -1,
                 "compartment": 0,
                 "compound": "cpd00002",
-                "formula": "C10H12N5O13P3",
+                "formula": "C10H13N5O13P3",
                 "name": "ATP"
             },
             {
@@ -88169,11 +88213,11 @@
         "status": "MI:C:-288/H:-480/O:-240/R:2",
         "stoichiometry": [
             {
-                "charge": -4,
+                "charge": -3,
                 "coefficient": -50,
                 "compartment": 0,
                 "compound": "cpd00002",
-                "formula": "C10H12N5O13P3",
+                "formula": "C10H13N5O13P3",
                 "name": "ATP"
             },
             {
@@ -88185,11 +88229,11 @@
                 "name": "Glucose-1-phosphate"
             },
             {
-                "charge": -3,
+                "charge": -2,
                 "coefficient": 50,
                 "compartment": 0,
                 "compound": "cpd00008",
-                "formula": "C10H12N5O10P2",
+                "formula": "C10H13N5O10P2",
                 "name": "ADP"
             },
             {
@@ -88321,11 +88365,11 @@
         "status": "CPDFORMERROR",
         "stoichiometry": [
             {
-                "charge": -4,
+                "charge": -3,
                 "coefficient": -8,
                 "compartment": 1,
                 "compound": "cpd00002",
-                "formula": "C10H12N5O13P3",
+                "formula": "C10H13N5O13P3",
                 "name": "ATP"
             },
             {
@@ -88369,11 +88413,11 @@
                 "name": "NADP"
             },
             {
-                "charge": -3,
+                "charge": -2,
                 "coefficient": 8,
                 "compartment": 0,
                 "compound": "cpd00008",
-                "formula": "C10H12N5O10P2",
+                "formula": "C10H13N5O10P2",
                 "name": "ADP"
             },
             {
@@ -88504,11 +88548,11 @@
         "status": "MI:H:6/O:7|CI:-8",
         "stoichiometry": [
             {
-                "charge": -4,
+                "charge": -3,
                 "coefficient": -7,
                 "compartment": 0,
                 "compound": "cpd00002",
-                "formula": "C10H12N5O13P3",
+                "formula": "C10H13N5O13P3",
                 "name": "ATP"
             },
             {
@@ -88552,11 +88596,11 @@
                 "name": "NADP"
             },
             {
-                "charge": -3,
+                "charge": -2,
                 "coefficient": 7,
                 "compartment": 0,
                 "compound": "cpd00008",
-                "formula": "C10H12N5O10P2",
+                "formula": "C10H13N5O10P2",
                 "name": "ADP"
             },
             {
@@ -88635,11 +88679,11 @@
         "status": "CPDFORMERROR",
         "stoichiometry": [
             {
-                "charge": -4,
+                "charge": -3,
                 "coefficient": -7,
                 "compartment": 0,
                 "compound": "cpd00002",
-                "formula": "C10H12N5O13P3",
+                "formula": "C10H13N5O13P3",
                 "name": "ATP"
             },
             {
@@ -88683,11 +88727,11 @@
                 "name": "NADP"
             },
             {
-                "charge": -3,
+                "charge": -2,
                 "coefficient": 7,
                 "compartment": 0,
                 "compound": "cpd00008",
-                "formula": "C10H12N5O10P2",
+                "formula": "C10H13N5O10P2",
                 "name": "ADP"
             },
             {
@@ -89306,11 +89350,11 @@
         "status": "MI:C:-2/H:-5|CI:-1",
         "stoichiometry": [
             {
-                "charge": -4,
+                "charge": -3,
                 "coefficient": -1,
                 "compartment": 0,
                 "compound": "cpd00002",
-                "formula": "C10H12N5O13P3",
+                "formula": "C10H13N5O13P3",
                 "name": "ATP"
             },
             {
@@ -89362,11 +89406,11 @@
                 "name": "NADP"
             },
             {
-                "charge": -3,
+                "charge": -2,
                 "coefficient": 1,
                 "compartment": 0,
                 "compound": "cpd00008",
-                "formula": "C10H12N5O10P2",
+                "formula": "C10H13N5O10P2",
                 "name": "ADP"
             },
             {
@@ -89507,11 +89551,11 @@
         "status": "MI:C:-2/H:-5|CI:-1",
         "stoichiometry": [
             {
-                "charge": -4,
+                "charge": -3,
                 "coefficient": -1,
                 "compartment": 0,
                 "compound": "cpd00002",
-                "formula": "C10H12N5O13P3",
+                "formula": "C10H13N5O13P3",
                 "name": "ATP"
             },
             {
@@ -89563,11 +89607,11 @@
                 "name": "NADP"
             },
             {
-                "charge": -3,
+                "charge": -2,
                 "coefficient": 1,
                 "compartment": 0,
                 "compound": "cpd00008",
-                "formula": "C10H12N5O10P2",
+                "formula": "C10H13N5O10P2",
                 "name": "ADP"
             },
             {
@@ -90015,11 +90059,11 @@
         "status": "CPDFORMERROR",
         "stoichiometry": [
             {
-                "charge": -4,
+                "charge": -3,
                 "coefficient": -1,
                 "compartment": 0,
                 "compound": "cpd00002",
-                "formula": "C10H12N5O13P3",
+                "formula": "C10H13N5O13P3",
                 "name": "ATP"
             },
             {
@@ -90120,14 +90164,14 @@
         "pathways": null,
         "reversibility": "<",
         "source": "Published Model",
-        "status": "MI:C:-21/H:-31/N:-7/O:-15/P:-3/S:-1|CI:3",
+        "status": "MI:C:-21/H:-32/N:-7/O:-15/P:-3/S:-1|CI:2",
         "stoichiometry": [
             {
-                "charge": -4,
+                "charge": -3,
                 "coefficient": -1,
                 "compartment": 0,
                 "compound": "cpd00002",
-                "formula": "C10H12N5O13P3",
+                "formula": "C10H13N5O13P3",
                 "name": "ATP"
             },
             {
@@ -90208,11 +90252,11 @@
         "status": "CPDFORMERROR",
         "stoichiometry": [
             {
-                "charge": -4,
+                "charge": -3,
                 "coefficient": -1,
                 "compartment": 0,
                 "compound": "cpd00002",
-                "formula": "C10H12N5O13P3",
+                "formula": "C10H13N5O13P3",
                 "name": "ATP"
             },
             {
@@ -90293,11 +90337,11 @@
         "status": "CPDFORMERROR",
         "stoichiometry": [
             {
-                "charge": -4,
+                "charge": -3,
                 "coefficient": -1,
                 "compartment": 0,
                 "compound": "cpd00002",
-                "formula": "C10H12N5O13P3",
+                "formula": "C10H13N5O13P3",
                 "name": "ATP"
             },
             {
@@ -90378,11 +90422,11 @@
         "status": "CPDFORMERROR",
         "stoichiometry": [
             {
-                "charge": -4,
+                "charge": -3,
                 "coefficient": -1,
                 "compartment": 0,
                 "compound": "cpd00002",
-                "formula": "C10H12N5O13P3",
+                "formula": "C10H13N5O13P3",
                 "name": "ATP"
             },
             {
@@ -90463,11 +90507,11 @@
         "status": "CPDFORMERROR",
         "stoichiometry": [
             {
-                "charge": -4,
+                "charge": -3,
                 "coefficient": -1,
                 "compartment": 0,
                 "compound": "cpd00002",
-                "formula": "C10H12N5O13P3",
+                "formula": "C10H13N5O13P3",
                 "name": "ATP"
             },
             {
@@ -90548,11 +90592,11 @@
         "status": "CPDFORMERROR",
         "stoichiometry": [
             {
-                "charge": -4,
+                "charge": -3,
                 "coefficient": -1,
                 "compartment": 0,
                 "compound": "cpd00002",
-                "formula": "C10H12N5O13P3",
+                "formula": "C10H13N5O13P3",
                 "name": "ATP"
             },
             {
@@ -90633,11 +90677,11 @@
         "status": "CPDFORMERROR",
         "stoichiometry": [
             {
-                "charge": -4,
+                "charge": -3,
                 "coefficient": -1,
                 "compartment": 0,
                 "compound": "cpd00002",
-                "formula": "C10H12N5O13P3",
+                "formula": "C10H13N5O13P3",
                 "name": "ATP"
             },
             {
@@ -90718,11 +90762,11 @@
         "status": "CPDFORMERROR",
         "stoichiometry": [
             {
-                "charge": -4,
+                "charge": -3,
                 "coefficient": -1,
                 "compartment": 0,
                 "compound": "cpd00002",
-                "formula": "C10H12N5O13P3",
+                "formula": "C10H13N5O13P3",
                 "name": "ATP"
             },
             {
@@ -90803,11 +90847,11 @@
         "status": "CPDFORMERROR",
         "stoichiometry": [
             {
-                "charge": -4,
+                "charge": -3,
                 "coefficient": -1,
                 "compartment": 0,
                 "compound": "cpd00002",
-                "formula": "C10H12N5O13P3",
+                "formula": "C10H13N5O13P3",
                 "name": "ATP"
             },
             {
@@ -90888,11 +90932,11 @@
         "status": "CPDFORMERROR",
         "stoichiometry": [
             {
-                "charge": -4,
+                "charge": -3,
                 "coefficient": -1,
                 "compartment": 0,
                 "compound": "cpd00002",
-                "formula": "C10H12N5O13P3",
+                "formula": "C10H13N5O13P3",
                 "name": "ATP"
             },
             {
@@ -93306,11 +93350,11 @@
         "status": "CPDFORMERROR",
         "stoichiometry": [
             {
-                "charge": -4,
+                "charge": -3,
                 "coefficient": -1,
                 "compartment": 0,
                 "compound": "cpd00002",
-                "formula": "C10H12N5O13P3",
+                "formula": "C10H13N5O13P3",
                 "name": "ATP"
             },
             {
@@ -93322,11 +93366,11 @@
                 "name": "L-Glutamate"
             },
             {
-                "charge": -3,
+                "charge": -2,
                 "coefficient": 1,
                 "compartment": 0,
                 "compound": "cpd00008",
-                "formula": "C10H12N5O10P2",
+                "formula": "C10H13N5O10P2",
                 "name": "ADP"
             },
             {
@@ -94015,14 +94059,14 @@
         "pathways": null,
         "reversibility": ">",
         "source": "Published Model",
-        "status": "MI:H:1/O:1|CI:-1",
+        "status": "MI:O:1|CI:-2",
         "stoichiometry": [
             {
-                "charge": -4,
+                "charge": -3,
                 "coefficient": -1,
                 "compartment": 0,
                 "compound": "cpd00002",
-                "formula": "C10H12N5O13P3",
+                "formula": "C10H13N5O13P3",
                 "name": "ATP"
             },
             {
@@ -94164,11 +94208,11 @@
         "status": "OK",
         "stoichiometry": [
             {
-                "charge": -4,
+                "charge": -3,
                 "coefficient": -1,
                 "compartment": 0,
                 "compound": "cpd00002",
-                "formula": "C10H12N5O13P3",
+                "formula": "C10H13N5O13P3",
                 "name": "ATP"
             },
             {
@@ -94188,11 +94232,11 @@
                 "name": "L-Glutamate"
             },
             {
-                "charge": -3,
+                "charge": -2,
                 "coefficient": 1,
                 "compartment": 0,
                 "compound": "cpd00008",
-                "formula": "C10H12N5O10P2",
+                "formula": "C10H13N5O10P2",
                 "name": "ADP"
             },
             {
@@ -94315,11 +94359,11 @@
         "status": "OK",
         "stoichiometry": [
             {
-                "charge": -4,
+                "charge": -3,
                 "coefficient": -1,
                 "compartment": 0,
                 "compound": "cpd00002",
-                "formula": "C10H12N5O13P3",
+                "formula": "C10H13N5O13P3",
                 "name": "ATP"
             },
             {
@@ -94339,11 +94383,11 @@
                 "name": "L-Glutamate"
             },
             {
-                "charge": -3,
+                "charge": -2,
                 "coefficient": 1,
                 "compartment": 0,
                 "compound": "cpd00008",
-                "formula": "C10H12N5O10P2",
+                "formula": "C10H13N5O10P2",
                 "name": "ADP"
             },
             {
@@ -94493,11 +94537,11 @@
         "status": "CPDFORMERROR",
         "stoichiometry": [
             {
-                "charge": -4,
+                "charge": -3,
                 "coefficient": -1,
                 "compartment": 0,
                 "compound": "cpd00002",
-                "formula": "C10H12N5O13P3",
+                "formula": "C10H13N5O13P3",
                 "name": "ATP"
             },
             {
@@ -94509,11 +94553,11 @@
                 "name": "Aspartate"
             },
             {
-                "charge": -3,
+                "charge": -2,
                 "coefficient": 1,
                 "compartment": 0,
                 "compound": "cpd00008",
-                "formula": "C10H12N5O10P2",
+                "formula": "C10H13N5O10P2",
                 "name": "ADP"
             },
             {
@@ -95618,7 +95662,7 @@
         "pathways": null,
         "reversibility": "<",
         "source": "Published Model",
-        "status": "MI:H:-1/O:-6/P:-2|CI:1",
+        "status": "MI:H:-2/O:-6/P:-2",
         "stoichiometry": [
             {
                 "charge": 0,
@@ -95629,11 +95673,11 @@
                 "name": "H2O"
             },
             {
-                "charge": -4,
+                "charge": -3,
                 "coefficient": -1,
                 "compartment": 0,
                 "compound": "cpd00038",
-                "formula": "C10H12N5O14P3",
+                "formula": "C10H13N5O14P3",
                 "name": "GTP"
             },
             {
@@ -95844,11 +95888,11 @@
         "status": "CPDFORMERROR",
         "stoichiometry": [
             {
-                "charge": -4,
+                "charge": -3,
                 "coefficient": -1,
                 "compartment": 0,
                 "compound": "cpd00002",
-                "formula": "C10H12N5O13P3",
+                "formula": "C10H13N5O13P3",
                 "name": "ATP"
             },
             {
@@ -96129,11 +96173,11 @@
         "status": "OK",
         "stoichiometry": [
             {
-                "charge": -4,
+                "charge": -3,
                 "coefficient": -1,
                 "compartment": 0,
                 "compound": "cpd00002",
-                "formula": "C10H12N5O13P3",
+                "formula": "C10H13N5O13P3",
                 "name": "ATP"
             },
             {
@@ -96145,11 +96189,11 @@
                 "name": "Glycerose"
             },
             {
-                "charge": -3,
+                "charge": -2,
                 "coefficient": 1,
                 "compartment": 0,
                 "compound": "cpd00008",
-                "formula": "C10H12N5O10P2",
+                "formula": "C10H13N5O10P2",
                 "name": "ADP"
             },
             {
@@ -97346,11 +97390,11 @@
         "status": "OK",
         "stoichiometry": [
             {
-                "charge": -4,
+                "charge": -3,
                 "coefficient": -1,
                 "compartment": 0,
                 "compound": "cpd00002",
-                "formula": "C10H12N5O13P3",
+                "formula": "C10H13N5O13P3",
                 "name": "ATP"
             },
             {
@@ -97386,11 +97430,11 @@
                 "name": "NADP"
             },
             {
-                "charge": -3,
+                "charge": -2,
                 "coefficient": 1,
                 "compartment": 0,
                 "compound": "cpd00008",
-                "formula": "C10H12N5O10P2",
+                "formula": "C10H13N5O10P2",
                 "name": "ADP"
             },
             {
@@ -97541,11 +97585,11 @@
                 "name": "H2O"
             },
             {
-                "charge": -4,
+                "charge": -3,
                 "coefficient": -2,
                 "compartment": 0,
                 "compound": "cpd00002",
-                "formula": "C10H12N5O13P3",
+                "formula": "C10H13N5O13P3",
                 "name": "ATP"
             },
             {
@@ -97573,11 +97617,11 @@
                 "name": "Ornithine"
             },
             {
-                "charge": -3,
+                "charge": -2,
                 "coefficient": 2,
                 "compartment": 0,
                 "compound": "cpd00008",
-                "formula": "C10H12N5O10P2",
+                "formula": "C10H13N5O10P2",
                 "name": "ADP"
             },
             {
@@ -97671,11 +97715,11 @@
         "status": "CPDFORMERROR",
         "stoichiometry": [
             {
-                "charge": -4,
+                "charge": -3,
                 "coefficient": -1,
                 "compartment": 0,
                 "compound": "cpd00002",
-                "formula": "C10H12N5O13P3",
+                "formula": "C10H13N5O13P3",
                 "name": "ATP"
             },
             {
@@ -97903,11 +97947,11 @@
                 "name": "H2O"
             },
             {
-                "charge": -4,
+                "charge": -3,
                 "coefficient": -1,
                 "compartment": 0,
                 "compound": "cpd00002",
-                "formula": "C10H12N5O13P3",
+                "formula": "C10H13N5O13P3",
                 "name": "ATP"
             },
             {
@@ -97943,11 +97987,11 @@
                 "name": "NADP"
             },
             {
-                "charge": -3,
+                "charge": -2,
                 "coefficient": 1,
                 "compartment": 0,
                 "compound": "cpd00008",
-                "formula": "C10H12N5O10P2",
+                "formula": "C10H13N5O10P2",
                 "name": "ADP"
             },
             {
@@ -98070,12 +98114,12 @@
         },
         "code": "(1) cpd00103[0] + (1) cpd00216[0] + (1) cpd00253[0] <=> (1) cpd00012[0] + (1) cpd00020[0] + (1) cpd00023[0] + (1) cpd02642[0]",
         "compound_ids": "cpd00012;cpd00020;cpd00023;cpd00067;cpd00103;cpd00216;cpd00253;cpd02642",
-        "definition": "(1) PRPP[0] + (1) Chorismate[0] + (1) Glutamine[0] => (1) PPi[0] + (1) Pyruvate[0] + (1) L-Glutamate[0] + (1) H+[0] + (1) N-5-phosphoribosyl-anthranilate[0]",
+        "definition": "(1) PRPP[0] + (1) Chorismate[0] + (1) Glutamine[0] => (1) PPi[0] + (1) Pyruvate[0] + (1) L-Glutamate[0] + (2) H+[0] + (1) N-5-phosphoribosyl-anthranilate[0]",
         "ec_numbers": [
             "2.4.2.18",
             "4.1.3.27"
         ],
-        "equation": "(1) cpd00103[0] + (1) cpd00216[0] + (1) cpd00253[0] => (1) cpd00012[0] + (1) cpd00020[0] + (1) cpd00023[0] + (1) cpd00067[0] + (1) cpd02642[0]",
+        "equation": "(1) cpd00103[0] + (1) cpd00216[0] + (1) cpd00253[0] => (1) cpd00012[0] + (1) cpd00020[0] + (1) cpd00023[0] + (2) cpd00067[0] + (1) cpd02642[0]",
         "id": "rxn33991",
         "is_obsolete": 0,
         "is_transport": 0,
@@ -98093,11 +98137,11 @@
         "status": "OK",
         "stoichiometry": [
             {
-                "charge": -5,
+                "charge": -4,
                 "coefficient": -1,
                 "compartment": 0,
                 "compound": "cpd00103",
-                "formula": "C5H8O14P3",
+                "formula": "C5H9O14P3",
                 "name": "PRPP"
             },
             {
@@ -98142,7 +98186,7 @@
             },
             {
                 "charge": 1,
-                "coefficient": 1,
+                "coefficient": 2,
                 "compartment": 0,
                 "compound": "cpd00067",
                 "formula": "H",
@@ -98506,11 +98550,11 @@
         "status": "OK",
         "stoichiometry": [
             {
-                "charge": -4,
+                "charge": -3,
                 "coefficient": -1,
                 "compartment": 0,
                 "compound": "cpd00002",
-                "formula": "C10H12N5O13P3",
+                "formula": "C10H13N5O13P3",
                 "name": "ATP"
             },
             {
@@ -98538,11 +98582,11 @@
                 "name": "H+"
             },
             {
-                "charge": -5,
+                "charge": -4,
                 "coefficient": 1,
                 "compartment": 0,
                 "compound": "cpd00103",
-                "formula": "C5H8O14P3",
+                "formula": "C5H9O14P3",
                 "name": "PRPP"
             }
         ],
@@ -98598,19 +98642,19 @@
         "status": "CPDFORMERROR",
         "stoichiometry": [
             {
-                "charge": -4,
+                "charge": -3,
                 "coefficient": -1,
                 "compartment": 0,
                 "compound": "cpd00002",
-                "formula": "C10H12N5O13P3",
+                "formula": "C10H13N5O13P3",
                 "name": "ATP"
             },
             {
-                "charge": -5,
+                "charge": -4,
                 "coefficient": -1,
                 "compartment": 0,
                 "compound": "cpd00103",
-                "formula": "C5H8O14P3",
+                "formula": "C5H9O14P3",
                 "name": "PRPP"
             },
             {
