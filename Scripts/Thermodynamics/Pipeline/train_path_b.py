@@ -91,7 +91,7 @@ def main():
 
     print("building training data (parses openTECR + formation + redox) ...")
     t0 = time.time()
-    td = FullTrainingDataFactory(ccache=ccache).make(opentecr_path=opentecr_path)
+    td = FullTrainingDataFactory(ccache=ccache).make(tecrdb_path=opentecr_path)
     print(f"  built in {time.time() - t0:.0f}s")
     print(f"  reactions                 : {td.stoichiometric_matrix.shape[1]}")
     print(f"  compounds                 : {len(td.compounds)}")

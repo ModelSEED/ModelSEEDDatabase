@@ -331,11 +331,32 @@ def process(source, version, structures="both", cxcalc="cxcalc"):
     # PkaPlugin, which accepts the query molecules and organometallics the CLI
     # refuses. Same engine either way -- see INPUT SELECTION.
     if inchi_rows:
-        results = run_cxcalc([s for _, s in inchi_rows], ".inchi", cxcalc=cxcalc)
-        got = emit(inchi_rows, results, prefix, version)
+        # TAUTOMER. Marvin reads many InChIs as the lactim / imidic-acid
+        # tautomer and then reports pKas for groups the molecule does not have
+        # (uridine N3 6.28 from the InChI vs 9.15 from the lactam, measured
+        # 9.25). Each InChI is therefore handed to Marvin as the same neutral,
+        # canonical, amide/lactam-normalized tautomer the protonation step
+        # uses (Run_Marvin_Protonations.pka_input), as isomeric SMILES. RDKit
+        # failures keep their InChI and run in a batch of their own.
+        from Run_Marvin_Protonations import pka_input
+        conv, keep = [], []
+        for e, s in inchi_rows:
+            smi = pka_input(s)
+            (conv if smi else keep).append((e, smi or s))
+        got = []
+        for batch, suffix, label in ((conv, ".smi", "inchi->canonical SMILES (cxcalc)"),
+                                     (keep, ".inchi", "inchi, RDKit-unreadable (cxcalc)")):
+            results = run_cxcalc([s for _, s in batch], suffix, cxcalc=cxcalc)
+            batch_rows = emit(batch, results, prefix, version)
+            got += batch_rows
+            # Same meaning as before the tautomer step: no_result = structures
+            # cxcalc returned no row for (unparseable); with_pka = compounds
+            # that got at least one value.
+            stats[label] = (len(batch), len(batch) - len(results),
+                            len({r[0] for r in batch_rows}))
+        order = {prefix + e: i for i, (e, _) in enumerate(inchi_rows)}
+        got.sort(key=lambda r: (order.get(r[0], 0), r[1]))
         out_rows += got
-        stats["inchi (cxcalc)"] = (
-            len(inchi_rows), len(inchi_rows) - len(results), len({r[0] for r in got}))
 
     if smiles_rows:
         results = run_plugin([s for _, s in smiles_rows], cxcalc=cxcalc)
@@ -369,6 +390,13 @@ def main():
     print(f"Marvin {version} via {cxcalc}  (structures={_ARGS.structures})\n")
     for source in (_ARGS.sources or SOURCES):
         process(source, version, structures=_ARGS.structures, cxcalc=cxcalc)
+    # Site classes 26.1 gets wrong (adenine N1 ~7.0 vs measured 4.0-4.7;
+    # histidine imidazole 7.2-7.3 vs 6.04-6.05): replace with 23.4's value --
+    # see Site_pKa_Overrides.py. Runs for EVERY --structures mode: each mode
+    # rewrites marvin_<ver>.tsv, and skipping the override would ship the
+    # uncorrected values.
+    import Override_Site_pKas
+    Override_Site_pKas.run(_ARGS.sources or SOURCES, version)
 
 
 if __name__ == "__main__":

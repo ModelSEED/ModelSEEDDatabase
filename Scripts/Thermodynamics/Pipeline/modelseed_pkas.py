@@ -1,10 +1,11 @@
-"""Adapt ModelSEED structures and pKas (as they exist on dev) for eQuilibrator.
+"""Adapt ModelSEED structures and pKas for eQuilibrator.
 
-Reads the pinned export produced by ``tools/extract_dev_structures.sh``, which
-mirrors the layout on ``upstream/dev`` of the ModelSEED biochemistry database:
+Reads the pinned export produced by ``Scripts/Thermodynamics/Pipeline/export_structures.sh``
+(in this repository), which mirrors the structure layout of the ModelSEED biochemistry
+database at the pinned commit recorded in its PROVENANCE.txt:
 
     Unique_ModelSEED_Structures.txt        cpd-keyed, pH-7 charged structures
-    <SOURCE>/pkas/marvin_23.4.tsv          Marvin pKa/pKb, keyed by source id
+    <SOURCE>/pkas/marvin_*.tsv             Marvin pKa/pKb, keyed by source id
     <SOURCE>/protonations/marvin_*_ph7.tsv per-source pH-7 structures
     ModelSEED/pkas/molgpka_opam2.tsv       MolGpKa pKa/pKb, keyed by cpd id
 
@@ -45,7 +46,7 @@ import re
 # is not part of this repository.
 EQ_DIR = Path(os.environ.get("EQUILIBRATOR_DIR",
                              "/scratch/seaver/Claude_Projects/eQuilibrator"))
-DEV_DIR = EQ_DIR / "data" / "msd_dev"
+STRUCTURES_DIR = EQ_DIR / "data" / "msd_structures"
 # The upstream (Zenodo) compound cache. build_seed_mapping.py resolves
 # ``our_cache_id`` against this database, so anything reading that id must read
 # it here too.
@@ -240,7 +241,7 @@ def _read_pka_table(path: Path) -> Dict[str, List[float]]:
     return dict(merged)
 
 
-def load_marvin_pkas(dev_dir: Path = DEV_DIR) -> Dict[str, Dict[str, List[float]]]:
+def load_marvin_pkas(structures_dir: Path = STRUCTURES_DIR) -> Dict[str, Dict[str, List[float]]]:
     """Marvin pKas per source, keyed by that source's own external id.
 
     GLOBS the directory and lets the last-sorted file win per id, matching what
@@ -256,13 +257,13 @@ def load_marvin_pkas(dev_dir: Path = DEV_DIR) -> Dict[str, Dict[str, List[float]
     out: Dict[str, Dict[str, List[float]]] = {}
     for source in MARVIN_SOURCES:
         merged: Dict[str, List[float]] = {}
-        for table in sorted((Path(dev_dir) / source / "pkas").glob("marvin_*.tsv")):
+        for table in sorted((Path(structures_dir) / source / "pkas").glob("marvin_*.tsv")):
             merged.update(_read_pka_table(table))
         out[source] = merged
     return out
 
 
-def load_molgpka_pkas(dev_dir: Path = DEV_DIR) -> Dict[str, List[float]]:
+def load_molgpka_pkas(structures_dir: Path = STRUCTURES_DIR) -> Dict[str, List[float]]:
     """MolGpKa pKas, already keyed by ModelSEED cpd id.
 
     The file is whichever ModelSEED pKa table ``sources.yaml`` flags
@@ -273,8 +274,8 @@ def load_molgpka_pkas(dev_dir: Path = DEV_DIR) -> Dict[str, List[float]]:
     heavy atom bearing it, so silently using it would understate coverage by a
     third.
     """
-    base = Path(dev_dir) / "ModelSEED" / "pkas"
-    manifest = Path(dev_dir) / "sources.yaml"
+    base = Path(structures_dir) / "ModelSEED" / "pkas"
+    manifest = Path(structures_dir) / "sources.yaml"
     chosen = None
     if manifest.exists():
         try:
@@ -321,13 +322,13 @@ def load_molgpka_pkas(dev_dir: Path = DEV_DIR) -> Dict[str, List[float]]:
     return _read_pka_table(fallback)
 
 
-def load_structures(dev_dir: Path = DEV_DIR) -> Dict[str, dict]:
+def load_structures(structures_dir: Path = STRUCTURES_DIR) -> Dict[str, dict]:
     """Read cpd-keyed pH-7 structures from the aggregate file.
 
     Returns {cpd_id: {smiles, inchi_key, inchi, formula, charge, aliases}}.
     """
     out: Dict[str, dict] = {}
-    path = Path(dev_dir) / "Unique_ModelSEED_Structures.txt"
+    path = Path(structures_dir) / "Unique_ModelSEED_Structures.txt"
     with path.open() as handle:
         next(handle, None)  # header
         for line in handle:
@@ -655,15 +656,15 @@ def magnesium_guard(cache_path: Path):
 
 
 def build_dataset(
-    dev_dir: Path = DEV_DIR, preference: Tuple[str, ...] = DEFAULT_PKA_PREFERENCE
+    structures_dir: Path = STRUCTURES_DIR, preference: Tuple[str, ...] = DEFAULT_PKA_PREFERENCE
 ) -> Dict[str, dict]:
     """Join structures to pKas, keeping compounds that have both.
 
     Returns {cpd_id: {smiles, inchi_key, pkas, pka_source, ...}}.
     """
-    structures = load_structures(dev_dir)
+    structures = load_structures(structures_dir)
     resolved = resolve_pkas(
-        structures, load_marvin_pkas(dev_dir), load_molgpka_pkas(dev_dir), preference
+        structures, load_marvin_pkas(structures_dir), load_molgpka_pkas(structures_dir), preference
     )
 
     dataset = {}

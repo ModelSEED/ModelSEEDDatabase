@@ -103,16 +103,14 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 
-ANALYSIS_DIR = ANALYSIS_DIR
-MSDB_CODE = MSDB_CODE
-OUT = Path(os.environ.get("RECOMMEND_OUT",
-                          str(ANALYSIS_DIR / "results" / "thermo_recommendation")))
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 REPO_ROOT = Path(__file__).resolve().parents[3]
 MSDB_ROOT = Path(os.environ.get("MSDB_ROOT", str(REPO_ROOT)))
 MSDB_CODE = Path(os.environ.get("MSDB_CODE", str(REPO_ROOT)))
 ANALYSIS_DIR = Path(os.environ.get("THERMO_GRADING_OUT",
                                    str(REPO_ROOT / "Biochemistry" / "Thermodynamics" / "SourceGrading")))
+OUT = Path(os.environ.get("RECOMMEND_OUT",
+                          str(ANALYSIS_DIR / "results" / "thermo_recommendation")))
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from reversibility_heuristics import (  # noqa: E402
@@ -500,7 +498,19 @@ def main() -> None:
     args = ap.parse_args()
     OUT.mkdir(parents=True, exist_ok=True)
 
-    from build_graded_direction_maps import load_reactions
+    # load_reactions lived in build_graded_direction_maps.py, which stayed
+    # with the core-models analysis; inline the same loader (BiochemPy-style
+    # None->"null" normalisation over reaction_*.json).
+    import glob
+    def load_reactions():
+        out = {}
+        for path in sorted(glob.glob(str(MSDB_ROOT / "Biochemistry" / "reaction_*.json"))):
+            for entry in json.load(open(path)):
+                for key, val in list(entry.items()):
+                    if val is None:
+                        entry[key] = "null"
+                out[entry["id"]] = entry
+        return out
     db = load_db().reset_index(drop=True)
     tec = db[["rxn"]].merge(load_opentecr(), on="rxn", how="left")
     tec.index = db.index

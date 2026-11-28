@@ -36,93 +36,75 @@ with open("../../../Biochemistry/Structures/Unique_ModelSEED_Structures.txt") as
         if("InChI" in array[5]):
             MS_Complete_Structures[array[5]]=1
 
-MNX_Complete_Structures=dict()
-with open("../../../Biochemistry/Structures/MetaNetX/chem_prop.tsv") as fh:
-    header=1
-    for line in fh.readlines():
-        if(line[0] == "#"):
-            continue
-
-        line=line.strip()
-        array=line.split('\t')
-
-        if('InChI' in array[5]):
-            MNX_Complete_Structures[array[5]]=1
-
-Shared_Structures=0
-for struct in MS_Complete_Structures:
-    if(struct in MNX_Complete_Structures):
-        Shared_Structures+=1
-
+# The MetaNetX chem_prop.tsv cross-check was retired (Biochemistry/Structures/
+# MetaNetX/README.md): MetaNetX identifier versioning made it untenable, so
+# the cache cross-check now lives in Structures_in_ModelSEED_and_eQuilibrator.txt.
+# The InChI-overlap block is therefore omitted here.
 print("InChI in ModelSEED: ",len(MS_Complete_Structures.keys()))
-print("InChI in MetaNetX: ",len(MNX_Complete_Structures.keys()))
-print("Shared InChI: ",Shared_Structures,"\n")
+print("(MetaNetX cross-check omitted -- retired; see Biochemistry/Structures/MetaNetX/README.md)\n")
 
-with open('../../Thermodynamics/Compounds_GroupContribution_eQuilibrator_Comparison.txt') as fh:
-    header=1
-    Reported_Cpds={'GC':0,'EQ':0,'EQR':0,'LoEQE':0,'HiEQE':0}
-    for line in fh.readlines():
-        if(header==1):
-            header-=1
-            continue
+# The committed *_GroupContribution_eQuilibrator_Comparison.txt files are stale
+# 2020-era artifacts no current script regenerates; compute the same stats from
+# the live per-source `thermodynamics` dicts instead.
+SOURCES = ("Group contribution", "eQuilibrator", "dGPredictor")
+def _src(rec, label):
+    v = (rec.get("thermodynamics") or {}).get(label)
+    if isinstance(v, list) and len(v) >= 2:
+        try:
+            return float(v[0]), float(v[1])
+        except (TypeError, ValueError):
+            return None
+    return None
 
-        array = line.split('\t')
-
-        if(compounds_dict[array[0]]["is_obsolete"] == 1):
-            continue
-
-        if('nan' not in array[1] and '1000000' not in array[1]):
-            Reported_Cpds['GC']+=1
-
-        if('nan' not in array[2]):
-            Reported_Cpds['EQ']+=1
-            (dg,dge)=array[2].split('|')
-            if(float(dge)>50):
-                Reported_Cpds['EQR']+=1
-            if(float(dge)<5):
-                Reported_Cpds['LoEQE']+=1
-            if(float(dge)>100):
-                Reported_Cpds['HiEQE']+=1
-fh.close()
+Reported_Cpds = {"GC": 0, "EQ": 0, "DGP": 0, "EQR": 0, "LoEQE": 0, "HiEQE": 0, "GC_EQ": 0, "GC_DGP": 0, "EQ_DGP": 0}
+for cpd, c in compounds_dict.items():
+    if c.get("is_obsolete") == 1:
+        continue
+    gc, eq, dgp = _src(c, "Group contribution"), _src(c, "eQuilibrator"), _src(c, "dGPredictor")
+    if gc and abs(gc[0]) < 1e6:
+        Reported_Cpds["GC"] += 1
+    if eq:
+        Reported_Cpds["EQ"] += 1
+        if eq[1] > 50: Reported_Cpds["EQR"] += 1
+        if eq[1] < 5: Reported_Cpds["LoEQE"] += 1
+        if eq[1] > 100: Reported_Cpds["HiEQE"] += 1
+    if dgp and abs(dgp[0]) < 1e6:
+        Reported_Cpds["DGP"] += 1
+    if gc and eq: Reported_Cpds["GC_EQ"] += 1
+    if gc and dgp: Reported_Cpds["GC_DGP"] += 1
+    if eq and dgp: Reported_Cpds["EQ_DGP"] += 1
 
 print("Compounds: ")
 print("\tGC: ",Reported_Cpds["GC"])
 print("\tEQ: ",Reported_Cpds["EQ"])
+print("\tDGP: ",Reported_Cpds["DGP"])
 print("\tRejected EQ: ",Reported_Cpds["EQR"])
+print("\tShared GC&EQ: ",Reported_Cpds["GC_EQ"], " GC&DGP: ",Reported_Cpds["GC_DGP"], " EQ&DGP: ",Reported_Cpds["EQ_DGP"])
 
-with open('../../Thermodynamics/Reactions_GroupContribution_eQuilibrator_Comparison.txt') as fh:
-    header=1
-    Reported_Rxns={'GC':0,'EQ':0,'EQR':0,'GCEQ':0,'LoEQE':0,'HiEQE':0}
-    for line in fh.readlines():
-        if(header==1):
-            header-=1
-            continue
+Reported_Rxns = {"GC": 0, "EQ": 0, "DGP": 0, "EQR": 0, "GCEQ": 0, "LoEQE": 0, "HiEQE": 0, "GC_DGP": 0, "EQ_DGP": 0}
+for rxn, r in reactions_dict.items():
+    if rxn not in reactions_dict or r.get("is_obsolete") == 1:
+        continue
+    gc, eq, dgp = _src(r, "Group contribution"), _src(r, "eQuilibrator"), _src(r, "dGPredictor")
+    if gc and abs(gc[0]) < 1e6:
+        Reported_Rxns["GC"] += 1
+    if eq:
+        Reported_Rxns["EQ"] += 1
+        if gc and abs(gc[0]) < 1e6:
+            Reported_Rxns["GCEQ"] += 1
+        if eq[1] > 100: Reported_Rxns["EQR"] += 1
+        if eq[1] < 5: Reported_Rxns["LoEQE"] += 1
+        if eq[1] > 100: Reported_Rxns["HiEQE"] += 1
+    if dgp and abs(dgp[0]) < 1e6:
+        Reported_Rxns["DGP"] += 1
+    if gc and dgp: Reported_Rxns["GC_DGP"] += 1
+    if eq and dgp: Reported_Rxns["EQ_DGP"] += 1
 
-        array = line.split('\t')
-
-        if(array[0] not in reactions_dict or reactions_dict[array[0]]["is_obsolete"] == 1):
-            continue
-
-        if('nan' not in array[1] and '1000000' not in array[1]):
-            Reported_Rxns['GC']+=1
-
-        if('nan' not in array[2]):
-            Reported_Rxns['EQ']+=1
-            if('nan' not in array[1] and '1000000' not in array[1]):
-                Reported_Rxns['GCEQ']+=1
-
-            (dg,dge)=array[2].split('|')
-            if(float(dge)>100):
-                Reported_Rxns['EQR']+=1
-            if(float(dge)<5):
-                Reported_Rxns['LoEQE']+=1
-            if(float(dge)>100):
-                Reported_Rxns['HiEQE']+=1
-fh.close()
 print("Reactions: ")
 print("\tGC: ",Reported_Rxns["GC"])
 print("\tEQ: ",Reported_Rxns["EQ"])
-print("\tShared GC & EQ: ",Reported_Rxns["GCEQ"])
+print("\tDGP: ",Reported_Rxns["DGP"])
+print("\tShared GC & EQ: ",Reported_Rxns["GCEQ"], " GC&DGP: ",Reported_Rxns["GC_DGP"], " EQ&DGP: ",Reported_Rxns["EQ_DGP"])
 print("\tRejected EQ: ",Reported_Rxns["EQR"],"\n")
 
 print("================")
